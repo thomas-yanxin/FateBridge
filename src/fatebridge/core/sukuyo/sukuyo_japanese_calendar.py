@@ -47,14 +47,10 @@ def _table(path: Path) -> _Table:
             or length not in (29, 30)
         ):
             raise ValueError("Invalid Japanese reference-calendar month")
-        else:
-            pass
         if previous_end is not None and civil != previous_end:
             raise ValueError(
                 "Japanese reference-calendar month intervals are not contiguous"
             )
-        else:
-            pass
         if previous_label is not None:
             py, pm, pl = previous_label
             expected = (py + 1, 1) if pm == 12 else (py, pm + 1)
@@ -64,10 +60,6 @@ def _table(path: Path) -> _Table:
                 raise ValueError(
                     "Japanese reference-calendar labels are not sequential"
                 )
-            else:
-                pass
-        else:
-            pass
         starts.append(civil.toordinal())
         rows.append((year, month, leap, length))
         previous_end = civil + timedelta(days=length)
@@ -80,8 +72,6 @@ def _table(path: Path) -> _Table:
         or sum(r[3] for r in rows) != bundle["reference_day_count"]
     ):
         raise ValueError("Japanese reference-calendar domain does not match its data")
-    else:
-        pass
     metadata = {k: v for k, v in bundle.items() if k != "months"}
     # The immutable index and its metadata use this same captured record. An
     # LRU eviction elsewhere cannot attach a new disk hash to an old index.
@@ -111,8 +101,6 @@ def lunar_fields(civil: date) -> tuple[int, int, int, bool]:
         raise ValueError(
             f"日本旧历参考数据仅支持{table.first}至{table.last}；范围外不回退中国历或外推"
         )
-    else:
-        pass
     index = bisect_right(table.starts, civil.toordinal()) - 1
     year, month, leap, _ = table.rows[index]
     return year, month, civil.toordinal() - table.starts[index] + 1, leap

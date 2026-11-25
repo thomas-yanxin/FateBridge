@@ -34,8 +34,6 @@ def _catalogue(
         raw = CATALOGUE_PATH.read_bytes()
         if hashlib.sha256(raw).hexdigest() != CATALOGUE_SHA256:
             raise ValueError("Context annotation catalogue changed")
-        else:
-            pass
         catalogue = json.loads(
             raw, object_pairs_hook=base._object, parse_constant=base._nonfinite
         )
@@ -54,16 +52,12 @@ def _catalogue(
             or [r["key"] for r in catalogue["annotations"]] != KEYS
         ):
             raise ValueError("Invalid context annotation scope or parent")
-        else:
-            pass
         by_key = {r["key"]: r for r in catalogue["annotations"]}
         for row in data["rows"]:
             annotation = by_key.get(row["key"])
             row["source_context_annotations"] = None
             if annotation is None:
                 continue
-            else:
-                pass
             if (
                 annotation["source_pdf_page_one_based"]
                 != row["source_pdf_page_one_based"]
@@ -77,8 +71,6 @@ def _catalogue(
                 or annotation["source_interpretation_resolved"] is not False
             ):
                 raise ValueError("Invalid locator or invented applicability")
-            else:
-                pass
             row["source_context_annotations"] = [deepcopy(annotation)]
         data.update(version=4, catalogue_id=catalogue["catalogue_id"])
         snapshot[CATALOGUE_PATH] = raw

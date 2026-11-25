@@ -100,16 +100,12 @@ def dignity_at(planet: str, longitude: Angle, sect: str | None) -> dict[str, Any
         raise ValueError(
             "Lilly dignity requires a traditional planet and explicit or unknown sect"
         )
-    else:
-        pass
     value = angle_fraction(longitude) % 360
     index, degree = int(value // 30), value % 30
     start = 0
     for term_lord, end in TERMS[index]:
         if degree < end:
             break
-        else:
-            pass
         start = end
     day, night = TRIPLICITIES[index % 4]
     triplicity = (
@@ -142,12 +138,8 @@ def dignity_at(planet: str, longitude: Angle, sect: str | None) -> dict[str, Any
     debilities = []
     if DOMICILES[opposite] == planet:
         debilities.append("detriment")
-    else:
-        pass
     if EXALTATIONS[planet][0] == opposite:
         debilities.append("fall")
-    else:
-        pass
     return {
         "rule_id": RULESET,
         "status": "partial" if unknown else "computed",
@@ -182,13 +174,9 @@ def reception(
         raise ValueError(
             "Distinct traditional planets required for directional reception"
         )
-    else:
-        pass
     allowed = tuple(allowed)
     if not set(allowed) <= set(KINDS):
         raise ValueError("Unknown essential dignity")
-    else:
-        pass
     placement = dignity_at(receiver, guest_longitude, sect)
     held = [kind for kind in placement["dignities"] if kind in allowed]
     unknown = [kind for kind in placement["unknown_dignities"] if kind in allowed]
@@ -220,8 +208,6 @@ def pair_reception(
         or sect not in {"day", "night", None}
     ):
         raise ValueError("Traditional planets and explicit or unknown sect required")
-    else:
-        pass
     angle_fraction(first_longitude)
     angle_fraction(second_longitude)
     if first == second:
@@ -232,8 +218,6 @@ def pair_reception(
             "mutual": None,
             "mutual_same_kind": [],
         }
-    else:
-        pass
     directions = [
         reception(first, second, second_longitude, sect),
         reception(second, first, first_longitude, sect),

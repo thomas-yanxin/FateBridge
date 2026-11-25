@@ -22,8 +22,6 @@ XING = dict(zip("子卯寅巳申丑戌未辰午酉亥", "卯子巳申寅戌未�
 def branch_pair_facts(left: str, right: str) -> dict[str, Any]:
     if left not in EARTHLY_BRANCHES or right not in EARTHLY_BRANCHES:
         raise ValueError("六壬支位关系需要单个有效地支")
-    else:
-        pass
     pair = frozenset((left, right))
     return {
         "same_branch": left == right,
@@ -51,20 +49,14 @@ def branch_relations(
 ) -> dict[str, Any]:
     if day_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("六壬支位关系需要有效日干支")
-    else:
-        pass
     branches = set(EARTHLY_BRANCHES)
     if any(
         v not in branches
         for v in (year_branch, month_branch, hour_branch, month_general_branch)
     ):
         raise ValueError("六壬支位关系需要有效年月时支与月将")
-    else:
-        pass
     if set(sky_by_earth) != branches or set(sky_by_earth.values()) != branches:
         raise ValueError("六壬支位关系需要完整天地盘")
-    else:
-        pass
     offsets = {
         (EARTHLY_BRANCHES.index(s) - EARTHLY_BRANCHES.index(e)) % 12
         for e, s in sky_by_earth.items()
@@ -77,8 +69,6 @@ def branch_relations(
         % 12
     }:
         raise ValueError("六壬支位关系天地盘与月将加时不一致")
-    else:
-        pass
     house = STEM_HOUSES[day_ganzhi[0]]
     lower = [house, sky_by_earth[house], day_ganzhi[1], sky_by_earth[day_ganzhi[1]]]
     if len(lessons) != 4 or any(
@@ -88,12 +78,8 @@ def branch_relations(
         for i, (l, b) in enumerate(zip(lessons, lower), 1)
     ):
         raise ValueError("六壬支位关系四课与日干寄宫及天地盘不一致")
-    else:
-        pass
     if len(transmissions) != 3 or any(v not in branches for v in transmissions):
         raise ValueError("六壬支位关系需要完整三传")
-    else:
-        pass
     rows = []
 
     def add(

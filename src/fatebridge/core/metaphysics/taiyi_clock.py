@@ -42,8 +42,6 @@ def civil_clock_resolution(
     offset = seed.input_datetime.utcoffset()
     if offset is None:
         raise ValueError("太乙偏移回执须使用已消歧的民用实际时刻")
-    else:
-        pass
     return {
         "method": "explicit_input_offset_checked_against_named_zone",
         "timezone": seed.timezone,
@@ -68,8 +66,6 @@ def nominal_clock_label(
     if seed.applied_true_solar:
         if seed.longitude is None:
             raise ValueError("太乙真太阳时计需要明确经度")
-        else:
-            pass
         utc = calendar.utc
         # note (solar clock): UTC plus longitude and the equation of time avoids wall-clock folds.
         return NominalClockLabel(utc.ordinal, utc.microseconds_of_day).shifted(
@@ -77,8 +73,6 @@ def nominal_clock_label(
                 minutes=4 * seed.longitude + calculate_equation_of_time_minutes(utc)
             )
         )
-    else:
-        pass
     zone = seed.input_datetime.tzinfo
     assert zone is not None
     local = ZonedCalendar(calendar.utc, zone)

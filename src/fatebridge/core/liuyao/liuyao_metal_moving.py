@@ -34,8 +34,6 @@ def prove_moving_earth_sources(
     ]
     if not candidates:
         return None
-    else:
-        pass
     rows = {r["position"]: r for r in lines}
     sources = {r["position"]: r for r in generation["sources"]}
     pairs = {
@@ -49,8 +47,6 @@ def prove_moving_earth_sources(
     for p in sorted(rows):
         if p == subject_position:
             continue
-        else:
-            pass
         own_element = rows[p]["element"]
         for i, actor in enumerate(strengths[p]["supports"]):
             location, branch = actor["location"], actor["branch"]
@@ -58,8 +54,6 @@ def prove_moving_earth_sources(
                 location == "day" and branch == "巳" and own_element in ("金", "土")
             ) or (own_element == "土" and location == "changed" and branch == "巳"):
                 continue
-            else:
-                pass
             calendar_anchor = location in ("month", "day") and element_relation(
                 ELEMENTS[branch], own_element
             ) in ("生爻", "比和")
@@ -82,30 +76,22 @@ def prove_moving_earth_sources(
                     )
                 ]
                 break
-            else:
-                pass
     changed = True
     while changed:
         changed = False
         for p in sorted(rows):
             if p == subject_position or p in proofs:
                 continue
-            else:
-                pass
             for i, actor in enumerate(strengths[p]["supports"]):
                 q = actor.get("position")
                 if actor["location"] != "visible" or q not in proofs:
                     continue
-                else:
-                    pass
                 source = sources[q]
                 if (
                     source["condition_match"] is not True
                     or source["activity_condition_match"] is not True
                 ):
                     continue
-                else:
-                    pass
                 relation = element_relation(rows[q]["element"], rows[p]["element"])
                 pair = pairs.get((q, p))
                 if relation == "生爻":
@@ -134,8 +120,6 @@ def prove_moving_earth_sources(
                     ]
                     changed = True
                     break
-                else:
-                    pass
     published = []
     for row in sorted(candidates, key=lambda r: r["position"]):
         p = row["position"]
@@ -200,8 +184,6 @@ def moving_support_context(
 ) -> dict[str, Any] | None:
     if element != "金" or day_ganzhi[1] != "巳":
         return None
-    else:
-        pass
     return prove_moving_earth_sources(
         subject_position=subject_position,
         lines=lines,

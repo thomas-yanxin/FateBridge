@@ -91,8 +91,6 @@ def ephemeris_inventory() -> dict[str, JsonValue]:
     ):
         if not root.is_dir():
             continue
-        else:
-            pass
         try:
             paths = sorted(root.iterdir())
         except PermissionError:
@@ -113,8 +111,6 @@ def ephemeris_inventory() -> dict[str, JsonValue]:
                 }
             ) and path.is_file():
                 files.append(f"{index}/{path.name}")
-            else:
-                pass
     return {
         "scope": "configured_filenames; actual models/sources are reported separately",
         "files": files,
@@ -151,8 +147,6 @@ def provenance_values(payload: ServiceResult) -> dict[str, list[str]]:
         current = queue.pop()
         if id(current) in seen:
             continue
-        else:
-            pass
         seen.add(id(current))
         if isinstance(current, dict):
             ruleset_id = current.get("ruleset_id")
@@ -161,21 +155,15 @@ def provenance_values(payload: ServiceResult) -> dict[str, list[str]]:
                 found.setdefault("ruleset", set()).add(
                     f"{ruleset_id}@{ruleset_version}"
                 )
-            else:
-                pass
             for field_name, value in current.items():
                 if field_name in provenance_fields and isinstance(value, str):
                     found.setdefault(field_name, set()).add(value)
                 elif isinstance(value, (dict, list, tuple)):
                     queue.append(value)
-                else:
-                    pass
         elif isinstance(current, (list, tuple)):
             queue.extend(
                 item for item in current if isinstance(item, (dict, list, tuple))
             )
-        else:
-            pass
     return {field_name: sorted(values) for field_name, values in sorted(found.items())}
 
 
@@ -186,8 +174,6 @@ def runtime_receipt(
 ) -> dict[str, JsonValue]:
     if not include_astronomy and "ephemeris_model" not in observed_provenance:
         return dict(environment_receipt())
-    else:
-        pass
 
     configured_solar_mode = (
         os.environ.get(solar_model_policy.ENVIRONMENT_NAME, "auto").strip().lower()
@@ -245,8 +231,6 @@ def execution_receipt(
     ]
     if spec.resolve_time_defaults is not None:
         time_defaults = spec.resolve_time_defaults(result, time_defaults)
-    else:
-        pass
     receipt: ExecutionReceipt = {
         "metadata_schema_version": METADATA_SCHEMA_VERSION,
         "package_version": __version__,
@@ -277,12 +261,8 @@ def execution_receipt(
     }
     if options.parent_run_id is not None:
         receipt["parent_run_id"] = options.parent_run_id
-    else:
-        pass
     if compact_receipt:
         return receipt
-    else:
-        pass
 
     observed_provenance = provenance_values(
         {key: value for key, value in result.items() if key != "run_metadata"}
@@ -311,6 +291,4 @@ def execution_receipt(
                 "this_run",
             ),
         }
-    else:
-        pass
     return receipt

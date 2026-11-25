@@ -42,8 +42,6 @@ def resolve_bazi_effective_date(
     """
     if hour >= LATE_ZI_HOUR:
         return gregorian_date_parts(gregorian_ordinal(year, month, day) + 1)
-    else:
-        pass
     return year, month, day
 
 
@@ -155,8 +153,6 @@ class BaZiCalendar:
         """
         if hour is not None and apply_late_zi_rollover:
             year, month, day = resolve_bazi_effective_date(year, month, day, hour)
-        else:
-            pass
         day_ganzhi = get_day_ganzhi(year, month, day)
         return day_ganzhi[0], day_ganzhi[1]
 
@@ -289,8 +285,6 @@ class BaZiCalendar:
             label = birth_datetime
             if civil_datetime is None:
                 raise ValueError("名义日时钟须另附真实民用时刻，不能反推年月交节")
-            else:
-                pass
             civil_input = civil_datetime
         civil = localize_datetime(civil_input, timezone_name)
         year_pillar, month_pillar, day_pillar, hour_pillar = (

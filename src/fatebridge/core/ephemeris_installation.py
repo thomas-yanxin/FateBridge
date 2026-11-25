@@ -135,8 +135,6 @@ def verified_user_ephemeris_dir() -> str | None:
     directory = user_ephemeris_dir()
     if not ephemeris_path_fits(directory) or not directory.is_dir():
         return None
-    else:
-        pass
     return (
         str(directory)
         if fengshui_file_status(directory)["all_files_verified"]

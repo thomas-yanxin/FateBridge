@@ -27,8 +27,6 @@ def personal_day_evidence(
     if natal_mansion is not None:
         # Validate even when the target day's mansion remains unresolved.
         relation_between_su27(natal_mansion, natal_mansion)
-    else:
-        pass
     relative = (
         relation_between_su27(natal_mansion, mansion)
         if natal_mansion and mansion
@@ -79,8 +77,6 @@ def personal_day_evidence(
             ),
             "scope": "文献择日条文；不从原文标签推断现实必然吉凶、疾病或灾祸。",
         }
-    else:
-        pass
     return personal_day
 
 
@@ -115,8 +111,6 @@ def _conditions(calendar: dict[str, Any], name: str) -> list[dict[str, Any]]:
             ):
                 if selected not in (None, half):
                     continue
-                else:
-                    pass
                 calculation = branch[key]
                 if calculation["direct_mansion"] == name:
                     conditions.append(
@@ -126,8 +120,6 @@ def _conditions(calendar: dict[str, Any], name: str) -> list[dict[str, Any]]:
                             "calculation": deepcopy(calculation),
                         }
                     )
-                else:
-                    pass
     elif assignment:
         for slot in assignment["slots"]:
             if (
@@ -141,8 +133,6 @@ def _conditions(calendar: dict[str, Any], name: str) -> list[dict[str, Any]]:
                         "assignment_origin": slot["origin"],
                     }
                 )
-            else:
-                pass
     else:
         conditions.append(
             {
@@ -164,8 +154,6 @@ def candidate_mansion_days(
     calendar = day["calendar"]
     if day["day_mansion"] is not None:
         return []
-    else:
-        pass
     rows = []
     for name in calendar.get("candidate_su27s", []):
         nature = mansion_nature(name)
@@ -193,8 +181,6 @@ def candidate_mansion_days(
         if activity == "clothing":
             # A per-name documentary lookup, not a rewritten birth calendar.
             facts["clothing_reference"] = clothing_reference({"natal_su27": name})
-        else:
-            pass
         assessment = assess_activity(
             {**facts, "weekday": day["weekday"], "calendar_day": day["calendar_day"]},
             activity,

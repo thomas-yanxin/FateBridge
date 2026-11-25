@@ -102,8 +102,6 @@ def _build_weather_one(
                     "met": bool(matched_paths),
                 }
             )
-        else:
-            pass
         if "many" in conditions:
             name = conditions["many"]
             threshold = confirmed["many_min_count"]
@@ -123,8 +121,6 @@ def _build_weather_one(
                     ),
                 }
             )
-        else:
-            pass
         for name in ["season", "prior_condition"]:
             if name in conditions:
                 actual = confirmed[name]
@@ -145,8 +141,6 @@ def _build_weather_one(
                         ),
                     }
                 )
-            else:
-                pass
         if "pairs" in conditions:
             matched_paths = [
                 f"{fact_prefix}.{key}"
@@ -162,8 +156,6 @@ def _build_weather_one(
                     "met": bool(matched_paths),
                 }
             )
-        else:
-            pass
         states = [row["met"] for row in checks]
         status = (
             "not_met"
@@ -197,19 +189,13 @@ def _build_weather_one(
                     for slot in slots
                     if slot["trigram"] == condition["trigram"]
                 )
-            else:
-                pass
             fact_paths.update(condition.get("matched_paths", []))
             if condition["condition"] == "many":
                 fact_paths.add("interpretation.weather.context.many_min_count")
-            else:
-                pass
             if condition["condition"] in {"season", "prior_condition"}:
                 fact_paths.add(
                     "interpretation.weather.context." + condition["condition"]
                 )
-            else:
-                pass
         selected_readings.append(
             {
                 "rule_id": row["rule_id"],

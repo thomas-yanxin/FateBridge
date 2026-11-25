@@ -171,8 +171,6 @@ def context_reading(context: dict[str, Any]) -> dict[str, Any]:
             descriptions[
                 -1
             ] += f"，未在精度预算内确定舍入的项为{'、'.join(unresolved) or '无'}"
-        else:
-            pass
     reading: dict[str, Any] = {
         "text": "；".join(descriptions)
         + "。同批黄经、黄纬和距离用于计算角距与径向前后关系。Swiss 默认视位置采用透明太阳质量分布延拓计算太阳内部的光偏折，太阳附近的算法差异可能改变 Color/Tone/Base。",
@@ -205,8 +203,6 @@ def context_reading(context: dict[str, Any]) -> dict[str, Any]:
             {"path": "apparent_position_context." + key, "value": context[key]}
             for key in ("arithmetic_method", "arithmetic_policy")
         )
-    else:
-        pass
     if "coordinate_context" in context:
         reading["text"] = coordinate_frame_reading() + reading["text"]
         reading["basis"].append(
@@ -215,8 +211,6 @@ def context_reading(context: dict[str, Any]) -> dict[str, Any]:
                 "value": context["coordinate_context"],
             }
         )
-    else:
-        pass
     return reading
 
 
@@ -247,8 +241,6 @@ def add_apparent_evidence(value: dict[str, Any], context: dict[str, Any]) -> Non
     value["interpretation"]["apparent_position_context"] = context_reading(context)
     if "coordinate_context" in context:
         value["interpretation"]["coordinate_frame_meaning"] = coordinate_frame_reading()
-    else:
-        pass
     value["interpretation"]["basis"].append("apparent_position_context")
 
 
@@ -281,8 +273,6 @@ class PositionTrace:
             index = len(self.batches)
             self.indices[key] = index
             self.batches.append({"id": f"batch_{index}", **batch, "observed_count": 0})
-        else:
-            pass
         self.batches[index]["observed_count"] += 1
         self.positions[id(positions)] = positions, self.batches[index]["id"]
 
@@ -303,8 +293,6 @@ def record_position_batch(
     trace = _ACTIVE.get()
     if trace is not None:
         trace.record(positions, tt, mode, backend, role, bodies)
-    else:
-        pass
 
 
 def observed_coordinates(coords: Any) -> list[float | str]:
@@ -322,8 +310,6 @@ def register_chart(activations: dict[str, Any], refs: dict[str, str]) -> None:
     trace = _ACTIVE.get()
     if trace is not None:
         trace.charts[id(activations)] = activations, refs
-    else:
-        pass
 
 
 def guard_apparent_positions(

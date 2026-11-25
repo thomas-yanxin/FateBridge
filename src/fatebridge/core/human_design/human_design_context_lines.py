@@ -96,8 +96,6 @@ def _roots(
                 family["candidates"],
             )
         )
-    else:
-        pass
     for suffix, kind, rows in collections:
         for i, row in enumerate(rows):
             design = decode_native_positions(
@@ -156,8 +154,6 @@ def iter_contexts(source: dict) -> Iterator[dict]:
             mode,
             _times(source),
         )
-    else:
-        pass
     report = source["ephemeris_backend_comparison"]
     if report["status"] == "full_backend_compared":
         reference = report["reference_chart"]
@@ -166,8 +162,6 @@ def iter_contexts(source: dict) -> Iterator[dict]:
             path, "full_backend_reference", reference, mode, _times(reference)
         )
         yield from _roots(path, reference, mode, False, "auto")
-    else:
-        pass
     witnesses = source["time_sensitivity"]["evaluation_witnesses"]
     if witnesses is not None:
         samples = unpack_sample_witnesses(
@@ -180,8 +174,6 @@ def iter_contexts(source: dict) -> Iterator[dict]:
             path = f"$.time_sensitivity.evaluation_witnesses.samples.{i}"
             yield _context(path, "birth_interval_sample", sample, mode, _times(sample))
             yield from _roots(path, sample, mode, required, physical)
-    else:
-        pass
 
 
 def unavailable_contexts(source: dict) -> list[dict]:
@@ -201,8 +193,6 @@ def unavailable_contexts(source: dict) -> list[dict]:
                     "complete_chart_assembled": False,
                 }
             )
-        else:
-            pass
     if source["time_sensitivity"]["evaluation_witnesses"] is None:
         result.append(
             {
@@ -211,8 +201,6 @@ def unavailable_contexts(source: dict) -> list[dict]:
                 "complete_chart_assembled": False,
             }
         )
-    else:
-        pass
     result.append(
         {
             "source_path": "$.cycle_context",

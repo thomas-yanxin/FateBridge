@@ -45,8 +45,6 @@ def _liuren(
     align_seasonal(board, pillars)
     if board is None:
         return
-    else:
-        pass
     if not complete and all(
         _get(board, *path) is None
         for path in (
@@ -58,8 +56,6 @@ def _liuren(
     ):
 
         validate_selection(board.model_dump(exclude_unset=True), _day(pillars))
-    else:
-        pass
 
     align_branch_relations(board, pillars)
 
@@ -83,10 +79,6 @@ def _liuren(
             if evidence is not None and element in ("木", "火", "金", "水"):
                 for field, value in nominal_seasonal_evidence(month, element).items():
                     _same(evidence, field, value)
-            else:
-                pass
-    else:
-        pass
     meta = _get(board, "meta")
     chosen = _diurnal(meta, hour)
     if day is not None:
@@ -100,8 +92,6 @@ def _liuren(
         _same(board, "xun_head", xun_head_for_ganzhi(day))
         _same(board, "kongwang", kongwang_for_ganzhi(day))
         _same(runyear, "year_fate.day_ganzhi", day)
-    else:
-        pass
     for source, target in (
         ("year", "year_branch"),
         ("month", "month_building_branch"),
@@ -110,14 +100,10 @@ def _liuren(
         branch = _branch(_get(pillars, source, "branch"))
         if branch is not None:
             _same(board, "emptiness_evidence." + target, branch)
-        else:
-            pass
     stages = life_stage_cycle(stem) if stem is not None else None
     if stem is not None:
         _same(board, "life_stages.day_stem", stem)
         _same(board, "life_stages.stage_by_branch", stages)
-    else:
-        pass
     if month is not None:
         _same(board, "auxiliary_stars.month_building_branch", month)
         _same(
@@ -126,13 +112,9 @@ def _liuren(
             (EARTHLY_BRANCHES.index(month) - 2) % 12 + 1,
         )
         _same(board, "month_building_element", branch_element_text(month))
-    else:
-        pass
     general = _branch(_get(board, "month_general", "branch"))
     if general is not None:
         _same(board, "emptiness_evidence.month_general_branch", general)
-    else:
-        pass
     sky = (
         _liureng_month_general_on_hour(hour_branch=hour, month_general_branch=general)
         if hour is not None and general is not None
@@ -145,10 +127,6 @@ def _liuren(
             seat = _branch(_get(row, "earth_branch"))
             if seat is not None:
                 _same(row, "sky_branch", sky[seat])
-            else:
-                pass
-    else:
-        pass
     gods = None
     profile = _get(meta, "guiren_profile")
     if (
@@ -159,8 +137,6 @@ def _liuren(
     ):
         if profile not in ("liuren_common_v1", "tanyuan_xieji_v1"):
             raise ValueError("六壬贵人表配置未知")
-        else:
-            pass
         start = noble_start(stem, chosen, profile)
         assert earth is not None
         reverse = earth[start] in "巳午未申酉戌"
@@ -171,19 +147,13 @@ def _liuren(
             )
         )
         _same(meta, "guiren_earth_branch", earth[start])
-    else:
-        pass
     for row in _get(board, "twelve_board") or []:
         seated = _branch(_get(row, "earth_branch"))
         branch = _branch(_get(row, "sky_branch"))
         if seated is not None and sky is not None:
             _same(row, "sky_branch", sky[seated])
-        else:
-            pass
         if branch is not None and gods is not None:
             _same(row, "god", gods[branch])
-        else:
-            pass
     transmissions = _get(board, "three_transmissions")
     dun = xun_dun_stems(day) if day is not None else None
     for name in ("initial", "middle", "final"):
@@ -196,20 +166,12 @@ def _liuren(
                 _same(node, "dun_stem", value)
                 _same(node, "ganzhi", value + branch if value is not None else None)
                 _same(node, "xun_kong", branch not in dun)
-            else:
-                pass
             if earth is not None:
                 _same(node, "earth_branch", earth[branch])
-            else:
-                pass
             if gods is not None:
                 _same(node, "god", gods[branch])
-            else:
-                pass
             if stages is not None:
                 _same(node, "day_stem_life_stage", stages[branch])
-            else:
-                pass
             if stem is not None:
                 _same(
                     node,
@@ -218,18 +180,8 @@ def _liuren(
                         stem_element_text(stem), branch_element_text(branch)
                     ),
                 )
-            else:
-                pass
-        else:
-            pass
         if seated is not None:
             if dun is not None:
                 _same(node, "seated_kong", seated not in dun)
-            else:
-                pass
             if stages is not None:
                 _same(node, "seated_day_stem_life_stage", stages[seated])
-            else:
-                pass
-        else:
-            pass

@@ -49,8 +49,6 @@ def _form(observation: CityGateObservation | None) -> dict[str, Any]:
             "condition_match": None,
             "scope": "no_site_observation_supplied",
         }
-    else:
-        pass
     facts = observation.model_dump(mode="json")
     water = observation.water_present
     if water is None and any(
@@ -62,8 +60,6 @@ def _form(observation: CityGateObservation | None) -> dict[str, Any]:
         )
     ):
         water = True
-    else:
-        pass
     if (
         observation.multiple_openings_present is True
         or observation.water_present is False
@@ -176,8 +172,6 @@ def analyze_city_gate(
             form = _form(observations.get(physical["name"]))
             if physical["name"] in observations:
                 used.add(physical["name"])
-            else:
-                pass
             gates.append(
                 {
                     "direction": direction,
@@ -220,8 +214,6 @@ def analyze_city_gate(
         missing.append("city_gate.confirmed_magnetic_house_facing")
     elif ambiguous:
         missing.append("city_gate.unambiguous_facing_mountain")
-    else:
-        pass
     for c in candidates:
         for gate in c["gates"]:
             if gate["form_assessment"]["status"] in {
@@ -231,8 +223,6 @@ def analyze_city_gate(
                 missing.append(
                     f"city_gate.observations.{gate['mountain']['name']}.source_pattern_confirmation"
                 )
-            else:
-                pass
     return {
         "status": "partial" if missing else "complete",
         "calculation_status": "complete" if orientations else "partial",

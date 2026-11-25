@@ -64,6 +64,4 @@ def palace_star_relationship(
     }
     if star_name == "伏位":
         result["source_context_variation"] = fuwei_element_context()
-    else:
-        pass
     return result

@@ -16,29 +16,21 @@ def interaction_snapshot_lines(conditional: dict[str, Any]) -> list[str]:
                     else "没有因此免除其他独立条件。"
                 )
             )
-        else:
-            pass
         changed_month = row["changed"]
         if changed_month and changed_month["day_value_exception"]:
             condition_lines.append(
                 f"第{row['position']}爻本位变{changed_month['branch']}：原月破，本日同支值日，仅解除本项月令阻碍；原爻其他生克效力另审。"
             )
-        else:
-            pass
     for row in conditional["month_break_conditions"]["hidden"]:
         for kind, label in (("hidden", "伏神"), ("flying", "飞神")):
             if row[kind]["day_value_exception"]:
                 condition_lines.append(
                     f"第{row['position']}爻{label}{row[kind]['branch']}：原月破而本日同支值日，不能只据月破认定失力；飞伏关系与其他反制另审。"
                 )
-            else:
-                pass
     back_support = conditional["back_generation_conditions"]
     for source in back_support["sources"]:
         if not source["is_back_generation"]:
             continue
-        else:
-            pass
         status = (
             "回头生空破门槛匹配"
             if source["condition_match"] is True
@@ -61,8 +53,6 @@ def interaction_snapshot_lines(conditional: dict[str, Any]) -> list[str]:
     for pair in control["controls"]:
         if not pair["emit_edge"]:
             continue
-        else:
-            pass
         status = (
             "所列克制条件匹配，最终效力仍待审"
             if pair["condition_match"] is True
@@ -94,8 +84,6 @@ def interaction_snapshot_lines(conditional: dict[str, Any]) -> list[str]:
             "三支总作用待审" in reason for reason in pair["source_obstructions"]
         ):
             status += "；三支总作用待审，本位回头生支持未确认"
-        else:
-            pass
         condition_lines.append(
             f"第{pair['source_position']}爻{pair['source_branch']}克第{pair['target_position']}爻{pair['target_branch']}：{status}"
         )
@@ -109,13 +97,9 @@ def interaction_snapshot_lines(conditional: dict[str, Any]) -> list[str]:
             + generation_focus["source_explanation"]
         )
         condition_lines.append(generation_focus["target_explanation"])
-    else:
-        pass
     for pair in generation["generations"]:
         if pair["status"] == "static_outside_current_all_static_generation_scope":
             continue
-        else:
-            pass
         source_status = (
             "生源条件匹配"
             if pair["condition_match"] is True
@@ -137,31 +121,21 @@ def interaction_snapshot_lines(conditional: dict[str, Any]) -> list[str]:
         pair_text = f"第{pair['source_position']}爻{pair['source_branch']}生第{pair['target_position']}爻{pair['target_branch']}：{source_status}；{reception}"
         if qualification_note := pair.get("qualification_explanation"):
             pair_text += "；" + qualification_note
-        else:
-            pass
         condition_lines.append(pair_text)
     condition_lines.append(generation["scope"])
     clash = conditional["clash_conditions"]
     for row in clash["lines"]:
         if not row["clash_actors"]:
             continue
-        else:
-            pass
         labels = []
         if row["is_day_clash"]:
             labels.append("日冲事实")
-        else:
-            pass
         if row["day_void_fill_condition"]:
             labels.append("当日冲空填实条件匹配；原旬空支表保留")
-        else:
-            pass
         if row["day_break_condition"] is True:
             labels.append("静爻日破条件匹配；未推永久无用")
         elif row["day_break_condition"] is None:
             labels.append("静爻日冲与生扶前提未决")
-        else:
-            pass
         if (
             row["scatter_status"]
             == "supported_or_qi_moving_not_scattered_by_clash_alone"
@@ -172,16 +146,12 @@ def interaction_snapshot_lines(conditional: dict[str, Any]) -> list[str]:
             == "weak_or_pending_moving_scatter_not_automatically_decided"
         ):
             labels.append("衰动或气未决，不能因冲即判散")
-        else:
-            pass
         if row["back_clash"]:
             labels.append(
                 "本位回头冲兼克"
                 if row["back_control"]
                 else "本位回头冲而不克；不自动作回头克"
             )
-        else:
-            pass
         condition_lines.append(
             f"第{row['position']}爻{row['branch']}冲的条件：" + "；".join(labels)
         )
@@ -205,8 +175,6 @@ def interaction_snapshot_lines(conditional: dict[str, Any]) -> list[str]:
                 + progress_states[progress["state"]]
             )
             condition_lines.append(progress["scope"])
-        else:
-            pass
     harmony = conditional["three_harmony"]
     harmony_statuses = {
         "formation_requires_activity_resolution": "局的活动前提待审，不能据候选认定成局",
@@ -235,8 +203,6 @@ def interaction_snapshot_lines(conditional: dict[str, Any]) -> list[str]:
         )
     if harmony["candidates"]:
         condition_lines.append(harmony["scope"])
-    else:
-        pass
     for hidden in conditional["hidden_conditions"]:
         condition_lines.append(
             f"第{hidden['position']}爻伏神{hidden['branch']}，飞神{hidden['flying_branch']}"
@@ -275,8 +241,6 @@ def interaction_snapshot_lines(conditional: dict[str, Any]) -> list[str]:
             condition_lines.append(
                 "飞神不构成五行克伏，该阶段缺项仅作诊断，未据此新增克伏阻碍。"
             )
-        else:
-            pass
         condition_lines.append(phases["scope"])
         reception = hidden["reception"]
         gate_text = (
@@ -309,7 +273,5 @@ def interaction_snapshot_lines(conditional: dict[str, Any]) -> list[str]:
                 else "申爻活动资格待审，寅日长生生扶不能先行确认"
             )
             condition_lines.append(f"伏神巳火：{text}；刑的总作用未裁定。")
-        else:
-            pass
         condition_lines.append(reception["scope"])
     return condition_lines

@@ -49,8 +49,6 @@ def literal_lunar_candidates(anomaly_days: F) -> dict[str, Any]:
     data, digest = _rates()
     if digest != strict["source_data_sha256"]:
         raise ValueError("日率在同一计算中改变，不能混用来源")
-    else:
-        pass
     indices = (
         [168]
         if strict["whole_limit_index"] == 168
@@ -142,8 +140,6 @@ def _civil_consensus(branches: list[dict[str, Any]]) -> dict[str, Any]:
     """Intersect facts, retaining absent and differing branches as unresolved."""
     if not branches:
         raise ValueError("空候选集不能充作全体候选一致")
-    else:
-        pass
     calendars = [b["calendar"] for b in branches]
     all_complete = all(c["complete_named_year_assigned"] for c in calendars)
     conflicts = []
@@ -151,8 +147,6 @@ def _civil_consensus(branches: list[dict[str, Any]]) -> dict[str, Any]:
     def shared(locator: dict[str, Any], field: str, values: list[Any]) -> Any:
         if all(v is not None and v == values[0] for v in values):
             return values[0]
-        else:
-            pass
         conflicts.append(
             {
                 "locator": locator,
@@ -248,16 +242,12 @@ def literal_candidate_year(zhongji_days: F) -> dict[str, Any]:
     }
     if count > MAX_BRANCHES:
         return result
-    else:
-        pass
     branches = []
     for branch_id, selected in enumerate(product(*(c["candidates"] for c in choices))):
 
         def conjunction(middle: F, index: int) -> dict[str, Any]:
             if middle != zhongji_days:
                 raise ValueError("不能把其他中积的候选用于本分支")
-            else:
-                pass
             selected_conjunction: dict[str, Any] = selected[index]
             return selected_conjunction
 

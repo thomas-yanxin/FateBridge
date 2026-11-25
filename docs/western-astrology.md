@@ -114,7 +114,7 @@ C04内部范围、插值与同模型反解现保留精确源轴和已解TT，公
 
 先前ELP来源校勘中，原作者FTP当时不可访问，六张原始数表及原说明从固定提交镜像恢复，逐份核对Git原始blob和SHA-256。运行时为独立编写的数学实现，不含第三方C++程序。文档与程序的`-0.06420/-0.06424`常数差异单列；本实现按原可执行常数及原控制位置使用`-0.06424`。原程序对半径使用`a405/aelp`，却漏乘径向导数，导致原102组打印速度有64组超过冻结的`1e-4 km/日`线。这64个失败原值保留；修正导数另经完整位置函数的独立90位complex-step及实际编译C++核对，不修改打印参考。
 
-光路依次应用有限源太阳偏折和完整Lorentz观测者光行差。观测者beta使用同源地球的解析TDB坐标速度；显示黄经日速则对该完整映射求局部TT导数，连同beta的源加速度和日期旋转一起传播；旧跨日差分只作保留诊断。偏折按[固定Swiss来源](https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c)的101点透明太阳有效质量表、GM及名义角半径，使用[ERFA2.0.1有限源矢量公式](https://github.com/liberfa/erfa/blob/v2.0.1/src/ld.c)。接收／发射太阳的历元约定沿用该原生定义，并非最近掠过时刻的引力模型。正1e-11分母限制器是明确的中心数学延拓，不把原生中心0/0或不透明太阳改判为同一物理定义；太阳自身和月球按声明原生约定不加这项偏折。圆面内不是可观测的透射光。原书Michael Stix《The Sun》页47仅核到源代码引文，原版书页尚未逐页校勘。逐体来源、实际使用的依赖、光行时／光行差及偏折定义保留在`chart_profile.orbital_fallback`。逐对象`motion`与提供者回执共用同一来源定义：`source_url`对应`factor_source_urls`，`method_id`对应`factor_longitude_motion_methods`，版本仍见`factor_source_versions`。南交点继承北交点的计算源；未计算的日速不补造计算方法。混合回退、全回退及无原生库的热带／Lahiri三端均已核对，来源标签修复不改变轨道数值或物理精度资格。 平均北交点仍用独立的Moshier平根数／DE431长期修正模型，标为`moshier_mean_lunar_node_de431_v1`。混合后端为`swisseph_api_with_analytic_fallback`，全回退为`fatebridge_analytic_ephemerides`；物理模型仍标为近似，显式JPL及必须使用数据文件的策略继续拒绝降级。回退的完整偏折物理模型、本体中心／系统质心差异及全历元物理精度没有完成认证。平均交点不混入十个物理天体的误差分母。
+光路依次应用有限源太阳偏折和完整Lorentz观测者光行差。观测者beta使用同源地球的解析TDB坐标速度；显示黄经日速则对该完整映射求局部TT导数，连同beta的源加速度和日期旋转一起传播；旧跨日差分只作保留诊断。偏折按[固定Swiss来源](https://github.com/astrorigin/swisseph)的101点透明太阳有效质量表、GM及名义角半径，使用[ERFA2.0.1有限源矢量公式](https://github.com/liberfa/erfa/blob/v2.0.1/src/ld.c)。接收／发射太阳的历元约定沿用该原生定义，并非最近掠过时刻的引力模型。正1e-11分母限制器是明确的中心数学延拓，不把原生中心0/0或不透明太阳改判为同一物理定义；太阳自身和月球按声明原生约定不加这项偏折。圆面内不是可观测的透射光。原书Michael Stix《The Sun》页47仅核到源代码引文，原版书页尚未逐页校勘。逐体来源、实际使用的依赖、光行时／光行差及偏折定义保留在`chart_profile.orbital_fallback`。逐对象`motion`与提供者回执共用同一来源定义：`source_url`对应`factor_source_urls`，`method_id`对应`factor_longitude_motion_methods`，版本仍见`factor_source_versions`。南交点继承北交点的计算源；未计算的日速不补造计算方法。混合回退、全回退及无原生库的热带／Lahiri三端均已核对，来源标签修复不改变轨道数值或物理精度资格。 平均北交点仍用独立的Moshier平根数／DE431长期修正模型，标为`moshier_mean_lunar_node_de431_v1`。混合后端为`swisseph_api_with_analytic_fallback`，全回退为`fatebridge_analytic_ephemerides`；物理模型仍标为近似，显式JPL及必须使用数据文件的策略继续拒绝降级。回退的完整偏折物理模型、本体中心／系统质心差异及全历元物理精度没有完成认证。平均交点不混入十个物理天体的误差分母。
 
 显式TT统一换成距J2000的动力日，接收者与发射目标使用同一源时钟，不再调用库的`CorrectLightTravel`或`AddDays`。原适配及其专属测试已随这条旧路径退役；只要显式TT存在，UT1变化不改变物理位置。新求解器用输入binary64坐标差的精确平方残差判号，并以同一残差的有理化表达式更新，直到源时钟上相邻浮点时刻给出带符号括区。仍保留20次总上限，不把固定点重复、舍入零残差或超限当作成功。这是给定有限源状态的数值回执，不是物理TT/TDB认证。完整JD约40微秒的发射格点会放大近距月球的差分噪声，不能用它替代较细的源时钟。
 
@@ -156,7 +156,7 @@ C04内部范围、插值与同模型反解现保留精确源轴和已解TT，公
 
 新参数与[原发布者检查值](https://ftp.imcce.fr/pub/ephem/planets/vsop87/vsop87.chk)分开：80组八行星源状态符合预声明1e-9源单位线，48组原始十进制参数的独立90位计算符合各自算术线。原[说明文件](https://ftp.imcce.fr/pub/ephem/planets/vsop87/vsop87.doc)给出的精度和年代范围是作者对源模型的估计，不是本项目对所有视位置、物理钟时或现实预测的认证。前轮完整B阶段的192个时刻另有3日速及186广域位置失败，原阶段结果仍保留；当前同队列结果见上段。本地REST、原生MCP、CLI一致性也单独验证。
 
-旧线性平均交点在4038个时刻有408组位置超60角秒，远期最大约13.7°，该失败仍封存。现已按[Swiss方法说明§2.2.1](https://www.astro.com/swisseph/swisseph.htm)采用具名Moshier／DE431定义：[原始实现的数值参数](https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swemmoon.c)与实际2.10.03源码字节一致；平根数合成非线性节点黄经，扣除原作者的长期修正，真黄道另加入共享77项章动，赤纬使用同源Vondrak黄赤交角。输入统一为TT，没有按本项目残差重新拟合。JPL本身不直接提供平均交点记录，来源方相对DE431的精度估计也不是本次独立观测认证。
+旧线性平均交点在4038个时刻有408组位置超60角秒，远期最大约13.7°，该失败仍封存。现已按[Swiss方法说明§2.2.1](https://www.astro.com/swisseph/swisseph.htm)采用具名Moshier／DE431定义：[原始实现的数值参数](https://github.com/astrorigin/swisseph)与实际2.10.03源码字节一致；平根数合成非线性节点黄经，扣除原作者的长期修正，真黄道另加入共享77项章动，赤纬使用同源Vondrak黄赤交角。输入统一为TT，没有按本项目残差重新拟合。JPL本身不直接提供平均交点记录，来源方相对DE431的精度估计也不是本次独立观测认证。
 
 新的冻结网格保留原4038个时刻，增加公元1–9999年每年1／7月及修正表折点两侧相邻float，共24333个TT历元。平／真黄道均与原生可执行程序比较，黄经和赤纬全部符合更严格的0.001角秒线；最大差分别约0.00000047和0.00000018角秒。有唯一定义的24262组日速均符合0.001角秒／TT日线，最大差约0.0005412角秒／日。71个真正的分段斜率折点没有唯一瞬时导数，保留位置和赤纬，仅将该点日速及其依赖运动列为未知；`uncomputed_motion_reasons`说明原因。区间归属以输入float的精确有理值确定，折点两侧的相邻float保留各自导数，不因浮点商舍入而当作同一折点。热带与Lahiri的真实REST、原生MCP、CLI检查也包含精确TT折点，不通过模拟钟时制造该分支。
 
@@ -460,7 +460,7 @@ uv run --locked --extra dev --with pyerfa==2.0.1.5 --with numpy==2.5.4 python -m
 
 实际Temporal 0.5.1以15个明确工程出生钟生成99个周年窗口和1703个查询；两种目标时区表达共3406次调用，修复前769处字段差异，修复后零差。独立FLINT 3.6.0／python-flint 0.9.0的40000个次限时长输入在新固定键下全部满足最近微秒；旧键的8处纯浮点差异与两种键的系统差异分列。开发反例已见，两个确定性队列不称盲测或现实样本。
 
-另从官网所指仓库编译[Astrolog 8.00固定提交](https://github.com/CruiserOne/Astrolog/tree/5bf172ea231c4b6ea3d7e09ca307571354a41e8a)，只关闭X11，数值源码未改。15个明示输入实际调用90次；提供已声明TT偏移后，二次推运四个公开位置的60个分量均在预定2角秒内，最大约0.605角秒；旧键有31个分量超界。逐历元原生位置加独立FLINT旋转的太阳弧参照也在2角秒内，最大约0.781角秒；旧键同组最大约0.509角秒，不能据新键过线宣称误差单调改善，历史UT1轴模型仍有差异。默认TT假设、历史UT1模型及单个DeltaT覆盖跨闰秒的差异全部保留，未将其混成同一物理框架。双方共享Swiss数值后端，这不是独立天文精度、完整方法或预测有效性的证据，也未证明全软件SOTA。
+另从官网所指仓库编译[Astrolog 8.00固定提交](https://github.com/CruiserOne/Astrolog)，只关闭X11，数值源码未改。15个明示输入实际调用90次；提供已声明TT偏移后，二次推运四个公开位置的60个分量均在预定2角秒内，最大约0.605角秒；旧键有31个分量超界。逐历元原生位置加独立FLINT旋转的太阳弧参照也在2角秒内，最大约0.781角秒；旧键同组最大约0.509角秒，不能据新键过线宣称误差单调改善，历史UT1轴模型仍有差异。默认TT假设、历史UT1模型及单个DeltaT覆盖跨闰秒的差异全部保留，未将其混成同一物理框架。双方共享Swiss数值后端，这不是独立天文精度、完整方法或预测有效性的证据，也未证明全软件SOTA。
 
 ## 极区天球四轴与制宫分支
 
@@ -481,7 +481,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_polar_geomet
 
 `classical.planets.*.ninth_part` 采用 [P.V.R. Narasimha Rao《Vedic Astrology: An Integrated Approach》2000年版 §6.2.9、印刷55页](https://www.vedicastrologer.org/articles/vedic_astro_textbook.pdf)的具名Parashari映射：每座九等分，起座按火白羊、土摩羯、风天秤、水巨蟹，再顺行。书中例16的双子11度对应摩羯、天蝎19度对应射手；[独立转录](../tests/fixtures/western-ninth-part-pvr2000.json)保留作者、版本、原页身份、区间及例子。西占层复用这套映射，不由此认证其Hellenistic历史归属。
 
-区间左闭右开，按输入浮点数的精确值分类。旧实现用浮点`30/9`作整除，使精确10度、20度落在前一份；现先保留原角度的精确值再判成员，不设置模糊宽限。十二座的一角秒网格1296000项原有24项错误；修复后同队列均相符。另有324个边界／相邻浮点比较（与网格重叠，不能合计为独立样本）、12288个固定随机留出及两个书中例，均符合所选表。直接执行[PyJHora固定提交67b4c861的Navamsa函数](https://github.com/naturalstupid/PyJHora/blob/67b4c861a88ce5d112b2d182b7708f3781cc3c4a/src/jhora/horoscope/chart/charts.py)在同网格仍有24项错误，其结果未用作真值。
+区间左闭右开，按输入浮点数的精确值分类。旧实现用浮点`30/9`作整除，使精确10度、20度落在前一份；现先保留原角度的精确值再判成员，不设置模糊宽限。十二座的一角秒网格1296000项原有24项错误；修复后同队列均相符。另有324个边界／相邻浮点比较（与网格重叠，不能合计为独立样本）、12288个固定随机留出及两个书中例，均符合所选表。直接执行[PyJHora固定提交67b4c861的Navamsa函数](https://github.com/naturalstupid/PyJHora)在同网格仍有24项错误，其结果未用作真值。
 
 普通盘、十三分盘、古典盘与印占模式在`classical`交付；德国盘在`base_chart.classical`交付。果老盘走独立层，不消费此九分度函数。九种通用／专用请求经本地REST TestClient、进程内原生MCP客户端和CLI各核对10度／20度控制坐标；这是计算与交付检查，不是独立出生资料、物理天文、线上部署或现实预测认证。回归见[数值语义检查](../tests/western/test_western_semantic_fidelity.py)与[三端检查](../tests/western/test_western_accuracy_transports.py)。
 
@@ -522,7 +522,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_angular_pred
 
 旧版 `astrology_horary.py` 的12个定义曾按96项计算、选择、来源及说明职责审读。现行结果交付瞬时相位、实际事件、原书接纳及其各自的核对状态。
 
-固定113400个点态输入，覆盖42个七曜有向配对、原书两列容许度、五种主相位、端点及速度变化；浮点取模产生的重复输入保留，实际唯一64760组。未导入FateBridge的100位Decimal参考用直线上周期射线距离和速度方向核对候选、闭端点及瞬时相位，全部相符。作者的[flatlib固定版本](https://github.com/flatangle/flatlib/tree/d983057def1271f4f20a7e20b73611182460734c)与其后继[PyAstra固定版本](https://github.com/joaoventura/pyastra/tree/12ef93b91f4e587c096d8210705d3b4a135d5ceb)均实际运行；两者沿用共同代码，不能算两个独立理论。每库保留60370项原输出差异，其中22680项是未知速度输入不支持，其余涉及容许度、精确／停滞区间及浮点几何口径；没有为标签一致而更换各自阈值，也不据此宣称全面胜出。
+固定113400个点态输入，覆盖42个七曜有向配对、原书两列容许度、五种主相位、端点及速度变化；浮点取模产生的重复输入保留，实际唯一64760组。未导入FateBridge的100位Decimal参考用直线上周期射线距离和速度方向核对候选、闭端点及瞬时相位，全部相符。作者的[flatlib固定版本](https://github.com/flatangle/flatlib)与其后继[PyAstra固定版本](https://github.com/joaoventura/pyastra)均实际运行；两者沿用共同代码，不能算两个独立理论。每库保留60370项原输出差异，其中22680项是未知速度输入不支持，其余涉及容许度、精确／停滞区间及浮点几何口径；没有为标签一致而更换各自阈值，也不据此宣称全面胜出。
 
 上述原点取自简单四分度，另固定16384组一般浮点坐标与速度补查舍入。该补查在原比较结果可见后设计，未作盲测宣称；仍用原精确几何线，全部相符。两同行实现各有5197项原输出差异，原队列与补查分别保留，没有合并成新的全口径通过率。点态、取模别名和重复速度组合不算独立天文观测。
 
@@ -614,7 +614,7 @@ uv run --locked --extra dev pytest -q tests/western/test_western_lilly_orbs_hous
 
 此前完整审读择日领域六个定义及服务入口一个定义，将原1组1项展开为7组101项计算、所选传统摘要、产品政策、适配和交付职责。这些不是101种独立算法。主题实际选择自然用事星及水星逆行政策；`topic_house`本身只是关联宫号，不等于已计算完整宫主判断。后续婚姻分支增加下节的四宫主、自然星与月亮角色事实；完整择日判断仍未完成。
 
-按[作者当前PyAstra提交](https://github.com/joaoventura/pyastra/tree/12ef93b91f4e587c096d8210705d3b4a135d5ceb)和[旧Flatlib提交](https://github.com/flatangle/flatlib/tree/d983057def1271f4f20a7e20b73611182460734c)分别实际执行庙、旺、落、陷读取函数，84个七曜－星座组合的完整四类标记一致，也与Lilly1647第104–105页所选原表转录相符。两程序属于同一作者的前后版本，不算两个独立专家；水星处女的庙旺并存、双鱼的落陷并存仍保留，择日单标签的既有优先序没有改写完整尊贵事实。第112页仍把小尊贵纳入游离定义，所以本层`no_major_dignity`不能当作游离。
+按[作者当前PyAstra提交](https://github.com/joaoventura/pyastra)和[旧Flatlib提交](https://github.com/flatangle/flatlib)分别实际执行庙、旺、落、陷读取函数，84个七曜－星座组合的完整四类标记一致，也与Lilly1647第104–105页所选原表转录相符。两程序属于同一作者的前后版本，不算两个独立专家；水星处女的庙旺并存、双鱼的落陷并存仍保留，择日单标签的既有优先序没有改写完整尊贵事实。第112页仍把小尊贵纳入游离定义，所以本层`no_major_dignity`不能当作游离。
 
 独立FLINT参考未导入生产代码，以精确有理几何、未核贡献区间的顶点枚举及集合布尔语义核对5006条固定控制：84条大尊贵、1008条星体视图、496条候选政策条件、3216条小计／未核范围、202条产品分档，共4984条不同参数记录。源码及独立Python3.10包均符合所列数值与结构字段；相同输入的重复重放、别名和角色变体不算独立观测。这是源码审读后设计的合成队列，月亮结果注入仅检查评分传递，不冒充天文参考。权重及75／55／40分档只验证声明算术，没有新增独立校准或原典效力依据。
 
@@ -624,7 +624,7 @@ uv run --locked --extra dev pytest -q tests/western/test_western_lilly_orbs_hous
 
 ### 婚姻择日的四宫主事实与来源边界
 
-`election.marriage_significators`按[Ramesey1653卷三第175页的EEBO-TCP转录](https://github.com/textcreationpartnership/A57689/blob/0ca635de78458d674e5969ec9a51b79f1e432c0b/A57689.xml)返回第1、7、10、4宫的主星及实际状态，并分别列出两方的自然征象太阳／金星、月亮最后分离及下一接触的行星。原文把前两宫分属两方，第十宫涉及双方之间，第四宫涉及收束；原文角色不自动指派现实人物。
+`election.marriage_significators`按[Ramesey1653卷三第175页的EEBO-TCP转录](https://github.com/textcreationpartnership/A57689)返回第1、7、10、4宫的主星及实际状态，并分别列出两方的自然征象太阳／金星、月亮最后分离及下一接触的行星。原文把前两宫分属两方，第十宫涉及双方之间，第四宫涉及收束；原文角色不自动指派现实人物。
 
 已实际阅看[封面标1653年的扫描PDF](https://qhpastrology.co.uk/wp-content/uploads/Ramesey-William-1653-Astrology-Restored.pdf)第111–112页，对应印页174–177；其中175页为第八节第一章。另阅[独立Archive条目b30323149_0001](https://archive.org/details/b30323149_0001)的PDF第233–234页，即印页175–176；后者目录标1654年、Wellcome Copy1、WingR202，是不同副本。所选四宫、自然星与月亮角色均可交叉读取，但1653扫描的机构底本尚未识别，不能当作已确认的TCP／国会图书馆同一底本，也不称为独立专家校勘。文本及PDF身份、页码对应见 `tests/fixtures/western-ramesey-marriage-1653.json`；整册与阅看图保留在仓库外审计材料中。
 
@@ -675,7 +675,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_horary_motio
 
 此前把精神点自身当作峰期参照，导致144个福点／精神点星座组合中的96组峰期星座集合错误；同座不顺移还违反所选重建的12组起期规则。修复后144组起期、四角集合及1728个L1宫序／相位格通过，生成的L1／L2／L3共5856个峰期布尔值与实际运行的 Kerykeion6.0.5 一致。这是已给定星座的条件计算网格，不是144张独立天文出生盘，也不检验预测结果。全部原失败、原始第三方输出、版本与哈希保存在本轮仓库外证据中。
 
-第三方程序并非逐条真值。[Kerykeion冻结源码](https://github.com/g-battaglia/kerykeion/blob/b81527d689991f806f8ea991364b7c3fed4c4c41/kerykeion/zodiacal_releasing/factory.py)使用365.2422日年，公开工厂也未实现同座顺移。FateBridge保留所选360日年及顺移规则，不为取得软件一致率改掉来源规则。[Delphic Oracle5作者帮助](https://www.astrology-x-files.com/help-do5/do0920.html)同样以顺移为默认，并明确另提供不顺移选项；本轮只读了该帮助，没有把它记作实际运行 Delphic Oracle。所引规则属于具名现代重建；原希腊校勘本及完整Valens程序尚未验收。
+第三方程序并非逐条真值。[Kerykeion冻结源码](https://github.com/g-battaglia/kerykeion)使用365.2422日年，公开工厂也未实现同座顺移。FateBridge保留所选360日年及顺移规则，不为取得软件一致率改掉来源规则。[Delphic Oracle5作者帮助](https://www.astrology-x-files.com/help-do5/do0920.html)同样以顺移为默认，并明确另提供不顺移选项；本轮只读了该帮助，没有把它记作实际运行 Delphic Oracle。所引规则属于具名现代重建；原希腊校勘本及完整Valens程序尚未验收。
 
 360日及子期按经过日计算，内部区间与活动期比较使用UTC，输出标签再按出生时区的历史偏移转换。原先在带IANA时区的当地钟时上累加天数，会使跨夏令时的区间多出或少掉一小时。六个合成实际日期输入中，两条释放轨合计75个L1、175个L2、171个L3区间，原29处一小时差现为零；父期截断保留，完整周期与截断周期分开比较。子期单位另以[Brennan2019周期讲义](https://theastrologypodcast.com/wp-content/uploads/2019/02/zodiacal-releasing-periods.pdf)核对。上海1990年夏令时出生和悉尼1984年夏令时出生的20×360日边界，以及切换前一微秒与恰好切换时刻，保留为回归控制。这里的UTC日历经过日不等于逐闰秒的SI秒时长认证。
 
@@ -800,7 +800,7 @@ uv run --locked --extra dev pytest -q tests/western/test_western_natal_reference
 
 结果`reduction_model`记录`balbillus_continuous_proportional_v3`、主子周期公式、原书作者／编者、1921版页码及校勘信息，同步进入快照。七曜擢升／落陷及每个子星份额进入自包含回归；此前只检Venus和只检子限总和的抽查已由这些来源控制替代。已有[Delphic Oracle方法说明](https://t.astrology-x-files.com/help-do4/balbillus-method.html)及[Project Hindsight比例规则](https://www.projecthindsight.com/products/delphicoracle.html)仍作为软件读法参照，不代替原书校勘。
 
-另实际执行了 [Horosa固定提交的标量及主子期源码](https://github.com/Horace-Maxwell/Horosa-Web-App-comprehensively-improved-MacOS/blob/10fb75de980bb0a6e0d1f50c7ee93cc97a88d7de/Horosa-Web/astrostudyui/src/utils/balbillus.js)。它采用序数度`floor(黄经)+1`，太阳／月亮／火星基数为18／24／14；同一20,160点的标量定义差异继续保留。其`once/cycle/fill`三种子限读法，在七曜21组条件执行中，自年份额均不同于所选校订本的`小年/129`。该执行核对未运行GUI或日期转换，不将一种软件输出充作所有流派的唯一真值。原典全程序、所有取度及历年读法、实际事件预测和SOTA仍未获验收。
+另实际执行了 [Horosa固定提交的标量及主子期源码](https://github.com/Horace-Maxwell/Horosa-Web-App-comprehensively-improved-MacOS)。它采用序数度`floor(黄经)+1`，太阳／月亮／火星基数为18／24／14；同一20,160点的标量定义差异继续保留。其`once/cycle/fill`三种子限读法，在七曜21组条件执行中，自年份额均不同于所选校订本的`小年/129`。该执行核对未运行GUI或日期转换，不将一种软件输出充作所有流派的唯一真值。原典全程序、所有取度及历年读法、实际事件预测和SOTA仍未获验收。
 
 ## 近太阳导数的假收敛与分段
 
@@ -916,7 +916,7 @@ uv run --locked --extra dev python -m scripts.western.gen_western_returns_refere
 
 计算保留精确有理数，从出生UTC锚一次舍入到最近微秒，再转换出生区显示；半微秒取偶数。旧版第三层五分钟、第四层一分钟提前取整已移除，地方钟的夏令时变化不改变名义经过日。`start_offset_exact_minutes`／`end_offset_exact_minutes`给出名义分钟的分子、分母；原整数偏移和`nominal`仅为显示。`calculation_options`声明模型与舍入口径。预览仍为七个主期，当前三层各带七个直接子期；超过预览仍能定位当前期。
 
-独立FLINT 3.6.0／python-flint 0.9.0对40,320个父期与循环顺序状态的282,240个子段核对精确偏移及微秒端点，零差。在相同UTC比例模型下实际执行[shin10567/Morinus-Source-Codes固定提交](https://github.com/shin10567/Morinus-Source-Codes/blob/bbe3ebe1bb5b9a7d62cb6662ff413e61522cc6c6/decennials.py)，FateBridge边界误差均不大于参照，最大约0.49973微秒，参照最大约2.09411微秒；这只是所定比例公式与微秒表示的比较；具名实现参照不构成领域权威或完整软件SOTA认证。另核对全部47,293种七曜同经／异经排序关系，以及Temporal 0.5.1的24个合成出生钟、216个时轴场景和240个边界查询。它们没有独立重算本命天文，也不是盲测或现实预测证据。
+独立FLINT 3.6.0／python-flint 0.9.0对40,320个父期与循环顺序状态的282,240个子段核对精确偏移及微秒端点，零差。在相同UTC比例模型下实际执行[shin10567/Morinus-Source-Codes固定提交](https://github.com/shin10567/Morinus-Source-Codes)，FateBridge边界误差均不大于参照，最大约0.49973微秒，参照最大约2.09411微秒；这只是所定比例公式与微秒表示的比较；具名实现参照不构成领域权威或完整软件SOTA认证。另核对全部47,293种七曜同经／异经排序关系，以及Temporal 0.5.1的24个合成出生钟、216个时轴场景和240个边界查询。它们没有独立重算本命天文，也不是盲测或现实预测证据。
 
 公开Schema仍只提供默认模型。内部手选起星、Chaldean顺序和365.25日名义年缩放不作为新增公开能力，后者也不是实测太阳年。原称Hephaistio的未发布候选表缺少可核实出处，七行中六行与父期总长不符，故停止执行，未将其归一化或记为通过；原表、六行差额和原典差异保留在[固定参考](../tests/fixtures/decennials-reference.json)。原典校勘、完整起星资格、其他日主方法和预测有效性仍待验证。
 
@@ -968,7 +968,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_fidelity --o
 
 修复前冻结12星座、两个入口、两种修改方式的48组符号探针，以及20恒星、两个入口、两种修改方式的80组恒星探针，共128组。原128组均污染共享表或后续结果，其中80组导致后续恒星查询报错。修复后源码及新安装包在同一128组中均为0失败、0后续报错。恒星包装入口另以实际原生位置为20颗星建立合相输入、执行两种列表修改，共40组：修改前安装包40组后续报错，修后源码与新安装包均为0。固定包装探针中的位置替身、实际原生路径和重复调用分别记录；它们不构成168个独立精度样本。三种运行状态的全部原始未污染结果保持相同。
 
-本质尊贵参考实际执行未改动的[Flatlib固定提交d983057](https://github.com/flatangle/flatlib/blob/d983057def1271f4f20a7e20b73611182460734c/flatlib/dignities/essential.py)，使用其埃及界与Chaldean面配置。参考生成不导入FateBridge。先冻结十二星座的21,600个一角分网格点，再加入720个不重复的整数边界相邻浮点，共22,320组给定度数；分别核对昼夜五类主星，共44,640组，均相同。埃及界另与[Robbins1940印刷97页的HTML主表](https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#20)60个实际星主与段长逐格比较，相同。HTML取表没有充作新一轮影印本校勘，先前托勒密界天秤末格的纸本／HTML差异继续保留。
+本质尊贵参考实际执行未改动的[Flatlib固定提交d983057](https://github.com/flatangle/flatlib)，使用其埃及界与Chaldean面配置。参考生成不导入FateBridge。先冻结十二星座的21,600个一角分网格点，再加入720个不重复的整数边界相邻浮点，共22,320组给定度数；分别核对昼夜五类主星，共44,640组，均相同。埃及界另与[Robbins1940印刷97页的HTML主表](https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#20)60个实际星主与段长逐格比较，相同。HTML取表没有充作新一轮影印本校勘，先前托勒密界天秤末格的纸本／HTML差异继续保留。
 
 完整分数与度主比较没有被五主星相同替代。Flatlib的原分数同时给昼主、夜主和参与主三分权重，本层只给所选昼夜首主；其度主还使用不同的失势扣分和平手顺序。在原312,480组七曜昼夜条件比较中，89,280组分数不同、46,314组游离不同；44,640组度主比较中11,036组胜者不同，全部原始字段与差异均保留。分数差逐条符合额外两个三分主星的权重；所选正面度主累加和未知昼夜的条件一致性另作代数核对，不另计第三方验收。修复列表隔离后，同一22,320条完整结果逐字节保持，未为匹配另一模型改分。
 
@@ -1008,7 +1008,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_fidelity --o
 
 公开选择仍为 `ut1_source="iers_c04"`，限实际支持它的卜卦／择日工具，不新增第三profile或公开微秒时钟。现行方法为 `iers20_c04_lagrange4_zonal62_subdaily2010_tt_ut1_v2`：在连续TT轴上，用原四节点对去除62项带谐潮汐后的UT1−TAI作Lagrange插值，在查询点还原同一Z62，再加入71项海潮及11项UT1天平动；UT1相关项在同一固定点方程内求解，反解固定给定UT1直接求TT。回执的base已经含还原Z62，不能再把解释字段zonal加一遍。默认 `swiss_delta_t` 的四次迭代、原IEEE次序与源选择保持。
 
-原C04 raw SHA为 `2f451f2b9faf42dc32f7368888980c92c3e773957019963c5d22df9ac20c8c82`，仍为1962-01-01至2026-09-19的23638个0h UTC日值，不外推或回退。pole/CPO伴随数据逐行绑定同一MJD与source SHA，不复制另一DUT1真值。极移加海潮／10项准周日polar libration；dX/dY仅在已声明的1984起源资格范围应用，早期零值既不标缺失也不认证为观测零。发布sigma与求解残差分别交付，均非完整物理误差界。
+原 C04 资料覆盖1962-01-01至2026-09-19的23638个0h UTC日值，不外推或回退。pole/CPO伴随数据逐行绑定同一MJD与source SHA，不复制另一DUT1真值。极移加海潮／10项准周日polar libration；dX/dY仅在已声明的1984起源资格范围应用，早期零值既不标缺失也不认证为观测零。发布sigma与求解残差分别交付，均非完整物理误差界。
 
 系数依冻结的[IERS Conventions (2010)第5章](https://iers-conventions.obspm.fr/content/chapter5/icc5.pdf)实际2012-08-10修订及[第8章](https://iers-conventions.obspm.fr/content/chapter8/icc8.pdf)打印表，保源版本与旧Fortran差异。现代GMST采用ERA(UT1)加TT岁差；基本角理论时间与实践TT近似分清。固定新格式20C04的版本化官方ReadMe支持IAU2006/2000A dX/dY。按IERS配方与SOFA2023-10-11，先求模型X/Y、s与EO，加入CPO一次并保留模型s，不对corrected X/Y重算locator，也不重复加FCN。极移矩阵W由同一physical equator供receiver与ENU消费；名义旋转速度以UT1秒计，不认证完整站点SI速度或实测铅垂。
 

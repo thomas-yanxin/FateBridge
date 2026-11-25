@@ -35,13 +35,9 @@ def source_catalog() -> dict[str, Any]:
     raw = p.read_bytes()
     if hashlib.sha256(raw).hexdigest() != CATALOG_SHA256:
         raise ValueError("胜败钤资料指纹不符")
-    else:
-        pass
     data: dict[str, Any] = json.loads(raw)
     if len(data["cells"]) != 128:
         raise ValueError("胜败钤须保留全部128格")
-    else:
-        pass
     return data
 
 
@@ -95,8 +91,6 @@ def _clauses(
                 }
             )
             continue
-        else:
-            pass
         for text in re.split("[／；]", raw):
             row: dict[str, Any] = {"column": column, "text": text, "candidates": []}
             match = GEOMETRY_CLAUSE.fullmatch(text)
@@ -162,8 +156,6 @@ def victory_matrix_assessment(
 ) -> dict[str, Any]:
     if calculation_mode not in {None, "year", "month", "day", "hour"}:
         raise ValueError("胜败钤时间层须为明确计法或未知")
-    else:
-        pass
     data = source_catalog()
     result: dict[str, Any] = {
         "ruleset": {
@@ -208,8 +200,6 @@ def victory_matrix_assessment(
         )
         result["ruleset"] = copy.deepcopy(result["ruleset"])
         return result
-    else:
-        pass
     cell = next(
         c
         for c in data["cells"]
@@ -250,8 +240,6 @@ def victory_matrix_assessment(
 def victory_matrix_text(a: dict[str, Any]) -> str:
     if a["status"] == "not_assessed":
         return str(a["reason"])
-    else:
-        pass
     cell = a["source_cell"]
     conditions = cell["condition_column"]["text"]
     reading = cell["result_column"]["text"]
@@ -259,6 +247,4 @@ def victory_matrix_text(a: dict[str, Any]) -> str:
     diffs = a["comparison_summary"]["different_eye_geometry"]
     if diffs:
         text += f"其中{diffs}条天目几何文字与本盘所用十六神环位不符，差异保留，未改盘迎合原栏。"
-    else:
-        pass
     return text + str(a["role_scope"]) + str(a["method_scope"]) + str(a["scope"])

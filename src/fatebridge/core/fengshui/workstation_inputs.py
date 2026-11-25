@@ -47,8 +47,6 @@ class EntryBarrier(_DeferredModel):
     def distinct_objects(self) -> "EntryBarrier":
         if len({self.entrance_id, self.desk_id, self.barrier_id}) != 3:
             raise ValueError("入口、书桌与隔挡须为三个不同实际对象")
-        else:
-            pass
         return self
 
 
@@ -77,8 +75,6 @@ class WorkstationReview(_DeferredModel):
     def unique_requests(self) -> "WorkstationReview":
         if not self.activities and not self.entry_barriers:
             raise ValueError("工位作者审查至少提供活动或入口隔挡关系")
-        else:
-            pass
         for records, field in (
             (self.activities, "object_id"),
             (self.entry_barriers, "relation_id"),
@@ -86,15 +82,11 @@ class WorkstationReview(_DeferredModel):
             ids = [getattr(item, field) for item in records]
             if len(ids) != len(set(ids)):
                 raise ValueError("工位作者审查 ID 不能重复")
-            else:
-                pass
         triples = [
             (r.entrance_id, r.desk_id, r.barrier_id) for r in self.entry_barriers
         ]
         if len(triples) != len(set(triples)):
             raise ValueError("同一入口/坐者/隔挡关系不能重复")
-        else:
-            pass
         return self
 
 
@@ -134,29 +126,19 @@ def validate_review(
         )
         if obj.role == "main_entry_door":
             purpose = "door"
-        else:
-            pass
         if purpose:
             purposes.setdefault(obj.object_id, purpose)
-        else:
-            pass
     for activity in review.activities:
         if purposes.get(activity.object_id) != "desk":
             raise ValueError("工位活动须关联明确的书桌对象")
-        else:
-            pass
     for relation in review.entry_barriers:
         entrance = objects.get(relation.entrance_id)
         if purposes.get(relation.entrance_id) != "door" or (
             entrance and entrance.role == "bathroom_door"
         ):
             raise ValueError("隔挡须关联明确的实际入口门，不能由通道或厕门代替")
-        else:
-            pass
         if purposes.get(relation.desk_id) != "desk":
             raise ValueError("隔挡目标须为明确书桌坐者")
-        else:
-            pass
         barrier = objects.get(relation.barrier_id)
         if barrier is None or barrier.kind not in {
             "material_object",
@@ -164,12 +146,8 @@ def validate_review(
             "garden_feature",
         }:
             raise ValueError("隔挡须独立登记实际植物/屏风对象")
-        else:
-            pass
         if barrier.purpose is not None or barrier.role is not None:
             raise ValueError("隔挡不能同时伪装成门床桌灶或其他已声明角色")
-        else:
-            pass
         form = next((f for f in forms if f.object_id == relation.desk_id), None)
         if (
             form
@@ -180,5 +158,3 @@ def validate_review(
             and form.entrance_direct_line != relation.entry_line_through_user.value
         ):
             raise ValueError("同一工位入口直线事实不得互相矛盾")
-        else:
-            pass

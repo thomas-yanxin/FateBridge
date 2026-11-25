@@ -87,8 +87,6 @@ class ResultStore:
     def _published_path(self, result_id: str) -> Path:
         if not RESULT_ID_PATTERN.fullmatch(result_id):
             raise invalid_parameter("无效结果引用", "result_id", "invalid_result_id")
-        else:
-            pass
         name = f"{result_id}.json"
         directory = self._directory_path
         if directory is None:
@@ -106,20 +104,12 @@ class ResultStore:
                     "result_id",
                     "result_directory_ambiguous",
                 )
-            else:
-                pass
             if matches:
                 directory = next(iter(matches.values()))
-            else:
-                pass
-        else:
-            pass
         if directory is None:
             raise invalid_parameter(
                 "结果引用不存在或已过期", "result_id", "result_unavailable"
             )
-        else:
-            pass
         try:
             return validate_private_directory(directory) / name
         except (OSError, RuntimeError) as exc:
@@ -142,8 +132,6 @@ class ResultStore:
             ) from exc
         if not isinstance(record, dict):
             raise invalid_parameter("结果引用已损坏", "result_id", "result_unavailable")
-        else:
-            pass
         expires_at = record.get("expires_at")
         payload_digest = record.get("sha256")
         payload = record.get("payload")
@@ -154,23 +142,15 @@ class ResultStore:
             or not isinstance(payload, dict)
         ):
             raise invalid_parameter("结果引用已损坏", "result_id", "result_unavailable")
-        else:
-            pass
         if expires_at <= time.time():
             raise invalid_parameter(
                 "结果引用已过期，请重新计算", "result_id", "result_expired"
             )
-        else:
-            pass
         if allowed_tools is not None:
             receipt = payload.get("run_metadata")
             tool_name = receipt.get("tool_name") if isinstance(receipt, dict) else None
             if not isinstance(tool_name, str) or tool_name not in allowed_tools:
                 raise ValueError("结果所属工具未在当前 MCP 配置中公开")
-            else:
-                pass
-        else:
-            pass
         prefix = format_json_response(
             {"expires_at": expires_at, "sha256": payload_digest}
         )[:-1]
@@ -218,8 +198,6 @@ class ResultStore:
             raise invalid_parameter(
                 "结果超过本地交付存储容量，请缩小 fields", "fields", "result_too_large"
             )
-        else:
-            pass
         path = reference.path
         directory = ensure_private_directory(path.parent)
         pending = path.with_suffix(".pending")
@@ -230,15 +208,11 @@ class ResultStore:
             for artifact in directory.iterdir():
                 if artifact.suffix not in {".json", ".pending"}:
                     continue
-                else:
-                    pass
                 if (
                     not RESULT_ID_PATTERN.fullmatch(artifact.stem)
                     or artifact.is_symlink()
                 ):
                     continue
-                else:
-                    pass
                 info = artifact.stat()
                 if artifact.suffix == ".pending" or info.st_mtime <= cutoff:
                     artifact.unlink()
@@ -254,8 +228,6 @@ class ResultStore:
                 for _, artifact, size in sorted(retained):
                     if remaining_bytes >= 0:
                         break
-                    else:
-                        pass
                     artifact.unlink()
                     remaining_bytes += size
                 pending.replace(path)
@@ -304,8 +276,6 @@ class ResultStore:
             raise invalid_parameter(
                 "需要原回执的 run_id", "expected_run_id", "invalid_run_id"
             )
-        else:
-            pass
         return self.page(
             result_id,
             offset,
@@ -328,12 +298,8 @@ class ResultStore:
             raise invalid_parameter(
                 "分页 offset 不能为负数", "offset", "invalid_offset"
             )
-        else:
-            pass
         if path is not None and (len(path) > 1000 or len(path.split(".")) > 64):
             raise invalid_parameter("结果字段路径过长", "path", "invalid_result_path")
-        else:
-            pass
         retained_result = self._record(result_id, allowed_tools)
         text = retained_result.payload_text
         payload = retained_result.payload
@@ -358,8 +324,6 @@ class ResultStore:
                 raise invalid_parameter(
                     "结果不属于指定原 run", "expected_run_id", "result_run_mismatch"
                 )
-            else:
-                pass
             verification = {
                 "verification": {
                     "method": "retained_payload_integrity_v2",
@@ -370,8 +334,6 @@ class ResultStore:
                     "calculation_repeated": False,
                 }
             }
-        else:
-            pass
         if path is not None:
             value: JsonValue = payload
             for part in path.split("."):
@@ -391,14 +353,10 @@ class ResultStore:
             text = format_json_response(value)
         elif text is None:
             text = format_json_response(payload)
-        else:
-            pass
         if offset > len(text):
             raise invalid_parameter(
                 "分页 offset 超出结果长度", "offset", "invalid_offset"
             )
-        else:
-            pass
         end = min(offset + PAGE_CHARS, len(text))
         next_offset = end if end < len(text) else None
         base = f"fatebridge://results/{result_id}"
@@ -451,22 +409,16 @@ def bound_public_response(
     """Keep whole facts inline when possible and retain the exact selected result."""
     if response_char_limit == 0:
         return payload
-    else:
-        pass
     if not MIN_RESPONSE_LIMIT_CHARS <= response_char_limit <= MAX_RESPONSE_LIMIT_CHARS:
         raise invalid_parameter(
             "response_char_limit 须为 0 或 4096–65536",
             "response_char_limit",
             "invalid_response_limit",
         )
-    else:
-        pass
 
     text = format_json_response(payload, compact=compact)
     if len(text) <= response_char_limit:
         return payload
-    else:
-        pass
     body_text = text if compact else format_json_response(payload)
     body = body_text.encode("utf-8")
     reference = RESULT_STORE._reference(payload, len(body_text), len(body))

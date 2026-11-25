@@ -74,30 +74,20 @@ def select_solar_source(
     """
     if native_flags is not None:
         return NativeSolarSource(native_flags)
-    else:
-        pass
     if configured_jpl_file() is not None:
         module = runtime.swe
         if module is None:
             raise ModuleNotFoundError(
                 "Swiss Ephemeris is required for selected-file admission"
             )
-        else:
-            pass
         # Reuse native file selection/header/fallback admission. The returned
         # approximate TT-as-TDB coordinates are not used for solar optics.
         runtime.ephemeris_call("calc", start_tt, module.SUN, module.FLG_JPLEPH)
         return FileSolarSource(Path(module.get_current_file_data(0)[0]))
-    else:
-        pass
     if require_data_files:
         return NativeSolarSource(2)  # SEFLG_SWIEPH; callers reject a native fallback.
-    else:
-        pass
     if _DE440_START_TT <= start_tt <= end_tt < _DE440_END_TT:
         return PackagedSolarSource.DE440
-    else:
-        pass
     return PackagedSolarSource.DE441
 
 
@@ -151,16 +141,12 @@ def precise_solar_direction(
             )
             x, y, z = (v / de440_solar.AU_KM for v in position)
             return (x, y, z), None
-        else:
-            pass
         if isinstance(source, FileSolarSource):
             values, _ = source_kinematics(
                 source.path, 2451545 + tdb + Fraction(delay), "Sun"
             )
             x, y, z = values[:3]
             return (x, y, z), None
-        else:
-            pass
         state = barycentric_state("Sun", tdb + Fraction(delay))
         return state.position, None
 
@@ -190,8 +176,6 @@ def solar_source_reference(model_id: str, native_version: str) -> SolarSourceRef
             "coefficient_representation": "original type2 coefficient records, lossless storage",
             "coefficient_profile": de440_solar.EXTENDED_MODEL_ID,
         }
-    else:
-        pass
     if model_id == PackagedSolarSource.DE441.value:
         return {
             "author": "NASA/JPL; Park, Folkner, Williams and Boggs",
@@ -202,8 +186,6 @@ def solar_source_reference(model_id: str, native_version: str) -> SolarSourceRef
             "coefficient_representation": "selected original binary64 source words with lossless storage",
             "coefficient_profile": DE441_MODEL_ID,
         }
-    else:
-        pass
     if model_id == FileSolarSource.value:
         return {
             "author": "NASA/JPL; Park, Folkner, Williams and Boggs",
@@ -214,12 +196,8 @@ def solar_source_reference(model_id: str, native_version: str) -> SolarSourceRef
             "coefficient_representation": "original selected-file records; exact split source epoch",
             "coefficient_profile": None,
         }
-    else:
-        pass
     if model_id not in {"jpl", "swieph", "moshier"}:
         raise ValueError("Unknown solar source model")
-    else:
-        pass
     return {
         "author": "Astrodienst native reader; JPL or Moshier source as recorded",
         "source_version": (

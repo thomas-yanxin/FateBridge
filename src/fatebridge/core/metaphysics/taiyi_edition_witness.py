@@ -224,8 +224,6 @@ def edition_comparisons(
     row = next((r for r in ROWS if r.yin == yin and r.ju == ju), None)
     if row is None:
         return []
-    else:
-        pass
     observations: list[EditionObservation] = [
         {
             "field": field,

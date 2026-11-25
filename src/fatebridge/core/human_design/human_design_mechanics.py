@@ -194,8 +194,6 @@ def longitude_activation(longitude: float) -> Dict[str, Any]:
     """
     if not math.isfinite(longitude):
         raise ValueError("人类图黄经必须为有限数值")
-    else:
-        pass
     return _rational_activation(Fraction(longitude) % 360)
 
 
@@ -203,8 +201,6 @@ def opposite_activation(source_longitude: float) -> Dict[str, Any]:
     """Classify exact 180-degree opposition before rounding its display float."""
     if not math.isfinite(source_longitude):
         raise ValueError("人类图对点来源黄经必须为有限数值")
-    else:
-        pass
     return {
         **_rational_activation((Fraction(source_longitude) + 180) % 360),
         "derivation_source_longitude": source_longitude,
@@ -250,24 +246,14 @@ def positions_at_tt(
 ) -> Dict[str, Any]:
     if runtime.swe is None:
         raise RuntimeError("人类图需要 Swiss Ephemeris")
-    else:
-        pass
     if node_mode not in {"true", "mean"}:
         raise ValueError("node_mode 必须为 true 或 mean")
-    else:
-        pass
     if backend not in {"swieph", "moshier"}:
         raise ValueError("人类图星历请求后端必须为 swieph 或 moshier")
-    else:
-        pass
     if backend == "moshier" and require_swiss_files:
         raise ValueError("强制 Moshier 与要求 Swiss 数据文件冲突")
-    else:
-        pass
     if require_swiss_files and configured_jpl_file() is not None:
         raise EphemerisSourceError("jpl_swiss_file_requirement_conflict")
-    else:
-        pass
     ids = {
         **BODY_IDS,
         "NorthNode": (
@@ -297,20 +283,12 @@ def positions_at_tt(
                 ) from exc
             if not all(math.isfinite(float(coords[i])) for i in (0, 3)):
                 raise RuntimeError(f"Swiss Ephemeris 未返回有效的 {body} 位置")
-            else:
-                pass
             if model not in {"swieph", "moshier", "jpl"}:
                 raise RuntimeError("Swiss Ephemeris 返回未识别的星历后端标记")
-            else:
-                pass
             if require_swiss_files and model != "swieph":
                 raise RuntimeError("要求 Swiss Ephemeris 数据文件，但实际后端发生降级")
-            else:
-                pass
             if backend == "moshier" and model != "moshier":
                 raise RuntimeError("整盘参考后端未实际采用 Moshier")
-            else:
-                pass
             observe_native_source(
                 body,
                 jd_tt,
@@ -334,19 +312,13 @@ def positions_at_tt(
                         "ephemeris_model": model,
                     }
                 )
-            else:
-                pass
             if source_observer is not None:
                 source_observer(body, jd_tt, dict(positions[body]))
-            else:
-                pass
     finally:
         if physical_coordinates:
             record_position_batch(
                 positions, jd_tt, node_mode, backend, source_role, physical_coordinates
             )
-        else:
-            pass
     for body, opposite in (("Earth", "Sun"), ("SouthNode", "NorthNode")):
         source_longitude = positions[opposite]["longitude"]
         positions[body] = {
@@ -365,8 +337,6 @@ def _components(active: Set[int]) -> List[List[str]]:
             x, y = GATE_CENTER[a], GATE_CENTER[b]
             graph.setdefault(x, set()).add(y)
             graph.setdefault(y, set()).add(x)
-        else:
-            pass
     remaining = set(graph)
     groups = []
     while remaining:
@@ -375,8 +345,6 @@ def _components(active: Set[int]) -> List[List[str]]:
             center = queue.pop()
             if center in found:
                 continue
-            else:
-                pass
             found.add(center)
             queue.extend(graph[center] - found)
         groups.append(sorted(found))
@@ -390,8 +358,6 @@ def bodygraph(personality: Iterable[int], design: Iterable[int]) -> Dict[str, An
     active = p | d
     if not active <= set(GATE_CENTER):
         raise ValueError("人类图门号必须在 1 至 64 之间")
-    else:
-        pass
     groups = _components(active)
     defined = set().union(*(set(group) for group in groups)) if groups else set()
     throat_group = next((set(g) for g in groups if "throat" in g), set())
@@ -435,8 +401,6 @@ def bodygraph(personality: Iterable[int], design: Iterable[int]) -> Dict[str, An
                     "mixed_only": not ({a, b} <= p or {a, b} <= d),
                 }
             )
-        else:
-            pass
     centers = {
         center: {
             "status": (
@@ -457,10 +421,6 @@ def bodygraph(personality: Iterable[int], design: Iterable[int]) -> Dict[str, An
                 for group in new_groups
             ):
                 bridges.append(gate)
-            else:
-                pass
-    else:
-        pass
     return {
         "type": type_id,
         "subtype": subtype,

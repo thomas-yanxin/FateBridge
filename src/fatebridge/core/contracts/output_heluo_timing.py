@@ -32,16 +32,12 @@ class HeluoTimingRow(PartialOutput):
 def _boolean_without_numeric_coercion(value: object) -> bool:
     if type(value) is not bool:
         raise ValueError("布尔事实不能用0/1或字符串替代。")
-    else:
-        pass
     return value
 
 
 def _not_a_boolean_number(value: Any) -> Any:
     if type(value) is bool:
         raise ValueError("刻数不能用布尔替代。")
-    else:
-        pass
     return value
 
 
@@ -70,24 +66,18 @@ class HeluoTimingYearContext(PartialOutput):
         for gz in (self.birth_ganzhi, self.expected_ganzhi):
             if gz is not None and gz not in CYCLE:
                 raise ValueError("岁运年上下文须用有效六十甲子。")
-            else:
-                pass
             if (
                 gz is not None
                 and self.cycle_year is not None
                 and gz != CYCLE[(self.cycle_year - 4) % 60]
             ):
                 raise ValueError("岁运年标签与年柱不一致。")
-            else:
-                pass
         if (
             self.birth_ganzhi is not None
             and self.expected_ganzhi is not None
             and self.birth_ganzhi != self.expected_ganzhi
         ):
             raise ValueError("岁运实际与预期年柱不一致。")
-        else:
-            pass
         return self
 
 
@@ -111,8 +101,6 @@ class HeluoClockBranch(PartialOutput):
             and self.length_ke != (9 if self.branch in "寅申巳亥" else 8)
         ):
             raise ValueError("卷一九刻支组不能换成等长或其他支组。")
-        else:
-            pass
         return self
 
 
@@ -149,8 +137,6 @@ class HeluoClockProjection(PartialOutput):
                 and (value.numerator, value.denominator) != (n, d)
             ):
                 raise ValueError("等时条件推算与所列年余量不一致。")
-            else:
-                pass
         return self
 
 
@@ -177,8 +163,6 @@ class HeluoClockBranchShift(PartialOutput):
             and (value.numerator, value.denominator) != (365, 1)
         ):
             raise ValueError("六十支移位的源刻总量与所列大数年不一致。")
-        else:
-            pass
         return self
 
 
@@ -213,19 +197,13 @@ class HeluoSourceClock(PartialOutput):
             and self.extra_branches_in_printed_order != ["寅", "申", "巳", "亥"]
         ):
             raise ValueError("应保留原印寅申巳亥组及次序。")
-        else:
-            pass
         if self.branch_lengths is not None:
             if len(self.branch_lengths) != 12:
                 raise ValueError("百刻循环须保留十二支。")
-            else:
-                pass
             if all(b.branch is not None for b in self.branch_lengths) and [
                 b.branch for b in self.branch_lengths
             ] != list("子丑寅卯辰巳午未申酉戌亥"):
                 raise ValueError("展示用循环支序不能混换。")
-            else:
-                pass
             if (
                 all(b.length_ke is not None for b in self.branch_lengths)
                 and sum(
@@ -234,10 +212,6 @@ class HeluoSourceClock(PartialOutput):
                 != 100
             ):
                 raise ValueError("十二支原刻总数须为一百。")
-            else:
-                pass
-        else:
-            pass
         return self
 
 

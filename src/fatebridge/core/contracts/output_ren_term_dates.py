@@ -37,8 +37,6 @@ class RenPublishedDateReference(PartialOutput):
             and value["instant_accuracy_certified"] is not False
         ):
             raise ValueError("官方逐日表不认证交气瞬间精度")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -52,8 +50,6 @@ class RenPublishedDateReference(PartialOutput):
                     ZonedCalendar.from_isoformat(self.computed_hko_moment),
                 ),
             )
-        else:
-            pass
         return self
 
 
@@ -72,16 +68,12 @@ def align_published_date(dependency: Any) -> None:
         compare_present_branches(
             value, published_date_reference(name, ZonedCalendar.from_isoformat(moment))
         )
-    else:
-        pass
 
 
 def require_complete_published_dates(policy: Any) -> None:
 
     if not isinstance(policy, dict):
         raise ValueError("完整壬课输出缺少交气日期依据")
-    else:
-        pass
     rows = policy.get("solar_term_dependencies")
     if (
         policy.get("mode") != "civil_instant_checked"
@@ -97,23 +89,15 @@ def require_complete_published_dates(policy: Any) -> None:
         ]
     ):
         raise ValueError("完整壬课输出缺少五项实际交气依赖")
-    else:
-        pass
     for row in rows:
         if not isinstance(row.get("name"), str) or not isinstance(
             row.get("civil_moment"), str
         ):
             raise ValueError("完整交气日期对照缺少同次节气与瞬间")
-        else:
-            pass
         expected = published_date_reference(
             row["name"], ZonedCalendar.from_isoformat(row["civil_moment"])
         )
         if isinstance(row.get("published_date_reference"), dict):
             RenPublishedDateReference.model_validate(row["published_date_reference"])
-        else:
-            pass
         if row.get("published_date_reference") != expected:
             raise ValueError("完整交气官方日期对照缺项或与本次计算不符")
-        else:
-            pass

@@ -58,8 +58,6 @@ def _rotation_tt(module: RotationSource, jd_ut1: float | UT1Instant) -> TTInstan
     selected = active_ut1.get()
     if selected is not None:
         return selected.tt_from_ut1(point)
-    else:
-        pass
     scalar_ut1 = point.as_float()
     return TTInstant.from_float(
         scalar_ut1
@@ -77,8 +75,6 @@ def _native_sidereal_degrees(module: RotationSource, ut1: UT1Instant) -> float:
         raise EphemerisSourceError("coordinate_values_unavailable") from error
     if not 0 <= degrees < 360:
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     return degrees
 
 
@@ -92,8 +88,6 @@ def _native_obliquity_nutation(module: RotationSource, jd_tt: float) -> Sequence
         raise EphemerisSourceError("earth_attitude_model_unavailable") from error
     if flag < 0 or not all(math.isfinite(value) for value in coordinates[:4]):
         raise EphemerisSourceError("earth_attitude_model_unavailable")
-    else:
-        pass
     return coordinates
 
 
@@ -128,8 +122,6 @@ def _correction(
     )
     if selected_sidereal_model(tt) == 3:
         return _standard_correction(module, ut1, julian_day_tt=tt)
-    else:
-        pass
     boundary_tt = MODERN_REFERENCE_JD_TT + (
         -MODERN_HALF_WINDOW_DAYS
         if tt.days < MODERN_REFERENCE_JD_TT
@@ -251,8 +243,6 @@ def physical_equator(
                     (float(rotated[2][0]), float(rotated[2][1]), float(rotated[2][2])),
                 )
                 applied_cpo = orientation.cpo_arcsec
-            else:
-                pass
             gast = (
                 float((_era_turn(ut1) * 360 - Fraction(math.degrees(origins))) % 360)
                 % 360

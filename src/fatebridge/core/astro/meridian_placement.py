@@ -36,8 +36,6 @@ def _finite(value: float) -> None:
         or not math.isfinite(value)
     ):
         raise ValueError("Meridian coordinates require finite numbers")
-    else:
-        pass
 
 
 def _turn(value: Fraction) -> float:
@@ -68,8 +66,6 @@ def project_direction(
         _finite(value)
     if not -90 <= latitude <= 90 or not 0 <= obliquity < 90:
         raise ValueError("Invalid ecliptic latitude or house obliquity")
-    else:
-        pass
     lam, beta, eps = map(math.radians, (longitude % 360, latitude, obliquity))
     x = math.cos(beta) * math.cos(lam)
     y = math.cos(beta) * math.sin(lam) * math.cos(eps) - math.sin(beta) * math.sin(eps)
@@ -83,8 +79,6 @@ def project_direction(
             "declination": declination,
             "equatorial_horizontal_norm": horizontal,
         }
-    else:
-        pass
     # Keep the signed raw angle until sector classification, so a tiny
     # negative angle is not rounded by float addition to exactly360deg.
     if obliquity == 0.0:
@@ -128,8 +122,6 @@ def factor_position(
     if raw_ra is not None:
         result.update(house_from_ra(raw_ra, armc))
         result["latitude_changes_house"] = result["house"] != zero["house"]
-    else:
-        pass
     return result
 
 
@@ -143,8 +135,6 @@ def attach_factor_placement(
     profile = meridian["profile"]
     if not factors or len({factor["id"] for factor in factors}) != len(factors):
         raise RuntimeError("Meridian placement requires a nonempty distinct factor set")
-    else:
-        pass
     _finite(factor_ayanamsha)
     rows = []
     for factor in factors:
@@ -195,8 +185,6 @@ def placement_sample_summaries(
     nominal = meridian.get("factor_placement")
     if not nominal or sensitivity["status"] != "sampled":
         return []
-    else:
-        pass
     expected = {r["id"] for r in nominal["factors"]}
     cohorts = []
     for sample in sensitivity["samples"]:
@@ -207,8 +195,6 @@ def placement_sample_summaries(
             raise RuntimeError(
                 "Every meridian placement sample requires the same factor set"
             )
-        else:
-            pass
         cohorts.append(rows)
     summaries = []
     for factor in nominal["factors"]:

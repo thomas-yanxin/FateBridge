@@ -118,8 +118,6 @@ def build_passage_evidence(
             and GENERATION_CYCLE[em] == eb
         ):
             continue
-        else:
-            pass
         i, j, k = (ORDER.index(n["pillar"]) for n in (a, middle, b))
         between = min(i, k) < j < max(i, k)
         adjacent = abs(i - j) == abs(j - k) == 1

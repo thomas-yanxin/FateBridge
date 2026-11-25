@@ -36,8 +36,6 @@ def liuren_at_taiyi_palace(number: int, liureng: dict[str, Any]) -> dict[str, An
     """Read actual branch rows; a sector pair never chooses a lodging."""
     if type(number) is not int or number not in PALACES:
         raise ValueError("三式对应需要一至九的实际太乙宫数")
-    else:
-        pass
     palace = PALACES[number]
 
     def actual_row(branch: str) -> dict[str, Any]:
@@ -48,19 +46,13 @@ def liuren_at_taiyi_palace(number: int, liureng: dict[str, Any]) -> dict[str, An
         ]
         if len(matches) != 1:
             raise ValueError("三式对应要求唯一的六壬实际地盘支位")
-        else:
-            pass
         index, row = matches[0]
         return {"source_path": f"liureng.twelve_board.{index}", **row}
 
     if palace in "子卯午酉":
         return {"status": "direct_branch_match", **actual_row(palace)}
-    else:
-        pass
     if number == 5:
         return {"status": "not_assessed", "reason": "中宫无直接地支，不自动寄坤"}
-    else:
-        pass
     return {
         "status": "not_assessed",
         "reason": "四维寄支未校勘；同方位两支仅并列，不据神将吉凶择一",
@@ -87,8 +79,6 @@ def palace_correspondences(
         ]
         if len(qmatch) != 1 or qmatch[0][1]["trigram"] != trigram:
             raise ValueError("三式对应要求唯一且同方位的奇门实际宫，不能直接套太乙宫数")
-        else:
-            pass
         qi, qp = qmatch[0]
         qrow = {
             "source_path": f"qimen.palaces.{qi}",
@@ -151,8 +141,6 @@ def correspondence_text(joined: dict[str, Any]) -> str:
                 for p in ren["sector_candidates"]
             )
             liuren_text += "；同方位候选（未选寄支）：" + candidates
-        else:
-            pass
         lines.append(
             f"{entry['marker']}：太乙{entry['taiyi_number']}宫{entry['taiyi_palace']}／{entry['direction']}，对应奇门{q['index']}宫{q['trigram']}：{q['star'] or '无独立星'}、{q['door'] or '无独立门'}、{q['god'] or '无独立神'}；{liuren_text}。"
         )

@@ -24,18 +24,12 @@ def build_taiyi_board(
 
     if year_profile is not None and calculation_mode != "year":
         raise ValueError("year_profile仅用于year年计")
-    else:
-        pass
 
     if month_profile is not None and calculation_mode != "month":
         raise ValueError("month_profile仅用于month月计")
-    else:
-        pass
 
     if hour_profile is not None and calculation_mode != "hour":
         raise ValueError("hour_profile仅用于hour时计，不能用于年计、月计或日计")
-    else:
-        pass
     if calculation_mode == "year":
         return build_year_board(seed, gender, year_profile, shiji_profile=shiji_profile)
     if calculation_mode == "day":

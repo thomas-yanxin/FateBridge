@@ -37,8 +37,6 @@ def nutation_obliquity_rate(
     ):
         cached = previous.get("nutation_obliquity_rate_degrees_per_day")
         return float(cached) if cached is not None else None
-    else:
-        pass
     policy: dict[str, Any] = {
         "method_id": "native_nutation_ecliptic_rotation_derivative_v1",
         "epoch_jd_tt": julian_day_tt,
@@ -56,8 +54,6 @@ def nutation_obliquity_rate(
             "reason": "unverified_native_version",
         }
         return None
-    else:
-        pass
     values = []
     for epoch in (julian_day_tt, julian_day_tt - NUTATION_STEP_DAYS):
         coordinates, flags = runtime.ephemeris_call(
@@ -69,8 +65,6 @@ def nutation_obliquity_rate(
             or not all(math.isfinite(x) for x in coordinates[:4])
         ):
             raise EphemerisSourceError("coordinate_values_unavailable")
-        else:
-            pass
         values.append(float(coordinates[3]))
     rate = (values[0] - values[1]) / NUTATION_STEP_DAYS
     context["tropical_rotation"] = {
@@ -89,8 +83,6 @@ def display_rotation_rate_change(
         or not -90 < latitude < 90
     ):
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     return (
         obliquity_rate
         * math.cos(math.radians(longitude))
@@ -119,8 +111,6 @@ def corrected_longitude_motion(
     native = float(coordinates[3])
     if not math.isfinite(native):
         raise EphemerisSourceError("coordinate_motion_unavailable")
-    else:
-        pass
     result = {"longitude_speed_native": native}
     origin_wrap = 0.0
     if sidereal:
@@ -129,10 +119,6 @@ def corrected_longitude_motion(
         origin_wrap = traditional_lahiri_origin_wrap(julian_day_tt, metadata) or 0.0
         if origin_wrap:
             result["longitude_speed_sidereal_origin_wrap_correction"] = origin_wrap
-        else:
-            pass
-    else:
-        pass
     light = 0.0
     spatial = 0.0
     source_remainder: float | None = None
@@ -141,12 +127,8 @@ def corrected_longitude_motion(
             light, source_model, spatial, source_remainder = lunar_adjustment
             if source_model != model:
                 raise EphemerisSourceError("coordinate_model_changed")
-            else:
-                pass
             if not all(math.isfinite(value) for value in (light, spatial)):
                 raise EphemerisSourceError("coordinate_motion_unavailable")
-            else:
-                pass
             result["longitude_speed_light_time_correction"] = light
             result["longitude_speed_spatial_aberration_correction"] = spatial
         else:
@@ -162,22 +144,12 @@ def corrected_longitude_motion(
                 fixed = policy["fixed_frame_source_derivative"]
                 if fixed["status"] == "applied":
                     source_remainder = float(fixed["longitude_speed_correction"])
-                else:
-                    pass
-            else:
-                pass
         if source_remainder is not None:
             if not math.isfinite(source_remainder):
                 raise EphemerisSourceError("coordinate_motion_unavailable")
-            else:
-                pass
             result["longitude_speed_lunar_source_remainder_correction"] = (
                 source_remainder
             )
-        else:
-            pass
-    else:
-        pass
     rotation = 0.0
     if not sidereal:
         rate = nutation_obliquity_rate(julian_day_tt, metadata)
@@ -186,10 +158,6 @@ def corrected_longitude_motion(
                 float(coordinates[0]), float(coordinates[1]), rate
             )
             result["longitude_speed_rotation_correction"] = rotation
-        else:
-            pass
-    else:
-        pass
     result["longitude_speed"] = (
         math.fsum(
             (native, origin_wrap, light, spatial, source_remainder or 0.0, rotation)
@@ -213,10 +181,6 @@ def corrected_longitude_motion(
             correction = complete - result["longitude_speed"]
             result["longitude_speed_analytic_frame_correction"] = correction
             result["longitude_speed"] += correction
-        else:
-            pass
-    else:
-        pass
     if model == "moshier" and planet in moshier_motion.TARGETS:
         rate, policy = moshier_motion.complete_moshier_longitude_rate(
             planet,
@@ -246,6 +210,4 @@ def corrected_longitude_motion(
         remainder = rate - result["longitude_speed"]
         result["longitude_speed_position_derivative_correction"] = remainder
         result["longitude_speed"] += remainder
-    else:
-        pass
     return result

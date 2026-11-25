@@ -18,16 +18,12 @@ def _get(obj: Any, *parts: str) -> Any:
         obj = obj.get(part) if isinstance(obj, dict) else getattr(obj, part, None)
         if obj is None:
             break
-        else:
-            pass
     return obj
 
 
 def _has(obj: Any, name: str) -> bool:
     if isinstance(obj, BaseModel):
         return name in obj.model_fields_set
-    else:
-        pass
     return isinstance(obj, dict) and name in obj
 
 
@@ -35,31 +31,21 @@ def _same(obj: Any, field: str, expected: Any) -> None:
     actual = _get(obj, *field.split("."))
     if actual is not None and actual != expected:
         raise ValueError(f"六壬金口诀同次计算依据不一致：{field}")
-    else:
-        pass
 
 
 def _branch(value: Any) -> str | None:
     if value is None:
         return None
-    else:
-        pass
     if not isinstance(value, str) or value not in EARTHLY_BRANCHES:
         raise ValueError("六壬金口诀支位须为十二地支")
-    else:
-        pass
     return value
 
 
 def _stem(value: Any) -> str | None:
     if value is None:
         return None
-    else:
-        pass
     if not isinstance(value, str) or value not in HEAVENLY_STEMS:
         raise ValueError("六壬金口诀日干须为十天干")
-    else:
-        pass
     return value
 
 
@@ -67,8 +53,6 @@ def _day(pillars: Any) -> str | None:
     a, b = _stem(_get(pillars, "day", "stem")), _branch(_get(pillars, "day", "branch"))
     if a is None or b is None:
         return None
-    else:
-        pass
     value = a + b
     try:
         sexagenary_index_for(value)
@@ -86,10 +70,6 @@ def _diurnal(holder: Any, hour: str | None) -> bool | None:
             _same(evidence, "is_diurnal", expected["is_diurnal"])
             _same(evidence, "selection_source", expected["selection_source"])
             _same(holder, "is_diurnal", expected["is_diurnal"])
-        else:
-            pass
-    else:
-        pass
     chosen = _get(holder, "is_diurnal")
     if chosen is not None:
         _same(evidence, "is_diurnal", chosen)
@@ -97,10 +77,6 @@ def _diurnal(holder: Any, hour: str | None) -> bool | None:
         chosen = _get(evidence, "is_diurnal")
     if chosen is None:
         return None
-    else:
-        pass
     if not isinstance(chosen, bool):
         raise ValueError("六壬金口诀昼夜选择须为布尔值")
-    else:
-        pass
     return chosen

@@ -29,16 +29,12 @@ def _graph(chart: dict) -> tuple[list[dict], list[dict]]:
         or any(c["centers"] != [GATE_CENTER[g] for g in c["gates"]] for c in channels)
     ):
         raise ValueError("Source context channel and activation witnesses disagree")
-    else:
-        pass
     return activations, channels
 
 
 def _direct(gates: list[int], activations: list[dict], channels: list[dict]) -> dict:
     if len(gates) != 2 or sorted(gates) not in [sorted((a, b)) for a, b, _ in CHANNELS]:
         raise ValueError("Unsupported source-named channel")
-    else:
-        pass
     witnesses = [
         {"path": f"bodygraph.channels.{i}", "value": deepcopy(c)}
         for i, c in enumerate(channels)
@@ -65,19 +61,13 @@ def _root_path(channels: list[dict]) -> dict:
         if center == "root":
             path = edges
             break
-        else:
-            pass
         for i, channel in enumerate(channels):
             if center not in channel["centers"]:
                 continue
-            else:
-                pass
             other = next(c for c in channel["centers"] if c != center)
             if other not in visited:
                 visited.add(other)
                 queue.append((other, [*edges, i]))
-            else:
-                pass
     return {
         "model_id": "sacral_root_connected_component",
         "centers": ["sacral", "root"],
@@ -95,8 +85,6 @@ def bind_source_context(annotation: dict, chart: dict, fixing: dict) -> dict:
     key = f"{fixing['gate']}.{fixing['line']}"
     if key != annotation["key"]:
         raise ValueError("Wrong source-context reference key")
-    else:
-        pass
     activations, channels = _graph(chart)
     models = annotation["observation_models"]
     if models not in (
@@ -104,18 +92,12 @@ def bind_source_context(annotation: dict, chart: dict, fixing: dict) -> dict:
         ["direct_named_channel", "sacral_root_connected_component"],
     ):
         raise ValueError("Unsupported source observation models")
-    else:
-        pass
     observations = [_direct(annotation["named_channel_gates"], activations, channels)]
     if "sacral_root_connected_component" in models:
         observations.append(_root_path(channels))
-    else:
-        pass
     role = annotation["source_role"]
     if role not in ("exaltation", "line_intro"):
         raise ValueError("Unsupported source clause role")
-    else:
-        pass
     emphasized = (
         role in EMPHASIS[fixing["fixing_state"]] if role == "exaltation" else None
     )
@@ -153,20 +135,12 @@ def bind_source_context(annotation: dict, chart: dict, fixing: dict) -> dict:
         )
         if key == "6.3":
             text += "该句不专属于上升极性；生物结果未评估，不据盘图推断生育结果。"
-        else:
-            pass
         if key == "7.2":
             text += "被选择与社会影响未评估。"
-        else:
-            pass
         if key == "12.6":
             text += "社会形式改变、当前情绪清晰度及行动时机未评估。"
-        else:
-            pass
         if annotation["source_explicitly_says_permanent"] is False:
             text += "该句未明说永久性；本次只观察此盘，不扩展为永久性断言。"
-        else:
-            pass
     result["reading"] = (
         text + "结构观察不改变实际固定状态，不保证现实结果；完整爻义尚未验收。"
     )

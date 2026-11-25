@@ -18,24 +18,16 @@ def reference_angle_basis(
 ) -> str | None:
     if not definition:
         return None
-    else:
-        pass
     if name == "Ascendant":
         basis = definition.get("retained_ascendant_role", definition["status"])
         if basis is None or isinstance(basis, str):
             return basis
-        else:
-            pass
         raise ValueError("Reference-angle basis must be a string or unknown")
-    else:
-        pass
     if (
         name == "Midheaven"
         and definition["status"] == "geographic_pole_meridian_convention"
     ):
         return "geographic_pole_meridian_convention"
-    else:
-        pass
     return None
 
 
@@ -45,8 +37,6 @@ def qualify_reference_geometry(
     """Annotate only rows that actually depend on a qualified reference angle."""
     if not definition:
         return
-    else:
-        pass
 
     def qualify(row: dict[str, Any], names: list[str]) -> None:
         bases = {
@@ -59,8 +49,6 @@ def qualify_reference_geometry(
             row["physical_reference_geometry_resolved"] = not any(
                 basis in UNRESOLVED_REFERENCE_BASES for basis in bases.values()
             )
-        else:
-            pass
 
     def qualify_reading(row: dict[str, Any]) -> None:
         qualify(row, list(row.get("factor_longitudes", {})))
@@ -71,8 +59,6 @@ def qualify_reference_geometry(
                 "这条原文解释依赖未解析的物理参考；当前仅有后端约定下的形式条件，"
                 "不能据此判定该主题适用。"
             )
-        else:
-            pass
 
     for row in geometry.get("midpoint_axes", []):
         qualify(row, [row["id_a"], row["id_b"]])
@@ -98,11 +84,7 @@ def qualify_reference_geometry(
                             "physical_reference_geometry_resolved"
                         ],
                     )
-                else:
-                    pass
                 if "source_interpretation" in row:
                     qualify_reading(row["source_interpretation"])
-                else:
-                    pass
     for row in geometry.get("interpretations", []):
         qualify_reading(row)

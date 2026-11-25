@@ -90,12 +90,8 @@ def calculate_jieqi_year(
             snapshot_text=snapshot_text,
             selected_sections=selected_sections,
         )
-    else:
-        pass
     if missing_terms:
         result["warnings"] = [f"未识别的节气名称：{'、'.join(missing_terms)}"]
-    else:
-        pass
     return result
 
 
@@ -120,13 +116,9 @@ def calculate_nongli_time(
     """
     if ad != 1:
         raise ValueError("离线农历换算当前仅支持公元日期（ad=1）。")
-    else:
-        pass
 
     if time_alg not in (0, 1):
         raise ValueError("time_alg 仅支持 0（真太阳时）或 1（直接时间）。")
-    else:
-        pass
 
     timezone_name = zone or DEFAULT_BIRTH_TIMEZONE
     input_datetime = _parse_calendar_datetime(date, time)
@@ -156,8 +148,6 @@ def calculate_nongli_time(
             warnings.append(
                 "time_alg=0 需要 lon 或 gps_lon 才能计算真太阳时，已回退为直接时间。"
             )
-    else:
-        pass
 
     pillars = BaZiCalendar.get_four_pillars(
         clock,
@@ -176,8 +166,6 @@ def calculate_nongli_time(
         raise ValueError(
             lunar_support.get("reason") or "离线农历换算当前不支持该日期。"
         )
-    else:
-        pass
     summary = (
         f"{calendar_context['solar_datetime']} 对应农历"
         f"{lunar_calendar.get('display', '未知')}，"
@@ -266,6 +254,4 @@ def calculate_nongli_time(
     }
     if warnings:
         result["warnings"] = warnings
-    else:
-        pass
     return result

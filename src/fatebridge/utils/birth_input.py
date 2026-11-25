@@ -30,25 +30,15 @@ def normalize_gender(gender: object) -> Literal["男", "女", "未知"]:
     """
     if gender is None:
         return "未知"
-    else:
-        pass
     if isinstance(gender, bool):
         return "男" if gender else "女"
-    else:
-        pass
     token = str(gender).strip().casefold()
     if not token:
         return "未知"
-    else:
-        pass
     if token in _MALE_GENDER_TOKENS:
         return "男"
-    else:
-        pass
     if token in _FEMALE_GENDER_TOKENS:
         return "女"
-    else:
-        pass
     return "未知"
 
 
@@ -113,10 +103,6 @@ class PersonInfo(BaseModel):
                 raise ValueError(
                     f"无效的日期: {year}年{month}月{v}日 " f"(该月只有{max_day}天)"
                 )
-            else:
-                pass
-        else:
-            pass
         return v
 
     @model_validator(mode="after")
@@ -126,8 +112,6 @@ class PersonInfo(BaseModel):
             and "birth_minute" not in self.model_fields_set
         ):
             raise ValueError("birth_second需要显式提供birth_minute；不能替未知分钟填0")
-        else:
-            pass
         return self
 
 
@@ -171,12 +155,8 @@ def create_person_info(
     clock: _BirthClockComponents = {}
     if birth_minute is not None:
         clock["birth_minute"] = birth_minute
-    else:
-        pass
     if birth_second is not None:
         clock["birth_second"] = birth_second
-    else:
-        pass
     return PersonInfo(
         name=name,
         birth_year=birth_year,

@@ -65,8 +65,6 @@ def _validated_ephemeris_path(path: Optional[str]) -> Optional[str]:
             "Swiss Ephemeris search path must contain no NUL and fit within "
             f"{MAX_EPHEMERIS_PATH_BYTES} encoded bytes; otherwise the library silently uses its default"
         )
-    else:
-        pass
     return path or None
 
 
@@ -82,8 +80,6 @@ def default_ephe_dir() -> Optional[str]:
     candidate = _PROJECT_ROOT / "ephe"
     if has_project_ephemeris_files(candidate):
         return str(candidate)
-    else:
-        pass
     return verified_user_ephemeris_dir()
 
 
@@ -122,8 +118,6 @@ def configure_ephemeris_path(path: Optional[str] = None) -> Optional[str]:
     with _EPHEMERIS_LOCK:
         if swe is None:
             return None
-        else:
-            pass
         resolved = _validated_ephemeris_path(
             os.environ.get("SE_EPHE_PATH")
             or (path if path is not None else default_ephe_dir())
@@ -163,8 +157,6 @@ def preserve_ephemeris_path() -> Iterator[None]:
                 signature = (id(swe), selected)
                 _THREAD_STATE.signature = signature
                 _LAST_APPLIED_PATH = signature
-            else:
-                pass
 
 
 def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
@@ -183,8 +175,6 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
     ):
         if swe is None:
             raise ModuleNotFoundError("swisseph is unavailable")
-        else:
-            pass
         selected = configured_ephemeris_path()
         signature = (id(swe), selected)
         if (
@@ -196,8 +186,6 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
             swe.set_ephe_path(selected or "")
             _THREAD_STATE.signature = signature
             _LAST_APPLIED_PATH = signature
-        else:
-            pass
         jpl = configured_jpl_file()
         invoke = partial(
             native_rotation_call,
@@ -214,8 +202,6 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
                     configured_path=configured_ephemeris_path,
                 )
             )
-        else:
-            pass
         try:
             args, kwargs, strict_result = prepare_jpl_call(
                 swe, jpl, operation, args, kwargs
@@ -227,8 +213,6 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
             raise EphemerisSourceError("jpl_native_failed") from error
         if strict_result:
             check_jpl_result(swe, result, operation)
-        else:
-            pass
         return observe(result)
 
 
@@ -251,24 +235,14 @@ def ephemeris_model_from_retflag(retflag: int) -> str:
     """
     if swe is None:
         return "unavailable"
-    else:
-        pass
     if retflag < 0:
         return "error"
-    else:
-        pass
     if retflag & swe.FLG_MOSEPH:
         return "moshier"
-    else:
-        pass
     if retflag & swe.FLG_JPLEPH:
         return "jpl"
-    else:
-        pass
     if retflag & swe.FLG_SWIEPH:
         return "swieph"
-    else:
-        pass
     return "unknown"
 
 
@@ -280,8 +254,6 @@ def native_ephemeris_errors(
     swe_error = getattr(target, "Error", None)
     if isinstance(swe_error, type) and issubclass(swe_error, BaseException):
         return (swe_error, RuntimeError, OSError, OverflowError, ValueError)
-    else:
-        pass
     return (RuntimeError, OSError, OverflowError, ValueError)
 
 

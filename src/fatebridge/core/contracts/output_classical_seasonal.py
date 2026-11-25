@@ -55,8 +55,6 @@ class SeasonalClimateReference(PartialOutput):
             self.source_ref is not None or self.source_layers is not None
         ):
             raise ValueError("待核简表不能同时声称已核对的原典出处与层次")
-        else:
-            pass
         if (
             self.source_review_status
             == "bing_unit_developer_collation_not_full_acceptance"
@@ -69,18 +67,10 @@ class SeasonalClimateReference(PartialOutput):
                 for key, value in expected.items():
                     if key in self.source_ref and self.source_ref[key] != value:
                         raise ValueError("丙火校勘状态与实际来源身份不符")
-                    else:
-                        pass
-            else:
-                pass
-        else:
-            pass
         if (
             self.source_layers is not None
             and self.source_layers.get("chart_conditions_status") is not None
             and self.source_layers["chart_conditions_status"] != "not_adjudicated"
         ):
             raise ValueError("调候来源条件不能冒作已裁定全盘取用")
-        else:
-            pass
         return self

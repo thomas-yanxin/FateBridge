@@ -39,12 +39,8 @@ def resolve_meihua_clock(
     supplied_components = ["year", "month", "day", "hour"]
     if minute_supplied:
         supplied_components.append("minute")
-    else:
-        pass
     if seconds_supplied:
         supplied_components.append("second")
-    else:
-        pass
     evidence: CivilClockEvidence = {
         "ruleset_id": "meihua_civil_clock_v1",
         "version": "1.0.0",
@@ -90,6 +86,4 @@ def resolve_meihua_clock(
             "input_precision_certifies_accuracy": False,
             "original_text_uniquely_prescribes_seconds": False,
         }
-    else:
-        pass
     return ResolvedMeihuaClock(resolved_clock, evidence)

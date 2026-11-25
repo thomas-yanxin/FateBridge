@@ -81,8 +81,6 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
     for group in groups:
         if spec.key not in group.consuming_tools.split():
             continue
-        else:
-            pass
         implementation_refs: tuple[str, ...] = (
             f"src/fatebridge/{group.implementation_path}",
         )
@@ -101,8 +99,6 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 "https://www.astro.com/swisseph/swephprg.htm",
             )
             error_sources += ("numerical_solver",)
-        else:
-            pass
         records.append(
             MethodContract(
                 method_id=f"fatebridge.{group.method_name}.contract_v1",
@@ -216,8 +212,6 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 requires_non_null_output="chart",
             )
         )
-    else:
-        pass
     if spec.key == "human_design":
         records.append(
             MethodContract(
@@ -266,8 +260,6 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 ),
             )
         )
-    else:
-        pass
     if spec.key == "astro_chart":
         records.append(
             MethodContract(
@@ -299,12 +291,8 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 ),
             )
         )
-    else:
-        pass
     if not records:
         raise ValueError(f"未登记领域方法：{spec.key}")
-    else:
-        pass
     # note (methods): Preserve the published method IDs of the two numerical indices.
     return tuple(
         (

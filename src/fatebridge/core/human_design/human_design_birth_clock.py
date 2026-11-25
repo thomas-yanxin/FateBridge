@@ -39,8 +39,6 @@ class ConfirmedLeapSecond:
     def from_utc_anchor(cls, utc: datetime) -> ConfirmedLeapSecond:
         if (utc.hour, utc.minute, utc.second) != (23, 59, 59):
             raise ValueError("当地60秒未对应UTC闰秒分钟，不能归并到下一秒")
-        else:
-            pass
         effective_date = (utc.date() + timedelta(days=1)).isoformat()
         entries = leap_table()["entries"]
         for previous, following in zip(entries, entries[1:]):
@@ -48,8 +46,6 @@ class ConfirmedLeapSecond:
             after = following["tai_minus_utc_seconds"]
             if following["effective_date"] == effective_date and after - before == 1:
                 return cls(utc, before, after)
-            else:
-                pass
         raise ValueError("冻结IERS记录未确认该UTC闰秒，不推测未来插秒")
 
     @property
@@ -80,8 +76,6 @@ def resolve_birth_clock(
 ) -> BirthClock:
     if type(birth_second) is not int or not 0 <= birth_second <= 60:
         raise ValueError("出生秒须为0至60的整数；60仅用于已公布UTC闰秒")
-    else:
-        pass
     local = datetime(
         birth_year,
         birth_month,
@@ -97,8 +91,6 @@ def resolve_birth_clock(
         return BirthClock(
             local, utc, local.isoformat(), utc.isoformat(), False, None, None
         )
-    else:
-        pass
     leap = ConfirmedLeapSecond.from_utc_anchor(utc)
     tt = leap.tt.as_float()
     local_label = local.isoformat()[:17] + "60" + local.isoformat()[19:]
@@ -139,8 +131,6 @@ def replay_birth_clock(clock: BirthClock, *, method: str | None) -> BirthClock:
     """Reproduce the old scalar only when verifying an earlier receipt."""
     if clock.evidence is None or method != METHOD:
         return clock
-    else:
-        pass
     effective = clock.utc_anchor + timedelta(seconds=1)
     tt = (
         _julian_day(effective)
@@ -178,11 +168,7 @@ def verify_birth_clock(payload: dict[str, Any]) -> None:
             )
         ):
             raise ValueError("闰秒出生缺少冻结日历见证")
-        else:
-            pass
         return
-    else:
-        pass
     clock = replay_birth_clock(
         resolve_birth_clock(**proof["input"]),
         method=payload.get("clock_evidence", {}).get("method_id"),
@@ -198,5 +184,3 @@ def verify_birth_clock(payload: dict[str, Any]) -> None:
         or policy.get("birth_timezone") != proof["input"]["birth_timezone"]
     ):
         raise ValueError("闰秒标签、来源、当地钟或选定TT不一致")
-    else:
-        pass

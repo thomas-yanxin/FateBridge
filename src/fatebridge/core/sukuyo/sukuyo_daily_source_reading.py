@@ -38,8 +38,6 @@ def daily_source_reading_lines(
                 "乃至□戌的字形保留酉／西未定，前文典籍后的具／且及并字异体也未作全段逐字验收；"
                 "当直的直字可读。未由这些读字选择现代平明、昼夜时长、桧尾半日或闰小月优先。"
             )
-        else:
-            pass
         chinese = position.get("direct_chinese_print_reference")
         if chinese:
             lines.append(
@@ -52,16 +50,10 @@ def daily_source_reading_lines(
                 "尚未由所选五句及段序建立现代钟时、逐时七曜顺序、桧尾半日或闰小月优先。"
                 "‘萬不失一’是原典效力宣称，未作为现实预测证据。"
             )
-        else:
-            pass
-    else:
-        pass
     if day["weekday"]["luminary"] == "月":
         lines.append(
             "上卷月曜主文私精与下卷私情字面不同；未改字补定上卷旅行规则，因私出行条件仅按下卷匹配。"
         )
-    else:
-        pass
     comparative_clock = day["calendar_day"]["clock_doctrine"].get(
         "comparative_time_systems"
     )
@@ -74,35 +66,25 @@ def daily_source_reading_lines(
             "三十时不是现代三十小时，居俗八时也不是T1299昼八夜八；"
             "这些对照未证明旦等于平明、现代固定钟时、太阳高度或桧尾前后半，未代入本次计算。"
         )
-    else:
-        pass
     source_specific_clock = day["calendar_day"]["clock_doctrine"].get(
         "source_specific_time_calibration"
     )
     if source_specific_clock:
         lines.extend(source_specific_time_lines(source_specific_clock))
-    else:
-        pass
     commentarial_clock = day["calendar_day"]["clock_doctrine"].get(
         "commentarial_boundary_reference"
     )
     if commentarial_clock:
         lines.extend(commentarial_boundary_lines(commentarial_clock))
-    else:
-        pass
     phase_clock = day["calendar_day"]["clock_doctrine"].get("phase_and_time_reference")
     if phase_clock:
 
         lines.extend(phase_clock_lines(phase_clock))
-    else:
-        pass
     senmyo = day["calendar_day"]["clock_doctrine"].get(
         "senmyo_phase_annotation_reference"
     )
     if senmyo:
         lines.extend(phase_annotation_lines(senmyo))
-    else:
-        pass
     historical_clock = day["calendar_day"]["clock_doctrine"].get(
         "historical_clock_arithmetic"
     )
@@ -111,8 +93,6 @@ def daily_source_reading_lines(
     )
     if futen_clock:
         lines.extend(futen_clock_lines(futen_clock))
-    else:
-        pass
     if historical_clock:
         lines.append(
             "具注历时刻研究对照：相马充、渡边瑞穗子、谷川清隆2019年研究所选998至1020年记录，"
@@ -130,14 +110,10 @@ def daily_source_reading_lines(
             "论文把所选日出入解释为无大气差的太阳中心过几何地平，这只是作者对该记录的推断；"
             "未重做其天文比较，也未给T1299平明设零度、转换本次日界或桧尾半日，未改变事项。"
         )
-    else:
-        pass
     printed_clock = day["calendar_day"]["clock_doctrine"].get("kenyu_printed_reference")
     if printed_clock:
 
         lines.extend(printed_clock_reading_lines(printed_clock))
-    else:
-        pass
     taibai = day["taibai_direction_reference"]
     lines.append(
         f"下卷太白月日方位主表在入月第{taibai['lunar_day']}日列为{taibai['location']}；这是日序查表，不是实测金星方位或天文顺逆行。顺逆行路判据尚未核定，未据此改变事项宜忌。"
@@ -146,8 +122,6 @@ def daily_source_reading_lines(
         lines.append(
             "明本校记删去初十、二十、三十的天上行；本日该见证未列，不补为天上，也不解释成没有太白或行动已获允许。"
         )
-    else:
-        pass
     clothing = day.get("clothing_reference")
     if clothing:
         labels_clothing = {"favorable": "列可用", "caution": "按余并失列慎用"}
@@ -174,8 +148,6 @@ def daily_source_reading_lines(
                     + "／".join(text for text in excerpts if text)
                     + "；口诀与上卷裁衣断语分别保留，未纳入事项汇总，不保证现实应验。"
                 )
-            else:
-                pass
         predicate_limits = {
             "教女人裁衣服": "此条含教学与身份条件，不能泛化为任何人裁衣",
             "初王者嚴服觀兵": "此条同时要求王者严服与观兵，王者身份不能代替观兵条件，也未泛化为普通穿衣",
@@ -187,8 +159,6 @@ def daily_source_reading_lines(
                 + predicate_limits.get(predicate["literal"], predicate["reason"])
                 + "；未代入本次行为规则。"
             )
-    else:
-        pass
     six = day.get("six_palace_reference")
     if six and six["status"] == "natal_reference":
         members = "、".join(f"{r['name']}宿{r['mansion']}" for r in six["members"])
@@ -201,8 +171,6 @@ def daily_source_reading_lines(
             "本次未提供本命宿，个人三九日关系未计算，六宫位置未计算；"
             "七曜运行犯宿未计算，原文要求的三九参断亦未完成，未以历日宿或星期代替。"
         )
-    else:
-        pass
     methods = day.get("lower_methods") or {}
     group = (methods.get("nature") or {}).get("selected_group")
     if group:
@@ -213,14 +181,10 @@ def daily_source_reading_lines(
             lines.append(
                 f"下卷校勘：{variant['meaning']}（校记{variant['apparatus_id']}）。"
             )
-    else:
-        pass
     if methods:
         lines.append(
             f"下卷七曜证言为{methods['weekday']['literal_title']}（{methods['weekday']['locator']}）；继续按声明的{reference_zone}民用日索引，未核定平明钟时边界。"
         )
-    else:
-        pass
     special = day.get("special_day_evidence")
     if special:
         primary_labels = "、".join(special["primary"]["matched_labels"])
@@ -269,15 +233,11 @@ def daily_source_reading_lines(
             if label in relevant_labels:
                 if clause not in lower_body:
                     raise ValueError("特殊日词义参考原段已变，须重新校勘")
-                else:
-                    pass
                 lines.append(
                     f"{label}标签的传统词义另参考下卷大正{locator}：“{clause}”。"
                     "这是该卷的专门事项范围，不表示所有学习、交易或旅行均宜；"
                     "未声称其他印本说明全文相同，也不由此选择候选主宿、改变本次事项或认证现实效果。"
                 )
-            else:
-                pass
         witness_names = {
             "upper_taisho": "上卷大正",
             "lower_taisho": "下卷大正",
@@ -291,22 +251,16 @@ def daily_source_reading_lines(
                 main_literal = row.get("source_main_literal")
                 if main_literal and main_literal != row["literal_mansion"]:
                     item += f"（正文{main_literal}，校记重建{row['literal_mansion']}）"
-                else:
-                    pass
                 main_weekday = row.get("source_main_weekday_index")
                 if main_weekday is not None and main_weekday != row["weekday_index"]:
                     item += (
                         f"（正文{'日月火水木金土'[main_weekday]}曜，"
                         f"校记重建{row['luminary']}曜）"
                     )
-                else:
-                    pass
                 witness_items.append(item)
             matched_text = "、".join(witness["matched_labels"]) or "未匹配标签"
             if not name:
                 matched_text = "日宿未定，候选不代入确定标签"
-            else:
-                pass
             completeness = (
                 "本次标签集合完整"
                 if witness["labels_complete_for_selected_day"]
@@ -326,15 +280,11 @@ def daily_source_reading_lines(
                 lines.append(
                     f"{witness_name}本曜宿字{words}未识别，不默改为胃或氐；该卷标签集合未定，不把未匹配当作无此特殊日。"
                 )
-            else:
-                pass
             if comparison["disagrees_with_primary"]:
                 witness_labels = "、".join(comparison["matched_labels"]) or "未匹配标签"
                 lines.append(
                     f"{witness_name}本次为{witness_labels}，与主表不同；明本对照不代入主表或确定事项。"
                 )
-            else:
-                pass
         if not day.get("activity_assessment"):
             lower_special = next(
                 (
@@ -374,10 +324,4 @@ def daily_source_reading_lines(
                     )
                     + "本次没有事项输入，未形成事项汇总；不是现实失败或灾祸预告。"
                 )
-            else:
-                pass
-        else:
-            pass
-    else:
-        pass
     return lines

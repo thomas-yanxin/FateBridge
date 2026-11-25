@@ -26,8 +26,6 @@ def load_table() -> dict[str, Any]:
     raw = RECORD.read_bytes()
     if hashlib.sha256(raw).hexdigest() != RECORD_SHA256:
         raise RuntimeError("Witte1925 solar-arc table source checksum mismatch")
-    else:
-        pass
     return cast(Dict[str, Any], json.loads(raw))
 
 
@@ -45,17 +43,11 @@ def normalized_rows(record: dict[str, Any]) -> list[dict[str, Any]]:
             parts = raw.split()
             if len(parts) == 2:
                 degrees[index] = int(parts[0])
-            else:
-                pass
             if (row["row"], age) in unclear:
                 degrees[index] = None
-            else:
-                pass
             minute = int(parts[-1])
             if len(parts) not in (1, 2) or not 0 <= minute < 60:
                 raise RuntimeError("Invalid source table cell")
-            else:
-                pass
             degree = degrees[index]
             values.append(None if degree is None else degree * 60 + minute)
         result.append(
@@ -75,8 +67,6 @@ def _coordinate(value: int | float | Fraction) -> Fraction:
         isinstance(value, float) and not math.isfinite(value)
     ):
         raise ValueError("Table coordinates require finite explicit numbers")
-    else:
-        pass
     return Fraction(value)
 
 
@@ -99,8 +89,6 @@ def interpolate(
         or not ages[0] <= age <= ages[-1]
     ):
         raise ValueError("Source table axes require day_offset0..370 and age10..90")
-    else:
-        pass
     row0 = min(int(day // 10), len(rows) - 2)
     col0 = min(int((age - ages[0]) // 10), len(ages) - 2)
     date_weight = (day - rows[row0]["common_year_day_offset"]) / 10
@@ -113,8 +101,6 @@ def interpolate(
             weight = rw * cw
             if weight == 0:
                 continue
-            else:
-                pass
             value = rows[r]["normalized_arcminutes"][c]
             corners.append(
                 {
@@ -147,8 +133,6 @@ def interpolate(
 def _fraction(probe: dict[str, Any]) -> Fraction:
     if probe["status"] != "computed":
         raise RuntimeError("Printed worked example has unresolved source corners")
-    else:
-        pass
     return Fraction(*probe["arcminutes_fraction"])
 
 

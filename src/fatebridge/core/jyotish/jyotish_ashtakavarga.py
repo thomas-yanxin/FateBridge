@@ -162,8 +162,6 @@ def calculate(signs: Mapping[str, int]) -> dict[str, Any]:
         raise ValueError(
             "Ashtakavarga requires exactly seven planets and Ascendant, with integer signs0..11"
         )
-    else:
-        pass
     pav: dict[str, dict[str, list[int]]] = {}
     bav: dict[str, list[int]] = {}
     for target, table in zip(REFERENCES, HOUSE_ROWS):
@@ -194,11 +192,7 @@ def chart_inputs(chart: dict[str, Any]) -> dict[str, int]:
         if point["id"] in REFERENCES:
             if point["id"] in points:
                 raise ValueError("Duplicate Ashtakavarga contributor")
-            else:
-                pass
             points[point["id"]] = point
-        else:
-            pass
     return {name: SIGNS.index(points[name]["sign"]) for name in REFERENCES}
 
 
@@ -247,8 +241,6 @@ def source_profiles(
             chart_rule_ids=chart["rule_ids"],
             input_claims=chart_claims(name, chart),
         )
-    else:
-        pass
     return {"aiyar1905": other}
 
 
@@ -312,8 +304,6 @@ class SampleGrid:
     def observe(self, offset: float, raw: dict[str, Any]) -> None:
         if not math.isfinite(offset) or offset in self.offsets:
             raise ValueError("Ashtakavarga grid offsets must be finite and unique")
-        else:
-            pass
         self.offsets.add(offset)
         for name, groups in self.groups.items():
             division = int(name[1:])
@@ -338,8 +328,6 @@ class SampleGrid:
                     },
                     "sample_offsets_seconds": [],
                 }
-            else:
-                pass
             groups[key]["sample_offsets_seconds"].append(offset)
 
     def result(self) -> dict[str, Any]:
@@ -380,8 +368,6 @@ def topic_factor(
         != source_profiles(expected, name=name, chart=chart)
     ):
         raise ValueError("Ashtakavarga topic evidence contradicts chart contributors")
-    else:
-        pass
     ruler = chart["houses"][house - 1]["lord"]
     sign = packet["input_sign_indices"][ruler]
     house_sign = SIGNS.index(chart["houses"][house - 1]["sign"])

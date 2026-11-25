@@ -27,26 +27,18 @@ def lower_methods_evidence(
         "modern_utc_plus09_civil_midnight",
     }:
         raise ValueError("未知的宿曜七曜参考日界")
-    else:
-        pass
     bundle = source_bundle()
     # 牛 belongs to this source table, but never to the calendar's 27 names.
     if mansion == "牛":
         raise ValueError("下卷宿性证言不能把牛宿代入历日27宿")
-    else:
-        pass
     group = next((g for g in bundle["nature_groups"] if mansion in g["members"]), None)
     if mansion is not None and group is None:
         raise ValueError("未知的历日27宿")
-    else:
-        pass
     weekday = next(
         (w for w in bundle["weekday_records"] if w["luminary"] == luminary), None
     )
     if weekday is None:
         raise ValueError("七曜只支持日月火水木金土")
-    else:
-        pass
     normalized_upper = "轻" if upper_nature == "轻燥" else upper_nature
     return {
         "ruleset_id": bundle["id"],

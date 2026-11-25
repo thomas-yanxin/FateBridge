@@ -39,16 +39,10 @@ def event_wall_datetime(
     """
     if hour_origin not in {"midnight", "noon"}:
         raise ValueError("Unknown hour origin; select midnight or noon explicitly")
-    else:
-        pass
     if any(type(v) is not int for v in (hour, minute, second)):
         raise ValueError("Hour-origin clock parts must be integers")
-    else:
-        pass
     if not 0 <= hour <= 23 or not 0 <= minute <= 59 or not 0 <= second <= 59:
         raise ValueError("Hour-origin labels require hour0..23 and minute/second0..59")
-    else:
-        pass
     jdn = civil_date_jdn(year, month, day, calendar)
     noon = hour_origin == "noon"
     carry = int(noon and hour >= 12)
@@ -59,8 +53,6 @@ def event_wall_datetime(
         raise ValueError(
             "Final hour-origin wall label lies outside Gregorian year1..9999"
         )
-    else:
-        pass
     final_date = date.fromordinal(final_ordinal)
     wall = datetime(
         final_date.year,
@@ -76,8 +68,6 @@ def event_wall_datetime(
         raw_label = datetime(
             raw_date.year, raw_date.month, raw_date.day, hour, minute, second
         )
-    else:
-        pass
     calendar_receipt = _calendar_conversion_receipt(
         year, month, day, hour, minute, calendar, jdn, raw_label, second=second
     )

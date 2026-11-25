@@ -23,8 +23,6 @@ def validate_bundle(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("天平神护二年所选底本、校改和回指证据的固定绑定已改变")
-    else:
-        pass
 
 
 def month_witness_comparison(
@@ -40,12 +38,8 @@ def month_witness_comparison(
         or not 0 <= host_month_start_index < 60
     ):
         raise ValueError("底本月首比较须有明确月键及0至59月首干支序号")
-    else:
-        pass
     if (year, month, leap) != (766, 2, False):
         return None
-    else:
-        pass
     source = load_source(SOURCE)
     data = source.data
     validate_bundle(data)

@@ -83,6 +83,4 @@ class HumanDesignRequest(_DeferredModel):
                     }
                 )
             )
-        else:
-            pass
         return self

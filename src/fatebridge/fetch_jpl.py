@@ -90,23 +90,17 @@ def _signature(path: Path) -> tuple[int, int, int, int]:
 def _verify(path: Path, spec: _KernelSpec) -> KernelVerification:
     if path.is_symlink() or not path.is_file():
         raise ValueError("Kernel must be a regular file, not a symlink")
-    else:
-        pass
     original_device, original_inode, original_size_bytes, original_mtime_ns = (
         _signature(path)
     )
     if original_size_bytes != spec.bytes:
         raise ValueError("Kernel size does not match the fixed content pin")
-    else:
-        pass
     digest = hashlib.sha256()
     with path.open("rb") as stream:
         for block in iter(lambda: stream.read(_CHUNK), b""):
             digest.update(block)
     if digest.hexdigest() != spec.sha256:
         raise ValueError("Kernel SHA-256 does not match the fixed content pin")
-    else:
-        pass
     header = jpl_header(path)
     if (
         header["start_julian_day_tdb"] != spec.start_jd_tdb
@@ -115,8 +109,6 @@ def _verify(path: Path, spec: _KernelSpec) -> KernelVerification:
         != (original_device, original_inode, original_size_bytes, original_mtime_ns)
     ):
         raise ValueError("Kernel header or file changed during verification")
-    else:
-        pass
     return {
         "filename": spec.filename,
         "bytes": spec.bytes,
@@ -150,19 +142,13 @@ def _acquire(
         raise ValueError(
             "Choose a destination within native path limits and without search-path delimiters"
         )
-    else:
-        pass
     target = destination / spec.filename
     if target.exists() or target.is_symlink():
         _verify(target, spec)
         if receipt is not None:
             receipt["existing_verified_file_reused"] = True
             receipt["network_request_performed"] = False
-        else:
-            pass
         return target
-    else:
-        pass
     destination.mkdir(parents=True, exist_ok=True)
     descriptor, staging_name = tempfile.mkstemp(
         prefix=".de441-download-", dir=destination
@@ -200,15 +186,11 @@ def _acquire(
                     raise ValueError(
                         "Full acquisition requires an unambiguous HTTP 200 response"
                     )
-                else:
-                    pass
                 length = response.headers.get("Content-Length")
                 if length is not None and int(length) != spec.bytes:
                     raise ValueError(
                         "Server Content-Length differs from the fixed kernel size"
                     )
-                else:
-                    pass
                 received = 0
                 for block in iter(lambda: response.read(_CHUNK), b""):
                     received += len(block)
@@ -217,13 +199,9 @@ def _acquire(
                         raise ValueError(
                             "Server returned more bytes than the fixed kernel size"
                         )
-                    else:
-                        pass
                     output.write(block)
                     if progress is not None:
                         progress(received, spec.bytes)
-                    else:
-                        pass
                 output.flush()
                 os.fsync(output.fileno())
         metadata = _verify(pending, spec)
@@ -282,8 +260,6 @@ def january_first(year: int) -> float:
 def original_header(raw: bytes) -> tuple[float, float]:
     if len(raw) != RECORD_BYTES:
         raise ValueError("Incomplete original DE441 header")
-    else:
-        pass
     begin, end, step = struct.unpack_from("<3d", raw, 2652)
     if not (
         struct.unpack_from("<i", raw, 2840)[0] == 441
@@ -298,8 +274,6 @@ def original_header(raw: bytes) -> tuple[float, float]:
         and struct.unpack_from("<3i", raw, 2844) == (899, 10, 4)
     ):
         raise ValueError("Unsupported original DE441 direct-access layout")
-    else:
-        pass
     return begin, end
 
 
@@ -314,8 +288,6 @@ def source_range(
     }
     if etag is not None:
         headers["If-Match"] = etag
-    else:
-        pass
     request = urllib.request.Request(SOURCE_URL, headers=headers)
     with urllib.request.urlopen(
         request,
@@ -343,22 +315,16 @@ def source_range(
             or (etag is not None and received["ETag"] != etag)
         ):
             raise ValueError("Original DE441 byte range or source identity changed")
-        else:
-            pass
     return raw, received
 
 
 def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
     if not 1 <= start_year < end_year <= 10000:
         raise ValueError("Require 1 <= start-year < end-year <= 10000")
-    else:
-        pass
     manifest_path = output.with_suffix(output.suffix + ".manifest.json")
     partial = output.with_suffix(output.suffix + ".partial")
     if any(path.exists() for path in (output, manifest_path, partial)):
         raise ValueError("An output, manifest or partial source already exists")
-    else:
-        pass
     output.parent.mkdir(parents=True, exist_ok=True)
     ranges: list[dict[str, int | str]] = []
     manifest: dict[str, object] = {
@@ -387,14 +353,10 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
         total = int(headers["Content-Range"].split("/")[1])
         if total != (int((end - begin) / 32) + 2) * RECORD_BYTES:
             raise ValueError("Original DE441 object length and header disagree")
-        else:
-            pass
         first = math.floor((january_first(start_year) - 32 - begin) / 32)
         stop = math.ceil((january_first(end_year) + 32 - begin) / 32)
         if not 0 <= first < stop <= (end - begin) / 32:
             raise ValueError("Requested complete span exceeds official source coverage")
-        else:
-            pass
         actual_begin, actual_end = begin + first * 32, begin + stop * 32
         modified = bytearray(header)
         title = b"FateBridge complete continuous DE441 span; original coefficient words retained"
@@ -427,8 +389,6 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
                 block, response_headers = source_range(offset, size, headers["ETag"])
                 if int(response_headers["Content-Range"].split("/")[1]) != total:
                     raise ValueError("Original DE441 object extent changed")
-                else:
-                    pass
                 for k in range(count):
                     record = block[k * RECORD_BYTES : (k + 1) * RECORD_BYTES]
                     values = struct.unpack("<1018d", record)
@@ -439,8 +399,6 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
                         raise ValueError(
                             "Nonconsecutive or nonfinite original DE441 record"
                         )
-                    else:
-                        pass
                 target.write(block)
                 raw_digest.update(block)
                 ranges.append(
@@ -463,8 +421,6 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
             actual_end,
         ):
             raise ValueError("Prepared native source extent changed")
-        else:
-            pass
         manifest.update(
             status="ready",
             active_range=None,
@@ -489,13 +445,9 @@ def verify(output: Path) -> dict[str, object]:
     )
     if not isinstance(loaded, dict):
         raise ValueError("The source manifest must be a JSON object")
-    else:
-        pass
     manifest: dict[str, object] = loaded
     if manifest["status"] != "ready" or manifest["output"] != output.name:
         raise ValueError("The source manifest is not ready or bound to this basename")
-    else:
-        pass
     with output.open("rb") as source:
         source.seek(RECORD_BYTES)
         constants = source.read(RECORD_BYTES)
@@ -511,8 +463,6 @@ def verify(output: Path) -> dict[str, object]:
         or info["end_julian_day_tdb"] != manifest["end_julian_day_tdb"]
     ):
         raise ValueError("The prepared source bytes or extent changed")
-    else:
-        pass
     return manifest
 
 
@@ -538,17 +488,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             parser.error(
                 "--output span mode cannot be combined with --dest or --ca-file"
             )
-        else:
-            pass
         if args.verify_only:
             if args.start_year is not None or args.end_year is not None:
                 parser.error(
                     "span --verify-only uses the saved manifest, not year arguments"
                 )
-            else:
-                pass
-        else:
-            pass
         try:
             if args.verify_only:
                 result = verify(args.output)
@@ -559,20 +503,14 @@ def main(argv: Sequence[str] | None = None) -> int:
                     parser.error(
                         "span preparation requires --start-year and --end-year"
                     )
-                else:
-                    pass
                 result = prepare(args.output, start_year, end_year)
         except (OSError, ValueError) as error:
             print(f"error: {error}", file=sys.stderr)
             return 1
         print(json.dumps(result, indent=2))
         return 0
-    else:
-        pass
     if args.start_year is not None or args.end_year is not None:
         parser.error("year arguments require --output span mode")
-    else:
-        pass
     destination = args.dest if args.dest is not None else default_dest()
     try:
         path = destination / DE441.filename
@@ -587,8 +525,6 @@ def main(argv: Sequence[str] | None = None) -> int:
                 if milestone != last_milestone or received_bytes == total_bytes:
                     print(f"DE441 {received_bytes}/{total_bytes} bytes", flush=True)
                     last_milestone = milestone
-                else:
-                    pass
 
             path = fetch_de441(destination, ca_file=args.ca_file, progress=progress)
     except (OSError, ValueError) as error:
@@ -611,5 +547,3 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-else:
-    pass

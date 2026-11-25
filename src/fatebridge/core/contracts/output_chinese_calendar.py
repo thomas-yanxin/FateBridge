@@ -116,8 +116,6 @@ class SolarTerm(CivilPointLabelEvidence):
         # Literal[0, 1] alone also accepts True/False as Python-equal values.
         if value is not None and type(value) is not int:
             raise ValueError("节气fold必须为整数0或1")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -133,12 +131,8 @@ class SolarTerm(CivilPointLabelEvidence):
             )
         ):
             raise ValueError("当地钟时未定义时不能同时声明当地钟面或日序")
-        else:
-            pass
         if self.datetime_with_offset is None:
             return self
-        else:
-            pass
         text = self.datetime_with_offset
         clock = ZonedCalendar.from_isoformat(text)
         offset = clock.offset
@@ -147,15 +141,9 @@ class SolarTerm(CivilPointLabelEvidence):
             and offset.total_seconds() != self.utc_offset_seconds
         ):
             raise ValueError("节气时间字符串与utc_offset_seconds不一致")
-        else:
-            pass
         if self.datetime is not None:
             if not clock.matches_wall_label(self.datetime):
                 raise ValueError("节气旧钟面标签与带偏移时间不一致")
-            else:
-                pass
-        else:
-            pass
         return self
 
 

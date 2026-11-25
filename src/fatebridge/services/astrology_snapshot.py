@@ -67,8 +67,6 @@ def _build_standard_chart_snapshot_sections(
         info_lines.append(
             f"声明的输入钟时：{clock['input_wall_datetime']}（{clock_label}）"
         )
-    else:
-        pass
 
     detail_lines = [
         f"元素分布：{_build_balance_line(payload.get('element_balance', {}), ELEMENT_LABELS_ZH)}",
@@ -77,8 +75,6 @@ def _build_standard_chart_snapshot_sections(
 
     if chart_variant == "chart13":
         detail_lines.append(f"13扇区数量：{len(payload.get('thirteen_sectors', []))}")
-    else:
-        pass
 
     hellenistic = payload.get("hellenistic", {})
     if chart_variant == "hellen_chart":
@@ -94,8 +90,6 @@ def _build_standard_chart_snapshot_sections(
                 f"角宫星体：{angular_labels or ('未知' if angular_planets is None else '无')}",
             ]
         )
-    else:
-        pass
 
     india = payload.get("india", {})
     if chart_variant == "india_chart":
@@ -126,10 +120,6 @@ def _build_standard_chart_snapshot_sections(
             detail_lines.append(
                 f"生时敏感性：{india['birth_time_sensitivity']['status']}；{india['birth_time_sensitivity']['limitation']}"
             )
-        else:
-            pass
-    else:
-        pass
 
     greek_lines = (
         ["福点：未知（上升无法确定）。"]
@@ -142,8 +132,6 @@ def _build_standard_chart_snapshot_sections(
         greek_lines = [
             f"福点：{lot_of_fortune.get('sign_zh', '未知')} {_format_zodiac_degree(lot_of_fortune.get('degree_in_sign'))}，第{lot_of_fortune.get('house', '—')}宫"
         ]
-    else:
-        pass
 
     return [
         ("起盘信息", "\n".join(info_lines).strip()),

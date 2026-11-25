@@ -63,29 +63,19 @@ class TransmissionRelationRow(PartialOutput):
                 and branch_element_text(branch) != element
             ):
                 raise ValueError("三传支神或承座五行与本支不一致")
-            else:
-                pass
         if (
             self.god is not None
             and self.god_element is not None
             and GOD_ELEMENTS.get(self.god) != self.god_element
         ):
             raise ValueError("三传天将固有五行不一致")
-        else:
-            pass
         if self.god_element is not None and self.element is not None:
             expected = phase_relation(self.god_element, self.element)
             if self.god_to_spirit is not None and self.god_to_spirit != expected:
                 raise ValueError("三传神将生克方向不一致")
-            else:
-                pass
             war = {"克": "外战", "受克": "内战"}.get(expected)
             if "war" in self.model_fields_set and self.war != war:
                 raise ValueError("三传内外战与神将五行方向不一致")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -111,18 +101,12 @@ class TransmissionTrine(PartialOutput):
         if evidence is not None:
             if self.branches_complete is False:
                 raise ValueError("三合支未齐不能给出已成名义局体的季态")
-            else:
-                pass
             if (
                 self.nominal_element is not None
                 and evidence.nominal_element is not None
                 and self.nominal_element != evidence.nominal_element
             ):
                 raise ValueError("三合名义季态不能替换本局体五行")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -162,50 +146,34 @@ class LiurenTransmissionRelations(PartialOutput):
         if self.day_ganzhi is not None:
             if self.day_ganzhi not in SEXAGENARY_INDEX:
                 raise ValueError("三传关系需要有效日干支")
-            else:
-                pass
             day = stem_element_text(self.day_ganzhi[0])
             if self.day_element is not None and self.day_element != day:
                 raise ValueError("三传关系日干五行不一致")
-            else:
-                pass
             stages = life_stage_cycle(self.day_ganzhi[0])
             for row in self.rows or []:
                 if row.branch is None:
                     continue
-                else:
-                    pass
                 if (
                     row.day_stem_life_stage is not None
                     and row.day_stem_life_stage != stages.get(row.branch)
                 ):
                     raise ValueError("三传生墓与本次日干十二运不一致")
-                else:
-                    pass
                 if row.xun_kong is not None and row.xun_kong != (
                     row.branch in kongwang_for_ganzhi(self.day_ganzhi)[:2]
                 ):
                     raise ValueError("三传本空与占日旬空不一致")
-                else:
-                    pass
                 if (
                     row.element is not None
                     and row.day_relation is not None
                     and row.day_relation != liuqin_against_day(day, row.element)
                 ):
                     raise ValueError("三传六亲没有采用支神本五行")
-                else:
-                    pass
-        else:
-            pass
         if self.rows is not None and [r.position for r in self.rows] != [
             "initial",
             "middle",
             "final",
         ]:
             raise ValueError("三传关系必须保留初中末三位")
-        else:
-            pass
         if self.rows is not None and self.named_structures is not None:
             if all(r.branch is not None for r in self.rows):
 
@@ -215,10 +183,6 @@ class LiurenTransmissionRelations(PartialOutput):
                         [r.branch for r in self.rows if r.branch is not None]
                     ),
                 )
-            else:
-                pass
-        else:
-            pass
         if (
             self.course_conditions is not None
             and self.day_ganzhi is not None
@@ -243,26 +207,14 @@ class LiurenTransmissionRelations(PartialOutput):
                         },
                     ),
                 )
-            else:
-                pass
-        else:
-            pass
         if self.rules is not None:
             if [r.id for r in self.rules] != [i for i, _ in RULE_NAMES]:
                 raise ValueError("三传九条结构账本不能遗漏、重复或调序")
-            else:
-                pass
             if self.matched_rule_ids is not None and all(
                 r.matched is not None for r in self.rules
             ):
                 if self.matched_rule_ids != [r.id for r in self.rules if r.matched]:
                     raise ValueError("三传结构命中摘要与逐条账本不一致")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -271,16 +223,10 @@ def compare_present_relations(actual: object, expected: object) -> None:
         for k, v in actual.items():
             if k in expected:
                 compare_present_relations(v, expected[k])
-            else:
-                pass
     elif isinstance(actual, list) and isinstance(expected, list):
         if len(actual) != len(expected):
             raise ValueError("三传关系的队列与本课不一致")
-        else:
-            pass
         for a, b in zip(actual, expected):
             compare_present_relations(a, b)
     elif actual != expected:
         raise ValueError("三传关系与本课日干支、支神、天将或四课不一致")
-    else:
-        pass

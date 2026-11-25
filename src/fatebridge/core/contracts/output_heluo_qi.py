@@ -133,27 +133,15 @@ class HeluoYuanqiOppositionCondition(PartialOutput):
         if self.yuan_body_ids is not None and self.yuan_absent is not None:
             if self.yuan_absent != (not self.yuan_body_ids):
                 raise ValueError("元气缺席须与实际卦体位置一致。")
-            else:
-                pass
-        else:
-            pass
         if self.fan_body_ids is not None and self.fan_present is not None:
             if self.fan_present != bool(self.fan_body_ids):
                 raise ValueError("反候选命中须与实际卦体位置一致。")
-            else:
-                pass
-        else:
-            pass
         if all(
             v is not None
             for v in (self.yuan_absent, self.fan_present, self.condition_match)
         ):
             if self.condition_match != (self.yuan_absent and self.fan_present):
                 raise ValueError("无正而有反式不能省略无正前提。")
-            else:
-                pass
-        else:
-            pass
         return self
 
 

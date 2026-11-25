@@ -60,10 +60,6 @@ def build_control_conditions(
             )
             if context is not None:
                 cs[p][MOVING_SI_KEY] = context
-            else:
-                pass
-        else:
-            pass
     back_generation_conditions = (
         back_generation_conditions
         or build_back_generation_conditions(
@@ -185,13 +181,9 @@ def build_control_conditions(
             activity_match[p] = None
         if p in activity_overrides:
             activity_match[p] = None
-        else:
-            pass
         if moving[p] and activity_match[p] is None and preliminary[p] is not False:
             preliminary[p] = None
             reasons[p].append("暗动前提的生扶来源待审")
-        else:
-            pass
     # Simultaneous moving control cannot be resolved by arbitrary loop order.
     competing = {
         p: [
@@ -216,8 +208,6 @@ def build_control_conditions(
     for p in rows:
         if not moving[p] or activity_match[p] is not None:
             continue
-        else:
-            pass
         helpers = (
             cs[p]["supporting_moving_positions"] + cs[p]["supporting_static_positions"]
         )
@@ -237,8 +227,6 @@ def build_control_conditions(
                 None if preliminary[p] is True and competing[p] else preliminary[p]
             )
             reasons[p].remove("暗动前提的生扶来源待审")
-        else:
-            pass
     confirmed: dict[int, list[int]] = {}
     pending: dict[int, list[int]] = {}
     for p in rows:
@@ -252,8 +240,6 @@ def build_control_conditions(
                 or element_relation(source["element"], target["element"]) != "克爻"
             ):
                 continue
-            else:
-                pass
             source_month = monthly_qualified[p] is True
             target_month = monthly_qualified[q] is True
             if moving[p]:

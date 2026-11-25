@@ -132,16 +132,10 @@ def normalize_section_title(title: str | None) -> str:
     text = f"{title or ''}".strip()
     if not text:
         return ""
-    else:
-        pass
     if text.startswith("基于") and text.endswith("推运"):
         return "基于X点推运"
-    else:
-        pass
     if text.startswith("基于") and text.endswith("起运"):
         return "基于X起运"
-    else:
-        pass
     return text
 
 
@@ -153,8 +147,6 @@ def unique_list(items: list[str]) -> list[str]:
         if value and value not in seen:
             seen.add(value)
             output.append(value)
-        else:
-            pass
     return output
 
 
@@ -164,15 +156,11 @@ def get_meaning_setting_meta(key: str) -> dict[str, str]:
             "title": "悬浮注释（仅AI导出）：",
             "checkbox": "在对应分段输出六壬/遁甲/占星悬浮注释",
         }
-    else:
-        pass
     if key in AI_EXPORT_ASTRO_MEANING_TECHNIQUES:
         return {
             "title": "占星注释（仅AI导出）：",
             "checkbox": "在对应分段输出星/宫/座/相/希腊点释义",
         }
-    else:
-        pass
     return {"title": "", "checkbox": ""}
 
 
@@ -180,8 +168,6 @@ def get_technique_info(key: str) -> TechniqueInfo | None:
     base = next((item for item in AI_EXPORT_TECHNIQUES if item["key"] == key), None)
     if base is None:
         return None
-    else:
-        pass
     meaning_meta = get_meaning_setting_meta(key)
     has_planet_info = key in AI_EXPORT_PLANET_INFO_TECHNIQUES
     has_astro_meaning = key in AI_EXPORT_ASTRO_MEANING_TECHNIQUES

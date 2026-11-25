@@ -67,8 +67,6 @@ def _gua_tables() -> Tuple[Dict[str, Dict[str, str]], Dict[str, str], Dict[str, 
             name_to_tri[name] = {"up": up, "low": low}
             tri_to_name[f"{up}|{low}"] = name
             name_index[name] = payload["index"]
-        else:
-            pass
     return name_to_tri, tri_to_name, name_index
 
 

@@ -43,8 +43,6 @@ def solar_longitude(jd_tt: float) -> float:
     """Geocentric apparent native-frame longitude at the given TT point."""
     if not math.isfinite(jd_tt):
         raise ValueError("Solar TT Julian day must be finite")
-    else:
-        pass
     position = AnalyticObserver().apparent_position("Sun", jd_tt - 2451545.0)
     x, y, _ = mean_j2000_apparent_ecliptic(position, jd_tt)
     return math.degrees(math.atan2(y, x)) % 360.0

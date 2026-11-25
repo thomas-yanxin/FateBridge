@@ -78,23 +78,15 @@ def normalize_context(value: dict[str, Any] | None) -> dict[str, Any]:
     """Reports stay reports; no age, appearance or timed-event certainty inferred."""
     if value is not None and not isinstance(value, dict):
         raise ValueError("Radicality context must be an object or unknown")
-    else:
-        pass
     raw = value or {}
     if set(raw) - {*CONTEXT_FLAGS, "figure_origin"}:
         raise ValueError("Unknown radicality context field")
-    else:
-        pass
     for key in CONTEXT_FLAGS:
         if raw.get(key) is not None and type(raw[key]) is not bool:
             raise ValueError("Radicality reports must be booleans or unknown")
-        else:
-            pass
     origin = raw.get("figure_origin")
     if origin not in {None, "propounded_question", "timed_event", "unknown"}:
         raise ValueError("Invalid figure origin")
-    else:
-        pass
     return {
         "figure_origin": origin or "propounded_question",
         **{key: raw.get(key) for key in CONTEXT_FLAGS},
@@ -111,12 +103,8 @@ def hour_affinity(
 ) -> dict[str, Any]:
     if hour_ruler is not None and hour_ruler not in PLANETS:
         raise ValueError("Hour ruler must be a traditional planet or unknown")
-    else:
-        pass
     if sect not in {"day", "night", None}:
         raise ValueError("Invalid chart sect")
-    else:
-        pass
     sign_index = (
         None if ascendant is None else int((angle_fraction(ascendant) % 360) // 30)
     )
@@ -181,12 +169,8 @@ def evaluate_radicality(
     """All selected clauses retain prerequisites, exceptions and unresolved terms."""
     if quesited_house not in range(1, 13):
         raise ValueError("Quesited house must be1..12")
-    else:
-        pass
     if seventh_sign not in {*SIGNS, None}:
         raise ValueError("Seventh cusp sign must be known or unknown")
-    else:
-        pass
     reported = normalize_context(context)
     lon = None if ascendant is None else angle_fraction(ascendant) % 360
     degree = None if lon is None else lon % 30
@@ -223,8 +207,6 @@ def evaluate_radicality(
     voc = moon_voc.get("void_of_course")
     if voc is not None and type(voc) is not bool:
         raise ValueError("Moon VOC must be a boolean or unknown")
-    else:
-        pass
     via = None if moon is None else 195 <= moon < 225
     moon_sign_qualification = (
         None if moon_sign is None else moon_sign in VOC_SOME_PERFORMANCE
@@ -235,21 +217,13 @@ def evaluate_radicality(
         speed = seventh_state["speed"]
         if not isinstance(speed, (int, float)):
             raise ValueError("Longitude speed must be finite")
-        else:
-            pass
         from math import isfinite
 
         if not isfinite(speed):
             raise ValueError("Longitude speed must be finite")
-        else:
-            pass
         retro = speed < 0
-    else:
-        pass
     if retro is not None and type(retro) is not bool:
         raise ValueError("Retrograde state must be a boolean or unknown")
-    else:
-        pass
     seventh_afflicted = _any(
         [
             reported["seventh_cusp_afflicted_reported"],

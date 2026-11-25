@@ -25,8 +25,6 @@ class MeihuaQuerentPosition(_DeferredModel):
     def nonblank_reference(self) -> "MeihuaQuerentPosition":
         if not self.reference_label.strip():
             raise ValueError("方应须有已报方位参照，不能用空白代替未知")
-        else:
-            pass
         return self
 
 
@@ -85,25 +83,17 @@ class MeihuaResponseContext(_DeferredModel):
     def confirmed_and_unique(self) -> "MeihuaResponseContext":
         if not self.label.strip():
             raise ValueError("十应现场资料label不能仅为空白")
-        else:
-            pass
         if not self.same_casting_episode_confirmed:
             raise ValueError("十应资料须明确确认是同次起卦时已报现场条件")
-        else:
-            pass
         for name in ("weather", "setting", "human"):
             values = getattr(self, name)
             if values is not None and len(set(values)) != len(values):
                 raise ValueError("同类现场条目不得重复以增加象义票数")
-            else:
-                pass
         return self
 
     def validate_quiet_context(self, context: dict | None) -> None:
         if context is None:
             return
-        else:
-            pass
         known = any(
             getattr(self, name) is not None
             for name in ("querent_position", "weather", "setting", "human")
@@ -113,12 +103,8 @@ class MeihuaResponseContext(_DeferredModel):
             for name in ("quiet_room", "nothing_heard", "nothing_seen")
         ):
             raise ValueError("同次静室无所闻见的完整声明不能同时附带十应现场事实")
-        else:
-            pass
         if (
             "heard_laughter" in (self.human or [])
             and context.get("nothing_heard") is True
         ):
             raise ValueError("同次已闻笑语与nothing_heard=true相冲突")
-        else:
-            pass

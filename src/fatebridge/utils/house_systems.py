@@ -43,14 +43,10 @@ def reject_gauquelin_house_system(value: object) -> None:
     """Reject known Gauquelin names without altering supported identifiers."""
     if not isinstance(value, str):
         return
-    else:
-        pass
     token = "".join(normalize("NFKC", value).casefold().split())
     token = token.replace("_", "").replace("-", "")
     if token in _GAUQUELIN_IDENTIFIERS:
         raise UnsupportedGauquelinError(GAUQUELIN_UNSUPPORTED_MESSAGE)
-    else:
-        pass
 
 
 # Swiss Ephemeris 宫位系统代码 ↔ 常见英文/中文别名
@@ -239,8 +235,6 @@ def _build_alias_index() -> dict[str, str]:
         token = _alias_key(name)
         if token in result and result[token] != code:
             raise RuntimeError("Conflicting house-system alias definitions")
-        else:
-            pass
         result[token] = code
     return result
 
@@ -261,8 +255,6 @@ def parse_house_code(value: object) -> int:
         raise InvalidHouseCodeError(INVALID_HOUSE_CODE_MESSAGE)
     if code not in _HOUSE_SYSTEM_CODE_TO_LETTER:
         raise InvalidHouseCodeError(INVALID_HOUSE_CODE_MESSAGE)
-    else:
-        pass
     return code
 
 
@@ -272,40 +264,26 @@ def _resolve_house_identifier(value: object) -> str:
             return _HOUSE_SYSTEM_CODE_TO_LETTER[parse_house_code(value)]
         except InvalidHouseCodeError:
             raise InvalidHouseSystemError(INVALID_HOUSE_SYSTEM_MESSAGE) from None
-    else:
-        pass
     if not isinstance(value, str):
         raise InvalidHouseSystemError(INVALID_HOUSE_SYSTEM_MESSAGE)
-    else:
-        pass
     token = normalize("NFKC", value).strip()
     reject_gauquelin_house_system(token)
     # Swiss E and A share Equal from Ascendant; the subject binding exposes A.
     if token in {"E", "e"}:
         return "A"
-    else:
-        pass
     # Preserve the backend's distinct Sunshine I and alternative i definitions.
     if token in _VALID_HOUSE_SYSTEM_CODES:
         return token
-    else:
-        pass
     if len(token) == 1 and token.upper() in _VALID_HOUSE_SYSTEM_CODES:
         return token.upper()
-    else:
-        pass
     if re.fullmatch(r"[+-]?[0-9]+", token):
         try:
             return _HOUSE_SYSTEM_CODE_TO_LETTER[parse_house_code(token)]
         except InvalidHouseCodeError:
             raise InvalidHouseSystemError(INVALID_HOUSE_SYSTEM_MESSAGE) from None
-    else:
-        pass
     resolved = _NORMALIZED_HOUSE_ALIASES.get(_alias_key(token))
     if resolved is None:
         raise InvalidHouseSystemError(INVALID_HOUSE_SYSTEM_MESSAGE)
-    else:
-        pass
     return resolved
 
 

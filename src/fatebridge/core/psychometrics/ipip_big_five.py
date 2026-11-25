@@ -269,20 +269,12 @@ def scale_provenance() -> dict[str, JsonValue]:
 def _parse_item_id(key: object) -> int | None:
     if isinstance(key, bool):
         return None
-    else:
-        pass
     if isinstance(key, int):
         return key if 1 <= key <= TOTAL_ITEMS else None
-    else:
-        pass
     if isinstance(key, str) and key.isascii() and key.isdigit():
         item_id = int(key)
         if 1 <= item_id <= TOTAL_ITEMS and str(item_id) == key:
             return item_id
-        else:
-            pass
-    else:
-        pass
     return None
 
 
@@ -329,8 +321,6 @@ class IpipBigFiveRequest(_DeferredModel):
     def _normalize_response_keys(cls, value: object) -> object:
         if value is None or not isinstance(value, dict):
             return value
-        else:
-            pass
         normalized: dict[str, object] = {}
         for raw_key, raw_score in value.items():
             item_id = _parse_item_id(raw_key)
@@ -340,8 +330,6 @@ class IpipBigFiveRequest(_DeferredModel):
                     "题号必须为 '1' 到 '50' 的规范整数：{item_key}",
                     {"item_key": str(raw_key), "path": "responses"},
                 )
-            else:
-                pass
             canonical_key = str(item_id)
             if canonical_key in normalized:
                 raise PydanticCustomError(
@@ -349,8 +337,6 @@ class IpipBigFiveRequest(_DeferredModel):
                     "存在重复题号：{item_id}",
                     {"item_id": item_id, "path": "responses"},
                 )
-            else:
-                pass
             normalized[canonical_key] = raw_score
         return normalized
 
@@ -361,16 +347,12 @@ class IpipBigFiveRequest(_DeferredModel):
                 for key, score in self.responses.items()
                 if score is not None
             }
-        else:
-            pass
         if self.ratings is not None:
             return {
                 index + 1: score
                 for index, score in enumerate(self.ratings)
                 if score is not None
             }
-        else:
-            pass
         return {}
 
     @model_validator(mode="after")
@@ -382,50 +364,36 @@ class IpipBigFiveRequest(_DeferredModel):
                     "action=list_items 时不应提供 responses 或 ratings",
                     {"path": "responses" if self.responses is not None else "ratings"},
                 )
-            else:
-                pass
             return self
-        else:
-            pass
         if self.domain is not None:
             raise PydanticCustomError(
                 "invalid_mode_parameters",
                 "action=score 时不支持 domain 筛选参数",
                 {"path": "domain"},
             )
-        else:
-            pass
         if self.responses is not None and self.ratings is not None:
             raise PydanticCustomError(
                 "conflicting_inputs",
                 "responses 与 ratings 不能同时提供，请二选一",
                 {"path": "ratings"},
             )
-        else:
-            pass
         if self.responses is None and self.ratings is None:
             raise PydanticCustomError(
                 "missing_responses",
                 "action=score 时必须提供 responses 或 ratings",
                 {"path": "responses"},
             )
-        else:
-            pass
         if not self._answered_map():
             raise PydanticCustomError(
                 "empty_responses",
                 "至少需要提供 1 道有效（1-5 整数）作答",
                 {"path": "responses" if self.responses is not None else "ratings"},
             )
-        else:
-            pass
         return self
 
     def service_inputs(self) -> dict[str, str | bool | dict[int, int] | None]:
         if self.action == "list_items":
             return {"action": "list_items", "domain": self.domain}
-        else:
-            pass
         return {
             "action": "score",
             "answers": self._answered_map(),
@@ -541,16 +509,12 @@ def score_ipip_big_five(
     for item_id, raw_score in answers.items():
         if isinstance(item_id, bool) or item_id not in ITEMS_BY_ID:
             raise ValueError(f"无效题号：{item_id}（必须为 1–50 整数）")
-        else:
-            pass
         if (
             isinstance(raw_score, bool)
             or not isinstance(raw_score, int)
             or not (1 <= raw_score <= 5)
         ):
             raise ValueError(f"第 {item_id} 题作答无效：{raw_score}（必须为 1–5 整数）")
-        else:
-            pass
 
     breakdown: list[JsonValue] = []
     domain_raw_sums: dict[BigFiveDomain, int] = {d: 0 for d in DOMAIN_ORDER}
@@ -572,11 +536,7 @@ def score_ipip_big_five(
                         "status": "missing",
                     }
                 )
-            else:
-                pass
             continue
-        else:
-            pass
         scored_value = submitted_score if item.keying == 1 else 6 - submitted_score
         domain_raw_sums[item.domain] += scored_value
         domain_answered_counts[item.domain] += 1
@@ -591,8 +551,6 @@ def score_ipip_big_five(
                     "status": "answered",
                 }
             )
-        else:
-            pass
 
     domains_payload: dict[str, JsonValue] = {}
     domain_parts: list[str] = []
@@ -669,6 +627,4 @@ def score_ipip_big_five(
     }
     if include_item_breakdown:
         result["item_breakdown"] = breakdown
-    else:
-        pass
     return result

@@ -49,8 +49,6 @@ def native_year_context(birth: AstroBirthInfo) -> tuple[int, dict[str, Any]]:
     native = native_birth_epoch(birth)
     if native is None:
         raise ValueError("Native year context requires a primary physical epoch")
-    else:
-        pass
     return year_context_for_epoch(native, birth.local_datetime.year)
 
 
@@ -68,14 +66,10 @@ def year_context_for_epoch(
     # No generic yearly-lookup assumption may silently choose a remote root.
     if term.moment.year != year or term.moment.month != 2:
         raise ValueError("UTC LiChun crossing is not in the declared February window")
-    else:
-        pass
     boundary = term.tt_instant
     assert native.time.tt is not None
     if boundary is None:
         raise ValueError("Native year comparison requires the retained TT boundary")
-    else:
-        pass
     selected = year if native.time.tt.days >= boundary.days else year - 1
     return selected, {
         "policy_id": "shared_UTC_LiChun_primary_TT_comparison_v1",
@@ -102,8 +96,6 @@ def _ordinal(year: int, month: int, day: int) -> int:
     months = [31, 29 if leap else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     if not 1 <= month <= 12 or not 1 <= day <= months[month - 1]:
         raise ValueError("Invalid native UTC calendar label")
-    else:
-        pass
     return (
         365 * previous
         + previous // 4
@@ -118,23 +110,15 @@ def native_utc8_clock(epoch: PhysicalEpoch) -> tuple[str | None, datetime | None
     """An actual UTC+08 label and a date-only lookup anchor, never a new epoch."""
     if epoch.utc_label is None:
         return None, None
-    else:
-        pass
     match = _UTC.fullmatch(epoch.utc_label)
     if match is None:
         raise ValueError("Native UTC label cannot be parsed without changing it")
-    else:
-        pass
     y, m, d, hour, minute, second = map(int, match.groups()[:6])
     micro = int((match[7] or "0").ljust(6, "0"))
     if not (0 <= hour < 24 and 0 <= minute < 60 and 0 <= second <= 60):
         raise ValueError("Invalid native UTC clock fields")
-    else:
-        pass
     if (second == 60) != epoch.utc_is_leap_second:
         raise ValueError("Native UTC leap-second label and epoch disagree")
-    else:
-        pass
     carry, local_hour = divmod(hour + 8, 24)
     date = UTCCalendar(_ordinal(y, m, d) + carry, 0)
     year, month, day = date.date_parts
@@ -174,8 +158,6 @@ def _historical_utc8_date(
     first_atomic = atomic["entries"][0]
     if first_tt is None or first_atomic["effective_date"] != historical["valid_until"]:
         raise EphemerisSourceError("birth_clock_source_mismatch")
-    else:
-        pass
     stop_offset = Fraction(str(first_atomic["tai_minus_utc_seconds"]))
     stop_tt = TTInstant.from_utc(stop, tai_minus_utc_seconds=stop_offset)
     # Include the first published atomic boundary itself. Its UTC+08 date
@@ -183,8 +165,6 @@ def _historical_utc8_date(
     # this historical-adjustment resolver's scope.
     if not first_tt.days <= point.days <= stop_tt.days:
         return None
-    else:
-        pass
 
     def source_record(table: Mapping[str, object]) -> dict[str, object]:
         return {
@@ -203,8 +183,6 @@ def _historical_utc8_date(
             return found, source_record(
                 early if moment.year == first.year else historical
             )
-        else:
-            pass
         # Only the first atomic UTC day is needed to close the1972 transition
         # date. This is not an extrapolation of the historical affine table.
         if stop <= moment < stop + timedelta(days=1):
@@ -212,8 +190,6 @@ def _historical_utc8_date(
                 TTInstant.from_utc(moment, tai_minus_utc_seconds=stop_offset),
                 source_record(atomic),
             )
-        else:
-            pass
         return None
 
     # TT+08 is a calendar search hint, not a conversion to UTC+08. Search
@@ -229,12 +205,8 @@ def _historical_utc8_date(
         start, end = midnight_boundary(start_utc), midnight_boundary(end_utc)
         if start is None or end is None:
             continue
-        else:
-            pass
         if end[0].days <= start[0].days:
             raise EphemerisSourceError("birth_clock_source_mismatch")
-        else:
-            pass
         if start[0].days <= point.days < end[0].days:
             matches.append(
                 (
@@ -259,8 +231,6 @@ def _historical_utc8_date(
                     },
                 )
             )
-        else:
-            pass
     return matches[0] if len(matches) == 1 else None
 
 
@@ -292,10 +262,6 @@ def native_month_context(epoch: PhysicalEpoch, basis: str) -> dict[str, Any]:
                     "primary_TT_Gregorian_year_selects_candidates_only"
                 ),
             )
-        else:
-            pass
-    else:
-        pass
     if lookup is None and label is None and basis == "chinese_lunar_utc8":
         assert epoch.time.tt is not None
         proved = _historical_utc8_date(epoch.time.tt)
@@ -304,10 +270,6 @@ def native_month_context(epoch: PhysicalEpoch, basis: str) -> dict[str, Any]:
             clocks.update(
                 calendar_date=evidence["calendar_date"], calendar_date_evidence=evidence
             )
-        else:
-            pass
-    else:
-        pass
     if lookup is None:
         return {
             **clocks,
@@ -326,8 +288,6 @@ def native_month_context(epoch: PhysicalEpoch, basis: str) -> dict[str, Any]:
                 )
             ),
         }
-    else:
-        pass
     if basis == "chinese_lunar_utc8":
         # The shared lunar table is indexed by a Gregorian DATE. Noon selects
         # that date only, and is never substituted for the physical epoch.
@@ -339,8 +299,6 @@ def native_month_context(epoch: PhysicalEpoch, basis: str) -> dict[str, Any]:
                 "month_number": None,
                 "boundary_basis": "shared_chinese_lunar_table_utc8_civil_date",
             }
-        else:
-            pass
         return {
             **clocks,
             "status": "available",
@@ -356,12 +314,8 @@ def native_month_context(epoch: PhysicalEpoch, basis: str) -> dict[str, Any]:
                 else "unique_UTC8_date_only_no_epoch_substitution"
             ),
         }
-    else:
-        pass
     if basis != "jie_month":
         raise ValueError("Unknown native month policy")
-    else:
-        pass
     try:
         window = (
             almanac._term_window(lookup, "Etc/GMT-8")
@@ -384,8 +338,6 @@ def native_month_context(epoch: PhysicalEpoch, basis: str) -> dict[str, Any]:
         boundary = term.tt_instant
         if boundary is None:
             raise ValueError("Native jie comparison requires the retained TT boundary")
-        else:
-            pass
         if boundary.days <= physical_tt:
             start = term
         else:
@@ -393,8 +345,6 @@ def native_month_context(epoch: PhysicalEpoch, basis: str) -> dict[str, Any]:
             break
     if start is None or stop is None:
         raise ValueError("Unable to bracket native epoch by shared jie boundaries")
-    else:
-        pass
     almanac.require_calculated_solar_term(start)
     almanac.require_calculated_solar_term(stop)
     branch = almanac.BAZI_MONTH_START_TERMS[start.name]

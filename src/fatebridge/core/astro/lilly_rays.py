@@ -78,8 +78,6 @@ def directed_sign_relationship(
     agrees = None
     if selected_degree_aspect is not None and status != "not_in_either_table":
         agrees = selected_degree_aspect == ("conjunction" if steps == 0 else ray)
-    else:
-        pass
     return {
         "method_id": METHOD_ID,
         "caster": caster,

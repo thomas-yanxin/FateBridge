@@ -8,8 +8,6 @@ from typing import Any
 def candidate_day_lines(rows: list[dict[str, Any]]) -> list[str]:
     if not rows:
         return []
-    else:
-        pass
     lines = [
         "以下逐宿保留条件三九日与事项证据；每支均未代入未定主宿或顶层事项，不据此选择古代日界、半日或闰小月次序。"
     ]
@@ -42,8 +40,6 @@ def candidate_day_lines(rows: list[dict[str, Any]]) -> list[str]:
                 lines.append(
                     f"此支下卷异文：{variant['meaning']}（{variant['locator']}）。"
                 )
-            else:
-                pass
             for witness in personal["source_day_evidence"]["witnesses"]:
                 lines.append(
                     f"此支三九日{witness['volume']}／{witness['source_witness']}：{witness['meaning']}（{witness['locator']}）。"
@@ -52,8 +48,6 @@ def candidate_day_lines(rows: list[dict[str, Any]]) -> list[str]:
             lines.append(
                 f"此支三九与长行历：{priority['meaning']}（{priority['locator']}）。"
             )
-        else:
-            pass
         assessment = row["activity_assessment"]
         if assessment:
             for key, label in (
@@ -69,6 +63,4 @@ def candidate_day_lines(rows: list[dict[str, Any]]) -> list[str]:
                     lines.append(
                         f"候选{name}宿{label} {rule['rule_id']}：{rule['meaning']}{condition}（{rule['locator']}）；未应用于主结果。"
                     )
-        else:
-            pass
     return lines

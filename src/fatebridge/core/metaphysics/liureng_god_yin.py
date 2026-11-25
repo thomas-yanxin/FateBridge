@@ -27,8 +27,6 @@ def role_presence(
     facts = [in_lesson, in_transmission, in_natal, in_annual]
     if any(v is True for v in facts):
         return True
-    else:
-        pass
     return None if any(v is None for v in facts) else False
 
 
@@ -47,41 +45,27 @@ def god_yin_spirits(
     branches = set(EARTHLY_BRANCHES)
     if day_ganzhi not in SEXAGENARY_INDEX or month_branch not in branches:
         raise ValueError("类神阴神需要有效占日与月建")
-    else:
-        pass
     if type(is_diurnal) is not bool:
         raise ValueError("类神阴神需要已声明的昼夜策略")
-    else:
-        pass
     if set(sky_by_earth) != branches or set(sky_by_earth.values()) != branches:
         raise ValueError("类神阴神需要完整的一一对应天地盘")
-    else:
-        pass
     if set(god_by_sky) != branches or set(god_by_sky.values()) != set(GUI_REN_SEQUENCE):
         raise ValueError("类神阴神需要完整且不重复的十二天将")
-    else:
-        pass
     if (
         len(lesson_uppers) != 4
         or len(transmission_branches) != 3
         or any(v not in branches for v in lesson_uppers + transmission_branches)
     ):
         raise ValueError("类神阴神需要同课四课与三传")
-    else:
-        pass
     upper_roles = year_fate_uppers or {"natal": None, "annual": None}
     if set(upper_roles) != {"natal", "annual"} or any(
         v is not None and v not in branches for v in upper_roles.values()
     ):
         raise ValueError("年命上神须明确提供，缺项保留未知")
-    else:
-        pass
     noble = noble_start(day_ganzhi[0], is_diurnal, guiren_profile)
     other_noble = noble_start(day_ganzhi[0], not is_diurnal, guiren_profile)
     if god_by_sky[noble] != "贵人":
         raise ValueError("阴神所用贵人表与本课实际天将盘不一致")
-    else:
-        pass
     by_god = {god: sky for sky, god in god_by_sky.items()}
     earth_by_sky = {sky: earth for earth, sky in sky_by_earth.items()}
     empty = kongwang_for_ganzhi(day_ganzhi)[:2]

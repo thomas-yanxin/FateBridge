@@ -16,8 +16,6 @@ def validate_course_qi(board: dict[str, Any]) -> None:
     block = board.get("qi_evidence")
     if isinstance(block, dict):
         JinkouQiEvidence.model_validate(block)
-    else:
-        pass
     traces = [
         t
         for t in board.get("rule_trace") or []
@@ -25,8 +23,6 @@ def validate_course_qi(board: dict[str, Any]) -> None:
     ]
     if len(traces) > 1:
         raise ValueError("月建日辰得气轨迹不可重复")
-    else:
-        pass
     for trace in traces:
         metadata = qi_metadata()
         compare(trace, {k: metadata[k] for k in ("source_url", "source_section")})
@@ -35,7 +31,3 @@ def validate_course_qi(board: dict[str, Any]) -> None:
             JinkouQiEvidence.model_validate(result)
             if isinstance(block, dict):
                 compare(result, block)
-            else:
-                pass
-        else:
-            pass

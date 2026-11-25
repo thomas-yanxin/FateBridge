@@ -49,24 +49,14 @@ def detect_sixyao_patterns(
         patterns.append(
             {"name": "本卦六冲", "basis": "本卦属十个六冲卦：八纯卦及无妄、大壮。"}
         )
-    else:
-        pass
     if current_code in LIUHE_HEXAGRAM_CODES:
         patterns.append({"name": "本卦六合", "basis": "本卦为六合卦。"})
-    else:
-        pass
     # 之卦六冲 / 六合
     if current_code != changed_code:
         if changed_code in LIUCHONG_HEXAGRAM_CODES:
             patterns.append({"name": "变卦六冲", "basis": "之卦转为六冲。"})
-        else:
-            pass
         if changed_code in LIUHE_HEXAGRAM_CODES:
             patterns.append({"name": "变卦六合", "basis": "之卦归六合。"})
-        else:
-            pass
-    else:
-        pass
 
     # 伏吟 / 反吟 (只在动爻上判断, 避开 changed_branch 为空的静爻)
     fu_count = 0
@@ -74,20 +64,14 @@ def detect_sixyao_patterns(
     for idx in moving_indices:
         if idx < 0 or idx >= 6:
             continue
-        else:
-            pass
         orig_branch = current_branches[idx]
         new_branch = changed_branches[idx]
         if not orig_branch or not new_branch:
             continue
-        else:
-            pass
         if orig_branch == new_branch:
             fu_count += 1
         elif BRANCH_CONFLICTS.get(orig_branch) == new_branch:
             fan_count += 1
-        else:
-            pass
     if fu_count and fu_count == len(moving_indices):
         patterns.append(
             {
@@ -102,8 +86,6 @@ def detect_sixyao_patterns(
                 "basis": f"{fu_count}个动爻之支与原支相同。",
             }
         )
-    else:
-        pass
     if fan_count and fan_count == len(moving_indices):
         patterns.append(
             {
@@ -118,15 +100,11 @@ def detect_sixyao_patterns(
                 "basis": f"{fan_count}个动爻之支与原支相冲。",
             }
         )
-    else:
-        pass
 
     if fanfu:
         if fanfu["explicit_body_example"]:
             body = fanfu["explicit_body_example"]
             patterns.append({"name": "卦体" + body["kind"], "basis": body["basis"]})
-        else:
-            pass
         for region in fanfu["regions"]:
             if region["nazhi_relation"] in ("反吟", "伏吟"):
                 label = "内卦" if region["region"] == "inner" else "外卦"
@@ -138,10 +116,6 @@ def detect_sixyao_patterns(
                         + "；静爻位置只作卦盘比较，不新增变爻作用。",
                     }
                 )
-            else:
-                pass
-    else:
-        pass
 
     return {
         "patterns": patterns,

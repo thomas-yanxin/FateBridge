@@ -45,8 +45,6 @@ def method_reference_provenance() -> dict[str, Any]:
         source_id = source.pop("source_id")
         if source_id in sources and sources[source_id] != source:
             raise ValueError(f"Conflicting method reference source: {source_id}")
-        else:
-            pass
         sources[source_id] = source
     source_ids = list(dict.fromkeys([*record["source_ids"], *sources]))
     return {

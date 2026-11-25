@@ -226,12 +226,8 @@ DEFAULT_POLICY = StrengthPolicy()
 def _label(share: float, policy: StrengthPolicy) -> str:
     if share > policy.strong_share:
         return "强"
-    else:
-        pass
     if share < policy.weak_share:
         return "弱"
-    else:
-        pass
     return "中和"
 
 
@@ -306,15 +302,11 @@ def _evaluate(
             members = tuple(name for name in names if branches[name] in group)
             if {branches[name] for name in members} == set(group):
                 candidates.append((kind, members, BUREAU_ELEMENT[bureau]))
-            else:
-                pass
     pairs = list(combinations(names, 2))
     for pair in pairs:
         target = BRANCH_COMBINATION_ELEMENT.get(frozenset(branches[n] for n in pair))
         if target is not None and abs(names.index(pair[0]) - names.index(pair[1])) == 1:
             candidates.append(("六合", pair, target))
-        else:
-            pass
     # A 六合 contained in a full bureau is not a competing claim or a second bonus.
     full_members = [set(c[1]) for c in candidates if len(c[1]) >= 3]
     candidates = [
@@ -354,8 +346,6 @@ def _evaluate(
         )
         if not incompatible:
             protected.update(members)
-        else:
-            pass
     # Prespecified source profile: whole four-column wealth -> officer ->
     # seal -> body branch path, matching visible officer -> seal -> body,
     # with time LU/prosperity and no competing complete/paired formation.
@@ -394,8 +384,6 @@ def _evaluate(
                 }
             )
             continue
-        else:
-            pass
         resolved = (left in protected) != (right in protected)
         if resolved or separated_zi_chou:
             events.append(
@@ -407,8 +395,6 @@ def _evaluate(
                 }
             )
             continue
-        else:
-            pass
         # Both exposed to incompatible relations: no arbitrary choice of a winning 合.
         clashed.update((left, right))
         storage = storage_movement_effect(
@@ -427,8 +413,6 @@ def _evaluate(
                 }
             )
             continue
-        else:
-            pass
         e1, e2 = BRANCH_ELEMENTS[branches[left]][0], BRANCH_ELEMENTS[branches[right]][0]
         # Compare initial physical hidden budgets, before interaction losses.
         # The month multiplier is included; seasonal energy and stem activation
@@ -505,8 +489,6 @@ def _evaluate(
                 }
             )
             continue
-        else:
-            pass
         claimed.update(members)
         season_supports = phases[target.value] == "旺"
         revealed = any(STEM_ELEMENTS[stem][0] == target for stem in visible)
@@ -520,8 +502,6 @@ def _evaluate(
                         part = token["mass"] * policy.transformation_transfer
                         token["mass"] -= part
                         transferred += part
-                    else:
-                        pass
                 tokens[name].append(
                     {
                         "stem": None,
@@ -574,8 +554,6 @@ def _evaluate(
                 }
             )
             continue
-        else:
-            pass
         claimed.update(pair)
         for name in pair:
             amount = 0.0
@@ -584,8 +562,6 @@ def _evaluate(
                     part = token["mass"] * policy.partial_transfer
                     token["mass"] -= part
                     amount += part
-                else:
-                    pass
             tokens[name].append(
                 {
                     "stem": None,
@@ -620,8 +596,6 @@ def _evaluate(
         punished = [n for n in names if branches[n] in punishment_group]
         if set(branches[n] for n in punished) != set(punishment_group):
             continue  # 寅巳/丑戌 two-branch fragments are not full 三刑 in this policy.
-        else:
-            pass
         participants = repeated_zi_mao_participants(
             punished, branches, punishment_cover
         )
@@ -639,8 +613,6 @@ def _evaluate(
                 }
             )
             continue
-        else:
-            pass
         if punishment_is_resolved(punished, branches, punishment_cover):
             events.append(
                 {
@@ -651,8 +623,6 @@ def _evaluate(
                 }
             )
             continue
-        else:
-            pass
         alternative = zi_month_officer_clash_alternative(
             punished,
             branches,
@@ -674,8 +644,6 @@ def _evaluate(
                 }
             )
             continue
-        else:
-            pass
         events.append(
             {
                 "kind": "刑",
@@ -695,13 +663,9 @@ def _evaluate(
                     "source_id": BRANCH_RELATION_SOURCE["id"],
                 }
             )
-        else:
-            pass
     for event in events:
         if event["kind"] not in {"刑", "自刑"} or event["status"] != "active":
             continue
-        else:
-            pass
         storage = (
             storage_movement_effect(
                 branches,
@@ -784,8 +748,6 @@ def _evaluate(
                         "quantity_kind": "post_interaction_hidden_stem_budget",
                     }
                 )
-            else:
-                pass
             if token["stem"] is None and token["mass"]:
                 combination_contributions.append(
                     {
@@ -797,8 +759,6 @@ def _evaluate(
                         "energy_unrounded": energy,
                     }
                 )
-            else:
-                pass
             if (
                 token["element"] == day_element
                 and token["mass"]
@@ -813,8 +773,6 @@ def _evaluate(
                         "energy": round(energy, 6),
                     }
                 )
-            else:
-                pass
     stem_effects = evaluate_stem_effects(
         pillars,
         factors,
@@ -1075,8 +1033,6 @@ def assess_strength(
     sources = SOURCES
     if any(event["source_id"] == ZI_CHOU_CLASH_SOURCE["id"] for event in relations):
         sources = [*SOURCES, ZI_CHOU_CLASH_SOURCE]
-    else:
-        pass
     result["clash_comparison"] = build_clash_comparison(pillars, relations, sources)
     stem_receipt = result.pop("stem_effects")
     result["stem_energy_accounting"] = {

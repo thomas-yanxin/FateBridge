@@ -46,8 +46,6 @@ def _scale(a: Interval, n: int) -> Interval:
 def _divide_integer(a: Interval, n: int) -> Interval:
     if n <= 0:
         raise ValueError("Positive interval divisor required")
-    else:
-        pass
     return a[0] // n, _ceil(a[1], n)
 
 
@@ -60,8 +58,6 @@ class _Arithmetic:
     def rational(self, n: int, d: int) -> Interval:
         if d <= 0:
             raise ValueError("Positive rational denominator required")
-        else:
-            pass
         return n * self.s // d, _ceil(n * self.s, d)
 
     def multiply(self, a: Interval, b: Interval) -> Interval:
@@ -75,8 +71,6 @@ class _Arithmetic:
     def divide(self, a: Interval, b: Interval) -> Interval:
         if b[0] <= 0:
             raise _MorePrecision
-        else:
-            pass
         return min(x * self.s // y for x in a for y in b), max(
             _ceil(x * self.s, y) for x in a for y in b
         )
@@ -85,8 +79,6 @@ class _Arithmetic:
         # Every caller has an independently known nonnegative radicand.
         if a[1] < 0:
             raise ValueError("Negative radicand enclosure")
-        else:
-            pass
         lo, hi = isqrt(max(0, a[0]) * self.s), isqrt(a[1] * self.s)
         return lo, hi + (hi * hi != a[1] * self.s)
 
@@ -103,8 +95,6 @@ class _Arithmetic:
             # |residual|<=45degrees and pi<4, hence |x|<1.
             if max(abs(x[0]), abs(x[1])) >= self.s:
                 raise _MorePrecision
-            else:
-                pass
             square = self.square(x)
             sine = sine_term = x
             cosine = cosine_term = self.one
@@ -131,12 +121,8 @@ class _Arithmetic:
     def atan_nonnegative(self, value: Interval) -> Interval:
         if value == (0, 0):
             return 0, 0
-        else:
-            pass
         if value[0] < 0:
             raise _MorePrecision
-        else:
-            pass
         x = value
         for _ in range(3):
             x = self.divide(
@@ -144,8 +130,6 @@ class _Arithmetic:
             )
         if x[1] > self.s // 8:
             raise _MorePrecision
-        else:
-            pass
         square, power, total = self.square(x), x, x
         count = self.bits // 4 + 8
         for k in range(1, count):
@@ -158,27 +142,17 @@ class _Arithmetic:
     def atan2_nonnegative_y(self, y: Interval, x: Interval) -> Interval:
         if y[0] < 0:
             raise ValueError("Nonnegative ordinate required")
-        else:
-            pass
         if y == (0, 0):
             if x[0] > 0:
                 return 0, 0
-            else:
-                pass
             if x[1] < 0:
                 return _pi(self.bits)
-            else:
-                pass
             raise _MorePrecision
-        else:
-            pass
         norm = self.sqrt(_add(self.square(x), self.square(y)))
         # Both formulas are valid on either side of x=0. Choose the stable one.
         if x[0] + x[1] >= 0:
             t = self.divide(y, _add(norm, x))
             return _scale(self.atan_nonnegative(t), 2)
-        else:
-            pass
         t = self.divide(y, _sub(norm, x))
         return _sub(_pi(self.bits), _scale(self.atan_nonnegative(t), 2))
 
@@ -186,8 +160,6 @@ class _Arithmetic:
         lo, hi = (float(Fraction(endpoint, self.s)) for endpoint in value)
         if lo != hi:
             raise _MorePrecision
-        else:
-            pass
         # Canonical positive zero avoids a platform/serialization sign choice.
         return lo if lo else 0.0
 
@@ -208,8 +180,6 @@ def _pi(bits: int) -> Interval:
                 # Alternating remainder bounded by the next exact term.
                 error = _ceil(a.s, denominator)
                 return total[0] - error, total[1] + error
-            else:
-                pass
 
     return _sub(_scale(atan_inverse(5), 16), _scale(atan_inverse(239), 4))
 
@@ -227,14 +197,10 @@ def _separation(
 ) -> Interval:
     if sun[:2] == target[:2] or (sun[1] == target[1] and abs(sun[1]) == 90):
         return 0, 0
-    else:
-        pass
     if sun[1] == -target[1] and (
         abs(sun[1]) == 90 or abs(Fraction(sun[0]) - Fraction(target[0])) == 180
     ):
         return _pi(a.bits)
-    else:
-        pass
     u, v = _vector(*sun[:2], a.bits), _vector(*target[:2], a.bits)
     cross = (
         _sub(a.multiply(u[1], v[2]), a.multiply(u[2], v[1])),
@@ -261,8 +227,6 @@ def portable_projection_scalars(
     ratio = Fraction(radius_m, au_m) / distance
     if not 0 < ratio < 1:
         raise ValueError("Observer is not outside the nominal solar sphere")
-    else:
-        pass
     threshold = Fraction(resolution)
     for bits in (128, 256, 512, 1024, 2048, 4096, 8192):
         a = _Arithmetic(bits)

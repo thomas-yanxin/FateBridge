@@ -38,16 +38,12 @@ def _position_state(positions: tuple[str, ...]) -> str:
     i, j, k = (ORDER.index(p) for p in positions)
     if len(set(positions)) < 3:
         return "shared_pillar_step"
-    else:
-        pass
     if min(i, k) < j < max(i, k):
         return (
             "adjacent_mediator_between"
             if abs(i - j) == abs(j - k) == 1
             else "between_with_gap"
         )
-    else:
-        pass
     return "outside_interval"
 
 
@@ -97,26 +93,18 @@ def _possible_path(
         b = GENERATION_CYCLE[middle]
         if DESTRUCTION_CYCLE[a] != b:
             continue
-        else:
-            pass
         chain = (a.value, middle.value, b.value)
         if elements is not None and elements != chain:
             continue
-        else:
-            pass
         if any(
             n and STEM_ELEMENTS[n[2]][0].value != chain[i]
             for i, n in enumerate(identities)
         ):
             continue
-        else:
-            pass
         if positions is not None and any(
             n and n[0] != positions[i] for i, n in enumerate(identities)
         ):
             continue
-        else:
-            pass
         pillars = [
             (positions[i],) if positions is not None else (n[0],) if n else ORDER
             for i, n in enumerate(identities)
@@ -136,23 +124,15 @@ def _possible_path(
             actual_plane = ls[0] if len(set(ls)) == 1 else "mixed"
             if plane is not None and plane != actual_plane:
                 continue
-            else:
-                pass
             if status is not None and status != _position_state(ps):
                 continue
-            else:
-                pass
             if any(
                 sum(p == q and layer == "stem" for q, layer in zip(ps, ls)) > 1
                 for p in ORDER
             ):
                 continue
-            else:
-                pass
             if principal is True and actual_plane != "hidden":
                 continue
-            else:
-                pass
             for ss in product(*stems):
                 possibilities = []
                 for p in ORDER:
@@ -169,16 +149,10 @@ def _possible_path(
                                 if all(s in hidden for s in local)
                             }
                         )
-                    else:
-                        pass
                 if any(not choices for choices in possibilities):
                     continue
-                else:
-                    pass
                 if principal is None:
                     return True
-                else:
-                    pass
                 can_be_principal = actual_plane == "hidden" and all(
                     True in choices for choices in possibilities
                 )
@@ -189,8 +163,6 @@ def _possible_path(
                     principal is False and can_be_nonprincipal
                 ):
                     return True
-                else:
-                    pass
     return False
 
 
@@ -203,8 +175,6 @@ def _node_identity(ref: str) -> tuple[str, str, str]:
         or parts[2] not in STEM_ELEMENTS
     ):
         raise ValueError("通关节点引用必须标明实际柱位、干藏层与天干")
-    else:
-        pass
     return parts[0], parts[1], parts[2]
 
 
@@ -231,55 +201,35 @@ class PassageNode(PartialOutput):
             for supplied, actual in zip((self.pillar, self.plane, self.stem), parts):
                 if supplied is not None and supplied != actual:
                     raise ValueError("通关节点引用不能与其实际柱位、干藏层或天干矛盾")
-                else:
-                    pass
-        else:
-            pass
         stem = self.stem if self.stem is not None else parts[2] if parts else None
         plane = self.plane if self.plane is not None else parts[1] if parts else None
         if stem is not None:
             if stem not in STEM_ELEMENTS:
                 raise ValueError("通关节点必须使用实际天干")
-            else:
-                pass
             if (
                 self.element is not None
                 and self.element != STEM_ELEMENTS[stem][0].value
             ):
                 raise ValueError("通关节点五行必须忠于实际天干")
-            else:
-                pass
-        else:
-            pass
         if plane == "stem" and (
             self.branch is not None or self.hidden_rank is not None
         ):
             raise ValueError("透干节点不能冒充支中藏干")
-        else:
-            pass
         if plane == "hidden" and self.branch is not None:
             hidden = BRANCH_HIDDEN_STEMS.get(self.branch)
             if hidden is None or (stem is not None and stem not in hidden):
                 raise ValueError("藏干节点必须存在于其实际地支")
-            else:
-                pass
             if self.hidden_rank is not None and (
                 self.hidden_rank >= len(hidden)
                 or (stem is not None and hidden[self.hidden_rank] != stem)
             ):
                 raise ValueError("藏干序位必须忠于实际地支目录")
-            else:
-                pass
-        else:
-            pass
         if not _physical_options(
             plane, stem, self.branch, self.hidden_rank, self.element
         ):
             raise ValueError(
                 "已给通关节点事实必须容许同一实际透干或藏干，缺项不消除矛盾"
             )
-        else:
-            pass
         return self
 
 
@@ -311,8 +261,6 @@ class PassagePath(PartialOutput):
             raise ValueError(
                 "已给通关路径节点引用和事实必须容许同一实体生克链，缺项不消除矛盾"
             )
-        else:
-            pass
         if self.elements is not None:
             try:
                 a, middle, b = (Element(e) for e in self.elements)
@@ -324,10 +272,6 @@ class PassagePath(PartialOutput):
                 and GENERATION_CYCLE[middle] == b
             ):
                 raise ValueError("通关候选必须保留实际相克及连续相生的生克链")
-            else:
-                pass
-        else:
-            pass
         refs = (self.from_node, self.via_node, self.to_node)
         identities = [_node_identity(ref) for ref in refs if ref is not None]
         if len(identities) == 3:
@@ -335,20 +279,12 @@ class PassagePath(PartialOutput):
                 STEM_ELEMENTS[identity[2]][0].value for identity in identities
             ]:
                 raise ValueError("通关路径五行必须忠于实际节点引用")
-            else:
-                pass
             planes = {identity[1] for identity in identities}
             expected_plane = identities[0][1] if len(planes) == 1 else "mixed"
             if self.plane is not None and self.plane != expected_plane:
                 raise ValueError("通关路径干藏层必须忠于实际节点")
-            else:
-                pass
             if self.principal_hidden_only is True and planes != {"hidden"}:
                 raise ValueError("透干或跨层路径不能冒充本气藏干子集")
-            else:
-                pass
-        else:
-            pass
         if self.positions is not None:
             order = ("year", "month", "day", "hour")
             i, j, k = (order.index(p) for p in self.positions)
@@ -367,17 +303,11 @@ class PassagePath(PartialOutput):
             )
             if self.position_status is not None and self.position_status != expected:
                 raise ValueError("不能把隔位或越位中介伪写为相邻通路")
-            else:
-                pass
             for position, ref in zip(
                 self.positions, (self.from_node, self.via_node, self.to_node)
             ):
                 if ref is not None and ref.split(":", 1)[0] != position:
                     raise ValueError("通关路径节点必须忠于实际柱位")
-                else:
-                    pass
-        else:
-            pass
         return self
 
 
@@ -413,8 +343,6 @@ class ClassicalPassage(PartialOutput):
         nodes = {n.id: n for n in self.nodes or [] if n.id is not None}
         if len(nodes) != sum(n.id is not None for n in self.nodes or []):
             raise ValueError("同一实体通关节点不能重复计入")
-        else:
-            pass
         by_column: dict[str, list[tuple[PhysicalOption, ...]]] = {p: [] for p in ORDER}
         for catalog_node in self.nodes or []:
             identity = (
@@ -430,15 +358,11 @@ class ClassicalPassage(PartialOutput):
             )
             if pillar is not None:
                 by_column[pillar].append(options)
-            else:
-                pass
         for column_options in by_column.values():
             visible = [o for o in column_options if all(x[0] == "stem" for x in o)]
             hidden = [o for o in column_options if all(x[0] == "hidden" for x in o)]
             if len(visible) > 1:
                 raise ValueError("同一柱位只能有一个实际透干节点")
-            else:
-                pass
             if len(hidden) > 3 or (
                 hidden
                 and not any(
@@ -453,8 +377,6 @@ class ClassicalPassage(PartialOutput):
                 )
             ):
                 raise ValueError("同一柱的已给藏干必须属于同一地支且各有实际序位")
-            else:
-                pass
         complete_node_ids = self.nodes is not None and all(
             n.id is not None for n in self.nodes
         )
@@ -472,8 +394,6 @@ class ClassicalPassage(PartialOutput):
                 refs = (path.from_node, path.via_node, path.to_node)
                 if path.plane is not None and path.plane != expected_plane:
                     raise ValueError("通关路径必须归入实际干藏层的集合")
-                else:
-                    pass
                 if not _possible_path(
                     refs,
                     tuple(path.elements) if path.elements is not None else None,
@@ -487,45 +407,31 @@ class ClassicalPassage(PartialOutput):
                     path.position_status,
                 ):
                     raise ValueError("已给路径事实必须容许其干藏层集合")
-                else:
-                    pass
                 if all(ref is not None for ref in refs):
                     key = (str(refs[0]), str(refs[1]), str(refs[2]))
                     if key in identities_by_collection[name]:
                         raise ValueError("同一实体通关路径不能重复计入")
-                    else:
-                        pass
                     identities_by_collection[name].add(key)
-                else:
-                    pass
                 if complete_node_ids and any(
                     ref is not None and ref not in nodes for ref in refs
                 ):
                     raise ValueError("通关路径不能引用已给节点目录之外的节点")
-                else:
-                    pass
                 actual = [nodes.get(ref) if ref is not None else None for ref in refs]
                 for i, node in enumerate(actual):
                     if node is None:
                         continue
-                    else:
-                        pass
                     if (
                         path.elements is not None
                         and node.element is not None
                         and path.elements[i] != node.element
                     ):
                         raise ValueError("通关路径五行必须沿用同次实际节点")
-                    else:
-                        pass
                     if (
                         path.binding_states is not None
                         and node.binding_state is not None
                         and path.binding_states[i] != node.binding_state
                     ):
                         raise ValueError("通关路径合绊状态必须沿用同次节点")
-                    else:
-                        pass
                 roots = [
                     n.remaining_root_state if n is not None else None for n in actual
                 ]
@@ -540,8 +446,6 @@ class ClassicalPassage(PartialOutput):
                     and "not_supplied" in roots
                 ):
                     raise ValueError("已给根预算状态不能被遗漏的其他节点改为有根或无根")
-                else:
-                    pass
                 if "all_nodes_have_remaining_roots" in path.model_fields_set and all(
                     r is not None for r in roots
                 ):
@@ -554,17 +458,11 @@ class ClassicalPassage(PartialOutput):
                         raise ValueError(
                             "通关路径根预算汇总必须沿用同次节点，不把未知改为有根或无根"
                         )
-                    else:
-                        pass
-                else:
-                    pass
                 principal_options = []
                 for node in actual:
                     if node is None:
                         principal_options.append({True, False})
                         continue
-                    else:
-                        pass
                     identity = _node_identity(node.id) if node.id is not None else None
                     principal_options.append(
                         {
@@ -589,8 +487,6 @@ class ClassicalPassage(PartialOutput):
                     principal is False and all(o == {True} for o in principal_options)
                 ):
                     raise ValueError("本气藏干子集必须忠于同次已给节点序位")
-                else:
-                    pass
         if (
             self.principal_hidden_paths is not None
             and self.all_hidden_paths is not None
@@ -606,10 +502,6 @@ class ClassicalPassage(PartialOutput):
                 <= identities_by_collection["all_hidden_paths"]
             ):
                 raise ValueError("本气藏干路径不能脱离已给全部藏干路径")
-            else:
-                pass
-        else:
-            pass
         if self.summary is not None:
             for field, collection in (
                 ("visible_path_count", self.visible_paths),
@@ -624,8 +516,4 @@ class ClassicalPassage(PartialOutput):
                     and count != len(collection)
                 ):
                     raise ValueError("通关路径汇总必须等于同次已给路径数")
-                else:
-                    pass
-        else:
-            pass
         return self

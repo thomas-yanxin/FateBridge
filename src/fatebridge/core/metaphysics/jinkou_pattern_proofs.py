@@ -92,8 +92,6 @@ def text(values: dict[str, Any], key: str) -> str:
     value = values.get(key)
     if not isinstance(value, str):
         raise ValueError("课钤条件缺少明确文字输入")
-    else:
-        pass
     return value
 
 
@@ -101,8 +99,6 @@ def texts(values: dict[str, Any], key: str) -> list[str]:
     value = values.get(key)
     if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
         raise ValueError("课钤条件缺少明确符号队列")
-    else:
-        pass
     return value
 
 
@@ -119,15 +115,11 @@ def evaluate_fact(
             else ELEMENT_GENERATES[a] if operation == "generate" else a
         )
         return b == target, [target]
-    else:
-        pass
     if operation in {"equal_branch", "clash", "combine", "stem_combine"}:
         a = text(operands, "source_symbol")
         right_symbol = operands.get("target_symbol")
         if right_symbol is not None and not isinstance(right_symbol, str):
             raise ValueError("课钤条件的目标符号无效")
-        else:
-            pass
         target = (
             SIX_CLASH_BRANCHES[a]
             if operation == "clash"
@@ -138,25 +130,17 @@ def evaluate_fact(
             )
         )
         return (None if right_symbol is None else right_symbol == target), [target]
-    else:
-        pass
     if operation in {"trine", "trine_controls"}:
         branches = texts(operands, "branches")
         if len(branches) != 3:
             raise ValueError("三合条件需要三位本支")
-        else:
-            pass
         phase = TRINES.get(frozenset(branches))
         if operation == "trine":
             return phase is not None, ["寅午戌", "申子辰", "亥卯未", "巳酉丑"]
-        else:
-            pass
         target = text(operands, "target_element")
         return bool(phase and ELEMENT_CONTROLS[phase] == target), (
             [ELEMENT_CONTROLS[phase]] if phase else []
         )
-    else:
-        pass
     if operation == "three_wonders":
         stems = operands.get("stems")
         if (
@@ -165,28 +149,18 @@ def evaluate_fact(
             or any(s is not None and not isinstance(s, str) for s in stems)
         ):
             raise ValueError("三奇条件需要人元、神遁干、将遁干三位")
-        else:
-            pass
         groups = ["甲戊庚", "乙丙丁", "壬癸辛"]
         return (
             None if None in stems else set(stems) in [set(v) for v in groups]
         ), groups
-    else:
-        pass
     if operation == "same_branches":
         branches = texts(operands, "branches")
         if len(branches) != 3:
             raise ValueError("本家同支条件需要三位本支")
-        else:
-            pass
         return len(set(branches)) == 1, [branches[0]]
-    else:
-        pass
     if operation == "house":
         house_branches = list(HOUSE_BRANCH[text(operands, "stem")])
         return text(operands, "branch") in house_branches, house_branches
-    else:
-        pass
     if operation == "robbery_absent":
         day = text(operands, "day_ganzhi")
         target = next(
@@ -200,42 +174,28 @@ def evaluate_fact(
             if day[1] in group
         )
         return target not in texts(operands, "branches"), [target]
-    else:
-        pass
     if operation == "step":
         a, z = text(operands, "source_symbol"), text(operands, "target_symbol")
         step = operands.get("step")
         if type(step) is not int or step not in (1, 11):
             raise ValueError("连茹条件只核逐支顺接或逆接")
-        else:
-            pass
         delta = (EARTHLY_BRANCHES.index(z) - EARTHLY_BRANCHES.index(a)) % 12
         return delta == step, [
             EARTHLY_BRANCHES[(EARTHLY_BRANCHES.index(a) + step) % 12]
         ]
-    else:
-        pass
     if operation == "branch_set":
         return set(texts(operands, "branches")) == set(
             text(operands, "required")
         ), list(text(operands, "required"))
-    else:
-        pass
     if operation in {"branch", "phase"}:
         return text(operands, "actual") == text(operands, "required"), [
             text(operands, "required")
         ]
-    else:
-        pass
     if operation in {"xun_kong", "si_da_kong"}:
         value = operands.get("flag")
         if value is not None and type(value) is not bool:
             raise ValueError("空亡条件须保留已算布尔旗标")
-        else:
-            pass
         return value, ["true"]
-    else:
-        pass
     raise ValueError("未知课钤条件运算")
 
 
@@ -245,8 +205,6 @@ def evaluate_groups(
     """False dominates unknown in AND; true dominates unknown in OR."""
     if not groups or any(not group for group in groups):
         raise ValueError("课钤条件表达式不可为空")
-    else:
-        pass
     alternatives: list[bool | None] = []
     for group in groups:
         terms: list[bool | None] = []
@@ -270,8 +228,6 @@ def condition_evidence(
     def fact(identity: str) -> None:
         if identity in facts:
             return
-        else:
-            pass
         op, *parts = identity.split(":")
         operands: dict[str, Any]
         if op in {
@@ -301,8 +257,6 @@ def condition_evidence(
                 operands["target_field"] = "dun_stem"
             elif op == "step":
                 operands["step"] = int(parts[2])
-            else:
-                pass
             label = {
                 "control": "克",
                 "generate": "生",
@@ -325,12 +279,8 @@ def condition_evidence(
             if op == "trine_controls":
                 operands["target_element"] = rows[0]["element"]
                 operands["target_position"] = "人元"
-            else:
-                pass
             if op == "robbery_absent":
                 operands["day_ganzhi"] = day_ganzhi
-            else:
-                pass
         elif op == "three_wonders":
             operands = dict(
                 stems=[rows[0]["content"], rows[1]["dun_stem"], rows[2]["dun_stem"]],

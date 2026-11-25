@@ -36,8 +36,6 @@ CARDINALS = ("winter", "spring", "summer", "autumn", "next_winter")
 def _number(value: str) -> F:
     if not isinstance(value, str) or not re.fullmatch(r"[0-9]+(?:\.[0-9]+)?", value):
         raise ValueError("源数须为十进制字符串，不强转浮点、不补字或选舍入")
-    else:
-        pass
     return F(value)
 
 
@@ -46,8 +44,6 @@ def _source() -> tuple[dict[str, Any], str]:
     raw = json.loads(blob)
     if raw.get("schema") != PROFILE or raw.get("profile_id") != PROFILE:
         raise ValueError("未核对的四正夜半选率版本")
-    else:
-        pass
     return raw, hashlib.sha256(blob).hexdigest()
 
 
@@ -56,25 +52,15 @@ def gujin39_cardinal_rate(cardinal: str, *, distance_days: int | None) -> F:
     raw, _ = _source()
     if cardinal not in CARDINALS:
         raise ValueError("须明确原文四正，不按月份或现代日期猜测")
-    else:
-        pass
     rates = raw["gujin39_literal_selector_rates"]
     if cardinal in ("spring", "autumn"):
         if type(distance_days) is not int:
             raise TypeError("相距日须为原历整数，不接收布尔、浮点或默认距离")
-        else:
-            pass
         if str(distance_days) not in rates[cardinal]:
             raise ValueError("超出卷39明确给出的相距日，不补一个最接近日率")
-        else:
-            pass
         return _number(rates[cardinal][str(distance_days)])
-    else:
-        pass
     if distance_days is not None:
         raise ValueError("冬夏初日率不使用相距日，不能混入春秋分支")
-    else:
-        pass
     return _number(rates[cardinal])
 
 
@@ -114,8 +100,6 @@ class RecomputedMidnightSolar:
             boundary["recomputed_right_anchor_du_exact"] = boundary.pop(
                 "printed_right_anchor_du_exact"
             )
-        else:
-            pass
         return result
 
     def audit(self) -> dict[str, Any]:
@@ -139,24 +123,16 @@ def load_recomputed_midnight(
 ) -> RecomputedMidnightSolar:
     if profile != PROFILE or rate_policy not in RATE_POLICIES:
         raise ValueError("须明确具名四正算例及选率政策，不默认选最有利结果")
-    else:
-        pass
     raw, policy_sha = _source()
     daily_blob = DAILY_DATA.read_bytes()
     if hashlib.sha256(daily_blob).hexdigest() != raw["source_daily_data_sha256"]:
         raise ValueError("四正源操作数已改变，不能沿用已冻结的选率版本")
-    else:
-        pass
     base = load_generated_daily_solar(DAILY_PROFILE)
     if base.generator.data_sha256 != raw["generator_parameter_sha256"]:
         raise ValueError("立成生成参数已改变，不能静默重新基准化锚点")
-    else:
-        pass
     source = json.loads(daily_blob)
     if tuple(source["cardinals"]) != CARDINALS:
         raise ValueError("四正操作数顺序不符，不能排序后补成同一版本")
-    else:
-        pass
     operands = source["source_subtraction_components"]
     fields = (
         "event_unwrapped_du",
@@ -166,8 +142,6 @@ def load_recomputed_midnight(
     )
     if any(len(operands[name]) != 5 for name in fields):
         raise ValueError("须保留五组加时操作数，不丢弃不闭合的一正")
-    else:
-        pass
     selections = raw["gujin43_explicit_generator_indices"]
     if selections != [
         {"origin": "winter", "index": 0},
@@ -177,8 +151,6 @@ def load_recomputed_midnight(
         {"origin": "winter", "index": 0},
     ] or any(type(row["index"]) is not int for row in selections):
         raise ValueError("卷43具名查表日序不符，不移一行凑减分")
-    else:
-        pass
     anchors: list[F] = []
     records = []
     for i, cardinal in enumerate(CARDINALS):
@@ -187,8 +159,6 @@ def load_recomputed_midnight(
         )
         if not 0 <= fraction < 1:
             raise ValueError("小余须在一个原历日内，不按UTC或刻数重新缩放")
-        else:
-            pass
         distance = (
             base.literal.offsets[i + 1] - base.literal.offsets[i]
             if cardinal in ("spring", "autumn")
@@ -198,8 +168,6 @@ def load_recomputed_midnight(
         row = base.generator.branch(selection["origin"]).rows()[selection["index"]]
         if row.motion_du is None:
             raise ValueError("原表所选日无下一日率，不外推端点")
-        else:
-            pass
         if rate_policy == RATE_POLICIES[0]:
             rate = printed_rate
         elif rate_policy == RATE_POLICIES[1]:
@@ -243,8 +211,6 @@ def load_recomputed_midnight(
         )
     if any(b <= a for a, b in zip(anchors, anchors[1:])):
         raise ValueError("复算夜半锚点未递增，不用取模或拉伸掩盖异常")
-    else:
-        pass
     trajectory = SourceDailySolar(
         PROFILE,
         policy_sha,

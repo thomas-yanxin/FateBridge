@@ -38,8 +38,6 @@ def _file_digest(path: Path) -> str:
 def assert_physical_configuration(selected: str | None) -> None:
     if configured_ephemeris_path() != selected:
         raise EphemerisSourceError("physical_configuration_changed")
-    else:
-        pass
 
 
 class PhysicalEphemerisTrace:
@@ -64,8 +62,6 @@ class PhysicalEphemerisTrace:
         require_physical_model(model)
         if configured_jpl_file() != self._jpl_name:
             raise EphemerisSourceError("physical_configuration_changed")
-        else:
-            pass
         ids = []
         if model == "moshier":
             status = "library_builtin"
@@ -82,20 +78,14 @@ class PhysicalEphemerisTrace:
                 filename, start, end, de_number = getter(slot)
                 if not filename:
                     continue
-                else:
-                    pass
                 path = _absolute_path(filename)
                 if model == "jpl":
                     header = jpl_header(path)
                     start = header["start_julian_day_tdb"]
                     end = header["end_julian_day_tdb"]
                     de_number = header["de_number"]
-                else:
-                    pass
                 if not (math.isfinite(start) and math.isfinite(end) and start < end):
                     raise EphemerisSourceError("invalid_range")
-                else:
-                    pass
                 if path not in self._paths:
                     try:
                         size = path.stat().st_size
@@ -103,8 +93,6 @@ class PhysicalEphemerisTrace:
                     except OSError as error:
                         if model == "jpl":
                             raise EphemerisSourceError("unavailable_during") from error
-                        else:
-                            pass
                         unidentified = True
                         continue
                     prefix = "jpl" if model == "jpl" else "se1"
@@ -137,13 +125,9 @@ class PhysicalEphemerisTrace:
                         ),
                     }
                     self._paths[path] = identity
-                else:
-                    pass
                 identity = self._paths[path]
                 if self._files[identity]["slot"] != slot:
                     raise EphemerisSourceError("slot_changed")
-                else:
-                    pass
                 ids.append(identity)
             if ids:
                 status = (
@@ -155,10 +139,6 @@ class PhysicalEphemerisTrace:
                         else "se1_contexts_observed"
                     )
                 )
-            else:
-                pass
-        else:
-            pass
         context = {
             "model": model,
             "status": status,
@@ -166,15 +146,11 @@ class PhysicalEphemerisTrace:
         }
         if record_factor:
             self._factors[factor] = context
-        else:
-            pass
         return context
 
     def finish(self) -> Dict[str, Any]:
         if configured_jpl_file() != self._jpl_name:
             raise EphemerisSourceError("physical_configuration_changed")
-        else:
-            pass
         for path, identity in self._paths.items():
             try:
                 digest = _file_digest(path)
@@ -182,8 +158,6 @@ class PhysicalEphemerisTrace:
                 raise EphemerisSourceError("unavailable_during") from error
             if digest != self._files[identity]["sha256"]:
                 raise EphemerisSourceError("changed_during")
-            else:
-                pass
         return self.snapshot()
 
     def snapshot(self) -> Dict[str, Any]:
@@ -208,8 +182,6 @@ class PhysicalEphemerisTrace:
         }
         if any(row["model"] == "jpl" for row in self._factors.values()):
             result["time_scale_policy"] = jpl_time_scale_policy()
-        else:
-            pass
         return result
 
 
@@ -251,24 +223,16 @@ class PhysicalSourceCohort:
         editions = {key: sorted(set(value)) for key, value in editions.items()}
         if self.sources and models != self._models:
             raise EphemerisSourceError("model_changed")
-        else:
-            pass
         if self.sources and editions != self._editions:
             raise EphemerisSourceError("edition_changed")
-        else:
-            pass
         for file in source["files"]:
             key = (file["slot"], file["filename"])
             if key in self._file_hashes and self._file_hashes[key] != file["sha256"]:
                 raise EphemerisSourceError("changed_across")
-            else:
-                pass
             self._file_hashes[key] = file["sha256"]
         self._models, self._editions = models, editions
         if source not in self.sources:
             self.sources.append(source)
-        else:
-            pass
         return self.sources.index(source)
 
 
@@ -283,9 +247,5 @@ def _absolute_path(filename: str) -> Path:
         if cached is None:
             cached = Path(filename).absolute()
             _ABS_PATHS[filename] = cached
-        else:
-            pass
         return cached
-    else:
-        pass
     return Path(filename).absolute()

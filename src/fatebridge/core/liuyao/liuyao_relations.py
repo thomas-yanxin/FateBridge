@@ -42,14 +42,10 @@ def xunkong(day_ganzhi: str) -> list[str]:
         or day_ganzhi[1] not in BRANCHES
     ):
         raise ValueError("旬空需要有效的日干支")
-    else:
-        pass
     stem_index = STEMS.index(day_ganzhi[0])
     branch_index = BRANCHES.index(day_ganzhi[1])
     if (stem_index - branch_index) % 2:
         raise ValueError("日干支不在六十甲子中")
-    else:
-        pass
     start = (branch_index - stem_index + 10) % 12
     return [BRANCHES[start], BRANCHES[(start + 1) % 12]]
 
@@ -57,20 +53,12 @@ def xunkong(day_ganzhi: str) -> list[str]:
 def element_relation(actor: str, target: str) -> str:
     if actor == target:
         return "比和"
-    else:
-        pass
     if GENERATES[actor] == target:
         return "生爻"
-    else:
-        pass
     if CONTROLS[actor] == target:
         return "克爻"
-    else:
-        pass
     if GENERATES[target] == actor:
         return "爻生"
-    else:
-        pass
     return "爻克"
 
 

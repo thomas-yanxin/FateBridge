@@ -37,8 +37,6 @@ SEASON_WINDOWS = (
 def _numbers(tian: int, di: int) -> None:
     if any(type(n) is not int or n <= 0 for n in (tian, di)):
         raise ValueError("天地数须为正整数，不能用布尔或去正数后的余数代替。")
-    else:
-        pass
 
 
 def numerical_conditions(tian: int, di: int) -> list[dict[str, Any]]:
@@ -197,8 +195,6 @@ def seasonal_number_evidence(
     }
     if birth_clock is None:
         return result
-    else:
-        pass
     anchor = birth_clock.utc.julian_day_exact()
     local = ZonedCalendar(
         birth_clock.utc, parse_timezone_name(context_timezone)
@@ -247,8 +243,6 @@ def seasonal_number_evidence(
         if band == "range_40_60" and value > 60:
             band_match = None
             band_status = "outside_cited_high_range"
-        else:
-            pass
         windows.append(
             {
                 "rule_id": key,
@@ -275,8 +269,6 @@ def seasonal_number_evidence(
     result["context_local_year"] = local_year
     if get_solar_term_environment_key(year=local_year) != environment:
         raise NumerologySourceError("runtime_heluo_solar_context_conflict")
-    else:
-        pass
     return result
 
 
@@ -315,8 +307,6 @@ def seasonal_snapshot(evidence: dict) -> str:
             )
         if not active:
             lines.append("出生瞬间不在该段列出的六个时窗内；其他时令规则须另查。")
-        else:
-            pass
     else:
         lines.append("缺出生瞬间，未评估时令条件。")
     lines.append("保留同时成立的数式和时窗；尚未裁定综合得中或葉否。")

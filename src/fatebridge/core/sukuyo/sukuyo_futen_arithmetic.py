@@ -49,8 +49,6 @@ def futen_arithmetic_reference() -> dict[str, Any]:
     ).encode()
     if hashlib.sha256(projection).hexdigest() != CANONICAL_SHA256:
         raise ValueError("符天讲义所选常数、十五行或未决印值已改变，须重新校核")
-    else:
-        pass
     c = bundle["constants"]
     unit_source = load_source(UNIT_SOURCE)
     unit_bundle = unit_source.data
@@ -61,8 +59,6 @@ def futen_arithmetic_reference() -> dict[str, Any]:
     }
     if len(unit_bundle["models"]) != 2 or set(models) != set(model_ids.values()):
         raise ValueError("进朔限名义单位须绑定完整两种既有研究模型")
-    else:
-        pass
     printed = bundle["printed_example"]
     day = c["day_units"]
     cycle = c["cycle_days"] * day
@@ -110,8 +106,6 @@ def futen_arithmetic_reference() -> dict[str, Any]:
         model = models[model_ids[row["model"]]]
         if model["day_units"] != row["day_units"]:
             raise ValueError("进朔限名义换算单位与所引研究模型不一致")
-        else:
-            pass
         nominal_hour = Fraction(24 * row["printed_threshold_units"], row["day_units"])
         units_at_hour = Fraction(row["printed_hour"] * row["day_units"], 24)
         thresholds.append(

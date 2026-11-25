@@ -163,8 +163,6 @@ def build_liureng_snapshot_text(
     for role, branch in empty["year_fate_earth_branches"].items():
         if branch is None:
             continue
-        else:
-            pass
         row = next(r for r in empty["rows"] if r["earth_branch"] == branch)
         empty_lines.append(
             f"{'本命' if role == 'natal' else '行年'}书地盘{branch}；"
@@ -249,8 +247,6 @@ def build_liureng_snapshot_text(
                 f"{item['right_role']}{item['right_branch']}，{'、'.join(matched)}"
                 + (f"；原文{annotation}" if annotation else "")
             )
-        else:
-            pass
     branch_lines += [
         f"依据：{branch_evidence.get('source_title', '无')}；PDF91、92、95–97。",
         "逐项布尔值见47条结构化依据；本节仅列有匹配项。六合与刑破可以并存，不据合独断成局；首课寄宫支关系不替代日干五行。",
@@ -277,25 +273,17 @@ def build_liureng_snapshot_text(
             )
             if birth_clock.get("timezone_resolution_advisory"):
                 runyear_lines.append(birth_clock["timezone_resolution_advisory"])
-            else:
-                pass
-        else:
-            pass
         if age_calendar := runyear.get("age_calendar"):
             runyear_lines += [
                 f"虚岁参考时区：{age_calendar['timezone']}；分析瞬间在该区：{age_calendar['analysis_civil_datetime']}。",
                 f"虚岁农历年：出生{age_calendar['birth_lunar_year']}、分析{age_calendar['analysis_lunar_year']}；两端同区，正月初一00:00换岁。",
             ]
-        else:
-            pass
         if year_fate := runyear.get("year_fate"):
             for key, label in (("natal", "本命"), ("annual", "行年")):
                 item = year_fate[key]
                 if item["status"] == "not_calculated":
                     runyear_lines.append(f"{label}落盘：未计算；{item['reason']}")
                     continue
-                else:
-                    pass
                 runyear_lines.append(
                     f"{label}干支{item['subject_ganzhi']}书地盘{item['earth_branch']}；"
                     f"上见{item['sky_branch']}乘{item['god']}，对占日为{item['upper_relation']}；"
@@ -304,10 +292,6 @@ def build_liureng_snapshot_text(
                     f"地盘旬空：{'是' if item['earth_xun_kong'] else '否'}。"
                 )
             runyear_lines.append(f"年命口径：{year_fate['birth_year_basis']}。")
-        else:
-            pass
-    else:
-        pass
     sections = [
         (
             "起盘信息",

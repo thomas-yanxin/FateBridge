@@ -111,8 +111,6 @@ def primary_direction_coordinate_meta(
         raise ValueError(
             "未知主限方法，请使用 astroapp_alchabitius、equatorial 或 fatebridge_mundane_semiarc"
         )
-    else:
-        pass
     if (
         pd_method
         in {
@@ -122,16 +120,12 @@ def primary_direction_coordinate_meta(
         and swe is None
     ):
         return PRIMARY_DIRECTION_METHOD_COORDINATES["astroapp_alchabitius"]
-    else:
-        pass
     return PRIMARY_DIRECTION_METHOD_COORDINATES[pd_method]
 
 
 def primary_direction_approximation_meta(pd_method: str) -> tuple[str, str]:
     if pd_method == "fatebridge_mundane_semiarc":
         return "mundane_semiarc_static_key", "半弧 mundane static key 近似"
-    else:
-        pass
     return "axis_static_key", "轴点 static key 近似"
 
 
@@ -139,25 +133,17 @@ def primary_direction_coordinate_runtime_meta(pd_method: str) -> tuple[str, str]
     if pd_method == "equatorial":
         if swe is not None:
             return "equatorial_runtime_projection", "swisseph_equatorial_projection"
-        else:
-            pass
         return (
             "ecliptic_runtime_reference_fallback",
             "native_ecliptic_reference_fallback",
         )
-    else:
-        pass
     if pd_method == "fatebridge_mundane_semiarc":
         if swe is not None:
             return "mundane_runtime_projection", "swisseph_mundane_semiarc_projection"
-        else:
-            pass
         return (
             "ecliptic_runtime_reference_fallback",
             "native_ecliptic_reference_fallback",
         )
-    else:
-        pass
     return "ephemeris_runtime_model", "fatebridge_native_subject_abs_pos"
 
 
@@ -183,8 +169,6 @@ def build_primary_direction_equatorial_context(
         raise ModuleNotFoundError(
             "Swiss Ephemeris is required for equatorial directions"
         )
-    else:
-        pass
     attitude = earth_attitude(swe, times.ut1, julian_day_tt=times.tt)
     armc = (attitude.house_sidereal_degrees + birth_info.longitude) % 360
     return PrimaryDirectionEquatorialContext(
@@ -224,16 +208,12 @@ def point_equatorial_position(
         )
         if retflag < 0:
             raise ValueError("Primary direction equatorial ephemeris failed")
-        else:
-            pass
         attitude = earth_attitude(swe, context.ut1, julian_day_tt=context.tt)
         return rotate_spherical(
             attitude.reduction.native_to_house,
             float(equatorial[0]),
             float(equatorial[1]),
         )
-    else:
-        pass
     # MC is on the ecliptic, not on the equator: its RA is ARMC but its
     # declination is generally nonzero. Preserve the physical chart point.
     offset = getattr(natal_subject, "calculation_basis", {}).get(
@@ -327,12 +307,8 @@ def semiarc_degrees_for_declination(latitude: float, declination: float) -> floa
     horizon_term = -math.tan(latitude_radians) * math.tan(declination_radians)
     if horizon_term <= -1.0:
         return 180.0
-    else:
-        pass
     if horizon_term >= 1.0:
         return 0.0
-    else:
-        pass
     return math.degrees(math.acos(horizon_term))
 
 
@@ -345,8 +321,6 @@ def mundane_semiarc_position(
         raise ValueError(
             "Mundane semiarc projection is undefined for circumpolar points"
         )
-    else:
-        pass
     clamped_semiarc = semiarc_degrees
     nocturnal_semiarc = 180.0 - clamped_semiarc
 
@@ -376,25 +350,17 @@ def hour_angle_from_mundane_coordinate(
         raise ValueError(
             "Mundane semiarc projection is undefined for circumpolar points"
         )
-    else:
-        pass
     clamped_semiarc = semiarc_degrees
     nocturnal_semiarc = 180.0 - clamped_semiarc
 
     if normalized_coordinate <= 90.0:
         return ((normalized_coordinate / 90.0) * clamped_semiarc) - clamped_semiarc
-    else:
-        pass
     if normalized_coordinate <= 180.0:
         return ((normalized_coordinate - 90.0) / 90.0) * clamped_semiarc
-    else:
-        pass
     if normalized_coordinate <= 270.0:
         return clamped_semiarc + (
             ((normalized_coordinate - 180.0) / 90.0) * nocturnal_semiarc
         )
-    else:
-        pass
     return -180.0 + (((normalized_coordinate - 270.0) / 90.0) * nocturnal_semiarc)
 
 
@@ -511,32 +477,18 @@ def quadrant_for_mundane_coordinate(coordinate_degrees: float) -> str:
         normalized, 360.0, abs_tol=1e-6
     ):
         return "horizon_east"
-    else:
-        pass
     if math.isclose(normalized, 90.0, abs_tol=1e-6):
         return "upper_meridian"
-    else:
-        pass
     if math.isclose(normalized, 180.0, abs_tol=1e-6):
         return "horizon_west"
-    else:
-        pass
     if math.isclose(normalized, 270.0, abs_tol=1e-6):
         return "lower_meridian"
-    else:
-        pass
     if normalized < 90.0:
         return "above_east"
-    else:
-        pass
     if normalized < 180.0:
         return "above_west"
-    else:
-        pass
     if normalized < 270.0:
         return "below_west"
-    else:
-        pass
     return "below_east"
 
 
@@ -571,16 +523,12 @@ def build_primary_direction_coordinate_entry(
                 "phase_within_quadrant_degrees": normalized_coordinate % 90.0,
             }
         )
-    else:
-        pass
     return entry
 
 
 def _shift_primary_direction_coordinate(coordinate: Angle, arc: Angle) -> Angle:
     if isinstance(coordinate, Fraction):
         return combine_longitudes_exact(coordinate, arc)
-    else:
-        pass
     return coordinate + float(arc)
 
 
@@ -625,13 +573,9 @@ def resolve_primary_direction_coordinate_entry(
 ) -> dict[str, Any] | None:
     if point_name in coordinate_points:
         return coordinate_points[point_name]
-    else:
-        pass
     lot_key = LOT_KEY_BY_POINT_NAME.get(point_name)
     if lot_key:
         return coordinate_lots.get(lot_key)
-    else:
-        pass
     return None
 
 
@@ -741,8 +685,6 @@ def normalize_primary_direction_aspects(
 ) -> list[int]:
     if not pd_aspects:
         return PRIMARY_DIRECTION_DEFAULT_ASPECTS.copy()
-    else:
-        pass
     normalized: list[int] = []
     for value in pd_aspects:
         try:
@@ -751,16 +693,12 @@ def normalize_primary_direction_aspects(
             continue
         if degree not in normalized:
             normalized.append(degree)
-        else:
-            pass
     return normalized or PRIMARY_DIRECTION_DEFAULT_ASPECTS.copy()
 
 
 def primary_direction_aspect_variants(aspect_degree: int) -> list[float]:
     if aspect_degree in {0, 180}:
         return [float(aspect_degree)]
-    else:
-        pass
     return [float(aspect_degree), float((360 - aspect_degree) % 360)]
 
 
@@ -768,8 +706,6 @@ def primary_direction_aspect_meta(aspect_degree: int) -> tuple[str, str]:
     meta = ASPECT_DEGREE_TO_META.get(aspect_degree)
     if meta is not None:
         return meta
-    else:
-        pass
     return f"{aspect_degree}deg", f"{aspect_degree}°"
 
 
@@ -832,16 +768,12 @@ def extract_primary_direction_coordinate_payload(
 
     if swe is None:
         return result
-    else:
-        pass
 
     if pd_method not in {
         "equatorial",
         "fatebridge_mundane_semiarc",
     }:
         return result
-    else:
-        pass
 
     equatorial_context = build_primary_direction_equatorial_context(birth_info)
     obliquity = equatorial_context.obliquity
@@ -883,8 +815,6 @@ def extract_primary_direction_coordinate_payload(
 
         result["diagnostics"] = diagnostics
         return result
-    else:
-        pass
 
     if "Ascendant" in coordinate_map:
         coordinate_map["Ascendant"] = 0.0
@@ -1061,8 +991,6 @@ def build_sign_change_payloads(
                     "to_sign_label": directed_payload["sign_label"],
                 }
             )
-        else:
-            pass
 
     for lot_key, natal_payload in natal_lots.items():
         directed_payload = directed_lots[lot_key]
@@ -1077,8 +1005,6 @@ def build_sign_change_payloads(
                     "to_sign_label": directed_payload["sign_label"],
                 }
             )
-        else:
-            pass
 
     return changes
 
@@ -1115,8 +1041,6 @@ def build_primary_direction_bounds_overlay(
             "points": {},
             "lots": {},
         }
-    else:
-        pass
 
     return {
         "system": PRIMARY_DIRECTION_BOUNDS_SYSTEM,
@@ -1271,8 +1195,6 @@ def build_primary_direction_analysis(
                     working_age_years = working_arc / working_time_key_rate
                     if working_age_years <= 0.05 or working_age_years > max_age_years:
                         continue
-                    else:
-                        pass
                     arc = float(working_arc)
                     event_age_years = float(working_age_years)
                     dedupe_key = (
@@ -1283,8 +1205,6 @@ def build_primary_direction_analysis(
                     )
                     if dedupe_key in seen_hits:
                         continue
-                    else:
-                        pass
                     seen_hits.add(dedupe_key)
                     # Event labels and ages share the same nominal UTC-duration axis.
                     event_datetime = ZonedCalendar(

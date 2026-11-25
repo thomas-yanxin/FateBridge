@@ -63,14 +63,8 @@ def date_conversion_provenance(
                     year_info_override = (
                         f"{year}:{LUNAR_YEAR_INFO_CORRECTIONS[year]:#x}"
                     )
-                else:
-                    pass
-        else:
-            pass
         if reference_id:
             witnesses[reference_id] = deepcopy(_references()[reference_id])
-        else:
-            pass
         lookups[clock] = dict(
             solar_date=label,
             status="available" if lunar else "unavailable",

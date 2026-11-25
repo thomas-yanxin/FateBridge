@@ -43,21 +43,13 @@ def anchor_from_day_longitudes(start: F, end: F, *, include_winter_day: bool) ->
     """Explicit whole-day hypothesis, not an astronomical accuracy claim."""
     if not isinstance(start, F) or not isinstance(end, F):
         raise TypeError("太阳日边界黄经须明确提供Fraction")
-    else:
-        pass
     if type(include_winter_day) is not bool:
         raise TypeError("须明确冬至日是否计入，不采用隐式真假值")
-    else:
-        pass
     if not (0 <= start < 360 and 0 <= end < 360):
         raise ValueError("太阳日边界黄经须在0至360度")
-    else:
-        pass
     advance = (end - start) % 360
     if not 0 < advance < 2:
         raise ValueError("一个真太阳日的太阳前行量异常，不猜年界或修正端点")
-    else:
-        pass
     unwrapped_end = start + advance
     winter = (
         unwrapped_end > 270 if include_winter_day else start > 270
@@ -106,8 +98,6 @@ def _day_brackets(
     values = [F(evaluate(t)["apparent_solar_label_serial_exact"]) for t in grid]
     if not all(a < b for a, b in zip(values, values[1:])):
         raise ValueError("完整搜索窗口内真太阳钟未单调前行，不能夹逼日界")
-    else:
-        pass
     roots: list[SolarDayBracket] = []
     for target in (ordinal, ordinal + 1):
         candidates = [
@@ -117,8 +107,6 @@ def _day_brackets(
         ]
         if len(candidates) != 1:
             raise ValueError("固定窗口无唯一真太阳日界，不扩大窗口凑结果")
-        else:
-            pass
         low, high = candidates[0]
         while high - low > _RESOLUTION_DAYS:
             mid = (low + high) / 2
@@ -134,8 +122,6 @@ def _day_brackets(
             <= F(upper["apparent_solar_label_serial_exact"])
         ):
             raise ValueError("真太阳日界端点未保留符号夹逼")
-        else:
-            pass
         roots.append(
             SolarDayBracket(
                 target_solar_label_ordinal=target,
@@ -157,8 +143,6 @@ def _day_brackets(
         < F(roots[1]["lower"]["julian_day_ut1_exact"])
     ):
         raise ValueError("出生瞬间落入数值日界夹逼，不能认证单一真太阳日标签")
-    else:
-        pass
     return SolarDaySearch(day_edge_brackets=roots, sample_julian_days_ut1=grid)
 
 
@@ -174,28 +158,18 @@ def apparent_solar_day_anchor(
     """Same native Sun backend and modeled UT1 as this birth, without UTC rebasing."""
     if policy not in POLICIES[1:]:
         raise ValueError("太阳日法须显式选择冬至日纳入或排除政策")
-    else:
-        pass
     if not apparent_clock_required(birth):
         raise ValueError("太阳日安命须明确use_true_solar_time=true")
-    else:
-        pass
     if (
         birth_clock.get("method_id") != CLOCK_METHOD
         or birth_clock.get("julian_day_ut1") != birth_ut1.as_float()
         or birth_clock.get("longitude") != birth.longitude
     ):
         raise ValueError("太阳日须衔接同次出生钟面和UT1，不能混用另一盘")
-    else:
-        pass
     if expected_sun_model not in {"moshier", "swieph", "jpl"}:
         raise ValueError("须有本次太阳实际星历模型")
-    else:
-        pass
     if runtime.swe is None:
         raise ValueError("太阳日安命需要原生星历")
-    else:
-        pass
     reference_ordinal = birth.local_datetime.toordinal()
     serial = F(reference_ordinal + birth_clock["solar_day_offset_from_civil"]) + F(
         birth_clock["apparent_day_fraction_exact"]
@@ -243,18 +217,12 @@ def apparent_solar_day_anchor(
                 sources.observe("Sun", eqmodel)
                 if model != expected_sun_model or eqmodel != expected_sun_model:
                     raise EphemerisSourceError("coordinate_model_changed")
-                else:
-                    pass
                 current_source = sources.snapshot()
                 if current_source["has_unidentified_sources"]:
                     raise ValueError("太阳日星历来源无法识别，不能保持本命数据版本")
-                else:
-                    pass
                 source_cohort.add(current_source)
                 if not 0 < pos[3] < 2:
                     raise ValueError("太阳未按声明速率前行")
-                else:
-                    pass
                 gast = (
                     float(
                         runtime.ephemeris_call("sidtime", ut1, _julian_day_tt=tt) * 15
@@ -285,8 +253,6 @@ def apparent_solar_day_anchor(
                     equatorial_return_flags=int(eqflag),
                     actual_sun_model=model,
                 )
-            else:
-                pass
             return evaluated[at]
 
         roots, grid = _day_brackets(birth_ut1.days, serial, evaluate)
@@ -307,16 +273,12 @@ def apparent_solar_day_anchor(
             raise ValueError(
                 "太阳日端点夹逼跨越安命交节界，须保留数值未定，不能暗取一侧"
             )
-        else:
-            pass
         receipt = sources.finish()
         if (
             configured_ephemeris_path() != selected_path
             or configured_jpl_file() != selected_jpl
         ):
             raise EphemerisSourceError("physical_configuration_changed")
-        else:
-            pass
     birth_solar_display = birth_clock.get("display")
     return dict(
         method_id=METHOD_ID,

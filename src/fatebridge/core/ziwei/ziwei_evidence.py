@@ -43,8 +43,6 @@ def horoscope_natal_prerequisites(chart: Dict[str, Any]) -> Dict[str, Any]:
     traces = chart["rule_trace"]
     if any(sum(t["rule_id"] == name for t in traces) != 1 for name in required):
         raise ValueError("紫微运限本命前置链缺少或重复必要规则回执")
-    else:
-        pass
     return {
         "schema_version": "ziwei_horoscope_natal_prerequisites_v1",
         "origin": "same_calculation_internal_natal_chart",

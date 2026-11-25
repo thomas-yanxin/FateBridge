@@ -105,10 +105,6 @@ class GenerationHypothesis(PartialOutput):
                 flags
             ):
                 raise ValueError("隔生候选的合取值与所列条件不一致")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -181,8 +177,6 @@ class JinkouDefinitionEvidence(PartialOutput):
             "P59",
         ]:
             raise ValueError("六条疑义课式不得遗漏、重排或重复")
-        else:
-            pass
         return value
 
 
@@ -192,19 +186,13 @@ def compare_present_definition_facts(actual: object, expected: object) -> None:
         for key, value in actual.items():
             if key in expected:
                 compare_present_definition_facts(value, expected[key])
-            else:
-                pass
     elif isinstance(actual, list) and isinstance(expected, list):
         if len(actual) != len(expected):
             raise ValueError("课钤疑义依据的队列与本课不一致")
-        else:
-            pass
         for a, b in zip(actual, expected):
             compare_present_definition_facts(a, b)
     elif actual != expected:
         raise ValueError("课钤疑义依据与本课四位、日干或昼夜条件不一致")
-    else:
-        pass
 
 
 def require_complete_chapter_witness(board: dict) -> None:
@@ -214,10 +202,6 @@ def require_complete_chapter_witness(board: dict) -> None:
     selected = [w for w in witnesses if w.get("id") == "waseda_book6"]
     if len(selected) != 1:
         raise ValueError("完整金口诀须保留唯一的早稻田原典见证")
-    else:
-        pass
     expected = chapter_provenance()
     if any(selected[0].get(key) != value for key, value in expected.items()):
         raise ValueError("完整金口诀须保留连续课钤书影清单及全部未裁定说明")
-    else:
-        pass

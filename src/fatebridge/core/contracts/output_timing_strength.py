@@ -79,12 +79,8 @@ class TimingRootEffectLayer(PartialOutput):
             or self.residual_natal_numerical_label is not None
         ):
             raise ValueError("未解会合不能发布岁运根量投影或数值档")
-        else:
-            pass
         if self.status == "projected" and self.blocker_relation_ids:
             raise ValueError("岁运根量存在阻塞关系时不能声明投影已完成")
-        else:
-            pass
         quantities = (
             [
                 r.remaining_mass_exact
@@ -102,8 +98,6 @@ class TimingRootEffectLayer(PartialOutput):
         bounded.extend((self.stem_retention_factors_exact or {}).values())
         if self.support_share_exact is not None:
             bounded.append(self.support_share_exact)
-        else:
-            pass
         for raw in quantities + bounded:
             try:
                 value = Fraction(raw)
@@ -111,12 +105,8 @@ class TimingRootEffectLayer(PartialOutput):
                 raise ValueError("岁运根预算须为有限分数") from error
             if value < 0:
                 raise ValueError("岁运根预算不可为负")
-            else:
-                pass
         if any(Fraction(raw) > 1 for raw in bounded):
             raise ValueError("根保留系数及扶身份额不可超过1")
-        else:
-            pass
         return self
 
 
@@ -143,16 +133,12 @@ class TimingStrengthProjection(PartialOutput):
     ) -> "TimingStrengthProjection":
         if self.baseline is None:
             return self
-        else:
-            pass
         if (
             self.baseline_method_id is not None
             and self.baseline.method_id is not None
             and self.baseline_method_id != self.baseline.method_id
         ):
             raise ValueError("岁运投影必须绑定同次旺衰基准版本")
-        else:
-            pass
         parameters = self.baseline.parameters or {}
         if "weak_share" in parameters and "strong_share" in parameters:
             for row in self.layers or []:
@@ -161,8 +147,6 @@ class TimingStrengthProjection(PartialOutput):
                     or row.residual_natal_numerical_label is None
                 ):
                     continue
-                else:
-                    pass
                 share = Fraction(row.support_share_exact)
                 expected = (
                     "强"
@@ -175,8 +159,4 @@ class TimingStrengthProjection(PartialOutput):
                 )
                 if row.residual_natal_numerical_label != expected:
                     raise ValueError("残存原局数值档必须遵守同次原门槛")
-                else:
-                    pass
-        else:
-            pass
         return self

@@ -54,8 +54,6 @@ def eye_general_relations(core: dict[str, Any]) -> list[dict[str, Any]]:
                     "scope": SCOPE,
                 }
             )
-        else:
-            pass
         if palace == core["shiji"]:
             patterns.append(
                 {
@@ -73,6 +71,4 @@ def eye_general_relations(core: dict[str, Any]) -> list[dict[str, Any]]:
                     "scope": SCOPE,
                 }
             )
-        else:
-            pass
     return patterns

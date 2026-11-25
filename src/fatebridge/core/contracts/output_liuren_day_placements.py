@@ -50,10 +50,6 @@ class DayPlacementRule(PartialOutput):
         if self.definition_adjudicated is False and "matched" in self.model_fields_set:
             if self.matched is not (False if self.placement_matches is False else None):
                 raise ValueError("合式未裁时，仅在缺少加临前提时排除")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -91,10 +87,6 @@ class LiurenDayPlacements(PartialOutput):
         if isinstance(value, dict) and "complete_classical_conformance" in value:
             if value["complete_classical_conformance"] is not False:
                 raise ValueError("干支加临条件不认证完整原典，须为布尔false")
-            else:
-                pass
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -104,8 +96,6 @@ class LiurenDayPlacements(PartialOutput):
         if self.day_ganzhi is not None:
             if self.day_ganzhi not in SEXAGENARY_INDEX:
                 raise ValueError("干支加临需要有效日干支")
-            else:
-                pass
             expected.update(
                 day_ganzhi=self.day_ganzhi,
                 day_stem_house=STEM_HOUSES[self.day_ganzhi[0]],
@@ -115,10 +105,6 @@ class LiurenDayPlacements(PartialOutput):
             if self.sky_by_earth is not None and len(self.sky_by_earth) == 12:
                 sky: dict[str, str] = {k: v for k, v in self.sky_by_earth.items()}
                 expected = day_placement_patterns(self.day_ganzhi, sky)
-            else:
-                pass
-        else:
-            pass
         compare_present_branches(self.model_dump(exclude_unset=True), expected)
         return self
 
@@ -131,25 +117,17 @@ def align_day_placements(board: Any, day_ganzhi: str | None = None) -> None:
     evidence = get(board, "day_placement_patterns")
     if evidence is None:
         return
-    else:
-        pass
     day = get(evidence, "day_ganzhi")
     actual_day = get(get(board, "calendar_policy"), "effective_day_ganzhi")
     if day is not None and actual_day is not None and day != actual_day:
         raise ValueError("干支加临与本课日干支不一致")
-    else:
-        pass
     if day is not None and day_ganzhi is not None and day != day_ganzhi:
         raise ValueError("干支加临与同时返回的四柱不一致")
-    else:
-        pass
     sky = get(evidence, "sky_by_earth") or {}
     for row in get(board, "twelve_board") or []:
         earth, upper = get(row, "earth_branch"), get(row, "sky_branch")
         if earth in sky and upper is not None and sky[earth] != upper:
             raise ValueError("干支加临与同时返回的天地盘不一致")
-        else:
-            pass
 
 
 def require_complete_day_placements(board: dict[str, Any]) -> None:
@@ -157,8 +135,6 @@ def require_complete_day_placements(board: dict[str, Any]) -> None:
     rows = board.get("twelve_board")
     if not isinstance(rows, list) or len(rows) != 12:
         raise ValueError("完整干支加临条件需要十二位天地盘")
-    else:
-        pass
     sky = {get(r, "earth_branch"): get(r, "sky_branch") for r in rows}
     expected = day_placement_patterns(
         get(board.get("calendar_policy"), "effective_day_ganzhi"), sky
@@ -168,8 +144,6 @@ def require_complete_day_placements(board: dict[str, Any]) -> None:
     )
     if canonical(board.get("day_placement_patterns")) != canonical(expected):
         raise ValueError("完整干支加临条件缺项或与本课不一致")
-    else:
-        pass
     traces = [
         t
         for t in board.get("rule_trace", [])
@@ -177,5 +151,3 @@ def require_complete_day_placements(board: dict[str, Any]) -> None:
     ]
     if canonical(traces) != canonical([day_placements_trace(expected)]):
         raise ValueError("干支加临轨迹缺失、重复或与本课不一致")
-    else:
-        pass

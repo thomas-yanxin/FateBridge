@@ -55,11 +55,7 @@ def _preserve_previous(target: Path, previous_bytes: bytes) -> Path:
             raise ValueError(
                 f"{target.name}: existing backup differs; leaving target unchanged"
             )
-        else:
-            pass
         return backup
-    else:
-        pass
     backup.parent.mkdir(parents=True, exist_ok=True)
     descriptor, staging_name = tempfile.mkstemp(
         prefix=f".{backup.name}.", dir=backup.parent
@@ -100,8 +96,6 @@ def fetch_one(
     validate_file_name(name)
     if name not in catalog["files"]:
         raise ValueError(f"{name}: no fingerprint in the selected manifest")
-    else:
-        pass
     target = dest / name
     previous = target.read_bytes() if target.exists() else None
     if previous is not None and not force:
@@ -110,14 +104,10 @@ def fetch_one(
             return target
         except ValueError:
             pass
-    else:
-        pass
     if target.is_symlink():
         raise ValueError(
             f"{name}: refusing to replace a symlink; choose a regular data directory"
         )
-    else:
-        pass
     downloaded_bytes = _download(f"{base_url or catalog['base_url']}/{name}")
     verify_ephemeris_bytes(name, downloaded_bytes, catalog)
     dest.mkdir(parents=True, exist_ok=True)
@@ -132,18 +122,12 @@ def fetch_one(
         if current != previous:
             if current == downloaded_bytes:
                 return target
-            else:
-                pass
             raise ValueError(
                 f"{name}: destination changed during download; left unchanged"
             )
-        else:
-            pass
         if previous is not None and previous != downloaded_bytes:
             backup = _preserve_previous(target, previous)
             logger.warning(f"Preserved previous {target} at {backup}")
-        else:
-            pass
         pending.replace(target)
     finally:
         pending.unlink(missing_ok=True)
@@ -236,11 +220,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             start, end = args.year_range
             if not 1 <= start <= end <= 9999:
                 raise ValueError("Year range must satisfy 1 <= START <= END <= 9999")
-            else:
-                pass
             files = ephemeris_files_for_years(range(start, end + 1))
-        else:
-            pass
     except ValueError as error:
         parser.error(str(error))
 
@@ -263,8 +243,6 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "Profile directory is not a literal Swiss Ephemeris search directory; "
                 "choose a shorter --dest without search-path delimiters"
             )
-        else:
-            pass
         catalog = load_ephemeris_manifest(args.manifest)
         if args.verify_only:
             for name in files:
@@ -323,5 +301,3 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-else:
-    pass

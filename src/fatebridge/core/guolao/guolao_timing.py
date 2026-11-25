@@ -31,8 +31,6 @@ def _calendar_clock(instant: datetime, recorded: datetime) -> datetime:
     clock = ZonedCalendar(utc_calendar(instant), zone).as_datetime()
     if clock is None:
         raise ValueError("目标时刻在出生时区的日历标签超出datetime范围")
-    else:
-        pass
     return clock
 
 
@@ -48,11 +46,7 @@ def enrich_guolao_timing(
     if analysis_datetime is None:
         if month_basis is not None:
             raise ValueError("月限须显式提供目标时刻")
-        else:
-            pass
         return
-    else:
-        pass
     require_resolved_birth_timezone(birth.timezone_source)
     selected_month_basis: MonthBasis | None
     if month_basis == "jie_month":
@@ -65,8 +59,6 @@ def enrich_guolao_timing(
         raise ValueError("须显式选择jie_month或chinese_lunar_utc8月序政策")
     if analysis_datetime.tzinfo is None or analysis_datetime.utcoffset() is None:
         raise ValueError("果老目标时刻 analysis_datetime 须带明确时区偏移")
-    else:
-        pass
     target_calendar = utc_calendar(analysis_datetime)
     target_utc = target_calendar.as_datetime()
     if target_utc is None:
@@ -88,12 +80,8 @@ def enrich_guolao_timing(
         difference = float((target_scales.tt.days - native.time.tt.days) * 86400)
         if abs(difference) <= 0.0002:
             raise ValueError("目标与原生出生历元的先后落入数值区间，不能认证顺序")
-        else:
-            pass
         if difference < 0:
             raise ValueError("果老目标时刻不能早于记录的出生时刻")
-        else:
-            pass
         order_evidence = {
             "comparison_basis": "primary_TT_not_solar_label_or_UTC_surrogate",
             "nominal_TT_difference_seconds": difference,
@@ -102,8 +90,6 @@ def enrich_guolao_timing(
         }
     elif utc_ordering_key(instant) < utc_ordering_key(recorded):
         raise ValueError("果老目标时刻不能早于记录的出生时刻")
-    else:
-        pass
 
     g = payload["guolao"]
     calendar_datetime: str | None
@@ -112,8 +98,6 @@ def enrich_guolao_timing(
         calendar_timezone_role = (
             "UTC_reference_for_explicit_solar_input_not_original_civil_zone"
         )
-    else:
-        pass
     if native is not None:
         calendar_datetime = target_calendar.isoformat()
         target_epoch = PhysicalEpoch(
@@ -218,13 +202,9 @@ def enrich_guolao_timing(
     }
     if calendar_timezone_role is not None:
         g["timing"]["calendar_timezone_role"] = calendar_timezone_role
-    else:
-        pass
     if native is not None:
         g["timing"]["native_year_comparison"] = native_year_evidence
         g["timing"]["target_order_evidence"] = order_evidence
-    else:
-        pass
     g["rule_trace"].append(
         {
             "rule_id": "source_small_limit_reverse_count",
@@ -286,5 +266,3 @@ def enrich_guolao_timing(
                 "verified_subset": "影像十二月序逆转；现代月制、年界和闰月未验收",
             }
         )
-    else:
-        pass

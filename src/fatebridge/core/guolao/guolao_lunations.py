@@ -33,26 +33,18 @@ def source_mean_lunation(
     for name, value in [("中积", zhongji_days), ("距冬至日数", days_after_winter)]:
         if not isinstance(value, Fraction):
             raise TypeError(f"{name}须为明确的Fraction原历日数，不接收现代JD浮点值")
-        else:
-            pass
         if value < 0:
             raise ValueError(f"{name}须非负；不借下算公式推定上考或岁前事件")
-        else:
-            pass
     blob = DATA.read_bytes()
     source = json.loads(blob)
     if not isinstance(profile_id, str) or profile_id not in source["profiles"]:
         raise ValueError("须明确选择具名经朔参数，不能混用闰应")
-    else:
-        pass
     profile = source["profiles"][profile_id]
     month = Fraction(profile["synodic_month_days"])
     offset = Fraction(profile["runying_days"])
     qiying = Fraction(profile["qiying_days"])
     if not 0 <= offset < month or not 0 <= qiying < 60:
         raise ValueError("具名经朔参数超出原历周期")
-    else:
-        pass
     rows = source["gujin58_month_table"]
     if len(rows) != 12 or any(
         row["lunation_index"] != i
@@ -61,8 +53,6 @@ def source_mean_lunation(
         for i, row in enumerate(rows)
     ):
         raise ValueError("刊载月数钤不符，不补格或改值归一化")
-    else:
-        pass
     runyu = (zhongji_days + offset) % month
     month_total = runyu + days_after_winter
     index = month_total // month

@@ -81,36 +81,24 @@ def require_clock_input_binding(
         receipt = clock.get("input_representation")
         if requested_time is None and receipt is None:
             return
-        else:
-            pass
         original = (
             requested_time if requested_time is not None else receipt["supplied_text"]
         )
         expected = clock_input_representation(original)
         if not isinstance(receipt, dict):
             raise ValueError("Missing original clock provenance")
-        else:
-            pass
         if any(
             k not in receipt or type(receipt[k]) is not type(v) or receipt[k] != v
             for k, v in expected.items()
         ):
             raise ValueError("Clock provenance differs from request")
-        else:
-            pass
         if any(type(v) is not int for v in receipt["calculation_defaults"].values()):
             raise ValueError("Defaults must be integer reference components")
-        else:
-            pass
         if result["input_normalized"]["time"] != expected["normalized_clock"]:
             raise ValueError("Normalized calculation clock differs from input")
-        else:
-            pass
         civil = datetime.fromisoformat(clock["civil_datetime"])
         if civil.time() != time.fromisoformat(expected["normalized_clock"]):
             raise ValueError("Civil clock differs from supplied calculation reference")
-        else:
-            pass
         traces = [
             r["facts"]
             for r in evidence["rule_trace"]
@@ -118,11 +106,7 @@ def require_clock_input_binding(
         ]
         if len(traces) != 1 or traces[0] != clock:
             raise ValueError("Clock trace differs from output")
-        else:
-            pass
         if result["snapshot_text"].count(expected["statement"]) != 1:
             raise ValueError("Clock input statement differs from receipt")
-        else:
-            pass
     except (KeyError, TypeError, ValueError, AttributeError) as exc:
         raise NumerologySourceError("runtime_numerology_clock_input_conflict") from exc

@@ -47,8 +47,6 @@ def relation_between_su27(self_su27: str, other_su27: str) -> Dict[str, Any]:
     self_su27, other_su27 = map(normalize_mansion, (self_su27, other_su27))
     if self_su27 not in SU27_ORDER or other_su27 not in SU27_ORDER:
         raise ValueError("双方必须是二十七宿宿名（不含牛）")
-    else:
-        pass
     offset = (SU27_ORDER.index(other_su27) - SU27_ORDER.index(self_su27)) % 27
     relation = RELATION_TEMPLATE[offset]
     assessment = "favorable" if relation in _GOOD_CONTACT else "caution"

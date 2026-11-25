@@ -178,8 +178,6 @@ class AstroHoraryRequest(AstroHouseValidatorMixin, WesternEphemerisRequest):
     def _exclusive_question_clock(self) -> "AstroHoraryRequest":
         if self.question_clock_basis != "civil" and self.timezone_name is not None:
             raise ValueError("Solar question clock must omit timezone_name")
-        else:
-            pass
         return self
 
 
@@ -269,6 +267,4 @@ class AstroElectionRequest(AstroHouseValidatorMixin, WesternEphemerisRequest):
     def _exclusive_candidate_clock(self) -> "AstroElectionRequest":
         if self.candidate_clock_basis != "civil" and self.timezone_name is not None:
             raise ValueError("Solar candidate clock must omit timezone_name")
-        else:
-            pass
         return self

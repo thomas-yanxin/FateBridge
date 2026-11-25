@@ -86,8 +86,6 @@ class FormObservation(_DeferredModel):
     def consistent_observation(self) -> "FormObservation":
         if not self.evidence.strip():
             raise ValueError("形态观察依据不能为空白")
-        else:
-            pass
         if all(
             v is None
             for v in (
@@ -104,27 +102,19 @@ class FormObservation(_DeferredModel):
             )
         ):
             raise ValueError("至少提供一项观察，未知值省略")
-        else:
-            pass
         if (
             self.observation_basis == "image_observed"
             and self.backing_distance_m is not None
         ):
             raise ValueError("照片不能代替距离测量或用户确认")
-        else:
-            pass
         if (
             self.entrance_position in {"back", "back_left", "back_right"}
             and self.entrance_visible is True
             and self.view_via_mirror is not True
         ):
             raise ValueError("入口在身后但正面可见需确认镜面视野或纠正使用者参考方向")
-        else:
-            pass
         if self.view_via_mirror is True and self.entrance_visible is not True:
             raise ValueError("镜面补视野须确认入口实际可见")
-        else:
-            pass
         return self
 
 
@@ -146,26 +136,16 @@ class ElementAdjustment(_DeferredModel):
     def target_scope(self) -> "ElementAdjustment":
         if not self.evidence.strip():
             raise ValueError("调节目标依据不能为空白")
-        else:
-            pass
         if (self.target_method == "xuankong_natal") != (self.star_role is not None):
             raise ValueError("玄空目标须指定运/山/向星角色；其他方法不得指定玄空角色")
-        else:
-            pass
         if self.target_method != "bazhai" and self.subject_id is not None:
             raise ValueError("住户/宅卦筛选仅适用于八宅，不能覆盖年盘或玄空宅盘")
-        else:
-            pass
         if self.target_method == "bazhai" and (
             self.subject_id is None or self.aspect is None
         ):
             raise ValueError(
                 "八宅调节须指定宅/人的 subject_id 和位置/朝向 aspect，不合并作用域"
             )
-        else:
-            pass
         if self.target_method != "bazhai" and self.aspect == "facing":
             raise ValueError("年盘/玄空调节只关联位置，不能用对象朝向代替落宫")
-        else:
-            pass
         return self

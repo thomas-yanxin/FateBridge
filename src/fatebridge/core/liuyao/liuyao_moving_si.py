@@ -29,8 +29,6 @@ def moving_si_context(
     actors = [r for r in lines if r["change"] and r["branch"] == "巳"]
     if row["element"] != "金" or not actors:
         return None
-    else:
-        pass
     p = row["position"]
     path = f"liuyao_evidence.conditional_analysis.growth_conditions.lines.{p - 1}.moving_si"
     roots = []
@@ -40,8 +38,6 @@ def moving_si_context(
             location == "month" and monthly["monthly_supported"] is not True
         ):
             continue
-        else:
-            pass
         actor_path = None
         if assessment is not None:
             supports = assessment["lines"][p - 1]["strength"]["supports"]
@@ -51,8 +47,6 @@ def moving_si_context(
                 if a["location"] == location and a["branch"] == branch
             )
             actor_path = f"liuyao_evidence.conditional_analysis.classical_assessment.lines.{p - 1}.strength.supports.{i}"
-        else:
-            pass
         roots.append(
             dict(
                 location=location,
@@ -72,8 +66,6 @@ def moving_si_context(
             profile=PROFILE,
             scope="只核金爻以外的有独立根实际动土，不以动巳信用或该金爻自证。",
         )
-    else:
-        pass
     support = True if roots or moving and moving["condition_match"] is True else None
     return dict(
         ruleset_id=PROFILE["ruleset_id"],
@@ -114,8 +106,6 @@ def qualify_control(
 ) -> tuple[bool | None, str, dict[str, Any]]:
     if not contextual_pair(source, target, condition):
         return raw_match, raw_status, {}
-    else:
-        pass
     context = condition[INTERNAL_KEY]
     i = context["actual_si_positions"].index(source["position"])
     growth = (
@@ -196,16 +186,10 @@ def publish_context(
 def actor_reason(control: dict[str, Any]) -> str:
     if control["metal_si_growth_condition"] is True:
         return "普通克制许可与动巳遇长生资格并见，合并效力待审"
-    else:
-        pass
     if control["condition_match"] is True:
         return "普通克制许可按原条件保留，动巳长生资格待审"
-    else:
-        pass
     if control["condition_match"] is None:
         return "普通克制许可或动巳长生资格待审"
-    else:
-        pass
     return "实际动巳来源未匹配当前作用门槛"
 
 
@@ -225,15 +209,11 @@ def finalize_moving_si(
         )
         if context is not None:
             condition[INTERNAL_KEY] = context
-        else:
-            pass
     controls = {}
     for control in control_conditions["controls"]:
         p, q = control["source_position"], control["target_position"]
         if not contextual_pair(by_position[p], by_position[q], conditions[q - 1]):
             continue
-        else:
-            pass
         _, _, extra = qualify_control(
             by_position[p],
             by_position[q],
@@ -253,8 +233,6 @@ def finalize_moving_si(
             key = (actor.get("position"), q)
             if actor["location"] != "visible" or key not in controls:
                 continue
-            else:
-                pass
             control = controls[key]
             actor.update(
                 metal_si_growth_condition=control["metal_si_growth_condition"],

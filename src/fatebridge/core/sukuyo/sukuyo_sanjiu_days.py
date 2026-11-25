@@ -24,8 +24,6 @@ def personal_day_witnesses(relation: str) -> dict[str, Any]:
     )
     if record is None:
         raise ValueError("未知的三九日关系")
-    else:
-        pass
     return {
         "ruleset_id": bundle["id"],
         "source_url": bundle["source_url"],

@@ -71,8 +71,6 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
     """Build each catalog's public schema from explicit root-field contracts."""
     if key not in _TOOL_FIELDS:
         raise KeyError(f"Missing output contract for tool {key}")
-    else:
-        pass
     fields: dict[str, Any] = {
         "run_metadata": (RunMetadata | None, None),
         "snapshot_text": (str | None, None),
@@ -80,8 +78,6 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
     }
     if western_data_policy:
         fields["ephemeris_data_policy"] = (WesternDataPolicy | None, None)
-    else:
-        pass
     tool_fields = {
         **CHINESE_TOOL_FIELDS.get(key, {}),
         **CHART_TOOL_FIELDS.get(key, {}),
@@ -119,8 +115,6 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
     if key == "astro_chart":
         for variant_key in CHART_VARIANT_TOOL_KEYS.values():
             root_fields.update(dict.fromkeys(_TOOL_FIELDS[variant_key].split()))
-    else:
-        pass
     for field in root_fields:
         annotation = overrides.get(field, _FIELD_TYPES.get(field, Object))
         metadata: dict[str, JsonValue] = {}
@@ -139,8 +133,6 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
                     ],
                 }
             )
-        else:
-            pass
         if key == "astro_chart":
             variants: list[JsonValue] = [
                 variant
@@ -151,10 +143,6 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
                 metadata["x-fatebridge-full-result-required-for-chart-variants"] = (
                     variants
                 )
-            else:
-                pass
-        else:
-            pass
         fields[field] = (
             annotation | None,
             Field(

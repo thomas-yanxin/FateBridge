@@ -64,8 +64,6 @@ def qualify_weather_frequency(traces: list[dict[str, Any]]) -> None:
             or assessment["status"] != "scope_unresolved"
         ):
             continue
-        else:
-            pass
         row["qualification_reasons"].append("unresolved_frequency_scope")
         row["effective_status"] = (
             "conditional_on_unresolved_frequency"

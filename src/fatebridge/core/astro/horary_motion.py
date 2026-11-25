@@ -63,14 +63,10 @@ def _bisect_crossing(
     """Return adjacent TT endpoints with negative left and nonnegative right."""
     if not residual(left) < 0 <= residual(right):
         raise ValueError("Lunar event root is not bracketed")
-    else:
-        pass
     for _ in range(80):
         middle = (left + right) / 2
         if middle == left or middle == right:
             return left, right
-        else:
-            pass
         if residual(middle) < 0:
             left = middle
         else:
@@ -92,8 +88,6 @@ def first_lunar_contact(
             False,
             "Native lunar event search unavailable; a linear projection is not historical event evidence",
         )
-    else:
-        pass
     contacts = motion.get("contacts", [])
     if not contacts:
         return (
@@ -101,8 +95,6 @@ def first_lunar_contact(
             False,
             "No certain contact in the lunar before-ingress window; no assertion about events outside this window",
         )
-    else:
-        pass
     first = contacts[0]
     first_end = first["root_bracket_tt"][1]
     # The lunar solver proves (lower, upper]. A competing root is strictly
@@ -113,8 +105,6 @@ def first_lunar_contact(
             False,
             "Overlapping first-event brackets cannot establish a strict order",
         )
-    else:
-        pass
     if any(
         row["root_bracket_tt"][0] < first_end
         for row in motion.get("ambiguous_boundary_contacts", [])
@@ -124,8 +114,6 @@ def first_lunar_contact(
             False,
             "An ambiguous boundary event may overlap or precede the selected contact",
         )
-    else:
-        pass
     return (
         first,
         True,
@@ -167,8 +155,6 @@ def solve_lunar_contacts(
     """
     if not math.isfinite(start_tt):
         raise ValueError("Finite TT epoch required")
-    else:
-        pass
     unchecked_sample = sampler
 
     def sample(planet: str, at: float) -> SampledPlanetMotion:
@@ -177,8 +163,6 @@ def solve_lunar_contacts(
             raise ValueError(
                 "Finite longitude and speed required for every event sample"
             )
-        else:
-            pass
         return value
 
     first = {p: sample(p, start_tt) for p in ("Moon", *bodies)}
@@ -196,15 +180,11 @@ def solve_lunar_contacts(
         after = {p: sample(p, right) for p in ("Moon", *bodies)}
         if before["Moon"]["speed"] <= 0 or after["Moon"]["speed"] <= 0:
             raise ValueError("Lunar forward-motion condition not established")
-        else:
-            pass
         moon_step = _signed_step(
             before["Moon"]["longitude"], after["Moon"]["longitude"]
         )
         if not 0 < moon_step < 5:
             raise ValueError("Lunar scan interval violates the declared unwrap bound")
-        else:
-            pass
         next_longitude = longitude + moon_step
         if longitude < boundary <= next_longitude:
 
@@ -218,15 +198,11 @@ def solve_lunar_contacts(
                 )
 
             exit_bracket = _bisect_crossing(left, right, ingress_residual)
-        else:
-            pass
         for planet in bodies:
             if any(
                 row["Moon"]["speed"] <= row[planet]["speed"] for row in (before, after)
             ):
                 raise ValueError("Lunar relative-motion condition not established")
-            else:
-                pass
             change = moon_step - _signed_step(
                 before[planet]["longitude"], after[planet]["longitude"]
             )
@@ -234,16 +210,12 @@ def solve_lunar_contacts(
                 raise ValueError(
                     "Relative lunar scan is not monotone within unwrap bounds"
                 )
-            else:
-                pass
             low, high = relative[planet], relative[planet] + change
             for turn in range(low // 360 - 1, high // 360 + 2):
                 for ray in RAYS:
                     target = ray + turn * 360
                     if not low < target <= high:
                         continue
-                    else:
-                        pass
 
                     def residual(at: float) -> Fraction:
                         current_moon = _signed_step(
@@ -274,13 +246,9 @@ def solve_lunar_contacts(
             relative[planet] = high
         if exit_bracket is not None:
             break
-        else:
-            pass
         left, before, longitude = right, after, next_longitude
     if exit_bracket is None:
         raise ValueError("No lunar ingress bracket within the declared seven-day guard")
-    else:
-        pass
     accepted = [row for row in contacts if row["root_bracket_tt"][1] <= exit_bracket[0]]
     ambiguous = [
         row
@@ -340,13 +308,9 @@ def native_lunar_contacts(subject: Any) -> dict[str, Any]:
         )
         if result is None:
             raise ValueError("Physical lunar-event ephemeris unavailable")
-        else:
-            pass
         state, model = result
         if planet in models and models[planet] != model:
             raise EphemerisSourceError("model_changed")
-        else:
-            pass
         models[planet] = model
         values = {
             "longitude": normalize_angle(state["longitude"] - offset(at)),
@@ -355,8 +319,6 @@ def native_lunar_contacts(subject: Any) -> dict[str, Any]:
         }
         if not all(math.isfinite(v) for v in values.values()):
             raise ValueError("Nonfinite physical lunar-event state")
-        else:
-            pass
         return values
 
     try:

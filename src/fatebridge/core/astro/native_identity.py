@@ -56,8 +56,6 @@ def binding_distribution_version(
     filename = getattr(native, "__file__", None)
     if not filename:
         return _read(resolver)
-    else:
-        pass
     try:
         stat = (
             _native_path(filename) if type(filename) is str else Path(filename)

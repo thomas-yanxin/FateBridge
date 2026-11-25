@@ -20,8 +20,6 @@ def validate_identity_index(data: dict[str, Any]) -> None:
         witness = record.get("source_identity_revision")
         if witness is None:
             continue
-        else:
-            pass
         reference = record["source_reference"]
         if (
             reference["whole_pdf_sha256"] != PDF_SHA256
@@ -34,8 +32,6 @@ def validate_identity_index(data: dict[str, Any]) -> None:
             or witness["new_independent_validation_credit"] != 0
         ):
             raise ValueError("当前出版身份与所选书影字面不符")
-        else:
-            pass
         if "name_correction" in witness:
             name = witness["name_correction"]
             expected = printed_names.get(record["case_id"])
@@ -46,7 +42,3 @@ def validate_identity_index(data: dict[str, Any]) -> None:
                 or name["historical_person_identity_asserted"] is not False
             ):
                 raise ValueError("当前姓名必须忠于同页四柱且不宣称历史人物身份")
-            else:
-                pass
-        else:
-            pass

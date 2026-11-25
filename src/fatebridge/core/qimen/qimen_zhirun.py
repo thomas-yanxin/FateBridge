@@ -46,8 +46,6 @@ def qimen_day_key(day_number: int) -> str:
 def next_term(name: str) -> str:
     if name not in QIMEN_ZHIRUN_TERM_SEQUENCE:
         raise ValueError(f"未知奇门节气：{name!r}")
-    else:
-        pass
     index = QIMEN_ZHIRUN_TERM_SEQUENCE.index(name)
     return QIMEN_ZHIRUN_TERM_SEQUENCE[(index + 1) % len(QIMEN_ZHIRUN_TERM_SEQUENCE)]
 
@@ -100,10 +98,6 @@ def build_zhirun_schedule(
                     current_day_number += 1
                     rizhu_index = (rizhu_index + 1) % 60
                 break
-            else:
-                pass
-        else:
-            pass
 
     current_term = (
         "芒种"
@@ -137,10 +131,6 @@ def build_zhirun_schedule(
                     current_day_number += 1
                     rizhu_index = (rizhu_index + 1) % 60
                 break
-            else:
-                pass
-        else:
-            pass
 
     current_term = (
         "大雪"
@@ -169,9 +159,5 @@ def build_zhirun_schedule(
                     sexagenary_text(rizhu_index),
                 )
                 break
-            else:
-                pass
-        else:
-            pass
 
     return result

@@ -44,10 +44,6 @@ class _DeferredModel(BaseModel):
                     "此请求超出允许的咨询范围",
                     {"policy": POLICY_ID, "path": path},
                 )
-            else:
-                pass
-        else:
-            pass
         return data
 
     @model_validator(mode="after")
@@ -90,8 +86,6 @@ class _DeferredModel(BaseModel):
                             {"path": prefix + "datetime"},
                         ) from None
                     continue
-                else:
-                    pass
                 if getattr(self, prefix + "calendar", None) == "julian":
                     try:
                         gregorian_date(
@@ -107,8 +101,6 @@ class _DeferredModel(BaseModel):
                             {"path": prefix + "date"},
                         ) from None
                     continue
-                else:
-                    pass
                 try:
                     datetime(year, month, day)
                 except (ValueError, TypeError):
@@ -123,12 +115,8 @@ class _DeferredModel(BaseModel):
                             input=[year, month, day],
                         )
                     )
-            else:
-                pass
         if errors:
             raise ValidationError.from_exception_data(type(self).__name__, errors)
-        else:
-            pass
         return self
 
 
@@ -141,8 +129,6 @@ class AstroHouseValidatorMixin:
         try:
             if value is None:
                 raise InvalidHouseSystemError(INVALID_HOUSE_SYSTEM_MESSAGE)
-            else:
-                pass
             normalize_house_system(value)
         except UnsupportedGauquelinError:
             raise PydanticCustomError(
@@ -161,8 +147,6 @@ class AstroHouseValidatorMixin:
     def _validate_numeric_house_code(cls, value: object) -> object:
         if value is None:
             return None
-        else:
-            pass
         try:
             parse_house_code(value)
         except InvalidHouseCodeError:

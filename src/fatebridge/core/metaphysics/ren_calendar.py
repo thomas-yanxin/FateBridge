@@ -47,8 +47,6 @@ def resolve_runyear_birth_zone(
         zone = explicit_timezone.strip()
         if not zone:
             raise ValueError("行年birth_timezone不能为空；请提供民用时区或省略该字段")
-        else:
-            pass
         source = "birth_timezone"
     elif birth_place and birth_place.strip() not in ("", "未提供"):
         place = resolve_birth_place_context(birth_place)
@@ -56,8 +54,6 @@ def resolve_runyear_birth_zone(
             raise ValueError(
                 "行年出生地无法唯一解析民用时区；请补全国家、省市或明确birth_timezone"
             )
-        else:
-            pass
         zone = place.timezone
         canonical = place.canonical_name
         source = "birth_place"
@@ -120,8 +116,6 @@ def _term_time_scale(moment: datetime | UTCCalendar) -> dict[str, Any]:
         result = _term_time_scale_cached(moment, profile)
         if loaded_clock_profile_key() == profile:
             return result
-        else:
-            pass
         _term_time_scale_cached.cache_clear()
     raise RuntimeError("Civil time profile changed during term receipt calculation")
 
@@ -171,17 +165,11 @@ def require_ren_solar_term(term: SolarTerm) -> None:
         and term.ephemeris_retflags
     ):
         raise RuntimeError("独立太阳模型不能借用原生星历返回标志")
-    else:
-        pass
     if not is_calculated_solar_term(term):
         raise EphemerisSourceError("solar_term_source_unverified")
-    else:
-        pass
     if provider == "swisseph":
         if term.ephemeris_model not in {"swieph", "moshier", "jpl"}:
             raise RuntimeError("六壬与金口诀交气的实际星历模型未知，不能认证计算来源")
-        else:
-            pass
         model_flags = {"jpl": 1, "swieph": 2, "moshier": 4}
         if not term.ephemeris_retflags or any(
             type(flag) is not int or flag not in (1, 2, 4)
@@ -190,17 +178,11 @@ def require_ren_solar_term(term: SolarTerm) -> None:
             raise RuntimeError(
                 "六壬与金口诀交气黄经选项未知，不能认证默认地心视黄经定义"
             )
-        else:
-            pass
         if any(
             flag != model_flags[term.ephemeris_model]
             for flag in term.ephemeris_retflags
         ):
             raise RuntimeError("六壬与金口诀交气模型回执与原生返回标志不一致")
-        else:
-            pass
-    else:
-        pass
     if provider == "jpl_de440":
 
         expected = de440_solar.source_receipt(term.ephemeris_model)
@@ -219,10 +201,6 @@ def require_ren_solar_term(term: SolarTerm) -> None:
             or details.get("numerical_resolution_is_physical_accuracy") is not False
         ):
             raise EphemerisSourceError("solar_de440_invalid")
-        else:
-            pass
-    else:
-        pass
     try:
         validate_term_point(term.solar_model_details, term.calendar, complete=True)
     except EphemerisSourceError:
@@ -363,46 +341,32 @@ def require_ren_calendar(
                 source_section="Per-boundary JPL SPK vectors, ERFA dtdb, IAU2006/P03 and IAU2000B",
                 scope="逐交气列出实际SPK文件、TDB覆盖与参考系；不借用Swiss原生返回标志或将有限比较认证为绝对UTC、Horizons等同或完整物理精度。",
             )
-        else:
-            pass
         if models & {DE440_SOLAR_MODEL, DE440_EXTENDED_MODEL}:
             result["solar_longitude_definition"].update(
                 source_section="Per-boundary losslessly extracted DE440 coefficients, geocentric ERFA Fairhead TDB, IAU2006/P03 and IAU2000B",
                 scope="逐交气列出实际载入系数及原始SPK的不同来源、TDB覆盖与参考系；FateBridge裁取系数产品的生产者另列。原始内核来源不等于运行时加载了完整SPK，也不认证绝对UTC、Horizons等同或完整物理精度。",
             )
-        else:
-            pass
         if AA1996_SOLAR_MODEL in models:
             result["solar_longitude_definition"].update(
                 source_section="Per-boundary AA1996 EMB and full Moshier Moon, complete Swiss2.10.03 native apparent recomputation",
                 scope="逐交气列出改版模型的实际二进制、源图与配置来源；底层Moshier类别标志不代表原版模型身份，不将有限数值比较认证为全部时刻、民用时制或Horizons等同。",
             )
-        else:
-            pass
         if DE441_SOLAR_MODEL in models:
             result["solar_longitude_definition"].update(
                 source_section="Per-boundary bundled DE441 Earth/EMB/Moon/Sun, geocentric ERFA Fairhead TDB, fixed-reception light cone and Lorentz aberration, Vondrak2011 scalar obliquity, full-Simon77 nutation and IAU2006 bias",
                 scope="逐交气记录同源DE441接收地球、发射太阳、TDB时标与参考系；不冒充原版Swiss默认太阳或运行时载入完整JPL文件，也不以有限TT对照认证整个时域、绝对UTC或预测。",
             )
-        else:
-            pass
         if VSOP2013_SOLAR_MODEL in models:
             result["solar_longitude_definition"].update(
                 source_section="Per-boundary complete VSOP2013 EMB and full Moshier Moon, geocentric ERFA TT-to-TDB and Swiss2.10.03 apparent recomputation",
                 scope="逐交气列出具名VSOP2013模型的实际二进制、配置与源图来源；内部Moshier类别选项不是原生模型身份。TT有限对照不认证绝对UTC、所有连续时刻或Horizons参考系等同。",
             )
-        else:
-            pass
-    else:
-        pass
     if analysis_utc_offset is not None:
         resolved = resolve_civil_clock(
             civil.replace(tzinfo=None, fold=0), seed.timezone, analysis_utc_offset
         )
         if utc_calendar(resolved) != utc_calendar(civil):
             raise ValueError("明确UTC偏移与起课实际民用瞬间不一致")
-        else:
-            pass
         offset = resolved.utcoffset()
         assert offset is not None
         result["civil_clock_resolution"] = {
@@ -419,8 +383,6 @@ def require_ren_calendar(
             "instant_utc": utc_calendar(resolved).isoformat(),
             "timezone_rules": timezone_rules_metadata(seed.timezone),
         }
-    else:
-        pass
     return result
 
 

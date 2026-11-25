@@ -26,8 +26,6 @@ def seven_planet_view(factors: list[dict[str, Any]]) -> dict[str, Any]:
             antipodal = delta == 180
             if delta > 180:
                 delta -= 360
-            else:
-                pass
             # Exact antipodal points have two equally valid midpoints. Use a
             # canonical axis, publish both, and do not let factor order choose.
             midpoint = ((a + b) / 2) % 180 if antipodal else (a + delta / 2) % 360
@@ -60,8 +58,6 @@ def seven_planet_view(factors: list[dict[str, Any]]) -> dict[str, Any]:
                             }
                         )
                         break
-                    else:
-                        pass
     # Preserve the existing planet-major / midpoint-minor public ordering.
     body_order = {body["id"]: index for index, body in enumerate(bodies)}
     midpoint_order = {

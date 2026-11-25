@@ -72,8 +72,6 @@ def derive_lattice(
     times = lattice_times(lower, upper)
     if len(samples) != len(times):
         raise ValueError("Missing local Sun lattice samples")
-    else:
-        pass
     rows: list[SolarLatticeSample] = []
     residuals: list[Fraction] = []
     for tt, source in zip(times, samples, strict=True):
@@ -87,8 +85,6 @@ def derive_lattice(
             or not 0 <= lon < 360
         ):
             raise ValueError("Detached local Sun lattice sample")
-        else:
-            pass
         residual = (Fraction(birth_sun) - Fraction(lon)) % 360 - 88
         residuals.append(residual)
         rows.append(
@@ -138,8 +134,6 @@ def derive_lattice(
             key=lambda i: (abs(residuals[i]), times[i]),
         )
         changed = selected != initial_selected
-    else:
-        pass
     return {
         "radius_ulps": RADIUS_ULPS,
         "initial_lower_jd_tt": lower,

@@ -101,8 +101,6 @@ def collect_natal_event_probes(
     low, high = utc_instant(start), utc_instant(end)
     if high < low or high - low > timedelta(minutes=240):
         raise ValueError("出生事件核对需要顺序明确且不超过240分钟的实际时刻范围")
-    else:
-        pass
     zone = parse_timezone_name(template.timezone)
     low_day = utc_calendar(low).julian_day_exact()
     high_day = utc_calendar(high).julian_day_exact()
@@ -114,8 +112,6 @@ def collect_natal_event_probes(
     def clock_at(at: datetime) -> NormalizedBirthTime:
         if at not in clocks:
             clocks[at] = rebase_birth_clock(template, at)
-        else:
-            pass
         return clocks[at]
 
     def add_event(
@@ -129,8 +125,6 @@ def collect_natal_event_probes(
     ) -> None:
         if right < low or left > high:
             return
-        else:
-            pass
         left, right = max(left, low), min(right, high)
         event: BirthEventRecord = {
             "kind": kind,
@@ -144,13 +138,9 @@ def collect_natal_event_probes(
         if civil_point is not None:
             event["civil_point"] = civil_point
             event["bracket_basis"] = "nominal_gregorian_microsecond_enclosure_v1"
-        else:
-            pass
         if event not in events:
             events.append(event)
             cuts.update((left, right))
-        else:
-            pass
 
     clock_cuts, scan_step = birth_civil_clock_cuts(
         zone, low, high, boundary="offset" if template.applied else "shichen"
@@ -175,16 +165,12 @@ def collect_natal_event_probes(
         point = following.point
         if point.day > high_day:
             break
-        else:
-            pass
         terms.append(following)
         _, upper = point.nominal_calendar_bracket()
         cursor = ZonedCalendar(upper, timezone.utc).require_datetime()
         _, next_term = get_adjacent_solar_terms(cursor, template.timezone)
         if next_term.point.day <= point.day:
             raise ValueError("节令事件迭代没有前进，不能给出完整候选")
-        else:
-            pass
         following = next_term
     else:
         raise ValueError("出生范围内节令事件超出核对预算，不能静默裁剪")
@@ -193,8 +179,6 @@ def collect_natal_event_probes(
             require_calculated_solar_term(term)
             if not low_day <= term.point.day <= high_day:
                 continue
-            else:
-                pass
             lower, upper = term.point.nominal_calendar_bracket()
             add_event(
                 "jie",
@@ -208,8 +192,6 @@ def collect_natal_event_probes(
                 },
                 civil_point=term.point.to_record(),
             )
-        else:
-            pass
 
     monotonic_anchors: bool | None = None
     if template.applied and high > low:
@@ -234,21 +216,15 @@ def collect_natal_event_probes(
                     }
                 )
                 continue
-            else:
-                pass
             target = first.replace(minute=0, second=0, microsecond=0)
             if target < first:
                 target += timedelta(hours=1)
-            else:
-                pass
             targets = 0
             while target <= last:
                 if target.hour == 0 or target.hour % 2 == 1:
                     targets += 1
                     if targets > 32:
                         raise ValueError("校正钟面跨度异常，不能静默裁剪事件")
-                    else:
-                        pass
                     left, right = a, b
                     if first == target:
                         right = left
@@ -258,13 +234,9 @@ def collect_natal_event_probes(
                         for _ in range(64):
                             if right - left <= SOLAR_BRACKET:
                                 break
-                            else:
-                                pass
                             middle = left + (right - left) / 2
                             if middle in (left, right):
                                 break
-                            else:
-                                pass
                             value = clock_at(middle).corrected_datetime.replace(
                                 tzinfo=None
                             )
@@ -285,11 +257,7 @@ def collect_natal_event_probes(
                             "precision_scope": "conditional_computational_bracket",
                         },
                     )
-                else:
-                    pass
                 target += timedelta(hours=1)
-    else:
-        pass
 
     events.sort(
         key=lambda event: (event["lower_utc"], event["upper_utc"], event["kind"])
@@ -297,8 +265,6 @@ def collect_natal_event_probes(
     for index, event in enumerate(events):
         if event["kind"] != "solar_clock" or event["lower_utc"] == event["upper_utc"]:
             continue
-        else:
-            pass
         for other_index, other in enumerate(events):
             if (
                 other["kind"] == "jie"
@@ -313,21 +279,15 @@ def collect_natal_event_probes(
                         "reason": "apparent_clock_bracket_overlaps_calculated_jie",
                     }
                 )
-            else:
-                pass
 
     instants = set(cuts)
     for cut in cuts:
         for neighbor in (cut - MICROSECOND, cut + MICROSECOND):
             if low <= neighbor <= high:
                 instants.add(neighbor)
-            else:
-                pass
     intervals = list(zip(sorted(cuts), sorted(cuts)[1:]))
     if not intervals:
         intervals = [(low, high)]
-    else:
-        pass
     midpoints = [left + (right - left) / 2 for left, right in intervals]
     instants.update(midpoints)
     ordered_instants = sorted(instants)

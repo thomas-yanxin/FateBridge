@@ -39,8 +39,6 @@ def build_solar_arc_payload(
     }
     if progression_options is not None:
         calculation_options["progression"] = progression_options
-    else:
-        pass
     return {
         "calculation_options": calculation_options,
         "arc_degrees": round(float(arc_degrees), 4),

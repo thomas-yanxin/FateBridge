@@ -47,8 +47,6 @@ def _source() -> dict[str, Any]:
             or len(set(data["gua_order"])) != 60
         ):
             raise ValueError("所选节候表的身份、字节或条目不一致。")
-        else:
-            pass
         # The digest fixes literal errors too; a convenient correction is a
         # different source/version, never an invisible rewrite of this one.
     except (OSError, KeyError, TypeError, ValueError) as exc:
@@ -60,13 +58,9 @@ def _source() -> dict[str, Any]:
 def _term(name: str) -> str:
     if not isinstance(name, str):
         raise ValueError("节候查表需要明确节气名，不能猜候或出生时间。")
-    else:
-        pass
     name = ALIASES.get(name, name)
     if name not in {row["term"] for row in _source()["term_rows"]}:
         raise ValueError("所选底本没有该节气名。")
-    else:
-        pass
     return name
 
 
@@ -106,12 +100,8 @@ def nominal_hou_day(day_offset: int, *, model: str) -> dict[str, Any]:
     """
     if type(day_offset) is not int or not 0 <= day_offset < 360:
         raise ValueError("候卦名义日序须明确为0至359的整数；不静默进年。")
-    else:
-        pass
     if not isinstance(model, str) or model not in MODELS:
         raise ValueError("须明确指定具名候卦重建模型；不按吻合程度暗选。")
-    else:
-        pass
     if model == "continuous_yao_from_yi_four":
         offset = (day_offset + 3) % 360
         gua_index, position = offset // 6, offset % 6 + 1
@@ -180,8 +170,6 @@ def jiehou_evidence(solar: dict[str, Any]) -> dict[str, Any]:
             not in {"birth_instant", "date_midnight_approximation"}
         ):
             raise ValueError("节气标签、已算象限或瞬间来源不一致。")
-        else:
-            pass
     except (KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("runtime_heluo_jiehou_context_conflict") from exc
     rows = literal_hou_table()

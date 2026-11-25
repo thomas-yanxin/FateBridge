@@ -55,8 +55,6 @@ def cyclic_core(
     """
     if type(accumulation) is not int or accumulation < 1 or type(yin) is not bool:
         raise ValueError("太乙积数必须是正整数")
-    else:
-        pass
     ju = (accumulation - 1) % 72 + 1
     taiyi_number = (1, 2, 3, 4, 6, 7, 8, 9)[((accumulation - 1) % 24) // 3]
     # Vol. 1: start at 武德申; repeat 阴德乾 and 大武坤.
@@ -65,8 +63,6 @@ def cyclic_core(
     if yin:
         taiyi_number = 10 - taiyi_number
         eyes = RING[(RING.index(eyes) + 8) % 16]
-    else:
-        pass
     jishen = BRANCHES[((8 if yin else 2) - (accumulation - 1)) % 12]
     starting_spirit = resolve_shiji_variant(
         yin=yin,
@@ -120,8 +116,6 @@ def yearly_core(year: int, *, shiji_profile: str | None = None) -> dict[str, Any
     """Resolve a CE year using vol. 1's 724 CE = 1,937,281 anchor."""
     if type(year) is not int or year < 1:
         raise ValueError("年计需要正整数公元年份")
-    else:
-        pass
     accumulation = 1937281 + year - 724
     core = cyclic_core(accumulation, shiji_profile=shiji_profile)
     core.update(
@@ -148,8 +142,6 @@ def build_year_board(
         not isinstance(year_profile, str) or year_profile not in YEAR_PROFILES
     ):
         raise ValueError("year_profile须明确选择已发布年计配置")
-    else:
-        pass
     historical = (
         historical_year_context(
             localize_datetime(seed.input_datetime, seed.timezone).date(),
@@ -165,13 +157,9 @@ def build_year_board(
     )
     if lunar is None:
         raise ValueError("太乙年计需要农历年，" + lunar_supported_range_message())
-    else:
-        pass
     year_value = lunar["year"]
     if not isinstance(year_value, int):
         raise ValueError("太乙年计农历年份必须是整数")
-    else:
-        pass
     year = year_value
     core = yearly_core(year, shiji_profile=shiji_profile)
     board = assemble_board(core, calculation_mode="year")
@@ -225,8 +213,6 @@ def build_year_board(
         board["calendar_rules"]["civil_lunar_calendar"] = civil_lunar_evidence(
             lunar, localize_datetime(seed.input_datetime, seed.timezone).date()
         )
-    else:
-        pass
     if historical:
         board["calendar_rules"].update(
             year_profile=year_profile,
@@ -252,8 +238,6 @@ def build_year_board(
                 if not s.startswith("岁首采用现代")
             ],
         ]
-    else:
-        pass
     board["calendar_summary"] = calendar_summary(board)
     attach_long_cycles(board, year)
     attach_gate_board(board, "year", year)

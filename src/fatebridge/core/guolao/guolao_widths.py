@@ -31,19 +31,13 @@ QUARTERS = {"少": Fraction(1, 4), "半": Fraction(1, 2), "太": Fraction(3, 4)}
 def _integer(value: int, maximum: int) -> None:
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError("源字组件须为明确整数，不接收浮点、布尔或隐式古度")
-    else:
-        pass
     if not 0 <= value <= maximum:
         raise ValueError("源字组件超出本表范围，不能取模或进位修正")
-    else:
-        pass
 
 
 def _policy(policy: str) -> None:
     if policy not in QUARTER_POLICIES:
         raise ValueError("须明确保留半太未释，或声明按四分制读少半太")
-    else:
-        pass
 
 
 @dataclass(frozen=True)
@@ -57,33 +51,19 @@ class WidthReading:
     def __post_init__(self) -> None:
         if self.mansion not in MANSIONS:
             raise ValueError("须保留28宿的明确宿名")
-        else:
-            pass
         if not isinstance(self.normalized_text, str) or not self.normalized_text:
             raise ValueError("须保留格内原字的规范转写")
-        else:
-            pass
         if self.whole_degree is not None:
             _integer(self.whole_degree, 40)
-        else:
-            pass
         if self.minute is not None:
             _integer(self.minute, 99)
-        else:
-            pass
         if self.quarter_mark is not None:
             if self.quarter_mark not in QUARTERS or self.whole_degree is None:
                 raise ValueError("本行只记录明确的整度附少半太")
-            else:
-                pass
             if self.minute is not None:
                 raise ValueError("本行不得混造分数与整度附半太")
-            else:
-                pass
         elif self.whole_degree is None and self.minute is None:
             raise ValueError("不得把空格变成零宿宽")
-        else:
-            pass
 
     def resolve(self, *, quarter_policy: str) -> dict[str, Any]:
         _policy(quarter_policy)
@@ -97,8 +77,6 @@ class WidthReading:
                 + Fraction(self.minute or 0, 100)
                 + QUARTERS.get(self.quarter_mark or "", Fraction(0))
             )
-        else:
-            pass
         return {
             "mansion": self.mansion,
             "normalized_text": self.normalized_text,
@@ -138,20 +116,14 @@ class WidthWitness:
             for v in (self.witness_id, self.locator, self.credit)
         ):
             raise ValueError("须保留具名底本、定位与来源署名")
-        else:
-            pass
         if self.primary_kind not in ("jpeg", "pdf"):
             raise ValueError("须区分原始JPEG与跨页PDF，不能混称图片")
-        else:
-            pass
         if (
             not isinstance(self.primary_sha256, str)
             or len(self.primary_sha256) != 64
             or any(c not in "0123456789abcdef" for c in self.primary_sha256)
         ):
             raise ValueError("原始资料须有明确SHA-256指纹")
-        else:
-            pass
 
 
 @dataclass(frozen=True)
@@ -166,24 +138,16 @@ class WidthRow:
     def __post_init__(self) -> None:
         if not isinstance(self.witness, WidthWitness):
             raise TypeError("宿宽行须绑定冻结的具名底本")
-        else:
-            pass
         expected_image = (
             self.witness.primary_sha256 if self.witness.primary_kind == "jpeg" else None
         )
         if self.image_sha256 != expected_image:
             raise ValueError("图片指纹须对应原JPEG；原PDF指纹不能冒充图片指纹")
-        else:
-            pass
         object.__setattr__(self, "readings", tuple(self.readings))
         if any(not isinstance(r, WidthReading) for r in self.readings):
             raise TypeError("各格须为冻结的具名宿宽释读")
-        else:
-            pass
         if tuple(r.mansion for r in self.readings) != tuple(MANSIONS):
             raise ValueError("本行须按角至轸顺序恰有28格，不重排、补齐或混历")
-        else:
-            pass
 
     def audit(self, *, quarter_policy: str) -> dict[str, Any]:
         _policy(quarter_policy)
@@ -268,8 +232,6 @@ class WidthRow:
     ) -> dict[str, Any]:
         if whole_degree_policy not in POLICIES:
             raise ValueError("过宫对照须另行声明整度承接政策")
-        else:
-            pass
         result = self.audit(quarter_policy=quarter_policy)
         widths = {r["mansion"]: r for r in result["entries"]}
         passages = load_registry()
@@ -322,14 +284,10 @@ class WidthRow:
 def load_row(source: str = "tohoku") -> WidthRow:
     if source not in SOURCES:
         raise ValueError("须明确选择已登记的宿宽底本，不按周天吻合度自动择本")
-    else:
-        pass
     blob = SOURCES[source].read_bytes()
     data = json.loads(blob)
     if data["calendar"] != "shoushi" or data["printed_calendar_label"] != "授時":
         raise ValueError("本资料须为授时源行，不接受混历")
-    else:
-        pass
     return WidthRow(
         source_id=data["source_id"],
         source_url=data["source_url"],

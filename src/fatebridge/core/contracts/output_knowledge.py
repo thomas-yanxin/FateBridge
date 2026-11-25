@@ -29,8 +29,6 @@ class KnowledgeCoverage(PartialOutput):
 def _reference_boolean(value: object) -> bool:
     if type(value) is not bool:
         raise ValueError("来源参考布尔事实不能用数字或字符串替代。")
-    else:
-        pass
     return value
 
 

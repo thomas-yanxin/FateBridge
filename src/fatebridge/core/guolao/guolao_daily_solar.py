@@ -26,23 +26,17 @@ POLICIES = ("gujin36_rate_sum_bridge", "gujin43_printed_daily_differences")
 def _integer(value: int, name: str) -> None:
     if type(value) is not int:
         raise TypeError(f"{name}须为明确原历整数日，不接收布尔、浮点或现代日期")
-    else:
-        pass
 
 
 def _policy(value: str) -> None:
     if value not in POLICIES:
         raise ValueError("须显式选择卷36累计率日差或卷43刊载日差，不自动选择较吻合者")
-    else:
-        pass
 
 
 def _segment_index(value: int) -> None:
     _integer(value, "四正段序")
     if not 0 <= value < 4:
         raise ValueError("四正段序须为0至3，不用Python负下标代替原历段序")
-    else:
-        pass
 
 
 def _number(value: str) -> F:
@@ -51,8 +45,6 @@ def _number(value: str) -> F:
         or re.fullmatch(r"-?[0-9]+(?:\.[0-9]+)?", value) is None
     ):
         raise ValueError("原刊操作数须为明确精度的十进制字符串，不接收浮点或布尔")
-    else:
-        pass
     return F(value)
 
 
@@ -68,8 +60,6 @@ class MotionSegment:
         _integer(offset, "段内距日")
         if not 0 <= offset <= self.days:
             raise ValueError("段内距日越界，不取模或跨段套率")
-        else:
-            pass
         return sum(self.rates[:offset], F())
 
 
@@ -89,8 +79,6 @@ class SourceDailySolar:
         s = self.segments[segment]
         if policy == "gujin43_printed_daily_differences":
             return s.printed_difference
-        else:
-            pass
         return (
             self.anchors[segment + 1] - self.anchors[segment] - s.cumulative(s.days)
         ) / s.days
@@ -110,8 +98,6 @@ class SourceDailySolar:
         _policy(policy)
         if not 0 <= day_index <= 365:
             raise ValueError("仅复原具名318算例的0至365日，不外推年份或认作公历日")
-        else:
-            pass
         segment = bisect_right(self.offsets, day_index) - 1
         terminal = segment == 4
         offset = day_index - self.offsets[segment]
@@ -123,8 +109,6 @@ class SourceDailySolar:
             rate = self.segments[segment].rates[offset] + self.difference(
                 segment, policy=policy
             )
-        else:
-            pass
         left = None
         if offset == 0 and segment:
             previous = self.segments[segment - 1]
@@ -136,8 +120,6 @@ class SourceDailySolar:
                 "left_minus_right_du_exact": str(value - midnight),
                 "nonclosing_left_limit_preserved": True,
             }
-        else:
-            pass
         return {
             "model_id": "gujin43_daily_solar_literal_motion_v1",
             "profile_id": self.profile_id,
@@ -225,8 +207,6 @@ def load_daily_solar(profile: str) -> SourceDailySolar:
         raise ValueError(
             "须明确选择gujin43_siku318_literal_motion，不默认出生年或拼用大统"
         )
-    else:
-        pass
     blob = DATA.read_bytes()
     raw = json.loads(blob)
     if (
@@ -234,32 +214,22 @@ def load_daily_solar(profile: str) -> SourceDailySolar:
         or raw.get("profile_id") != profile
     ):
         raise ValueError("未核对的原历日太阳参数版本")
-    else:
-        pass
     if (
         raw.get("coordinate_unit") != "historical_du_not_modern_degrees"
         or raw.get("source_day_unit") != "source_day_not_UTC_TT_or_modern_JD"
     ):
         raise ValueError("原历日度单位不能自动转换为现代角度或时间尺度")
-    else:
-        pass
     offsets = tuple(raw["integer_day_offsets"])
     if offsets != (0, 88, 182, 276, 365) or any(type(n) is not int for n in offsets):
         raise ValueError("具名四正相距日不可重采或补成平均象限")
-    else:
-        pass
     if (
         raw.get("elapsed_source_years") != 318
         or raw.get("source_first_midnight_day") != "42"
     ):
         raise ValueError("具名距算及首日不能更换后沿用同一参数版本")
-    else:
-        pass
     anchors = tuple(_number(v) for v in raw["midnight_unwrapped_du"])
     if len(anchors) != 5 or any(b <= a for a, b in zip(anchors, anchors[1:])):
         raise ValueError("须保留五个递增的四正夜半操作数，不取模去周后相减")
-    else:
-        pass
     segments: list[MotionSegment] = []
     for name, count in zip(NAMES, (89, 94, 94, 89), strict=True):
         source = raw["segments"][name]
@@ -270,29 +240,21 @@ def load_daily_solar(profile: str) -> SourceDailySolar:
             type(q["index"]) is not int or q["index"] != i for i, q in enumerate(rows)
         ):
             raise ValueError("须保留所选完整行度列的位置和刊空，不补缺或排序")
-        else:
-            pass
         values = [q["rate_du"] for q in rows[:-1]]
         if rows[-1]["rate_du"] is not None or any(
             not isinstance(v, str) or re.fullmatch(r"[01]\.[0-9]{6}", v) is None
             for v in values
         ):
             raise ValueError("刊率须为六位精度字符串；末格刊空不得补零")
-        else:
-            pass
         days = source["distance_source_days"]
         if (
             type(days) is not int
             or days != offsets[len(segments) + 1] - offsets[len(segments)]
         ):
             raise ValueError("相距日与所选行度列长度不符")
-        else:
-            pass
         rates = tuple(F(v) for v in values)
         if any(not 0 < rate < 2 for rate in rates):
             raise ValueError("源行度超出本具名模型范围，不截断或以邻值填充")
-        else:
-            pass
         segments.append(
             MotionSegment(
                 name,

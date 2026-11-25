@@ -35,13 +35,9 @@ def evidence_text(board: dict[str, Any]) -> str:
     ]
     if board.get("counter_cycles"):
         lines.append(counter_cycles_text(board["counter_cycles"]))
-    else:
-        pass
     if board.get("winter_origin_selection"):
 
         lines.append(winter_origin_selection_text(board["winter_origin_selection"]))
-    else:
-        pass
     resolution = calendar.get("civil_clock_resolution")
     if resolution:
         lines.append(
@@ -50,8 +46,6 @@ def evidence_text(board: dict[str, Any]) -> str:
             f"fold={resolution['fold']}；实际UTC：{resolution['instant_utc']}。"
             + resolution["scope"]
         )
-    else:
-        pass
     if mode == "year":
         historical = calendar.get("historical_calendar")
         if historical:
@@ -81,8 +75,6 @@ def evidence_text(board: dict[str, Any]) -> str:
                 + "。"
                 + board["solar_anchor_scope"]
             )
-        else:
-            pass
         lines.extend(
             [
                 f"起点：{calendar['anchor_name']} / {calendar['anchor_utc']}；天文来源：{calendar['anchor_provider']}。",
@@ -101,8 +93,6 @@ def evidence_text(board: dict[str, Any]) -> str:
                 lines.append(
                     f"完整积时：({origin['day_number']} - 1) × 12 + {origin['hour_number']} = {origin['accumulation']}；23时子初为现代约定；来源：{origin['source']}。"
                 )
-            else:
-                pass
         elif mode == "day":
             origin = calendar["day_origin"]
             lines.append(
@@ -129,10 +119,6 @@ def evidence_text(board: dict[str, Any]) -> str:
                     lines.append(
                         f"历表：{reference['calendar_authors']}《{reference['calendar_title']}》{reference['calendar_edition']}第{reference['calendar_printed_page']}页；{reference['calendar_source']}。{reference['scope']}"
                     )
-                else:
-                    pass
-            else:
-                pass
     reference = calendar.get("historical_date_reference")
     if reference:
         lines.append(
@@ -143,12 +129,8 @@ def evidence_text(board: dict[str, Any]) -> str:
             f"日期干支：原例{reference['source_day_ganzhi']}，本盘{reference['actual_day_ganzhi']}；积数：原例{reference['source_accumulation']}，本盘{reference['actual_accumulation']}。"
             + reference["scope"]
         )
-    else:
-        pass
     if board.get("shiji_derivation"):
         lines.append(shiji_derivation_text(board["shiji_derivation"]))
-    else:
-        pass
     for label, field in (("主算", "main"), ("客算", "guest")):
         trace = board["rule_trace"][field]
         path = " + ".join(f"{p['palace']}{p['value']}" for p in trace["path"])
@@ -173,18 +155,12 @@ def evidence_text(board: dict[str, Any]) -> str:
     )
     if board.get("count_assessment"):
         lines.append(counts_text(board["count_assessment"]))
-    else:
-        pass
     if board.get("victory_matrix_assessment"):
 
         lines.append(victory_matrix_text(board["victory_matrix_assessment"]))
-    else:
-        pass
     if board.get("elemental_guan_assessment"):
 
         lines.append(elemental_relations_text(board["elemental_guan_assessment"]))
-    else:
-        pass
     alignment = board.get("count_source_assessment")
     if alignment and (
         alignment["status"] == "not_assessed"
@@ -193,23 +169,15 @@ def evidence_text(board: dict[str, Any]) -> str:
     ):
 
         lines.append(source_alignment_text(alignment))
-    else:
-        pass
     lines.append(conditions_text(board["condition_assessment"]))
     if board.get("enclosure_assessment"):
         lines.append(enclosures_text(board["enclosure_assessment"]))
-    else:
-        pass
     if board.get("opposition_assessment"):
         lines.append(oppositions_text(board["opposition_assessment"]))
-    else:
-        pass
     lines.append(gates_text(board))
     if board.get("ten_jing"):
 
         lines.append(ten_jing_text(board["ten_jing"]))
-    else:
-        pass
     for comparison in board.get("day_source_comparisons", []):
         lines.append(
             f"{comparison['scope']} {comparison['field']}原文{comparison['source_value']}，本盘规则推算{comparison['rule_derived_value']}；来源：{comparison['source']}。"
@@ -222,8 +190,6 @@ def gates_text(board: dict[str, Any]) -> str:
     gates = board["gates"]
     if gates["status"] != "computed":
         return f"太乙八门未计算：{gates['reason']}"
-    else:
-        pass
     counter = gates["counter"]
     lines = [
         f"太乙八门：{gates['selected_profile']}，积数{counter['accumulation']}，{counter['duty_gate']}门入第{counter['unit_in_gate']}计数单位。"
@@ -275,6 +241,4 @@ def gates_text(board: dict[str, Any]) -> str:
             lines.append(
                 f"定计原文分歧：{item['field']}原文{item['source_value']}，按本盘算路{item['rule_derived_value']}；两值保留，未据程序改原文。"
             )
-    else:
-        pass
     return "\n".join(lines)

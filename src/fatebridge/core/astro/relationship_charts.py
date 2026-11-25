@@ -90,8 +90,6 @@ def _composite_chart(
     for planet in PLANET_SEQUENCE:
         if planet not in inner_planets or planet not in outer_planets:
             continue
-        else:
-            pass
         longitude = unique_midpoint(
             inner_planets[planet]["longitude"],
             outer_planets[planet]["longitude"],
@@ -107,8 +105,6 @@ def _composite_chart(
         )
         if not are_houses_resolved:
             record["house"] = None
-        else:
-            pass
         composite_planets.append(record)
     aspect_evidence = _build_aspects(composite_planets, include_evidence=True)
     aspects = [
@@ -165,8 +161,6 @@ def _composite_chart(
             if not are_houses_resolved
             else "因参与方上升点未解析，组合盘未计算 ASC；已保留基于天顶（MC）的等宫宫位。"
         )
-    else:
-        pass
     result: dict[str, Any] = {
         "person_info": {
             "name": f"{inner_chart['person_info']['name']} / {outer_chart['person_info']['name']} 组合盘",
@@ -220,8 +214,6 @@ def _composite_chart(
             ascendant_resolved=False,
             unavailable_reason="unresolved_source_ascendant",
         )
-    else:
-        pass
     return result
 
 
@@ -261,8 +253,6 @@ def planet_display_order(item: dict[str, Any]) -> tuple[int, int | str]:
     planet_id: str = item["id"]
     if planet_id in PLANET_SEQUENCE:
         return (0, PLANET_SEQUENCE.index(planet_id))
-    else:
-        pass
     return (1, planet_id)
 
 

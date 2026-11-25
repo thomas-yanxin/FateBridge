@@ -89,8 +89,6 @@ def resolve_useful_elements(
                 "scope": "仅在从儿成立时采用；普通扶抑和从儿条件方向均未提升为全局已定喜忌。",
             }
         )
-    else:
-        pass
     for structure in structures:
         layers.append(
             {
@@ -200,8 +198,6 @@ def resolve_useful_elements(
             for e in Element
             if e.value not in source_useful and e.value not in source_avoid
         ]
-    else:
-        pass
     return {
         "resolution_policy": "source_force_before_preference_v4",
         "from_child_reference": from_child,

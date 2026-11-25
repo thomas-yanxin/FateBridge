@@ -361,8 +361,6 @@ def build_candidate_selection(
         )
         if month_match["status"] == "not_observed":
             continue
-        else:
-            pass
         matching_anchors = (
             month_match["witness_ids"] + month_match["pending_witness_ids"]
         )
@@ -370,8 +368,6 @@ def build_candidate_selection(
             spec.month_kind == "peer" and month_is_blade
         ):
             continue
-        else:
-            pass
         observations = []
         cautions = []
         force_conditions = spec.force_conditions
@@ -398,8 +394,6 @@ def build_candidate_selection(
                     for stem in dict.fromkeys(s["stem"] for s in root_stars)
                 )
                 root_statuses[spec.observed_check] = root_status
-            else:
-                pass
             if root_status == "unknown":
                 force_conditions = (
                     f"{role}仅见阶段根参考，{role}有根须复核",
@@ -489,8 +483,6 @@ def build_candidate_selection(
                     "scope": "PDF84–85对此作警语，不否定用官路径的存在；警语不作成格、现实结果或个人福祸的判断。",
                 }
             )
-        else:
-            pass
         if spec.id == "peer_officer":
             officers, killers = (
                 [
@@ -523,8 +515,6 @@ def build_candidate_selection(
                         "scope": scope,
                     }
                 )
-        else:
-            pass
         if spec.id in ("peer_wealth", "peer_output"):
             wealth = [
                 s["evidence_id"]
@@ -548,8 +538,6 @@ def build_candidate_selection(
                             "scope": "PDF29、89–90禄劫用财带伤食；这里只核财与食伤并透，转生效力未判。",
                         }
                     )
-                else:
-                    pass
                 cautions.append(
                     {
                         "id": "peer_wealth_single_revealed_without_output",
@@ -583,15 +571,11 @@ def build_candidate_selection(
             role_by_element = {GENERATION_CYCLE[day_element]: "output"}
             if spec.id == "peer_wealth":
                 role_by_element[DESTRUCTION_CYCLE[day_element]] = "wealth"
-            else:
-                pass
             branches = {position: pillars[position][1] for position in ORDER}
             for triad, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
                 triad_role = role_by_element.get(BUREAU_ELEMENT[bureau])
                 if triad_role is None or branches["month"] not in triad:
                     continue
-                else:
-                    pass
                 membership = classify_triple_members(triad, branches.values())
                 if membership != "insufficient":
                     observations.append(
@@ -604,10 +588,6 @@ def build_candidate_selection(
                             "scope": "PDF90–91列会支用例。这里只核参与月支的实际成员、柱位及财或食伤类；不判合化、正偏或力量。",
                         }
                     )
-                else:
-                    pass
-        else:
-            pass
         observed = all(c["status"] == "matched" for c in observations)
         rows.append(
             {

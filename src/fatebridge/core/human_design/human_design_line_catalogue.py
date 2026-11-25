@@ -88,8 +88,6 @@ def _object(pairs: list[tuple[str, Any]]) -> dict:
     for key, value in pairs:
         if key in result:
             raise ValueError("Duplicate Human Design reference key")
-        else:
-            pass
         result[key] = value
     return result
 
@@ -111,13 +109,9 @@ def _base_catalogue() -> tuple[dict, bytes]:
         )
         if _BASE_CACHE is not None and _BASE_CACHE[0] == cache_key:
             return deepcopy(_BASE_CACHE[1]), _BASE_CACHE[2]
-        else:
-            pass
         raw = CATALOGUE_PATH.read_bytes()
         if hashlib.sha256(raw).hexdigest() != CATALOGUE_SHA256:
             raise ValueError("Human Design editorial reference identity changed")
-        else:
-            pass
         data = json.loads(raw, object_pairs_hook=_object, parse_constant=_nonfinite)
         expected = [(gate, line) for gate in range(1, 65) for line in range(1, 7)]
         if (
@@ -135,8 +129,6 @@ def _base_catalogue() -> tuple[dict, bytes]:
             or data["complete384_line_meanings_accepted"] is not False
         ):
             raise ValueError("Incomplete or falsely certified line catalogue")
-        else:
-            pass
         curated = []
         for row in data["rows"]:
             if (
@@ -146,13 +138,9 @@ def _base_catalogue() -> tuple[dict, bytes]:
                 or row["source_pdf_page_one_based"] != 7 + 2 * (row["gate"] - 1)
             ):
                 raise ValueError("Invalid source locator or review claim")
-            else:
-                pass
             if row["editorial_paraphrase"] is None:
                 if row["meaning_status"] != "not_yet_curated":
                     raise ValueError("Unknown meaning silently promoted")
-                else:
-                    pass
             else:
                 meanings = row["editorial_paraphrase"]
                 if (
@@ -162,13 +150,9 @@ def _base_catalogue() -> tuple[dict, bytes]:
                     or any(type(v) is not str or not v for v in meanings.values())
                 ):
                     raise ValueError("Invalid editorial paraphrase")
-                else:
-                    pass
                 curated.append(row["key"])
         if curated != [f"1.{line}" for line in range(1, 7)]:
             raise ValueError("Unreviewed semantic coverage changed")
-        else:
-            pass
         _BASE_CACHE = (cache_key, deepcopy(data), raw)
         return data, raw
     except (OSError, KeyError, TypeError, ValueError, RecursionError) as exc:
@@ -189,8 +173,6 @@ def _catalogue() -> tuple[dict, dict[Path, bytes]]:
         )
         if _CATALOGUE_CACHE is not None and _CATALOGUE_CACHE[0] == cache_key:
             return deepcopy(_CATALOGUE_CACHE[1]), dict(_CATALOGUE_CACHE[2])
-        else:
-            pass
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise EphemerisSourceError("human_design_reference_invalid") from exc
     data, base_raw = _base_catalogue()
@@ -198,8 +180,6 @@ def _catalogue() -> tuple[dict, dict[Path, bytes]]:
         raw = MANIFEST_PATH.read_bytes()
         if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
             raise ValueError("Composite reference revision changed")
-        else:
-            pass
         manifest = json.loads(raw, object_pairs_hook=_object, parse_constant=_nonfinite)
         snapshot = {CATALOGUE_PATH: base_raw, MANIFEST_PATH: raw}
         if (
@@ -215,18 +195,12 @@ def _catalogue() -> tuple[dict, dict[Path, bytes]]:
             or len(manifest["supplements"]) != 1
         ):
             raise ValueError("Invalid composite identity or certification")
-        else:
-            pass
         binding = manifest["supplements"][0]
         if binding["file"] != "line-knowledge-gate2-v1.json":
             raise ValueError("Undeclared supplement path")
-        else:
-            pass
         supplement_raw = SUPPLEMENT_PATH.read_bytes()
         if hashlib.sha256(supplement_raw).hexdigest() != binding["sha256"]:
             raise ValueError("Supplement identity changed")
-        else:
-            pass
         snapshot[SUPPLEMENT_PATH] = supplement_raw
         supplement = json.loads(
             supplement_raw, object_pairs_hook=_object, parse_constant=_nonfinite
@@ -243,8 +217,6 @@ def _catalogue() -> tuple[dict, dict[Path, bytes]]:
             or binding["keys"] != [f"2.{line}" for line in range(1, 7)]
         ):
             raise ValueError("Invalid supplementary coverage or certification")
-        else:
-            pass
         for row in supplement["rows"]:
             gate, line = map(int, row["key"].split("."))
             original = data["rows"][(gate - 1) * 6 + line - 1]
@@ -265,8 +237,6 @@ def _catalogue() -> tuple[dict, dict[Path, bytes]]:
                 raise ValueError(
                     "Supplement overwrites or falsely certifies a source row"
                 )
-            else:
-                pass
             if row["key"] == "2.3":
                 conditions = row["source_conditions"]
                 if (
@@ -275,10 +245,6 @@ def _catalogue() -> tuple[dict, dict[Path, bytes]]:
                     or conditions[0]["automatic_application"] is not False
                 ):
                     raise ValueError("Source condition silently applied to a person")
-                else:
-                    pass
-            else:
-                pass
             original.update(deepcopy(row))
         data["version"] = manifest["version"]
         data["catalogue_id"] = manifest["catalogue_id"]
@@ -288,8 +254,6 @@ def _catalogue() -> tuple[dict, dict[Path, bytes]]:
             != manifest["expected_local_paraphrase_count"]
         ):
             raise ValueError("Declared coverage differs from actual records")
-        else:
-            pass
         _CATALOGUE_CACHE = (cache_key, deepcopy(data), dict(snapshot))
         return data, snapshot
     except (OSError, KeyError, TypeError, ValueError, RecursionError) as exc:
@@ -373,16 +337,12 @@ def read_reference(*, category: str | None, key: str | None) -> dict:
             code="knowledge.human_design.unknown_category",
             details={"category": category},
         )
-    else:
-        pass
     if not isinstance(key, str) or not KEY.fullmatch(key.strip()):
         raise ToolValidationError(
             "人类图参考键须为门.线，门1至64、线1至6",
             code="knowledge.human_design.unknown_key",
             details={"key": key},
         )
-    else:
-        pass
     normalized = key.strip()
     gate, line = map(int, normalized.split("."))
     with coherent_human_design_references():

@@ -54,8 +54,6 @@ def build_routing_conditions(
     if selected is None:
         result["status"] = "requires_selected_focus"
         return result
-    else:
-        pass
     if selected["location"] not in ("visible", "hidden"):
         result["status"] = "focus_scope_not_supported"
         result["focus"] = dict(
@@ -65,8 +63,6 @@ def build_routing_conditions(
             status="focus_scope_not_supported",
         )
         return result
-    else:
-        pass
     result["status"] = "route_conditions_only"
     rows = {r["position"]: r for r in lines}
     cs = {c["position"]: c for c in conditions}
@@ -91,8 +87,6 @@ def build_routing_conditions(
             or element_relation(rows[y]["element"], selected["element"]) != "生爻"
         ):
             raise ValueError("元忌角色与接续相生方向不一致")
-        else:
-            pass
         f = selected["position"]
         second = pairs.get((y, f)) if selected["location"] == "visible" else None
         hidden_reception = (
@@ -109,8 +103,6 @@ def build_routing_conditions(
         )
         if selected["location"] == "visible" and second is None:
             raise ValueError("元神至明爻用神缺少同向生扶关系")
-        else:
-            pass
         bindings = [p for p in (j, y) if cs[p]["binding_cues"]]
         obstructions = [p for p in (j, y) if outgoing_blocker(cs[p]) is True]
         pending_obstructions = [p for p in (j, y) if outgoing_blocker(cs[p]) is None]
@@ -303,8 +295,6 @@ def build_routing_conditions(
             raw.update(
                 route_condition_match=match, route_status=status, route_source_path=path
             )
-        else:
-            pass
         result["routes"].append(route)
     for edge in edges:
         if (
@@ -315,15 +305,11 @@ def build_routing_conditions(
             or edge["relation"] != "克爻"
         ):
             continue
-        else:
-            pass
         routes = [
             r for r in result["routes"] if r["positions"][0] == edge["source_position"]
         ]
         if not routes:
             continue
-        else:
-            pass
         value = any_conditions([r["condition_match"] for r in routes])
         edge.update(
             qualified_routing_condition=value,

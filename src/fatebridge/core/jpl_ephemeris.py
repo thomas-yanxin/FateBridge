@@ -22,18 +22,12 @@ def configured_jpl_file() -> str | None:
     name = os.environ.get("FATEBRIDGE_JPL_FILE")
     if not name:
         return None
-    else:
-        pass
     # swe_set_jpl_file discards directory components and truncates long input.
     # Require an unambiguous basename; SE_EPHE_PATH owns directory selection.
     if len(name.encode()) >= 256 or not re.fullmatch(r"[A-Za-z0-9_.-]+", name):
         raise EphemerisSourceError("jpl_filename_invalid")
-    else:
-        pass
     if name in {".", ".."}:
         raise EphemerisSourceError("jpl_filename_invalid")
-    else:
-        pass
     return name
 
 
@@ -45,15 +39,11 @@ def jpl_header(path: Path) -> dict[str, Any]:
         size = path.stat().st_size
         if len(data) != 2856:
             raise ValueError("short header")
-        else:
-            pass
         for order in ("<", ">"):
             start, end, step = struct.unpack_from(order + "3d", data, 2652)
             de = struct.unpack_from(order + "i", data, 2840)[0]
             if de != 441:
                 continue
-            else:
-                pass
             au, emrat = struct.unpack_from(order + "2d", data, 2680)
             pointers = struct.unpack_from(order + "36i", data, 2696)
             libration = struct.unpack_from(order + "3i", data, 2844)
@@ -76,8 +66,6 @@ def jpl_header(path: Path) -> dict[str, Any]:
                 and size in {expected, expected + record_bytes}
             ):
                 raise ValueError("invalid DE441 layout")
-            else:
-                pass
             return {
                 "time_scale": "TDB",
                 "start_julian_day_tdb": start,
@@ -102,8 +90,6 @@ def prepare_jpl_call(
     filename = module.get_current_file_data(0)[0]
     if not filename or Path(filename).name != name or not Path(filename).is_file():
         raise EphemerisSourceError("jpl_file_unavailable")
-    else:
-        pass
     jpl_header(Path(filename))
     # These are the flagged functions used by managed chart calculations.
     # Unflagged native helpers (e.g. time_equ) retain their own documented
@@ -119,19 +105,13 @@ def prepare_jpl_call(
     }
     if operation not in flag_arguments:
         return args, kwargs, False
-    else:
-        pass
     index, key, default = flag_arguments[operation]
     flags = args[index] if len(args) > index else kwargs.get(key, default)
     # The negative Delta-T flag has a separate historical calibration meaning.
     if flags < 0:
         return args, kwargs, False
-    else:
-        pass
     if flags & module.FLG_MOSEPH:
         raise EphemerisSourceError("jpl_mixed_request")
-    else:
-        pass
     flags = (flags & ~module.FLG_SWIEPH) | module.FLG_JPLEPH
     if len(args) > index:
         updated = list(args)
@@ -146,5 +126,3 @@ def check_jpl_result(module: Any, result: Any, operation: str = "calc") -> None:
     flags = result[2] if operation == "fixstar2" else result[1]
     if flags < 0 or not flags & module.FLG_JPLEPH:
         raise EphemerisSourceError("jpl_native_fallback")
-    else:
-        pass

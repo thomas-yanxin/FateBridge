@@ -27,22 +27,16 @@ def clothing_reference(calendar: dict[str, Any]) -> dict[str, Any]:
     mansion = calendar.get("natal_su27")
     if mansion is not None and (not isinstance(mansion, str) or len(mansion) != 1):
         raise ValueError("衣事章须使用已核定的二十七宿，不含牛或并字")
-    else:
-        pass
     candidates = [mansion] if mansion else calendar.get("candidate_su27s", [])
     names = []
     rows = []
     for value in candidates:
         if not isinstance(value, str) or len(value) != 1:
             raise ValueError("衣事章须使用已核定的二十七宿，不含牛或并字")
-        else:
-            pass
         name = normalize_mansion(value)
         matches = [r for r in source["verse_rows"] if r["mansion"] == name]
         if len(matches) != 1 or name in names:
             raise ValueError("衣事章须使用不重复的二十七宿，不含牛或并字")
-        else:
-            pass
         names.append(name)
         primary = (
             "favorable" if name in source["primary_positive_mansions"] else "caution"

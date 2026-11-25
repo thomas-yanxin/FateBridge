@@ -158,16 +158,10 @@ def _angularity(house: int | None) -> str | None:
     """Classify a house number as angular / succedent / cadent."""
     if house is None:
         return None
-    else:
-        pass
     if house in ANGULAR_HOUSES:
         return "angular"
-    else:
-        pass
     if house in SUCCEDENT_HOUSES:
         return "succedent"
-    else:
-        pass
     return "cadent"
 
 
@@ -251,8 +245,6 @@ def build_harmonic_payload(
                         },
                     )
                 )
-            else:
-                pass
     conjunctions.sort(key=lambda item: item[0])
 
     return {
@@ -288,8 +280,6 @@ def build_planetary_ages_payload(
         )
         if is_active:
             active_planet = planet
-        else:
-            pass
         bands.append(
             {
                 "planet": planet,
@@ -440,8 +430,6 @@ def build_lunation_phase_payload(
     cap_tt = ephemeris_time(cap_calendar).tt
     if cap_tt is None:
         raise ValueError("Progressed lunation window requires a known TT clock")
-    else:
-        pass
     trace = PhysicalEphemerisTrace()
     cohort = PhysicalSourceCohort()
     natal_source = natal_subject.calculation_basis["physical_ephemeris_source"]
@@ -463,8 +451,6 @@ def build_lunation_phase_payload(
     def phase_at(jd_tt: float) -> Fraction:
         if jd_tt in samples:
             return samples[jd_tt]
-        else:
-            pass
         longitudes: list[Fraction] = []
         speeds: list[float] = []
         for name in ("Sun", "Moon"):
@@ -476,8 +462,6 @@ def build_lunation_phase_payload(
             )
             if result is None:
                 raise ValueError("Progressed lunation ephemeris source unavailable")
-            else:
-                pass
             state, _model = result
             longitudes.append(Fraction(state["longitude"]))
             speeds.append(state["longitude_speed"])
@@ -486,8 +470,6 @@ def build_lunation_phase_payload(
         cohort.add(trace.snapshot())
         if speeds[1] <= speeds[0]:
             raise ValueError("Progressed lunation requires increasing Moon–Sun motion")
-        else:
-            pass
         elongation = (longitudes[1] - longitudes[0]) % 360
         samples[jd_tt] = elongation
         return elongation
@@ -506,8 +488,6 @@ def build_lunation_phase_payload(
         age = civil.day - birth_day
         if not 0 < age <= max_age:
             continue
-        else:
-            pass
         key, label, _start_degree = LUNAR_PHASES[crossing.target_elongation // 45]
         timeline.append(
             {
@@ -611,8 +591,6 @@ def build_distributions_payload(
             "max_age_years": max_age_years,
             "periods": [],
         }
-    else:
-        pass
 
     asc_longitude = float(asc_raw)
     span_degrees = max_age_years * rate
@@ -628,8 +606,6 @@ def build_distributions_payload(
         for point_name, natal_lon in longitudes.items():
             if point_name in ("Ascendant", "Medium_Coeli"):
                 continue
-            else:
-                pass
             # Arc from the Ascendant to this body, measured forward.
             contact_arc = (Fraction(natal_lon) - Fraction(asc_longitude)) % 360
             if segment["enter_arc"] <= contact_arc < segment["exit_arc"]:
@@ -640,8 +616,6 @@ def build_distributions_payload(
                         "contact_age_years": round(contact_arc / rate, 3),
                     }
                 )
-            else:
-                pass
         participants.sort(key=lambda item: item["contact_age_years"])
 
         periods.append(
@@ -713,8 +687,6 @@ def _balbillus_distance(longitude: float, exaltation: float, mode: str) -> float
     raw = _wrap360(longitude - exaltation)
     if mode == "forward":
         return raw
-    else:
-        pass
     return min(raw, 360.0 - raw)
 
 
@@ -723,8 +695,6 @@ def _balbillus_period_years(planet: str, longitude: float | None, mode: str) -> 
     small_year = BALBILLUS_SMALL_YEARS[planet]
     if longitude is None:
         return float(small_year)
-    else:
-        pass
     distance = _balbillus_distance(longitude, BALBILLUS_EXALTATION[planet], mode)
     return small_year * (1.0 - distance / 360.0)
 
@@ -737,13 +707,9 @@ def _balbillus_order(
     ordered = sorted(present, key=lambda p: _wrap360(float(longitudes[p])))  # type: ignore[arg-type]
     if not ordered:
         ordered = list(BALBILLUS_PLANET_ORDER)
-    else:
-        pass
     if start_planet in ordered:
         pivot = ordered.index(start_planet)
         ordered = ordered[pivot:] + ordered[:pivot]
-    else:
-        pass
     return ordered
 
 
@@ -761,12 +727,8 @@ def build_balbillus_payload(
     """
     if mode not in BALBILLUS_MODES:
         mode = "nearest"
-    else:
-        pass
     if start_planet not in BALBILLUS_SMALL_YEARS:
         start_planet = "Sun"
-    else:
-        pass
 
     longitudes: dict[str, float | None] = {
         p: (
@@ -786,8 +748,6 @@ def build_balbillus_payload(
         duration = _balbillus_period_years(planet, longitudes[planet], mode)
         if duration <= 0:
             break
-        else:
-            pass
         # CCAG VIII.4 p237.23-p238.2: divide this parent's years into 129
         # shares, allotting each child its unmodified small-year weight.
         # The parent receives its own share first, then the following stars.
@@ -874,8 +834,6 @@ def _factor_pairs(number: int) -> list[list[int]]:
     while factor * factor <= number:
         if number % factor == 0:
             pairs.append([factor, number // factor])
-        else:
-            pass
         factor += 1
     return pairs
 
@@ -894,8 +852,6 @@ def build_keypoints_payload(
     """
     if release_mode not in KEYPOINTS_RELEASE_MODES:
         release_mode = "soul"
-    else:
-        pass
     max_age = max(1, min(120, int(max_age_years)))
 
     release_key = "ascendant" if release_mode == "body" else "moon"
@@ -916,8 +872,6 @@ def build_keypoints_payload(
             "positions": [],
             "activations": [],
         }
-    else:
-        pass
     if release_longitude is None:
         return {
             "system": "keypoints_120",
@@ -930,8 +884,6 @@ def build_keypoints_payload(
             "positions": [],
             "activations": [],
         }
-    else:
-        pass
 
     release_sign = int(_wrap360(float(release_longitude)) // 30)
     positions: list[dict[str, Any]] = []
@@ -939,8 +891,6 @@ def build_keypoints_payload(
         point = natal_reference.get(planet.lower())
         if point is None:
             continue
-        else:
-            pass
         sign_index = int(_wrap360(float(point["absolute_degree"])) // 30)
         position_number = ((sign_index - release_sign) % 12 + 12) % 12 + 1
         positions.append(
@@ -970,8 +920,6 @@ def build_keypoints_payload(
         ]
         if not position_active and not period_active:
             continue
-        else:
-            pass
         activations.append(
             {
                 "age": age,
@@ -1014,8 +962,6 @@ def build_yearsystem129_payload(
     """
     if start_planet not in BALBILLUS_SMALL_YEARS:
         start_planet = "Sun"
-    else:
-        pass
     longitudes: dict[str, float | None] = {
         p: (
             float(natal_reference[p.lower()]["absolute_degree"])
@@ -1079,8 +1025,6 @@ def build_planetary_arc_payload(
     """
     if arc_source not in natal_longitudes or arc_source not in progressed_longitudes:
         arc_source = "Moon"
-    else:
-        pass
     arc_degrees, directed_points = source_arc_positions(
         natal_longitudes,
         natal_longitudes[arc_source],
@@ -1153,26 +1097,18 @@ def build_persian_directed_payload(
         mover_lon = by_id.get(promittor)
         if mover_lon is None:
             continue
-        else:
-            pass
         for target_id, target_lon in targets:
             if target_id == promittor:
                 continue
-            else:
-                pass
             for aspect in PERSIAN_ASPECTS:
                 for sign in (1, -1):
                     if aspect in (0, 180) and sign == -1:
                         continue
-                    else:
-                        pass
                     contact = (target_lon + sign * aspect) % 360
                     arc = (contact - mover_lon) % 360
                     age = arc / Fraction(PERSIAN_RATE_DEG_PER_YEAR)
                     if not 0 < age <= max_age_years:
                         continue
-                    else:
-                        pass
                     date = ""
                     if birth_datetime is not None:
                         date = (
@@ -1181,8 +1117,6 @@ def build_persian_directed_payload(
                                 days=float(age) * PERSIAN_TROPICAL_YEAR_DAYS
                             )
                         ).strftime("%Y-%m-%d")
-                    else:
-                        pass
                     hits.append(
                         (
                             age,
@@ -1232,8 +1166,6 @@ def _house_containing(
         offset = (point - start) % 360
         if arc > 0 and offset < arc:
             return house_index, offset / arc
-        else:
-            pass
     raise ValueError("年龄推进点宫头未覆盖给定黄经，不能补为零岁上升点")
 
 
@@ -1272,8 +1204,6 @@ def build_age_point_payload(
             contact_age = base_age + cycle * cycle_years
             if contact_age > 0:
                 contacts.append((contact_age, body, round(longitude % 360.0, 4)))
-            else:
-                pass
             cycle += 1
     contacts.sort(key=lambda contact: contact[0])
 
@@ -1394,8 +1324,6 @@ def build_jaynes_declination_payload(
                 kind, hit_orb = "parallel", abs(prog_working - natal_work)
             if hit_orb > orb_limit:
                 continue
-            else:
-                pass
             parallels.append(
                 {
                     "progressed": prog_body,

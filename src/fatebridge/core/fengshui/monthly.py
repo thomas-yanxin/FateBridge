@@ -61,8 +61,6 @@ def monthly_position_reading(layer: dict[str, Any]) -> dict[str, Any]:
                 for candidate in time["candidate_months"]
             )
             text += f"候选有效期：{windows}，各区间起点含、终点不含；暂取区间不表示月份已确认。"
-        else:
-            pass
         statements.append(
             {
                 "target_path": "layers.monthly_stars.time_context",
@@ -178,8 +176,6 @@ def monthly_stars(req: MonthlyRequest) -> dict[str, Any]:
                 "month_boundary": "twelve_jie",
             },
         )
-    else:
-        pass
     validate_monthly_layer(result, req)
     result["position_reading"] = monthly_position_reading(result)
     return result

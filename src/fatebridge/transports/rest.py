@@ -81,8 +81,6 @@ def register_rest_route(
             f"Tool '{spec.tool_name}' request model has reserved field name(s) "
             f"{reserved_fields}; these collide with REST output-shaping query params."
         )
-    else:
-        pass
 
     async def calculation_route(
         request: BaseModel,

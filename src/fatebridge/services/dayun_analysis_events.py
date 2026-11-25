@@ -38,10 +38,6 @@ def collect_dayun_analysis_events(
                 analysis_walls.append(
                     gap.lower_wall + analysis.elapsed_since(gap_start)
                 )
-            else:
-                pass
-    else:
-        pass
     events: list[BirthEventRecord] = []
     unresolved: list[UnresolvedBirthEvent] = []
     seen = set()
@@ -55,8 +51,6 @@ def collect_dayun_analysis_events(
                 )
             )
             continue
-        else:
-            pass
         low_wall, high_wall = cell.wall_range
         targets = []
         for index in range(DEFAULT_DAYUN_PERIODS + 1):
@@ -75,20 +69,14 @@ def collect_dayun_analysis_events(
                     targets.append(
                         ("dayun_decade_leap_clip", index, datetime(year, 2, 29))
                     )
-                else:
-                    pass
         for kind, index, target in targets:
             bracket = cell.inverse(target)
             if bracket is None:
                 continue
-            else:
-                pass
             lower, upper = bracket
             key = (kind, index, target, lower, upper)
             if key in seen:
                 continue
-            else:
-                pass
             seen.add(key)
             if kind == "dayun_analysis_moment":
                 # note (dayun): Check the actual instant because a wall label can repeat in a fold.
@@ -96,8 +84,6 @@ def collect_dayun_analysis_events(
                 for at in {lower - MICROSECOND, lower, upper, upper + MICROSECOND}:
                     if not cell.lower <= at <= cell.last:
                         continue
-                    else:
-                        pass
                     birth, _, wall, _ = TimingAnalysis._dayun_calendar_wall_context(
                         clock_at(at).input_datetime, gender, template.timezone
                     )
@@ -111,10 +97,6 @@ def collect_dayun_analysis_events(
                     or not min(actual) <= analysis <= max(actual)
                 ):
                     continue
-                else:
-                    pass
-            else:
-                pass
             source = dict(
                 policy="three_days_one_year_calendar_v1",
                 direction="顺行" if cell.is_forward else "逆行",

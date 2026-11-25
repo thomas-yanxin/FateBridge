@@ -18,8 +18,6 @@ def _profile() -> dict[str, Any]:
     )
     if profile["id"] != "meihua_tone_input_v1" or profile["version"] != "1.0.0":
         raise ValueError("Unknown Meihua tone input evidence profile")
-    else:
-        pass
     return profile
 
 

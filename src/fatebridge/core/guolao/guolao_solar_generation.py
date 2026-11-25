@@ -30,8 +30,6 @@ DAILY_PROFILE = "gujin40_exact_recurrence_on_g43_span_anchors"
 def _integer(value: int) -> None:
     if type(value) is not int:
         raise TypeError("仅接收明确原历整数日序，不接收布尔、浮点或现代JD")
-    else:
-        pass
 
 
 def _decimal(value: str) -> F:
@@ -40,8 +38,6 @@ def _decimal(value: str) -> F:
         or re.fullmatch(r"[0-9]+(?:\.[0-9]+)?", value) is None
     ):
         raise ValueError("源值须为保留精度的十进制字符串，不自动补字、补零或改单位")
-    else:
-        pass
     return F(value)
 
 
@@ -96,8 +92,6 @@ class GenerationBranch:
         _integer(index)
         if not 0 <= index <= self.terminal_index:
             raise ValueError("超出所选立成日序，不延长初末限或按年取模")
-        else:
-            pass
         a, b, c = self.coefficients
         return F(index) * (a - index * (b + c * index)) / 100000000
 
@@ -114,8 +108,6 @@ class SolarGenerator:
         for branch in self.branches:
             if branch.name == origin:
                 return branch
-            else:
-                pass
         raise ValueError("须明确winter或summer原表，不根据月份猜测")
 
     def row(self, origin: str, index: int) -> dict[str, Any]:
@@ -123,8 +115,6 @@ class SolarGenerator:
         branch = self.branch(origin)
         if not 0 <= index <= branch.terminal_index:
             raise ValueError("越过原表末行，不补下一日行度")
-        else:
-            pass
         row = branch.rows()[index]
         return {
             "model_id": "gujin40_exact_solar_generation_v1",
@@ -225,8 +215,6 @@ def load_generator(profile: str) -> SolarGenerator:
         raise ValueError(
             "须明确选择gujin40_exact_recurrence_v1，不自动换成刊率或最佳拟合"
         )
-    else:
-        pass
     blob = DATA.read_bytes()
     raw = json.loads(blob)
     if (
@@ -234,30 +222,22 @@ def load_generator(profile: str) -> SolarGenerator:
         or raw.get("profile_id") != profile
     ):
         raise ValueError("未核对的太阳立成生成版本")
-    else:
-        pass
     if (
         raw.get("column_fen_per_ancient_du") != "10000"
         or raw.get("coefficient_polynomial_du_divisor") != "100000000"
     ):
         raise ValueError("此处立成分不是百分之一古度的角分，不能自动换尺度")
-    else:
-        pass
     branches: list[GenerationBranch] = []
     for name, terminal, sign in [("winter", 89, 1), ("summer", 94, -1)]:
         source = raw["branches"][name]
         coeff = tuple(_decimal(v) for v in source["volume36_polynomial_coefficients"])
         if len(coeff) != 3:
             raise ValueError("须保留定差、平差、立差三个源系数")
-        else:
-            pass
         a, b, c = coeff
         increment = _decimal(source["volume40_initial_correction_increment_fen"])
         difference = _decimal(source["volume40_initial_combined_difference_fen"])
         if increment != (a - b - c) / 10000 or difference != (2 * b + 6 * c) / 10000:
             raise ValueError("原页首行种子与所声明三次式不符，不能改种子或静默选一方")
-        else:
-            pass
         if (
             type(source["terminal_cumulative_index"]) is not int
             or source["terminal_cumulative_index"] != terminal
@@ -265,8 +245,6 @@ def load_generator(profile: str) -> SolarGenerator:
             or source["motion_sign"] != sign
         ):
             raise ValueError("原表末行或盈缩方向不符，不扩域或猜正负")
-        else:
-            pass
         branches.append(
             GenerationBranch(name, (a, b, c), increment, difference, terminal, sign)
         )
@@ -284,8 +262,6 @@ def load_generated_daily_solar(profile: str) -> GeneratedDailySolar:
         raise ValueError(
             "须明确选择gujin40_exact_recurrence_on_g43_span_anchors，不改动既有刊率版本"
         )
-    else:
-        pass
     generator = load_generator(GENERATOR_PROFILE)
     literal = load_daily_solar(LITERAL_PROFILE)
 
@@ -294,8 +270,6 @@ def load_generated_daily_solar(profile: str) -> GeneratedDailySolar:
         for row in generator.branch(origin).rows()[:-1]:
             if row.motion_du is None:
                 raise ValueError("段内生成率缺失，不丢行补齐计算")
-            else:
-                pass
             values.append(row.motion_du)
         return tuple(values)
 

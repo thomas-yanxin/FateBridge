@@ -74,8 +74,6 @@ def _fixed_qice_year_from_conjunctions(
     if assignment["status"] != "assigned_under_explicit_civil_mean_qi_policy":
         result["reason"] = "first_winter_cycle_unresolved"
         return result
-    else:
-        pass
     rows = assignment["months"]
     first = next(
         i
@@ -101,21 +99,15 @@ def _fixed_qice_year_from_conjunctions(
         if a is None or b is None:
             result["reason"] = "missing_required_year_tail_conjunction"
             return result
-        else:
-            pass
         start_time, stop_time = winter + Fraction(a), winter + Fraction(b)
         start, stop = start_time // 1, stop_time // 1
         if stop - start not in (29, 30):
             result["reason"] = "year_tail_month_length_outside_29_or_30"
             return result
-        else:
-            pass
         qi = [i for i in range(12, 15) if start <= principal_terms[i] // 1 < stop]
         if len(qi) > 1 or (qi and qi[0] != expected_qi):
             result["reason"] = "year_tail_principal_term_sequence_conflict"
             return result
-        else:
-            pass
         number = (expected_qi + 10) % 12 + 1 if qi else (expected_qi + 9) % 12 + 1
         instant_qi = [
             i for i in range(12, 15) if start_time <= principal_terms[i] < stop_time
@@ -140,8 +132,6 @@ def _fixed_qice_year_from_conjunctions(
         }
         if qi:
             expected_qi += 1
-        else:
-            pass
         if number == 1 and qi:
             if (
                 len(year_rows) not in (12, 13)
@@ -154,8 +144,6 @@ def _fixed_qice_year_from_conjunctions(
             ):
                 result["reason"] = "calendar_year_month_sequence_conflict"
                 return result
-            else:
-                pass
             result.update(
                 status="complete_under_named_fixed_qice_policy",
                 month_count=len(year_rows),
@@ -164,8 +152,6 @@ def _fixed_qice_year_from_conjunctions(
                 complete_named_year_assigned=True,
             )
             return result
-        else:
-            pass
         year_rows.append(row)
     result["reason"] = "next_regular_first_month_not_bracketed"
     return result

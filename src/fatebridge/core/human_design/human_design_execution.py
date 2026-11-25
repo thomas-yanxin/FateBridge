@@ -22,8 +22,6 @@ def isolated_human_design(
                         kwargs,
                     ),
                 )
-        else:
-            pass
         result = function(*args, **kwargs)
         result["native_execution_context"] = native_execution.context_evidence()
         return result

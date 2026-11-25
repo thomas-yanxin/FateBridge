@@ -45,8 +45,6 @@ def observe_human_design_clocks(
             # Also retain the operation's original identity if another caller
             # explicitly clears or evicts the shared parser cache mid-flight.
             raise EphemerisSourceError("timezone_rules_changed")
-        else:
-            pass
         reference = result["cycle_context"].get("reference_utc")
         precise_leap = result.get("birth_clock_evidence") is not None or (
             reference is not None and reference[17:19] == "60"
@@ -67,8 +65,6 @@ def observe_human_design_clocks(
         }
         if kwargs.get("compare_cycle_origins", False):
             result["clock_evidence"]["compare_cycle_origins"] = True
-        else:
-            pass
         return result
 
     return guarded

@@ -43,8 +43,6 @@ def evaluate_stem_effects(
         review = "day" in (left, right) or contested
         if not review:
             multipliers[left] = multipliers[right] = binding
-        else:
-            pass
         events.append(
             {
                 "kind": "天干合",
@@ -108,8 +106,6 @@ def stem_energy_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
     receipt = assessment.get("stem_energy_accounting")
     if not receipt or not receipt.get("ledger"):
         return []
-    else:
-        pass
     names = {"year": "年干", "month": "月干", "hour": "时干"}
     details = [
         f"{names[r['pillar']]}{r['physical_stem']}：预算{r['available_budget']:g}"
@@ -126,6 +122,4 @@ def stem_energy_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
     line = stem_order_review_snapshot_line(receipt.get("source_order_review") or {})
     if line:
         lines.append(line)
-    else:
-        pass
     return lines

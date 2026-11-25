@@ -26,8 +26,6 @@ def _profile() -> dict[str, Any]:
         or profile["version"] != "1.0.0"
     ):
         raise ValueError("Unknown selected quiet-context source profile")
-    else:
-        pass
     return profile
 
 
@@ -41,20 +39,14 @@ def ensure_observation_method_context(
     """Reject only explicitly conflicting source declarations in the same cast."""
     if context is None:
         return
-    else:
-        pass
     if method == "sound_groups" and context.get("nothing_heard") is True:
         raise ValueError("sound_groups声明实际听闻，不能同时声明同次起卦无所闻")
-    else:
-        pass
     if method in {"observed_trigrams", "observed_categories"} and all(
         context.get(key) is True for key in CONTEXT_FIELDS
     ):
         raise ValueError(
             "观物起卦声明外部物象，不能同时套用同次静室无所闻见的无外卦条件"
         )
-    else:
-        pass
 
 
 def _seed_calendar_values(seed: dict[str, Any]) -> list[dict[str, Any]]:
@@ -67,23 +59,15 @@ def _seed_calendar_values(seed: dict[str, Any]) -> list[dict[str, Any]]:
             "lunar_time_added_count"
         ):
             raise ValueError("Quiet-context lunar labels require their original method")
-        else:
-            pass
         if seed.get("hour_branch") != parameters.get("hour_branch"):
             raise ValueError("Quiet-context hour must match the original lunar seed")
-        else:
-            pass
         lunar_parameters = parameters
-    else:
-        pass
     result = []
     for key in ("year_branch", "lunar_month", "lunar_day", "hour_branch"):
         if lunar_parameters is not None and key != "hour_branch":
             value = lunar_parameters[key]
             if seed.get(key) is not None and seed[key] != value:
                 raise ValueError("Quiet-context lunar seed labels disagree")
-            else:
-                pass
             path = "meihua.seed.parameters." + key
         else:
             value = seed.get(key)
@@ -209,8 +193,6 @@ def apply_observation_context(
     interpretation["observation_context"] = None
     if interpretation["interpretation_topic"] == "weather":
         return
-    else:
-        pass
     layer = _reading(
         cast,
         context,
@@ -247,9 +229,5 @@ def apply_observation_context(
                 + "静占条件另核："
                 + row["summary"]
             )
-        else:
-            pass
     if suffix:
         interpretation["comprehensive_judgement"] += suffix
-    else:
-        pass

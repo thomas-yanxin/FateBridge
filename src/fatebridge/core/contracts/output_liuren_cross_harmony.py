@@ -42,10 +42,6 @@ class CrossHarmonyPair(PartialOutput):
                 is not branch_pair_facts(self.left_branch, self.right_branch)["liuhe"]
             ):
                 raise ValueError("交车六合配对事实不一致")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -91,8 +87,6 @@ class LiurenCrossHarmony(PartialOutput):
             and value["complete_classical_conformance"] is not False
         ):
             raise ValueError("交车合结构不认证完整原典，须为布尔false")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -110,8 +104,6 @@ class LiurenCrossHarmony(PartialOutput):
         if self.day_ganzhi is not None:
             if self.day_ganzhi not in SEXAGENARY_INDEX:
                 raise ValueError("交车合条件需要有效日干支")
-            else:
-                pass
             house = STEM_HOUSES[self.day_ganzhi[0]]
             distinct = house != self.day_ganzhi[1]
             expected.update(
@@ -123,22 +115,14 @@ class LiurenCrossHarmony(PartialOutput):
             )
             if not distinct:
                 expected["matched"] = False
-            else:
-                pass
             expected["cross_pairs"][0]["right_branch"] = self.day_ganzhi[1]
             expected["cross_pairs"][1]["right_branch"] = house
             if self.sky_by_earth is not None and len(self.sky_by_earth) == 12:
                 sky: dict[str, str] = {k: v for k, v in self.sky_by_earth.items()}
                 expected = cross_harmony(self.day_ganzhi, sky)
-            else:
-                pass
-        else:
-            pass
         for key, index in (("stem_upper", 0), ("branch_upper", 1)):
             if getattr(self, key) is not None:
                 expected["cross_pairs"][index]["left_branch"] = getattr(self, key)
-            else:
-                pass
         both = self.both_cross_pairs
         if self.cross_pairs is not None:
             values = [p.liuhe for p in self.cross_pairs]
@@ -146,21 +130,13 @@ class LiurenCrossHarmony(PartialOutput):
                 both = False
             elif all(v is True for v in values):
                 both = True
-            else:
-                pass
             if both is not None:
                 expected["both_cross_pairs"] = both
-            else:
-                pass
-        else:
-            pass
         distinct_value = expected.get("distinct_anchors", self.distinct_anchors)
         if both is False or distinct_value is False:
             expected["matched"] = False
         elif both is True and distinct_value is True:
             expected["matched"] = True
-        else:
-            pass
         compare_present_branches(self.model_dump(exclude_unset=True), expected)
         return self
 
@@ -169,23 +145,17 @@ def align_cross_harmony(board: Any, day_ganzhi: str | None = None) -> None:
     own = get(board, "cross_harmony")
     if own is None:
         return
-    else:
-        pass
     day = get(own, "day_ganzhi")
     actual = get(get(board, "calendar_policy"), "effective_day_ganzhi")
     if day is not None and any(
         d is not None and d != day for d in (actual, day_ganzhi)
     ):
         raise ValueError("交车合条件与本课日干支不一致")
-    else:
-        pass
     sky = get(own, "sky_by_earth") or {}
     for row in get(board, "twelve_board") or []:
         earth, upper = get(row, "earth_branch"), get(row, "sky_branch")
         if earth in sky and upper is not None and sky[earth] != upper:
             raise ValueError("交车合条件与本课天地盘不一致")
-        else:
-            pass
     rows = get(board, "twelve_board")
     effective = actual or day_ganzhi
     if (
@@ -203,8 +173,6 @@ def align_cross_harmony(board: Any, day_ganzhi: str | None = None) -> None:
         )
         value = own if isinstance(own, dict) else own.model_dump(exclude_unset=True)
         compare_present_branches(value, expected)
-    else:
-        pass
     lessons = get(board, "four_lessons")
     if lessons is not None and len(lessons) >= 3:
         for key, index in (("stem_upper", 0), ("branch_upper", 2)):
@@ -215,10 +183,6 @@ def align_cross_harmony(board: Any, day_ganzhi: str | None = None) -> None:
                 and own_upper != actual_upper
             ):
                 raise ValueError("交车合条件与同时返回的干支上神不一致")
-            else:
-                pass
-    else:
-        pass
 
 
 def require_complete_cross_harmony(board: dict[str, Any]) -> None:
@@ -226,8 +190,6 @@ def require_complete_cross_harmony(board: dict[str, Any]) -> None:
     rows = board.get("twelve_board")
     if not isinstance(rows, list) or len(rows) != 12:
         raise ValueError("完整交车合条件需要十二位天地盘")
-    else:
-        pass
     sky = {get(r, "earth_branch"): get(r, "sky_branch") for r in rows}
     expected = cross_harmony(
         get(board.get("calendar_policy"), "effective_day_ganzhi"), sky
@@ -237,8 +199,6 @@ def require_complete_cross_harmony(board: dict[str, Any]) -> None:
     )
     if canonical(board.get("cross_harmony")) != canonical(expected):
         raise ValueError("完整交车合条件缺项或与本课不一致")
-    else:
-        pass
     traces = [
         t
         for t in board.get("rule_trace", [])
@@ -246,5 +206,3 @@ def require_complete_cross_harmony(board: dict[str, Any]) -> None:
     ]
     if canonical(traces) != canonical([cross_harmony_trace(expected)]):
         raise ValueError("交车合轨迹缺失、重复或与本课不一致")
-    else:
-        pass

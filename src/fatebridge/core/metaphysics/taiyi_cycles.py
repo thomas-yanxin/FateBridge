@@ -49,15 +49,11 @@ def counter_cycles(
         or mode not in UNITS
     ):
         raise ValueError("太乙周期分解需要同盘正整数完整计数、实际局号和明确计量单位")
-    else:
-        pass
     completed, offset = divmod(counter - 1, 360)
     ji, within_ji = divmod(offset, 60)
     yuan, within_yuan = divmod(offset, 72)
     if within_yuan + 1 != ju:
         raise ValueError("太乙同盘完整计数的72周期位与实际局号不一致")
-    else:
-        pass
     return {
         "ruleset_id": "taiyi_selected_counter_cycles_v1",
         "version": "1.0.0",

@@ -118,8 +118,6 @@ def assess_birth_interval(
 ) -> dict[str, Any]:
     if type(plus_minus_minutes) is not int or not 1 <= plus_minus_minutes <= 60:
         raise ValueError("人类图生时范围必须为1至60个整数分钟")
-    else:
-        pass
     center = nominal["time_scales"]["personality"]["jd_tt"]
     radius = plus_minus_minutes * 60
     grid = [
@@ -135,8 +133,6 @@ def assess_birth_interval(
                 if _chart_reader is not None
                 else chart_at_tt(jd, node_mode, require_swiss_files=require_swiss_files)
             )
-        else:
-            pass
         return cache[jd]
 
     def activation(jd: float, side: str, body: str) -> dict[str, Any]:
@@ -157,8 +153,6 @@ def assess_birth_interval(
                 vright = activation(right, side, body)["longitude_speed"]
                 if vleft * vright >= 0:
                     continue
-                else:
-                    pass
                 kind = "maximum" if vleft > 0 else "minimum"
                 lo, hi = left, right
                 while (hi - lo) * 86400 > STATION_BRACKET_SECONDS:
@@ -167,8 +161,6 @@ def assess_birth_interval(
                     if vmid == 0:
                         lo = hi = mid
                         break
-                    else:
-                        pass
                     if vleft * vmid < 0:
                         hi = mid
                     else:
@@ -250,8 +242,6 @@ def assess_birth_interval(
                 "first_observed_witness": _witness(chart),
             }
             changed_fields.update(k for k, v in structure.items() if v != baseline[k])
-        else:
-            pass
     variants = []
     for side in SIDES:
         for a in nominal["activations"][side]:
@@ -275,8 +265,6 @@ def assess_birth_interval(
                             if key in observed
                         },
                     }
-                else:
-                    pass
             if len(states) > 1:
                 variants.append(
                     {
@@ -290,8 +278,6 @@ def assess_birth_interval(
                         "first_observed_witness_per_state": list(states.values()),
                     }
                 )
-            else:
-                pass
     ends = [at(grid[0]), at(grid[-1])]
     result = {
         "status": "grid_and_station_candidates_compared",
@@ -394,6 +380,4 @@ def assess_birth_interval(
             "黄金分割只保留有限观察，不证明单峰或连续穷尽；预算耗尽和方向未定显式保留。"
             + result["limitation"]
         )
-    else:
-        pass
     return {**result, "summary": interval_summary(result)}

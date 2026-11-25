@@ -37,8 +37,6 @@ def longitude_ratio(longitude: float | Fraction) -> tuple[int, int]:
     else:
         if not math.isfinite(longitude):
             raise ValueError("经度必须为有限数。")
-        else:
-            pass
         n, d = float(longitude).as_integer_ratio()
     return n % (360 * d), d
 
@@ -51,8 +49,6 @@ def _varga_components(
     sign, degree_numerator = divmod(n, 30 * d)
     if division == 1:
         return sign, Fraction(degree_numerator, d)
-    else:
-        pass
     if division == 30:
         bounds, destinations = (
             ([5, 10, 18, 25, 30], [0, 10, 8, 2, 6])
@@ -62,17 +58,11 @@ def _varga_components(
         for end, destination in zip(bounds, destinations):
             if degree_numerator < end * d:
                 return destination, None
-            else:
-                pass
         raise AssertionError("Normalized longitude must belong to one D30 interval")
-    else:
-        pass
     if division not in SUPPORTED_DIVISIONS:
         raise ValueError(
             "本版本支持完整十六分盘（Shodashavarga）：D1、D2、D3、D4、D7、D9、D10、D12、D16、D20、D24、D27、D30、D40、D45、D60。"
         )
-    else:
-        pass
     part, remainder = divmod(degree_numerator * division, 30 * d)
     if division == 2:
         destination = ([4, 3] if sign % 2 == 0 else [3, 4])[part]
@@ -119,6 +109,4 @@ def varga_longitude(longitude: float | Fraction, division: int) -> float:
     sign, degree = _varga_components(longitude, division)
     if degree is None:
         raise ValueError("D30 仅分配星座；所选原典未规定唯一的盘内度数。")
-    else:
-        pass
     return min(float(sign * 30 + degree), math.nextafter((sign + 1) * 30.0, -math.inf))

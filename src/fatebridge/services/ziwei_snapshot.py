@@ -175,8 +175,6 @@ def build_ziwei_horoscope_snapshot_text(
                 )
             )
             continue
-        else:
-            pass
         if s.get("status") == "not_started":
             sections.append(
                 (
@@ -186,8 +184,6 @@ def build_ziwei_horoscope_snapshot_text(
                 )
             )
             continue
-        else:
-            pass
         sections.append(
             (
                 str(s.get("scope", "运限")),
@@ -281,6 +277,4 @@ def build_ziwei_rules_snapshot_text(payload: dict[str, Any]) -> str:
                 ),
             )
         )
-    else:
-        pass
     return render_snapshot_text(sections)

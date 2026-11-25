@@ -28,24 +28,18 @@ def _profile(profile_id: str) -> tuple[dict[str, Any], str]:
     data = json.loads(blob)
     if not isinstance(profile_id, str) or profile_id not in data["profiles"]:
         raise ValueError("须明确选择具名定朔研究参数，不自动选择或混用原典与论文")
-    else:
-        pass
     profile = data["profiles"][profile_id]
     if profile["terminal_limit_method"] not in {
         "printed_168_minus_limit",
         "half_month_minus_within_then_scale",
     }:
         raise ValueError("未核对的末限算法，不自动回退")
-    else:
-        pass
     return profile, hashlib.sha256(blob).hexdigest()
 
 
 def _exact(value: Fraction, name: str) -> None:
     if not isinstance(value, Fraction):
         raise TypeError(f"{name}须为Fraction原历日数，不接收现代JD浮点值")
-    else:
-        pass
 
 
 def solar_correction(days_from_winter: Fraction, *, profile_id: str) -> dict[str, Any]:
@@ -72,8 +66,6 @@ def solar_correction(days_from_winter: Fraction, *, profile_id: str) -> dict[str
     )
     if not surplus:
         correction = -correction
-    else:
-        pass
     return {
         "profile_id": profile_id,
         "source_data_sha256": digest,
@@ -197,26 +189,16 @@ def _source_phase_components(
     _exact(fraction_of_mean_month, "朔内经月份额")
     if not 0 <= fraction_of_mean_month < 1:
         raise ValueError("朔内经月份额须在0至1之间，不能隐式转移经朔序号")
-    else:
-        pass
     if zhongji_days < 0:
         raise ValueError("中积须非负；不以负数猜测上考")
-    else:
-        pass
     if isinstance(lunation_index, bool) or not isinstance(lunation_index, int):
         raise TypeError("经朔序号须为非负整数")
-    else:
-        pass
     if lunation_index < 0:
         raise ValueError("经朔序号须非负；0为天正经朔")
-    else:
-        pass
     p, digest = _profile(profile_id)
     mean = source_mean_lunation(zhongji_days, Fraction(), profile_id=GUJIN)
     if Fraction(p["runying_days"]) != Fraction(mean["runying_days_exact"]):
         raise ValueError("具名角差与经朔闰应不符，不能混参")
-    else:
-        pass
     runyu = Fraction(mean["runyu_days_exact"])
     month = Fraction(mean["synodic_month_days_exact"])
     offset = (lunation_index + fraction_of_mean_month) * month - runyu
@@ -237,8 +219,6 @@ def _source_phase_components(
             )
             / Fraction(velocity["velocity_ancient_du_per_limit_exact"])
         )
-    else:
-        pass
     true_total = mean_total + correction if correction is not None else None
     cycle = true_total % 60 if true_total is not None else None
     day = cycle // 1 if cycle is not None else None

@@ -16,8 +16,6 @@ Pillar = Literal["year", "month", "day", "hour"]
 def coherent_months(months: list[str]) -> None:
     if len(set(months)) > 1:
         raise ValueError("同次月令、原文分日与书影观察不能混用不同月支")
-    else:
-        pass
 
 
 class DutyHiddenPosition(PartialOutput):
@@ -30,10 +28,6 @@ class DutyHiddenPosition(PartialOutput):
         if self.branch is not None and self.hidden_rank is not None:
             if self.hidden_rank >= len(BRANCH_HIDDEN_STEMS[self.branch]):
                 raise ValueError("分日文献的藏干观察不能超出实际支中目录")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -51,10 +45,6 @@ class DutyClaim(PartialOutput):
                 raise ValueError(
                     "未指认的司事字不能伪作已核对的透藏观察，空列表也不是未知"
                 )
-            else:
-                pass
-        else:
-            pass
         for position in self.hidden_positions or []:
             if not any(
                 (position.branch is None or position.branch == branch)
@@ -64,8 +54,6 @@ class DutyClaim(PartialOutput):
                 for rank, stem in enumerate(stems)
             ):
                 raise ValueError("分日文献所指天干与已给藏干位置矛盾；不能增造物理根")
-            else:
-                pass
         return self
 
 
@@ -101,12 +89,8 @@ class DutyDurationLayer(PartialOutput):
             or self.claims is None
         ):
             return
-        else:
-            pass
         if not all("canonical_stem" in c.model_fields_set for c in self.claims):
             return
-        else:
-            pass
         expected = list(
             dict.fromkeys(
                 c.canonical_stem
@@ -119,8 +103,6 @@ class DutyDurationLayer(PartialOutput):
             raise ValueError(
                 "表中目录外天干必须忠于已给身份与月支，不能把分日记载改作藏干"
             )
-        else:
-            pass
 
     @model_validator(mode="after")
     def preserve_literal_arithmetic(self) -> "DutyDurationLayer":
@@ -131,22 +113,12 @@ class DutyDurationLayer(PartialOutput):
             actual = sum(c.days for c in self.claims if c.days is not None)
             if total is not None and total != actual:
                 raise ValueError("分日合计必须沿用已给字面日数，不能凑成三十日")
-            else:
-                pass
             total = actual
-        else:
-            pass
         if total is not None and self.equals_nominal_thirty_days is not None:
             if self.equals_nominal_thirty_days != (total == 30):
                 raise ValueError("三十日比较标记必须忠于实际字面合计")
-            else:
-                pass
-        else:
-            pass
         if months:
             self.check_catalog(months[0])
-        else:
-            pass
         return self
 
 
@@ -164,18 +136,12 @@ class DutyAnnualArithmetic(PartialOutput):
         ]
         if len(set(stated)) > 1:
             raise ValueError("同一字面年合计不能拼接不同所述总数")
-        else:
-            pass
         if stated and self.computed_literal_sum is not None:
             for flag in (self.matches, self.matches_stated_total):
                 if flag is not None and flag != (
                     self.computed_literal_sum == stated[0]
                 ):
                     raise ValueError("文献算术矛盾必须保留，不能宣称不等总数相合")
-                else:
-                    pass
-        else:
-            pass
         return self
 
 
@@ -200,8 +166,6 @@ class DutyScannedWitness(PartialOutput):
             and self.cross_chapter_identities.month_branch is not None
         ):
             result.append(self.cross_chapter_identities.month_branch)
-        else:
-            pass
         for layer in self.duration_source_layers or []:
             result.extend(layer.known_months())
         return result
@@ -213,8 +177,6 @@ class DutyScannedWitness(PartialOutput):
         if months:
             for layer in self.duration_source_layers or []:
                 layer.check_catalog(months[0])
-        else:
-            pass
         return self
 
 
@@ -234,13 +196,9 @@ class MonthDutySourceReference(PartialOutput):
             != list(BRANCH_HIDDEN_STEMS[branch])
         ):
             raise ValueError("已给月支与常规藏干目录矛盾，缺少重复月支字段不消除矛盾")
-        else:
-            pass
         layers = list(self.duration_source_layers or [])
         if self.scanned_witness is not None:
             layers.extend(self.scanned_witness.duration_source_layers or [])
-        else:
-            pass
         for layer in layers:
             layer.check_catalog(branch)
 
@@ -250,8 +208,6 @@ class MonthDutySourceReference(PartialOutput):
             result.extend(layer.known_months())
         if self.scanned_witness is not None:
             result.extend(self.scanned_witness.known_months())
-        else:
-            pass
         return result
 
     @model_validator(mode="after")
@@ -266,12 +222,8 @@ class MonthDutySourceReference(PartialOutput):
         )
         if hidden is not None and not any(hidden == list(stems) for stems in possible):
             raise ValueError("常规月藏干目录不能从分日文献增补或替换")
-        else:
-            pass
         if months:
             self.check_month(months[0])
-        else:
-            pass
         return self
 
 
@@ -293,8 +245,6 @@ class MonthCommand(PartialOutput):
             and self.intra_month_duty.source_reference is not None
         ):
             self.intra_month_duty.source_reference.check_month(branch)
-        else:
-            pass
 
     def known_months(self) -> list[str]:
         result: list[str] = [self.month_branch] if self.month_branch is not None else []
@@ -303,8 +253,6 @@ class MonthCommand(PartialOutput):
             and self.intra_month_duty.source_reference is not None
         ):
             result.extend(self.intra_month_duty.source_reference.known_months())
-        else:
-            pass
         return result
 
     @model_validator(mode="after")
@@ -313,6 +261,4 @@ class MonthCommand(PartialOutput):
         coherent_months(months)
         if months:
             self.check_month(months[0])
-        else:
-            pass
         return self

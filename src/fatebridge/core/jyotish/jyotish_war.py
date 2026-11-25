@@ -52,16 +52,12 @@ SOURCE = {
 def finite(value: object) -> Fraction | None:
     if value is None:
         return None
-    else:
-        pass
     if (
         isinstance(value, bool)
         or not isinstance(value, (int, float, Fraction))
         or not math.isfinite(value)
     ):
         raise ValueError("War strength inputs must be finite numbers or missing")
-    else:
-        pass
     return Fraction(value)
 
 
@@ -99,8 +95,6 @@ def war_bala_result(
             )
             neighbours[a].add(b)
             neighbours[b].add(a)
-        else:
-            pass
     pairs: list[dict[str, Any]] = []
     for candidate in candidates:
         a, b = candidate["planets"]
@@ -112,8 +106,6 @@ def war_bala_result(
             state, winner = "longitude_origin_crossing_unadjudicated", None
         elif len(neighbours[a]) > 1 or len(neighbours[b]) > 1:
             state, winner = "simultaneous_multi_planet_war_unadjudicated", None
-        else:
-            pass
         pairs.append({**candidate, "status": state, "winner": winner})
     # A chain of three or more must not acquire a spurious isolated endpoint
     # result merely because only one edge touches that endpoint.
@@ -124,21 +116,15 @@ def war_bala_result(
             q = pending.pop()
             if q in group:
                 continue
-            else:
-                pass
             group.add(q)
             pending.extend(neighbours[q] - group)
         if len(group) > 2:
             blocked.update(group)
-        else:
-            pass
     for pair in pairs:
         if any(p in blocked for p in pair["planets"]):
             pair.update(
                 status="simultaneous_multi_planet_war_unadjudicated", winner=None
             )
-        else:
-            pass
     sthana_inputs: Mapping[str, object]
     dig_inputs: Mapping[str, object]
     sthana_values: Mapping[str, Fraction | None]
@@ -196,8 +182,6 @@ def war_bala_result(
             exact_totals[p] = total
             if total is not None and not math.isfinite(float(total)):
                 raise ValueError("Prewar strength exceeds finite numerical range")
-            else:
-                pass
             basis[p] = {
                 "inputs": {
                     k: float(v) if isinstance(v, Fraction) else v
@@ -228,18 +212,12 @@ def war_bala_result(
                 amount = abs(left - right) / denominator
                 if not math.isfinite(float(amount)):
                     raise ValueError("War amount exceeds finite numerical range")
-                else:
-                    pass
-            else:
-                pass
             if winner is not None and amount is not None:
                 loser = b if winner == a else a
                 values[winner], values[loser] = amount, -amount
             else:
                 if winner is not None:
                     state = "prewar_inputs_missing"
-                else:
-                    pass
                 values[a] = values[b] = None
             pair_results.append(
                 {

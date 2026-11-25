@@ -169,8 +169,6 @@ class C04Table:
             or orientation["source_sha256"] != SOURCE_SHA
         ):
             raise ValueError("IERS C04 asset identity mismatch")
-        else:
-            pass
         policy = leap_table()
         entries = policy["entries"]
         samples: list[C04Sample] = []
@@ -179,14 +177,10 @@ class C04Table:
             pole_mjd, x, y, dx, dy = pole
             if pole_mjd != mjd:
                 raise ValueError("IERS C04 orientation and clock rows disagree")
-            else:
-                pass
             day = date.fromordinal(mjd + 678576)
             stamp = datetime(day.year, day.month, day.day, tzinfo=timezone.utc)
             if stamp >= datetime.fromisoformat(policy["expires_at"]):
                 raise ValueError("C04 dates exceed the frozen UTC leap policy")
-            else:
-                pass
             offset = (
                 historical_tai_minus_utc_exact(stamp)
                 if day.year < 1972
@@ -200,13 +194,9 @@ class C04Table:
             )
             if offset is None:
                 raise ValueError("C04 sample lacks a supported TAI-UTC definition")
-            else:
-                pass
             dut1, sigma = Fraction(dut1_text), float(sigma_text)
             if not math.isfinite(sigma) or abs(dut1) > 2 or not 0 <= sigma < 1:
                 raise ValueError("Invalid IERS C04 value or formal error")
-            else:
-                pass
             civil = Fraction(mjd) + Fraction(4800001, 2)
             samples.append(
                 C04Sample(
@@ -224,15 +214,11 @@ class C04Table:
             )
         if len(samples) != 23638 or samples[0].mjd != 37665 or samples[-1].mjd != 61302:
             raise ValueError("Unexpected IERS C04 coverage")
-        else:
-            pass
         if any(
             b.mjd - a.mjd != 1 or b.tt.days <= a.tt.days or b.ut1 <= a.ut1
             for a, b in zip(samples, samples[1:])
         ):
             raise ValueError("IERS C04 time series is incomplete or nonmonotonic")
-        else:
-            pass
         self.samples = tuple(samples)
         self.tt = tuple(sample.tt.days for sample in samples)
         # Published UT1 locates an inverse bracket; it is not the modern axis.
@@ -251,8 +237,6 @@ class C04Table:
                 "IERS C04 source is unavailable outside its qualified TT support; "
                 "no prediction, extrapolation or Swiss fallback was applied"
             )
-        else:
-            pass
         start = min(max(bisect_right(self.tt, value) - 2, minimum), len(self.tt) - 4)
         indices = (start, start + 1, start + 2, start + 3)
         weights: list[Fraction] = []
@@ -261,8 +245,6 @@ class C04Table:
             for j in indices:
                 if j != i:
                     weight *= (value - self.tt[j]) / (self.tt[i] - self.tt[j])
-                else:
-                    pass
             weights.append(weight)
         return indices, (weights[0], weights[1], weights[2], weights[3])
 
@@ -303,8 +285,6 @@ class C04Table:
                     residual_seconds=residual,
                     iterations=iteration,
                 )
-            else:
-                pass
             value = updated
         raise ValueError("IERS C04 subdaily UT1 fixed point did not converge")
 
@@ -326,16 +306,10 @@ class C04Table:
         lower, upper = self.ut1_bounds
         if not lower <= value <= upper:
             raise ValueError("IERS C04 UT1 is outside the modern forward source bounds")
-        else:
-            pass
         if value == lower:
             return self.samples[0].tt
-        else:
-            pass
         if value == upper:
             return self.samples[-1].tt
-        else:
-            pass
         given = UT1Instant(value)
 
         def residual(tt: Fraction) -> Fraction:
@@ -353,33 +327,21 @@ class C04Table:
         if not r_lo <= 0 <= r_hi:
             lo, hi = self.tt[0], self.tt[-1]
             r_lo, r_hi = residual(lo), residual(hi)
-        else:
-            pass
         if abs(r_lo) <= _SOLVER_SECONDS:
             return TTInstant(lo)
-        else:
-            pass
         if abs(r_hi) <= _SOLVER_SECONDS:
             return TTInstant(hi)
-        else:
-            pass
         if not r_lo <= 0 <= r_hi:
             raise ValueError("IERS C04 inverse could not bracket its pair equation")
-        else:
-            pass
         for _ in range(32):
             trial = lo - r_lo * (hi - lo) / (r_hi - r_lo)
             trial = min(max(Fraction(round(trial * _TT_GRID), _TT_GRID), lo), hi)
             if trial == lo or trial == hi:
                 midpoint = Fraction(round((lo + hi) * _TT_GRID / 2), _TT_GRID)
                 trial = min(max(midpoint, lo), hi)
-            else:
-                pass
             error = residual(trial)
             if abs(error) <= _SOLVER_SECONDS:
                 return TTInstant(trial)
-            else:
-                pass
             if error < 0:
                 lo, r_lo = trial, error
             else:
@@ -420,8 +382,6 @@ class C04Table:
                 interpolate(cpo_window, lambda sample: sample.dx_arcsec),
                 interpolate(cpo_window, lambda sample: sample.dy_arcsec),
             )
-        else:
-            pass
         return C04Orientation(x + subdaily.x_arcsec, y + subdaily.y_arcsec, cpo)
 
     def receipt(self, tt: float | TTInstant, ut1: float | UT1Instant) -> C04Receipt:
@@ -429,8 +389,6 @@ class C04Table:
         point = UT1Instant.from_value(ut1)
         if abs(evaluation.ut1 - point.days) * 86400 > Fraction(1, 5000):
             raise ValueError("Chart UT1 and selected IERS C04 source disagree")
-        else:
-            pass
         if point.days == evaluation.ut1:
             ut1_tai = evaluation.ut1_tai
             subdaily = evaluation.subdaily_ut1_seconds
@@ -508,12 +466,8 @@ def c04_table() -> C04Table:
     orientation = resource.joinpath(ORIENTATION_ASSET).read_bytes()
     if hashlib.sha256(raw).hexdigest() != ASSET_SHA:
         raise ValueError("IERS C04 packaged asset checksum mismatch")
-    else:
-        pass
     if hashlib.sha256(orientation).hexdigest() != ORIENTATION_ASSET_SHA:
         raise ValueError("IERS C04 orientation asset checksum mismatch")
-    else:
-        pass
     return C04Table(
         TypeAdapter(_UT1Data).validate_json(gzip.decompress(raw)),
         TypeAdapter(_OrientationData).validate_json(gzip.decompress(orientation)),
@@ -529,8 +483,6 @@ active_ut1: ContextVar[C04Table | None] = ContextVar(
 def use_ut1_source(source: str) -> Iterator[None]:
     if source not in {"swiss_delta_t", "iers_c04"}:
         raise ValueError("UT1 source must be swiss_delta_t or iers_c04")
-    else:
-        pass
     token = active_ut1.set(c04_table() if source == "iers_c04" else None)
     try:
         yield
@@ -544,6 +496,4 @@ def ut1_reference(
     selected = active_ut1.get()
     if selected is None or tt is None or ut1 is None:
         return None
-    else:
-        pass
     return selected.receipt(tt, ut1)

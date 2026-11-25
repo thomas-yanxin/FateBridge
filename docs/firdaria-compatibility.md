@@ -78,7 +78,7 @@ uv run --locked --extra dev fatebridge firdaria \
 
 Birchfield 三个附表有 16 处水星／金星位置与正文规则及 Döşer 图 7 冲突。产品的 `nodes_after_mars` 有 Döşer 图 6 的明确依据。Bonatti 印本文义允许据日段类推，夜盘次序的历史归属仍有分歧。 [固定参考](../tests/fixtures/firdaria-reference.json)
 
-[Morinus所选提交](https://github.com/shin10567/Morinus-Source-Codes/blob/bbe3ebe1bb5b9a7d62cb6662ff413e61522cc6c6/firdaria.py)用于公历模式的日期级对照，原模块实际执行，只适配输出词汇。它不接收出生钟时，所选版本的闰日出生会报错，不能认证亚日精度或本命天文。[Cosmic Patterns公开示例](https://www.astrosoftware.com/Firdaria.htm)的无交点版本只在首70年与所选顺序可比；其日粒度表在固定UTC年轴、UTC日期解释下相合，但未公布确切年常量和显示时区，不能由此推定内部设置或秒级符合。实际Temporal参考则独立核对所声明的名义时间模型，不认证物理计时或传统预测。
+[Morinus所选提交](https://github.com/shin10567/Morinus-Source-Codes)用于公历模式的日期级对照，原模块实际执行，只适配输出词汇。它不接收出生钟时，所选版本的闰日出生会报错，不能认证亚日精度或本命天文。[Cosmic Patterns公开示例](https://www.astrosoftware.com/Firdaria.htm)的无交点版本只在首70年与所选顺序可比；其日粒度表在固定UTC年轴、UTC日期解释下相合，但未公布确切年常量和显示时区，不能由此推定内部设置或秒级符合。实际Temporal参考则独立核对所声明的名义时间模型，不认证物理计时或传统预测。
 
 来源只支撑传统算法与版本沿革，不证明现实预测效力。
 

@@ -41,8 +41,6 @@ def _dayun_start_age_lines(info: dict[str, Any]) -> list[str]:
     raw = info.get("start_age_unrounded")
     if raw is None:
         return [f"起运年龄：{info.get('start_age', '未知')}"]
-    else:
-        pass
     return [
         f"起运年龄：{info.get('start_age', '未知')}（原始间隔折算后向上取整，至少1岁，仅展示）",
         f"起运折算年龄：{raw!r}（浮点展示）；{info.get('start_age_precise', '未知')}（两位展示）",
@@ -96,8 +94,6 @@ def _build_liuyue_snapshot_text(
         combo_lines.append(
             f"流年月支：{liuyue_info.get('branch', '未知')} / 流年支：{liunian_info.get('branch', '未知')}"
         )
-    else:
-        pass
     liuyue_liunian = combination_effects.get("liuyue_liunian") or {}
     if liuyue_liunian:
         combo_lines.append(
@@ -108,12 +104,8 @@ def _build_liuyue_snapshot_text(
                 f"{relation.get('type', '普通')}：{relation.get('description', '无')} / "
                 f"{relation.get('effect', '无')}"
             )
-    else:
-        pass
     if not combo_lines:
         combo_lines.append("无流年联动信息")
-    else:
-        pass
 
     effect_lines = [
         f"十神关系：{detailed_analysis.get('stem_relation', '未知')}",
@@ -143,8 +135,6 @@ def _build_liuyue_snapshot_text(
 def _birth_range_snapshot_lines(data: dict[str, Any] | None) -> list[str]:
     if data is None:
         return []
-    else:
-        pass
     candidates = data.get("current_dayun_candidates") or []
     status_labels = {"before_dayun": "尚未起运", "beyond_calculation": "超出已配置期数"}
     labels = [
@@ -155,8 +145,6 @@ def _birth_range_snapshot_lines(data: dict[str, Any] | None) -> list[str]:
     candidate_text = "、".join(labels)
     if data.get("dayun_assessment_status") == "unavailable_missing_gender":
         candidate_text = "未计算（顺逆所需性别未提供）"
-    else:
-        pass
     lines = [
         f"已声明出生时间范围：±{data['uncertainty_minutes']}分钟；逐分钟核对{data['sample_count']}个输入",
         f"本命四柱候选数：{len(data.get('pillars_candidates') or [])}",
@@ -174,10 +162,6 @@ def _birth_range_snapshot_lines(data: dict[str, Any] | None) -> list[str]:
         )
         if data["event_analysis"].get("unresolved_event_orders"):
             lines.append("校正钟面与节令事件存在未决顺序，不能只选其中一种解释。")
-        else:
-            pass
-    else:
-        pass
     if data.get("dayun_event_analysis") is not None:
         lines.append(
             f"大运历法事件探针{data.get('dayun_event_probe_count', 0)}个；"
@@ -195,20 +179,12 @@ def _birth_range_snapshot_lines(data: dict[str, Any] | None) -> list[str]:
         ]
         if names:
             lines.append("本次实际核对的补充事件：" + "、".join(names) + "。")
-        else:
-            pass
         if data["dayun_event_analysis"].get("unresolved_cells"):
             lines.append("大运事件分区存在未决项，已核对点未证明整段候选完整。")
-        else:
-            pass
-    else:
-        pass
     if data.get("boundary_ranges_vary"):
         lines.append(
             "交运边界随出生输入变化，已核对探针的起止包络见birth_time_sensitivity.dayun_boundary_ranges；未认证连续极值。"
         )
-    else:
-        pass
     return lines
 
 
@@ -540,14 +516,10 @@ def _build_comprehensive_timing_snapshot_text(
         impact_lines.extend(
             timing_root_snapshot_lines(interaction_analysis["root_context"])
         )
-    else:
-        pass
     if interaction_analysis and "strength_projection" in interaction_analysis:
         impact_lines.extend(
             timing_strength_snapshot_lines(interaction_analysis["strength_projection"])
         )
-    else:
-        pass
     return _render_snapshot_text(
         [
             ("查询信息", query_lines),
@@ -567,8 +539,6 @@ def with_birth_clock_reference(
     marker = "[查询信息]\n"
     if marker not in result["snapshot_text"]:
         raise ValueError("时运快照缺少查询信息，无法交付出生钟时输入依据")
-    else:
-        pass
     result["snapshot_text"] = result["snapshot_text"].replace(
         marker, marker + "\n".join(lines) + "\n", 1
     )
@@ -598,8 +568,6 @@ def with_analysis_reference(
             snapshot_text=result["snapshot_text"],
             selected_sections=selected_sections,
         )
-    else:
-        pass
     return with_birth_clock_reference(
         result, technique=technique, selected_sections=selected_sections
     )

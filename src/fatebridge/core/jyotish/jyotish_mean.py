@@ -71,8 +71,6 @@ def mean_longitudes(jd_tt: float) -> dict[str, float]:
     """
     if not admitted(jd_tt):
         raise ValueError("Simon mean profile admitted only for1900-2050 TT")
-    else:
-        pass
     t = (Fraction(jd_tt) - 2451545) / 365250
     result: dict[str, Fraction] = {}
     for planet, values in LONGITUDE_COEFFICIENTS.items():
@@ -92,8 +90,6 @@ def icrs_to_j2000_ecliptic(xyz: tuple[float, ...]) -> tuple[float, float, float]
     """
     if len(xyz) != 3 or not all(math.isfinite(v) for v in xyz):
         raise ValueError("Finite ICRS position vector with three coordinates required")
-    else:
-        pass
     arcsecond = math.pi / (180 * 3600)
     epsilon = 84381.448 * arcsecond
     x, y, z = xyz
@@ -119,17 +115,11 @@ def geometric_points(jd_tt: float, policy: str) -> dict[str, Any]:
     """True geometric geocentric positions in the declared common frame."""
     if policy not in {"auto", "require_data_files"}:
         raise ValueError("Unsupported geometric ephemeris policy")
-    else:
-        pass
     if not admitted(jd_tt):
         return {}
-    else:
-        pass
     swe = runtime.swe
     if swe is None:
         raise ValueError("Swiss Ephemeris required for geometric true positions")
-    else:
-        pass
     result = {}
     flags = (
         swe.FLG_SWIEPH
@@ -147,21 +137,15 @@ def geometric_points(jd_tt: float, policy: str) -> dict[str, Any]:
             )
             if retflag < 0 or not all(math.isfinite(v) for v in value[:3]):
                 raise ValueError(f"Could not compute{planet} geometric ICRS position")
-            else:
-                pass
             model = runtime.ephemeris_model_from_retflag(retflag)
             observe_physical(f"geometric_j2000_{planet}", model)
             if policy == "require_data_files" and model not in {"swieph", "jpl"}:
                 raise ValueError(
                     f"{planet}运动力J2000几何位置使用{model}; require_data_files rejects fallback"
                 )
-            else:
-                pass
             xyz = icrs_to_j2000_ecliptic(tuple(value[:3]))
             if xyz[0] == xyz[1] == 0:
                 raise ValueError("Geometric position has undefined ecliptic longitude")
-            else:
-                pass
             result[planet] = {
                 "longitude": math.degrees(math.atan2(xyz[1], xyz[0])) % 360,
                 "latitude": math.degrees(
@@ -178,32 +162,24 @@ def _matches_derived(actual: Any, expected: Any) -> bool:
     """Exact same-run agreement, including nulls, branch shape and scalar types."""
     if expected is None:
         return actual is None
-    else:
-        pass
     if isinstance(expected, (int, float)):
         return (
             type(actual) in (int, float)
             and math.isfinite(actual)
             and actual == expected
         )
-    else:
-        pass
     if isinstance(expected, dict):
         return (
             isinstance(actual, dict)
             and actual.keys() == expected.keys()
             and all(_matches_derived(actual[k], v) for k, v in expected.items())
         )
-    else:
-        pass
     if isinstance(expected, list):
         return (
             isinstance(actual, list)
             and len(actual) == len(expected)
             and all(_matches_derived(a, b) for a, b in zip(actual, expected))
         )
-    else:
-        pass
     return type(actual) is type(expected) and actual == expected
 
 
@@ -224,13 +200,9 @@ def verified_planet_evidence(model: dict[str, Any], planet: str) -> dict[str, An
             or type(model["julian_day_tt"]) not in (int, float)
         ):
             raise ValueError("Unrecognized computed mean model")
-        else:
-            pass
         means = mean_longitudes(model["julian_day_tt"])
         if not _matches_derived(model["mean_longitudes"], means):
             raise ValueError("Mean longitudes disagree with their declared TT")
-        else:
-            pass
         true = model["true_position_provenance"][planet]
         longitude = true["longitude"]
         if (
@@ -240,8 +212,6 @@ def verified_planet_evidence(model: dict[str, Any], planet: str) -> dict[str, An
             or not 0 <= longitude < 360
         ):
             raise ValueError("Invalid geometric operand or frame")
-        else:
-            pass
         inner = planet in {"Mercury", "Venus"}
         mean = means["Sun"] if inner else means[planet]
         apogee = means[planet] if inner else means["Sun"]
@@ -261,8 +231,6 @@ def verified_planet_evidence(model: dict[str, Any], planet: str) -> dict[str, An
         evidence = model["planet_evidence"][planet]
         if not isinstance(evidence, dict) or not _matches_derived(evidence, expected):
             raise ValueError("Operands or angular branches disagree with calculation")
-        else:
-            pass
     except (KeyError, TypeError, ValueError, OverflowError) as error:
         raise ValueError(
             "Cheshta model inputs contradict the declared mean/geometry/arc chain"
@@ -281,17 +249,11 @@ def model_balas(raw: dict[str, Any]) -> dict[str, Any]:
     }
     if selected == "unadjudicated":
         return {"model_context": context, "summary": dict.fromkeys(STAR_PLANETS)}
-    else:
-        pass
     if selected != MODEL:
         raise ValueError("Unsupported Cheshta model")
-    else:
-        pass
     if not admitted(raw["julian_day_tt"]):
         context["status"] = "outside_validated_model_window"
         return {"model_context": context, "summary": dict.fromkeys(STAR_PLANETS)}
-    else:
-        pass
     means = mean_longitudes(raw["julian_day_tt"])
     evidence = {}
     for planet in STAR_PLANETS:

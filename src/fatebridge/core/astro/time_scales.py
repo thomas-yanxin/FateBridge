@@ -103,8 +103,6 @@ def _delta_t_for_ut1(
     delta = float(runtime.ephemeris_call("deltat_ex", julian_day_ut1, flag))
     if steps is not None:
         steps.append([julian_day_ut1, flag, delta])
-    else:
-        pass
     return delta
 
 
@@ -114,12 +112,8 @@ def resolve_tt_from_ut1(julian_day_ut1: float | UT1Instant) -> TTInstant:
     selected = active_ut1.get()
     if selected is not None:
         return selected.tt_from_ut1(point)
-    else:
-        pass
     if runtime.swe is None:
         raise ModuleNotFoundError("Swiss Ephemeris is required for UT1 conversion")
-    else:
-        pass
     scalar_ut1 = point.as_float()
     delta = _delta_t_for_ut1(scalar_ut1)
     return TTInstant.from_float(float(scalar_ut1 + delta))
@@ -144,12 +138,8 @@ def resolve_ut1_from_tt(julian_day_tt: float | TTInstant) -> UT1Instant:
             ut1_source="iers_c04",
         )
         return ut1
-    else:
-        pass
     if runtime.swe is None:
         raise ModuleNotFoundError("Swiss Ephemeris is required for TT conversion")
-    else:
-        pass
     scalar_tt = point.as_float()
     result = scalar_tt
     steps: list[list[float | int]] | None = [] if observer.get() else None
@@ -265,12 +255,8 @@ def _pre_atomic_ephemeris_time(
         raise ValueError(
             "IERS C04 UT1 source has no records before 1962; no modeled fallback applied"
         )
-    else:
-        pass
     if runtime.swe is None:
         return EphemerisTime(civil, civil, None, "UTC_as_UT1_approximation", False)
-    else:
-        pass
     native_args = (
         *calendar.date_parts,
         *calendar.time_parts[:2],
@@ -306,8 +292,6 @@ def historical_mean_solar_time(
     if seconds == 60.0:
         # The seconds word rounds to the next ordinary minute.
         lower, seconds = upper, 0.0
-    else:
-        pass
     return _pre_atomic_ephemeris_time(
         lower, seconds, float(source.day), display.isoformat()
     )
@@ -325,8 +309,6 @@ def ephemeris_time(moment: datetime | UTCCalendar) -> EphemerisTime:
         return _pre_atomic_ephemeris_time(
             calendar, second + microsecond / 1e6, civil, calendar.isoformat()
         )
-    else:
-        pass
     steps: list[list[float | int]] | None = [] if observer.get() else None
     if selected is not None:
         ut1_point = UT1Instant(selected.evaluate(tt).ut1)
@@ -342,11 +324,7 @@ def ephemeris_time(moment: datetime | UTCCalendar) -> EphemerisTime:
                     )
                     if steps is not None:
                         steps.append([ut1, runtime.swe.FLG_SWIEPH, float(delta)])
-                    else:
-                        pass
                     ut1 = tt.as_float() - delta
-        else:
-            pass
         ut1_point = UT1Instant.from_float(float(ut1))
     observe_clock(
         "civil_to_tt_ut1",
@@ -385,8 +363,6 @@ def utc_point_from_tt(
     if isinstance(julian_day_tt, TTInstant):
         if exact_epoch is False:
             raise ValueError("TTInstant cannot request nominal scalar boundary labels")
-        else:
-            pass
         exact_tt = julian_day_tt.days
         julian_day_tt = julian_day_tt.as_float()
         exact_epoch = True
@@ -397,8 +373,6 @@ def utc_point_from_tt(
         for previous, current in zip(entries, entries[1:]):
             if current["tai_minus_utc_seconds"] <= previous["tai_minus_utc_seconds"]:
                 continue
-            else:
-                pass
             effective = datetime.fromisoformat(current["effective_date"]).replace(
                 tzinfo=timezone.utc
             )
@@ -410,10 +384,6 @@ def utc_point_from_tt(
                 raise ValueError(
                     "Solved event lies in a UTC leap second not representable by datetime"
                 )
-            else:
-                pass
-    else:
-        pass
     for index in range(len(entries) - 1, -1, -1):
         entry = entries[index]
         effective = datetime.fromisoformat(entry["effective_date"]).replace(
@@ -445,10 +415,6 @@ def utc_point_from_tt(
                     raise ValueError(
                         "Solved event lies in a UTC leap second not representable by datetime"
                     )
-                else:
-                    pass
-            else:
-                pass
             point = CivilPoint(
                 (
                     utc_calendar(effective).julian_day_exact()
@@ -463,11 +429,7 @@ def utc_point_from_tt(
                 raise ValueError(
                     "Solved event lies in a UTC leap second not representable by datetime"
                 )
-            else:
-                pass
             return point
-        else:
-            pass
     historical = (
         historical_utc_point_from_tt(TTInstant(exact_tt))
         if exact_epoch
@@ -479,21 +441,13 @@ def utc_point_from_tt(
             raise HistoricalUTCAdjustment(
                 "Historical UTC inversion did not preserve TT"
             )
-        else:
-            pass
         return historical
-    else:
-        pass
     if active_ut1.get() is not None:
         raise ValueError("Selected IERS C04 has no pre-1960 UTC/UT1 inversion")
-    else:
-        pass
     if runtime.swe is None:
         raise ModuleNotFoundError(
             "Swiss Ephemeris is required for pre-UTC TT conversion"
         )
-    else:
-        pass
     if not exact_epoch or legacy_pre_utc:
         year, month, day, hour, minute, seconds = runtime.ephemeris_call(
             "jdet_to_utc", julian_day_tt, runtime.swe.GREG_CAL
@@ -504,8 +458,6 @@ def utc_point_from_tt(
             elapsed.seconds * 1000000 + elapsed.microseconds,
         )
         return CivilPoint(calendar.julian_day_exact())
-    else:
-        pass
     with runtime.preserve_ephemeris_path():
         runtime.swe.set_ephe_path(configured_ephemeris_path() or "")
         ut1 = exact_tt
@@ -519,15 +471,11 @@ def utc_point_from_tt(
             raise HistoricalUTCAdjustment(
                 "TT point has no consistent label across the start of UTC"
             )
-        else:
-            pass
         roundtrip_tt = ephemeris_time(moment).jd_tt
         if roundtrip_tt is None or abs(roundtrip_tt - julian_day_tt) * 86400 > 0.0002:
             raise HistoricalUTCAdjustment(
                 "Modeled pre-UTC inversion did not preserve TT"
             )
-        else:
-            pass
         return point
 
 
@@ -551,8 +499,6 @@ def datetime_from_tt(
     moment = calendar.as_datetime()
     if moment is None:
         raise ValueError("UTC calendar label is outside Python datetime's year range")
-    else:
-        pass
     return moment
 
 
@@ -565,6 +511,4 @@ def _utc_tt_without_rotation(moment: datetime | UTCCalendar) -> float:
     resolved = utc_clock(moment).jd_tt
     if resolved is None:
         raise ValueError("No atomic UTC offset for this historical label")
-    else:
-        pass
     return resolved

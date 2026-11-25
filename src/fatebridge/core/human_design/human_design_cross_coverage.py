@@ -103,8 +103,6 @@ def expanded_cross_reading(record: dict[str, Any]) -> str:
         text += "新增官方样本未观察到本盘四门及角度，不补造名称映射。"
     if record["course_list_disagreement"]:
         text += "官方课程页列16/6｜63/64，同次冻结官方盘显示16/9｜63/64；课程列项与日地对宫关系冲突，未取得出版方勘误，不用该列项改写本盘激活。"
-    else:
-        pass
     return (
         text
         + "新增193盘覆盖192个门角组合，仍是有限虚构输入；本段不代表完整线义、任意自由文本或现实预测验收。"

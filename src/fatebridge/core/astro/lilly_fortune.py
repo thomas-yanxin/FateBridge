@@ -120,8 +120,6 @@ def evaluate_fortune(
     house = assignment.get("assigned_house")
     if house is not None and house not in range(1, 13):
         raise ValueError("Fortune assigned house must be1..12 or unknown")
-    else:
-        pass
     evaluated: dict[str, tuple[bool | None, dict[str, Any]]] = {}
 
     def put(code: str, holds: bool | None, **facts: Any) -> None:

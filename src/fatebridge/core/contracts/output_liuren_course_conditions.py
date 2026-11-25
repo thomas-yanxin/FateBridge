@@ -123,10 +123,6 @@ class LiurenCourseConditions(PartialOutput):
         ):
             if value["complete_classical_conformance"] is not False:
                 raise ValueError("课体条件不认证完整原典，须为布尔false")
-            else:
-                pass
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -134,8 +130,6 @@ class LiurenCourseConditions(PartialOutput):
 
         if self.day_ganzhi is not None and self.day_ganzhi not in SEXAGENARY_INDEX:
             raise ValueError("课体条件需要有效日干支")
-        else:
-            pass
         inputs = (
             self.day_ganzhi,
             self.branches,
@@ -171,8 +165,6 @@ class LiurenCourseConditions(PartialOutput):
                 for row in expected[group]:
                     for k in ("matched", "stage_matches", "god_matches", "checks"):
                         row.pop(k, None)
-        else:
-            pass
         if self.day_ganzhi is None:
             for row in expected["stage_god_patterns"]:
                 for k in (
@@ -181,8 +173,6 @@ class LiurenCourseConditions(PartialOutput):
                     "compatible_in_any_supported_noble_layout",
                 ):
                     row.pop(k)
-        else:
-            pass
         compare_present_branches(self.model_dump(exclude_unset=True), expected)
         # Some projections include enough inputs for a smaller independent check.
         if self.day_ganzhi is not None:
@@ -193,12 +183,6 @@ class LiurenCourseConditions(PartialOutput):
                     != life_stage_cycle(self.day_ganzhi[0])[self.branches[0]]
                 ):
                     raise ValueError("初传十二运与本课日干不一致")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -212,26 +196,18 @@ def require_complete_course_conditions(board: dict[str, Any]) -> None:
     )
     if canonical(actual) != canonical(expected):
         raise ValueError("完整课体条件缺项或与本课日干支、三传天将承座不一致")
-    else:
-        pass
     relations = board.get("transmission_relations", {})
     if relations.get("day_ganzhi") != day:
         raise ValueError("课体条件与同次三传关系日干支不一致")
-    else:
-        pass
     rows = relations.get("rows")
     if not isinstance(rows, list) or len(rows) != 3:
         raise ValueError("课体条件需要同次完整三传关系")
-    else:
-        pass
     for i, row in enumerate(rows):
         p = ("initial", "middle", "final")[i]
         recorded = board["three_transmissions"][p]
         for field in ("branch", "god", "earth_branch"):
             if row.get(field) != recorded[field]:
                 raise ValueError("课体条件不能借用另一课三传事实")
-            else:
-                pass
     traces = [
         t
         for t in board.get("rule_trace", [])
@@ -239,5 +215,3 @@ def require_complete_course_conditions(board: dict[str, Any]) -> None:
     ]
     if canonical(traces) != canonical([course_conditions_trace(expected)]):
         raise ValueError("课体条件轨迹缺项、重复或与本课不一致")
-    else:
-        pass

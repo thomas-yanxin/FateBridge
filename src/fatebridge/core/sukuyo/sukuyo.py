@@ -258,8 +258,6 @@ def rulesets(
         result["calendar_reference"] = japanese_calendar_reader(
             calendar_basis
         ).reference_metadata()
-    else:
-        pass
     return result
 
 
@@ -276,12 +274,8 @@ def _lunar_fields(
             tuple[int, int, int, bool],
             japanese_calendar_reader(calendar_basis).lunar_fields(civil),
         )
-    else:
-        pass
     if calendar_basis != DEFAULT_CALENDAR_BASIS:
         raise ValueError("未知的宿曜宿主历法，不能回退中国历")
-    else:
-        pass
     correction = _calendar_corrections()["corrections"].get(civil.isoformat())
     if correction is not None:
         return (
@@ -290,8 +284,6 @@ def _lunar_fields(
             int(correction[2]),
             bool(correction[3]),
         )
-    else:
-        pass
     lunar = LunarDate.from_solar_date(civil.year, civil.month, civil.day)
     return lunar.year, lunar.month, lunar.day, bool(lunar.is_leap_month)
 
@@ -312,8 +304,6 @@ def calendar_mansion(
     timezone_label = f"UTC+{offset:02}:00"
     if leap_month_policy not in {"unresolved", "repeat_month"}:
         raise ValueError("leap_month_policy仅支持unresolved或repeat_month")
-    else:
-        pass
     civil_date = date.fromisoformat(date_text.replace("/", "-"))
     selected_zone = zone or "+08:00"
     input_moment = None
@@ -324,8 +314,6 @@ def calendar_mansion(
         )
         if naive.tzinfo is not None:
             raise ValueError("time不得内嵌时区；请使用zone")
-        else:
-            pass
         moment = localize_datetime(naive, selected_zone)
         input_moment = moment.isoformat()
         try:
@@ -361,8 +349,6 @@ def calendar_mansion(
                     calendar_day_part=calendar_day_part,
                     calendar_basis=calendar_basis,
                 )
-            else:
-                pass
             calendar_date = date.fromisoformat(
                 date_support["possible_calendar_dates"][0]
             )
@@ -371,8 +357,6 @@ def calendar_mansion(
             f"宿曜{calendar_label}历法支持{first_date}至{last_date}；范围外不回退其他历法或外推"
             f"。{range_provenance(calendar_basis)}"
         )
-    else:
-        pass
     year, month, day, leap = _lunar_fields(calendar_date, calendar_basis)
     correction = (
         _calendar_corrections()["corrections"].get(calendar_date.isoformat())
@@ -401,12 +385,6 @@ def calendar_mansion(
                     "lunar_day": rd,
                     "is_leap_month": rl,
                 }
-            else:
-                pass
-        else:
-            pass
-    else:
-        pass
     selection = select_profile(
         month,
         day,
@@ -549,8 +527,6 @@ def calendar_mansion(
     }
     if date_support is not None:
         result["date_support"] = date_support
-    else:
-        pass
     if calendar_basis in JAPANESE_CALENDAR_BASES:
         reference = japanese_calendar_reader(calendar_basis).date_reference(
             calendar_date
@@ -569,8 +545,6 @@ def calendar_mansion(
                 "historical_local_time_reconstruction": False,
             }
         )
-    else:
-        pass
     return result
 
 
@@ -594,8 +568,6 @@ def _date_uncertain_calendar(
         if not first_date.isoformat() <= value <= last_date.isoformat():
             excluded.append(value)
             continue
-        else:
-            pass
         # A derived reference-date candidate is a table lookup, never an imputed
         # observed birth clock. Each branch retains its full calendar profile.
         candidate = calendar_mansion(
@@ -615,8 +587,6 @@ def _date_uncertain_calendar(
             f"所有可能{calendar_label}历日均超出{first_date}至{last_date}的支持范围。"
             + range_provenance(calendar_basis)
         )
-    else:
-        pass
     complete = not excluded and all(
         c["profile_calculation"][
             "candidate_set_complete_under_declared_reconstructions"
@@ -707,8 +677,6 @@ def _date_uncertain_calendar(
         ).reference_metadata()
         result["resolution_reason"] = "local_date_spans_japanese_reference_dates"
         result["profile_calculation"]["resolution_reason"] = result["resolution_reason"]
-    else:
-        pass
     return result
 
 
@@ -763,8 +731,6 @@ def candidate_relation_analysis(
                     in ([c["natal_su27"]] if c["natal_su27"] else c["candidate_su27s"])
                 ]
         result["calendar_date_uncertainty_remains"] = True
-    else:
-        pass
 
     return add_shared_reconstruction_support(first, second, result)
 
@@ -835,8 +801,6 @@ def day_evidence(
             )
         )
         return result
-    else:
-        pass
     mansion = context["natal_su27"]
 
     personal_day = personal_day_evidence(natal_mansion, mansion)
@@ -939,8 +903,6 @@ def day_evidence(
     if activity == "clothing":
 
         result["clothing_reference"] = clothing_reference(context)
-    else:
-        pass
     result["candidate_days"] = []
 
     result["kenyu_lingbi_reference"] = conditional_lingbi_reference(

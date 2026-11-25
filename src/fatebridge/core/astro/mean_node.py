@@ -44,8 +44,6 @@ _RAW = (
 ).read_bytes()
 if hashlib.sha256(_RAW).hexdigest() != COEFFICIENT_SHA256:
     raise RuntimeError("Mean-node parameters differ from the declared source")
-else:
-    pass
 _DATA: MeanNodeParameters = json.loads(_RAW)
 MODEL_ID = _DATA["model_id"]
 SOURCE_URL = _DATA["method_reference_url"]
@@ -66,8 +64,6 @@ def mean_lunar_node(
     point = TTInstant.from_value(julian_day_tt)
     if not _START <= point.days <= _END:
         raise ValueError("Mean lunar node TT is outside the sourced model range")
-    else:
-        pass
     t = float((point.days - 2451545) / 36525)
     longitude = _COEFFICIENTS[-1]
     derivative = 0.0
@@ -88,8 +84,6 @@ def mean_lunar_node(
         longitude += psi
         rate += psi_rate
         obliquity += math.radians(deps)
-    else:
-        pass
     longitude %= 360.0
     state = {
         "longitude": longitude,
@@ -100,8 +94,6 @@ def mean_lunar_node(
     }
     if remainder or difference == _VALUES[index] - _VALUES[index - 1]:
         state["longitude_speed"] = rate
-    else:
-        pass
     # At a genuine correction-slope corner there is no unique instantaneous
     # derivative. The coordinate stays defined; motion remains unavailable.
     return state

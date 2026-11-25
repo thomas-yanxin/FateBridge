@@ -13,8 +13,6 @@ from fatebridge.core.heluo.heluo_jiehou import _form, nominal_hou_day, term_assi
 def _bool(value: object) -> bool:
     if type(value) is not bool:
         raise ValueError("不能用0／1替代节候来源布尔事实。")
-    else:
-        pass
     return value
 
 
@@ -34,22 +32,14 @@ class JiehouForm(PartialOutput):
 
         if self.lines is not None and any(n not in (0, 1) for n in self.lines):
             raise ValueError("节候卦形须为自下而上的六个0／1。")
-        else:
-            pass
         lines: list[int] | None = self.lines
         if self.gua is not None:
             pair = _gua_tables()[0].get(self.gua)
             if pair is None:
                 raise ValueError("节候卦名无对应卦形。")
-            else:
-                pass
             lines = gua_lines(pair["up"], pair["low"])
             if self.lines is not None and self.lines != lines:
                 raise ValueError("节候卦名与六爻不一致。")
-            else:
-                pass
-        else:
-            pass
         if (
             lines is not None
             and self.position is not None
@@ -57,8 +47,6 @@ class JiehouForm(PartialOutput):
             and self.yao != yao_name(lines, self.position)
         ):
             raise ValueError("推演用爻名与卦形不一致；原印标签应另存。")
-        else:
-            pass
         return self
 
 
@@ -75,10 +63,6 @@ class JiehouTerm(JiehouForm):
                 value = getattr(self, key)
                 if value is not None and value != actual[key]:
                     raise ValueError("节气名与所选底本节卦不一致。")
-                else:
-                    pass
-        else:
-            pass
         return self
 
 
@@ -98,17 +82,11 @@ class JiehouLiteral(PartialOutput):
         if self.raw_yao is not None and self.printed_position is not None:
             if self.printed_position != (4 if self.raw_yao == "六四" else 1):
                 raise ValueError("原印爻名与所列原印位置不一致。")
-            else:
-                pass
-        else:
-            pass
         if self.gua is not None and self.printed_position is not None:
 
             canonical = _form(self.gua, self.printed_position)["yao"]
             if self.canonical_yao is not None and self.canonical_yao != canonical:
                 raise ValueError("候卦形的爻名不一致。")
-            else:
-                pass
         else:
             canonical = self.canonical_yao
         if (
@@ -118,8 +96,6 @@ class JiehouLiteral(PartialOutput):
             and self.yao_polarity_agrees != (self.raw_yao == canonical)
         ):
             raise ValueError("原印与卦形的差异不能被反转。")
-        else:
-            pass
         return self
 
 
@@ -145,10 +121,6 @@ class JiehouNominalDay(JiehouForm):
                 value = getattr(self, key)
                 if value is not None and value != row[key]:
                     raise ValueError("名义日序与六日重建的卦爻不一致。")
-                else:
-                    pass
-        else:
-            pass
         return self
 
 
@@ -174,8 +146,6 @@ class JiehouCaptionComparison(PartialOutput):
             and self.agrees != ((p.gua, p.position) == (d.gua, d.position))
         ):
             raise ValueError("原例与六日重建的比较事实不一致。")
-        else:
-            pass
         return self
 
 
@@ -200,8 +170,6 @@ class JiehouTermStartComparison(PartialOutput):
             and self.gua_agrees != (self.printed_gua == d.gua)
         ):
             raise ValueError("表头与十五名义日模型的卦名比较不一致。")
-        else:
-            pass
         if (
             self.printed_position is not None
             and d is not None
@@ -210,8 +178,6 @@ class JiehouTermStartComparison(PartialOutput):
             and self.position_agrees != (self.printed_position == d.position)
         ):
             raise ValueError("表头与十五名义日模型的位置比较不一致。")
-        else:
-            pass
         return self
 
 
@@ -237,8 +203,6 @@ class JiehouModelComparison(PartialOutput):
             and self.model != start.derived.model
         ):
             raise ValueError("交节点比较不能混用不同日序模型。")
-        else:
-            pass
         rows = self.caption_comparison
         if rows is not None:
             if self.model is not None and any(
@@ -248,8 +212,6 @@ class JiehouModelComparison(PartialOutput):
                 for r in rows
             ):
                 raise ValueError("示例比较不能混用不同日序模型。")
-            else:
-                pass
             if (
                 self.caption_difference_count is not None
                 and all(r.agrees is not None for r in rows)
@@ -257,10 +219,6 @@ class JiehouModelComparison(PartialOutput):
                 != sum(r.agrees is False for r in rows)
             ):
                 raise ValueError("原例差异计数与逐项比较不一致。")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -318,10 +276,6 @@ class HeluoJiehouEvidence(PartialOutput):
                 "six_days_per_gua_caption_first",
             ]:
                 raise ValueError("须保留两种具名重建，不能重复或删去一种。")
-            else:
-                pass
-        else:
-            pass
         if self.upstream_term_label is not None:
 
             actual = term_assignment(self.upstream_term_label)
@@ -333,34 +287,20 @@ class HeluoJiehouEvidence(PartialOutput):
                 for r in self.reconstruction_models
             ):
                 raise ValueError("模型交节点比较与本次节气不一致。")
-            else:
-                pass
             if self.selected_term_gua is not None:
                 for key in ("gua", "position"):
                     value = getattr(self.selected_term_gua, key)
                     if value is not None and value != actual[key]:
                         raise ValueError("本次节气与已知节卦事实不一致。")
-                    else:
-                        pass
-            else:
-                pass
             if (
                 self.selected_term_gua is not None
                 and self.selected_term_gua.term is not None
             ):
                 if term != self.selected_term_gua.term:
                     raise ValueError("本次节气标签与所选节卦不一致。")
-                else:
-                    pass
-            else:
-                pass
             if self.literal_hou_group is not None and any(
                 row.term is not None and row.term != term
                 for row in self.literal_hou_group
             ):
                 raise ValueError("原候卦组与本次节气不一致。")
-            else:
-                pass
-        else:
-            pass
         return self

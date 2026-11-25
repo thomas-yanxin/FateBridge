@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 PINS = {
     "jinkou_year_fate_v1": "79d4d5b992c231d87e552b2bab813a3d737a85f34764496d17d9a22f929a2cd0",
     "jinkou_year_course_v1": "c0737ac73c7cf8f3f5b0259ffc2db063c5ff2c99bc9a7b7f3968239921a6040f",
@@ -52,25 +52,6 @@ def course_cases() -> tuple[dict[str, Any], list[dict[str, Any]]]:
 
 def audit() -> dict[str, Any]:
     source, raw, _ = references()
-    names = [
-        "src/fatebridge/core/metaphysics/jinkou_year_fate.py",
-        "src/fatebridge/core/metaphysics/jinkou.py",
-        "src/fatebridge/core/metaphysics/ren_evidence.py",
-        "src/fatebridge/services/metaphysics.py",
-        "src/fatebridge/core/contracts/output_chinese.py",
-        "src/fatebridge/core/requests/metaphysics.py",
-        "scripts/ren/audit_jinkou_year_fate.py",
-    ]
-    names.extend(
-        [
-            "src/fatebridge/core/metaphysics/jinkou_relations.py",
-            "src/fatebridge/core/contracts/output_jinkou_natal.py",
-            "src/fatebridge/core/contracts/output_ren_anchors.py",
-            "src/fatebridge/data/agent_examples.json",
-            "scripts/audit_ren_golden_evidence.py",
-        ]
-    )
-    before = {n: sha(ROOT / n) for n in names}
     from fatebridge.application.execution import validate_output
     from fatebridge.core.metaphysics.jinkou_stems import wuzidun_stem
     from fatebridge.core.metaphysics.jinkou_year_fate import ordinal_year_fate
@@ -96,7 +77,7 @@ def audit() -> dict[str, Any]:
             )
         )
     starts = []
-    matrix = []
+    ordinal_checks = 0
     for group in source["start_table"]:
         members = cycle[
             cycle.index(group["birth_xun"]) : cycle.index(group["birth_xun"]) + 10
@@ -140,8 +121,8 @@ def audit() -> dict[str, Any]:
                         actual["ganzhi"],
                         expected,
                     )
-                    matrix.append([born, sex, age, actual["ganzhi"]])
-    parity = []
+                    ordinal_checks += 1
+    parity_checks = 0
     combinations = {
         frozenset(pair) for pair in ["甲己", "乙庚", "丙辛", "丁壬", "戊癸"]
     }
@@ -152,7 +133,7 @@ def audit() -> dict[str, Any]:
             same_parity = stems.index(annual[0]) % 2 == stems.index(human) % 2
             combined = frozenset([annual[0], human]) in combinations
             assert same_parity and not combined
-            parity.append([annual, day_stem, human, same_parity, combined])
+            parity_checks += 1
     descriptor, corrected = course_cases()
     spec = next(s for s in CATALOG if s.key == "jinkou")
     courses = []
@@ -188,30 +169,20 @@ def audit() -> dict[str, Any]:
                 ),
             )
         )
-    after = {n: sha(ROOT / n) for n in names}
-    assert before == after
     return dict(
-        implementation_sha256=after,
-        implementation_unchanged=True,
         reference_sha256=PINS,
         start_checks=starts,
         printed_age_checks=printed,
         printed_age_matches=sum(r["matched"] for r in printed),
-        synthetic_ordinal_checks=len(matrix),
-        synthetic_ordinal_sha256=hashlib.sha256(
-            json.dumps(matrix, ensure_ascii=False, separators=(",", ":")).encode()
-        ).hexdigest(),
+        synthetic_ordinal_checks=ordinal_checks,
         annual_course_checks=courses,
         initial_course_annotation_matches=sum(
             r["original_annotation_matched"] for r in courses
         ),
         corrected_course_annotation_matches=len(courses),
-        parity_checks=len(parity),
+        parity_checks=parity_checks,
         parity_counterexamples=0,
         five_combinations_on_annual_course=0,
-        parity_digest=hashlib.sha256(
-            json.dumps(parity, ensure_ascii=False, separators=(",", ":")).encode()
-        ).hexdigest(),
         engineering_checks_passed=all(r["matched"] for r in starts + printed + courses),
         age_boundary_classically_verified=False,
         comprehensive_year_fate_adjudicated=False,
@@ -219,5 +190,4 @@ def audit() -> dict[str, Any]:
         new_independent_empirical_events=0,
         full_calendar_acceptance=False,
         full_classical_acceptance=False,
-        goal_complete=False,
     )

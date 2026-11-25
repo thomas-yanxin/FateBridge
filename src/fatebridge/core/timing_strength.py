@@ -227,8 +227,6 @@ def project_timing_root_effects(
         layers.append(row)
         if blockers:
             continue
-        else:
-            pass
         powers = dict(natal_powers)
         forcing = initial_hidden_budgets(
             {node_id: pillar["branch"]}, {node_id: q["branch_budget"]}
@@ -262,16 +260,10 @@ def project_timing_root_effects(
                             retention[p][e],
                             Fraction(str(root["event_retention_multiplier"])),
                         )
-                    else:
-                        pass
                 continue
-            else:
-                pass
             for member in members:
                 if not member.startswith("natal."):
                     continue
-                else:
-                    pass
                 position = member.removeprefix("natal.")
                 multiplier = q["punishment"]
                 if kind == "六冲":
@@ -286,8 +278,6 @@ def project_timing_root_effects(
                             else q["clash_loser"]
                         )
                     )
-                else:
-                    pass
                 for element in Element:
                     retention[position][element] = min(
                         retention[position][element], multiplier
@@ -367,6 +357,4 @@ def timing_strength_snapshot_lines(projection: TimingStrengthProjection) -> list
         lines.append(
             "限定投影保留原局月令，不加入时间干支能量、新根或层间救应；运干五合只折减原局非日干既有预算，0.85为工程系数；残存原局数值档不是完整行运后旺衰。"
         )
-    else:
-        pass
     return lines

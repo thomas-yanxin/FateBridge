@@ -79,8 +79,6 @@ def _unique_midpoint_fraction(first: Angle, second: Angle) -> Fraction:
     values = midpoint_candidates_fraction(first, second)
     if len(values) != 1:
         raise ValueError("精确相隔180°的输入没有唯一短弧中点；不能任取一个方向")
-    else:
-        pass
     return values[0]
 
 
@@ -92,12 +90,8 @@ def midpoint_candidates_fraction(first: Angle, second: Angle) -> tuple[Fraction,
     if delta == 180:
         axis = ((first_degrees + second_degrees) / 2) % 180
         return axis, axis + 180
-    else:
-        pass
     if delta > 180:
         delta -= 360
-    else:
-        pass
     return ((first_degrees + delta / 2) % 360,)
 
 
@@ -121,16 +115,10 @@ def geographic_midpoint(
     values = (first_longitude, first_latitude, second_longitude, second_latitude)
     if not all(math.isfinite(value) for value in values):
         raise ValueError("地理坐标必须为有限数值")
-    else:
-        pass
     if not (-90 <= first_latitude <= 90 and -90 <= second_latitude <= 90):
         raise ValueError("纬度必须在[-90,90]内")
-    else:
-        pass
     if not (-180 <= first_longitude <= 180 and -180 <= second_longitude <= 180):
         raise ValueError("经度必须在[-180,180]内")
-    else:
-        pass
     if not spherical:
         return (
             _signed_longitude(
@@ -138,19 +126,13 @@ def geographic_midpoint(
             ),
             float((Fraction(first_latitude) + Fraction(second_latitude)) / 2),
         )
-    else:
-        pass
     delta = (Fraction(second_longitude) - Fraction(first_longitude) + 180) % 360 - 180
     if first_latitude == -second_latitude and (
         abs(delta) == 180 or abs(first_latitude) == 90
     ):
         raise ValueError("对跖点没有唯一球面中点")
-    else:
-        pass
     if first_latitude == second_latitude and abs(first_latitude) == 90:
         return 0.0, first_latitude
-    else:
-        pass
     mean_lat = math.radians(
         float((Fraction(first_latitude) + Fraction(second_latitude)) / 2)
     )
@@ -166,8 +148,6 @@ def geographic_midpoint(
     latitude = math.degrees(math.atan2(z, math.hypot(x, y)))
     if abs(latitude) == 90:
         return 0.0, latitude
-    else:
-        pass
     longitude = float(Fraction(first_longitude) + delta / 2) + math.degrees(
         math.atan2(y, x)
     )
@@ -230,16 +210,12 @@ def _corrected_ut1(
             and right_residual_degrees - left_residual_degrees < 90
         ):
             brackets.append((left_julian_day_ut1, right_julian_day_ut1))
-        else:
-            pass
         left_julian_day_ut1, left_residual_degrees = (
             right_julian_day_ut1,
             right_residual_degrees,
         )
     if not brackets:
         raise ValueError("Davison MC校正未找到有效括界")
-    else:
-        pass
     solutions_julian_day_ut1: list[float] = []
     for left_julian_day_ut1, right_julian_day_ut1 in brackets:
         for _ in range(MC_BISECTION_LIMIT):
@@ -269,13 +245,9 @@ def davison_birth(
     """Use the selected UT1 midpoint and preserve its physical epoch."""
     if variant not in DAVISON_VARIANTS:
         raise ValueError("davison_variant必须为uncorrected、corrected或spherical")
-    else:
-        pass
     first_time, second_time = first.time_scales, second.time_scales
     if runtime.swe is None:
         raise ValueError("Davison时间尺度换算需要Swiss Ephemeris，不能冒用UTC为UT1")
-    else:
-        pass
     midpoint = UT1Instant((first_time.ut1.days + second_time.ut1.days) / 2)
     longitude, latitude = geographic_midpoint(
         first.longitude,
@@ -315,8 +287,6 @@ def davison_birth(
                 * SECONDS_PER_DAY,
                 "mc_target_policy": "nearest direction of the natal MC midpoint meridian axis",
             }
-    else:
-        pass
     zone = first.timezone if first.timezone == second.timezone else "UTC"
     birth = AstroBirthInfo(
         name=f"{first.name}/{second.name} 时空中点",

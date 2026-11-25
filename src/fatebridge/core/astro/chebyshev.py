@@ -125,8 +125,6 @@ def chebyshev_kinematics(
         or not all(math.isfinite(c) for c in coefficients)
     ):
         raise EphemerisSourceError("jpl_kinematics_invalid")
-    else:
-        pass
     if isinstance(x, Fraction):
         high = float(x)
         coord_h, coord_l = high, float(x - Fraction(high))
@@ -224,8 +222,6 @@ def chebyshev_kinematics(
     result = ChebyshevKinematics(value, first, second)
     if not all(math.isfinite(part) for part_pair in result for part in part_pair):
         raise EphemerisSourceError("jpl_kinematics_invalid")
-    else:
-        pass
     return result
 
 
@@ -234,13 +230,9 @@ def _flatten_terms(values: Sequence[DoubleDouble]) -> tuple[float, ...]:
     if n == 3:
         a, b, c = values
         return (a[0], a[1], b[0], b[1], c[0], c[1])
-    else:
-        pass
     if n == 2:
         a, b = values
         return (a[0], a[1], b[0], b[1])
-    else:
-        pass
     return tuple(part for value in values for part in value)
 
 
@@ -252,26 +244,18 @@ def _scale_dd(value: DoubleDouble, scale: float, divisor: float) -> DoubleDouble
         and divisor != 0.0
     ):
         return (0.0, 0.0)
-    else:
-        pass
     return _divide(_multiply(value, (scale, 0.0)), divisor)
 
 
 def _divide_dd(value: DoubleDouble, divisor: float) -> DoubleDouble:
     if value == (0.0, 0.0) and math.isfinite(divisor) and divisor != 0.0:
         return (0.0, 0.0)
-    else:
-        pass
     return _divide(value, divisor)
 
 
 def _add_dd(a: DoubleDouble, b: DoubleDouble) -> DoubleDouble:
     if a == (0.0, 0.0):
         return b
-    else:
-        pass
     if b == (0.0, 0.0):
         return a
-    else:
-        pass
     return _add(a, b)

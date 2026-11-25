@@ -19,46 +19,30 @@ from typing import Any, Dict, Optional, cast
 def validate_file_name(name: str) -> None:
     if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+\.se1", name):
         raise ValueError("Ephemeris file name must be one .se1 basename")
-    else:
-        pass
 
 
 def _validate_manifest(manifest: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(manifest, dict):
         raise ValueError("Ephemeris manifest must be an object")
-    else:
-        pass
     if (
         type(manifest.get("schema_version")) is not int
         or manifest["schema_version"] != 1
     ):
         raise ValueError("Unsupported ephemeris manifest schema")
-    else:
-        pass
     if not isinstance(manifest.get("base_url"), str) or not manifest["base_url"]:
         raise ValueError("Ephemeris manifest requires a base_url")
-    else:
-        pass
     records = manifest.get("files")
     if not isinstance(records, dict) or not records:
         raise ValueError("Ephemeris manifest requires file fingerprints")
-    else:
-        pass
     for name, record in records.items():
         validate_file_name(name)
         if not isinstance(record, dict):
             raise ValueError(f"{name}: invalid fingerprint record")
-        else:
-            pass
         size, digest = record.get("bytes"), record.get("sha256")
         if type(size) is not int or size < 2:
             raise ValueError(f"{name}: invalid expected byte count")
-        else:
-            pass
         if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
             raise ValueError(f"{name}: invalid SHA-256 fingerprint")
-        else:
-            pass
     return manifest
 
 
@@ -75,8 +59,6 @@ def load_ephemeris_manifest(path: Optional[Path] = None) -> Dict[str, Any]:
         return _validate_manifest(
             cast(Dict[str, Any], json.loads(path.read_text("utf-8")))
         )
-    else:
-        pass
     return copy.deepcopy(_packaged_manifest())
 
 
@@ -87,16 +69,10 @@ def verify_ephemeris_bytes(name: str, data: bytes, manifest: Dict[str, Any]) -> 
         raise ValueError(
             f"{name}: no fingerprint in the selected edition; provide a manifest for custom data"
         )
-    else:
-        pass
     if not data.startswith(b"SW"):
         raise ValueError(f"{name}: content is not Swiss Ephemeris data")
-    else:
-        pass
     actual = hashlib.sha256(data).hexdigest()
     if len(data) != record["bytes"] or actual != record["sha256"]:
         raise ValueError(
             f"{name}: content does not match the selected edition's byte count and SHA-256"
         )
-    else:
-        pass

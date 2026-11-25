@@ -22,8 +22,6 @@ def _profile() -> dict[str, Any]:
         or profile["version"] != "1.0.0"
     ):
         raise ValueError("Unknown selected observed category profile")
-    else:
-        pass
     return profile
 
 

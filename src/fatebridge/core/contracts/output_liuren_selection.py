@@ -30,21 +30,15 @@ def compare(actual: Any, expected: Any) -> None:
     if isinstance(actual, dict) and isinstance(expected, dict):
         if actual.keys() - expected.keys():
             raise ValueError("九宗门证据含本次推导中不存在的字段")
-        else:
-            pass
         for key in actual.keys() & expected.keys():
             compare(actual[key], expected[key])
     elif isinstance(actual, list) and isinstance(expected, list):
         if len(actual) != len(expected):
             raise ValueError("九宗门证据队列与同次计算不一致")
-        else:
-            pass
         for a, e in zip(actual, expected):
             compare(a, e)
     elif type(actual) is not type(expected) or actual != expected:
         raise ValueError("九宗门选课、三传、细名或推导轨迹与日干支天地盘不一致")
-    else:
-        pass
 
 
 def expected_selection(
@@ -60,48 +54,30 @@ def expected_selection(
         value = board.get(name)
         if isinstance(value, dict) and value.get(key) is not None:
             days.append(value[key])
-        else:
-            pass
     if not days:
         return None
-    else:
-        pass
     if (
         any(not isinstance(d, str) or d not in SEXAGENARY_INDEX for d in days)
         or len(set(days)) != 1
     ):
         raise ValueError("九宗门计算日干支依据不一致")
-    else:
-        pass
     rows = board.get("twelve_board")
     if not isinstance(rows, list) or len(rows) != 12:
         return None
-    else:
-        pass
     if any(not isinstance(r, dict) for r in rows):
         raise ValueError("九宗门天地盘行必须是对象")
-    else:
-        pass
     if any(r.get("earth_branch") is None or r.get("sky_branch") is None for r in rows):
         return None
-    else:
-        pass
     if any(
         not isinstance(r[k], str) for r in rows for k in ("earth_branch", "sky_branch")
     ):
         raise ValueError("九宗门天地盘须使用十二地支")
-    else:
-        pass
     sky = {r["earth_branch"]: r["sky_branch"] for r in rows}
     if set(sky) != set(BRANCHES) or set(sky.values()) != set(BRANCHES):
         raise ValueError("九宗门需要完整且无重复的天地盘")
-    else:
-        pass
     offsets = {(BRANCHES.index(v) - BRANCHES.index(k)) % 12 for k, v in sky.items()}
     if len(offsets) != 1:
         raise ValueError("九宗门天地盘须为同一次顺布旋转盘")
-    else:
-        pass
 
     return derive_selection(days[0], sky)
 
@@ -136,35 +112,21 @@ def validate_selection(
     if selection is None:
         if complete:
             raise ValueError("完整九宗门输出缺少日干支或天地盘依据")
-        else:
-            pass
         return
-    else:
-        pass
     for key in ("four_lessons", "board_style", "board_style_detail", "classification"):
         if complete:
             if key not in board:
                 raise ValueError("完整九宗门输出缺少取传字段")
-            else:
-                pass
             require_shape(board[key], selection[key])
-        else:
-            pass
         if key in board:
             compare(board[key], selection[key])
-        else:
-            pass
     meta = board.get("meta")
     keys = ("selected_lesson_index", "selected_lesson_relation")
     wanted_meta = {key: selection[key] for key in keys}
     if complete:
         require_shape(meta, wanted_meta)
-    else:
-        pass
     if isinstance(meta, dict):
         compare({key: meta[key] for key in keys if key in meta}, wanted_meta)
-    else:
-        pass
     transmissions = board.get("three_transmissions")
     labels = ("initial", "middle", "final")
     wanted_transmissions = {
@@ -176,8 +138,6 @@ def validate_selection(
     }
     if complete:
         require_shape(transmissions, wanted_transmissions)
-    else:
-        pass
     if isinstance(transmissions, dict):
         present = {k: transmissions[k] for k in ("method",) if k in transmissions}
         for label in labels:
@@ -188,11 +148,7 @@ def validate_selection(
                     if isinstance(row, dict) and "branch" in row
                     else ({} if isinstance(row, dict) else row)
                 )
-            else:
-                pass
         compare(present, wanted_transmissions)
-    else:
-        pass
     expected = {t["rule_id"]: t for t in trace_expectations(selection)}
     actual = [
         t for t in board.get("rule_trace") or [] if t.get("rule_id") in SELECTION_TRACES
@@ -200,17 +156,11 @@ def validate_selection(
     ids = [t["rule_id"] for t in actual]
     if len(ids) != len(set(ids)) or set(ids) - set(expected):
         raise ValueError("九宗门轨迹重复或不属于本次取传分支")
-    else:
-        pass
     if complete and set(ids) != set(expected):
         raise ValueError("完整九宗门输出缺少唯一完整推导轨迹")
-    else:
-        pass
     for item in actual:
         if complete:
             require_shape(item, expected[item["rule_id"]])
-        else:
-            pass
         compare(item, expected[item["rule_id"]])
 
 
@@ -218,16 +168,10 @@ def require_shape(actual: Any, expected: Any) -> None:
     if isinstance(expected, dict):
         if not isinstance(actual, dict) or set(expected) - set(actual):
             raise ValueError("完整九宗门输出缺少选课计算依据")
-        else:
-            pass
         for key, value in expected.items():
             require_shape(actual[key], value)
     elif isinstance(expected, list):
         if not isinstance(actual, list) or len(actual) != len(expected):
             raise ValueError("完整九宗门输出缺少完整队列")
-        else:
-            pass
         for a, e in zip(actual, expected):
             require_shape(a, e)
-    else:
-        pass

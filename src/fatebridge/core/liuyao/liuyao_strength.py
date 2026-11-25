@@ -117,23 +117,13 @@ def calendar_conditions(
                     reason="三支活动待审，寅月生扶不能先行确认",
                 )
             )
-        else:
-            pass
-    else:
-        pass
     if COMBINES[month] == b:
         add_support("month", month, "月合有扶")
-    else:
-        pass
     daily_relation = element_relation(ELEMENTS[day], element)
     if daily_relation in ("生爻", "比和") and day_growth_allowed is True:
         add_support("day", day, "日辰生扶")
-    else:
-        pass
     if COMBINES[day] == b:
         add_support("day", day, "日合扶起条件")
-    else:
-        pass
     if stages[element].get(day) in ("长生", "帝旺"):
         if day_growth_allowed is not True:
             if day_growth_allowed is None:
@@ -145,8 +135,6 @@ def calendar_conditions(
                         reason="申爻活动前提待审，寅日长生生扶不能先行确认",
                     )
                 )
-            else:
-                pass
         elif element == "金" and day == "巳" and not qualified_metal_growth:
             pending.append(
                 {
@@ -170,8 +158,6 @@ def calendar_conditions(
                     else "已校核日长生帝旺"
                 ),
             )
-    else:
-        pass
     for location, calendar_branch in (("month", month), ("day", day)):
         facts = branch_facts(b, month, calendar_branch, void)
         relation = element_relation(ELEMENTS[calendar_branch], element)
@@ -179,8 +165,6 @@ def calendar_conditions(
             # The retained raw month category is not this qualified opposition.
             # Other moving and transformed control is collected independently.
             continue
-        else:
-            pass
         if (
             relation == "克爻" and not (location == "day" and qualified_metal_growth)
         ) or (location == "month" and facts["is_month_clash"]):
@@ -197,8 +181,6 @@ def calendar_conditions(
                     "grounded": True,
                 }
             )
-        else:
-            pass
     if penalty["condition_match"] is not False:
         harms.append(
             dict(
@@ -221,8 +203,6 @@ def calendar_conditions(
                 penalty_source_path=penalty["source_path"],
             )
         )
-    else:
-        pass
     return {"supports": supports, "pending_supports": pending, "oppositions": harms}
 
 
@@ -351,10 +331,6 @@ def build_classical_assessment(
                     )
                     if qualified_back is None:
                         actor["reason"] = "本位金化巳的长生或回头克资格待审"
-                    else:
-                        pass
-                else:
-                    pass
                 if qualified_back is False:
                     actor["reason"] = (
                         "金爻实际化巳，独立生扶已核；本项按长生而不作回头克"
@@ -362,10 +338,6 @@ def build_classical_assessment(
                     excluded_back_controls.append(actor)
                 else:
                     harms.append(actor)
-            else:
-                pass
-        else:
-            pass
         possible_supports: list[dict[str, Any]] = []
         blocked_supports: list[dict[str, Any]] = excluded_back
         blocked_oppositions: list[dict[str, Any]] = excluded_back_controls
@@ -373,8 +345,6 @@ def build_classical_assessment(
             op = other["position"]
             if op == p:
                 continue
-            else:
-                pass
             oc = conditions[op - 1]
             moving = active(other, oc)
             static_allowed = all_static and monthly_qualified[op] is True
@@ -403,8 +373,6 @@ def build_classical_assessment(
                         and oc.get("activity_condition_match", True) is not True,
                     }
                 )
-            else:
-                pass
             if relation == "克爻" and controls:
                 control = controls[(op, p)]
                 actor = {
@@ -425,8 +393,6 @@ def build_classical_assessment(
                         ],
                     )
                     actor["reason"] = actor_reason(control)
-                else:
-                    pass
                 (
                     blocked_oppositions
                     if control["condition_match"] is False
@@ -447,8 +413,6 @@ def build_classical_assessment(
                         "grounded": False,
                     }
                 )
-            else:
-                pass
         facts = branch_facts(b, month, day, void)
         pending_day_clash = (
             facts["is_day_clash"]
@@ -468,8 +432,6 @@ def build_classical_assessment(
                     "clash_source_path": f"liuyao_evidence.conditional_analysis.clash_conditions.lines.{p - 1}",
                 }
             )
-        else:
-            pass
         observations[p] = {
             "penalty": c.get(INTERNAL_KEY)
             or penalty_context(
@@ -542,8 +504,6 @@ def build_classical_assessment(
                 actor["branch"],
                 target_context,
             )
-        else:
-            pass
         # Peer support is not the chapter-ten outgoing-generation rule.
         return (
             True
@@ -569,13 +529,9 @@ def build_classical_assessment(
         for p, o in observations.items():
             if p in grounded or o["harms"]:
                 continue
-            else:
-                pass
             if any(support_match(a, p) is True for a in o["possible_supports"]):
                 grounded.add(p)
                 changed = True
-            else:
-                pass
     generation_conditions = build_generation_conditions(
         lines=lines,
         sources=sources,
@@ -610,8 +566,6 @@ def build_classical_assessment(
                     "benefit_now": pair["benefit_now"],
                     "generation_source_path": pair["source_path"],
                 }
-            else:
-                pass
             match = (
                 False
                 if actor["position"] in blocked_positions
@@ -646,8 +600,6 @@ def build_classical_assessment(
                 harm["reason"] = (
                     "静爻日破条件匹配" if day_break else "静爻日冲与生扶前提仍待审"
                 )
-            else:
-                pass
         for harm in harms:
             if harm["location"] == "visible":
                 hp = harm["position"]
@@ -655,10 +607,6 @@ def build_classical_assessment(
                     harm["grounded"] = (
                         hp in grounded and not conditions[hp - 1]["binding_cues"]
                     )
-                else:
-                    pass
-            else:
-                pass
         weak = (
             not supports
             and not pending
@@ -713,8 +661,6 @@ def build_classical_assessment(
         candidates: list[dict[str, Any]] = []
         if day == tomb:
             candidates.append({"location": "day", "position": None, "branch": tomb})
-        else:
-            pass
         candidates.extend(
             {
                 "location": "moving",
@@ -731,8 +677,6 @@ def build_classical_assessment(
         )
         if row["change"] and row["changed_branch"] == tomb:
             candidates.append({"location": "changed", "position": p, "branch": tomb})
-        else:
-            pass
         for candidate in candidates:
             breakers: list[dict[str, Any]] = []
             pending_breakers: list[dict[str, Any]] = []
@@ -748,8 +692,6 @@ def build_classical_assessment(
             ]:
                 if not branch_facts(tomb, month, branch, void)["is_day_clash"]:
                     continue
-                else:
-                    pass
                 actor = {"location": location, "position": position, "branch": branch}
                 # Do not manufacture original-line attacks on a changed line or
                 # a calendar deity. Day-tomb opening needs its separate context.

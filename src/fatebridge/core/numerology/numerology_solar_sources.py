@@ -51,25 +51,17 @@ def solar_source_profiles(boundaries: Iterable[dict[str, Any]]) -> dict[str, Any
             provider, model = record["resolution_provider"], record["ephemeris_model"]
             if any(not isinstance(v, str) or not v for v in (provider, model)):
                 raise ValueError("A consumed boundary needs its actual provider/model")
-            else:
-                pass
             details = record.get("solar_model_details")
             if details is None:
                 details = {}
-            else:
-                pass
             if not isinstance(details, dict):
                 raise ValueError("A model receipt must be an object")
-            else:
-                pass
             url = details.get("source_url")
             if url is not None:
                 if not isinstance(url, str) or not url.startswith(
                     ("https://", "http://")
                 ):
                     raise ValueError("A recorded source URL must be HTTP(S)")
-                else:
-                    pass
                 basis = "consumed_model_receipt"
             elif provider == "swisseph" and model in {"moshier", "swieph", "jpl"}:
                 url, basis = NATIVE_DOCUMENTATION_URL, "provider_documentation"
@@ -101,8 +93,6 @@ def solar_source_profiles(boundaries: Iterable[dict[str, Any]]) -> dict[str, Any
             key = canonical_bytes(profile)
             if key not in profiles:
                 profiles[key] = {**profile, "boundary_count": 0}
-            else:
-                pass
             profiles[key]["boundary_count"] += 1
         values = list(profiles.values())
         available = bool(values) and all(p["source_url"] is not None for p in values)
@@ -130,8 +120,6 @@ def attach_solar_sources(
     rules = [r for r in evidence["rulesets"] if r["ruleset_id"] == policy_id]
     if len(rules) != 1 or any(r["rule_id"] == TRACE_ID for r in evidence["rule_trace"]):
         raise NumerologySourceError("runtime_numerology_solar_source_conflict")
-    else:
-        pass
     rules[0]["source_url"] = profiles["source_url"]
     evidence["rule_trace"].append(
         dict(

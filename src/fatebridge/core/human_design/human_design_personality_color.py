@@ -101,8 +101,6 @@ def personality_color_reading(
     text = "；".join(parts) + "。" if parts else ""
     if value["status"] != "computed":
         text += "缺少一致Color对点的部分未生成类别。"
-    else:
-        pass
     if comparison and comparison.get("personality_colors_changed"):
         same_code = (
             comparison["variable_codes"]["before"]
@@ -113,8 +111,6 @@ def personality_color_reading(
             if same_code
             else "分别读取同一口径的类别与箭头。"
         )
-    else:
-        pass
     return (
         text
         + "这是来源对数值的传统归类；现实动机、能力及转移／分心状态未由本命计算测量。"

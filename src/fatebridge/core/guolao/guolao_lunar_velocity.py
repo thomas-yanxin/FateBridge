@@ -34,31 +34,23 @@ def _table() -> tuple[dict[str, Any], str]:
     rows = table["rows"]
     if len(rows) != 169 or [r["limit_index"] for r in rows] != list(range(169)):
         raise ValueError("卷45行度表须保留169格，不能补格、删格或改序")
-    else:
-        pass
     for row in rows:
         for key in ["fast_ancient_du_per_limit", "slow_ancient_du_per_limit"]:
             value = row[key]
             if row["limit_index"] == 168:
                 if value is not None:
                     raise ValueError("卷45末限原刊为空，不能按周期回填")
-                else:
-                    pass
             elif (
                 not isinstance(value, str)
                 or not re.fullmatch(r"[01]\.\d{4}", value)
                 or Fraction(value) <= 0
             ):
                 raise ValueError("卷45行度须为原刊四位小数正值；不代填缺数")
-            else:
-                pass
     if (
         table["profile_id"] != PROFILE
         or table["angular_profile_id"] != GUJIN_COMPONENTS
     ):
         raise ValueError("具名行度与角差参数不符，不能混参")
-    else:
-        pass
     if (
         Fraction(table["anomalistic_month_days"]),
         Fraction(table["half_anomalistic_month_days"]),
@@ -71,8 +63,6 @@ def _table() -> tuple[dict[str, Any], str]:
         Fraction("0.0820"),
     ):
         raise ValueError("卷45周期、限率或定朔单位不符，不重新缩放")
-    else:
-        pass
     return table, hashlib.sha256(blob).hexdigest()
 
 
@@ -80,8 +70,6 @@ def gujin45_lunar_velocity(anomaly_days: Fraction) -> dict[str, Any]:
     """Look up the unreflected whole limit; never interpolate or mirror rows."""
     if not isinstance(anomaly_days, Fraction):
         raise TypeError("入转须为Fraction原历日数，不接收现代JD浮点值")
-    else:
-        pass
     table, digest = _table()
     phase = anomaly_days % Fraction(table["anomalistic_month_days"])
     half = Fraction(table["half_anomalistic_month_days"])
@@ -109,8 +97,6 @@ def gujin45_lunar_velocity(anomaly_days: Fraction) -> dict[str, Any]:
             "agrees": Fraction(velocity) == Fraction(reflected_value),
             "comparison_used_to_replace_selected_value": False,
         }
-    else:
-        pass
     return {
         "model_id": table["model_id"],
         "profile_id": PROFILE,
@@ -153,8 +139,6 @@ def gujin45_time_correction(
     for value in [solar_signed_du, lunar_signed_du]:
         if not isinstance(value, Fraction):
             raise TypeError("盈缩、迟疾须为Fraction有符号原历古度")
-        else:
-            pass
     velocity = gujin45_lunar_velocity(anomaly_days)
     v = velocity["velocity_ancient_du_per_limit_exact"]
     correction = (
@@ -204,8 +188,6 @@ def _table_event_from_angles(
             Fraction(moon["anomaly_phase_days_exact"]),
         )
         correction = Fraction(step["time_correction_days_exact"])
-    else:
-        pass
     offset = Fraction(angles["mean_conjunction_offset_from_winter_days_exact"])
     mean_total = zhongji_days + Fraction("55.06") + offset
     total = mean_total + correction if correction is not None else None
@@ -276,10 +258,6 @@ def gujin_four_extras_table_days(zhongji_days: Fraction) -> dict[str, Any]:
             length = last - first
             if valid:
                 diagnostic_day = event_total // 1 - first + 1
-            else:
-                pass
-        else:
-            pass
         factors[key] = {
             "mean_lunation_candidate_index": index,
             "candidate_contains_event_civil_day": valid,

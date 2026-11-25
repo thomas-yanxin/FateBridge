@@ -30,15 +30,11 @@ def _fuyi_elements(day_element: Element, strength: str) -> list[Element]:
             controller,
             DESTRUCTION_CYCLE[day_element],
         ]
-    else:
-        pass
     if strength == "弱":
         parent = next(
             e for e, generated in GENERATION_CYCLE.items() if generated == day_element
         )
         return [day_element, parent]
-    else:
-        pass
     return []
 
 
@@ -115,8 +111,6 @@ class ElementAnalysis:
         total = sum(element_counts.values())
         if total == 0:
             return {elem.value: 0.0 for elem in Element}
-        else:
-            pass
 
         percentages = {}
         for element, count in element_counts.items():
@@ -133,8 +127,6 @@ class ElementAnalysis:
             # 把残差并到占比最大的元素上，使总和恰为 100%。
             max_key = max(percentages.keys(), key=lambda k: percentages[k])
             percentages[max_key] = round(percentages[max_key] + residual, 1)
-        else:
-            pass
 
         return percentages
 
@@ -198,8 +190,6 @@ class ElementAnalysis:
                         "ten_god": ten_god_relationship.value,
                     }
                 )
-            else:
-                pass
 
             # Analyze hidden stems in branch
             hidden_stems_in_branch = BRANCH_HIDDEN_STEMS[pillar_branch]
@@ -232,14 +222,10 @@ class ElementAnalysis:
             if element_enum.value == day_master_analysis["day_element"]:
                 day_master_element = element_enum
                 break
-            else:
-                pass
         if day_master_element is None:
             raise ValueError(
                 f"Unknown day element: {day_master_analysis['day_element']!r}"
             )
-        else:
-            pass
 
         assessment = day_master_analysis.get("assessment", {})
         if (
@@ -248,8 +234,6 @@ class ElementAnalysis:
             or assessment.get("status") == "boundary_sensitive"
         ):
             return []
-        else:
-            pass
         return _fuyi_elements(
             day_master_element,
             day_master_analysis["engineering_index"]["strength_level"],
@@ -265,8 +249,6 @@ class ElementAnalysis:
             or adjudication["body_strength"] is None
         ):
             return []
-        else:
-            pass
         return _fuyi_elements(
             Element(day_master_analysis["day_element"]), adjudication["body_strength"]
         )
@@ -313,7 +295,5 @@ class ElementAnalysis:
             result["warning"] = (
                 f"百分比总和异常: {result['percentage_validation']['total']}%"
             )
-        else:
-            pass
 
         return result

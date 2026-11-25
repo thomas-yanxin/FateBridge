@@ -86,31 +86,19 @@ def validate_profiles(god_profile: str, season_profile: str) -> None:
     ]:
         if not isinstance(value, str) or value not in profiles:
             raise ValueError(f"{name}仅支持：{', '.join(profiles)}")
-        else:
-            pass
 
 
 def star_season_relation(star_element: str, month_element: str) -> str:
     if star_element not in ELEMENT_GENERATES or month_element not in ELEMENT_GENERATES:
         raise ValueError("九星旺衰须使用木火土金水五行")
-    else:
-        pass
     if star_element == month_element:
         return "same_element"
-    else:
-        pass
     if ELEMENT_GENERATES[star_element] == month_element:
         return "star_generates_month"
-    else:
-        pass
     if ELEMENT_GENERATES[month_element] == star_element:
         return "month_generates_star"
-    else:
-        pass
     if ELEMENT_CONTROLS[star_element] == month_element:
         return "star_controls_month"
-    else:
-        pass
     return "month_controls_star"
 
 
@@ -183,8 +171,6 @@ def god_evidence(god: str) -> dict[str, Any]:
             "source": YANYI_VOLUMES[4],
             "scan_pages": [63, 65, 67, 69],
         }
-    else:
-        pass
     result = {
         **common,
         "interpretation_status": "source_scoped_role",
@@ -195,6 +181,4 @@ def god_evidence(god: str) -> dict[str, Any]:
             "原文附有得奇门会合则不忌的条件；此处不凭神名判断该条件已满足。"
         )
         result["qualification_evaluated"] = False
-    else:
-        pass
     return result

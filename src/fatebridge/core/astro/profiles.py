@@ -26,8 +26,6 @@ def native_factor_model(body_id: int, returned_flags: int) -> str:
     """
     if runtime.swe is not None and body_id == runtime.swe.MEAN_NODE:
         return ANALYTICAL_MEAN_NODE_MODEL
-    else:
-        pass
     return runtime.ephemeris_model_from_retflag(returned_flags)
 
 
@@ -36,12 +34,8 @@ def physical_ephemeris_summary(models: Mapping[str, str]) -> str:
     physical = {model for name, model in models.items() if name not in NODE_BODIES}
     if not physical:
         return "none"
-    else:
-        pass
     if len(physical) == 1:
         return next(iter(physical))
-    else:
-        pass
     return "mixed"
 
 
@@ -87,12 +81,8 @@ def _derive_engine_profile(
 def _precision_label_zh(engine_precision: str) -> str:
     if engine_precision == "ephemeris_runtime_model":
         return "离线高精度"
-    else:
-        pass
     if engine_precision == "mixed_precision_runtime_model":
         return "离线混合精度"
-    else:
-        pass
     return "离线近似"
 
 
@@ -118,8 +108,6 @@ def _coerce_house_system_code(hsys: object) -> int | None:
     resolved (caller raises a descriptive error)."""
     if hsys is None:
         return None
-    else:
-        pass
     try:
         return house_system_fields(hsys)["house_system_code"]
     except InvalidHouseSystemError:
@@ -132,14 +120,10 @@ def _resolve_offline_house_system(hsys: Any, *, context_label: str) -> dict[str,
         raise ValueError(
             f"{context_label}离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为第10宫宫头的等宫制）。"
         )
-    else:
-        pass
     if runtime.swe is None and resolved != 0:
         raise ValueError(
             f"当前环境缺少 swisseph，{context_label}离线模式仅能在 hsys=0(整宫制) 下运行。"
         )
-    else:
-        pass
     return {"value": resolved, **RELATIVE_HOUSE_SYSTEM_SPECS[resolved]}
 
 
@@ -162,8 +146,6 @@ def _resolve_core_chart_house_system(
                 "label_zh": CORE_CHART_DEFAULT_HOUSE_LABELS_ZH[default_house_system],
                 "source": "variant_default",
             }
-        else:
-            pass
         # For swisseph-backed defaults (e.g. "equal_mc"), look up the full spec so
         # _relative_house_layout has the swisseph_code it needs.  We do NOT call
         # _resolve_offline_house_system here because that raises when swe is None;
@@ -175,8 +157,6 @@ def _resolve_core_chart_house_system(
                     **spec,
                     "source": "variant_default",
                 }
-            else:
-                pass
         return {
             "value": None,
             "key": default_house_system,
@@ -185,8 +165,6 @@ def _resolve_core_chart_house_system(
             ),
             "source": "variant_default",
         }
-    else:
-        pass
     return {
         **_resolve_offline_house_system(hsys, context_label="核心星盘"),
         "source": "explicit",
@@ -208,8 +186,6 @@ def _resolve_offline_zodiacal_mode(
         raise ValueError(
             f"{context_label}离线模式暂仅支持 zodiacal=0(回归黄道) 或 zodiacal=1(恒星黄道/Lahiri)。"
         )
-    else:
-        pass
     return {
         "value": resolved,
         "zodiac": "sidereal" if resolved == 1 else "tropical",
@@ -238,8 +214,6 @@ def _resolve_core_chart_zodiacal_mode(
             ),
             "source": "variant_default",
         }
-    else:
-        pass
     return {
         **_resolve_offline_zodiacal_mode(
             zodiacal,
@@ -261,6 +235,4 @@ def _relative_zodiac_profile_overrides(
     }
     if ayanamsha is not None:
         overrides["ayanamsha"] = round(ayanamsha, 4)
-    else:
-        pass
     return overrides

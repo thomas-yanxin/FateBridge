@@ -37,7 +37,7 @@ Pareto比较采用已知的逐条规则维度、改变物件数、移动距离�
 
 同日后续在修改实现前固定了输入、原始失败和门槛，实际编译运行[CGAL 6.2.1](https://github.com/CGAL/cgal/releases/tag/v6.2.1)的旋转扫描可见性和三维凸包；使用其支持的Boost `cpp_rational`精确有理内核。初始计划的Gmpq内核因本机缺MPFR头文件改用等价精确内核，原计划及构建失败保留，没有修改数值线。CGAL、DEAP仅用于仓库外的参考采集，没有新增产品依赖。
 
-CGAL原发布库包SHA-256为`8e7ce1e30e8ffcb3e69d153c3a561bb1f38bbb4becd8e6544cbaa0fb2889af62`。参考还实际使用固定mpmath 1.3.0的90位运算、DEAP 1.4.3原始`Fitness.dominates`及`sortNondominated`；对应版本、采集驱动和输出哈希、输入与范围保存在[固定小型参考包](../tests/data/fengshui_geometry_cgal_v1/README.md)。Shapely没有作为独立真值。
+参考还实际使用固定mpmath 1.3.0的90位运算、DEAP 1.4.3原始`Fitness.dominates`及`sortNondominated`；对应版本、采集驱动和输出哈希、输入与范围保存在[固定小型参考包](../tests/data/fengshui_geometry_cgal_v1/README.md)。Shapely没有作为独立真值。
 
 | 步骤 | 固定案例数 | 原失败 | 修改后 | 原门槛／范围 |
 | --- | ---: | ---: | --- | --- |

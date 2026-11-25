@@ -88,8 +88,6 @@ def policy_for(key: str, model: type[BaseModel]) -> ReproducibilityPolicy:
         )
     elif key == "jieqi_timeline_analysis":
         clock_fields = ("target_year",)
-    else:
-        pass
     return ReproducibilityPolicy(
         current_time_fields=clock_fields,
         implicit_current_time=key == "analyze_destiny",

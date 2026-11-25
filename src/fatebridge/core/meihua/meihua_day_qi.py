@@ -32,8 +32,6 @@ def _profile() -> dict[str, Any]:
     )
     if value["id"] != "meihua_day_qi_nlc1925_v1" or value["version"] != "1.0.0":
         raise ValueError("Unknown selected day-qi profile")
-    else:
-        pass
     return value
 
 
@@ -46,12 +44,8 @@ def normalize_day_qi_context(
 ) -> dict[str, Any] | None:
     if context is None:
         return None
-    else:
-        pass
     if topic == "weather":
         raise ValueError("所选日气体用条款仅用于人事分支，不能套用天时占")
-    else:
-        pass
     return MeihuaDayQiContext.model_validate(context).model_dump(mode="json")
 
 
@@ -80,8 +74,6 @@ def civil_day_qi_context(moment: datetime, *, bazi_day_ganzhi: str) -> dict[str,
                 "day_boundary": "zi_start",
             }
         )
-    else:
-        pass
     return {
         "origin": "computed_from_selected_civil_clock",
         "selected_candidate_id": "local_midnight",
@@ -182,8 +174,6 @@ def _reading(
                 raise ValueError(
                     "Day and month strength must refer to the same actual role"
                 )
-            else:
-                pass
             month_label = month["strength"] if month else None
             agreement = (
                 "month_context_missing"
@@ -272,13 +262,9 @@ def _reading(
     summary = f"{label}取{selected['day_element']}气，原体{body['name']}的日气标记为{body_row['day_strength']}，符号关系为{selected['day_relation_label']}。"
     if body_row["month_day_comparison"] == "different_labels_no_aggregation":
         summary += f"月令标记{body_row['month_strength']}与日气标记{body_row['day_strength']}并存，未作平均、抵消或净旺衰裁定。"
-    else:
-        pass
     if context["boundary_changes_day_branch"]:
         alternate = candidates[1]
         summary += f"23时另保留子初换日口径：{alternate['calendar']['date']}{alternate['calendar']['ganzhi']}、{alternate['day_element']}气，原体日气标记{alternate['roles'][0]['day_strength']}；不能把附带八字日柱冒作所选午夜日。"
-    else:
-        pass
     summary += "日应与时令偏好另列，年月日完整合参尚未成立，不据此推断现实成败或应期。"
     return {
         "ruleset_id": _profile()["id"],
@@ -317,8 +303,6 @@ def apply_day_qi(
     interpretation["day_qi"] = None
     if interpretation["interpretation_topic"] == "weather":
         return
-    else:
-        pass
     if context is not None:
         interpretation["day_qi"] = _reading(
             cast,
@@ -329,8 +313,6 @@ def apply_day_qi(
             month_strength=cast.get("seasonal_strength"),
             month_path="meihua.seasonal_strength",
         )
-    else:
-        pass
     suffix = interpretation["day_qi"]["summary"] if context is not None else ""
     for index, row in enumerate(interpretation.get("casting_readings") or []):
         row["day_qi"] = (
@@ -352,9 +334,5 @@ def apply_day_qi(
                 + "候选日气另核："
                 + row["day_qi"]["summary"]
             )
-        else:
-            pass
     if suffix:
         interpretation["comprehensive_judgement"] += suffix
-    else:
-        pass

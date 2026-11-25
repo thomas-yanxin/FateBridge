@@ -47,8 +47,6 @@ def horizon_altitude(
         or not -90 <= ecliptic_latitude <= 90
     ):
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     if runtime.swe is not None:
         try:
             result = runtime.ephemeris_call(
@@ -71,8 +69,6 @@ def horizon_altitude(
             except (IndexError, TypeError, ValueError, OverflowError) as error:
                 raise EphemerisSourceError("coordinate_values_unavailable") from error
             return require_altitude(altitude), "swisseph_true_altitude"
-    else:
-        pass
     lam, beta, phi = map(
         math.radians, (ecliptic_longitude, ecliptic_latitude, latitude)
     )

@@ -92,8 +92,6 @@ class MoiraMansionBoundaries:
     def __post_init__(self) -> None:
         if len(self.points) != 28:
             raise ValueError("Moira mansion boundaries require all28 source points")
-        else:
-            pass
         object.__setattr__(
             self, "points", tuple(Fraction(p) % 360 for p in self.points)
         )
@@ -116,8 +114,6 @@ def _source_placements(value: str) -> tuple[MoiraGodPlacement, ...]:
         branch, separator, name = entry.partition(":")
         if not separator or not branch or not name:
             raise ValueError("Moira god resource requires branch:name entries")
-        else:
-            pass
         placements.append(MoiraGodPlacement(branch, name))
     return tuple(placements)
 
@@ -129,13 +125,9 @@ def _source_enabled(
 ) -> bool:
     if name in defaults:
         return defaults[name]
-    else:
-        pass
     for first, second in pairs:
         if name == second:
             return defaults.get(first, True)
-        else:
-            pass
     return True
 
 
@@ -144,29 +136,21 @@ def load_provider_profile(path: Path) -> MoiraProviderProfile:
     document: object = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(document, dict):
         raise ValueError("Moira provider profile must be an object")
-    else:
-        pass
     identity: dict[str, str] = {}
     for key in ("profile_id", "source_commit", "source_property_sha256", "source_url"):
         value = document.get(key)
         if not isinstance(value, str):
             raise ValueError(f"Moira provider profile requires string {key}")
-        else:
-            pass
         identity[key] = value
     raw_resources = document.get("resources")
     if not isinstance(raw_resources, dict):
         raise ValueError("Moira provider profile requires resources")
-    else:
-        pass
     resources: dict[str, str] = {}
     for key, value in raw_resources.items():
         if not isinstance(key, str) or not isinstance(value, str):
             raise ValueError(
                 "Moira provider resources must have string keys and values"
             )
-        else:
-            pass
         resources[key] = value
     selections: dict[str, tuple[str, ...]] = {}
     for key in ("selected_gods", "selected_bodies"):
@@ -175,8 +159,6 @@ def load_provider_profile(path: Path) -> MoiraProviderProfile:
             isinstance(item, str) for item in value
         ):
             raise ValueError(f"Moira provider profile requires string list {key}")
-        else:
-            pass
         selections[key] = tuple(item for item in value if isinstance(item, str))
 
     zodiac = _source_array(resources["zodiac"])
@@ -188,19 +170,13 @@ def load_provider_profile(path: Path) -> MoiraProviderProfile:
         raise ValueError(
             "Moira provider profile requires its three source12-place orders"
         )
-    else:
-        pass
     if len(labels) != 28 or len(names) != 28:
         raise ValueError(
             "Moira provider profile requires all28 mansion labels and queries"
         )
-    else:
-        pass
     corrections = {name: float(resources[name]) for name in names}
     if not all(math.isfinite(value) for value in corrections.values()):
         raise ValueError("Moira source star corrections must be finite")
-    else:
-        pass
     anchors = tuple(
         MoiraMansionAnchor("," + name, label, corrections[name])
         for name, label in zip(names, labels)
@@ -215,14 +191,10 @@ def load_provider_profile(path: Path) -> MoiraProviderProfile:
         raise ValueError(
             "Moira provider profile requires source60years/10stems/12branches"
         )
-    else:
-        pass
     if any(len(values) <= long_life_index for values in year_data.values()):
         raise ValueError(
             "Moira year resources do not contain the long-life source field"
         )
-    else:
-        pass
     long_life_starts: dict[str, int] = {}
     for start_record in _source_array(resources["long_life_pos"]):
         element, start = start_record.split(":", 1)
@@ -230,8 +202,6 @@ def load_provider_profile(path: Path) -> MoiraProviderProfile:
     long_life_stages = _source_array(resources["long_life_signs"])
     if len(long_life_stages) != 12:
         raise ValueError("Moira long-life cycle requires all12 source stages")
-    else:
-        pass
 
     year_gods = {
         year: _source_placements(resources[resources["star_sky_earth_key"] + year])
@@ -263,8 +233,6 @@ def load_provider_profile(path: Path) -> MoiraProviderProfile:
         start, separator, target = resources[qi_name + stem].partition(":")
         if not separator or start not in zodiac or target not in zodiac:
             raise ValueError("Moira qi source requires two source palace branches")
-        else:
-            pass
         qi_seeds[stem] = (start, target)
 
     tables = (year_gods, stem_gods, branch_gods, month_gods, month_hour_gods)
@@ -278,8 +246,6 @@ def load_provider_profile(path: Path) -> MoiraProviderProfile:
     paired_values = _source_array(resources["star_equ_map"])
     if len(paired_values) % 2:
         raise ValueError("Moira source god aliases require pairs")
-    else:
-        pass
     paired_gods = tuple(zip(paired_values[::2], paired_values[1::2]))
     master_defaults: dict[str, bool] = {}
     for name in _source_array(resources["master_list"]):
@@ -312,19 +278,13 @@ def load_provider_profile(path: Path) -> MoiraProviderProfile:
                 for name in generated:
                     if _source_enabled(name, master_defaults, paired_gods):
                         requirements.setdefault(name, set()).update(needed)
-                    else:
-                        pass
     for name in long_life_stages:
         if _source_enabled(name, master_defaults, paired_gods):
             requirements.setdefault(name, set()).add("year_pillar")
-        else:
-            pass
     if _source_enabled(qi_name, master_defaults, paired_gods):
         requirements.setdefault(qi_name, set()).update(
             ("year_pillar", "selected_luminary")
         )
-    else:
-        pass
     for first, second in paired_gods:
         combined = requirements.get(first, set()) | requirements.get(second, set())
         requirements.setdefault(first, set()).update(combined)
@@ -423,20 +383,12 @@ def resolve_source_provider_facts(
             shifted_stem = profile.stems[(stem_index + shift) % 10]
             _, target = profile.qi_seeds[shifted_stem]
             head.append(MoiraGodPlacement(target, profile.qi_name))
-        else:
-            pass
         add_entries(profile.branch_gods[year[1]])
-    else:
-        pass
     if calendar.month_pillar is not None:
         month = calendar.month_pillar[1]
         add_entries(profile.month_gods[month])
         if calendar.hour_branch is not None:
             add_entries(profile.month_hour_gods[month + calendar.hour_branch])
-        else:
-            pass
-    else:
-        pass
 
     source_palaces: dict[str, str] = {}
     for palace in profile.full_zodiac:
@@ -445,15 +397,11 @@ def resolve_source_provider_facts(
                 entry.name, profile.master_defaults, profile.paired_gods
             ):
                 source_palaces[entry.name] = palace
-            else:
-                pass
     for first, second in profile.paired_gods:
         if first in source_palaces:
             source_palaces[second] = source_palaces[first]
         elif second in source_palaces:
             source_palaces[first] = source_palaces[second]
-        else:
-            pass
     for name in profile.selected_gods:
         missing = []
         for requirement in profile.god_requirements[name]:
@@ -468,10 +416,6 @@ def resolve_source_provider_facts(
                     missing.append("source day/night")
                 elif ("日" if is_day else "月") not in coordinates:
                     missing.append("selected source luminary longitude")
-                else:
-                    pass
-            else:
-                pass
         if missing:
             unavailable["@" + name] = "Missing " + ", ".join(missing) + " for @" + name
         elif name in source_palaces:
@@ -523,8 +467,6 @@ def resolve_source_provider_facts(
                 if contains:
                     mansion = profile.anchors[index - 1].label
                     break
-                else:
-                    pass
                 previous = point
             mansions[name] = mansion
             booleans[name + "宿歧"] = any(
@@ -556,8 +498,6 @@ def resolve_source_provider_facts(
                 for key, value in mansion_boundaries.provenance.items()
             }
         )
-    else:
-        pass
     return MoiraProviderResolution(
         MoiraSourceFacts(
             palaces=MappingProxyType(palaces),

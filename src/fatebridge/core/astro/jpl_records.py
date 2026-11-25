@@ -28,8 +28,6 @@ class SourceRecords:
         self.header = stream.read(RECORD_BYTES)
         if len(self.header) != RECORD_BYTES or self.signature[2] != info["bytes"]:
             raise EphemerisSourceError("jpl_kinematics_invalid")
-        else:
-            pass
         orders = [
             o
             for o in ("<", ">")
@@ -37,8 +35,6 @@ class SourceRecords:
         ]
         if len(orders) != 1:
             raise EphemerisSourceError("jpl_kinematics_invalid")
-        else:
-            pass
         self.order = orders[0]
         self.start, self.end, self.step = struct.unpack_from(
             self.order + "3d", self.header, 2652
@@ -52,8 +48,6 @@ class SourceRecords:
             or self.end != info["end_julian_day_tdb"]
         ):
             raise EphemerisSourceError("jpl_kinematics_invalid")
-        else:
-            pass
         self.cache: dict[int, tuple[float, ...]] = {}
         self.receipts: dict[int, dict[str, Any]] = {}
         self.cells: set[tuple] = set()
@@ -63,14 +57,10 @@ class SourceRecords:
             os.fstat(self.stream.fileno())
         ) or self.signature != _signature(self.path.stat()):
             raise EphemerisSourceError("changed_during")
-        else:
-            pass
 
     def record(self, epoch: Fraction) -> tuple[float, ...]:
         if not Fraction(self.start) <= epoch <= Fraction(self.end):
             raise EphemerisSourceError("jpl_kinematics_outside_source")
-        else:
-            pass
         index = min(
             int((epoch - Fraction(self.start)) // Fraction(self.step)),
             int((self.end - self.start) / self.step) - 1,
@@ -81,16 +71,12 @@ class SourceRecords:
             self.check()
             if len(raw) != RECORD_BYTES:
                 raise EphemerisSourceError("jpl_kinematics_invalid")
-            else:
-                pass
             values = struct.unpack(self.order + "1018d", raw)
             if not all(math.isfinite(x) for x in values) or values[:2] != (
                 self.start + index * self.step,
                 self.start + (index + 1) * self.step,
             ):
                 raise EphemerisSourceError("jpl_kinematics_invalid")
-            else:
-                pass
             self.cache[index] = values
             self.receipts[index] = {
                 "index": index,
@@ -98,15 +84,11 @@ class SourceRecords:
                 "start": values[0],
                 "end": values[1],
             }
-        else:
-            pass
         return self.cache[index]
 
     def pointer(self, group: int) -> tuple[int, int, int]:
         if not 0 <= group <= 10:
             raise EphemerisSourceError("jpl_kinematics_invalid")
-        else:
-            pass
         offset, count, parts = struct.unpack_from(
             self.order + "3i", self.header, 2696 + 12 * group
         )
@@ -117,8 +99,6 @@ class SourceRecords:
             and offset + 3 * count * parts - 1 <= 1018
         ):
             raise EphemerisSourceError("jpl_kinematics_invalid")
-        else:
-            pass
         return offset, count, parts
 
     def evidence(self) -> dict[str, Any]:

@@ -62,8 +62,6 @@ def describe_hidden_targets(stem: str, branch: str) -> dict[str, Any]:
     """Enumerate every literal hidden stem once, with no fitted force quantity."""
     if stem + branch not in SEXAGENARY_INDEX:
         raise ValueError("同柱藏干关系需要六十甲子中的完整干支")
-    else:
-        pass
     return _describe_literal_hidden_targets(stem, branch)
 
 
@@ -71,8 +69,6 @@ def _describe_literal_hidden_targets(stem: str, branch: str) -> dict[str, Any]:
     """Observe literal source characters without inventing a calendar origin."""
     if stem not in STEM_ELEMENTS or branch not in BRANCH_HIDDEN_STEMS:
         raise ValueError("字面藏干关系需要有效的单字天干和地支")
-    else:
-        pass
     element = STEM_ELEMENTS[stem][0]
     targets = []
     for index, hidden in enumerate(BRANCH_HIDDEN_STEMS[branch]):
@@ -157,12 +153,8 @@ def hidden_carrier_snapshot_lines(receipt: Mapping[str, Any]) -> list[str]:
             lines.append(
                 f"{labels[row['position']]}{row['pillar']}：干克本柱藏干{names}；仅在这些藏干为所喜时列盖头候选。"
             )
-        else:
-            pass
     if lines:
         lines.append(
             "藏干目标与支本气分别列示；生克关系未裁定真实喜忌、作用程度、救应或根损。"
         )
-    else:
-        pass
     return lines

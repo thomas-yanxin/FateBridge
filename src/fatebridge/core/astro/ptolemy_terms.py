@@ -57,8 +57,6 @@ def terms_at(longitude: float, chart_sect: str) -> dict[str, dict[str, Any]]:
     """
     if chart_sect not in {"day", "night"}:
         raise ValueError("Chaldaean terms require an explicit day or night condition")
-    else:
-        pass
     longitude = normalize_angle(longitude)
     index = int(longitude // 30)
     degree = longitude % 30
@@ -91,7 +89,5 @@ def terms_at(longitude: float, chart_sect: str) -> dict[str, dict[str, Any]]:
                     "chapter_ref": chapter,
                 }
                 break
-            else:
-                pass
             start = end
     return result

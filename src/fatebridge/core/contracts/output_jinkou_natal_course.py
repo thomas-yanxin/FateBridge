@@ -18,21 +18,15 @@ def shared_compare(a: Any, b: Any) -> None:
     elif isinstance(a, list) and isinstance(b, list):
         if len(a) != len(b):
             raise ValueError("本命另课须保留同次分析队列")
-        else:
-            pass
         for x, y in zip(a, b):
             shared_compare(x, y)
     elif type(a) is not type(b) or a != b:
         raise ValueError("本命另课与本次占时、本命来源或课盘依据不一致")
-    else:
-        pass
 
 
 def expected_metadata(value: dict[str, Any]) -> dict[str, Any] | None:
     if not {"birth_year_ganzhi", "natal_branch", "natal_branch_source"} <= value.keys():
         return None
-    else:
-        pass
     source = value["natal_branch_source"]
     if not isinstance(source, str) or source not in {
         "explicit_natal_branch",
@@ -40,8 +34,6 @@ def expected_metadata(value: dict[str, Any]) -> dict[str, Any] | None:
         "missing",
     }:
         raise ValueError("本命另课来源无效")
-    else:
-        pass
     return natal_course_metadata(
         value["birth_year_ganzhi"],
         value["natal_branch"] if source == "explicit_natal_branch" else None,
@@ -52,30 +44,20 @@ def validate_natal_course(parent: dict[str, Any]) -> None:
     value = parent.get("natal_course")
     if value is None:
         return
-    else:
-        pass
     if not isinstance(value, dict):
         raise ValueError("本命另课须为资料对象")
-    else:
-        pass
     expected = expected_metadata(value)
     if expected is not None:
         compare({k: v for k, v in value.items() if k != "course"}, expected)
-    else:
-        pass
     child = value.get("course")
     if child is not None and not isinstance(child, dict):
         raise ValueError("本命另课课盘须为对象或未知")
-    else:
-        pass
     if (
         "status" in value
         and "course" in value
         and (child is not None) != (value["status"] == "calculated")
     ):
         raise ValueError("本命未知不能生成另课，明确已算不能丢失另课")
-    else:
-        pass
     annual = parent.get("year_fate")
     if isinstance(annual, dict):
         shared_compare(
@@ -86,16 +68,12 @@ def validate_natal_course(parent: dict[str, Any]) -> None:
                 if k in annual
             },
         )
-    else:
-        pass
     boards = [parent] + ([child] if isinstance(child, dict) else [])
     for board in boards:
         natal = ((board.get("relations") or {}).get("si_jue") or {}).get("natal")
         if isinstance(natal, dict):
             if "right_branch" in natal and "natal_branch" in value:
                 shared_compare(value["natal_branch"], natal["right_branch"])
-            else:
-                pass
             if "input_source" in natal and "natal_branch_source" in value:
                 shared_compare(
                     (
@@ -105,25 +83,15 @@ def validate_natal_course(parent: dict[str, Any]) -> None:
                     ),
                     natal["input_source"],
                 )
-            else:
-                pass
-        else:
-            pass
     if isinstance(child, dict):
         if any(k in child for k in ["year_fate", "natal_course"]):
             raise ValueError("本命另课不得递归另起年命课")
-        else:
-            pass
         overview = child.get("overview")
         if isinstance(overview, dict):
             if "di_fen" in overview and "natal_branch" in value:
                 shared_compare(overview["di_fen"], value["natal_branch"])
-            else:
-                pass
             if "di_fen_source" in overview:
                 compare(overview["di_fen_source"], "natal_branch_derived_course")
-            else:
-                pass
             main = parent.get("overview")
             if isinstance(main, dict):
                 shared_compare(
@@ -139,16 +107,8 @@ def validate_natal_course(parent: dict[str, Any]) -> None:
                         if k in main
                     },
                 )
-            else:
-                pass
-        else:
-            pass
         if "calendar_policy" in parent and "calendar_policy" in child:
             shared_compare(parent["calendar_policy"], child["calendar_policy"])
-        else:
-            pass
-    else:
-        pass
     traces = [
         t
         for t in parent.get("rule_trace") or []
@@ -156,35 +116,23 @@ def validate_natal_course(parent: dict[str, Any]) -> None:
     ]
     if len(traces) > 1:
         raise ValueError("本命另课推导轨迹不能重复")
-    else:
-        pass
     if expected is not None:
         for trace in traces:
             compare(trace, natal_course_trace(expected))
-    else:
-        pass
 
 
 def require_complete_natal_course(parent: dict[str, Any]) -> None:
     value = parent.get("natal_course")
     if not isinstance(value, dict):
         raise ValueError("完整金口诀须保留可空的本命另课资料")
-    else:
-        pass
     expected = expected_metadata(value)
     if expected is None or set(expected) | {"course"} != set(value):
         raise ValueError("完整本命另课缺少输入、来源或范围说明")
-    else:
-        pass
     validate_natal_course(parent)
     if value["course"] is not None:
         overview = value["course"].get("overview") or {}
         if not {"di_fen", "di_fen_source"} <= overview.keys():
             raise ValueError("完整本命另课须保留派生地分")
-        else:
-            pass
-    else:
-        pass
     traces = [
         t
         for t in parent.get("rule_trace") or []
@@ -192,5 +140,3 @@ def require_complete_natal_course(parent: dict[str, Any]) -> None:
     ]
     if len(traces) != 1 or traces[0] != natal_course_trace(expected):
         raise ValueError("完整本命另课须有唯一完整依据轨迹")
-    else:
-        pass

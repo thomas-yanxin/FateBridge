@@ -137,34 +137,22 @@ def build_native_subject(
 ) -> NativeSubject:
     if (local_datetime is None) == (physical_epoch is None):
         raise ValueError("Supply exactly one civil datetime or physical epoch")
-    else:
-        pass
     chart_timezone = parse_timezone_name(timezone_name)
     if local_datetime is not None and local_datetime.utcoffset() is None:
         local_datetime = local_datetime.replace(tzinfo=chart_timezone)
         validate_local_clock(local_datetime)
-    else:
-        pass
     if not math.isfinite(longitude) or not -180 <= longitude <= 180:
         raise ValueError("Invalid chart longitude")
-    else:
-        pass
     if not math.isfinite(latitude) or not -90 < latitude < 90:
         raise ValueError("Chart latitude must be strictly between the geographic poles")
-    else:
-        pass
     if zodiac_type not in {"Tropic", "Tropical", "Sidereal"}:
         raise ValueError("Unsupported zodiac_type; use Tropic, Tropical or Sidereal")
-    else:
-        pass
     # Swiss distinguishes the two Sunshine variants I/i.
     code = house_system if house_system == "i" else house_system.upper()
     if len(code) != 1 or not code.isascii():
         raise ValueError(
             "Timing house system must resolve to one Swiss Ephemeris letter"
         )
-    else:
-        pass
     civil: UTCCalendar | None
     utc_label: str | None
     if physical_epoch is None:
@@ -191,8 +179,6 @@ def build_native_subject(
         raise ModuleNotFoundError(
             "Swiss Ephemeris is required for predictive chart positions"
         )
-    else:
-        pass
     native_tt = tt.as_float()
     sidereal = zodiac_type == "Sidereal"
     offset = native_lahiri_ayanamsha(julian_day_tt=native_tt) if sidereal else 0.0
@@ -241,8 +227,6 @@ def build_native_subject(
     asc = (float(angles[0]) - offset) % 360
     if code == "W":
         cusps = [(int(asc // 30) * 30 + index * 30) % 360 for index in range(12)]
-    else:
-        pass
     house_projection = (
         build_ecliptic_house_projection(
             julian_day_ut1=times.ut1,
@@ -282,8 +266,6 @@ def build_native_subject(
                     lon, asc, "whole_sign" if code == "W" else "cusps", cusps
                 )
             )
-        else:
-            pass
         return NativePoint(
             name,
             lon,
@@ -313,8 +295,6 @@ def build_native_subject(
             raise ValueError(
                 f"Native ephemeris failed for {planet}; predictive charts cannot use an orbital approximation"
             )
-        else:
-            pass
         state, model = result
         assert_physical_configuration(selected_path)
         models[planet] = model
@@ -394,16 +374,10 @@ def build_native_subject(
     }
     if angle_definition is not None:
         basis["angle_definition"] = angle_definition
-    else:
-        pass
     if house_projection is not None:
         basis["house_position_projection"] = house_projection.metadata()
-    else:
-        pass
     if physical_epoch is not None:
         basis["utc_representation"] = physical_epoch.representation()
-    else:
-        pass
     if house_axis_convention is not None:
         if sidereal:
             house_axis_convention = {
@@ -427,23 +401,13 @@ def build_native_subject(
                 for key in ("native_cusps", "delivered_cusps"):
                     if key in precision:
                         precision[key] = [(v - offset) % 360 for v in precision[key]]
-                    else:
-                        pass
                 precision["coordinate_frame"] = "sidereal_lahiri"
                 house_axis_convention["eastern_direction_precision"] = precision
-            else:
-                pass
-        else:
-            pass
         precision = house_axis_convention.get("eastern_direction_precision")
         if precision is not None:
             precision["delivered_ascendant"] = asc
             precision["delivered_cusps"] = cusps
-        else:
-            pass
         basis["house_axis_convention"] = house_axis_convention
-    else:
-        pass
     if projected_clock is not None:
         local_label = (
             None

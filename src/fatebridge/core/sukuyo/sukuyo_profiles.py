@@ -41,16 +41,10 @@ def _fullmoon_from_loaded(
 ) -> dict[str, Any]:
     if type(month) is not int or not 1 <= month <= 12:
         raise ValueError("农历月必须为1..12的整数")
-    else:
-        pass
     if type(day) is not int or not 1 <= day <= 30:
         raise ValueError("农历日必须为1..30的整数")
-    else:
-        pass
     if len(order) != 27 or len(set(order)) != 27 or "牛" in order:
         raise ValueError("望宿法必须使用不含牛的27宿顺序")
-    else:
-        pass
     rows = bundle["fullmoon_anchors"]
     if len(rows) != 12 or any(
         type(row.get("month")) is not int
@@ -59,8 +53,6 @@ def _fullmoon_from_loaded(
         for row in rows
     ):
         raise ValueError("十二月望宿表必须完整、月份唯一且宿名有效")
-    else:
-        pass
     anchors = {
         row["month"]: row["fullmoon_mansion"].translate(_ALIASES) for row in rows
     }
@@ -68,8 +60,6 @@ def _fullmoon_from_loaded(
         name not in order for name in anchors.values()
     ):
         raise ValueError("十二月望宿表必须完整、月份唯一且宿名有效")
-    else:
-        pass
     anchor = anchors[month]
     anchor_index = order.index(anchor)
     # First method: day 15 is the anchor, earlier days count backwards.
@@ -80,8 +70,6 @@ def _fullmoon_from_loaded(
     shortcut = order[(anchor_index + (inclusive_count - 1) % 27) % 27]
     if direct != shortcut:
         raise RuntimeError("原典两种望宿算法不一致，不能静默择一")
-    else:
-        pass
     return {
         "ruleset_id": bundle["id"],
         "lunar_month": month,
@@ -116,20 +104,12 @@ def select_profile(
 ) -> dict[str, Any]:
     if profile not in PROFILES:
         raise ValueError("calendar_profile仅支持t1299_fullmoon27或hinoo_t1299_host27")
-    else:
-        pass
     if day_part is not None and day_part not in DAY_PARTS:
         raise ValueError("calendar_day_part仅支持first_half或second_half")
-    else:
-        pass
     if day_part is not None and profile != HINOO_PROFILE:
         raise ValueError("calendar_day_part只适用于明确选择的hinoo_t1299_host27档案")
-    else:
-        pass
     if leap_policy not in {"unresolved", "repeat_month"}:
         raise ValueError("闰月政策无效")
-    else:
-        pass
     previous_lunar = deepcopy(previous_lunar)
     source = load_source(SOURCE)
     bundle = source.data
@@ -203,8 +183,6 @@ def select_profile(
                             },
                         ],
                     }
-            else:
-                pass
             slots = [
                 {
                     "day_part": "first_half",
@@ -236,8 +214,6 @@ def select_profile(
             precedence_unresolved = day_part == "first_half" and len(first_choices) > 1
             if len(choices) == 1:
                 selected = choices[0]
-            else:
-                pass
             assignment = (
                 {
                     "previous_lunar": previous_lunar,
@@ -252,8 +228,6 @@ def select_profile(
                 if omitted or leap
                 else None
             )
-    else:
-        pass
     effective_leap_policy = "repeat_month" if profile == HINOO_PROFILE else leap_policy
     leap_unresolved = leap and effective_leap_policy == "unresolved"
     resolved = (

@@ -30,21 +30,15 @@ def _build_classical_lines(payload: dict[str, Any]) -> str:
     planets = classical.get("planets", {})
     if not planets:
         return "无"
-    else:
-        pass
     lines: list[str] = []
     if classical.get("solar_condition_policy"):
         lines.append(
             "太阳条件采用Lilly 1647第113页明文：日心≤17′、焦伤<8.5°且同星座、日下<17°；原页10°示例与8.5°定义的冲突尚未解决。"
         )
-    else:
-        pass
     for planet in _CLASSICAL_PLANET_ORDER:
         entry = planets.get(planet)
         if not entry:
             continue
-        else:
-            pass
         essential = entry.get("essential") or {}
         labels = essential.get("labels_zh") or ["未列本质尊贵标签"]
         score = essential.get("score")
@@ -56,24 +50,14 @@ def _build_classical_lines(payload: dict[str, Any]) -> str:
         ]
         if entry.get("sect_placement") == "of_sect":
             parts.append("得宗派")
-        else:
-            pass
         if entry.get("combustion"):
             parts.append(_COMBUSTION_ZH.get(entry["combustion"], entry["combustion"]))
-        else:
-            pass
         if entry.get("retrograde"):
             parts.append("逆行")
-        else:
-            pass
         if entry.get("out_of_bounds"):
             parts.append("出界")
-        else:
-            pass
         if entry.get("joy"):
             parts.append("喜乐宫")
-        else:
-            pass
         lines.append(" ".join(part for part in parts if part))
     return "\n".join(lines).strip() or "无"
 
@@ -93,8 +77,6 @@ def _build_dispositor_lines(payload: dict[str, Any]) -> str:
     chains = dispositors.get("chains", {})
     if not chains:
         return "无"
-    else:
-        pass
     finals = dispositors.get("final_dispositors", [])
     finals_zh = (
         "、".join(PLANET_LABELS_ZH.get(p, p) for p in finals) or "无（多为互含/循环）"
@@ -104,8 +86,6 @@ def _build_dispositor_lines(payload: dict[str, Any]) -> str:
         info = chains.get(planet)
         if not info:
             continue
-        else:
-            pass
         arrow = "→".join(PLANET_LABELS_ZH.get(p, p) for p in info.get("chain", []))
         lines.append(f"{arrow}（{_TERMINAL_ZH.get(info.get('terminal_type'), '')}）")
     return "\n".join(lines).strip()
@@ -116,8 +96,6 @@ def _build_lots_lines(payload: dict[str, Any]) -> str:
     lots = payload.get("classical", {}).get("lots", {})
     if not lots:
         return "无"
-    else:
-        pass
     lines = []
     for lot in lots.values():
         sign_zh = SIGN_LABELS_ZH.get(lot.get("sign"), lot.get("sign", "?"))
@@ -138,8 +116,6 @@ def _build_classical_patterns_lines(payload: dict[str, Any]) -> str:
     patterns = payload.get("classical_patterns", {})
     if not patterns:
         return "无"
-    else:
-        pass
 
     def zh(planet: str) -> str:
         return PLANET_LABELS_ZH.get(planet, planet)
@@ -155,8 +131,6 @@ def _build_classical_patterns_lines(payload: dict[str, Any]) -> str:
                 f"{zh(o['overcomer'])}凌驾{zh(o['overcome'])}" for o in overcoming
             )
         )
-    else:
-        pass
     besiegement = patterns.get("besiegement", {})
     if besiegement:
         lines.append(
@@ -165,23 +139,15 @@ def _build_classical_patterns_lines(payload: dict[str, Any]) -> str:
                 f"{zh(p)}{_BESIEGE_ZH.get(s, s)}" for p, s in besiegement.items()
             )
         )
-    else:
-        pass
     bonification = patterns.get("bonification", {})
     for planet, info in bonification.items():
         parts = []
         if info["bonified_by"]:
             parts.append("吉化←" + "·".join(zh(p) for p in info["bonified_by"]))
-        else:
-            pass
         if info["maltreated_by"]:
             parts.append("凶伤←" + "·".join(zh(p) for p in info["maltreated_by"]))
-        else:
-            pass
         if parts:
             lines.append(f"{zh(planet)}：{'　'.join(parts)}")
-        else:
-            pass
     for hand in patterns.get("translation_of_light", []):
         lines.append(
             f"光的传递（结构候选）：{zh(hand['translator'])} 自 {zh(hand['from'])} 递光至 {zh(hand['to'])}"
@@ -195,8 +161,6 @@ def _build_classical_patterns_lines(payload: dict[str, Any]) -> str:
         lines.append(
             "传光／聚光已核对传统轻重次序与当前入出相；真实先后、接纳、阻碍／折返及完整Lilly成事条件尚未核验，不能据候选断成败。"
         )
-    else:
-        pass
     bending = patterns.get("nodal_bending", [])
     if bending:
         side_zh = {"north": "北弯", "south": "南弯"}
@@ -207,8 +171,6 @@ def _build_classical_patterns_lines(payload: dict[str, Any]) -> str:
                 for b in bending
             )
         )
-    else:
-        pass
     policy = patterns.get("application_policy", {})
     if policy.get("rule_id") == "instantaneous_longitude_phase_v1":
         phase_zh = {
@@ -231,23 +193,15 @@ def _build_classical_patterns_lines(payload: dict[str, Any]) -> str:
                 }.get(condition.get("status"))
                 if label:
                     line += f"（{label}）"
-                else:
-                    pass
-            else:
-                pass
             return line
 
         if motion:
             lines.append(
                 "相位运动（瞬时黄经）：" + "；".join(motion_line(row) for row in motion)
             )
-        else:
-            pass
         lines.append(
             "入出相仅按当前黄经与相对速度判定；精确、同速及速度未知分别列示。合相黄纬同侧条件在逐项证据中单列（可为缺项），未检验未来成相及完整原典条件。"
         )
-    else:
-        pass
     return "\n".join(lines).strip()
 
 
@@ -257,8 +211,6 @@ def _build_temperament_lines(payload: dict[str, Any]) -> str:
     temperament = classical.get("temperament")
     if not temperament:
         return "无"
-    else:
-        pass
     tally = temperament.get("tally")
     if tally is None:
         lines = ["气质：未知（上升及其守护星分量无法确定）。"]
@@ -274,27 +226,17 @@ def _build_temperament_lines(payload: dict[str, Any]) -> str:
         entry = (classical.get("planets") or {}).get(planet)
         if not entry:
             continue
-        else:
-            pass
         planet_zh = PLANET_LABELS_ZH.get(planet, planet)
         if entry.get("dodekatemorion"):
             sign = entry["dodekatemorion"]
             dodeka.append(f"{planet_zh}→{SIGN_LABELS_ZH.get(sign, sign)}")
-        else:
-            pass
         if entry.get("ninth_part"):
             sign = entry["ninth_part"]
             ninth.append(f"{planet_zh}→{SIGN_LABELS_ZH.get(sign, sign)}")
-        else:
-            pass
     if dodeka:
         lines.append("12分度：" + " ".join(dodeka))
-    else:
-        pass
     if ninth:
         lines.append("九分部：" + " ".join(ninth))
-    else:
-        pass
     return "\n".join(lines).strip()
 
 
@@ -302,8 +244,6 @@ def _build_topic_almuten_line(payload: dict[str, Any]) -> str:
     topic = payload.get("classical", {}).get("topic_almutens", {})
     if not topic:
         return "无"
-    else:
-        pass
     parts = []
     for house in sorted(topic, key=lambda h: int(h)):
         winner = topic[house].get("winner")
@@ -329,8 +269,6 @@ def _build_almuten_figuris_line(payload: dict[str, Any]) -> str:
     method = figuris.get("method") or {}
     if not winner and not method:
         return "无"
-    else:
-        pass
     totals = figuris.get("totals", {})
     lines = (
         [f"命主：{PLANET_LABELS_ZH.get(winner, winner)}（{totals.get(winner, 0)}分）"]
@@ -357,8 +295,6 @@ def _build_almuten_figuris_line(payload: dict[str, Any]) -> str:
         )
         if not included:
             lines.append("无可用参与点。")
-        else:
-            pass
         missing = method.get("missing_points", [])
         if missing:
             lines.append(
@@ -366,18 +302,12 @@ def _build_almuten_figuris_line(payload: dict[str, Any]) -> str:
                 + "、".join(_FIGURIS_POINT_ZH.get(point, point) for point in missing)
                 + "。"
             )
-        else:
-            pass
-    else:
-        pass
     points = figuris.get("points", {})
     point_parts = []
     for point_id in ("Sun", "Moon", "Ascendant", "fortune", "syzygy"):
         info = points.get(point_id)
         if not info:
             continue
-        else:
-            pass
         ruler = info.get("winner")
         point_parts.append(
             f"{_FIGURIS_POINT_ZH.get(point_id, point_id)}→"
@@ -385,8 +315,6 @@ def _build_almuten_figuris_line(payload: dict[str, Any]) -> str:
         )
     if point_parts:
         lines.append("点主：" + " ".join(point_parts))
-    else:
-        pass
     syzygy = classical.get("syzygy")
     if isinstance(syzygy, dict):
         sign = str(syzygy.get("sign") or "?")
@@ -398,18 +326,12 @@ def _build_almuten_figuris_line(payload: dict[str, Any]) -> str:
         )
         if (syzygy.get("ephemeris_source") or {}).get("models_stable") is False:
             lines.append("朔望搜索发生星历模型切换；请结合来源回执读取。")
-        else:
-            pass
         representation = syzygy.get("utc_representation") or {}
         if representation.get("datetime_representable") is False:
             lines.append(
                 "朔望采用扩展纪年或特殊UTC标签；Python日期表示受限，"
                 "已保留TT／UT1及计算星位。"
             )
-        else:
-            pass
-    else:
-        pass
     return "\n".join(lines).strip()
 
 
@@ -418,13 +340,9 @@ def _build_fixed_stars_lines(payload: dict[str, Any]) -> str:
     profile = payload.get("chart_profile", {}).get("fixed_stars") or {}
     if profile.get("status") == "unavailable":
         return profile.get("note_zh") or "恒星层未计算"
-    else:
-        pass
     hits = payload.get("fixed_stars")
     if not isinstance(hits, list) or not hits:
         return "无"
-    else:
-        pass
     point_zh = {**PLANET_LABELS_ZH, "Ascendant": "上升", "Midheaven": "中天"}
     lines = []
     for hit in hits:
@@ -443,8 +361,6 @@ def _build_fixed_stars_lines(payload: dict[str, Any]) -> str:
                 + qualifiers[item["qualifier"]]
                 for item in hit["nature_components"]
             )
-        else:
-            pass
         lines.append(
             f"{hit.get('cn', '')}({hit.get('star', '?')}) 合 {point}"
             f" {_format_degree(hit.get('orb'))}　[{nature}]"
@@ -457,8 +373,6 @@ def _build_planetary_hours_line(payload: dict[str, Any]) -> str:
     hours = payload.get("planetary_hours")
     if not isinstance(hours, dict) or not hours.get("hour_ruler"):
         return "无"
-    else:
-        pass
     period = "昼" if hours.get("is_day") else "夜"
     hour_ruler = PLANET_LABELS_ZH.get(hours["hour_ruler"], hours["hour_ruler"])
     day_ruler = hours.get("day_ruler")

@@ -71,8 +71,6 @@ def activity_day_reading_lines(
     if day.get("kenyu_lingbi_reference"):
 
         lines.extend(lingbi_reading_lines(day["kenyu_lingbi_reference"]))
-    else:
-        pass
     if personal:
         relation = personal["relation"]
         lines.append(
@@ -86,15 +84,11 @@ def activity_day_reading_lines(
             lines.append(
                 f"下卷异文：{alternative['meaning']}（{alternative['locator']}）"
             )
-        else:
-            pass
         if personal["textual_conflict"]:
             subject = "业日所作" if relation["relation"] == "業" else "危日婚姻"
             lines.append(
                 f"{subject}的所选原文存在宜忌冲突，保留已列相反见证，不投票或互相覆盖。"
             )
-        else:
-            pass
         witnesses = personal.get("source_day_evidence")
         if witnesses:
             for row in witnesses["witnesses"]:
@@ -107,10 +101,6 @@ def activity_day_reading_lines(
             lines.append(
                 f"三九与长行历：{priority['meaning']}（{priority['locator']}）"
             )
-        else:
-            pass
-    else:
-        pass
     doctrine = day.get("conjunction_doctrine") or {}
     group = doctrine.get("selected_group")
     if group:
@@ -121,10 +111,6 @@ def activity_day_reading_lines(
             lines.append(
                 "此组九宿成员由27宿序扣除已列六宿及十二宿推得；原文本段没有逐宿列名。"
             )
-        else:
-            pass
-    else:
-        pass
     lower = day.get("lower_mansion_day") or {}
     for note in lower.get("mapping_notes", []):
         lines.append(
@@ -143,8 +129,6 @@ def activity_day_reading_lines(
                 + "／".join(dict.fromkeys(excerpts))
                 + f"{condition}（{rule['locator']}）；未据此补造事项或实际行为。"
             )
-    else:
-        pass
     for issue in lower.get("textual_issues", []):
         lines.append(
             f"下卷逐宿文本问题：{issue['issue']}（{issue['locator']}）"
@@ -157,8 +141,6 @@ def activity_day_reading_lines(
     if day.get("palace_reference"):
 
         lines.append(render_palace_reference(day["palace_reference"]))
-    else:
-        pass
     directions = day.get("directional_travel")
     if directions and directions["selected_records"]:
         lines.append(
@@ -188,29 +170,21 @@ def activity_day_reading_lines(
                     "两章同向出行证言相反，分别保留，未据此改变本次事项匹配状态；"
                     "未声明出行方向时仍是条件参考。"
                 )
-            else:
-                pass
             for variant in record["textual_variants"]:
                 lines.append(
                     f"方向校记：{variant['literal']}（{variant['locator']}）；未替换大正主文。"
                 )
-    else:
-        pass
     if directions:
         if name and not directions["selected_records"]:
             lines.append(
                 f"下卷行动禁闭法未找到已识别的{name}宿方向条文；"
                 "空匹配不能证明准许或禁止某行向，不能补齐未列方向。"
             )
-        else:
-            pass
         for issue in directions.get("textual_issues", []):
             lines.append(
                 f"方向原文校勘问题：{issue['issue']}（{issue['locator']}）；"
                 "未定选择字及另一见证的增删均未改写当前主文或事项。"
             )
-    else:
-        pass
     activity = day.get("activity_assessment")
     direction_names = {
         "northbound_journey": "向北出行",
@@ -229,8 +203,6 @@ def activity_day_reading_lines(
             + "、".join(direction_names[d] for d in declared_directions)
             + "；行向不自动代表远行。"
         )
-    else:
-        pass
     if directions and directions.get("candidate_records"):
         complete = calendar.get("profile_calculation", {}).get(
             "candidate_set_complete_under_declared_reconstructions"
@@ -261,8 +233,6 @@ def activity_day_reading_lines(
         lines.append(
             "以上只核对各候选条文与已声明行向，未代入未定主宿或顶层事项；不能将一支方向相符提升为全案宜行。"
         )
-    else:
-        pass
     if activity:
         if activity.get("activity_details"):
             lines.append(
@@ -273,8 +243,6 @@ def activity_day_reading_lines(
                 )
                 + "；只呈现已声明输入，推导分类另列，不补其他事实。"
             )
-        else:
-            pass
         if activity.get("detail_inferences"):
             lines.append(
                 "行为分类仅从已声明细节推出："
@@ -284,8 +252,6 @@ def activity_day_reading_lines(
                 )
                 + "；未推断方向、路程、付款方式或其他事实。"
             )
-        else:
-            pass
         topic = {
             "social": "社交",
             "marriage": "婚姻",
@@ -333,22 +299,14 @@ def activity_day_reading_lines(
                         + "、".join(direction_names[d] for d in required)
                         + "；不能将已知其他行向说成方向全部未知。"
                     )
-                else:
-                    pass
                 lines.append(
                     f"{rule['rule_id']}：{rule['meaning']}；条件为{rule['topic_condition']}（{rule['locator']}）。"
                 )
-        else:
-            pass
-    else:
-        pass
     if not activity:
         lines.append(
             "本次没有事项输入，以上保留各层文献证言，未形成事项汇总；"
             "不据一般吉日、单条宜慎或来源标签裁决现实行动。"
         )
-    else:
-        pass
 
     lines.extend(candidate_day_lines(day.get("candidate_mansion_days", [])))
     return lines

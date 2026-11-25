@@ -30,15 +30,11 @@ from fatebridge.core.metaphysics.jinkou_patterns import (
 def _identity(value: Any, keys: tuple[str, ...]) -> dict[str, Any] | None:
     if value.id is None:
         return None
-    else:
-        pass
 
     expected = pattern_identity(value.id)
     for key in keys:
         if key in value.model_fields_set and getattr(value, key) != expected[key]:
             raise ValueError("课钤ID所指课名、页码或条件与所选定义不一致")
-        else:
-            pass
     return expected
 
 
@@ -80,8 +76,6 @@ class JinkouPatternFact(PartialOutput):
     def validate_present_atomic_calculation(self) -> "JinkouPatternFact":
         if self.operation is None or self.operands is None:
             return self
-        else:
-            pass
 
         try:
             result, reference = evaluate_fact(self.operation, self.operands)
@@ -89,12 +83,8 @@ class JinkouPatternFact(PartialOutput):
             raise ValueError("课钤条件输入不完整或不合法") from error
         if "matched" in self.model_fields_set and self.matched is not result:
             raise ValueError("课钤原子条件与自身计算输入不符")
-        else:
-            pass
         if "reference" in self.model_fields_set and self.reference != reference:
             raise ValueError("课钤原子条件的查表依据不符")
-        else:
-            pass
         return self
 
 
@@ -124,37 +114,21 @@ class JinkouPatternEvaluation(PartialOutput):
                 _identity(self, ("reason",))
                 if self.matched is not None or self.condition_groups is not None:
                     raise ValueError("未裁定课钤不能取得布尔结论或已裁定表达式")
-                else:
-                    pass
                 if self.status not in (None, "unresolved_definition"):
                     raise ValueError("此课钤ID的原典定义仍未裁定")
-                else:
-                    pass
             elif self.status == "unresolved_definition":
                 raise ValueError("已实现条件的缺项不能改称原典定义未裁定")
-            else:
-                pass
-        else:
-            pass
         if self.condition_groups is not None:
             if not self.condition_groups or any(not g for g in self.condition_groups):
                 raise ValueError("已实现课钤不能用空表达式伪造成立")
-            else:
-                pass
             if any(
                 not t.fact_id or t.expected is None
                 for group in self.condition_groups
                 for t in group
             ):
                 raise ValueError("课钤条件须保留事实ID与明确要求值")
-            else:
-                pass
             if self.status == "unresolved_definition":
                 raise ValueError("未裁定义不可以已评估表达式代替")
-            else:
-                pass
-        else:
-            pass
         # A field projection may contain only one fact. Validate their
         # relationship only when both were actually supplied.
         if {"status", "matched"} <= self.model_fields_set:
@@ -166,10 +140,6 @@ class JinkouPatternEvaluation(PartialOutput):
             }
             if self.status in expected and self.matched is not expected[self.status]:
                 raise ValueError("格局判定状态与matched三态值不一致")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -193,8 +163,6 @@ class JinkouPatternMatch(PartialOutput):
         expected = _identity(self, ("name", "alias", "original_pdf_page", "condition"))
         if expected is not None and expected["unresolved"]:
             raise ValueError("未裁定课钤不能进入命中列表")
-        else:
-            pass
         return self
 
 
@@ -208,8 +176,6 @@ class JinkouUnresolvedPattern(PartialOutput):
         expected = _identity(self, ("name",))
         if expected is not None and expected["unresolved"]:
             _identity(self, ("reason",))
-        else:
-            pass
         return self
 
 
@@ -217,8 +183,6 @@ def _distinct_ids(items: list[Any], label: str) -> set[str]:
     ids = [item.id for item in items]
     if any(not isinstance(value, str) for value in ids) or len(set(ids)) != len(ids):
         raise ValueError(f"六十四课钤{label}缺少ID或ID重复")
-    else:
-        pass
     return set(ids)
 
 
@@ -250,8 +214,6 @@ class JinkouPatterns(PartialOutput):
     ) -> Literal[False] | None:
         if value is not None and value is not False:
             raise ValueError("当前六十四课钤节录未取得完整原典符合认证")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -260,8 +222,6 @@ class JinkouPatterns(PartialOutput):
         for key, expected in pattern_metadata().items():
             if key in self.model_fields_set and getattr(self, key) != expected:
                 raise ValueError("课钤来源、所选规则及适用范围不一致")
-            else:
-                pass
         if self.condition_facts is not None:
 
             actual = _distinct_ids(self.condition_facts, "条件事实")
@@ -273,8 +233,6 @@ class JinkouPatterns(PartialOutput):
             }
             if actual != canonical_fact_ids:
                 raise ValueError("课钤条件事实须保留全部已实现规则的完整队列")
-            else:
-                pass
             required = {
                 "id",
                 "operation",
@@ -289,10 +247,6 @@ class JinkouPatterns(PartialOutput):
                 for f in self.condition_facts
             ):
                 raise ValueError("课钤条件队列的条目须保留完整事实")
-            else:
-                pass
-        else:
-            pass
         matched_ids = (
             _distinct_ids(self.matched, "命中列表")
             if self.matched is not None
@@ -309,52 +263,28 @@ class JinkouPatterns(PartialOutput):
             if self.catalog_count is not None and all(p is not None for p in parts):
                 if sum(p for p in parts if p is not None) != self.catalog_count:
                     raise ValueError("六十四课钤三态计数与完整目录数量不一致")
-                else:
-                    pass
-            else:
-                pass
             if matched_ids is not None and counts.matched is not None:
                 if len(matched_ids) != counts.matched:
                     raise ValueError("六十四课钤命中列表与命中计数不一致")
-                else:
-                    pass
-            else:
-                pass
             if unresolved_ids is not None and counts.unresolved is not None:
                 if len(unresolved_ids) != counts.unresolved:
                     raise ValueError("六十四课钤未决列表与未决计数不一致")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         if self.evaluations is None:
             return self
-        else:
-            pass
         ids = _distinct_ids(self.evaluations, "逐条判定")
         if ids != {f"P{i:02}" for i in range(1, 65)}:
             raise ValueError("六十四课钤逐条判定必须保留完整64个ID")
-        else:
-            pass
         if any(
             not {"status", "matched"} <= row.model_fields_set or row.status is None
             for row in self.evaluations
         ):
             raise ValueError("六十四课钤逐条判定缺少三态事实")
-        else:
-            pass
         positive = {row.id for row in self.evaluations if row.matched is True}
         negative = {row.id for row in self.evaluations if row.matched is False}
         unknown = {row.id for row in self.evaluations if row.matched is None}
         if self.evaluated_rule_count is not None:
             if self.evaluated_rule_count != len(positive) + len(negative):
                 raise ValueError("六十四课钤已评估数量与逐条三态不一致")
-            else:
-                pass
-        else:
-            pass
         if counts is not None:
             for key, expected in (
                 ("matched", len(positive)),
@@ -364,18 +294,12 @@ class JinkouPatterns(PartialOutput):
                 value = getattr(counts, key)
                 if value is not None and value != expected:
                     raise ValueError("六十四课钤三态计数与逐条判定不一致")
-                else:
-                    pass
-        else:
-            pass
         for observed, expected_ids, label in (
             (matched_ids, positive, "命中"),
             (unresolved_ids, unknown, "未决"),
         ):
             if observed is not None and observed != expected_ids:
                 raise ValueError(f"六十四课钤{label}列表与逐条判定不一致")
-            else:
-                pass
         ledger = {row.id: row for row in self.evaluations}
         if self.condition_facts is not None:
             facts = {fact.id: fact for fact in self.condition_facts}
@@ -385,12 +309,8 @@ class JinkouPatterns(PartialOutput):
                 groups = row.condition_groups
                 if groups is None:
                     continue
-                else:
-                    pass
                 if any(term.fact_id not in facts for group in groups for term in group):
                     raise ValueError("课钤表达式引用不存在的计算事实")
-                else:
-                    pass
                 referenced.update(
                     term.fact_id
                     for group in groups
@@ -407,14 +327,8 @@ class JinkouPatterns(PartialOutput):
                 )
                 if row.matched is not result:
                     raise ValueError("课钤结论与条件组计算不一致")
-                else:
-                    pass
             if referenced != set(facts):
                 raise ValueError("课钤条件事实含未被表达式引用的项目")
-            else:
-                pass
-        else:
-            pass
         for items, keys in (
             (self.matched, ("name", "original_pdf_page", "condition")),
             (self.unresolved, ("name", "reason")),
@@ -427,8 +341,4 @@ class JinkouPatterns(PartialOutput):
                             raise ValueError(
                                 "六十四课钤同一ID的依据文字与逐条判定不一致"
                             )
-                        else:
-                            pass
-                    else:
-                        pass
         return self

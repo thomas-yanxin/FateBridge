@@ -85,8 +85,6 @@ def repeated_zi_mao_participants(
         or sum(branches[p] == "卯" for p in positions) != 2
     ):
         return None
-    else:
-        pass
     remaining = [p for p in positions if p not in cover]
     return (
         remaining
@@ -118,13 +116,9 @@ def zi_month_officer_clash_alternative(
         or any(list(branches.values()).count(branch) != 1 for branch in "子卯酉")
     ):
         return None
-    else:
-        pass
     actors = {p for p, branch in branches.items() if branch in "子卯酉"}
     if actors & cover:
         return None
-    else:
-        pass
     alternatives = [
         pair for pair in active_clashes if {branches[p] for p in pair} == {"卯", "酉"}
     ]
@@ -133,6 +127,4 @@ def zi_month_officer_clash_alternative(
         for pair in active_clashes
     ):
         return None
-    else:
-        pass
     return list(alternatives[0])

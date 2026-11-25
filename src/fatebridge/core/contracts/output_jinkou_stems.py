@@ -50,24 +50,18 @@ class JinkouDunStemNode(PartialOutput):
     def compound_matches_its_parts(self) -> "JinkouDunStemNode":
         if self.dun_ganzhi is not None:
             _valid_ganzhi(self.dun_ganzhi)
-        else:
-            pass
         if (
             self.branch is not None
             and self.branch_element is not None
             and branch_element_text(self.branch) != self.branch_element
         ):
             raise ValueError("神将本支五行不能换成遁干五行")
-        else:
-            pass
         if (
             self.dun_stem is not None
             and self.dun_element is not None
             and STEM_ELEMENTS[self.dun_stem][0].value != self.dun_element
         ):
             raise ValueError("遁干五行须来自所列当日遁干")
-        else:
-            pass
         if (
             self.dun_ganzhi is not None
             and self.dun_stem is not None
@@ -75,10 +69,6 @@ class JinkouDunStemNode(PartialOutput):
         ):
             if self.dun_ganzhi != self.dun_stem + self.branch:
                 raise ValueError("神将遁干支与所列干支不一致")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -108,33 +98,19 @@ class JinkouGanzhiPairFacts(PartialOutput):
                 _valid_ganzhi(value)
                 if head is not None and xun_head_for_ganzhi(value) != head:
                     raise ValueError("所列自身旬首须来自该遁干支")
-                else:
-                    pass
-            else:
-                pass
         if self.left_ganzhi is not None and self.right_ganzhi is not None:
             expected = ganzhi_pair_facts(self.left_ganzhi, self.right_ganzhi)
             for name in self.model_fields_set:
                 if name in expected and getattr(self, name) != expected[name]:
                     raise ValueError("配对事实须符合所列两组遁干支")
-                else:
-                    pass
-        else:
-            pass
         if self.stem_harmony_matched is True:
             for name in ("canonical_stem_pair", "candidate_element"):
                 if name in self.model_fields_set and getattr(self, name) is None:
                     raise ValueError("已配对的天干须保留所列候选事实")
-                else:
-                    pass
-        else:
-            pass
         if self.stem_harmony_matched is False and (
             self.candidate_element is not None or self.canonical_stem_pair is not None
         ):
             raise ValueError("未成天干配对不能给出该配对候选五行")
-        else:
-            pass
         if (
             self.stem_harmony_matched is not None
             and self.branch_harmony_matched is not None
@@ -144,10 +120,6 @@ class JinkouGanzhiPairFacts(PartialOutput):
                 self.stem_harmony_matched and self.branch_harmony_matched
             ):
                 raise ValueError("干支俱合与两个分别条件不一致")
-            else:
-                pass
-        else:
-            pass
         if (
             self.left_ganzhi_xun_head is not None
             and self.right_ganzhi_xun_head is not None
@@ -157,10 +129,6 @@ class JinkouGanzhiPairFacts(PartialOutput):
                 self.left_ganzhi_xun_head == self.right_ganzhi_xun_head
             ):
                 raise ValueError("两遁干支自身同旬与所列旬首不一致")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -188,8 +156,6 @@ class JinkouStemRule(PartialOutput):
             self.phase_relation,
         ) != expected:
             raise ValueError("干元类条目标识与其明示方向不一致")
-        else:
-            pass
         return self
 
 
@@ -227,8 +193,6 @@ class JinkouStemRelations(PartialOutput):
             "general_controls_god",
         }:
             raise ValueError("干元类须保留四条不同的明示生克规则")
-        else:
-            pass
         return value
 
     @field_validator("complete_classical_conformance", mode="before")
@@ -236,8 +200,6 @@ class JinkouStemRelations(PartialOutput):
     def no_full_book_claim(cls, value: object) -> Literal[False] | None:
         if value is not None and value is not False:
             raise ValueError("遁干节录不等于整书符合")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -245,8 +207,6 @@ class JinkouStemRelations(PartialOutput):
         for role, node in (("贵神", self.god), ("将神", self.general)):
             if node is not None and node.position is not None and node.position != role:
                 raise ValueError("神干与将干的角色不得交换")
-            else:
-                pass
             if (
                 self.day_stem is not None
                 and node is not None
@@ -263,10 +223,6 @@ class JinkouStemRelations(PartialOutput):
                         and getattr(node, name) != expected_fact
                     ):
                         raise ValueError("当日遁干须符合所列日干与神将本支")
-                    else:
-                        pass
-            else:
-                pass
         if self.guishen_intrinsic_ganzhi is not None:
             _valid_ganzhi(self.guishen_intrinsic_ganzhi)
             if (
@@ -275,10 +231,6 @@ class JinkouStemRelations(PartialOutput):
                 and self.guishen_intrinsic_ganzhi[1] != self.god.branch
             ):
                 raise ValueError("贵神固有干支须与本支一致")
-            else:
-                pass
-        else:
-            pass
         phases: dict[str, str] = {}
         for role, node in (("贵神", self.god), ("将神", self.general)):
             if node is not None:
@@ -289,10 +241,6 @@ class JinkouStemRelations(PartialOutput):
                 )
                 if phase is not None:
                     phases[role] = phase
-                else:
-                    pass
-            else:
-                pass
         if "贵神" in phases and "将神" in phases:
             a, b = phases["贵神"], phases["将神"]
             derived = "两干比和"
@@ -306,39 +254,23 @@ class JinkouStemRelations(PartialOutput):
             for relation, matched in relations:
                 if matched:
                     derived = relation
-                else:
-                    pass
             if self.relation is not None and self.relation != derived:
                 raise ValueError("干类关系须符合实际两遁干五行")
-            else:
-                pass
             if self.rule_evaluations is not None and any(
                 r.matched != phase_matches[r.relation] for r in self.rule_evaluations
             ):
                 raise ValueError("干类条目须符合实际两遁干五行")
-            else:
-                pass
-        else:
-            pass
         if self.relation is not None and self.rule_evaluations is not None:
             matches = [r.relation for r in self.rule_evaluations if r.matched]
             expected = [] if self.relation == "两干比和" else [self.relation]
             if matches != expected:
                 raise ValueError("干类摘要与四条生克事实不一致")
-            else:
-                pass
-        else:
-            pass
         if self.relation is not None and "motion_analogue" in self.model_fields_set:
             expected_motion = {"神干克将干": "贼动同类", "将干克神干": "财动同类"}.get(
                 self.relation
             )
             if self.motion_analogue != expected_motion:
                 raise ValueError("干类动象同类与实际遁干生克不一致")
-            else:
-                pass
-        else:
-            pass
         if self.pair_facts is not None:
             for node, value in (
                 (self.god, self.pair_facts.left_ganzhi),
@@ -351,8 +283,4 @@ class JinkouStemRelations(PartialOutput):
                     and node.dun_ganzhi != value
                 ):
                     raise ValueError("配对干支与神将遁干事实不一致")
-                else:
-                    pass
-        else:
-            pass
         return self

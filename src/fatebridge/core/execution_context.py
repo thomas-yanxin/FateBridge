@@ -30,13 +30,9 @@ def _execution_instant(value: str) -> datetime:
         raise ValueError("as_of must be an ISO 8601 datetime with timezone") from exc
     if not isinstance(clock, UTCCalendar):
         raise ValueError("as_of must include a timezone")
-    else:
-        pass
     instant = clock.as_datetime()
     if instant is None:
         raise ValueError("UTC instant is outside the datetime range")
-    else:
-        pass
     return instant
 
 
@@ -67,8 +63,6 @@ class ExecutionOptions(BaseModel):
     def aware_timestamp(cls, value: str | None) -> str | None:
         if value is None:
             return value
-        else:
-            pass
         return _execution_instant(value).isoformat().replace("+00:00", "Z")
 
 
@@ -94,10 +88,6 @@ def merge_clock_reads(reads: list[str]) -> None:
         for name in reads:
             if name not in clock.reads:
                 clock.reads.append(name)
-            else:
-                pass
-    else:
-        pass
 
 
 @contextmanager
@@ -135,16 +125,12 @@ def current_datetime(
         )
         if name not in clock.reads:
             clock.reads.append(name)
-        else:
-            pass
     if is_unspecified_local_time(local):
         raise ParameterError(
             "执行时刻在所用分析时区没有定义当地钟面。请明确填写缺省的分析日期和时刻，"
             "或用 as_of 指定当地钟面有定义的分析瞬间。",
             [{"path": issue_path, "code": "unresolved_timezone_offset"}],
         )
-    else:
-        pass
     return local
 
 

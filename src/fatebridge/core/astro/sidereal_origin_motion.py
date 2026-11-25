@@ -31,19 +31,13 @@ def circular_origin_correction(
     """Replace only the integer winding of two normalized degree values."""
     if not all(math.isfinite(v) and 0 <= v < 360 for v in (current, previous)):
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     difference = current - previous
     principal = math.remainder(difference, 360.0)
     if abs(principal) == 180:
         raise EphemerisSourceError("coordinate_motion_unavailable")
-    else:
-        pass
     turns = round((difference - principal) / 360.0)
     if abs(turns) > 1 or difference - principal != turns * 360.0:
         raise EphemerisSourceError("coordinate_motion_unavailable")
-    else:
-        pass
     correction = turns * 360.0 / NATIVE_INTERVAL_DAYS
     return correction, turns, difference, principal
 
@@ -76,38 +70,26 @@ def traditional_lahiri_origin_wrap(
             "reason": "unverified_native_version",
         }
         return None
-    else:
-        pass
     if not math.isfinite(julian_day_tt):
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     previous_epoch = julian_day_tt - NATIVE_INTERVAL_DAYS
     if not math.isfinite(previous_epoch) or previous_epoch == julian_day_tt:
         raise EphemerisSourceError("coordinate_motion_unavailable")
-    else:
-        pass
     requested_flags = swe.FLG_SWIEPH | swe.FLG_NONUT
 
     def read(epoch: float) -> tuple[int, float]:
         value = runtime.ephemeris_call("get_ayanamsa_ex", epoch, requested_flags)
         if not isinstance(value, (tuple, list)) or len(value) != 2:
             raise EphemerisSourceError("coordinate_values_unavailable")
-        else:
-            pass
         flags, angle = value
         if flags != requested_flags:
             raise EphemerisSourceError("coordinate_contract_changed")
-        else:
-            pass
         try:
             angle = float(angle)
         except (TypeError, ValueError) as error:
             raise EphemerisSourceError("coordinate_values_unavailable") from error
         if not math.isfinite(angle) or not 0 <= angle < 360:
             raise EphemerisSourceError("coordinate_values_unavailable")
-        else:
-            pass
         return int(flags), angle
 
     # Lock without a path-restoration call: preserve_ephemeris_path resets
@@ -125,15 +107,11 @@ def traditional_lahiri_origin_wrap(
         restored = read(julian_day_tt)
         if restored != (current_flags, current):
             raise EphemerisSourceError("sidereal_origin_not_reproduced")
-        else:
-            pass
         if (
             configured_ephemeris_path() != selected_path
             or configured_jpl_file() != selected_jpl
         ):
             raise EphemerisSourceError("physical_configuration_changed")
-        else:
-            pass
     correction, turns, difference, principal = circular_origin_correction(
         current, previous
     )

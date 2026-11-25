@@ -50,8 +50,6 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
             or not 0 < s["iterations"] < 128
         ):
             raise ValueError("Malformed solar solver numbers")
-        else:
-            pass
         if (
             s["birth_jd_tt"] != birth
             or s["design_jd_tt"] != design
@@ -61,13 +59,9 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
             or s["target_solar_arc_degrees"] != 88.0
         ):
             raise ValueError("Detached solar epoch")
-        else:
-            pass
         p = w["birth_sun_longitude"]
         if type(p) is not float or not math.isfinite(p) or not 0 <= p < 360:
             raise ValueError("Malformed natal solar function value")
-        else:
-            pass
         residuals = []
         for key in ("lower", "upper", "selected"):
             row = w[key]
@@ -78,19 +72,13 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
                 "exact_residual",
             }:
                 raise ValueError("Unexpected endpoint fields")
-            else:
-                pass
             if any(
                 type(row[k]) is not float or not math.isfinite(row[k])
                 for k in ("jd_tt", "sun_longitude", "residual_degrees")
             ):
                 raise ValueError("Malformed endpoint values")
-            else:
-                pass
             if not 0 <= row["sun_longitude"] < 360:
                 raise ValueError("Malformed endpoint angle")
-            else:
-                pass
             residual = (Fraction(p) - Fraction(row["sun_longitude"])) % 360 - 88
             if not _same_value(
                 row["exact_residual"],
@@ -100,8 +88,6 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
                 },
             ) or row["residual_degrees"] != float(residual):
                 raise ValueError("Incorrect exact residual")
-            else:
-                pass
             residuals.append(residual)
         # The root and activations now request the identical native flags.
         # Even an ULP shift contradicts this internal binding. Exact equality
@@ -115,8 +101,6 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
             )
             if not _same_value(actual, observed):
                 raise ValueError("Solar function detached from the assembled Sun")
-            else:
-                pass
         for key in ("lower", "upper"):
             endpoint = next(
                 row
@@ -127,23 +111,17 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
                 endpoint["native_positions"][0][0], w[key]["sun_longitude"]
             ):
                 raise ValueError("Endpoint solar function detached from actual Sun")
-            else:
-                pass
         lo, hi = w["lower"]["jd_tt"], w["upper"]["jd_tt"]
         exact = lo == hi
         if exact:
             if residuals[0] != 0 or not _same_value(w["lower"], w["upper"]):
                 raise ValueError("Not an observed function zero")
-            else:
-                pass
         elif not (
             lo < hi
             and math.nextafter(lo, math.inf) == hi
             and residuals[0] > 0 > residuals[1]
         ):
             raise ValueError("Not a final adjacent bracket")
-        else:
-            pass
         expected = min(
             (w["lower"], w["upper"]),
             key=lambda row: (
@@ -163,8 +141,6 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
             or not 0 <= s["bracket_width_seconds"] <= 0.0002
         ):
             raise ValueError("Wrong selected root")
-        else:
-            pass
         observed = w["local_solar_lattice"]
         initial_lo, initial_hi = (
             observed["initial_lower_jd_tt"],
@@ -180,8 +156,6 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
             or math.nextafter(initial_lo, math.inf) == initial_hi
         ):
             raise ValueError("Not an initial adjacent bracket or zero")
-        else:
-            pass
         lattice = derive_lattice(
             p,
             initial_lo,
@@ -202,13 +176,9 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
             else initial_residuals[0] > 0 > initial_residuals[1]
         ):
             raise ValueError("Initial contact lacks a forward bracket or zero")
-        else:
-            pass
         contact = lattice["preferred_numeric_contact"]
         if contact is None:
             raise ValueError("No observed forward contact")
-        else:
-            pass
         if any(
             not _same_value(
                 {k: w[key][k] for k in ("jd_tt", "sun_longitude", "exact_residual")},
@@ -221,8 +191,6 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
             )
         ):
             raise ValueError("Not the preferred observed forward contact")
-        else:
-            pass
         fixed = {
             "sun_coordinate_policy": SOLAR_COORDINATE_POLICY,
             "local_solar_lattice": lattice,
@@ -312,8 +280,6 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
             "selected",
         } or any(not _same_value(w[k], v) for k, v in fixed.items()):
             raise ValueError("Wrong solar witness or invented precision certificate")
-        else:
-            pass
     except (
         KeyError,
         TypeError,

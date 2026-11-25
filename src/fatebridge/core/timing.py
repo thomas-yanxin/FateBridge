@@ -52,8 +52,6 @@ def _copy_timing_info(info: Dict) -> Dict:
     result = info.copy()
     if "solar_term_window" in info:
         result["solar_term_window"] = deepcopy(info["solar_term_window"])
-    else:
-        pass
     return result
 
 
@@ -389,19 +387,9 @@ class TimingAnalysis:
                     )
                     if reopened is None:
                         return None
-                    else:
-                        pass
                     anchor = reopened.replace(second=0, microsecond=0)
                     if anchor != reopened:
                         anchor += timedelta(minutes=1)
-                    else:
-                        pass
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         while True:
             try:
                 validate_local_clock(anchor)
@@ -411,12 +399,8 @@ class TimingAnalysis:
             anchor_day = utc_calendar(anchor).julian_day_exact()
             if end_day is not None and anchor_day >= end_day:
                 return None
-            else:
-                pass
             if anchor_day > start_day:
                 return anchor
-            else:
-                pass
             anchor += timedelta(minutes=1)
 
     @staticmethod
@@ -536,13 +520,9 @@ class TimingAnalysis:
             liushi_info = TimingAnalysis.calculate_liushi(
                 target_datetime, timezone_name=timezone_name
             )
-        else:
-            pass
 
         if day_stem is None:
             day_stem = birth_pillars["day"][0]
-        else:
-            pass
 
         stem_shishen = get_shishen(day_stem, liushi_info["stem"])
         branch_relations = TimingAnalysis._collect_branch_relations(
@@ -583,8 +563,6 @@ class TimingAnalysis:
         if branch_relations:
             relation_desc = "、".join([r["type"] for r in branch_relations])
             summary_parts.append(f"有{relation_desc}关系")
-        else:
-            pass
 
         return "，".join(summary_parts) + "。"
 
@@ -648,8 +626,6 @@ class TimingAnalysis:
                         "description": f"{label}{target_branch}与{pillar_name}柱{pillar_branch}相冲",
                     }
                 )
-            else:
-                pass
 
             if check_branch_combination(target_branch, pillar_branch):
                 branch_relations.append(
@@ -660,8 +636,6 @@ class TimingAnalysis:
                         "description": f"{label}{target_branch}与{pillar_name}柱{pillar_branch}六合",
                     }
                 )
-            else:
-                pass
 
         return branch_relations
 
@@ -685,13 +659,9 @@ class TimingAnalysis:
                 timezone_name=timezone_name,
                 target_date=target_date,
             )
-        else:
-            pass
 
         if day_stem is None:
             day_stem = birth_pillars["day"][0]
-        else:
-            pass
 
         stem_shishen = get_shishen(day_stem, liuyue_info["stem"])
 
@@ -726,13 +696,9 @@ class TimingAnalysis:
             liuri_info = TimingAnalysis.calculate_liuri(
                 target_date, timezone_name=timezone_name
             )
-        else:
-            pass
 
         if day_stem is None:
             day_stem = birth_pillars["day"][0]
-        else:
-            pass
 
         stem_shishen = get_shishen(day_stem, liuri_info["stem"])
         branch_relations = TimingAnalysis._collect_branch_relations(
@@ -770,8 +736,6 @@ class TimingAnalysis:
         if branch_relations:
             relation_desc = "、".join([r["type"] for r in branch_relations])
             summary_parts.append(f"有{relation_desc}关系")
-        else:
-            pass
 
         return "，".join(summary_parts) + "。"
 
@@ -796,7 +760,5 @@ class TimingAnalysis:
         if branch_relations:
             relation_desc = "、".join([r["type"] for r in branch_relations])
             summary_parts.append(f"有{relation_desc}关系")
-        else:
-            pass
 
         return "，".join(summary_parts) + "。"

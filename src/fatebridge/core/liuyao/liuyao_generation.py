@@ -39,26 +39,16 @@ def target_admission(
         and not observation["pending_supports"]
     ):
         return False, "month_broken_day_controlled_without_independent_root"
-    else:
-        pass
     if facts["is_xunkong"] and not facts["is_day_clash"]:
         return None, "target_current_void_waits_for_filling"
-    else:
-        pass
     if facts["is_month_clash"] and day_value_exception(
         row["branch"], month, day_ganzhi[1]
     ):
         if observation["harms"]:
             return None, "day_value_month_break_other_controls_require_resolution"
-        else:
-            pass
         return True, "day_value_excludes_month_only_admission_obstruction"
-    else:
-        pass
     if month_opposition_applies(row["branch"], month, day_ganzhi[1]):
         return None, "target_month_break_requires_resolution"
-    else:
-        pass
     return True, "no_listed_target_admission_obstruction"
 
 
@@ -142,16 +132,10 @@ def source_explanation(source: dict[str, Any]) -> str:
     """Describe the computed source gate; do not re-adjudicate its predicates."""
     if source["condition_match"] is True:
         return "本爻向外生扶的来源资格已匹配；具体生向与受方条件仍须分别核对。"
-    else:
-        pass
     if source["condition_match"] is False:
         if source["status"] == "own_back_control_obstructs_generation":
             return "本爻受本位回头克，向外生扶受阻；另有生扶不自动解除该阻碍。"
-        else:
-            pass
         return "本爻未匹配所列向外生扶条件；不据此推永久无用或现实失败。"
-    else:
-        pass
     return "本爻向外生扶的来源资格仍待审；不能把待审写成不生，也不能当作已生。"
 
 
@@ -159,12 +143,8 @@ def target_explanation(reception: bool | None) -> str:
     """Receiving eligibility never certifies a particular source or benefit."""
     if reception is True:
         return "作为受生爻，未见所列当前承受障碍；这不证明某一来源已能生扶。"
-    else:
-        pass
     if reception is False:
         return "作为受生爻，本项月破日克且无已核独立根，不能据有生即认定受益。"
-    else:
-        pass
     return "作为受生爻，当前承受门槛仍待审；不以来源有力代替受方资格。"
 
 
@@ -173,8 +153,6 @@ def pair_qualification_explanation(pair: dict[str, Any]) -> str | None:
     permission = pair["target_yin_generation_allowed"]
     if permission is True:
         return None
-    else:
-        pass
     qualification = (
         "巳寅申限定条款排除这一路寅木生扶"
         if permission is False
@@ -210,8 +188,6 @@ def build_generation_conditions(
                 or element_relation(source["element"], target["element"]) != "生爻"
             ):
                 continue
-            else:
-                pass
             s = sources[source["position"]]
             reception, target_status = target_admission(
                 target, observations[target["position"]], month, day_ganzhi
@@ -247,8 +223,6 @@ def build_generation_conditions(
             )
             if note := pair_qualification_explanation(pairs[-1]):
                 pairs[-1]["qualification_explanation"] = note
-            else:
-                pass
     focus = None
     if selected and selected["location"] == "visible":
         p = selected["position"]
@@ -267,8 +241,6 @@ def build_generation_conditions(
             target_explanation=target_explanation(reception),
             scope="仅为本爻作为生源与受方的两项当前资格；不新增生向，不综合总效力。实际变爻、伏神及日月主体不借本爻的资格。",
         )
-    else:
-        pass
     return dict(
         ruleset_id=PROFILE["ruleset_id"],
         ruleset_version=PROFILE["ruleset_version"],

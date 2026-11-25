@@ -22,8 +22,6 @@ class CivilRationalEvidence(PartialOutput):
         """Read a projected coordinate only when both decimal integers exist."""
         if self.numerator is None or self.denominator is None:
             return None
-        else:
-            pass
         return Fraction(int(self.numerator), int(self.denominator))
 
 
@@ -36,12 +34,8 @@ class CivilPointEvidence(CivilRationalEvidence):
         day = self.known_day()
         if day is None or "excluded_before" not in self.model_fields_set:
             return None
-        else:
-            pass
         if self.excluded_before is None:
             return CivilPoint(day)
-        else:
-            pass
         cap = self.excluded_before.known_day()
         return CivilPoint(day, cap) if cap is not None else None
 
@@ -54,8 +48,6 @@ class CivilPointEvidence(CivilRationalEvidence):
             and point.day >= point.excluded_before
         ):
             raise ValueError("民用时刻必须早于其已限定的排除端点")
-        else:
-            pass
         return self
 
 
@@ -74,8 +66,6 @@ class CivilPointLabelEvidence(PartialOutput):
     def display_with_offset(self) -> str | None:
         if self.datetime_utc is not None:
             return self.datetime_utc
-        else:
-            pass
         return self.datetime_with_offset
 
     @model_validator(mode="after")
@@ -89,22 +79,12 @@ class CivilPointLabelEvidence(PartialOutput):
             and (point is None or display is None)
         ):
             raise ValueError("完整的精确民用比较回执须保留主点和显示标签")
-        else:
-            pass
         if self.datetime_utc is not None and self.datetime_with_offset is not None:
             raise ValueError("当地钟时未定义时不能同时声明当地带偏移时间")
-        else:
-            pass
         if display is not None and (point is not None or self.datetime_utc is not None):
             clock = ZonedCalendar.from_isoformat(display)
             if self.datetime_utc is not None and clock.offset != timedelta(0):
                 raise ValueError("节气UTC显示须采用零偏移")
-            else:
-                pass
             if point is not None and point.as_calendar() != clock.utc:
                 raise ValueError("精确民用主点与显示时间不一致")
-            else:
-                pass
-        else:
-            pass
         return self

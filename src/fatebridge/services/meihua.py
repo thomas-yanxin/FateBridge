@@ -120,8 +120,6 @@ def calculate_meihua_cast(
             actual_month_length_validated=False,
             added_count_basis="caller_confirmed_count_not_automatic_glyph_strokes",
         )
-    else:
-        pass
     cast["evidence_scope"]["implemented"][0] = cast["seed"]["casting_method"]
     cast["evidence_scope"]["not_implemented"] = [
         "single_sound_count",
@@ -135,8 +133,6 @@ def calculate_meihua_cast(
     if season_month_branch is None:
         cast["evidence_scope"]["implemented"].remove("season")
         cast["evidence_scope"]["missing_context"] = ["season_month_branch"]
-    else:
-        pass
     interpretation = build_meihua_interpretation(
         cast,
         interpretation_topic=interpretation_topic,
@@ -157,8 +153,6 @@ def calculate_meihua_cast(
             interpretation["comprehensive_judgement"] = general_casting_summary(
                 interpretation["casting_readings"]
             )
-        else:
-            pass
         interpretation["evidence_scope"]["counting_candidate_readings"] = (
             "各候选沿用自身本互变、固定原体和同一已报节月，分别引用实际动爻经文；"
             "不以所选口径的旺衰、生克或爻辞代替另一候选。"
@@ -170,14 +164,10 @@ def calculate_meihua_cast(
         cast["evidence_scope"]["implemented"].append("selected_topic_clauses")
         if interpretation_topic == "wealth":
             cast["evidence_scope"]["implemented"].append("selected_wealth_components")
-        else:
-            pass
         if interpretation_topic == "lost_property":
             cast["evidence_scope"]["implemented"].append(
                 "selected_lost_property_changed_use_location_symbols"
             )
-        else:
-            pass
     interpretation["evidence_scope"]["no_universal_relation_verdict"] = True
     if cast["seed"].get("count_boundary_status") == "convention_changes_result":
         cast["evidence_scope"][
@@ -197,8 +187,6 @@ def calculate_meihua_cast(
             interpretation["evidence_scope"]["counting_convention"]
             + interpretation["comprehensive_judgement"]
         )
-    else:
-        pass
     tone_basis = cast["seed"].get("text_tone_basis")
     if tone_basis is not None:
         cast["evidence_scope"]["text_tone_basis"] = tone_basis
@@ -222,8 +210,6 @@ def calculate_meihua_cast(
             + comparison_note
             + interpretation["comprehensive_judgement"]
         )
-    else:
-        pass
     text_basis = cast["seed"].get("text_count_basis")
     if text_basis is not None:
         cast["evidence_scope"]["text_count_basis"] = text_basis
@@ -237,17 +223,11 @@ def calculate_meihua_cast(
                     "calculation_status"
                 ] = "conditional_on_textual_extent"
                 interpretation["status"] = "conditional_on_textual_extent"
-            else:
-                pass
             interpretation["comprehensive_judgement"] = (
                 "所选影印作百余字，精确上限未裁定；本次数量超过100，按明示软件扩展计算，"
                 "不能据此宣称该数量范围已获原文唯一裁定。"
                 + interpretation["comprehensive_judgement"]
             )
-        else:
-            pass
-    else:
-        pass
     apply_external_omens(
         cast,
         interpretation,
@@ -321,8 +301,6 @@ def calculate_meihua_cast(
         interpretation["comprehensive_judgement"] = (
             observation_basis["summary"] + interpretation["comprehensive_judgement"]
         )
-    else:
-        pass
 
     apply_trigram_relation_symbols(cast, interpretation)
 

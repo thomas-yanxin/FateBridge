@@ -38,8 +38,6 @@ def _source() -> dict[str, Any]:
         ).encode()
         if sha256(canonical).hexdigest() != CONTENT_SHA256:
             raise ValueError("元气相反来源版本内容不符。")
-        else:
-            pass
     except (OSError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_heluo_opposition_source") from exc
     data["loaded_sha256"] = sha256(raw).hexdigest()
@@ -67,8 +65,6 @@ def opposition_evidence(
     cycle = {GAN[i % 10] + ZHI[i % 12] for i in range(60)}
     if not isinstance(year_ganzhi, str) or year_ganzhi not in cycle:
         _conflict()
-    else:
-        pass
     targets = {}
     for kind, symbol in zip(("tian", "di"), year_ganzhi):
         mapping = next(r for r in source["mappings"] if symbol in r["symbols"])
@@ -77,12 +73,8 @@ def opposition_evidence(
         k: r["fan"] for k, r in targets.items()
     }:
         _conflict()
-    else:
-        pass
     if not isinstance(bodies, list) or len(bodies) != 8:
         _conflict()
-    else:
-        pass
     phases = []
     try:
         for phase in ("xian", "hou"):
@@ -90,8 +82,6 @@ def opposition_evidence(
             kinds = [kind for kind, _ in BODY_POSITIONS]
             if len(rows) != 4 or [r["kind"] for r in rows] != kinds:
                 _conflict()
-            else:
-                pass
             by_kind = {r["kind"]: r for r in rows}
             bits = gua_lines(by_kind["upper"]["trigram"], by_kind["lower"]["trigram"])
             name = lines_to_gua(bits)["name"]
@@ -104,8 +94,6 @@ def opposition_evidence(
                     or row["trigram"] != _trigram_of([bits[p - 1] for p in positions])
                 ):
                     _conflict()
-                else:
-                    pass
             conditions = []
             for kind, mapping in targets.items():
                 original = [

@@ -21,8 +21,6 @@ def standalone_reference(commentarial: dict[str, Any]) -> dict[str, Any]:
     cited = next(row for row in commentarial["sources"] if row["id"] == "T2216")
     if data["T2216_context"]["publisher_capture_sha256"] != cited["capture_sha256"]:
         raise ValueError("玄应条目与本次注疏来源不一致，须重新核验")
-    else:
-        pass
     return {
         **data,
         "source_bundle_sha256": loaded.sha256,

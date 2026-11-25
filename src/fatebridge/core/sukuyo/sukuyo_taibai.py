@@ -19,15 +19,11 @@ def taibai_direction_reference(lunar_day: int) -> dict[str, Any]:
         raise ValueError(
             "太白月日方位表只接受实际入月日1至30，不以公历日或补配宿序代替"
         )
-    else:
-        pass
     record = load_source(SOURCE)
     source = record.data
     matches = [row for row in source["rows"] if lunar_day in row["lunar_days"]]
     if len(matches) != 1:
         raise ValueError("太白原文日序必须在所选主表中恰有一行")
-    else:
-        pass
     row = matches[0]
     witnesses = []
     for name, present, excerpt in (

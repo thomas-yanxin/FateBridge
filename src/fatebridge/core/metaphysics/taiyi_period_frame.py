@@ -83,13 +83,9 @@ def previous_solar_term(instant: datetime, names: tuple[str, ...]) -> SolarTerm:
         )
     if not candidates:
         raise ValueError("无法取得起盘之前的太乙节气锚点")
-    else:
-        pass
     term = max(candidates, key=lambda t: t.point.day)
     if not is_calculated_solar_term(term):
         raise ValueError("太乙月/日/时计要求天文节气实刻，不能使用线性近似回退")
-    else:
-        pass
     return term
 
 
@@ -105,16 +101,12 @@ def period_frame(
         or month_profile not in MONTH_PROFILES
     ):
         raise ValueError("month_profile仅用于month，须选择已发布月计配置")
-    else:
-        pass
     if hour_profile is not None and (
         mode != "hour"
         or not isinstance(hour_profile, str)
         or hour_profile not in HOUR_PROFILES
     ):
         raise ValueError("hour_profile仅用于hour计法，须明确选择已发布时计配置")
-    else:
-        pass
     instant = localize_datetime(seed.input_datetime, seed.timezone)
 
     validate_seed_civil_clock(seed)
@@ -132,15 +124,11 @@ def period_frame(
         )
         if term.name not in ("大雪", "小寒"):
             cycle_year -= 1
-        else:
-            pass
         origin = jinjing_month_origin(cycle_year, month_offset)
         accumulation = origin["accumulation"]
         if month_profile == KEY_MONTH_PROFILE:
             origin = key_month_origin(cycle_year, month_offset)
             accumulation = origin["accumulation"]
-        else:
-            pass
         return {
             "accumulation": accumulation,
             "yin": False,
@@ -150,14 +138,10 @@ def period_frame(
             "month_offset": month_offset,
             "month_origin": origin,
         }
-    else:
-        pass
     if mode != "hour":
         raise ValueError(
             "本节月/时计入口仅支持month/hour；其他计法请调用build_taiyi_board"
         )
-    else:
-        pass
     term = previous_solar_term(instant, ("冬至", "夏至"))
     anchor_clock = nominal_clock_label(term.calendar, seed)
     target_clock = nominal_clock_label(instant, seed)
@@ -180,13 +164,9 @@ def period_frame(
             "hour_origin": origin,
             "winter_anchor": winter,
         }
-    else:
-        pass
     accumulation = double_hour_slot(target_clock) - double_hour_slot(anchor_clock) + 1
     if accumulation < 1:
         raise ValueError("太乙时计的时钟序列早于所选至点，不能静默倒推")
-    else:
-        pass
     return {
         "accumulation": accumulation,
         "yin": term.name == "夏至",

@@ -45,12 +45,8 @@ def _exact_target_datetime(
     moment: datetime = validate(value)
     if isinstance(value, bytes):
         value = value.decode()
-    else:
-        pass
     if isinstance(value, str) and _SUBMICROSECOND_TARGET.match(value):
         raise ValueError("Target datetime must be representable to the microsecond")
-    else:
-        pass
     if isinstance(value, float):
         timestamp = Decimal.from_float(value)
     elif isinstance(value, str) and _NUMERIC_TARGET.fullmatch(value):
@@ -66,8 +62,6 @@ def _exact_target_datetime(
     sign, digits, exponent = timestamp.as_tuple()
     if not isinstance(exponent, int):
         raise ValueError("Target timestamp must be finite")
-    else:
-        pass
     scale = 3 if timestamp.copy_abs() > 20_000_000_000 else 6
     microseconds = round(Decimal((sign, digits, exponent + scale)))
     try:
@@ -207,16 +201,10 @@ class AstroGuolaoRequest(AstroChartRequest):
     def _month_limit_requires_target(self) -> "AstroGuolaoRequest":
         if self.ephemeris_policy != "auto":
             raise ValueError("Western ephemeris_policy is not implemented for Guolao")
-        else:
-            pass
         if self.birth_clock_basis != "civil" and self.birth_timezone is not None:
             raise ValueError("Explicit solar birth labels must omit birth_timezone")
-        else:
-            pass
         if self.guolao_month_basis is not None and self.analysis_datetime is None:
             raise ValueError("guolao_month_basis requires analysis_datetime")
-        else:
-            pass
         if self.guolao_seasonal_anchor_policy in {
             "source_solar_days_winter_exclusive",
             "source_solar_days_winter_inclusive",
@@ -226,8 +214,6 @@ class AstroGuolaoRequest(AstroChartRequest):
             raise ValueError(
                 "Solar-day anchors require use_true_solar_time=true or explicit LAT input"
             )
-        else:
-            pass
         return self
 
 
@@ -264,8 +250,6 @@ class AstroSpecialtyRequest(AstroChartRequest):
             raise ValueError(
                 "Local solar birth clocks require birth_timezone omitted and use_true_solar_time=false"
             )
-        else:
-            pass
         return self
 
 
@@ -351,8 +335,6 @@ class AstroIndiaRequest(AstroChartRequest):
     def _distinct_divisions(self) -> "AstroIndiaRequest":
         if len(self.divisions) != len(set(self.divisions)):
             raise ValueError("divisions must not contain duplicates")
-        else:
-            pass
         return self
 
     @model_validator(mode="after")
@@ -363,8 +345,6 @@ class AstroIndiaRequest(AstroChartRequest):
             raise ValueError(
                 "Local solar birth clocks require birth_timezone omitted and use_true_solar_time=false"
             )
-        else:
-            pass
         return self
 
 
@@ -425,8 +405,6 @@ class AstroVimshottariRequest(AstroIndiaRequest):
     def _vedic_configuration(self) -> "AstroVimshottariRequest":
         if self.zodiacal not in {None, 1} or self.hsys not in {None, 0}:
             raise ValueError("Vimshottari uses Lahiri sidereal / whole-sign only")
-        else:
-            pass
         return self
 
 
@@ -508,23 +486,17 @@ class AstroChartPolyRequest(AstroIndiaRequest):
                 "Local solar birth clocks require birth_timezone omitted; "
                 "use_true_solar_time=true is only supported by guolao_chart"
             )
-        else:
-            pass
         return self
 
     @model_validator(mode="after")
     def _india_options_scope(self) -> "AstroChartPolyRequest":
         if self.apparent_model != "native" and self.chart_variant != "chart":
             raise ValueError("apparent_model=opaque_solar requires chart_variant=chart")
-        else:
-            pass
         if self.guolao_seasonal_anchor_policy is not None:
             if self.chart_variant != "guolao_chart":
                 raise ValueError(
                     "guolao_seasonal_anchor_policy requires chart_variant=guolao_chart"
                 )
-            else:
-                pass
             if self.guolao_seasonal_anchor_policy != "term_instants" and not (
                 self.use_true_solar_time
                 or self.birth_clock_basis == "local_apparent_solar"
@@ -532,18 +504,12 @@ class AstroChartPolyRequest(AstroIndiaRequest):
                 raise ValueError(
                     "Solar-day anchors require use_true_solar_time=true or explicit LAT input"
                 )
-            else:
-                pass
-        else:
-            pass
         if self.guolao_month_basis is not None and (
             self.chart_variant != "guolao_chart" or self.analysis_datetime is None
         ):
             raise ValueError(
                 "guolao_month_basis requires chart_variant=guolao_chart and analysis_datetime"
             )
-        else:
-            pass
         if self.birth_clock_basis != "civil":
             if self.chart_variant not in {
                 "germany",
@@ -554,10 +520,6 @@ class AstroChartPolyRequest(AstroIndiaRequest):
                 raise ValueError(
                     "Noncivil birth_clock_basis requires chart_variant=germany, chart13, india_chart or guolao_chart"
                 )
-            else:
-                pass
-        else:
-            pass
         if self.birth_second and self.chart_variant not in {
             "germany",
             "chart13",
@@ -567,8 +529,6 @@ class AstroChartPolyRequest(AstroIndiaRequest):
             raise ValueError(
                 "nonzero birth_second requires chart_variant=germany, chart13, india_chart or guolao_chart"
             )
-        else:
-            pass
         if self.birth_microsecond and self.chart_variant not in {
             "india_chart",
             "guolao_chart",
@@ -576,8 +536,6 @@ class AstroChartPolyRequest(AstroIndiaRequest):
             raise ValueError(
                 "nonzero birth_microsecond requires chart_variant=india_chart or guolao_chart"
             )
-        else:
-            pass
         if self.analysis_datetime is not None and self.chart_variant not in {
             "germany",
             "guolao_chart",
@@ -585,8 +543,6 @@ class AstroChartPolyRequest(AstroIndiaRequest):
             raise ValueError(
                 "analysis_datetime requires chart_variant=germany or guolao_chart"
             )
-        else:
-            pass
         # MCP signatures materialize optional defaults before model validation.
         # Accept that neutral configuration on every existing chart variant;
         # reject Indian settings that would otherwise be silently discarded.
@@ -601,12 +557,8 @@ class AstroChartPolyRequest(AstroIndiaRequest):
             raise ValueError(
                 "custom node_mode/divisions/saptavargaja_profile/drekkana_profile/cheshta_model require chart_variant=india_chart"
             )
-        else:
-            pass
         if self.ephemeris_policy != "auto" and self.chart_variant == "guolao_chart":
             raise ValueError("Western ephemeris_policy is not implemented for Guolao")
-        else:
-            pass
         if (
             self.birth_time_uncertainty_minutes is not None
             and self.chart_variant not in {"india_chart", "germany", "chart13"}
@@ -614,8 +566,6 @@ class AstroChartPolyRequest(AstroIndiaRequest):
             raise ValueError(
                 "birth_time_uncertainty_minutes requires chart_variant=india_chart, germany or chart13"
             )
-        else:
-            pass
         return self
 
     def uses_western_ephemeris_policy(self) -> bool:

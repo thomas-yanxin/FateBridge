@@ -27,20 +27,14 @@ class MonthHourSourceCandidate(PartialOutput):
     def preserve_actual_geometry(self) -> "MonthHourSourceCandidate":
         if self.positions is not None and self.positions != ["month", "hour"]:
             raise ValueError("月时候选必须保留原柱顺序")
-        else:
-            pass
         if self.stems is not None and frozenset(self.stems) not in {
             frozenset(pair) for pair in ("甲己", "乙庚", "丙辛", "丁壬", "戊癸")
         }:
             raise ValueError("月时候选须为实际五合字对")
-        else:
-            pass
         if self.other_matching_stem_positions is not None and len(
             set(self.other_matching_stem_positions)
         ) != len(self.other_matching_stem_positions):
             raise ValueError("其他同字候选柱位不得重复")
-        else:
-            pass
         return self
 
 
@@ -66,10 +60,6 @@ class StemOrderSourceReview(PartialOutput):
                 and any(c.recorded_relation_refs is not None for c in self.candidates)
             ):
                 raise ValueError("关系未供不能补成已给空事件或未记录数")
-            else:
-                pass
-        else:
-            pass
         if (
             self.candidates is not None
             and self.unrecorded_source_candidate_count is not None
@@ -78,8 +68,4 @@ class StemOrderSourceReview(PartialOutput):
             expected = sum(not c.recorded_relation_refs for c in self.candidates)
             if expected != self.unrecorded_source_candidate_count:
                 raise ValueError("未记录数须忠于同次候选及事件引用")
-            else:
-                pass
-        else:
-            pass
         return self

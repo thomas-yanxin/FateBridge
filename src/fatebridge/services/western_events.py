@@ -126,8 +126,6 @@ def calculate_mundane(
                     ("入宫盘星与角", format_snapshot_json(payload)),
                 ]
             )
-        else:
-            pass
         return result
     except Exception as exc:
         return handle_calculation_error(exc, label)
@@ -151,8 +149,6 @@ def calculate_extrareturns(
             raise ValueError(
                 "Unsupported zodiac_type; use Tropic, Tropical or Sidereal"
             )
-        else:
-            pass
         sidereal = zodiac == "sidereal"
         house_system = normalize_house_system(house_system)
         birth_info = build_predictive_birth_info(
@@ -211,8 +207,6 @@ def calculate_extrareturns(
                         }
                     )
                     continue
-                else:
-                    pass
                 raise
             most_recent = resolved.past[-1] if resolved.past else None
             upcoming = resolved.future[0] if resolved.future else None
@@ -225,14 +219,10 @@ def calculate_extrareturns(
                 if event is None:
                     return_moments[key] = None
                     continue
-                else:
-                    pass
                 moment, utc_label = event.utc_datetime, event.utc_label
                 local_label = None
                 if moment is not None:
                     utc_label = moment.isoformat()
-                else:
-                    pass
                 if utc_label is not None:
                     if event.utc_is_leap_second:
                         local_label = local_leap_second_label(utc_label, local_tz)
@@ -245,10 +235,6 @@ def calculate_extrareturns(
                         local = ZonedCalendar(calendar, local_tz)
                         if not is_unspecified_local_time(local.rule_sample()):
                             local_label = local.isoformat()
-                        else:
-                            pass
-                else:
-                    pass
                 event_record: dict[str, JsonValue] = {
                     "datetime_utc": utc_label,
                     "datetime_local": local_label,
@@ -258,8 +244,6 @@ def calculate_extrareturns(
                     event_record["utc_representation"] = utc_representation(
                         utc_label, moment, event.utc_is_leap_second
                     )
-                else:
-                    pass
                 return_moments[key] = event_record
                 if key == "next_return":
                     if local_label is not None:
@@ -268,8 +252,6 @@ def calculate_extrareturns(
                         next_date = f"{utc_label.partition('T')[0]}（UTC）"
                     else:
                         next_date = "UTC 钟面无唯一表示"
-                else:
-                    pass
             body_label = "凯龙星" if body_name == "Chiron" else planet_label(body_name)
             returns.append(
                 {
@@ -316,8 +298,6 @@ def calculate_extrareturns(
                     ("返照时刻", format_snapshot_json(returns)),
                 ]
             )
-        else:
-            pass
         return result
     except Exception as exc:
         return handle_calculation_error(exc, label)

@@ -114,8 +114,6 @@ def _moving_marker(
 ) -> AnnualMarker:
     if type(accumulation) is not int or accumulation < 1:
         raise ValueError("太乙年运积数必须是正整数")
-    else:
-        pass
     cycle_length = len(sequence) * years_per_position
     offset = (accumulation - 1) % cycle_length
     index, in_position = divmod(offset, years_per_position)
@@ -197,8 +195,6 @@ def _source_table() -> dict[str, Any]:
 def annual_long_cycles(year: int) -> AnnualLongCycles:
     if type(year) is not int or not 1 <= year <= 9999:
         raise ValueError("太乙年运需要1至9999之间的整数公元年份")
-    else:
-        pass
     elapsed_years = year - REFERENCE_YEAR
     sanji = SANJI_REFERENCE_ACCUMULATION_YEARS + elapsed_years
     long_count = LONG_CYCLE_REFERENCE_ACCUMULATION_YEARS + elapsed_years
@@ -279,8 +275,6 @@ def long_cycle_text(cycles: dict[str, Any] | None) -> str:
         return (
             "本盘采用月/时计，未附加年度十神；需要年计时以相同资料另选year并分层解释。"
         )
-    else:
-        pass
     lines = [
         f"卷五年度巡行：{cycles['year']}；{cycles['ruleset']['id']}。",
         cycles["interpretation_scope"],
@@ -296,8 +290,6 @@ def long_cycle_text(cycles: dict[str, Any] | None) -> str:
             lines.append(
                 f"本年{record['label']}有异文：正文通则{record['position']}，原表{record['table_position']}（{yuan_label}／{record['table_row']}）；双方保留。"
             )
-        else:
-            pass
     lines.append(
         "直符中元表文与通则仍有分歧；地乙起九有明钞本补证，额外三宫物理对应仍待校勘，不能据这些位置单独断成败。"
     )

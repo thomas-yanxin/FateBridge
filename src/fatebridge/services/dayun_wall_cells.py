@@ -45,8 +45,6 @@ class DayunWallCell:
         low, high = self.wall_range
         if not low <= target <= high:
             return None
-        else:
-            pass
         delta = (target - self.first_wall) // MICROSECOND
         quotient, remainder = divmod(delta, self.slope)
         lower = self.lower + quotient * MICROSECOND
@@ -105,8 +103,6 @@ def build_dayun_wall_cells(
                 == (calendar_offset["years"], calendar_offset["months"])
                 and final_wall - initial_wall == slope * (last - left)
             )
-        else:
-            pass
         cells.append(
             DayunWallCell(
                 lower=left,

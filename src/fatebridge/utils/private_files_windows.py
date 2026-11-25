@@ -6,8 +6,6 @@ import sys
 
 if sys.platform != "win32":
     raise ImportError("private_files_windows requires Windows")
-else:
-    pass
 
 import msvcrt
 import os
@@ -81,8 +79,6 @@ def validate_private_handle(handle: pywintypes.HANDLEType) -> None:
     file_attributes = win32file.GetFileInformationByHandle(handle)[0]
     if file_attributes & win32con.FILE_ATTRIBUTE_REPARSE_POINT:
         raise OSError("Result artifacts cannot be reparse points")
-    else:
-        pass
     descriptor = win32security.GetSecurityInfo(
         handle,
         win32security.SE_FILE_OBJECT,
@@ -97,14 +93,10 @@ def validate_private_handle(handle: pywintypes.HANDLEType) -> None:
         or not acl.GetAceCount()
     ):
         raise RuntimeError("Result artifacts must be owned by and private to this user")
-    else:
-        pass
     for index in range(acl.GetAceCount()):
         ace = acl.GetAce(index)
         if ace[0][0] != win32security.ACCESS_ALLOWED_ACE_TYPE or ace[2] != user_sid:
             raise RuntimeError("Result artifacts must be private to this user")
-        else:
-            pass
 
 
 def ensure_private_directory(path: Path) -> Path:
@@ -114,8 +106,6 @@ def ensure_private_directory(path: Path) -> Path:
     except pywintypes.error as exc:
         if exc.winerror != ERROR_ALREADY_EXISTS:
             raise
-        else:
-            pass
     return validate_private_directory(path)
 
 
@@ -143,8 +133,6 @@ def open_private_file(path: Path, flags: int) -> int:
     access = win32con.GENERIC_READ | win32con.READ_CONTROL
     if flags & (os.O_WRONLY | os.O_RDWR):
         access |= win32con.GENERIC_WRITE
-    else:
-        pass
     creation = (
         win32con.CREATE_NEW
         if flags & os.O_EXCL

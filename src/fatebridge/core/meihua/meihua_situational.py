@@ -24,8 +24,6 @@ def _profile() -> dict[str, Any]:
         or value["version"] != "1.0.0"
     ):
         raise ValueError("Unknown selected situational-response profile")
-    else:
-        pass
     return value
 
 
@@ -43,8 +41,6 @@ def _reading(
         supplied = context[family]
         if supplied is None:
             continue
-        else:
-            pass
         categories = (
             [supplied["direction"]] if family == "querent_position" else supplied
         )
@@ -132,8 +128,6 @@ def _reading(
             )
             if not detail:
                 detail = "原文喜庆象" if category == "heard_laughter" else "原文悲愁象"
-            else:
-                pass
             summaries.append(
                 f"{row['section']}按已报{row['category_label']}列{detail}。"
             )
@@ -147,12 +141,8 @@ def _reading(
         for r in rows
     ):
         summary += "雨雪均取坎象，但原句坎體宜雨只明说雨；已报雪不扩充为宜雪，雨雪未分时宜雨条件待定。"
-    else:
-        pass
     if any(r["unresolved_source_relation_clause"] is not None for r in rows):
         summary += "所选影印‘體見雷為比和’的主语接续未裁定，转录‘火見雷’另存，均不覆盖上述五行关系。"
-    else:
-        pass
     summary += "这些是同次已报条件的传统对应，未合成为现实结果、概率或应期。"
     return {
         "ruleset_id": profile["id"],
@@ -189,12 +179,8 @@ def apply_situational_responses(
     """Use each retained candidate's own body; never alter or select its cast."""
     if context is None:
         return
-    else:
-        pass
     if interpretation["interpretation_topic"] == "weather":
         raise ValueError("十应体用现场条件不能套用天时占")
-    else:
-        pass
     layer = _reading(
         cast["body_trigram"],
         context,

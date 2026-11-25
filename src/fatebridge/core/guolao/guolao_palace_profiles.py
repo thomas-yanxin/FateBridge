@@ -25,8 +25,6 @@ def _fraction(value: Fraction) -> Fraction:
         raise TypeError(
             "须以Fraction明确提供所选原典古度，不能混入浮点、现代黄经或日期"
         )
-    else:
-        pass
     return value
 
 
@@ -36,13 +34,9 @@ def mansion_angle(
     degree = _fraction(degree_du)
     if mansion not in MANSIONS:
         raise ValueError("须提供单个简体宿名；不可用未知宿或默认值")
-    else:
-        pass
     index = MANSIONS.index(mansion)
     if not 0 <= degree < table.widths_du[index]:
         raise ValueError("宿内古度须首含尾不含；越过宿尾须明确提供下一宿")
-    else:
-        pass
     return sum(table.widths_du[:index], Fraction()) + degree
 
 
@@ -66,15 +60,11 @@ class HistoricalPalaceProfile:
     def __post_init__(self) -> None:
         if self.table.coordinate_frame != "source_ecliptic":
             raise ValueError("黄道十二次入口不能套用赤道或未指定坐标系的宿表")
-        else:
-            pass
         object.__setattr__(self, "entrances", tuple(self.entrances))
         if len(self.entrances) != 12 or {e.branch for e in self.entrances} != set(
             BRANCHES
         ):
             raise ValueError("十二次须逐一具备十二个不同辰支")
-        else:
-            pass
         pairs = sorted(
             (
                 (mansion_angle(self.table, e.mansion, e.degree_du), e)
@@ -85,8 +75,6 @@ class HistoricalPalaceProfile:
         starts = tuple(pair[0] for pair in pairs)
         if len(set(starts)) != 12:
             raise ValueError("十二次入口重合，不能强制分摊或重新等分")
-        else:
-            pass
         object.__setattr__(self, "_starts", starts)
         object.__setattr__(self, "_ordered", tuple(pair[1] for pair in pairs))
 
@@ -94,8 +82,6 @@ class HistoricalPalaceProfile:
         for index, entry in enumerate(self._ordered):
             if entry.branch == branch:
                 return index
-            else:
-                pass
         raise ValueError("须提供所选十二次的单个辰支，不是命财官等功能宫名")
 
     def width(self, branch: str) -> Fraction:
@@ -139,8 +125,6 @@ class HistoricalPalaceProfile:
         index = self._index(branch)
         if not 0 <= degree < self.width(branch):
             raise ValueError("十二次内古度须首含尾不含；不能按30度取模或挤入所选辰支")
-        else:
-            pass
         return self.locate(self._starts[index] + degree)
 
     def transfer_candidate(
@@ -160,19 +144,13 @@ class HistoricalPalaceProfile:
         """
         if basis not in {"from_entrance", "to_exit"}:
             raise ValueError("须明确选择from_entrance或to_exit候选，不猜对度法")
-        else:
-            pass
         source = self.from_mansion(mansion, degree_du)
         if source["branch"] != source_branch:
             raise ValueError("输入宿度不在所选版本的来源宫支内，不跨版本迁就例子")
-        else:
-            pass
         offset = Fraction(source["degree_in_branch_interval_du_exact"])
         target_width = self.width(target_branch)
         if basis == "to_exit":
             offset += target_width - self.width(source_branch)
-        else:
-            pass
         target = (
             self.from_palace(target_branch, offset)
             if 0 <= offset < target_width

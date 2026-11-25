@@ -81,8 +81,6 @@ _RULES = MappingProxyType(
 def _rule(profile_id: str) -> _ClockRule:
     if not isinstance(profile_id, str) or profile_id not in _RULES:
         raise ValueError("须显式选择已有原页钟制依据的完整宋历profile_id。")
-    else:
-        pass
     return _RULES[profile_id]
 
 
@@ -109,8 +107,6 @@ def source_clock_from_fraction(
         raise ValueError(
             "源日分须为整数分子分母，分母为正，且0≤分子<分母；不接受布尔值或浮点。"
         )
-    else:
-        pass
     day = Fraction(numerator, denominator)
     scaled = day * p.day_units * p.chen_input_factor
     chen = scaled // p.chen_divisor
@@ -174,8 +170,6 @@ def source_term_clock(
     )
     if term["source_day_divisor"] != p.day_units:
         raise ValueError("来源气朔日法与已核钟制日法不一致。")
-    else:
-        pass
     fraction = term["source_day_fraction"]
     return {
         "profile_id": profile_id,
@@ -202,12 +196,8 @@ def compare_branch_window_to_term(
     """
     if type(birth_day_offset_from_term_day) is not int:
         raise ValueError("相对源历日位移须为明确整数，不能以干支日名或布尔值猜补。")
-    else:
-        pass
     if not isinstance(birth_branch, str) or birth_branch not in BRANCHES:
         raise ValueError("出生时支须为一个明确地支，不猜时支或默认时刻。")
-    else:
-        pass
     result = source_term_clock(
         profile_id=profile_id,
         accumulated_years=accumulated_years,

@@ -52,8 +52,6 @@ def desktop_rule_comparisons(
     if any("desktop_bagua_btb_v1" in d.ruleset_ids for d in scene.desktops):
         bagua = _bagua_rules()
         rulesets.append(RegisteredRuleset.model_validate(surface_provenance()))
-    else:
-        pass
     positions = {p.object_id: p for p in geometry.desktop_placements}
     seats = {seat.desk_id: seat for seat in geometry.seats}
     uses = {seat.desk_id: seat for seat in scene.seats}
@@ -86,8 +84,6 @@ def desktop_rule_comparisons(
                     inverse_point(PlanPoint(x=x, y=y), observer).x
                     for x, y in world.exterior.coords
                 ]
-        else:
-            pass
         for item in desktop.items:
             position = positions[item.object_id]
             uncertain = (
@@ -130,14 +126,10 @@ def desktop_rule_comparisons(
                                     ),
                                 )
                             )
-                        else:
-                            pass
                 elif selected == "wofs_desktop_compass_v1":
                     for compass_rule in desktop_compass_rules():
                         if item.representation != compass_rule.representation:
                             continue
-                        else:
-                            pass
                         directions = position.compass_directions
                         match = (
                             directions[0] == compass_rule.direction
@@ -196,10 +188,6 @@ def desktop_rule_comparisons(
                                 ],
                             )
                         )
-                    else:
-                        pass
-                else:
-                    pass
                 if not records:
                     records.append(
                         RuleComparison(
@@ -220,8 +208,6 @@ def desktop_rule_comparisons(
                             ],
                         )
                     )
-                else:
-                    pass
                 for record in records:
                     if record.status != "not_covered":
                         if item.representation in PLANT_REPRESENTATIONS:
@@ -249,7 +235,5 @@ def desktop_rule_comparisons(
                                 )
                             )
                         )
-                    else:
-                        pass
                 result.extend(records)
     return result, rulesets

@@ -22,13 +22,9 @@ def calendar_witness_reference(
     loaded = load_source(SOURCE)
     if loaded.sha256 != CANONICAL_SHA256:
         raise ValueError("历日校勘层来源已改变，须重新核验")
-    else:
-        pass
     data = loaded.data
     if parent_sha256 != data["parent_fortnight_source_bundle_sha256"]:
         raise ValueError("历日校勘层与黑白分来源版本不一致")
-    else:
-        pass
     paragraphs = {r["paragraph_id"]: r for r in parent["selected_paragraphs"]}
     for row in data["all_five_selected_paragraphs"]:
         original = paragraphs.get(row["paragraph_id"])
@@ -42,8 +38,6 @@ def calendar_witness_reference(
             != data["actual_sources"][row["source_file"]]["sha256"]
         ):
             raise ValueError("历日校勘层与所选正文、行内注或实际源字节不一致")
-        else:
-            pass
     return {
         **data,
         "source_bundle_sha256": loaded.sha256,

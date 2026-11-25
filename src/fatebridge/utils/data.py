@@ -457,17 +457,11 @@ def normalize_gender(gender: str | None) -> Literal["male", "female"] | None:
     """
     if gender is None:
         return None
-    else:
-        pass
     token = gender.strip().lower()
     if token in GENDER_MALE_TOKENS:
         return "male"
-    else:
-        pass
     if token in GENDER_FEMALE_TOKENS:
         return "female"
-    else:
-        pass
     return None
 
 
@@ -515,14 +509,10 @@ def iter_pillar_gods(
         is_day = pillar == "day"
         if is_day and skip_day_pillar:
             continue
-        else:
-            pass
         if not is_day:
             yield PillarGod(
                 pillar, branch, "天干", stem, get_ten_god(day_stem, stem), stem_weight
             )
-        else:
-            pass
         for hidden in BRANCH_HIDDEN_STEMS.get(branch, []):
             yield PillarGod(
                 pillar,

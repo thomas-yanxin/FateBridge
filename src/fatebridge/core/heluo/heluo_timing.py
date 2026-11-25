@@ -35,15 +35,11 @@ def year_context(chart: dict, birth_ganzhi: str) -> dict[str, Any]:
     cycle_year = chart.get("cycleYear")
     if type(cycle_year) is not int or birth_ganzhi not in CYCLE:
         raise HeluoYearContextError("岁运需要已选干支年标签及有效出生年柱。")
-    else:
-        pass
     expected = CYCLE[(cycle_year - 4) % 60]
     if birth_ganzhi != expected:
         raise HeluoYearContextError(
             f"岁运年上下文不一致：所用年标签{cycle_year}应为{expected}，实际传入{birth_ganzhi}。"
         )
-    else:
-        pass
     return dict(
         cycle_year=cycle_year,
         birth_ganzhi=birth_ganzhi,
@@ -56,12 +52,8 @@ def year_context(chart: dict, birth_ganzhi: str) -> dict[str, Any]:
 def _validate(lines: list[int], pos: int) -> None:
     if len(lines) != 6 or any(type(b) is not int or b not in (0, 1) for b in lines):
         raise ValueError("卦必须是自初爻至上爻的六个0/1整数。")
-    else:
-        pass
     if type(pos) is not int or not 1 <= pos <= 6:
         raise ValueError("爻位必须是1至6的整数。")
-    else:
-        pass
 
 
 def _advance(pos: int, count: int = 1) -> int:
@@ -91,8 +83,6 @@ def annual_sequence(
     _validate(lines, period_pos)
     if type(start_yang) is not bool:
         raise ValueError("交运首年阴阳必须明确为布尔值。")
-    else:
-        pass
     yang_line = bool(lines[period_pos - 1])
     positions = (
         [period_pos, _ying(period_pos), period_pos]
@@ -119,8 +109,6 @@ def selected_timing_snapshot(timing: dict[str, Any]) -> str:
     """
     if not timing.get("selected_annual"):
         return ""
-    else:
-        pass
     texts = ["[指定岁运卦序]"]
     for key, label, value_key, scope in (
         ("selected_annual", "年标签", "year_label", "annual"),
@@ -145,10 +133,6 @@ def selected_timing_snapshot(timing: dict[str, Any]) -> str:
                 text = selected["heluo_commentary"]
                 texts.append(f"所用爻文校勘：{text_status_snapshot(text)}。")
                 texts.extend(text_reading_notes_snapshot(text))
-            else:
-                pass
-        else:
-            pass
     texts.append("月序、日定式序尚未桥接实际日期；不据此给出公历或农历应期。")
     return "\n".join(texts)
 
@@ -262,18 +246,12 @@ def build_heluo_timing(
         or analysis_year is None
     ):
         raise ValueError("month_index须为1至12，且必须指定analysis_year年标签。")
-    else:
-        pass
     if day_index is not None and (
         type(day_index) is not int or not 1 <= day_index <= 30 or month_index is None
     ):
         raise ValueError("day_index须为1至30的定式序号，且必须指定month_index。")
-    else:
-        pass
     if analysis_year is not None and type(analysis_year) is not int:
         raise ValueError("analysis_year必须是干支年对应的整数年标签。")
-    else:
-        pass
     rows = annual_timeline(chart, birth_ganzhi)
     result: dict[str, Any] = {
         "ruleset_id": RULESET_ID,
@@ -302,23 +280,17 @@ def build_heluo_timing(
     }
     if analysis_year is None:
         return result
-    else:
-        pass
     annual = next((r for r in rows if r["year_label"] == analysis_year), None)
     if annual is None:
         raise ValueError(
             f"analysis_year超出本次两卦年序范围{rows[0]['year_label']}至{rows[-1]['year_label']}；不外推。"
         )
-    else:
-        pass
     result["selected_annual"] = deepcopy(annual)
     result["selected_texts"].append(_selected_text(annual, "annual"))
     months = monthly_sequence(annual["lines"], annual["pos"])
     result["monthly_rows"] = months
     if month_index is None:
         return result
-    else:
-        pass
     month = months[month_index - 1]
     result["selected_month"] = deepcopy(month)
     result["selected_texts"].append(_selected_text(month, "month_ordinal"))
@@ -329,6 +301,4 @@ def build_heluo_timing(
         result["selected_texts"].append(
             _selected_text(days[day_index - 1], "day_template_ordinal")
         )
-    else:
-        pass
     return result

@@ -30,8 +30,6 @@ def emptiness_evidence(
 ) -> dict[str, Any]:
     if day_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("六壬空亡依据需要有效日干支")
-    else:
-        pass
     branches = set(EARTHLY_BRANCHES)
     if (
         any(
@@ -42,8 +40,6 @@ def emptiness_evidence(
         or set(sky_by_earth.values()) != branches
     ):
         raise ValueError("六壬空亡依据需要有效年月时支、月将和完整天地盘")
-    else:
-        pass
     offsets = {
         (EARTHLY_BRANCHES.index(sky) - EARTHLY_BRANCHES.index(earth)) % 12
         for earth, sky in sky_by_earth.items()
@@ -54,8 +50,6 @@ def emptiness_evidence(
     ) % 12
     if offsets != {expected_offset}:
         raise ValueError("六壬空亡依据的天地盘与月将加时不一致")
-    else:
-        pass
     empty = kongwang_for_ganzhi(day_ganzhi)[:2]
     house = STEM_HOUSES[day_ganzhi[0]]
     roles = (

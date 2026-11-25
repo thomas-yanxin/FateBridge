@@ -33,8 +33,6 @@ def definition_evidence(
 
     if [r.get("label") for r in rows] != ["人元", "贵神", "将神", "地分"]:
         raise ValueError("课钤疑义证据需要按次序排列的四位")
-    else:
-        pass
     by_label = {r["label"]: r for r in rows}
     ground, human = rows[3]["content"], rows[0]["content"]
     path = Path(__file__).resolve().parents[2] / "data/jinkou_definition_witnesses.json"

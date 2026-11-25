@@ -34,8 +34,6 @@ def travel_direction_evidence(
         name not in MANSIONS for name in candidates
     ):
         raise ValueError("出行方向日宿只支持27宿（不含牛）")
-    else:
-        pass
     bundle = source_bundle()
 
     def records(name: str) -> list[dict[str, Any]]:

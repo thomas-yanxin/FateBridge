@@ -38,19 +38,13 @@ def normalize_solar_display(
                 ),
                 None,
             )
-        else:
-            pass
         return birth, None
-    else:
-        pass
     require_recorded_instant(birth)
     session = current_source_session()
     if session is None:
         raise RuntimeError(
             "India solar display requires the calculation source session"
         )
-    else:
-        pass
     recorded = birth.recorded_datetime or birth.local_datetime
     key = (
         "india_physical_solar_display",
@@ -111,8 +105,6 @@ def normalize_solar_display(
             "scope": "Geocentric apparent solar wall label on shared model UT1/TT; not another timestamp or a birth-time correction. JD and display precision do not certify the birth clock, measured EOP, source accuracy or prediction validity.",
         }
         session.memo[key] = (label, round(correction, 4), context)
-    else:
-        pass
     label, correction, context = session.memo[key]
     return (
         replace(

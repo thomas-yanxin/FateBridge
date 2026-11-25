@@ -55,15 +55,9 @@ def derive_family(
     if not times:
         if raw:
             raise ValueError("Invented local root family")
-        else:
-            pass
         return None
-    else:
-        pass
     if len(raw) != len(times):
         raise ValueError("Missing actual numeric root candidate")
-    else:
-        pass
     cache = JointSnapshotCache()
     baseline = cache.snapshot(candidate_chart(personality, selected))
     solar = {
@@ -84,8 +78,6 @@ def derive_family(
             )
         ):
             raise ValueError("Detached root family epoch")
-        else:
-            pass
         rows = decode_native_positions(
             entry["native_positions"],
             node_mode,
@@ -94,12 +86,8 @@ def derive_family(
         )
         if rows[0]["longitude"] != solar[tt]:
             raise ValueError("Root family Sun differs from observed function")
-        else:
-            pass
         if tt == solver["design_jd_tt"] and rows != selected:
             raise ValueError("Root family selected chart changed")
-        else:
-            pass
         snapshot = cache.snapshot(candidate_chart(personality, rows))
         changes = [
             {

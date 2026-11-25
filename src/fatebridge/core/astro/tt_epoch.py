@@ -25,15 +25,11 @@ class TTInstant:
     def __post_init__(self) -> None:
         if not isinstance(self.days, Fraction):
             raise TypeError("TTInstant requires an exact Fraction of TT days")
-        else:
-            pass
 
     @classmethod
     def from_float(cls, jd_tt: float) -> TTInstant:
         if isinstance(jd_tt, bool) or not math.isfinite(jd_tt):
             raise ValueError("TT point must be finite and numeric")
-        else:
-            pass
         return cls(Fraction(jd_tt))
 
     @classmethod
@@ -61,8 +57,6 @@ class TTInstant:
             tai_minus_utc_seconds, (int, Fraction)
         ):
             raise TypeError("Atomic offset must be exact integer or Fraction seconds")
-        else:
-            pass
         return cls(
             calendar.julian_day_exact()
             + (tai_minus_utc_seconds + Fraction(4023, 125)) / 86400

@@ -18,10 +18,6 @@ TANYUAN_NIGHT = dict(zip("甲乙丙丁戊己庚辛壬癸", "丑子亥酉未申�
 def noble_start(day_stem: str, is_day: bool, profile: GuirenProfile) -> str:
     if profile == "liuren_common_v1":
         return (LIURENG_GUIREN_DAY if is_day else LIURENG_GUIREN_NIGHT)[day_stem]
-    else:
-        pass
     if profile == "tanyuan_xieji_v1":
         return (TANYUAN_DAY if is_day else TANYUAN_NIGHT)[day_stem]
-    else:
-        pass
     raise ValueError("未知贵人规则配置")

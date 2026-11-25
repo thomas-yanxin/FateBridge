@@ -19,15 +19,9 @@ def six_palace_reference(natal_mansion: Optional[str]) -> dict[str, Any]:
     if natal_mansion is not None:
         if not isinstance(natal_mansion, str) or len(natal_mansion) != 1:
             raise ValueError("六宫宿须使用已核定的二十七宿本命宿（不含牛）")
-        else:
-            pass
         natal_mansion = normalize_mansion(natal_mansion)
         if natal_mansion not in order:
             raise ValueError("六宫宿须使用已核定的二十七宿本命宿（不含牛）")
-        else:
-            pass
-    else:
-        pass
     start = order.index(natal_mansion) if natal_mansion is not None else None
     return {
         "ruleset_id": source["id"],

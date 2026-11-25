@@ -114,8 +114,6 @@ def _build_decennial_zodiacal_order(subject: NativeSubject) -> list[str]:
 def resolve_decennial_start_planet(subject: NativeSubject, start_mode: str) -> str:
     if start_mode != DECENNIAL_START_MODE_SECT_LIGHT:
         return start_mode
-    else:
-        pass
     return "Sun" if determine_sect(subject) == "day" else "Moon"
 
 
@@ -140,45 +138,25 @@ def _format_nominal_offset(total_minutes: int, level: int) -> str:
         prefix = ""
         if years:
             prefix += f"{years}年"
-        else:
-            pass
         if months:
             prefix += f"{months}个月"
-        else:
-            pass
         if days:
             prefix += f"{days}天"
-        else:
-            pass
         return f"{prefix or '0天'} {hours:02d}:{minutes:02d}"
-    else:
-        pass
     if level == 3:
         parts = []
         if years:
             parts.append(f"{years}年")
-        else:
-            pass
         if months:
             parts.append(f"{months}个月")
-        else:
-            pass
         if days or not parts:
             parts.append(f"{days}天")
-        else:
-            pass
         return "".join(parts)
-    else:
-        pass
     parts = []
     if years:
         parts.append(f"{years}年")
-    else:
-        pass
     if months or not parts:
         parts.append(f"{months}个月")
-    else:
-        pass
     return "".join(parts)
 
 
@@ -285,20 +263,12 @@ def build_decennials_payload(
         *DECENNIAL_TRADITIONAL_PLANETS,
     ]:
         raise ValueError(f"Unsupported decennial start mode: {start_mode}")
-    else:
-        pass
     if order_type not in (DECENNIAL_ORDER_ZODIACAL, DECENNIAL_ORDER_CHALDEAN):
         raise ValueError(f"Unsupported decennial order: {order_type}")
-    else:
-        pass
     if day_method != DECENNIAL_DAY_METHOD_VALENS:
         raise ValueError(f"Unverified decennial day method: {day_method}")
-    else:
-        pass
     if calendar_type not in (DECENNIAL_CALENDAR_TRADITIONAL, DECENNIAL_CALENDAR_ACTUAL):
         raise ValueError(f"Unsupported decennial calendar: {calendar_type}")
-    else:
-        pass
 
     birth_utc = birth_info.utc_calendar
     analysis_utc = utc_calendar(analysis_datetime)
@@ -320,8 +290,6 @@ def build_decennials_payload(
     indices = list(range(7))
     if current_index >= 7:
         indices.append(current_index)
-    else:
-        pass
     intervals = [
         _DecennialInterval(
             f"l1_{index}",
@@ -344,8 +312,6 @@ def build_decennials_payload(
     for index in range(3):
         if active is None:
             break
-        else:
-            pass
         node = active.payload(birth_utc, display_zone, analysis_utc, calendar_scale)
         children = active.children(base_order)
         node["sublevel"] = [

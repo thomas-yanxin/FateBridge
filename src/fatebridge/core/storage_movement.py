@@ -61,8 +61,6 @@ def storage_movement_effect(
     )
     if not applicable:
         return None
-    else:
-        pass
     retention = min(1.0, max(0.0, water_retention))
     return {
         "method_id": "ziping_storage_movement_v1",
@@ -103,8 +101,6 @@ def storage_movement_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
         effect = event.get("storage_effect")
         if not effect:
             continue
-        else:
-            pass
         roots = effect["root_effects"]
         seats = list(
             dict.fromkeys(
@@ -125,6 +121,4 @@ def storage_movement_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
         lines.append(
             "保留系数为工程约定；其他合绊等作用及最终根量另见同次回执，不据本条判开库或成格。"
         )
-    else:
-        pass
     return lines

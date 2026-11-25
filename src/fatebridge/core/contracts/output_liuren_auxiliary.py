@@ -71,8 +71,6 @@ class LiurenAuxiliaryStars(PartialOutput):
             "heaven_horse",
         }:
             raise ValueError("德禄马需保留七项不同的规则标识")
-        else:
-            pass
         return value
 
     @field_validator("complete_classical_conformance", mode="before")
@@ -80,6 +78,4 @@ class LiurenAuxiliaryStars(PartialOutput):
     def no_full_book_claim(cls, value: object) -> Literal[False] | None:
         if value is not None and value is not False:
             raise ValueError("所选七项定位不能声明整书符合")
-        else:
-            pass
         return value

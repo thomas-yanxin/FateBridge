@@ -57,8 +57,6 @@ class JinkouYearFate(PartialOutput):
     ) -> Literal[False] | None:
         if value is not None and value is not False:
             raise ValueError("京本岁首及综合行年未裁定，不能预发认证")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -73,10 +71,6 @@ class JinkouYearFate(PartialOutput):
             actual = self.model_dump(exclude_unset=True)
             if any(actual[k] != expected[k] for k in actual.keys() & expected.keys()):
                 raise ValueError("京本行年事实与所给出生年干支、岁序及性别不一致")
-            else:
-                pass
-        else:
-            pass
         if (
             self.birth_year_ganzhi is not None
             and "natal_branch" in self.model_fields_set
@@ -88,17 +82,9 @@ class JinkouYearFate(PartialOutput):
                 != self.natal_branch
             ):
                 raise ValueError("行年层的本命支须来自明确出生年支")
-            else:
-                pass
-        else:
-            pass
         if "course" in self.model_fields_set and self.status is not None:
             if (self.course is not None) != (self.status == "calculated"):
                 raise ValueError("资料缺失不能返回已算行年课，已算行年不能丢失课盘")
-            else:
-                pass
-        else:
-            pass
         if self.course is not None:
             if (
                 self.course.overview is not None
@@ -107,24 +93,14 @@ class JinkouYearFate(PartialOutput):
             ):
                 if self.course.overview.di_fen != self.branch:
                     raise ValueError("行年课的地分必须是本次行年支")
-                else:
-                    pass
-            else:
-                pass
             if (
                 self.course.overview is not None
                 and self.course.overview.di_fen_source is not None
                 and self.course.overview.di_fen_source != "annual_branch_derived_course"
             ):
                 raise ValueError("行年另课地分来自行年支，不是已观测或直接指定方位")
-            else:
-                pass
             if (self.course.model_extra or {}).get("year_fate") is not None:
                 raise ValueError("行年另课不递归产生另一层行年")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -158,8 +134,6 @@ class JinkouNatalCourse(PartialOutput):
     def no_unverified_natal_certification(cls, value: object) -> Literal[False] | None:
         if value is not None and value is not False:
             raise ValueError("本命课地分属于派生，出生年标签换岁边界尚未认证")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -193,16 +167,12 @@ class Jinkou(JinkouCourse):
                 )
                 if natal is None:
                     continue
-                else:
-                    pass
                 if (
                     "natal_branch" in self.year_fate.model_fields_set
                     and "right_branch" in natal.model_fields_set
                     and self.year_fate.natal_branch != natal.right_branch
                 ):
                     raise ValueError("行年与本课大绝须使用同一明确本命支")
-                else:
-                    pass
                 if (
                     "natal_branch_source" in self.year_fate.model_fields_set
                     and "input_source" in natal.model_fields_set
@@ -214,23 +184,13 @@ class Jinkou(JinkouCourse):
                     )
                     if natal.input_source != expected_source:
                         raise ValueError("本命支来源须与明确输入事实一致")
-                    else:
-                        pass
-                else:
-                    pass
-        else:
-            pass
         if self.year_fate is None or self.year_fate.course is None:
             return self
-        else:
-            pass
         child = self.year_fate.course
 
         def agree(a: Any, b: Any) -> bool:
             if isinstance(a, dict) and isinstance(b, dict):
                 return all(agree(a[k], b[k]) for k in a.keys() & b.keys())
-            else:
-                pass
             return bool(a == b)
 
         if self.calendar_policy is not None and child.calendar_policy is not None:
@@ -239,10 +199,6 @@ class Jinkou(JinkouCourse):
                 child.calendar_policy.model_dump(exclude_unset=True),
             ):
                 raise ValueError("行年另课须保留同次分析历法口径")
-            else:
-                pass
-        else:
-            pass
         if self.overview is not None and child.overview is not None:
             for key in (
                 "month_general",
@@ -254,8 +210,4 @@ class Jinkou(JinkouCourse):
                 b = child.overview.model_dump(exclude_unset=True)
                 if key in a and key in b and not agree(a[key], b[key]):
                     raise ValueError("行年另课须保留本次月将与显式昼夜选择")
-                else:
-                    pass
-        else:
-            pass
         return self

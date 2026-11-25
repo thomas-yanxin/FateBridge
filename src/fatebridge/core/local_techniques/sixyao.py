@@ -118,13 +118,9 @@ def build_sixyao_result(
 ) -> dict[str, Any]:
     if event_horizon not in (None, "near", "long_term"):
         raise ValueError("event_horizon 必须是 near、long_term 或省略。")
-    else:
-        pass
     method = (method or "auto").strip().lower()
     if method not in {"auto", "coin", "time"}:
         raise ValueError("method 必须是 auto、coin 或 time。")
-    else:
-        pass
     if (
         timing_days
         and focus_line is None
@@ -132,8 +128,6 @@ def build_sixyao_result(
         and focus_kind is None
     ):
         raise ValueError("展开日级候选需要先明确focus_line或focus_kinship")
-    else:
-        pass
 
     context = _build_context(date_text=date, time_text=time, timezone_name=zone)
     normalized_lines = normalize_cast_lines(lines)
@@ -148,21 +142,13 @@ def build_sixyao_result(
         and coins is None
     ):
         raise ValueError("changed_code 需要同时提供本卦 gua_code 或完整 lines/coins")
-    else:
-        pass
     if normalized_lines:
         if gua_code is not None and gua_code != cast_hexagram_code(normalized_lines):
             raise ValueError("gua_code 与 lines 本卦不一致")
-        else:
-            pass
         if changed_code is not None and changed_code != changed_hexagram_code(
             normalized_lines
         ):
             raise ValueError("changed_code 与 lines 动爻不一致")
-        else:
-            pass
-    else:
-        pass
 
     coin_source: str | None = None
     coin_tosses: list[CoinToss] | None = None
@@ -182,15 +168,11 @@ def build_sixyao_result(
             changed_code is not None and changed_code != coin_changed
         ):
             raise ValueError("coins 与所提供卦码不一致")
-        else:
-            pass
         if normalized_lines and (
             cast_hexagram_code(normalized_lines),
             changed_hexagram_code(normalized_lines),
         ) != (coin_current, coin_changed):
             raise ValueError("coins 与 lines 不一致")
-        else:
-            pass
         normalized_lines = coin_lines
         current_code = coin_current
         changed_hexagram_binary_code = coin_changed
@@ -207,8 +189,6 @@ def build_sixyao_result(
         )
         if len(current_code) != 6 or len(changed_hexagram_binary_code) != 6:
             raise ValueError("六爻卦码必须是 6 位 0/1 字符串。")
-        else:
-            pass
         # When the caller supplied codes but no explicit lines, derive the
         # canonical line set from the authoritative codes so moving-line
         # detection reflects the real request.
@@ -216,8 +196,6 @@ def build_sixyao_result(
             normalized_lines = cast_lines_from_codes(
                 current_code, changed_hexagram_binary_code
             )
-        else:
-            pass
     elif method == "coin":
         # 摇钱起卦（系统随机六掷）：真·铜钱筮法，seed 可复现。
         cast_method = "coin"
@@ -237,16 +215,12 @@ def build_sixyao_result(
                 "六爻需先起卦：当前环境缺少农历上下文，无法做时间起卦，"
                 "请改为提供 coins/gua_code/changed_code 或 lines。"
             )
-        else:
-            pass
         current_code = validate_hexagram_code(meihua["base_hexagram"]["binary_code"])
         changed_hexagram_binary_code = validate_hexagram_code(
             meihua["changed_hexagram"]["binary_code"]
         )
         if len(current_code) != 6 or len(changed_hexagram_binary_code) != 6:
             raise ValueError("六爻卦码必须是 6 位 0/1 字符串。")
-        else:
-            pass
         normalized_lines = cast_lines_from_codes(
             current_code, changed_hexagram_binary_code
         )
@@ -303,8 +277,6 @@ def build_sixyao_result(
                 line_dict["changed_branch"] = extra["branch"]
                 line_dict["changed_liuqin"] = extra["liuqin"]
                 line_dict["is_fuyin_line"] = True
-        else:
-            pass
 
     # Only missing kinship categories are candidates for 伏神, located at the
     # same position of the original palace's pure hexagram.
@@ -359,8 +331,6 @@ def build_sixyao_result(
     )
     if comparison is not None:
         evidence["calendar_conventions"]["month_model_comparison"] = comparison
-    else:
-        pass
 
     from fatebridge.core.liuyao.liuyao_fanfu import build_fanfu_evidence
 
@@ -443,8 +413,6 @@ def build_sixyao_result(
             "seed": context["lunar"]["meihua"]["seed"],
             "source_url": "https://zh.wikisource.org/wiki/梅花易數/卷一",
         }
-    else:
-        pass
     return {
         "analysis_type": "六爻 / 易卦",
         "input_normalized": input_normalized,

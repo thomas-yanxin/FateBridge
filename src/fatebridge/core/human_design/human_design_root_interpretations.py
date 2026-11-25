@@ -32,8 +32,6 @@ def family_comparison_basis(
         or family_index < 0
     ):
         raise ValueError("Invalid selected-to-candidate comparison context")
-    else:
-        pass
     selected, candidate = epochs
     return {
         "order": "selected_then_candidate",
@@ -109,11 +107,7 @@ def root_interpretations(
     if comparison_epochs is not None or family_candidate_index is not None:
         if len(designs) != 2:
             raise ValueError("Selected-to-candidate comparison requires two charts")
-        else:
-            pass
         comparison = family_comparison_basis(comparison_epochs, family_candidate_index)
-    else:
-        pass
     cache = JointSnapshotCache()
     snapshots = [
         cache.snapshot(candidate_chart(personality, design)) for design in designs
@@ -195,16 +189,10 @@ def root_interpretation_reading(proof: dict[str, Any]) -> str:
     )
     if summary["definition_bridging_changed"]:
         text += "假设桥接的完整门集或结构有差异，不能只比较方案数量。"
-    else:
-        pass
     if summary["circuitry_changed"]:
         text += "回路／整合拓扑证据有差异。"
-    else:
-        pass
     if summary["profile_evidence_changed"]:
         text += "角色结构依据有差异，未支持的组合保留未完成状态。"
-    else:
-        pass
     return (
         text + "这是候选计算的条件解释；固定极性不代表吉凶，完整384线原典线义仍未验收。"
     )

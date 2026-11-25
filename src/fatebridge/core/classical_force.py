@@ -116,8 +116,6 @@ def _source_roots_by_stem(
     for stem in "甲乙丙丁戊己庚辛壬癸":
         if stem not in observed:
             continue
-        else:
-            pass
         roots = []
         for position in ORDER:
             branch = pillars[position][1]
@@ -240,10 +238,6 @@ def build_force_components(
         )
         if body_energy + seal_energy > 0:
             body_share = body_energy / (body_energy + seal_energy)
-        else:
-            pass
-    else:
-        pass
     float_relation = relation
     receipt = assessment.get("threshold_arithmetic") or {}
     rational = receipt.get("energies_exact")
@@ -259,10 +253,6 @@ def build_force_components(
             rational_energy = {}
         if any(value < 0 for value in rational_energy.values()):
             rational_energy = {}
-        else:
-            pass
-    else:
-        pass
     comparison_basis = basis
     body_share_exact = None
     if rational_energy:
@@ -278,10 +268,6 @@ def build_force_components(
         comparison_basis = "exact_rational_same_assessment"
         if body_exact + seal_exact:
             body_share_exact = str(body_exact / (body_exact + seal_exact))
-        else:
-            pass
-    else:
-        pass
     return {
         "method_id": "body_seal_force_components_v1",
         "source": deepcopy(SOURCE),

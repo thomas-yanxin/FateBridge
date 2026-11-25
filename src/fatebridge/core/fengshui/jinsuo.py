@@ -26,8 +26,6 @@ def jinsuo(req: JinsuoRequest) -> dict[str, Any]:
             missing.append(
                 f"features.{feature.object_id}.single_confirmed_classification"
             )
-        else:
-            pass
         preference = preferences[feature.direction]["preferred_classification"]
         findings.append(
             {

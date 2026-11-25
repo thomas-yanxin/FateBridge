@@ -22,8 +22,6 @@ def joint_reconstruction_contract(analysis: dict[str, Any]) -> str:
     shared = analysis.get("shared_reconstruction_analysis")
     if not shared:
         return ""
-    else:
-        pass
     status = shared.get("status")
     resolved = analysis.get("status") == "not_needed"
     if status == "applied":
@@ -48,8 +46,6 @@ def joint_reconstruction_contract(analysis: dict[str, Any]) -> str:
             scope += "rows仍为原无约束外包络。"
             if "unconstrained_rows" in analysis:
                 scope += "完整原矩阵也保留在unconstrained_rows。"
-            else:
-                pass
     elif status == "not_needed":
         scope = (
             "共同重建状态not_needed：双方宿名已定，rows为空；有向关系由person1_to_person2和person2_to_person1交付。"
@@ -74,24 +70,16 @@ def ordinary_candidate_envelope_reading(
         or "shared_reconstruction_analysis" in analysis
     ):
         return ""
-    else:
-        pass
     for context in contexts:
         if not isinstance(context, dict):
             return ""
-        else:
-            pass
         candidates = context.get("calendar_candidates")
         if candidates is not None and not isinstance(candidates, list):
             return ""
-        else:
-            pass
         leaves = candidates or [context]
         for node in [context, *leaves]:
             if not isinstance(node, dict):
                 return ""
-            else:
-                pass
             profile = node.get("profile_calculation")
             if not isinstance(profile, dict) or not (
                 node.get("calendar_profile")
@@ -102,8 +90,6 @@ def ordinary_candidate_envelope_reading(
                 == "t1299_lower_fullmoon27_v1"
             ):
                 return ""
-            else:
-                pass
             # Date aggregates omit leaf-only source/assignment fields. If an
             # aggregate does supply them, contradictory evidence still vetoes.
             if any(
@@ -111,8 +97,6 @@ def ordinary_candidate_envelope_reading(
                 for key in ("hinoo_source", "short_month_assignment")
             ):
                 return ""
-            else:
-                pass
         if any(
             key not in leaf["profile_calculation"]
             or leaf["profile_calculation"][key] is not None
@@ -120,8 +104,6 @@ def ordinary_candidate_envelope_reading(
             for key in ("hinoo_source", "short_month_assignment")
         ):
             return ""
-        else:
-            pass
     completeness = (
         "仅在本次档案内完整，不认证全部历史规则。"
         if analysis.get("candidate_set_complete_within_profile") is True
@@ -138,12 +120,8 @@ def joint_reconstruction_reading(names: list[str], analysis: dict[str, Any]) -> 
     shared = analysis.get("shared_reconstruction_analysis")
     if not shared:
         return ""
-    else:
-        pass
     if shared["status"] == "not_shared":
         return "双方档案、算法、来源或宿主历法身份未能核成相同，未施加共同重建约束，保留原无约束候选。"
-    else:
-        pass
     lines = [
         "以下仅在双方共同采用同一套已声明现代重建的条件下分析；不证明古代各时期规则统一，"
         "也未裁定原典优先次序。两人的日期和半日条件各自保留，未知半日不绑定为相同；支持记录不能拆开后再任意交叉。"
@@ -156,14 +134,10 @@ def joint_reconstruction_reading(names: list[str], analysis: dict[str, Any]) -> 
         lines.append(
             "双方宿名虽已定，仍不能确定采用哪种重建；所列两套模型均支持既定宿，未选择模型。"
         )
-    else:
-        pass
     if "unconstrained_rows" in analysis:
         lines.append(
             f"原无约束矩阵{len(analysis['unconstrained_rows'])}行完整保留，另列共同模型支持。"
         )
-    else:
-        pass
     supports = [
         support for row in analysis["rows"] for support in row.get("joint_support", [])
     ] + shared.get("resolved_support", [])
@@ -192,8 +166,6 @@ def joint_reconstruction_reading(names: list[str], analysis: dict[str, Any]) -> 
                 != "unsupported_within_enumerated_shared_models"
             ):
                 continue
-            else:
-                pass
             forward, reverse = row["person1_to_person2"], row["person2_to_person1"]
             lines.append(
                 f"无共同重建支持的原矩阵对照：{row['person1_su27']}→{row['person2_su27']}为{forward['relation']}，"
@@ -201,8 +173,6 @@ def joint_reconstruction_reading(names: list[str], analysis: dict[str, Any]) -> 
                 "此行在上述共享假设及已完整列举的模型内没有共同支持，不作为该条件下的相性候选；"
                 "不表示原典禁止或其他未考证历史规则绝对不可能。"
             )
-    else:
-        pass
     return "".join(lines)
 
 
@@ -230,8 +200,6 @@ def candidate_compatibility_reading(
         )
         if not context.get("calendar_candidates"):
             lines.append(input_timezone_reading(context))
-        else:
-            pass
         if context.get("calendar_candidates"):
             lines.append(
                 "按输入当地整日映射到所选宿主参考日期，未猜出生钟时；区间长度不是出生概率。"
@@ -246,14 +214,10 @@ def candidate_compatibility_reading(
                     "左端含、右端不含；它是当地日期的计算支持范围，不是已知出生钟时。"
                 )
                 lines.append(support_interval_duration_reading(interval))
-        else:
-            pass
         if context.get("out_of_range_calendar_dates"):
             lines.append(
                 f"另保留范围外参考日期{'、'.join(context['out_of_range_calendar_dates'])}，未为范围外分支补造农历或宿名。"
             )
-        else:
-            pass
         for branch in context.get("calendar_candidates") or [context]:
             reference_date = branch["calendar_date"]
             if all(
@@ -270,8 +234,6 @@ def candidate_compatibility_reading(
                     f"后端{branch['calendar_backend']}，参考日界{branch['calendar_timezone']}；"
                     f"历日来源{branch['calendar_source']}。这些身份属于本次计算条件，不由输入时区或档案名称替代。"
                 )
-            else:
-                pass
             lunar = (
                 f"{branch['lunar_year']}年{'闰' if branch['is_leap_month'] else ''}"
                 f"{branch['lunar_month']}月{branch['lunar_day']}日"
@@ -305,8 +267,6 @@ def candidate_compatibility_reading(
                     f"逆顺法得{host['direct_mansion']}、生日加十三含首法得{host['shortcut_mansion']}，两法{agreement}；"
                     "表定望日不等实际满月瞬间，基准结果不覆盖本次闰月／小月的实际宿或未定候选。"
                 )
-            else:
-                pass
             variant = branch.get("source_table_variant")
             if variant:
                 lines.append(
@@ -314,29 +274,21 @@ def candidate_compatibility_reading(
                     f"同月日的基准27宿为{variant['reference_month_day_mansion_27']}，"
                     "与本次实际宿或全部候选分别保留，不覆盖本次27宿或三九结果。"
                 )
-            else:
-                pass
             profile = branch.get("profile_calculation")
             printed = branch.get("printed_edition_reference")
             if printed:
 
                 lines.extend(printed_reference_lines(printed))
-            else:
-                pass
             if profile and profile.get("hinoo_source"):
 
                 lines.extend(hinoo_unassigned_month_start_lines(branch, profile))
                 lines.extend(profile_calculation_lines(profile))
-            else:
-                pass
             if has_daily_reference and not branch.get("calendar_reference", {}).get(
                 "manuscript_daily_annotations"
             ):
                 lines.append(
                     f"参考日期{reference_date}未被本批逐日旁注选录覆盖；未返回不等于原卷无注，也未把月首注当本日直接实录。"
                 )
-            else:
-                pass
             half = branch.get("calendar_day_part")
             if half in {"first_half", "second_half"}:
                 label = "前半" if half == "first_half" else "后半"
@@ -348,8 +300,6 @@ def candidate_compatibility_reading(
                     f"{name}原典半日未声明；民用钟时和时区换日均未自动补出前半或后半，"
                     "本支实际宿和完整候选仍按已返回的分配条件交付。"
                 )
-            else:
-                pass
     lines.append(joint_reconstruction_reading(names, analysis))
     lines.append(ordinary_candidate_envelope_reading(contexts, analysis))
     if analysis["candidate_set_complete_within_profile"]:
@@ -365,8 +315,6 @@ def candidate_compatibility_reading(
             available = row.get(key)
             if available:
                 dates.append(f"{names[index]}参考日期{'、'.join(available)}")
-            else:
-                pass
         condition = "；".join(dates)
         shared_status = analysis.get("shared_reconstruction_analysis", {}).get("status")
         if shared_status == "applied":
@@ -388,8 +336,6 @@ def candidate_compatibility_reading(
         )
     elif analysis["status"] != "not_needed":
         lines.append("当前没有可列的关系组合，未用缺失或范围外分支补造关系。")
-    else:
-        pass
 
     for name, reference in zip(names, palace_references):
         lines.append(f"{name}：{render_palace_reference(reference)}")

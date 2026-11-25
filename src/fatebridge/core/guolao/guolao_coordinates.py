@@ -48,8 +48,6 @@ def audit_opposite_examples(profile: HistoricalPalaceProfile) -> dict[str, Any]:
         or grid_binding["marker_data_sha256"] != grid.marker_data_sha256
     ):
         raise ValueError("对照矩阵或扫描已变化，须重新核读例子，不跨版本套用")
-    else:
-        pass
     cases = source_examples["cases"]
     case_ids = [case["id"] for case in cases]
     source_ids = [source["id"] for source in source_examples["sources"]]
@@ -61,14 +59,10 @@ def audit_opposite_examples(profile: HistoricalPalaceProfile) -> dict[str, Any]:
         or {case["source_document_id"] for case in cases} != set(source_ids)
     ):
         raise ValueError("具名原例及来源须完整且唯一，不能删例或重复计数")
-    else:
-        pass
     for case in cases:
         cell = grid.cell(case["source_branch"], case["declared_column"])
         if cell["numeral_value"] != case["source_degree"]:
             raise ValueError("显式来源格与原例整数不符，不能挪列修复")
-        else:
-            pass
     # Exhaust all shared shifts that remain inside all three printed rows.
     shifts = []
     lower = max(1 - case["declared_column"] for case in cases)
@@ -165,10 +159,6 @@ def audit_opposite_examples(profile: HistoricalPalaceProfile) -> dict[str, Any]:
                         "overlap_with_expected_unit_bin_du_exact": str(overlap),
                         "whole_input_interval_matches_expected_unit_bin": overlap == 1,
                     }
-                else:
-                    pass
-            else:
-                pass
             results.append(
                 {
                     "case": case,

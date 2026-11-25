@@ -31,8 +31,6 @@ def preface_reference(arc: dict[str, Any]) -> dict[str, Any]:
         != identity["signature"]
     ):
         raise ValueError("序跋翻刻对照与本次ARC序文身份不符，须重新校核")
-    else:
-        pass
     return {**bundle, "source_bundle_sha256": loaded.sha256}
 
 
@@ -57,8 +55,6 @@ def dated_weekday_reference(
     )
     if selected is None:
         return None
-    else:
-        pass
     actual = LUMINARIES[civil.weekday()]
     neighbours = [
         {
@@ -136,8 +132,6 @@ def preface_reading_lines(reference: dict[str, Any]) -> list[str]:
             "上面的省略号选段不是完整定本。案语彼后筭字也保留一方暂读、一方读定的差别，"
             "不倒改2013翻刻的未定字，不以相合的历算补字；校按作者及形成时间未认证。"
         )
-    else:
-        pass
     return lines
 
 
@@ -149,15 +143,11 @@ def editorial_weekday_reference(
     arc = loaded.data.get("arc_supplement_selected_reference")
     if arc is None:
         return None
-    else:
-        pass
     selected = next(
         (r for r in arc["dated_claims"] if tuple(r["lunar_fields"]) == lunar), None
     )
     if selected is None:
         return None
-    else:
-        pass
     actual = LUMINARIES[civil.weekday()]
     ganzhi = calendar_reference["day_ganzhi_reference"]["name"]
     return {
@@ -213,8 +203,6 @@ def dated_weekday_reading_lines(reference: dict[str, Any]) -> list[str]:
             f"该条另称{row['tang_alternative']['literal']}；保留准拟及应当语气，"
             "未用日本同名正月四日替代唐历四日，未重建唐历或认证两历对应。"
         )
-    else:
-        pass
     if reference["printed_day_ganzhi"] is None:
         lines.append("此条未录日干支，未把参考干支补成原文。")
     elif reference["ganzhi_matches_under_same_label"]:
@@ -229,8 +217,6 @@ def dated_weekday_reading_lines(reference: dict[str, Any]) -> list[str]:
         lines.append(
             f"固定同名参考日的邻日诊断为{neighbours}；不是出生候选或唐历换算，未据此改日或校准平明。"
         )
-    else:
-        pass
     if not reference["weekday_matches_under_same_label"]:
         labels = "、".join(
             f"{r['civil_day_offset']:+d}日{r['luminary']}曜"
@@ -244,6 +230,4 @@ def dated_weekday_reading_lines(reference: dict[str, Any]) -> list[str]:
             "这三个标签不是新增出生候选，不能靠选邻日、换月份或改原字消除分歧。"
             "原记录的历法身份、传写与未定日界分别待核，不直接认定抄误。"
         )
-    else:
-        pass
     return lines

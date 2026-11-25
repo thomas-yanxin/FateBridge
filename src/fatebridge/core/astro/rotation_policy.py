@@ -199,8 +199,4 @@ def earth_rotation_policy(
                     "vertical_scope": "WGS84 ellipsoid normal, not a surveyed plumb line",
                 },
             )
-        else:
-            pass
-    else:
-        pass
     return value

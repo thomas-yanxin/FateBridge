@@ -149,8 +149,6 @@ def analyze_timing_interactions(
         )
     if any(node["pillar"] not in SEXAGENARY_INDEX for node in nodes):
         raise ValueError("时运关系需要六十甲子中的完整干支柱")
-    else:
-        pass
 
     events: list[TimingInteraction] = []
 
@@ -161,8 +159,6 @@ def analyze_timing_interactions(
     ) -> None:
         if not any(node["scope"] == "timing" for node in members):
             return
-        else:
-            pass
         participants = [node["id"] for node in members]
         events.append(
             {
@@ -185,8 +181,6 @@ def analyze_timing_interactions(
         branches = frozenset((left["branch"], right["branch"]))
         if stems in STEM_COMBINATIONS:
             emit("stem_combination", pair, transformation="not_assessed")
-        else:
-            pass
         for source, target in (pair, pair[::-1]):
             if (
                 DESTRUCTION_CYCLE[STEM_ELEMENTS[source["stem"]][0]]
@@ -205,29 +199,17 @@ def analyze_timing_interactions(
                         target=target["id"],
                         definition="六冲加同阴阳天干相克；不等于已判断吉凶",
                     )
-                else:
-                    pass
-            else:
-                pass
         if BRANCH_CONFLICTS[left["branch"]] == right["branch"]:
             emit("branch_clash", pair)
-        else:
-            pass
         if BRANCH_COMBINATIONS[left["branch"]] == right["branch"]:
             emit("branch_combination", pair, transformation="not_assessed")
-        else:
-            pass
         if BRANCH_HARMS[left["branch"]] == right["branch"]:
             emit("branch_harm", pair)
-        else:
-            pass
         if (
             left["branch"] == right["branch"]
             and left["branch"] in BRANCH_SELF_PUNISHMENTS
         ):
             emit("self_punishment", pair)
-        else:
-            pass
         for punishment_group in BRANCH_THREE_PUNISHMENTS:
             if len(branches) == 2 and branches <= set(punishment_group):
                 emit(
@@ -240,8 +222,6 @@ def analyze_timing_interactions(
                     group="".join(punishment_group),
                     complete=len(punishment_group) == 2,
                 )
-            else:
-                pass
         for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
             if (
                 len(branches) == 2
@@ -255,16 +235,10 @@ def analyze_timing_interactions(
                     bureau=bureau,
                     transformation="not_assessed",
                 )
-            else:
-                pass
         if left["pillar"] == right["pillar"]:
             emit("pillar_repeat", pair, traditional_label="同柱重见（伏吟结构）")
             if {left["id"], right["id"]} == {"timing.dayun", "timing.liunian"}:
                 emit("suiyun_binglin", pair, traditional_label="岁运并临")
-            else:
-                pass
-        else:
-            pass
 
     for group_nodes in combinations(nodes, 3):
         group_branches = {node["branch"] for node in group_nodes}
@@ -281,8 +255,6 @@ def analyze_timing_interactions(
                         bureau=bureau,
                         transformation="not_assessed",
                     )
-                else:
-                    pass
         for punishment_group in BRANCH_THREE_PUNISHMENTS:
             if len(punishment_group) == 3 and group_branches == set(punishment_group):
                 emit(
@@ -291,16 +263,12 @@ def analyze_timing_interactions(
                     group="".join(punishment_group),
                     complete=True,
                 )
-            else:
-                pass
 
     day_stem = natal["day"][0]
     ten_gods: list[TimingTenGodContext] = []
     for node in nodes:
         if node["scope"] != "timing":
             continue
-        else:
-            pass
         ten_gods.append(
             {
                 "node_id": node["id"],

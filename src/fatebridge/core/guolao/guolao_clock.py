@@ -77,28 +77,16 @@ def apparent_solar_clock(
     ):
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             raise TypeError("太阳钟面须使用明确的有限天文数值")
-        else:
-            pass
         if not math.isfinite(value):
             raise ValueError("太阳钟面天文输入须有限")
-        else:
-            pass
     if not 0 <= sun_right_ascension < 360:
         raise ValueError("视太阳赤经须在[0,360)")
-    else:
-        pass
     if not 0 <= greenwich_apparent_sidereal_degrees < 360:
         raise ValueError("格林尼治视恒星角须在[0,360)")
-    else:
-        pass
     if not -180 <= longitude <= 180:
         raise ValueError("经度须在[-180,180]，东经为正")
-    else:
-        pass
     if civil_datetime.utcoffset() is None:
         raise ValueError("须明确提供记录的带时区民用时刻")
-    else:
-        pass
 
     ut1 = UT1Instant.from_value(julian_day_ut1).days
     ra = Fraction(sun_right_ascension)
@@ -121,8 +109,6 @@ def apparent_solar_clock(
         display = (
             datetime.fromordinal(ordinal) + timedelta(microseconds=microseconds)
         ).isoformat()
-    else:
-        pass
     local = civil_datetime.replace(tzinfo=None)
     civil_jd = (
         local.toordinal()

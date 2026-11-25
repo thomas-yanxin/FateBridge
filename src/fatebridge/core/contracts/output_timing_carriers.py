@@ -61,8 +61,6 @@ class TimingCarrier(PartialOutput):
             and bool(self.own_hidden_roots) != self.own_hidden_root_present
         ):
             raise ValueError("本柱实根状态必须忠于本柱藏干，不能拿原局外援或长生名替代")
-        else:
-            pass
         if self.principal_relation is not None:
             if (
                 self.branch_covered_if_desired is not None
@@ -70,8 +68,6 @@ class TimingCarrier(PartialOutput):
                 != (self.principal_relation == "stem_overcomes_branch")
             ):
                 raise ValueError("喜支时的盖头条件必须忠于干克支本气")
-            else:
-                pass
             if (
                 self.stem_pressure_if_desired is not None
                 and self.stem_pressure_if_desired
@@ -83,8 +79,4 @@ class TimingCarrier(PartialOutput):
                 raise ValueError(
                     "喜干时的承载压力须与主气生克一致，不能冒充完整截脚裁决"
                 )
-            else:
-                pass
-        else:
-            pass
         return self

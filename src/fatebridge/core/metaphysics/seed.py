@@ -71,11 +71,7 @@ def build_metaphysics_seed(
     if is_solar_time_applied and longitude is None:
         if true_solar_explicit:
             raise ValueError("真太阳时修正需要 analysis_longitude")
-        else:
-            pass
         is_solar_time_applied = False
-    else:
-        pass
     clock = NominalClockLabel.from_local_datetime(civil)
     total_correction_minutes = 0.0
     receipt = None
@@ -93,8 +89,6 @@ def build_metaphysics_seed(
             longitude=longitude,
             adjustment=adjustment,
         )
-    else:
-        pass
     return assemble_metaphysics_seed(
         civil=civil,
         clock=clock,

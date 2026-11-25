@@ -76,8 +76,6 @@ def root_prerequisite_status(
     for has_hidden_root, has_growth_reference in evidence:
         if has_hidden_root:
             return "matched"
-        else:
-            pass
         has_phase_reference |= has_growth_reference
     return "unknown" if has_phase_reference else "not_matched"
 
@@ -98,8 +96,6 @@ def wealth_rule_context(pillars: Pillars) -> dict[str, Any]:
         stem = pillars[name][0]
         if name == "day" or STEM_ELEMENTS[stem][0] != wealth_element:
             continue
-        else:
-            pass
         roots = hidden_roots(stem, pillars)
         phase_references = [
             {"pillar": n, "branch": pillars[n][1], "phase": "长生"}

@@ -46,19 +46,13 @@ class DataFilePolicy:
     def observe_file(self, path: Path) -> None:
         if path not in self.files:
             self.files[path] = _digest(path)
-        else:
-            pass
 
     def finish(self) -> None:
         if self.failure:
             raise EphemerisSourceError(self.failure)
-        else:
-            pass
         for path, digest in self.files.items():
             if _digest(path) != digest:
                 self.fail("changed_during")
-            else:
-                pass
 
     def receipt(self) -> dict[str, Any]:
         return {
@@ -100,8 +94,6 @@ def require_physical_model(model: str) -> None:
     state = current_policy()
     if state is not None and model not in {"swieph", "jpl"}:
         state.fail("required_data_files_fallback")
-    else:
-        pass
 
 
 def _physical(body: Any) -> TypeGuard[int]:
@@ -124,14 +116,10 @@ def _coordinate_result(
     state = current_policy()
     if state is None:
         return value
-    else:
-        pass
     body = args[1] if len(args) > 1 else kwargs.get("planet")
     if not _physical(body):
         state.nonphysical_calls += 1
         return value
-    else:
-        pass
     if (
         not isinstance(value, tuple)
         or len(value) != 2
@@ -139,54 +127,36 @@ def _coordinate_result(
         or value[1] < 0
     ):
         state.fail("required_data_files_unavailable")
-    else:
-        pass
     coordinates, flags = value
     slots = _physical_slots(native, body, flags)
     if not slots:
         if len(coordinates) != 6 or any(value != 0 for value in coordinates):
             state.fail("coordinate_values_unavailable")
-        else:
-            pass
         state.reference_zero_calls += 1
         return value
-    else:
-        pass
     model = model_from_retflag(flags)
     require_physical_model(model)
     if len(coordinates) != 6 or not all(math.isfinite(v) for v in coordinates):
         state.fail("coordinate_values_unavailable")
-    else:
-        pass
     getter = getattr(native, "get_current_file_data", None)
     if not callable(getter):
         state.fail("required_data_files_unverified")
-    else:
-        pass
     if model == "swieph":
         if (
             str(getattr(native, "version", "unavailable")),
             binding_distribution_version(native, version),
         ) != ("2.10.03", "2.10.3.2"):
             state.fail("required_data_files_unverified")
-        else:
-            pass
         instant = (
             args[0] if args else kwargs.get("tjdet" if operation == "calc" else "tjdut")
         )
         if not isinstance(instant, (int, float)) or not math.isfinite(instant):
             state.fail("required_data_files_unverified")
-        else:
-            pass
         epoch = float(instant)
         if operation == "calc_ut":
             epoch += native.deltat_ex(epoch, flags & 7)
-        else:
-            pass
         if 15 <= body <= 20 or body >= 10000:
             slots = (*slots, 2)
-        else:
-            pass
         for slot in slots:
             path, start, end, _ = getter(slot)
             if (
@@ -197,15 +167,11 @@ def _coordinate_result(
                 or start >= end
             ):
                 state.fail("required_data_files_unverified")
-            else:
-                pass
             state.observe_file(Path(path).absolute())
     else:
         path = getter(0)[0]
         if not path:
             state.fail("required_data_files_unverified")
-        else:
-            pass
         state.observe_file(Path(path).absolute())
     state.physical_calls_by_model[model] = (
         state.physical_calls_by_model.get(model, 0) + 1
@@ -227,8 +193,6 @@ def native_call_policy(
     if state is None:
         yield lambda value: value
         return
-    else:
-        pass
     body = args[1] if len(args) > 1 else kwargs.get("planet")
     coordinate = operation in {"calc", "calc_ut"}
     event = operation == "rise_trans"
@@ -238,8 +202,6 @@ def native_call_policy(
         and not callable(getattr(native, "get_current_file_data", None))
     ):
         state.fail("required_data_files_unverified")
-    else:
-        pass
 
     def probe(epoch: float) -> None:
         probe_call("calc_ut", epoch, body, native.FLG_SWIEPH | native.FLG_SPEED)
@@ -250,23 +212,15 @@ def native_call_policy(
             return _coordinate_result(
                 native, operation, args, kwargs, value, model_from_retflag
             )
-        else:
-            pass
         if event and value[0] >= 0:
             probe(float(value[1][0]))
-        else:
-            pass
         return value
 
     try:
         if event:
             if not _physical(body):
                 state.fail("required_data_files_unverified")
-            else:
-                pass
             probe(float(args[0] if args else kwargs["tjdut"]))
-        else:
-            pass
         yield observe
     except EphemerisSourceError as error:
         state.failure = state.failure or error.reason
@@ -274,8 +228,6 @@ def native_call_policy(
     except Exception:
         if coordinate and _physical(body) or event:
             state.fail("required_data_files_unavailable")
-        else:
-            pass
         raise
 
 
@@ -288,8 +240,4 @@ def merge_worker_policy(receipt: Any) -> None:
             or receipt.get("requested") != "require_data_files"
         ):
             state.fail("required_data_files_unverified")
-        else:
-            pass
         state.worker_reports.append(receipt)
-    else:
-        pass

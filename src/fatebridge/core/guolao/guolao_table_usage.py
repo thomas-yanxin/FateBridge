@@ -27,8 +27,6 @@ def _data() -> dict[str, Any]:
     raw = DATA.read_bytes()
     if hashlib.sha256(raw).hexdigest() != DATA_SHA256:
         raise ValueError("原页用法资料指纹变化，不能静默改写假设或校注")
-    else:
-        pass
     data: dict[str, Any] = json.loads(raw)
     grid = load_nijl_grid()
     if (
@@ -38,36 +36,24 @@ def _data() -> dict[str, Any]:
         or data["source_grid_image_sha256"] != grid.source_image_sha256
     ):
         raise ValueError("用法审计须绑定同一NIJL原表，不跨见证拼表")
-    else:
-        pass
     return data
 
 
 def _require_policy(policy: str) -> None:
     if policy != POLICY:
         raise ValueError("须明确选择具名的宿标区段假设；不默认继承普通格宿名")
-    else:
-        pass
 
 
 def _label(cell: dict[str, Any]) -> int | str:
     if cell["initial_marker"]:
         return "初"
-    else:
-        pass
     if cell["numeral_value"] is not None:
         return int(cell["numeral_value"])
-    else:
-        pass
     attached = cell["marker_reading"]
     if attached["kind"] == "initial":
         return "初"
-    else:
-        pass
     if attached["kind"] != "integer":
         raise ValueError("此具名NIJL假设不接收未见附字，不从邻格补数")
-    else:
-        pass
     return int(attached["integer_value"])
 
 
@@ -80,12 +66,8 @@ def _contexts() -> list[dict[str, Any]]:
             cell = grid.cell(palace, column)
             if cell["mansion_marker"] is not None:
                 anchor = cell
-            else:
-                pass
             if anchor is None:
                 raise ValueError("区段缺少本行明确宿标，不跨行或取后格补标")
-            else:
-                pass
             result.append(
                 dict(
                     palace=palace,
@@ -138,19 +120,13 @@ def locate_label(
     _require_policy(context_policy)
     if not isinstance(palace, str) or palace not in BRANCHES or len(palace) != 1:
         raise ValueError("须明确单个原行宫支，不从现代黄经推定")
-    else:
-        pass
     if not isinstance(mansion, str) or mansion not in MANSIONS:
         raise ValueError("须明确原表规范宿名，不由所求目标反推来源宿名")
-    else:
-        pass
     if not (
         (type(label) is int and 1 <= label <= 30)
         or (type(label) is str and label == "初")
     ):
         raise ValueError("原字标签须为1至30整数或初；不取整、不将初改为0")
-    else:
-        pass
     data = _data()
     row = [r for r in _contexts() if r["palace"] == palace]
     numeral_matches = [r for r in row if r["literal_label"] == label]

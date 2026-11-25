@@ -95,12 +95,8 @@ def _build_person(
         supplied_fields is None or f"{prefix}birth_minute" in supplied_fields
     ):
         person_arguments["birth_minute"] = birth_minute
-    else:
-        pass
     if birth_second is not None:
         person_arguments["birth_second"] = birth_second
-    else:
-        pass
     return PersonInfo.model_validate(person_arguments)
 
 
@@ -180,8 +176,6 @@ def raw_invoke(
             accepts_explicit_solar_time = (
                 "true_solar_explicit" in signature(resolved).parameters
             )
-        else:
-            pass
         arguments: dict[str, ServiceInput] = (
             dict(request.service_inputs())
             if isinstance(request, ServiceInputProvider)
@@ -191,12 +185,8 @@ def raw_invoke(
             arguments["true_solar_explicit"] = (
                 "use_true_solar_time" in request.model_fields_set
             )
-        else:
-            pass
         if fixed:
             arguments.update(fixed)
-        else:
-            pass
         return BoundServiceCall(resolved, (), arguments)
 
     return bind

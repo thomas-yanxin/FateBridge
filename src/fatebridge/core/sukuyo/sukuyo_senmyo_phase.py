@@ -27,8 +27,6 @@ def validate_selected_rule(bundle: dict[str, Any]) -> None:
     sources = {s["id"]: s for s in ref["electronic_sources"]}
     if len(sources) != 3 or set(sources) != {"phase-rule", "clock-units", "twilight"}:
         raise ValueError("宣明弦望所选来源须完整唯一")
-    else:
-        pass
     rules = bundle["rules"]
     expected = {
         "quarter_or_full_before_twilight": (
@@ -50,8 +48,6 @@ def validate_selected_rule(bundle: dict[str, Any]) -> None:
         for key, (text, phases) in expected.items()
     ):
         raise ValueError("宣明退日完整条件未绑定所选原句")
-    else:
-        pass
     if (
         rules["quarter_or_full_before_twilight"]["comparison"] != "strict_less_than"
         or rules["full_moon_eclipse_exception"]["conjunction"] is not True
@@ -61,8 +57,6 @@ def validate_selected_rule(bundle: dict[str, Any]) -> None:
         != "".join(text for text, _ in expected.values())
     ):
         raise ValueError("宣明退日比较或食例外未绑定原文")
-    else:
-        pass
     unit = bundle["units"]
     keys = [
         "day_units",
@@ -79,8 +73,6 @@ def validate_selected_rule(bundle: dict[str, Any]) -> None:
         or "刻法八十四" not in _normalize(sources["clock-units"]["literal_context"])
     ):
         raise ValueError("宣明所选单位未绑定原文")
-    else:
-        pass
     terms = bundle["terminology"]
     if (
         [
@@ -92,8 +84,6 @@ def validate_selected_rule(bundle: dict[str, Any]) -> None:
         or terms["modern_clock_or_solar_altitude_assigned"] is not False
     ):
         raise ValueError("宣明昏明、晨初与平明不得混同")
-    else:
-        pass
     case = bundle["reported_1117_case"]
     if (
         any(
@@ -111,8 +101,6 @@ def validate_selected_rule(bundle: dict[str, Any]) -> None:
         or case["initial_before_chenchu_established"] is not None
     ):
         raise ValueError("1117报告量及未定晨初条件未绑定所选记录")
-    else:
-        pass
     variant = bundle["named_print_variant"]
     if (
         variant["selected_comparison_literal"] != "弦望小餘昏明小餘已下者退"
@@ -124,20 +112,14 @@ def validate_selected_rule(bundle: dict[str, Any]) -> None:
         != "selected_literal_comparison_only_not_full_ando_algorithm"
     ):
         raise ValueError("具名安藤刊本的已下边界差异不得合并为高麗史不盈")
-    else:
-        pass
 
 
 def _remainder(value: Fraction | int, day_units: int) -> Fraction:
     if type(value) is not int and not isinstance(value, Fraction):
         raise ValueError("小余须为整数或精确分数，不接受浮点或布尔值")
-    else:
-        pass
     result = Fraction(value)
     if not 0 <= result < day_units:
         raise ValueError("所选8400统法小余须在[0,8400)内，不隐式进退日")
-    else:
-        pass
     return result
 
 
@@ -150,22 +132,16 @@ def _evaluate(
 ) -> dict[str, Any]:
     if phase not in {"quarter", "full"}:
         raise ValueError("退日原段仅限弦或望，不扩为朔日规则")
-    else:
-        pass
     if any(
         type(v) is not bool and v is not None
         for v in (has_lunar_eclipse, initial_before_chenchu)
     ):
         raise ValueError("食条件须明确为布尔或未知")
-    else:
-        pass
     if (
         phase == "quarter"
         and (has_lunar_eclipse is True or initial_before_chenchu is not None)
     ) or (has_lunar_eclipse is False and initial_before_chenchu is True):
         raise ValueError("inconsistent_eclipse_context: 食初条件与弦或无食矛盾")
-    else:
-        pass
     early = point < twilight
     if (
         phase == "quarter"

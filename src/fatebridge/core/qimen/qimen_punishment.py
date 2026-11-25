@@ -63,8 +63,6 @@ def palace_punishment(
 ) -> dict[str, Any]:
     if type(hour_ganzhi) is not str or hour_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("六仪击刑须使用完整有效时柱，不以日旬或小时地支代替")
-    else:
-        pass
     if (
         not isinstance(trigram, str)
         or trigram not in set("坎坤震巽乾兑艮离")
@@ -76,8 +74,6 @@ def palace_punishment(
         )
     ):
         raise ValueError("六仪击刑须读取实际外八宫及有效天盘主干、寄干")
-    else:
-        pass
     # This helper validates the entire sexagenary token, not just its prefix.
     head = xun_head_for_ganzhi(hour_ganzhi)
     stem, branch, target = PUNISHMENT_BY_HEAD[head]

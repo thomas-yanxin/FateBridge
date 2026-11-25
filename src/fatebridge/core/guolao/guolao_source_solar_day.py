@@ -56,8 +56,6 @@ class NamedSourceSolarDay:
     def side_at(self, source_day: F, position_du: F) -> dict[str, Any]:
         if not isinstance(source_day, F) or not isinstance(position_du, F):
             raise TypeError("源时刻及坐标须为明确Fraction，不从民用日期或浮点猜测")
-        else:
-            pass
         time_side = position_side = None
         if source_day < self.event_times[0]:
             status = "before_named_winter_event"
@@ -152,8 +150,6 @@ class NamedSourceSolarDay:
     def day(self, index: int) -> dict[str, Any]:
         if type(index) is not int:
             raise TypeError("仅接收具名原历整数日序，不强转布尔、浮点或现代JD")
-        else:
-            pass
         midnight = self.anchor_model.day(index, policy=self.daily_policy)
         source_time = self.first_midnight + index
         position = F(midnight["midnight_unwrapped_from_ji_start_du_exact"])
@@ -173,8 +169,6 @@ class NamedSourceSolarDay:
                     basis="dadu_source_table",
                 )
                 status = result["status"]
-        else:
-            pass
         return {
             "model_id": PROFILE,
             "profile_id": PROFILE,
@@ -239,35 +233,25 @@ def load_named_source_solar_day(
         raise ValueError(
             "须明确具名算例、选率、日差、折叠、半夜分表、内外重构及大都基准"
         )
-    else:
-        pass
     blob = DATA.read_bytes()
     raw = json.loads(blob)
     if raw.get("schema") != PROFILE or raw.get("profile_id") != PROFILE:
         raise ValueError("未核对的原历日太阳衔接版本")
-    else:
-        pass
     if (
         raw.get("origin_policy")
         != "subtract_same_named_winter_event_unwrapped_coordinate"
         or raw.get("side_policy") != SIDE_POLICY
     ):
         raise ValueError("源积度起点或内外口径改变，不能沿用同一版本")
-    else:
-        pass
     hashes = raw["input_data_sha256"]
     if set(hashes) != set(INPUTS):
         raise ValueError("源组件输入指纹不全，不能静默混用版本")
-    else:
-        pass
     for name in INPUTS:
         if (
             hashlib.sha256((DATA.parent / name).read_bytes()).hexdigest()
             != hashes[name]
         ):
             raise ValueError(f"源组件{name}已变化，不自动重新基准化整条计算链")
-        else:
-            pass
     source = json.loads((DATA.parent / "daily-solar-motion-v1.json").read_bytes())
     first = F(source["source_first_midnight_day"])
     operands = source["source_subtraction_components"]
@@ -288,8 +272,6 @@ def load_named_source_solar_day(
         )
     ):
         raise ValueError("具名四正源时刻或位置顺序不符，不重排或补缺")
-    else:
-        pass
     return NamedSourceSolarDay(
         load_recomputed_midnight(ANCHOR_PROFILE, rate_policy=anchor_rate_policy),
         daily_policy,

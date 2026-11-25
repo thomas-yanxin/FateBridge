@@ -29,8 +29,6 @@ def _counts(values: Sequence[int]) -> list[int]:
     row = list(values)
     if len(row) != 12 or any(type(x) is not int or not 0 <= x <= 8 for x in row):
         raise ValueError("Aiyar reduction requires twelve integer dot counts0..8")
-    else:
-        pass
     return row
 
 
@@ -44,8 +42,6 @@ def _occupancy(signs: Sequence[int]) -> set[int]:
         raise ValueError(
             "Occupancy requires distinct integer sign indices0..11, at most7"
         )
-    else:
-        pass
     return set(positions)
 
 

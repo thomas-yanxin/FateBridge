@@ -21,8 +21,6 @@ def month_header_reference(
 ) -> dict[str, Any] | None:
     if year not in (1345, 1346, 1347):
         return None
-    else:
-        pass
     record = load_source(SOURCE)
     bundle = record.data
     row = next(
@@ -35,8 +33,6 @@ def month_header_reference(
     )
     if row is None:
         return None
-    else:
-        pass
     return {
         "id": bundle["id"],
         "source_url": bundle["source_url"],
@@ -104,15 +100,11 @@ def header_reading(
             "康永二年，同栏年干支为乙酉。二／四差异未改字，未独立核读原卷"
             "或确定刊误原因，也未据此重置历法年份。"
         )
-    else:
-        pass
     if row["lunar_year"] == 1345 and row["month"] == 4:
         lines.append(
             "作者第232页说明3指出四月朱印位于初一与初二之间，并判断应属初一；"
             "位置、作者订正意见与假名字形疑读分别保留。"
         )
-    else:
-        pass
     mansion = row["marginal_mansion_normalized_candidate"]
     if mansion is None:
         lines.append(
@@ -128,15 +120,11 @@ def header_reading(
         )
         if row["marginal_status"] == "kana_glyph_uncertain":
             lines.append("该宿注假名字形仍有疑读，两个读字候选均保留。")
-        else:
-            pass
         if row["marginal_status"] == "displaced_stamp":
             lines.append(
                 "1345年五月朱印在表中偏至二日栏上；按作者正文归属月首，"
                 "保留错位，未改成二日实录。"
             )
-        else:
-            pass
         if reference["current_day_is_month_first"] and selection:
             selected = selection.get("natal_su27")
             if selected:
@@ -149,19 +137,13 @@ def header_reading(
                 )
             else:
                 lines.append("本次主宿未定，月首朱注未用于消除补配候选。")
-        else:
-            pass
     if not reference["current_day_is_month_first"]:
         lines.append("本日不是初一，上述宿曜朱注不作为本日的直接观测或记载。")
-    else:
-        pass
     if row["leap"]:
         lines.append(
             "1346年闰九月虽记同宿，两种已声明补配次序在此同得氐；"
             "此例没有区分力，不能确立次序优先级。"
         )
-    else:
-        pass
     lines.append(
         "该历书未提供所选朱注的半日或钟时，不能据此确定平明、民用正午或"
         "Hinoo半日界，也未证明全部古代历法；1345年正文五行是纳音，不能当七曜。"

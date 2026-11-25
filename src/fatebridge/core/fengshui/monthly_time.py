@@ -74,8 +74,6 @@ def solar_month_context(
     }
     if effective_year is None and local is None:
         return {**result, "input_basis": "missing"}
-    else:
-        pass
     start_term = end_term = None
     if local is not None:
         start_term, end_term = almanac.get_jie_boundaries(local, zone)
@@ -85,11 +83,7 @@ def solar_month_context(
             # Direct calendar fixtures may supply a defined projection only.
             assert start_term.has_defined_local_clock
             source_year = start_term.calendar.local_parts[0]
-        else:
-            pass
         effective_year = source_year - int(month_number == 12)
-    else:
-        pass
     assert effective_year is not None and month_number is not None
     next_year, next_month = _next_month(effective_year, month_number, 1)
     start = _boundary(effective_year, month_number, zone, term=start_term)
@@ -124,12 +118,8 @@ def solar_month_context(
         policy = boundary_model_policy(resolution)
         if policy is not None:
             model_policies.append({"boundary": name, **policy})
-        else:
-            pass
     if model_policies:
         result["precision_policy"]["boundary_model_policies"] = model_policies
-    else:
-        pass
     if local is not None:
         candidates = {(effective_year, month_number)}
         uncertain = []
@@ -141,8 +131,6 @@ def solar_month_context(
             if reason is not None:
                 candidates.add(neighbor)
                 uncertain.append({**resolution, "uncertainty_reason": reason})
-            else:
-                pass
         if uncertain:
             resolutions = {
                 (effective_year, month_number): start,
@@ -153,8 +141,6 @@ def solar_month_context(
                 key = (year, month)
                 if key not in resolutions:
                     resolutions[key] = _boundary(year, month, zone)
-                else:
-                    pass
                 # Keep actual clock/model identity inline. Large per-root
                 # analytical details live once in this same result, reachable
                 # through the exact full record path even after projection.
@@ -219,8 +205,4 @@ def solar_month_context(
                 uncertain_boundary_resolutions=uncertain,
                 interval_scope="provisional_interval_until_boundary_confirmed",
             )
-        else:
-            pass
-    else:
-        pass
     return result

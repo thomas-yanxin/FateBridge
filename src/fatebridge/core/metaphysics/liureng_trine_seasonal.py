@@ -36,8 +36,6 @@ def nominal_seasonal_evidence(
         "水",
     ):
         raise ValueError("名义三合局体季态需要明确月建支和五行")
-    else:
-        pass
     season = MONTH_PARTITION[month_branch]
     power = POWERS[season][nominal_element]
     return dict(

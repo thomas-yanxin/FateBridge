@@ -28,8 +28,6 @@ def _counts(values: Sequence[int]) -> list[int]:
     result = list(values)
     if len(result) != 12 or any(type(v) is not int or not 0 <= v <= 8 for v in result):
         raise ValueError("Pinda requires twelve integer BAV counts0..8")
-    else:
-        pass
     return result
 
 
@@ -40,8 +38,6 @@ def _signs(signs: Mapping[str, int]) -> dict[str, int]:
         raise ValueError(
             "Pinda occupancy requires exactly seven classical planetary signs0..11"
         )
-    else:
-        pass
     return dict(signs)
 
 
@@ -168,13 +164,9 @@ def analyze(
     positions = _signs(signs)
     if set(bhinna) not in (set(PLANETS), {*PLANETS, "Ascendant"}):
         raise ValueError("Pinda targets must be the seven classical planetary BAVs")
-    else:
-        pass
     totals = {p: sum(_counts(values)) for p, values in bhinna.items()}
     if any(total != BAV_TOTALS[p] for p, total in totals.items()):
         raise ValueError("Pinda requires the unreduced Rao BAV totals for each target")
-    else:
-        pass
     targets = {p: reduce_row(bhinna[p], positions) for p in PLANETS}
     return {
         "status": (

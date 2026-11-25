@@ -18,13 +18,9 @@ def binary64_integer_diagnostic(text: str) -> dict[str, Any]:
     """
     if not isinstance(text, str) or not re.fullmatch(r"-?(?:0|[1-9][0-9]*)", text):
         raise ValueError("微秒端点须为规范十进制整数字符串")
-    else:
-        pass
     value = int(text)
     if str(value) != text or not -(1 << 63) <= value < (1 << 63):
         raise ValueError("微秒端点不在支持的有符号64位整数域")
-    else:
-        pass
     magnitude = abs(value)
     shift = max(0, magnitude.bit_length() - 53)
     quotient, remainder = divmod(magnitude, 1 << shift)
@@ -32,8 +28,6 @@ def binary64_integer_diagnostic(text: str) -> dict[str, Any]:
         remainder * 2 > (1 << shift) or (remainder * 2 == (1 << shift) and quotient % 2)
     ):
         quotient += 1
-    else:
-        pass
     represented = (quotient << shift) * (-1 if value < 0 else 1)
     return {
         "exact": text,
@@ -51,19 +45,13 @@ def integer_transport_diagnostic(
         keys = ("start_utc_epoch_microseconds", "end_utc_epoch_microseconds")
         if not any(key in interval for key in keys):
             continue
-        else:
-            pass
         if not all(key in interval for key in keys):
             raise ValueError("微秒端点须成对提供，不能省略一端后认证无损")
-        else:
-            pass
         start = binary64_integer_diagnostic(interval[keys[0]])
         end = binary64_integer_diagnostic(interval[keys[1]])
         duration = int(end["exact"]) - int(start["exact"])
         if duration <= 0:
             raise ValueError("微秒支持区间须有正长度")
-        else:
-            pass
         after = int(end["after_number"]) - int(start["after_number"])
         rows.append(
             {
@@ -77,8 +65,6 @@ def integer_transport_diagnostic(
         )
     if not rows:
         return None
-    else:
-        pass
     return {
         "method_id": "exact_integer_binary64_counterfactual_v1",
         "wire_epoch_values_are_decimal_strings": True,
@@ -105,8 +91,6 @@ def integer_transport_reading(diagnostic: dict[str, Any]) -> str:
             "这不证明其他端点或相邻整数也安全，仍按返回字符串读取整数。"
             "这是按本次端点计算的假设转换，本次未运行Node。"
         )
-    else:
-        pass
     rows = diagnostic["intervals"]
     example = next(
         (r for r in rows if r["number_collapsed"]),

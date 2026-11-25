@@ -56,10 +56,6 @@ class LiurenProgression(PartialOutput):
             flag = value.get("complete_classical_conformance")
             if flag is not None and flag is not False:
                 raise ValueError("三传局部条件只允许布尔false，不认证完整原典")
-            else:
-                pass
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -73,16 +69,12 @@ class LiurenProgression(PartialOutput):
             value = getattr(self, name)
             if value is not None and len(value) != size:
                 raise ValueError("三传进退依据队列长度不符")
-            else:
-                pass
         if self.day_ganzhi is not None and self.branches is not None:
 
             compare_present_branches(
                 self.model_dump(exclude_unset=True),
                 transmission_progression(self.day_ganzhi, list(self.branches)),
             )
-        else:
-            pass
         return self
 
 
@@ -94,17 +86,11 @@ def align_progression(board: Any, pillars: Any = None) -> None:
     evidence = get(board, "transmission_progression")
     if evidence is None:
         return
-    else:
-        pass
     day = get(evidence, "day_ganzhi")
     if pillars is not None:
         a, b = get(get(pillars, "day"), "stem"), get(get(pillars, "day"), "branch")
         if a is not None and b is not None and day is not None and day != a + b:
             raise ValueError("三传进退与同次四柱日干支不符")
-        else:
-            pass
-    else:
-        pass
     for name in [
         "calendar_policy",
         "emptiness_evidence",
@@ -117,8 +103,6 @@ def align_progression(board: Any, pillars: Any = None) -> None:
         )
         if day is not None and own is not None and day != own:
             raise ValueError("三传进退日干支与本课其他依据不符")
-        else:
-            pass
     branches = get(evidence, "branches")
     flags = get(evidence, "branch_xun_kong")
     trans = get(board, "three_transmissions")
@@ -127,12 +111,8 @@ def align_progression(board: Any, pillars: Any = None) -> None:
         branch, empty = get(item, "branch"), get(item, "xun_kong")
         if branches is not None and branch is not None and branches[i] != branch:
             raise ValueError("三传进退支序与本课三传不符")
-        else:
-            pass
         if flags is not None and empty is not None and flags[i] != empty:
             raise ValueError("三传进退本空与本课三传不符")
-        else:
-            pass
 
 
 def require_complete_progression(board: dict[str, Any]) -> None:
@@ -144,13 +124,9 @@ def require_complete_progression(board: dict[str, Any]) -> None:
         or value.get("day_ganzhi") is None
     ):
         raise ValueError("完整六壬输出缺少三传进退依据")
-    else:
-        pass
     expected = transmission_progression(value["day_ganzhi"], value["branches"])
     if value != expected:
         raise ValueError("完整三传进退依据缺项或与同次计算不符")
-    else:
-        pass
     align_progression(board)
     traces = [
         t
@@ -159,5 +135,3 @@ def require_complete_progression(board: dict[str, Any]) -> None:
     ]
     if traces != [progression_trace(expected)]:
         raise ValueError("三传进退轨迹缺项、重复或与依据不符")
-    else:
-        pass

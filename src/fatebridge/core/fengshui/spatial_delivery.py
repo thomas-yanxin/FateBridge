@@ -99,8 +99,6 @@ def merge_measured_layout(
     result["missing_inputs"] = missing_json
     if missing:
         result["status"] = "partial"
-    else:
-        pass
     previous = current.analysis_progress
     counts = dict(previous.rule_coverage_counts)
     counts["supported"] += 0 if geometry.candidate_only else len(geometry.checks)

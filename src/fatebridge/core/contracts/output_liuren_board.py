@@ -305,8 +305,6 @@ class Liuren(PartialOutput):
 
         if not (info.context and info.context.get("full_result")):
             validate_selection(self.model_dump(exclude_unset=True))
-        else:
-            pass
         return self
 
     @model_validator(mode="after")
@@ -323,8 +321,6 @@ class Liuren(PartialOutput):
         evidence = self.emptiness_evidence
         if evidence is None or evidence.rows is None:
             return self
-        else:
-            pass
         by_earth = {r.earth_branch: r for r in evidence.rows}
         by_sky = {r.sky_branch: r for r in evidence.rows}
         for row in self.twelve_board or []:
@@ -334,21 +330,13 @@ class Liuren(PartialOutput):
                     or by_earth[row.earth_branch].sky_branch != row.sky_branch
                 ):
                     raise ValueError("六壬空亡依据与同时返回的天地盘不一致")
-                else:
-                    pass
-            else:
-                pass
         if self.three_transmissions is not None:
             for position in ("initial", "middle", "final"):
                 item = getattr(self.three_transmissions, position)
                 if item is None or item.branch is None:
                     continue
-                else:
-                    pass
                 if item.branch not in by_sky:
                     raise ValueError("六壬空亡依据中的三传支位无效")
-                else:
-                    pass
                 empty_row = by_sky[item.branch]
                 for name, expected in (
                     ("earth_branch", empty_row.earth_branch),
@@ -358,10 +346,6 @@ class Liuren(PartialOutput):
                     actual = getattr(item, name)
                     if actual is not None and actual != expected:
                         raise ValueError("六壬空亡依据与同时返回的三传不一致")
-                    else:
-                        pass
-        else:
-            pass
         return self
 
     @model_validator(mode="after")
@@ -375,26 +359,18 @@ class Liuren(PartialOutput):
                         trine.nominal_seasonal_evidence.model_dump(exclude_unset=True),
                         nominal_seasonal_evidence(month, trine.nominal_element),
                     )
-                else:
-                    pass
-        else:
-            pass
         if (
             self.transmission_relations is None
             or self.four_lessons is None
             or self.three_transmissions is None
         ):
             return self
-        else:
-            pass
         day = self.transmission_relations.day_ganzhi
         if day is None or any(
             lesson.index is None or lesson.upper_branch is None
             for lesson in self.four_lessons
         ):
             return self
-        else:
-            pass
         transmissions = self.three_transmissions.model_dump(exclude_unset=True)
         if any(
             not isinstance(transmissions.get(p), dict)
@@ -402,8 +378,6 @@ class Liuren(PartialOutput):
             for p in ("initial", "middle", "final")
         ):
             return self
-        else:
-            pass
 
         expected = transmission_relations(
             day_ganzhi=day,

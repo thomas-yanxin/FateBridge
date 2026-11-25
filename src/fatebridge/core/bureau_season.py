@@ -52,8 +52,6 @@ def build_bureau_season_reference(
         for event in events:
             if event.get("kind") != "三会":
                 continue
-            else:
-                pass
             target, positions = event["target"], event["positions"]
             flag = event.get("season_supports")
             matches_group = target == group_element
@@ -74,8 +72,6 @@ def build_bureau_season_reference(
                     "classical_transformation": "not_adjudicated",
                 }
             )
-    else:
-        pass
     return {
         "method_id": "month_branch_group_and_supplied_phase_gate_v1",
         "source": deepcopy(SOURCE),

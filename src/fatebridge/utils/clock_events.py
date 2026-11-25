@@ -50,12 +50,8 @@ def _defined_offset(local: datetime) -> timedelta | None:
     offset = local.utcoffset()
     if offset is None:
         raise ValueError("未来钟时事件需要明确的UTC偏移")
-    else:
-        pass
     if isinstance(local.tzinfo, ZoneInfo) and is_unspecified_local_time(local):
         return None
-    else:
-        pass
     return offset
 
 
@@ -75,8 +71,6 @@ def birth_civil_clock_cuts(
     """
     if lower == upper:
         return (), None
-    else:
-        pass
     transitions = (
         ()
         if isinstance(zone, timezone)
@@ -108,17 +102,11 @@ def birth_civil_clock_cuts(
                         delta = timedelta(days=day, hours=hour) - elapsed
                         if timedelta(0) < delta <= span:
                             candidates.add(start + delta)
-                        else:
-                            pass
-        else:
-            pass
         probes = sorted(candidates)
     cuts = []
     for at in probes:
         if transitions is not None:
             previous = (at - timedelta(microseconds=1)).astimezone(zone)
-        else:
-            pass
         local = at.astimezone(zone)
         changed = (
             local.utcoffset() != previous.utcoffset()
@@ -130,8 +118,6 @@ def birth_civil_clock_cuts(
         )
         if changed:
             cuts.append((at, local))
-        else:
-            pass
         previous = local
     return tuple(cuts), 1 if transitions is None else None
 
@@ -146,8 +132,6 @@ def clock_offset_changes(
     """
     if isinstance(zone, timezone):
         return ()
-    else:
-        pass
     previous = _defined_offset(lower.astimezone(zone))
     candidates = timezone_transition_candidates(zone, lower, upper)
     probes: Iterable[datetime]
@@ -167,13 +151,9 @@ def clock_offset_changes(
             previous = _defined_offset(
                 (at - timedelta(microseconds=1)).astimezone(zone)
             )
-        else:
-            pass
         current = _defined_offset(at.astimezone(zone))
         if previous is not None and current is not None and current != previous:
             changes.append((at, previous, current))
-        else:
-            pass
         previous = current
     return tuple(changes)
 

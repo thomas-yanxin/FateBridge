@@ -18,12 +18,8 @@ BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 def branch_relation(original: str, changed: str) -> str:
     if original == changed:
         return "伏吟"
-    else:
-        pass
     if (BRANCHES.index(original) - BRANCHES.index(changed)) % 12 == 6:
         return "反吟"
-    else:
-        pass
     return "其他纳支关系"
 
 
@@ -91,8 +87,6 @@ def build_fanfu_evidence(
     if explicit:
         explicit["source_url"] = source + f"#page={explicit['pdf_page']}"
         explicit["basis"] = "指定底本明列的卦体例；不由纳支相冲推得，也不外推完整卦体表"
-    else:
-        pass
     return {
         "ruleset_id": PROFILE["ruleset_id"],
         "ruleset_version": PROFILE["ruleset_version"],

@@ -11,20 +11,14 @@ def get_element_relationship(element1: str, element2: str) -> dict[str, str]:
     for element_enum in Element:
         if element_enum.value == element1:
             element1_enum = element_enum
-        else:
-            pass
         if element_enum.value == element2:
             element2_enum = element_enum
-        else:
-            pass
 
     if element1_enum is None or element2_enum is None:
         return {
             "type": "错误",
             "description": f"无效的五行元素: {element1 if element1_enum is None else element2}",
         }
-    else:
-        pass
 
     if element1_enum == element2_enum:
         return {"type": "相同", "description": "同类元素"}

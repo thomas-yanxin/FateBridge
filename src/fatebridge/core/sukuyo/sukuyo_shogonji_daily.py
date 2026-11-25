@@ -16,16 +16,12 @@ def daily_annotation_reference(
 ) -> dict[str, Any] | None:
     if year != 1346 or leap or (month, day) not in {(6, 20), (6, 21), (8, 3), (8, 5)}:
         return None
-    else:
-        pass
     source = load_source(SOURCE)
     bundle = deepcopy(source.data)
     records = []
     for row in bundle["records"]:
         if row["month"] != month:
             continue
-        else:
-            pass
         role = (
             "original_position"
             if day == row["original_position"]["day"]

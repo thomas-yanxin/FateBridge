@@ -41,8 +41,6 @@ def _source() -> dict[str, Any]:
             != ["甲子", "丙子", "戊子", "庚子", "壬子"]
         ):
             raise ValueError("卷七起月起时原句与所选表不一致。")
-        else:
-            pass
         for key in (
             "version",
             "source_title",
@@ -54,12 +52,8 @@ def _source() -> dict[str, Any]:
         ):
             if not isinstance(data[key], str) or not data[key].strip():
                 raise ValueError("卷七起月起时来源元数据缺失。")
-            else:
-                pass
         if data["source_pdf_pages"] != [108]:
             raise ValueError("卷七原页不一致。")
-        else:
-            pass
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_pillar_link_source_data") from exc
     data["loaded_sha256"] = sha256(raw).hexdigest()
@@ -72,8 +66,6 @@ def pillar_link_evidence(pillars: dict[str, str]) -> dict[str, Any]:
         for k in ("year", "month", "day", "hour")
     ):
         raise ValueError("干支衔接核对需要四个有效六十甲子。")
-    else:
-        pass
     source = _source()
     rows = []
     for target, basis in (("month", "year"), ("hour", "day")):
@@ -126,8 +118,6 @@ def require_pillar_links(pillars: dict[str, str]) -> dict[str, Any]:
             raise ValueError(
                 f"{label}衔接不一致：所给{row['actual_pillar']}，按卷七附法应为{row['expected_pillar']}。"
             )
-        else:
-            pass
     return evidence
 
 

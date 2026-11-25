@@ -56,13 +56,9 @@ def boundary_model_policy(
     model = resolution.get("ephemeris_model")
     if not isinstance(model, str) or resolution.get("approximate") is True:
         return None
-    else:
-        pass
     name = _MODEL_GUARD_NAMES.get(model)
     if name is None:
         return None
-    else:
-        pass
     guard_name = "moshier_numeric" if model == "moshier" else name
     policy = {
         "ephemeris_model": model,
@@ -72,8 +68,6 @@ def boundary_model_policy(
     }
     if date_only:
         policy["reason"] = f"{name}_guard_crosses_civil_date_not_fabricated_birth_hour"
-    else:
-        pass
     return policy
 
 
@@ -81,8 +75,6 @@ def resolution_point(record: CivilPointRecord | None, moment: str) -> CivilPoint
     """Read the retained event, or the label precision of a saved old receipt."""
     if record is None:
         return CivilPoint(ZonedCalendar.from_isoformat(moment).utc.julian_day_exact())
-    else:
-        pass
     cap = record["excluded_before"]
     return CivilPoint(
         Fraction(int(record["numerator"]), int(record["denominator"])),
@@ -102,14 +94,10 @@ def boundary_uncertainty_reason(
     policy = boundary_model_policy(resolution)
     if policy is None:
         return None
-    else:
-        pass
     boundary = resolution_point(resolution.get("civil_point"), resolution["moment"])
     distance = abs(utc_calendar(local).julian_day_exact() - boundary.day) * 86400
     if distance <= policy["operational_guard_seconds"]:
         return str(policy["uncertainty_reason"])
-    else:
-        pass
     return None
 
 
@@ -119,8 +107,6 @@ def boundary_dates(
     """Project a defined event date and dates touched by its closed guard."""
     if resolution.get("local_clock_status") == "undefined":
         return None
-    else:
-        pass
     tz = parse_timezone_name(timezone_name)
     point = resolution_point(resolution.get("civil_point"), resolution["moment"])
 
@@ -133,8 +119,6 @@ def boundary_dates(
     policy = boundary_model_policy(resolution)
     if policy is None:
         return primary, {primary}
-    else:
-        pass
     guard = Fraction(policy["operational_guard_seconds"]) / 86400
     return primary, {
         local_date(point.day - guard),
@@ -149,8 +133,6 @@ def lichun(year: int, timezone_name: str) -> datetime:
         return datetime.fromisoformat(historical["moment"]).astimezone(
             parse_timezone_name(timezone_name)
         )
-    else:
-        pass
     return almanac.get_solar_term(year, "立春", timezone_name).moment
 
 
@@ -166,8 +148,6 @@ def solar_term_resolution(
     historical = historical_solar_resolution(year, term_name, timezone_name)
     if historical is not None:
         return historical
-    else:
-        pass
     return solar_term_receipt(almanac.get_solar_term(year, term_name, timezone_name))
 
 
@@ -186,12 +166,8 @@ def solar_term_receipt(term: almanac.SolarTerm) -> dict[str, Any]:
     }
     if not defined:
         result["local_clock_status"] = "undefined"
-    else:
-        pass
     if term.tt_instant is None:
         raise ValueError("Solar source probe requires the retained TT boundary")
-    else:
-        pass
     clock_policy = native_solar_root_time_policy(term.calendar.utc)
     # The API name does not prove .se1 files were used. Inspect the actual
     # return flag at the selected root, not its re-encoded civil display.
@@ -230,8 +206,6 @@ def seasonal_query_clock(local: datetime | None) -> dict[str, str | None]:
             "local_clock_status": "undefined",
             "utc_moment": format_local_time_or_utc(local),
         }
-    else:
-        pass
     return {"local_moment": local.isoformat() if local is not None else None}
 
 
@@ -260,8 +234,6 @@ def _january_query_interval(
     for midnight in (start, end):
         if is_unspecified_local_time(midnight):
             continue
-        else:
-            pass
         later = midnight.replace(fold=1)
         first = midnight.astimezone(timezone.utc)
         last = later.astimezone(timezone.utc)
@@ -270,8 +242,6 @@ def _january_query_interval(
                 (first, midnight.isoformat())
             )
             continue
-        else:
-            pass
         lower, upper = sorted((first, last))
         # The fold coordinates bracket the relevant offset change. Some
         # coordinates are synthetic in a gap, so check both sides on UTC.
@@ -284,14 +254,10 @@ def _january_query_interval(
                 current
             ):
                 continue
-            else:
-                pass
             if previous.year != year == current.year:
                 starts.append((at, current.isoformat()))
             elif previous.year == year != current.year:
                 stops.append((at, current.isoformat()))
-            else:
-                pass
     left = max((cut for cut in starts if cut[0] <= query), default=None)
     right = min((cut for cut in stops if cut[0] > query), default=None)
     return (left[1] if left else None, right[1] if right else None)
@@ -313,8 +279,6 @@ def year_context(
             "year_boundary": boundary,
             "timezone_name": timezone_name,
         }
-    else:
-        pass
     query_clock = seasonal_query_clock(local)
     year = effective_year
     uncertain_boundary = None
@@ -333,8 +297,6 @@ def year_context(
                 "valid_from": None,
                 "valid_until": None,
             }
-        else:
-            pass
         year = local.year
         if boundary == "lichun":
             resolution = lichun_resolution(local.year, timezone_name)
@@ -350,14 +312,6 @@ def year_context(
                     uncertain_boundary["operational_guard_seconds"] = policy[
                         "operational_guard_seconds"
                     ]
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
-    else:
-        pass
     assert year is not None
     if not resolve_interval:
         result = {
@@ -380,11 +334,7 @@ def year_context(
         if uncertain_boundary is not None:
             assert local is not None
             result.update(_uncertain_year_fields(year, local, uncertain_boundary))
-        else:
-            pass
         return result
-    else:
-        pass
     valid_from: str | None
     valid_until: str | None
     if boundary == "lichun":
@@ -445,6 +395,4 @@ def year_context(
                 }
             )
         result["candidate_year_intervals"] = intervals
-    else:
-        pass
     return result

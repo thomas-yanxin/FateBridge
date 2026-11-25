@@ -47,8 +47,6 @@ def _digest(path: Path, signature: tuple[int, ...]) -> str:
             result.update(block)
     if _signature(path) != signature:
         raise EphemerisSourceError("solar_configuration_changed")
-    else:
-        pass
     return result.hexdigest()
 
 
@@ -57,8 +55,6 @@ def native_solar_file_context(native: Any) -> dict[str, Any] | None:
     getter = getattr(native, "get_current_file_data", None)
     if not callable(getter):
         return None
-    else:
-        pass
     windows = []
     for slot in (0, 1):
         filename, start, end, edition = getter(slot)
@@ -68,8 +64,6 @@ def native_solar_file_context(native: Any) -> dict[str, Any] | None:
             or start >= end
         ):
             return None
-        else:
-            pass
         path = Path(filename).absolute()
         try:
             signature = _signature(path)
@@ -117,14 +111,10 @@ def prime_swiss_solar_context(
     """
     if not swiss_solar_context_required(jd_tt):
         raise EphemerisSourceError("solar_native_context_unavailable")
-    else:
-        pass
     with lock_ephemeris_configuration():
         _, flags = invoke("calc", jd_tt, native.SUN, native.FLG_MOSEPH)
         if flags != native.FLG_MOSEPH:
             raise EphemerisSourceError("coordinate_contract_changed")
-        else:
-            pass
         result = invoke("calc", jd_tt, native.SUN, native.FLG_SWIEPH)
         context = (
             native_solar_file_context(native)

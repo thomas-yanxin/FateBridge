@@ -216,12 +216,8 @@ class _Evaluation:
     def _string(self, value: RuleValue) -> str:
         if isinstance(value, str):
             return value
-        else:
-            pass
         if isinstance(value, tuple):
             return self.profile.separator.join(value)
-        else:
-            pass
         return ""
 
     def _unknown(self, values: Sequence[RuleValue]) -> UnknownValue | None:
@@ -239,25 +235,17 @@ class _Evaluation:
         if namespace == "?":
             if name in self.facts.booleans:
                 return "t" if self.facts.booleans[name] else "f"
-            else:
-                pass
             if key in self.facts.unavailable:
                 reason = self.facts.unavailable[key]
                 state.missing_facts.add(reason)
                 return UnknownValue((reason,))
-            else:
-                pass
             if name in self.rules:
                 result = self.rule_value(name, check_level=False)
                 state.missing_facts.update(self.states[name].missing_facts)
                 state.undefined_symbols.update(self.states[name].undefined_symbols)
                 return result
-            else:
-                pass
             if name not in self.profile.primitive_booleans:
                 state.undefined_symbols.add(key)
-            else:
-                pass
             return "f"
         else:
             values: Mapping[str, str | tuple[str, ...]]
@@ -269,78 +257,50 @@ class _Evaluation:
                 values = self.facts.strings
             if name in values:
                 return values[name]
-            else:
-                pass
             if namespace == "$" and name in self.source_strings:
                 return self.source_strings[name]
-            else:
-                pass
         if key in self.facts.unavailable:
             reason = self.facts.unavailable[key]
             state.missing_facts.add(reason)
             return UnknownValue((reason,))
-        else:
-            pass
         state.undefined_symbols.add(key)
         raise _ExpressionAbort(f"{key} not defined")
 
     def expression_value(self, expression: Expression, current: str) -> RuleValue:
         if isinstance(expression, Atom):
             return expression.text
-        else:
-            pass
         if isinstance(expression, Name):
             parts = [self.expression_value(part, current) for part in expression.parts]
             if len(parts) == 1:
                 return parts[0]
-            else:
-                pass
             unknown = self._unknown(parts)
             return unknown if unknown else "".join(self._string(part) for part in parts)
-        else:
-            pass
         if isinstance(expression, Lookup):
             name = self.expression_value(expression.name, current)
             if isinstance(name, UnknownValue):
                 return name
-            else:
-                pass
             return self._lookup(expression.namespace, self._string(name), current)
-        else:
-            pass
         if isinstance(expression, Index):
             value = self.expression_value(expression.value, current)
             index_value = self.expression_value(expression.index, current)
             unknown = self._unknown((value, index_value))
             if unknown:
                 return unknown
-            else:
-                pass
             index = int(self._string(index_value)[0])
             if isinstance(value, str):
                 return value[index] if 0 <= index < len(value) else ()
-            else:
-                pass
             if isinstance(value, tuple):
                 return tuple(
                     dict.fromkeys(
                         item[index] for item in value if 0 <= index < len(item)
                     )
                 )
-            else:
-                pass
             raise _ExpressionAbort("null index argument")
-        else:
-            pass
         if isinstance(expression, Negation):
             value = self.expression_value(expression.value, current)
             if isinstance(value, UnknownValue):
                 return value
-            else:
-                pass
             return "f" if self._string(value) == "t" else "t"
-        else:
-            pass
         left = self.expression_value(expression.left, current)
         right = self.expression_value(expression.right, current)
         # Both operands have already been evaluated, as in the original parser.
@@ -348,53 +308,31 @@ class _Evaluation:
         if expression.operator == "&":
             if self._string(left) == "f" or self._string(right) == "f":
                 return "f"
-            else:
-                pass
             if unknown:
                 return unknown
-            else:
-                pass
             return (
                 "t" if self._string(left) == "t" and self._string(right) == "t" else "f"
             )
-        else:
-            pass
         if expression.operator == "|":
             if self._string(left) == "t" or self._string(right) == "t":
                 return "t"
-            else:
-                pass
             if unknown:
                 return unknown
-            else:
-                pass
             return "f"
-        else:
-            pass
         if unknown:
             return unknown
-        else:
-            pass
         if expression.operator == "=":
             if left is None or right is None:
                 raise _ExpressionAbort("null containment argument")
-            else:
-                pass
             left_set = (left,) if isinstance(left, str) else left
             right_set = (right,) if isinstance(right, str) else right
             if isinstance(left_set, tuple) and isinstance(right_set, tuple):
                 return "t" if any(item in right_set for item in left_set) else "f"
-            else:
-                pass
             return "f"
-        else:
-            pass
         first = self._string(left)
         shift = int(self._string(right)[0])
         if expression.operator == "-":
             shift = -shift
-        else:
-            pass
         if first in self.profile.full_zodiac and -6 <= shift <= 6:
             circle = self.profile.full_zodiac
         elif first in self.profile.full_stellar_signs and -14 <= shift <= 14:
@@ -407,12 +345,8 @@ class _Evaluation:
         state, rule = self.states[rule_id], self.rules[rule_id]
         if state.raw_state != "uncomputed":
             return state.value
-        else:
-            pass
         if check_level and (state.hidden or rule.priority[0] < self.display_level):
             return state.value
-        else:
-            pass
         state.raw_state = "evaluating"
         try:
             state.value = self.expression_value(rule.condition, rule_id)
@@ -422,8 +356,6 @@ class _Evaluation:
         state.raw_state = "computed"
         if self._string(state.value) == "t":
             self.reject(rule)
-        else:
-            pass
         return state.value
 
     def reject(self, source: CompiledRule) -> None:
@@ -436,26 +368,18 @@ class _Evaluation:
             if isinstance(value, UnknownValue):
                 self.unresolved_rejects.add(source.rule_id)
                 continue
-            else:
-                pass
             key = self._string(value)
             target = self.rules.get(key)
             if target is None:
                 self.rejected_aliases.setdefault(key, source.rule_id)
                 continue
-            else:
-                pass
             if not self.may_reject(source, target):
                 continue
-            else:
-                pass
             state = self.states[key]
             if not state.hidden:
                 state.hidden = True
                 state.suppressed_by.append(source.rule_id)
                 self.reject(target)
-            else:
-                pass
 
     @staticmethod
     def may_reject(source: CompiledRule, target: CompiledRule) -> bool:
@@ -472,8 +396,6 @@ class _Evaluation:
         """
         if isinstance(expression, Atom):
             return {expression.text}
-        else:
-            pass
         if isinstance(expression, Name):
             names = {""}
             for part in expression.parts:
@@ -483,8 +405,6 @@ class _Evaluation:
                     for suffix in self.possible_strings(part)
                 }
             return names
-        else:
-            pass
         if isinstance(expression, Lookup):
             values: set[str] = set()
             for name in self.possible_strings(expression.name):
@@ -513,8 +433,6 @@ class _Evaluation:
                 else:
                     values.update(("t", "f"))
             return values
-        else:
-            pass
         if isinstance(expression, Index):
             return {
                 value[int(index[0])]
@@ -522,16 +440,10 @@ class _Evaluation:
                 for index in self.possible_strings(expression.index)
                 if index and index[0].isdigit() and int(index[0]) < len(value)
             }
-        else:
-            pass
         if isinstance(expression, Negation):
             return {"t", "f"}
-        else:
-            pass
         if expression.operator in ("&", "|", "="):
             return {"t", "f"}
-        else:
-            pass
         results: set[str] = set()
         for value in self.possible_strings(expression.left):
             for amount in self.possible_strings(expression.right):
@@ -543,8 +455,6 @@ class _Evaluation:
                 )
                 if value in circle:
                     results.add(circle[(circle.index(value) + shift) % len(circle)])
-                else:
-                    pass
         return results
 
     def possible_suppression(self) -> tuple[dict[str, set[str]], set[str]]:
@@ -562,8 +472,6 @@ class _Evaluation:
                 key = pending.pop()
                 if key in visited:
                     continue
-                else:
-                    pass
                 visited.add(key)
                 source = self.rules[key]
                 for expression in source.rejects:
@@ -574,8 +482,6 @@ class _Evaluation:
                         elif self.may_reject(source, target):
                             possible[target_name].add(root)
                             pending.append(target_name)
-                        else:
-                            pass
         return possible, aliases
 
 
@@ -670,19 +576,13 @@ def evaluate_source_profile(
             or record["condition_value"] is not True
         ):
             continue
-        else:
-            pass
         name = evaluation.aliases.get(rule.rule_id, rule.rule_id)
         if rule.rule_id in evaluation.aliases and name in evaluation.rejected_aliases:
             record["visibility"] = "suppressed"
             record["suppressed_by"].append(evaluation.rejected_aliases[name])
             continue
-        else:
-            pass
         if name in possible_aliases:
             record["visibility"] = "unknown"
-        else:
-            pass
         if facts.male is None and "妻" in name:
             record["missing_facts"].append(
                 "?male: source display remapping unavailable"
@@ -690,17 +590,11 @@ def evaluate_source_profile(
             record["visibility"] = "unknown"
         elif facts.male is False:
             name = name.replace("妻", "夫")
-        else:
-            pass
         star = name.rfind("*")
         if star > 0:
             name = name[:star]
-        else:
-            pass
         if record["visibility"] != "active":
             continue
-        else:
-            pass
         if (
             fill_max_styles is not None
             and rule.priority[0] == display_level
@@ -709,8 +603,6 @@ def evaluate_source_profile(
         ):
             record["visibility"] = "inactive"
             continue
-        else:
-            pass
         style_counts[rule.polarity] += 1
         displayed[rule.rule_id] = name
         patterns.append(ActivePattern(name, rule))

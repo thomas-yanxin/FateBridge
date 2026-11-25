@@ -83,8 +83,6 @@ def origin_source_evidence(body: str) -> dict[str, Any]:
     """Keep explicit birth wording separate from unresolved return conventions."""
     if body not in BODIES:
         raise ValueError("Unknown Human Design cycle body")
-    else:
-        pass
     raw = reference_bytes("cycles-2026-reference.json")
     reference = json.loads(raw)
     fact = reference["event_origin_evidence"][body]
@@ -110,23 +108,15 @@ def reference_epoch(value: str) -> tuple[str, float]:
     leap = reference_leap_second(value)
     if leap is not None:
         return leap.utc_label, leap.tt.as_float()
-    else:
-        pass
     moment = reference_datetime(value)
     if moment.utcoffset() is None:
         raise ValueError("cycle_reference_datetime 必须带明确时区或UTC偏移")
-    else:
-        pass
     moment = moment.astimezone(timezone.utc)
     if not 1800 <= moment.year <= 2600:
         raise ValueError("cycle_reference_datetime 的UTC年份须在1800至2600之间")
-    else:
-        pass
     tt = ephemeris_time(moment).jd_tt
     if tt is None:
         raise ValueError("cycle_reference_datetime 无可用TT")
-    else:
-        pass
     return moment.isoformat(), tt
 
 
@@ -144,13 +134,9 @@ def validate_row(row: Row, jd_tt: float, require_swiss_files: bool) -> str:
         or not 0 <= row[1] < 360
     ):
         raise ValueError("周期见证坐标无效")
-    else:
-        pass
     model = position_flag_model(row[3])  # type: ignore[arg-type]
     if require_swiss_files and model != "swieph":
         raise CycleUnavailable("required_swiss_backend_unavailable", jd_tt)
-    else:
-        pass
     return model
 
 
@@ -178,21 +164,15 @@ def coordinate_extremum_probe(
     for iterations in range(1, 129):
         if math.nextafter(lo, math.inf) >= hi:
             break
-        else:
-            pass
         # Fixed binary64 constants, with no platform transcendental call.
         a = lo + (hi - lo) * 0.3819660112501051
         b = lo + (hi - lo) * 0.6180339887498949
         if not lo < a <= b < hi:
             break
-        else:
-            pass
         ra, rb = read(a), read(b)
         samples[a], samples[b] = ra, rb
         if a == b:
             break
-        else:
-            pass
         av, bv = value(ra), value(rb)
         if av < bv:
             hi = b
@@ -239,8 +219,6 @@ def derive_body_contacts(
             model = actual
         elif actual != model:
             raise CycleUnavailable("native_model_changed_within_search", t)
-        else:
-            pass
         return row
 
     def station(left: Row, right: Row) -> tuple[Row, Row, Row]:
@@ -249,14 +227,10 @@ def derive_body_contacts(
             t = float(lo[0] + (hi[0] - lo[0]) / 2)
             if t in (lo[0], hi[0]):
                 break
-            else:
-                pass
             mid = at(t)
             if mid[2] == 0:
                 lo = hi = mid
                 break
-            else:
-                pass
             if (mid[2] > 0) == (lo[2] > 0):
                 lo = mid
             else:
@@ -264,8 +238,6 @@ def derive_body_contacts(
         chosen = min((lo, hi), key=lambda row: (abs(row[2]), row[0]))
         if (hi[0] - lo[0]) * 86400 > STATION_SECONDS:
             raise CycleUnavailable("station_bracket_did_not_converge", float(chosen[0]))
-        else:
-            pass
         return chosen, lo, hi
 
     def crossing(left: Row, lp: Fraction, right: Row, rp: Fraction) -> dict[str, Any]:
@@ -274,22 +246,14 @@ def derive_body_contacts(
             if lv == 0:
                 hi, hv = lo, lv
                 break
-            else:
-                pass
             if hv == 0:
                 lo, lv = hi, hv
                 break
-            else:
-                pass
             if math.nextafter(float(lo[0]), math.inf) >= hi[0]:
                 break
-            else:
-                pass
             t = float(lo[0] + (hi[0] - lo[0]) / 2)
             if t in (lo[0], hi[0]):
                 break
-            else:
-                pass
             mid = at(t)
             mv = lv + _increment(float(mid[1]), float(lo[1]))
             if (mv > 0) == (lv > 0):
@@ -304,12 +268,8 @@ def derive_body_contacts(
             lo[0] != hi[0] and math.nextafter(float(lo[0]), math.inf) != hi[0]
         ):
             raise CycleUnavailable("contact_bracket_did_not_converge", t)
-        else:
-            pass
         if abs(residual) > RESIDUAL_DEGREES:
             raise CycleUnavailable("angular_root_residual_exceeded", t)
-        else:
-            pass
         return {
             "jd_tt": t,
             "longitude": solved[1],
@@ -357,19 +317,13 @@ def derive_body_contacts(
         for (a, ap), (b, bp) in zip(points, points[1:]):
             if ap != target_exact:
                 zero_component_contact_index = None
-            else:
-                pass
             if ap == bp == target_exact:
                 # Consecutive observed zeroes form one candidate. They do not
                 # prove a continuous zero plateau or two physical roots.
                 if zero_component_contact_index is None:
                     contacts.append(crossing(a, ap, a, ap))
                     zero_component_contact_index = len(contacts) - 1
-                else:
-                    pass
                 continue
-            else:
-                pass
             if min(ap, bp) <= target <= max(ap, bp) and ap != bp:
                 event = crossing(a, ap, b, bp)
                 zero_endpoint = event["exact_residual"]["numerator"] == "0" and (
@@ -382,21 +336,13 @@ def derive_body_contacts(
                 )
                 if not shares_zero_component:
                     contacts.append(event)
-                else:
-                    pass
                 if zero_endpoint and bp == target_exact:
                     if not shares_zero_component:
                         zero_component_contact_index = len(contacts) - 1
-                    else:
-                        pass
                 else:
                     zero_component_contact_index = None
-            else:
-                pass
             if bp != target_exact:
                 zero_component_contact_index = None
-            else:
-                pass
 
     failure: dict[str, Any] | None = None
     try:
@@ -422,13 +368,9 @@ def derive_body_contacts(
                 delta = _increment(float(sample[1]), float(previous[1]))
                 if abs(delta) >= 90:
                     raise CycleUnavailable("sample_longitude_jump", float(sample[0]))
-                else:
-                    pass
                 right_phase += delta
                 if sample[0] != right[0]:
                     points.append((sample, right_phase))
-                else:
-                    pass
                 previous = sample
             if left[2] * right[2] < 0 or (right[2] == 0 and left[2] != 0):
                 turning, station_lo, station_hi = station(left, right)
@@ -459,8 +401,6 @@ def derive_body_contacts(
                                 phase + _increment(float(sample[1]), float(left[1])),
                             )
                         )
-                    else:
-                        pass
                 refinements.append(
                     (
                         len(stations) - 1,
@@ -471,8 +411,6 @@ def derive_body_contacts(
                         [turning, station_lo, station_hi],
                     )
                 )
-            else:
-                pass
             points.append((right, right_phase))
             points = sorted(
                 {float(row[0]): (row, p) for row, p in points}.values(),
@@ -512,15 +450,11 @@ def derive_body_contacts(
                     key=lambda pair: pair[0][0],
                 )
                 changed = True
-            else:
-                pass
         if changed:
             contacts = []
             zero_component_contact_index = None
             for points in segments:
                 visit_points(points)
-        else:
-            pass
     except CycleUnavailable as exc:
         failure = {"reason": exc.reason, "jd_tt": exc.jd_tt}
     return {
@@ -568,26 +502,16 @@ def reference_contact_relation(
     contacts = row["contacts"]
     if row["status"] != "sampled_search_completed":
         return "not_assessed_incomplete_search"
-    else:
-        pass
     if not contacts:
         return "no_contact_observed_in_search"
-    else:
-        pass
     if reference_tt < contacts[0]["bracket_jd_tt"][0]:
         return "before_first_observed_contact"
-    else:
-        pass
     if reference_tt > contacts[-1]["bracket_jd_tt"][1]:
         return "after_last_observed_contact"
-    else:
-        pass
     if any(
         a["bracket_jd_tt"][0] <= reference_tt <= a["bracket_jd_tt"][1] for a in contacts
     ):
         return "within_numerical_contact_bracket"
-    else:
-        pass
     return "between_observed_contacts"
 
 
@@ -635,12 +559,8 @@ def _cycle_summary_facts(context: dict[str, Any], profile: str) -> dict[str, Any
             },
             "scope": scope,
         }
-    else:
-        pass
     if context["ruleset"] != cycle_ruleset():
         raise ValueError("Unknown cycle reference/contact comparison ruleset")
-    else:
-        pass
     ordering = context["reference_ordering"]
     reference_tt = None
     if ordering is not None:
@@ -736,8 +656,6 @@ def cycle_summary(context: dict[str, Any], profile: str) -> dict[str, Any]:
     facts = _cycle_summary_facts(context, profile)
     if context["status"] == "not_requested":
         return facts
-    else:
-        pass
     return compact_cycle_summary(facts)
 
 
@@ -753,20 +671,12 @@ def _native_reader(
     def read(t: float) -> Row:
         if source_trace is not None:
             source_trace.check_configuration()
-        else:
-            pass
         if t in trace:
             return trace[t]
-        else:
-            pass
         if t in failures:
             raise CycleUnavailable(failures[t], t)
-        else:
-            pass
         if runtime.swe is None:
             raise RuntimeError("人类图周期需要 Swiss Ephemeris")
-        else:
-            pass
         try:
             coords, flags = runtime.ephemeris_call(
                 "calc",
@@ -787,11 +697,7 @@ def _native_reader(
                 raise ValueError(
                     "Cycle source indices are required with a source trace"
                 )
-            else:
-                pass
             source_indices[t] = index
-        else:
-            pass
         trace[t] = row
         return row
 
@@ -837,13 +743,9 @@ def calculate_cycle_context(
             "Uranus",
         }:
             raise EphemerisSourceError("nominal_source_mismatch")
-        else:
-            pass
         for body, seed_row in birth_sources.rows.items():
             traces[body][birth_tt] = list(seed_row)
             indices_by_body[body][birth_tt] = birth_sources.indices[body]
-    else:
-        pass
     readers = {
         body: _native_reader(
             body,
@@ -897,10 +799,6 @@ def calculate_cycle_context(
                 activation["ephemeris_model"],
             ):
                 raise EphemerisSourceError("nominal_source_mismatch")
-            else:
-                pass
-        else:
-            pass
         attach_contact_labels(row)
         row["evaluation_witnesses"] = [trace[t] for t in sorted(trace)]
         row["evaluation_source_context_indices"] = [

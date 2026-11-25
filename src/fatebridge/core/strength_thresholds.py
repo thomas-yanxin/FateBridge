@@ -80,25 +80,17 @@ def exact_threshold_decision(
                             amount = token[2] * transfer
                             token[2] -= amount
                             moved += amount
-                        else:
-                            pass
                     tokens[name].append([None, target, moved])
             elif status == "binding":
                 for name in positions:
                     for element in Element:
                         losses[name][element] = min(losses[name][element], q["binding"])
-            else:
-                pass
-        else:
-            pass
         if kind == "六冲" and status == "active":
             for name, multiplier in event.get("root_multipliers", {}).items():
                 for element in Element:
                     losses[name][element] = min(
                         losses[name][element], Fraction(str(multiplier))
                     )
-        else:
-            pass
         if "storage_effect" in event:
             for row in event["storage_effect"]["root_effects"]:
                 name, element = row["pillar"], Element(row["element"])
@@ -110,15 +102,11 @@ def exact_threshold_decision(
             for name in positions:
                 for element in Element:
                     losses[name][element] = min(losses[name][element], q["punishment"])
-        else:
-            pass
 
     if external_root_retention is not None:
         for name, elements in external_root_retention.items():
             for element, retention in elements.items():
                 losses[name][element] = min(losses[name][element], retention)
-    else:
-        pass
 
     factors = {
         element: 1
@@ -144,10 +132,6 @@ def exact_threshold_decision(
                             "remaining_mass_exact": str(remaining),
                         }
                     )
-                else:
-                    pass
-            else:
-                pass
             energy[element] += (
                 remaining
                 * factors[element]
@@ -158,13 +142,9 @@ def exact_threshold_decision(
         if event["kind"] == "天干合" and event["status"] == "binding":
             for name in event["positions"]:
                 binding[name] = q["binding"]
-        else:
-            pass
     if external_stem_retention is not None:
         for name, retention in external_stem_retention.items():
             binding[name] = min(binding[name], retention)
-    else:
-        pass
     for name, available in binding.items():
         element = STEM_ELEMENTS[pillars[name][0]][0]
         activation = q["floating_stem"] + (q["rooted_stem"] - q["floating_stem"]) * min(
@@ -234,8 +214,6 @@ def threshold_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
             f"{receipt['float_numerical_label']}，判定采用精确值。"
             "结构规则另审；此处不增加原典或现实准确率。"
         )
-    else:
-        pass
     energies = assessment.get("effective_elements_unrounded")
     review = receipt.get("requires_special_structure_review")
     if energies and review is not None:
@@ -246,10 +224,6 @@ def threshold_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
                 f"同次复核标记为{review}，已纠正浮点边界误报。"
                 "这是工程筛查标记，不裁定从格、化格或原典身印力量。"
             )
-        else:
-            pass
-    else:
-        pass
     roots = receipt.get("physical_root_unit_comparison") or {}
     if (
         roots.get("rooted_controller_stems") is not None
@@ -268,6 +242,4 @@ def threshold_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
             f"改为{roots.get('rooted_wealth_visible')}。"
             "这只修正既定单位门槛的比较，不裁定原典有效根力或通关成立。"
         )
-    else:
-        pass
     return lines

@@ -31,8 +31,6 @@ def _profile() -> dict[str, Any]:
         or len({r["id"] for r in profile["rules"]}) != 16
     ):
         raise ValueError("Retain all eight trigram-specific support/control pairs")
-    else:
-        pass
     return profile
 
 
@@ -55,8 +53,6 @@ def _layer(
         or [r["role"] for r in seasonal["roles"]] != ["body", *ROLES]
     ):
         raise ValueError("Symbol imagery requires the four actual roles in order")
-    else:
-        pass
     body = stages[0]["body"]
     if (control["nodes"][0]["trigram"], control["nodes"][0]["fact_path"]) != (
         body,
@@ -67,15 +63,11 @@ def _layer(
         for n, r in zip(control["nodes"][1:], stages, strict=True)
     ):
         raise ValueError("Trigram-symbol control context belongs to another cast")
-    else:
-        pass
     if (seasonal["roles"][0]["trigram"], seasonal["roles"][0]["fact_path"]) != (
         body,
         fact_prefix + ".body_trigram",
     ):
         raise ValueError("Trigram-symbol strength context belongs to another cast")
-    else:
-        pass
     rules = {(r["trigram"], r["relation"]): r for r in _profile()["rules"]}
     evaluations = []
     for index, (stage, qualification, strength) in enumerate(
@@ -94,8 +86,6 @@ def _layer(
             or not stage["fact_path"].startswith(fact_prefix + ".")
         ):
             raise ValueError("Symbol, control and strength facts must share one cast")
-        else:
-            pass
         rule = rules.get((stage["trigram"], stage["relation"]))
         evaluations.append(
             {
@@ -156,8 +146,6 @@ def apply_trigram_relation_symbols(
     interpretation["trigram_relation_symbols"] = None
     if interpretation["interpretation_topic"] == "weather":
         return
-    else:
-        pass
     selected = _layer(
         cast["stage_relations"],
         interpretation["internal_countercontrol"],

@@ -82,8 +82,6 @@ class SolarArcState:
     def birth_label(self) -> str:
         if self.retained_birth_label is not None:
             return self.retained_birth_label
-        else:
-            pass
         assert (
             self.birth_effective_utc is not None
         )  # Computed requires a calendar point.
@@ -140,8 +138,6 @@ def exact_solar_arc_timing(
     before_birth = analysis_tt is not None and analysis_tt.days < birth_tt.days
     if before_birth or not 0 <= exact_key <= MAX_KEY_YEARS:
         raise SolarArcTimeRangeError(key, before_birth=before_birth or exact_key < 0)
-    else:
-        pass
     return RetainedSolarArcTiming(
         elapsed_days, key, birth_tt.shifted_by(exact_key).as_float()
     )
@@ -156,8 +152,6 @@ def retained_solar_arc_timing(
         raise SolarArcCalendarUnavailable(
             "Sample has no defined nominal UTC calendar coordinate"
         )
-    else:
-        pass
     birth_tt = clock.effective.time.tt
     assert birth_tt is not None  # PhysicalEpoch owns exact TT.
     return exact_solar_arc_timing(
@@ -179,8 +173,6 @@ def resolve_solar_arc_state(
     retained_label = None
     if analysis_datetime.utcoffset() is None:
         raise ValueError("Solar-arc instants require explicit timezone offsets")
-    else:
-        pass
     analysis_datetime = analysis_datetime.astimezone(timezone.utc)
     if clock is not None:
         assert (
@@ -195,16 +187,12 @@ def resolve_solar_arc_state(
     else:
         if birth_utc is None or birth_utc.utcoffset() is None:
             raise ValueError("Solar-arc instants require explicit timezone offsets")
-        else:
-            pass
         birth_utc = birth_utc.astimezone(timezone.utc)
         if birth_tt is None:
             elapsed_days = (analysis_datetime - birth_utc).total_seconds() / 86400
             key_years = elapsed_days / YEAR_DAYS
             if not 0 <= key_years <= MAX_KEY_YEARS:
                 raise SolarArcTimeRangeError(key_years)
-            else:
-                pass
             progressed_jd = birth_jd_tt + key_years
         else:
             timing = exact_solar_arc_timing(

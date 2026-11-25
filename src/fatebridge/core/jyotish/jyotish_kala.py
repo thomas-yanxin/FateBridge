@@ -81,8 +81,6 @@ def solar_packet(
             for kind in ("rise", "set"):
                 if not any(event.rising == (kind == "rise") for event in daily_events):
                     no_events.append({"search_jd_ut1": day_start, "kind": kind})
-                else:
-                    pass
     rows = sorted(events.values(), key=lambda item: item["julian_day_ut1"])
     models = {row["ephemeris_model"] for row in rows}
     if not models:
@@ -91,8 +89,6 @@ def solar_packet(
             if not isinstance(source, NativeSolarSource)
             else runtime.ephemeris_model_from_retflag(source.requested_flags)
         )
-    else:
-        pass
     return {
         "events": rows,
         "ephemeris_policy": policy,
@@ -198,8 +194,6 @@ def solar_parts(
                 ),
             }
         )
-    else:
-        pass
 
     before = [row for row in events if row["julian_day_ut1"] <= jd_ut1]
     after = [row for row in events if row["julian_day_ut1"] > jd_ut1]
@@ -243,8 +237,6 @@ def solar_parts(
                     )[third],
                 }
             )
-    else:
-        pass
     result["status"] = (
         "bracketed"
         if sunrise_day and active_arc
@@ -258,8 +250,6 @@ def solar_parts(
         result["limitation"] = (
             "Only the unbracketed component remains unavailable; no missing event is invented. Supporting window is finite and polar/transition cases can remain partial."
         )
-    else:
-        pass
     return result
 
 

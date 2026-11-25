@@ -155,24 +155,16 @@ class JinkouJue(PartialOutput):
     def missing_natal_is_not_a_false_or_unavailable_known_branch(self) -> "JinkouJue":
         if self.natal is None or self.unavailable is None:
             return self
-        else:
-            pass
         if "right_branch" not in self.natal.model_fields_set:
             return self
-        else:
-            pass
         if self.natal.right_branch is not None:
             if self.unavailable:
                 raise ValueError("明确本命支的大绝不能仍列为缺失本命支")
-            else:
-                pass
         elif len(self.unavailable) != 1 or any(
             r.matched is not None or r.status != "missing_birth_branch"
             for r in self.unavailable
         ):
             raise ValueError("本命支缺失时大绝必须保留未算状态")
-        else:
-            pass
         return self
 
 
@@ -258,8 +250,6 @@ class JinkouRelations(PartialOutput):
     def no_unearned_full_conformance(cls, value: object) -> Literal[False]:
         if value is not False:
             raise ValueError("所选京本结构关系不能宣称完整原典认证")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")

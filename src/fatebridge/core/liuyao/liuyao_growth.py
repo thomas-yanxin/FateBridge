@@ -78,8 +78,6 @@ def build_growth_conditions(
         penalty = c.get(INTERNAL_KEY)
         if penalty and penalty["day_yin_growth_applicable"]:
             match = penalty["day_yin_growth_allowed"]
-        else:
-            pass
         path = f"liuyao_evidence.conditional_analysis.growth_conditions.lines.{p - 1}"
         strength = assessed["strength"]
         roots = [

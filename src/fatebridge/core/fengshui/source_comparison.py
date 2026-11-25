@@ -19,8 +19,6 @@ def _bundle() -> dict[str, Any]:
     raw = DATA.read_bytes()
     if hashlib.sha256(raw).hexdigest() != DATA_SHA256:
         raise RuntimeError("Packaged Shen source facts differ from their fixed edition")
-    else:
-        pass
     data = cast(Dict[str, Any], json.loads(raw))
     for field in ("rows", "replacement_rows"):
         keys = {(r["period"], r["facing_mountain"]) for r in data[field]}
@@ -30,8 +28,6 @@ def _bundle() -> dict[str, Any]:
             raise RuntimeError(
                 "All 216 distinct source associations per mode are required"
             )
-        else:
-            pass
     return data
 
 
@@ -66,8 +62,6 @@ def _compare(
     mode = chart["chart_mode"]
     if mode not in ("lower", "replacement"):
         raise ValueError("Unknown computed chart mode cannot receive source agreement")
-    else:
-        pass
     result: dict[str, Any] = {
         "candidate_id": chart["candidate_id"],
         "chart_mode": mode,
@@ -80,8 +74,6 @@ def _compare(
     row = rows[(mode, chart["period_number"], chart["facing"]["name"])]
     if row["sitting_mountain"] != chart["sitting"]["name"]:
         raise ValueError("Computed/source sitting mountain association differs")
-    else:
-        pass
     prose_differences = []
     if mode == "lower":
         actual = {
@@ -104,8 +96,6 @@ def _compare(
             "checked_fields": 4,
             "differences": prose_differences,
         }
-    else:
-        pass
     diagram = row["diagram"]
     differences = [
         {
@@ -265,12 +255,8 @@ def comparison_statements(
         ]
         if invalid_source:
             text += "原图" + "、".join(invalid_source) + "存在重复或缺数，原样保留。"
-        else:
-            pass
         if not all(candidate["computed_plate_integrity"].values()):
             text += "本次计算盘未通过九星排列或多份数字表示的一致性检查，不能作为有效盘接受。"
-        else:
-            pass
         statements.append((f"candidates.{index}", text))
     if not comparison["candidates"]:
         statements.append(
@@ -279,6 +265,4 @@ def comparison_statements(
                 "本次尚无计算宅盘候选，原书数表比较未执行，不能把缺少比较当作相合。",
             )
         )
-    else:
-        pass
     return statements

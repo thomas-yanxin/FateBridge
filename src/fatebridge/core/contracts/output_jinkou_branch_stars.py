@@ -46,8 +46,6 @@ class JinkouBranchStarCheck(BaseModel):
             != [p for p in POSITIONS if p in self.matched_positions]
         ):
             raise ValueError("京本神煞条目的目标、匹配范围或位置重复不一致")
-        else:
-            pass
         # Independent of an omitted projection context, target roles and labels
         # are fixed by the published entry. No calendar is inferred here.
         names = dict(
@@ -72,15 +70,11 @@ class JinkouBranchStarCheck(BaseModel):
             or self.original_pdf_page != page
         ):
             raise ValueError("京本神煞条目的名称、来源页或锚点类别不一致")
-        else:
-            pass
 
         if (day and self.target not in SEXAGENARY_INDEX) or (
             not day and (len(self.target) != 1 or self.target not in BRANCHES)
         ):
             raise ValueError("京本神煞目标需要有效支或完整日干支")
-        else:
-            pass
         allowed = (
             set(TIANSHE_TARGETS)
             if day
@@ -92,8 +86,6 @@ class JinkouBranchStarCheck(BaseModel):
         )
         if self.target not in allowed:
             raise ValueError("京本所选条目不存在该目标")
-        else:
-            pass
         return self
 
 
@@ -123,8 +115,6 @@ class JinkouBranchStars(PartialOutput):
     def no_false_certification(cls, v: object) -> Literal[False]:
         if v is not False:
             raise ValueError("所选神煞层不能宣称完整原典认证")
-        else:
-            pass
         return v
 
     @model_validator(mode="after")
@@ -132,23 +122,15 @@ class JinkouBranchStars(PartialOutput):
 
         if self.day_ganzhi is not None and self.day_ganzhi not in SEXAGENARY_INDEX:
             raise ValueError("神煞日序须为有效六十甲子")
-        else:
-            pass
         if self.month_building_branch is not None:
             i = MONTHS.index(self.month_building_branch)
             if self.nominal_month is not None and self.nominal_month != i + 1:
                 raise ValueError("神煞名义月序须对应实际月建")
-            else:
-                pass
             if (
                 self.season_partition is not None
                 and self.season_partition != "春夏秋冬"[i // 3]
             ):
                 raise ValueError("本节四季按三个月序分组，不借用土旺月五态分组")
-            else:
-                pass
-        else:
-            pass
         if self.checks is not None:
             if [c.id for c in self.checks] != [
                 "tianxi",
@@ -160,8 +142,6 @@ class JinkouBranchStars(PartialOutput):
                 "tianshe",
             ]:
                 raise ValueError("京本所选七项神煞须完整有序")
-            else:
-                pass
             targets = calendar_targets(
                 year_branch=self.year_branch, month_branch=self.month_building_branch
             )
@@ -169,26 +149,16 @@ class JinkouBranchStars(PartialOutput):
                 target = targets.get(c.id)
                 if target is not None and c.target != target:
                     raise ValueError("京本神煞目标与同时给出的年月不一致")
-                else:
-                    pass
                 if c.target_kind == "branch" and self.input_branches is not None:
                     for p, b in self.input_branches.items():
                         if (p in c.matched_positions) != (b == c.target):
                             raise ValueError("神煞匹配位置与实际本支不一致")
-                        else:
-                            pass
-                else:
-                    pass
                 if (
                     c.target_kind == "day_ganzhi"
                     and self.day_ganzhi is not None
                     and c.matched_day != (self.day_ganzhi == c.target)
                 ):
                     raise ValueError("天赦须与实际占日完整干支核对")
-                else:
-                    pass
-        else:
-            pass
         if (
             self.year_branch is not None
             and self.month_building_branch is not None
@@ -206,8 +176,6 @@ class JinkouBranchStars(PartialOutput):
                 input_branches=inputs,
             )
             compare_present(self.model_dump(exclude_unset=True), expected)
-        else:
-            pass
         return self
 
 
@@ -215,15 +183,11 @@ def align_branch_stars(board: dict[str, Any]) -> None:
     value = board.get("branch_stars")
     if not isinstance(value, dict):
         return
-    else:
-        pass
     for row in board.get("rows") or []:
         p = row.get("label")
         inputs = value.get("input_branches") or {}
         if p in inputs and "content" in row and inputs[p] != row["content"]:
             raise ValueError("京本神煞须使用同课贵神、将神、地分本支")
-        else:
-            pass
     traces = [
         t
         for t in board.get("rule_trace") or []
@@ -231,21 +195,15 @@ def align_branch_stars(board: dict[str, Any]) -> None:
     ]
     if len(traces) > 1:
         raise ValueError("京本神煞定位轨迹不可重复")
-    else:
-        pass
     for trace in traces:
         if trace.get("rule_id") == "jinkou.jingben_branch_stars" and "result" in trace:
             compare_present(trace["result"], value)
-        else:
-            pass
 
 
 def require_complete_branch_stars(board: dict[str, Any]) -> None:
     value = board.get("branch_stars")
     if not isinstance(value, dict):
         raise ValueError("完整金口诀须保留京本神煞定位依据")
-    else:
-        pass
     JinkouBranchStars.model_validate(value)
     try:
         expected = branch_stars(
@@ -258,8 +216,6 @@ def require_complete_branch_stars(board: dict[str, Any]) -> None:
         raise ValueError("完整京本神煞定位缺少同次输入") from exc
     if value != expected:
         raise ValueError("完整京本神煞定位须保留全部计算事实")
-    else:
-        pass
     traces = [
         t
         for t in board.get("rule_trace") or []
@@ -267,6 +223,4 @@ def require_complete_branch_stars(board: dict[str, Any]) -> None:
     ]
     if traces != [branch_stars_trace(expected)]:
         raise ValueError("完整京本神煞定位须保留唯一正确轨迹")
-    else:
-        pass
     align_branch_stars(board)

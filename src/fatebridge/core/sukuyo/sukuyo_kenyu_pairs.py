@@ -40,8 +40,6 @@ def conditional_pair_comparison(
     }
     if not isinstance(host, dict):
         return result
-    else:
-        pass
     month, day = calendar.get("lunar_month"), calendar.get("lunar_day")
     if (
         type(month) is not int
@@ -58,8 +56,6 @@ def conditional_pair_comparison(
         or not lookups
     ):
         return result
-    else:
-        pass
     translation = str.maketrans(source["normalization"])
     mansion = host["direct_mansion"].translate(translation)
     memberships = {
@@ -68,8 +64,6 @@ def conditional_pair_comparison(
     }
     if mansion not in set().union(*memberships.values()):
         return result
-    else:
-        pass
     comparisons = []
     # Consume the existing literal lookups, without recalculating the mansion,
     # inventing missing intervals, or using the selected Hinoo candidate.
@@ -82,8 +76,6 @@ def conditional_pair_comparison(
             or lookup["condition_lunar_day"] != day
         ):
             raise ValueError("曜宿对照与月表条件不一致")
-        else:
-            pass
         day_ruler = LUMINARIES[(LUMINARIES.index(first) + day - 1) % 7]
         pair_match = mansion in memberships[day_ruler]
         printed = lookup["membership_in_printed_interval"]
@@ -130,8 +122,6 @@ def conditional_pair_comparison(
 def pair_comparison_reading(reference: dict[str, Any]) -> str:
     if reference["status"] != "conditional_component_model":
         return "缺少可核对的T1299望宿基准，未组合曜宿小表，也未用已选主宿补算。"
-    else:
-        pass
     selected = reference["selected_civil_condition_comparison"]
     rows = (
         [selected]

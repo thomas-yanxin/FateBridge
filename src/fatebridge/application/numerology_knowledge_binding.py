@@ -24,12 +24,8 @@ def require_reference_binding(
                 for d in result.get("domains", [])
             )
         )
-    else:
-        pass
     if not active:
         return
-    else:
-        pass
     if isinstance(request, KnowledgeReadRequest):
         category = (request.category or "").strip()
         requested = (request.key or "").strip()
@@ -38,8 +34,6 @@ def require_reference_binding(
         if cell is not None:
             element, number, kind = cell
             requested = f"{element}.{number}.{kind or 'unselected'}"
-        else:
-            pass
         matches = (
             selected in DOMAINS
             and result.get("domain") == selected
@@ -55,5 +49,3 @@ def require_reference_binding(
             matches = domain in (None, "") and set(DOMAINS) <= present
     if not matches:
         raise NumerologySourceError("runtime_numerology_knowledge_binding_conflict")
-    else:
-        pass

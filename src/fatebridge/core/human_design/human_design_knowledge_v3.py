@@ -38,8 +38,6 @@ def _catalogue(
         raw = MANIFEST_PATH.read_bytes()
         if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
             raise ValueError("Version3 reference manifest changed")
-        else:
-            pass
         manifest = json.loads(
             raw, object_pairs_hook=base._object, parse_constant=base._nonfinite
         )
@@ -59,20 +57,14 @@ def _catalogue(
             or len(manifest["supplements"]) != 1
         ):
             raise ValueError("Invalid v3 scope or certification")
-        else:
-            pass
         binding = manifest["supplements"][0]
         if binding["file"] != "line-knowledge-gate3-v1.json" or binding["keys"] != [
             f"3.{i}" for i in range(1, 7)
         ]:
             raise ValueError("Invalid supplementary keys or path")
-        else:
-            pass
         added = SUPPLEMENT_PATH.read_bytes()
         if hashlib.sha256(added).hexdigest() != binding["sha256"]:
             raise ValueError("Version3 supplement changed")
-        else:
-            pass
         supplement = json.loads(
             added, object_pairs_hook=base._object, parse_constant=base._nonfinite
         )
@@ -90,8 +82,6 @@ def _catalogue(
             or [r["key"] for r in supplement["rows"]] != binding["keys"]
         ):
             raise ValueError("Invalid v3 supplement identity or coverage")
-        else:
-            pass
         for i, row in enumerate(supplement["rows"]):
             original = data["rows"][12 + i]
             meaning = row["editorial_paraphrase"]
@@ -131,16 +121,12 @@ def _catalogue(
                 raise ValueError(
                     "V3 overwrite, invented applicability or unverified semantic claim"
                 )
-            else:
-                pass
             original.update(deepcopy(row))
         data.update(
             version=3, catalogue_id=manifest["catalogue_id"], local_paraphrase_count=18
         )
         if base._coverage(data)["local_editorial_paraphrases"] != 18:
             raise ValueError("Invalid actual semantic coverage")
-        else:
-            pass
         provenance = base._provenance(parent, snapshot)
         snapshot.update({MANIFEST_PATH: raw, SUPPLEMENT_PATH: added})
         provenance.update(
@@ -235,8 +221,6 @@ def read_reference(*, key: str | None) -> dict:
             tips.append(
                 "引导语尚未转成可计算的个人条件，适用性未知；未列条件不表示无条件。"
             )
-        else:
-            pass
         tips.extend([record["selection_policy"], base._scope(data)])
         entry.update(
             tips=tips,
@@ -248,6 +232,4 @@ def read_reference(*, key: str | None) -> dict:
             entry[
                 "citation"
             ] += "；六条线名另与Jovian Archive的RA1.6四页公开样本目录核对，仅核对线名。"
-        else:
-            pass
         return entry

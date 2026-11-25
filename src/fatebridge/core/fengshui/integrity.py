@@ -16,8 +16,6 @@ ROLES = ("period", "mountain", "facing")
 def _require(condition: bool, reason: str) -> None:
     if not condition:
         raise FengshuiCalculationError(reason)
-    else:
-        pass
 
 
 def validate_natal_chart(
@@ -91,8 +89,6 @@ def validate_natal_chart(
                     "natal_trace_inconsistent",
                 )
                 step = 1 if trace["flight"] == "forward" else -1
-            else:
-                pass
             _require(
                 all(
                     numbers[direction] == (center - 1 + step * index) % 9 + 1

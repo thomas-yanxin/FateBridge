@@ -71,8 +71,6 @@ def resolve_analysis_moment(
     }
     if tool not in inherited:
         raise ValueError("Unsupported BaZi analysis clock: " + tool)
-    else:
-        pass
     zone = parse_timezone_name(timezone_name)
     supplied = dict(
         zip(
@@ -121,8 +119,6 @@ def resolve_analysis_moment(
                         else 1 if field in DATE_FIELDS[:3] else 0
                     )
                     fixed[field] = value
-            else:
-                pass
             values.append(value)
         # note (clock): Explicit components return a naive wall label after validation.
         moment = datetime(values[0], values[1], values[2], values[3], values[4])
@@ -173,8 +169,6 @@ def age_only_reference() -> AnalysisAgeReference:
 def analysis_clock_snapshot_lines(reference: AnalysisClockReference) -> list[str]:
     if reference["basis"] != "implicit_execution_clock":
         return []
-    else:
-        pass
     return [
         f"本次分析民用瞬间：{reference['analysis_datetime']}；UTC：{reference['utc_datetime']}。",
         "日期全部省略，使用本次as_of或执行开始时刻，未替换为月初、月中或零点。",

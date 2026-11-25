@@ -21,8 +21,6 @@ def fictitious_element_source() -> dict[str, Any]:
     }
     if search is None:
         return {**common, "status": "unavailable", "filename": None, "sha256": None}
-    else:
-        pass
     for index, directory in enumerate(ephemeris_search_directories(search)):
         candidate = directory / "seorbel.txt"
         try:

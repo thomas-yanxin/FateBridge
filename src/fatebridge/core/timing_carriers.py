@@ -85,8 +85,6 @@ def describe_timing_carrier(
     """Calculate the principal branch relation and actual hidden-root presence."""
     if stem + branch not in SEXAGENARY_INDEX:
         raise ValueError("时运本柱承载需要六十甲子中的完整干支")
-    else:
-        pass
     element = STEM_ELEMENTS[stem][0]
     principal = BRANCH_ELEMENTS[branch][0]
     relation: CarrierPrincipalRelation
@@ -133,8 +131,6 @@ def timing_carrier_snapshot_lines(interactions: Mapping[str, Any]) -> list[str]:
     rows = interactions.get("pillar_carriers") or []
     if not rows:
         return []
-    else:
-        pass
     layers = {
         "dayun": "大运",
         "liunian": "流年",
@@ -164,8 +160,6 @@ def timing_carrier_snapshot_lines(interactions: Mapping[str, Any]) -> list[str]:
             lines.append(
                 f"{row['pillar']}另见干克真实藏干{'、'.join(covered)}；仅在这些藏干为所喜时列盖头候选，不改述为全支受克。"
             )
-        else:
-            pass
     lines.append(
         "盖头须以支为所喜、截脚压力须以干为所喜分别核对；本柱关系、藏根与长生名不裁定实际喜忌、救应或吉凶。"
     )

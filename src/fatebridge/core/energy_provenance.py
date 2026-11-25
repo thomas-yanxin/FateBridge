@@ -54,8 +54,6 @@ def ledger_parts(rows: object, kind: str) -> dict[str, LedgerPart]:
     }
     if not isinstance(rows, list):
         return result
-    else:
-        pass
     element_key = "effective_element" if kind == "non_day_visible" else "element"
     energy_key = {
         "physical_hidden": "engineering_energy",
@@ -69,8 +67,6 @@ def ledger_parts(rows: object, kind: str) -> dict[str, LedgerPart]:
         if not isinstance(row, dict):
             complete = False
             continue
-        else:
-            pass
         element, energy, pillar = (
             row.get(element_key),
             row.get(energy_key),
@@ -100,8 +96,6 @@ def ledger_parts(rows: object, kind: str) -> dict[str, LedgerPart]:
         ):
             complete = False
             continue
-        else:
-            pass
         seen.add(identity)
         sums[element] += energy
         refs[element].append(identity)

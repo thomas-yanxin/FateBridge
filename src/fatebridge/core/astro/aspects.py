@@ -25,8 +25,6 @@ AspectMatch = tuple[str, Fraction, float, float, Fraction]
 def _checked_orb(orb: float) -> Fraction:
     if not math.isfinite(orb) or not 0 <= orb <= 180:
         raise ValueError("Aspect orb must be finite and within 0..180 degrees")
-    else:
-        pass
     return Fraction(orb)
 
 
@@ -39,8 +37,6 @@ def _get_dynamic_orb(
 
     if aspect_name in {"sextile", "square"}:
         return base_orb * 0.8
-    else:
-        pass
     return base_orb
 
 
@@ -64,8 +60,6 @@ def _build_aspects(
             )
             if matched is None:
                 continue
-            else:
-                pass
             fact = {
                 "planet_a": first["id"],
                 "planet_b": second["id"],
@@ -81,8 +75,6 @@ def _build_aspects(
                         "rule_id": "fatebridge_modern_dynamic_orbs_v1",
                     }
                 )
-            else:
-                pass
             ranked.append((matched[1], fact))
     ranked.sort(key=lambda row: (row[0], row[1]["planet_a"], row[1]["planet_b"]))
     return [fact for _, fact in ranked]
@@ -105,8 +97,6 @@ def _match_cross_aspect_fraction(
             dynamic_max_orb = _get_dynamic_orb(
                 planet_a_id, planet_b_id, aspect_name, default_orb=orb
             )
-        else:
-            pass
 
         if current_orb <= Fraction(dynamic_max_orb) and (
             matched is None or current_orb < matched[1]
@@ -118,8 +108,6 @@ def _match_cross_aspect_fraction(
                 dynamic_max_orb,
                 difference,
             )
-        else:
-            pass
 
     return matched
 
@@ -135,15 +123,11 @@ def _build_directional_relative_aspects(
     for source_planet in source_planets:
         if source_planet["id"] not in _TRADITIONAL_PLANET_IDS:
             continue
-        else:
-            pass
 
         matches: list[tuple[Fraction, dict[str, Any]]] = []
         for target_planet in target_planets:
             if target_planet["id"] not in _TRADITIONAL_PLANET_IDS:
                 continue
-            else:
-                pass
             matched = _match_cross_aspect_fraction(
                 source_planet["longitude"],
                 target_planet["longitude"],
@@ -153,8 +137,6 @@ def _build_directional_relative_aspects(
             )
             if matched is None:
                 continue
-            else:
-                pass
             matches.append(
                 (
                     matched[1],
@@ -168,8 +150,6 @@ def _build_directional_relative_aspects(
 
         if not matches:
             continue
-        else:
-            pass
 
         grouped.append(
             {
@@ -197,14 +177,10 @@ def _flatten_directional_relative_aspects(
         source_id = item.get("id")
         if not source_id:
             continue
-        else:
-            pass
         for target in item.get("objects", []):
             target_id = target.get("id")
             if not target_id:
                 continue
-            else:
-                pass
             flattened.append(
                 {
                     source_key: source_id,
@@ -255,8 +231,6 @@ def _build_directional_relative_midpoints(
     for source_planet in source_planets:
         if source_planet["id"] not in _TRADITIONAL_PLANET_IDS:
             continue
-        else:
-            pass
 
         hits: list[tuple[Fraction, dict[str, Any]]] = []
         for exact_midpoint, midpoint in target_midpoints:
@@ -265,8 +239,6 @@ def _build_directional_relative_midpoints(
             )
             if matched is None:
                 continue
-            else:
-                pass
             hits.append(
                 (
                     matched[1],
@@ -290,8 +262,6 @@ def _build_directional_relative_midpoints(
                     ),
                 )
             ]
-        else:
-            pass
 
     return midpoint_hits
 
@@ -309,14 +279,10 @@ def _build_directional_relative_antiscia(
     for source_planet in source_planets:
         if source_planet["id"] not in _TRADITIONAL_PLANET_IDS:
             continue
-        else:
-            pass
 
         for target_planet in target_planets:
             if target_planet["id"] not in _TRADITIONAL_PLANET_IDS:
                 continue
-            else:
-                pass
             target = angle_fraction(target_planet["longitude"])
             reference_longitude = -target if contra else 180 - target
             difference = angular_separation_fraction(
@@ -324,8 +290,6 @@ def _build_directional_relative_antiscia(
             )
             if difference > limit:
                 continue
-            else:
-                pass
             matched_items.append(
                 (
                     difference,

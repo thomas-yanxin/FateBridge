@@ -108,15 +108,11 @@ def _build_gua_lookup_snapshot_text(
             f"上卦：{upper.get('name', '无')} / {upper.get('nature', '无')} / "
             f"{upper.get('element', '无')}"
         )
-    else:
-        pass
     if lower:
         structure_lines.append(
             f"下卦：{lower.get('name', '无')} / {lower.get('nature', '无')} / "
             f"{lower.get('element', '无')}"
         )
-    else:
-        pass
 
     sections = [("查询信息", query_lines), ("卦象结构", structure_lines)]
     classical = result.get("classical")
@@ -137,8 +133,6 @@ def _build_gua_lookup_snapshot_text(
                 ("来源", [classical["source_url"], classical["edition_status"]]),
             ]
         )
-    else:
-        pass
     return _render_snapshot_text(sections)
 
 
@@ -160,8 +154,6 @@ def _build_gua_meiyi_snapshot_text(
         if classical := item.get("classical"):
             result_lines.append(f"《周易》卦辞：{classical['guaci']}")
             result_lines.append(f"来源：{classical['source_url']}")
-        else:
-            pass
     return _render_snapshot_text(
         [
             ("查询概览", overview_lines),
@@ -215,8 +207,6 @@ def calculate_meihua_analysis(
             "analysis_minute须为已确认的0至59整数分钟；未知时省略。",
             [{"path": "analysis_minute", "code": "invalid_civil_minute"}],
         ).as_result()
-    else:
-        pass
     if analysis_second is not None and (
         type(analysis_second) is not int or not 0 <= analysis_second <= 59
     ):
@@ -224,8 +214,6 @@ def calculate_meihua_analysis(
             "analysis_second须为已确认的0至59整秒；未知时省略，不支持闰秒标签60。",
             [{"path": "analysis_second", "code": "invalid_civil_second"}],
         ).as_result()
-    else:
-        pass
 
     supplied_clock = clock_components(
         analysis_minute, analysis_second, _clock_supplied_components
@@ -273,8 +261,6 @@ def calculate_meihua_analysis(
             "retryable": False,
             "issues": [{"path": "analysis_date", "code": "unsupported_calendar_date"}],
         }
-    else:
-        pass
 
     pillars = BaZiCalendar.get_four_pillars(
         analysis_datetime,
@@ -299,8 +285,6 @@ def calculate_meihua_analysis(
             "status_code": 503,
             "retryable": False,
         }
-    else:
-        pass
 
     meihua.update(
         {
@@ -361,16 +345,10 @@ def calculate_meihua_analysis(
         meihua["evidence_scope"]["implemented"].append("selected_topic_clauses")
         if interpretation_topic == "wealth":
             meihua["evidence_scope"]["implemented"].append("selected_wealth_components")
-        else:
-            pass
         if interpretation_topic == "lost_property":
             meihua["evidence_scope"]["implemented"].append(
                 "selected_lost_property_changed_use_location_symbols"
             )
-        else:
-            pass
-    else:
-        pass
 
     interpretation["evidence_scope"].update(
         calendar_label_precision_path="meihua.calendar_policy.label_precision",
@@ -384,8 +362,6 @@ def calculate_meihua_analysis(
             "当前日期位于明示的软件复核范围。如历表月日修订，须重新起算；"
             "此处没有推定另一套日期或卦象。"
         )
-    else:
-        pass
 
     apply_external_omens(
         meihua,
@@ -455,8 +431,6 @@ def calculate_meihua_analysis(
     if reference_notice is not None:
         interpretation["solar_term_date_reference_notice"] = reference_notice
         interpretation["comprehensive_judgement"] += " " + reference_notice
-    else:
-        pass
 
     apply_trigram_relation_symbols(meihua, interpretation)
 
@@ -568,8 +542,6 @@ def calculate_gua_meiyi(
     queries = [item.strip() for item in (name or []) if item and item.strip()]
     if not queries:
         raise ValueError("name 至少需要提供一个卦名或卦码。")
-    else:
-        pass
 
     results = {query: lookup_gua(query) for query in queries}
     ordered_names = [results[query]["name"] for query in queries]
@@ -860,8 +832,6 @@ def calculate_sukuyo_compatibility(
         )
         if any(c.get("calendar_candidates") for c in contexts):
             summary += f"当地日期仍有多个{calendar_label}历日候选，但完整候选均得到同一本命宿；未确定出生时刻或唯一历日。"
-        else:
-            pass
     else:
         summary = (
             f"出生当地日期对应多个可能{calendar_label}历日；已交付各日期的历法候选及双向条件关系，未补造出生时刻，也未据候选作确定相性。"
@@ -877,20 +847,14 @@ def calculate_sukuyo_compatibility(
     ):
         if forward is not None and reverse is not None:
             summary += f"前向含义：{forward['meaning']}反向含义：{reverse['meaning']}"
-        else:
-            pass
         summary += candidate_compatibility_reading(
             contexts,
             [person1_name, person2_name],
             candidate_analysis,
             [p["palace_reference"] for p in people],
         )
-    else:
-        pass
     if calendar_basis == "japanese_naoj_historical_utc09":
         summary += compatibility_reference_notes(contexts, [person1_name, person2_name])
-    else:
-        pass
 
     fixed_research_scope = research_scope()
     # Only the first item is the full-table overview. Later items describe a
@@ -931,12 +895,8 @@ def calculate_sukuyo_compatibility(
         result["interpretation_contract"]["joint_reconstruction"] = (
             joint_reconstruction_contract(candidate_analysis)
         )
-    else:
-        pass
     if calendar_basis != "chinese_hko_utc08":
         result["calendar_basis"] = calendar_basis
-    else:
-        pass
     snapshot_text = render_structured_snapshot_text(
         result, title="宿曜双人相性 / T1299三九法"
     )
@@ -1027,6 +987,4 @@ def calculate_sanshiunited_analysis(
             snapshot_text=snapshot_text,
             selected_sections=selected_sections,
         )
-    else:
-        pass
     return result

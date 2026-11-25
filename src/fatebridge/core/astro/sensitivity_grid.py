@@ -35,20 +35,14 @@ class RecordedBirthSample:
         """A symbolic key coordinate, separate from physical identity."""
         if self.epoch.source_calendar is not None:
             return self.epoch.source_calendar
-        else:
-            pass
         label = self.epoch.utc_label
         if label is None:
             return None
-        else:
-            pass
         if self.epoch.utc_is_leap_second:
             # Both sides of an insertion share this nominal limit. The
             # continuous nondecreasing extension holds it for all of :60.
             following_ordinal = date.fromisoformat(label[:10]).toordinal() + 1
             return CivilPoint(UTCCalendar(following_ordinal, 0).julian_day_exact())
-        else:
-            pass
         return utc_point_from_tt(self.tt)
 
 
@@ -62,8 +56,6 @@ def sampling_radius(minutes: float) -> timedelta:
     """Keep the established timedelta microsecond quantization of the input."""
     if not math.isfinite(minutes) or not 0 <= minutes <= 120:
         raise ValueError("birth_time_uncertainty_minutes must be finite and in [0,120]")
-    else:
-        pass
     return timedelta(minutes=minutes)
 
 
@@ -77,8 +69,6 @@ def shift_civil_recorded_sample(
     """Apply an elapsed SI offset, preserving an exactly matching civil label."""
     if not offset:
         return center
-    else:
-        pass
     delta = Fraction(
         (offset.days * 86400 + offset.seconds) * 1_000_000 + offset.microseconds,
         86_400_000_000,
@@ -92,8 +82,6 @@ def shift_civil_recorded_sample(
         label = source.as_calendar().shifted(offset)
     if label.ordinal >= date(1972, 1, 1).toordinal() and utc_clock(label).tt == tt:
         return civil_recorded_sample(label)
-    else:
-        pass
     return RecordedBirthSample(PhysicalEpoch.from_tt(tt))
 
 
@@ -117,8 +105,6 @@ def recorded_birth_grid(
         nominal = civil_recorded_sample(moment)
     if not radius:
         return RecordedBirthGrid((nominal,), 0)
-    else:
-        pass
 
     if conversion is None:
         lower = shift_civil_recorded_sample(nominal, -radius)
@@ -141,8 +127,6 @@ def recorded_birth_grid(
         raise ValueError(
             "Solar clock interval must contain its nominal physical instant"
         )
-    else:
-        pass
     points = {start: lower, stop: upper, center: nominal}
     anchor = lower.epoch.utc_datetime
     for index in range(1, math.ceil((stop - start) / _CADENCE)):
@@ -155,16 +139,12 @@ def recorded_birth_grid(
                 and ordinary != nominal.epoch.utc_datetime
             ):
                 points[ordinary_tt.days] = civil_recorded_sample(ordinary)
-            else:
-                pass
         else:
             point = start + index * _CADENCE
             if point != center:
                 points[point] = RecordedBirthSample(
                     PhysicalEpoch.from_tt(TTInstant(point))
                 )
-            else:
-                pass
 
     # The start-anchored modern label schedule can cross a +1 second
     # insertion. Optional subdivision points can move within that pair to
@@ -173,15 +153,11 @@ def recorded_birth_grid(
     for left, right in zip(ordered, ordered[1:]):
         if right - left <= _CADENCE:
             continue
-        else:
-            pass
         middle = (left + right) / 2
         sample = RecordedBirthSample(PhysicalEpoch.from_tt(TTInstant(middle)))
         if sample.epoch.utc_is_leap_second:
             middle -= _SECOND
             sample = RecordedBirthSample(PhysicalEpoch.from_tt(TTInstant(middle)))
-        else:
-            pass
         points[middle] = sample
     ordered = sorted(points)
     return RecordedBirthGrid(

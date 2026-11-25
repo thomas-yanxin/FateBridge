@@ -32,26 +32,18 @@ class QianyuanSourceDays:
     def __post_init__(self) -> None:
         if not isinstance(self.value, Fraction):
             raise TypeError("原书日数须明确用Fraction，不接收浮点、初标或猜定时刻")
-        else:
-            pass
         if self.quantity_basis != BASIS:
             raise ValueError(
                 "须明确为乾元太阳过宫原书日数，不把角度、尺格或UTC日重贴单位"
             )
-        else:
-            pass
         if not 0 <= self.value <= 30:
             raise ValueError("此原书比例只接收0至30原书日，不截断、取模或扩展到下一宫")
-        else:
-            pass
 
 
 def _source() -> dict[str, Any]:
     raw = DATA.read_bytes()
     if hashlib.sha256(raw).hexdigest() != DATA_SHA256:
         raise ValueError("乾元童限资料指纹变化，不能悄悄改比例、来源或删原例")
-    else:
-        pass
     source: dict[str, Any] = json.loads(raw)
     if (
         source["method_id"] != METHOD
@@ -60,8 +52,6 @@ def _source() -> dict[str, Any]:
         != ["two_days_six_source_hours", "thirty_days_less_nine_source_hours"]
     ):
         raise ValueError("须保持具名乾元方法及时间量纲，不能改名套用陆位图法")
-    else:
-        pass
     return source
 
 
@@ -69,8 +59,6 @@ def initial_limit(point: QianyuanSourceDays) -> dict[str, Any]:
     """Exact source-duration arithmetic; no civil date or modern birth mapping."""
     if not isinstance(point, QianyuanSourceDays):
         raise TypeError("须提供具名QianyuanSourceDays，不接收无单位Fraction或天文角度")
-    else:
-        pass
     source = _source()
     additional = point.value / Fraction(source["source_days_per_source_year"])
     total = Fraction(source["base_source_years"]) + additional

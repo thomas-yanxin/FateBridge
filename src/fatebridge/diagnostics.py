@@ -76,8 +76,6 @@ def resolve_codex_cli() -> CodexCliResolution:
     terminal = shutil.which("codex")
     if desktop and Path(desktop).is_file() and os.access(desktop, os.X_OK):
         return {"path": desktop, "source": "desktop", "path_cli": terminal or ""}
-    else:
-        pass
     if (
         not desktop
         and os.getenv("CODEX_INTERNAL_ORIGINATOR_OVERRIDE") == "Codex Desktop"
@@ -89,10 +87,6 @@ def resolve_codex_cli() -> CodexCliResolution:
                 "source": "running_desktop",
                 "path_cli": terminal or "",
             }
-        else:
-            pass
-    else:
-        pass
     return {
         "path": terminal or "codex",
         "source": "PATH" if terminal else "not_installed",
@@ -104,8 +98,6 @@ def _running_desktop_cli() -> str | None:
     """Discover a unique actual macOS app CLI; process arguments are never read."""
     if platform.system() != "Darwin":
         return None
-    else:
-        pass
     try:
         result = subprocess.run(
             ["ps", "-axo", "comm"], capture_output=True, text=True, timeout=2
@@ -114,8 +106,6 @@ def _running_desktop_cli() -> str | None:
         return None
     if result.returncode:
         return None
-    else:
-        pass
     candidates = {
         line.strip()
         for line in result.stdout.splitlines()
@@ -178,8 +168,6 @@ async def _probe_stdio(env: dict[str, str]) -> StdioProbeResult:
                     }
                     if names != expected:
                         raise RuntimeError("MCP catalog and tools/list disagree")
-                    else:
-                        pass
                     output: StdioProbeResult = {
                         "ok": True,
                         "scope": "initialize, tools/list, resources/read",
@@ -216,13 +204,9 @@ async def _probe_stdio(env: dict[str, str]) -> StdioProbeResult:
                         )
                         if response.is_error:
                             raise RuntimeError("MCP fictional smoke calculation failed")
-                        else:
-                            pass
                         receipt = response.structured_content["run_metadata"]
                         if receipt["tool_name"] != spec.tool_name:
                             raise RuntimeError("MCP smoke receipt has wrong tool name")
-                        else:
-                            pass
                         output["smoke_tool"] = spec.tool_name
                         output["scope"] += ", one fictional calculation"
                         break
@@ -242,8 +226,6 @@ def diagnose(
 ) -> ServiceResult:
     if mcp:
         load_runtime_env()
-    else:
-        pass
     family = family if family is not None else os.getenv("FATEBRIDGE_MCP_FAMILIES", "")
     try:
         selected = select_mcp_specs(
@@ -255,16 +237,12 @@ def diagnose(
     env = {"FATEBRIDGE_MCP_FAMILIES": family}
     if archive_dir := os.getenv("FATEBRIDGE_DE441_DIR"):
         env["FATEBRIDGE_DE441_DIR"] = archive_dir
-    else:
-        pass
     dependencies: dict[str, DependencyStatus] = {}
     for dependency in importlib.metadata.requires("fatebridge") or []:
         requirement = Requirement(dependency)
         # note (markers): Include active platform dependencies and exclude unselected extras.
         if requirement.marker and not requirement.marker.evaluate({"extra": ""}):
             continue
-        else:
-            pass
         try:
             version = importlib.metadata.version(requirement.name)
             dependencies[requirement.name] = {
@@ -316,10 +294,6 @@ def diagnose(
             }
             if isinstance(exc, _StdioProbeError):
                 output["mcp"].update(exc.details)
-            else:
-                pass
-    else:
-        pass
     has_fengshui = any(spec.family == "fengshui" for spec in selected)
     has_human_design = any(spec.key == "human_design" for spec in selected)
     if has_fengshui or has_human_design:
@@ -348,8 +322,6 @@ def diagnose(
             "astronomical_acceptance": "not_run_by_doctor; file identity does not certify one-second TT accuracy",
             "scope": "read_only_data_readiness; doctor ok describes package/dependencies/protocol, not full Feng Shui precision",
         }
-    else:
-        pass
     if has_human_design:
         setup = [
             sys.executable,
@@ -370,6 +342,4 @@ def diagnose(
             "astronomical_acceptance": "not_run_by_doctor; file identity does not certify positions, Design roots or cycle contacts",
             "scope": "read_only_data_readiness; doctor ok describes package/dependencies/protocol, not full Human Design acceptance",
         }
-    else:
-        pass
     return output

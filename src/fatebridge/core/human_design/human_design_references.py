@@ -50,8 +50,6 @@ REFERENCE_SHA256 = {
 def _read(name: str) -> bytes:
     if name not in REFERENCE_NAMES:
         raise ValueError("Unknown Human Design reference catalogue")
-    else:
-        pass
     try:
         return (
             files("fatebridge.data")
@@ -75,8 +73,6 @@ def _object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     for key, value in pairs:
         if key in result:
             raise ValueError("Duplicate source key")
-        else:
-            pass
         result[key] = value
     return result
 
@@ -92,15 +88,11 @@ def _load(name: str) -> _Reference:
         document = json.loads(raw, object_pairs_hook=_object, parse_constant=_nonfinite)
         if type(document) is not dict:
             raise ValueError("Source root must be an object")
-        else:
-            pass
     except (ValueError, TypeError, RecursionError) as error:
         raise EphemerisSourceError("human_design_reference_invalid") from error
     digest = hashlib.sha256(raw).hexdigest()
     if digest != REFERENCE_SHA256[name]:
         raise EphemerisSourceError("human_design_reference_identity_mismatch")
-    else:
-        pass
     return _Reference(raw, document, digest)
 
 
@@ -114,11 +106,7 @@ def _reference(name: str) -> _Reference:
     if active is not None:
         if name not in active:
             active[name] = _load(name)
-        else:
-            pass
         return active[name]
-    else:
-        pass
     return _load(name)
 
 
@@ -145,8 +133,6 @@ def coherent_human_design_references() -> Iterator[None]:
     if _active.get() is not None:
         yield
         return
-    else:
-        pass
     used: dict[str, _Reference] = {}
     token = _active.set(used)
     try:

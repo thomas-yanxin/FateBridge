@@ -23,14 +23,10 @@ def compare(actual: Any, expected: Any) -> None:
     elif isinstance(actual, list) and isinstance(expected, list):
         if len(actual) != len(expected):
             raise ValueError("月建日辰得气队列不一致")
-        else:
-            pass
         for a, b in zip(actual, expected):
             compare(a, b)
     elif type(actual) is not type(expected) or actual != expected:
         raise ValueError("月建日辰得气说明或事实与实际依据不一致")
-    else:
-        pass
 
 
 def validate_qi_fields(value: dict[str, Any]) -> None:
@@ -53,21 +49,13 @@ def validate_qi_fields(value: dict[str, Any]) -> None:
             and any(value.get(k) is not None for k in dependents)
         ):
             raise ValueError("明确未知的得气依据不能产生已知结论")
-        else:
-            pass
     if value.get("month_offset") is not None:
         compare(value, offset_qi_facts(value["month_offset"]))
-    else:
-        pass
     if month is not None and general is not None:
         compare(value, month_qi_facts(month, general))
-    else:
-        pass
     for key, branch in (("day_element", day), ("jiangshen_element", general)):
         if branch is not None and key in value:
             compare(value[key], branch_element_text(branch))
-        else:
-            pass
     if day is not None and general is not None:
         compare(value, day_qi_facts(day, general))
     elif (
@@ -81,8 +69,6 @@ def validate_qi_fields(value: dict[str, Any]) -> None:
                 == value["jiangshen_element"]
             ),
         )
-    else:
-        pass
     if (
         month is not None
         and general is not None
@@ -90,5 +76,3 @@ def validate_qi_fields(value: dict[str, Any]) -> None:
         and "basis" in value
     ):
         compare(value["basis"], qi_basis(month, general, day))
-    else:
-        pass

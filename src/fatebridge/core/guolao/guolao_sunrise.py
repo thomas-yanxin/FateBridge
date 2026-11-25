@@ -29,15 +29,11 @@ FIELDS = (
 def _fraction(value: F, name: str) -> None:
     if not isinstance(value, F):
         raise TypeError(f"{name}须为明确单位的Fraction，不接收浮点、布尔或默认值")
-    else:
-        pass
 
 
 def _side(value: str) -> None:
     if value not in ("inside", "outside"):
         raise ValueError("须明确黄道在赤道内或外，不从现代月份猜测")
-    else:
-        pass
 
 
 def _clock(night: F) -> dict[str, Any]:
@@ -82,34 +78,22 @@ class SourceNightTable:
         object.__setattr__(self, "rows", tuple(self.rows))
         if len(self.rows) != 93:
             raise ValueError("须保留93个原表位置，不删空行或用别本补行")
-        else:
-            pass
         for index, row in enumerate(self.rows):
             for v in (row.argument, row.summer, row.winter):
                 _fraction(v, "原表角度及半夜分")
             if index < 92 and row.argument != index:
                 raise ValueError("原表前92个积度须依序为0至91，不排序补缺")
-            else:
-                pass
             if not 0 <= row.summer <= 5000 or not 0 <= row.winter <= 5000:
                 raise ValueError("原表半夜分超出日周范围")
-            else:
-                pass
             if index < 92 and any(
                 v is None for v in (row.declination, row.drop_fen, row.difference)
             ):
                 raise ValueError("非表尾缺必需源值，不能填充")
-            else:
-                pass
             for optional_value in (row.declination, row.drop_fen, row.difference):
                 if optional_value is not None:
                     _fraction(optional_value, "内外度及刊差")
-                else:
-                    pass
         if not 91 < self.rows[-1].argument < 92:
             raise ValueError("须保留原表的短末段，不伸展为整度或理论象限")
-        else:
-            pass
         if any(
             v is not None
             for v in (
@@ -119,8 +103,6 @@ class SourceNightTable:
             )
         ):
             raise ValueError("末格刊空须为None，不能按几何补成零")
-        else:
-            pass
 
     def segment_residual(self, index: int) -> dict[str, Any]:
         row, after = self.rows[index : index + 2]
@@ -186,12 +168,8 @@ class SourceNightTable:
         _side(solar_side)
         if basis != "dadu_source_table":
             raise ValueError("须明确采用原表大都基准，不能自动用于其他出生地点")
-        else:
-            pass
         if not 0 <= local_argument_du <= self.rows[-1].argument:
             raise ValueError("超出所选原表刊载范围，不补齐理论象限、不取模或外推")
-        else:
-            pass
         index = bisect_right([r.argument for r in self.rows], local_argument_du) - 1
         row = self.rows[index]
         offset = local_argument_du - row.argument
@@ -207,8 +185,6 @@ class SourceNightTable:
             night += offset * row.difference * (1 if solar_side == "inside" else -1)
             declination = row.declination - offset * row.drop_fen / 100
             residual = self.segment_residual(index)
-        else:
-            pass
         return {
             "model_id": "named_source_half_night_interpolation_v1",
             "profile_id": self.profile_id,
@@ -251,12 +227,8 @@ def load_table(profile: str) -> SourceNightTable:
         or data.get("declination_rate_fen_per_du_divisor") != "100"
     ):
         raise ValueError("原表角分与日周分单位不符，不能自动缩放")
-    else:
-        pass
     if profile not in data["profiles"]:
         raise ValueError("须明确选择gujin37_siku或yuanshi55_digital，不混合版本")
-    else:
-        pass
     entry = data["profiles"][profile]
     rows = []
     for row in entry["rows"]:
@@ -264,8 +236,6 @@ def load_table(profile: str) -> SourceNightTable:
             v is not None and not isinstance(v, str) for v in (row[k] for k in FIELDS)
         ):
             raise TypeError("刊值须为原精度数值字符串或明确None，不接受隐式布尔/浮点")
-        else:
-            pass
         values = [F(row[k]) if row[k] is not None else None for k in FIELDS]
         assert values[0] is not None and values[3] is not None and values[4] is not None
         rows.append(
@@ -294,22 +264,14 @@ def local_solstice_sunrise(
     _side(solar_side)
     if not 0 <= declination_du <= F("23.9030") or not 0 <= measured_night_ke <= 100:
         raise ValueError("超出本原法日太阳内外度或百刻范围，不外推或截断")
-    else:
-        pass
     if measured_solstice not in ("winter", "summer"):
         raise ValueError("须明确当地观测属于冬至或夏至")
-    else:
-        pass
     if not isinstance(observation_reference, str) or not observation_reference.strip():
         raise ValueError("须提供当地至日观测记录的引用；引用本身不代表已认证")
-    else:
-        pass
     if (measured_solstice == "winter" and measured_night_ke < 50) or (
         measured_solstice == "summer" and measured_night_ke > 50
     ):
         raise ValueError("所给至日夜刻方向不合本原法的北方内外约定，不自动推广到南半球")
-    else:
-        pass
     amplitude = abs(measured_night_ke - 50)
     difference = declination_du * amplitude * 10 / 239
     night_ke = 50 + (difference if solar_side == "outside" else -difference)

@@ -93,8 +93,6 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
             if req.year_boundary == "january_1"
             else "confirmed_effective_birth_year_due_to_boundary_precision"
         )
-    else:
-        pass
     if req.birth_date is not None:
         day = req.birth_date
         resolution = (
@@ -139,10 +137,6 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
                         d.isoformat() for d in possible_dates
                     ),
                 }
-            else:
-                pass
-        else:
-            pass
         if unresolved_boundary_date:
             time["effective_year_status"] = "requires_confirmation"
             required_year_input = (
@@ -154,16 +148,10 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
             )
         else:
             required_year_input = "birth_at_on_year_boundary"
-    else:
-        pass
     if year is None:
         missing.append(f"occupants.{subject_id}.{required_year_input}")
-    else:
-        pass
     if req.gender_convention is None:
         missing.append(f"occupants.{subject_id}.gender_convention")
-    else:
-        pass
     candidates: list[dict[str, Any]] = []
     if year is not None:
         for convention in (
@@ -196,8 +184,6 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
                     },
                 }
             )
-    else:
-        pass
     return {
         "status": "partial" if missing else "complete",
         "subject_id": subject_id,
@@ -220,8 +206,6 @@ def _house_inputs(req: BazhaiRequest) -> tuple[House | None, float, str, str]:
             origin,
             origin + ".bearing_uncertainty_degrees",
         )
-    else:
-        pass
     return house, 0, origin, "not_provided_point_input_convention"
 
 
@@ -247,12 +231,8 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
                     supported = [
                         s for s in supported if s["sitting_trigram"] == sitting
                     ]
-                else:
-                    pass
                 if not supported:
                     raise ValueError("宅向误差区间与已确认 sitting_trigram 不一致")
-                else:
-                    pass
                 ambiguous = len(supported) > 1
                 for support in supported:
                     trigram = support["sitting_trigram"]
@@ -303,35 +283,23 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
             else:
                 sitting = bearing["trigram"]
                 data["sitting_bearing"] = bearing
-        else:
-            pass
         if sitting is not None and not house_candidates:
             house = {
                 **data,
                 "sitting_trigram": sitting,
                 "sectors": sectors(sitting, data["object_id"], "house_sitting_trigram"),
             }
-        else:
-            pass
-    else:
-        pass
     if house is None and not house_candidates:
         missing.append("house.sitting_trigram_or_confirmed_facing")
-    else:
-        pass
     occupants = [minggua(o, o.subject_id) for o in req.occupants]
     for o in occupants:
         missing.extend(o["missing_inputs"])
     if not occupants:
         missing.append("occupants")
-    else:
-        pass
     findings = []
     for placement in req.placements:
         if placement.location_direction is None:
             missing.append(f"placements.{placement.object_id}.location_direction")
-        else:
-            pass
         bases = []
         if house_candidates:
             for candidate in house_candidates:
@@ -352,8 +320,6 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
             bases.append(
                 (house["object_id"], "house", house["sectors"], None, {}, False)
             )
-        else:
-            pass
         for o in occupants:
             if placement.applies_to_occupant(o["subject_id"]):
                 for c in o["candidates"]:
@@ -367,8 +333,6 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
                             o["status"] == "partial",
                         )
                     )
-            else:
-                pass
         for (
             subject_id,
             basis,
@@ -383,8 +347,6 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
             ]:
                 if direction is None:
                     continue
-                else:
-                    pass
                 entry = chart[direction]
                 findings.append(
                     {
@@ -412,8 +374,6 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
         and not any(o["candidates"] for o in occupants)
     ):
         missing.append("placements.usable_house_or_personal_chart")
-    else:
-        pass
     return {
         "status": "partial" if missing else "complete",
         "house": house,

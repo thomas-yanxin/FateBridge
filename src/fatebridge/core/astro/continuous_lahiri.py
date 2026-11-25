@@ -129,8 +129,6 @@ def frame_state(tt: float | TTInstant) -> FrameState:
     point = TTInstant.from_value(tt)
     if not Fraction(3442851, 2) <= point.days <= Fraction(10746971, 2):
         raise ValueError("TT epoch outside the declared continuous-frame domain")
-    else:
-        pass
     matrix, matrix_d = precession(point)
     mean, mean_d = mean_ecliptic_frame(point)
     origin, origin_d = _mean_origin(matrix, matrix_d)
@@ -161,13 +159,9 @@ def frame_state(tt: float | TTInstant) -> FrameState:
 def _vector(values: Sequence[float]) -> Vector:
     if len(values) != 3 or any(isinstance(v, bool) for v in values):
         raise ValueError("A finite Cartesian three-vector is required")
-    else:
-        pass
     result = tuple(float(v) for v in values)
     if not all(math.isfinite(v) for v in result):
         raise ValueError("A finite Cartesian three-vector is required")
-    else:
-        pass
     return result
 
 
@@ -184,8 +178,6 @@ def spherical_state(
     radius = math.hypot(*p)
     if radius == 0:
         raise ValueError("The zero vector has no spherical direction")
-    else:
-        pass
     radial = dot(p, v) / radius
     if rho == 0:
         return {
@@ -196,8 +188,6 @@ def spherical_state(
             "latitude_rate_degrees_per_day": None,
             "radial_rate_per_day": radial,
         }
-    else:
-        pass
     rho_d = (p[0] * v[0] + p[1] * v[1]) / rho
     return {
         "longitude_degrees": math.degrees(math.atan2(p[1], p[0])) % 360.0,
@@ -231,8 +221,6 @@ def project_state(
         or vector_rate_scale <= 0
     ):
         raise ValueError("A finite positive input-velocity scale is required")
-    else:
-        pass
     p, v = _vector(position), _vector(velocity)
     frame = frame_state(julian_day_tt)
     matrix, derivative = frame["frame"], frame["frame_derivative_per_TT_day"]
@@ -270,8 +258,6 @@ def decode_native_fixed_reception_state(
     if native_tt == 2451545.0:
         epsilon = pair(native_tt, "pepol", "peper")[0][1]
         basis = ecliptic_rotation(epsilon)[0]
-    else:
-        pass
     inverse = transpose(basis)
     return {
         "position": list(mv(inverse, p)),

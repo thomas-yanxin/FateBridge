@@ -40,8 +40,6 @@ def auxiliary_placement_source_evidence(
     branches = "子丑寅卯辰巳午未申酉戌亥"
     if not 1 <= lunar_month <= 12 or not 1 <= lunar_day <= 30:
         raise ValueError("辅星来源比较要求有效的农历月日")
-    else:
-        pass
     hour_index, year_index = branches.index(hour_branch), branches.index(year_branch)
     objects: Dict[str, Dict[str, Any]] = {}
     for i, palace in enumerate(palaces):
@@ -49,8 +47,6 @@ def auxiliary_placement_source_evidence(
             # The source batch excludes 旬空, which may have two placements.
             if star["name"] in objects:
                 continue
-            else:
-                pass
             objects[star["name"]] = {
                 "actual_branch": palace["ganzhi"][1],
                 "calculation_path": f"ziwei_birth.palaces.{i}.stars_detail.{j}",
@@ -88,8 +84,6 @@ def auxiliary_placement_source_evidence(
             }
             if unresolved:
                 row["unresolved_reason"] = "leap_month_policy_not_stated_for_this_rule"
-            else:
-                pass
             rows.append(row)
     fire = source["fire_bell"]
     methods["fire_bell"] = {key: fire[key] for key in ("frame", "section", "quote")}

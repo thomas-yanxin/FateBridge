@@ -90,26 +90,16 @@ def structural_patterns(core: dict[str, Any]) -> list[dict[str, Any]]:
                 add("掩", field, "始击与太乙同宫", "推掩法")
             else:
                 add("囚", field, f"{labels[field]}与太乙同宫", "推囚法")
-        else:
-            pass
         if palace == opposite:
             if field == "wenchang_palace":
                 add("对", field, "文昌与太乙对宫", "推對法")
             elif field in {"shiji", "guest_general", "guest_vice_general"}:
                 add("格", field, f"{labels[field]}与太乙对宫", "推格法")
-            else:
-                pass
-        else:
-            pass
         if palace not in RING:
             continue  # Center has no ring bearing; do not manufacture one.
-        else:
-            pass
         distance = (RING.index(palace) - center) % 16
         if distance not in (1, 2, 14, 15):
             continue
-        else:
-            pass
         forward = distance in (1, 2)
         adjacent_spirit = distance in (1, 15)
         if field == "shiji":
@@ -146,8 +136,6 @@ def structural_patterns(core: dict[str, Any]) -> list[dict[str, Any]]:
                     "推闗法",
                     other=guest,
                 )
-            else:
-                pass
 
     result.extend(principal_enclosures(core))
     # Append so all previously emitted relation indices remain stable.
@@ -266,8 +254,6 @@ def calendar_summary(board: dict[str, Any]) -> dict[str, Any]:
                 else {}
             ),
         }
-    else:
-        pass
     return {
         **common,
         **(

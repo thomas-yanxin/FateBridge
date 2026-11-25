@@ -50,8 +50,6 @@ class PlanSegment(FengshuiInput):
     def nonzero(self) -> "PlanSegment":
         if self.start == self.end:
             raise ValueError("线段两端不能重合")
-        else:
-            pass
         return self
 
 
@@ -63,8 +61,6 @@ class PlanPolygon(FengshuiInput):
         polygon = Polygon([(p.x, p.y) for p in self.vertices])
         if not polygon.is_valid or polygon.area == 0:
             raise ValueError("平面多边形须有面积、无自交；不自动修复或改变边界")
-        else:
-            pass
         return self
 
 
@@ -117,8 +113,6 @@ class SpatialBody(FengshuiInput):
     def height_interval(self) -> "SpatialBody":
         if self.top_m <= self.bottom_m:
             raise ValueError("物件顶面须高于底面；平面投影与高度分别计算")
-        else:
-            pass
         return self
 
 
@@ -134,8 +128,6 @@ class SpatialOpening(FengshuiInput):
     def entrance_axis(self) -> "SpatialOpening":
         if self.kind == "entrance" and self.inward_degrees is None:
             raise ValueError("实际入口须明确向内方向；不能用坐者朝向代替")
-        else:
-            pass
         if self.inward_degrees is not None:
             dx, dy = (
                 self.segment.end.x - self.segment.start.x,
@@ -144,10 +136,6 @@ class SpatialOpening(FengshuiInput):
             sine, cosine = _sin_cos_degrees(self.inward_degrees)
             if abs(dx * sine + dy * cosine) > 1e-8 * hypot(dx, dy):
                 raise ValueError("入口向内方向须垂直于门洞线段")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -190,14 +178,10 @@ class WorkSeat(FengshuiInput):
     def eye_below_head(self) -> "WorkSeat":
         if self.eye_height_m >= self.head_height_m:
             raise ValueError("坐者眼高须低于头顶高度，两者独立于家具高度")
-        else:
-            pass
         if self.subject_ids is not None and len(self.subject_ids) != len(
             set(self.subject_ids)
         ):
             raise ValueError("同一工位使用人不能重复")
-        else:
-            pass
         return self
 
 
@@ -245,14 +229,10 @@ class DesktopObject(FengshuiInput):
             and self.representation not in PLANT_REPRESENTATIONS
         ):
             raise ValueError("植物/鲜花/剪枝状态条件不能套到其他物件")
-        else:
-            pass
         if self.screen is not None:
             screen = self.screen
             if screen.bottom_above_desktop_m + screen.height_m > self.height_m:
                 raise ValueError("显示面须包含在所登记物件的完整高度包络内")
-            else:
-                pass
             sine, cosine = _sin_cos_degrees(screen.front_degrees)
             for sign in (-1, 1):
                 x = screen.center.x + sign * screen.width_m / 2 * cosine
@@ -262,10 +242,6 @@ class DesktopObject(FengshuiInput):
                     or abs(y) > self.footprint.depth_m / 2 + 1e-10
                 ):
                     raise ValueError("显示面须包含在所登记物件的完整水平包络内")
-                else:
-                    pass
-        else:
-            pass
         return self
 
 
@@ -319,8 +295,6 @@ class SpatialScene(FengshuiInput):
         ids += [item.object_id for desktop in self.desktops for item in desktop.items]
         if len(ids) != len(set(ids)):
             raise ValueError("空间对象ID须全局唯一")
-        else:
-            pass
         desks = {b.object_id for b in self.bodies if b.kind == "desk"}
         for references in (
             [s.desk_id for s in self.seats],
@@ -328,34 +302,24 @@ class SpatialScene(FengshuiInput):
         ):
             if len(references) != len(set(references)) or set(references) - desks:
                 raise ValueError("坐者/桌面须唯一关联明确的书桌")
-            else:
-                pass
         entries = {o.object_id for o in self.openings if o.kind == "entrance"}
         if any(
             s.entrance_id is not None and s.entrance_id not in entries
             for s in self.seats
         ):
             raise ValueError("坐者入口须引用实际entrance，不能用窗/厕门/走道代替")
-        else:
-            pass
         windows = {o.object_id for o in self.openings if o.kind == "window"}
         if any(
             s.window_id is not None and s.window_id not in windows for s in self.seats
         ):
             raise ValueError("坐者窗须引用明确window")
-        else:
-            pass
         for desktop in self.desktops:
             if len(desktop.ruleset_ids) != len(set(desktop.ruleset_ids)):
                 raise ValueError("桌面规则版本不能重复")
-            else:
-                pass
             if any(
                 i.screen is not None for i in desktop.items
             ) and desktop.desk_id not in {s.desk_id for s in self.seats}:
                 raise ValueError("显示面视线须关联同桌实际坐者及眼高")
-            else:
-                pass
         return self
 
 
@@ -388,20 +352,14 @@ class SpatialMoveDomain(FengshuiInput):
     def unique_poses(self) -> "SpatialMoveDomain":
         if (self.positions is None) == (self.grid is None):
             raise ValueError("位置须在显式positions与自动grid中二选一")
-        else:
-            pass
         if self.positions is not None and len(
             {(p.x, p.y) for p in self.positions}
         ) != len(self.positions):
             raise ValueError("搜索位置不能重复")
-        else:
-            pass
         if len({compose_degrees(r) for r in self.rotations_degrees}) != len(
             self.rotations_degrees
         ):
             raise ValueError("搜索角度归一化后不能重复")
-        else:
-            pass
         return self
 
 
@@ -424,10 +382,6 @@ class SpatialSearch(FengshuiInput):
         ids = [d.object_id for d in self.domains]
         if len(ids) != len(set(ids)):
             raise ValueError("每个搜索对象只定义一个完整位置/角度域")
-        else:
-            pass
         if len(self.required_checks) != len(set(self.required_checks)):
             raise ValueError("搜索条件不能重复")
-        else:
-            pass
         return self

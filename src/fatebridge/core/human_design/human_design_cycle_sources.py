@@ -58,8 +58,6 @@ class CycleSourceTrace:
             or configured_jpl_file() != self._jpl
         ):
             raise EphemerisSourceError("physical_configuration_changed")
-        else:
-            pass
 
     def _file(self, slot: int, metadata: tuple[Any, ...], *, jpl: bool) -> str:
         key_metadata = slot, metadata, jpl
@@ -68,13 +66,9 @@ class CycleSourceTrace:
             try:
                 if _signature(path) != signature:
                     raise EphemerisSourceError("changed_during")
-                else:
-                    pass
             except OSError as error:
                 raise EphemerisSourceError("unavailable_during") from error
             return identity
-        else:
-            pass
         filename, start, end, de_number = metadata
         path = Path(filename).absolute()
         if jpl:
@@ -84,8 +78,6 @@ class CycleSourceTrace:
                 header["end_julian_day_tdb"],
                 header["de_number"],
             )
-        else:
-            pass
         if (
             type(start) not in (float, int)
             or type(end) not in (float, int)
@@ -96,46 +88,32 @@ class CycleSourceTrace:
             or de_number <= 0
         ):
             raise EphemerisSourceError("invalid_range")
-        else:
-            pass
         try:
             signature = _signature(path)
             if path in self._paths:
                 previous, identity = self._paths[path]
                 if signature != previous:
                     raise EphemerisSourceError("changed_during")
-                else:
-                    pass
                 saved = self._files[identity]
                 if saved["de_number"] != de_number:
                     raise EphemerisSourceError("edition_changed")
-                else:
-                    pass
                 if (
                     saved["slot"],
                     saved["start_julian_day_tdb" if jpl else "start_julian_day_tt"],
                     saved["end_julian_day_tdb" if jpl else "end_julian_day_tt"],
                 ) != (slot, start, end):
                     raise EphemerisSourceError("slot_changed")
-                else:
-                    pass
                 self._metadata_cache[key_metadata] = path, signature, identity
                 return identity
-            else:
-                pass
             digest = _digest(path)
             if _signature(path) != signature:
                 raise EphemerisSourceError("changed_during")
-            else:
-                pass
         except OSError as error:
             raise EphemerisSourceError("unavailable_during") from error
         identity = f"{'jpl' if jpl else 'se1'}:{slot}:{path.name}"
         previous_digest = self._names.get((slot, path.name))
         if previous_digest is not None and previous_digest != digest:
             raise EphemerisSourceError("changed_across")
-        else:
-            pass
         self._names[(slot, path.name)] = digest
         expected = self._manifest.get(path.name)
         self._files[identity] = {
@@ -166,8 +144,6 @@ class CycleSourceTrace:
             "jpl",
         }:
             raise ValueError("Unsupported cycle source context")
-        else:
-            pass
         getter = getattr(runtime.swe, "get_current_file_data", None)
         requires_files = body == "Chiron" or model != "moshier"
         ids = []
@@ -182,18 +158,12 @@ class CycleSourceTrace:
                 if not metadata[0]:
                     if slot in (0, 2):
                         raise EphemerisSourceError("unavailable_during")
-                    else:
-                        pass
                     continue
-                else:
-                    pass
                 identity = self._file(slot, metadata, jpl=model == "jpl" and slot == 0)
                 de_number = self._files[identity]["de_number"]
                 key = body, model, slot
                 if key in self._editions and self._editions[key] != de_number:
                     raise EphemerisSourceError("edition_changed")
-                else:
-                    pass
                 self._editions[key] = de_number
                 ids.append(identity)
             status = "file_contexts_observed" if ids else "library_builtin"
@@ -208,8 +178,6 @@ class CycleSourceTrace:
                     "file_ids": sorted(ids),
                 }
             )
-        else:
-            pass
         return self._context_indices[key_context]
 
     def finish(self) -> dict[str, Any]:
@@ -222,8 +190,6 @@ class CycleSourceTrace:
                     or _signature(path) != signature
                 ):
                     raise EphemerisSourceError("changed_during")
-                else:
-                    pass
             except OSError as error:
                 raise EphemerisSourceError("unavailable_during") from error
         return {
@@ -283,12 +249,8 @@ class CycleBirthSources:
     def observe(self, body: str, jd_tt: float, state: dict[str, Any]) -> None:
         if body not in {"Saturn", "Uranus"}:
             return
-        else:
-            pass
         if body in self.rows or (self.jd_tt is not None and self.jd_tt != jd_tt):
             raise EphemerisSourceError("nominal_source_mismatch")
-        else:
-            pass
         self.jd_tt = jd_tt
         model = position_flag_model(state["return_flags"])
         self.indices[body] = self.trace.observe(body, model)

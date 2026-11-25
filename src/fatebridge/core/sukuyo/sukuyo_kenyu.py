@@ -23,18 +23,12 @@ def lookup_printed_hour(
     table = loaded.data["clock_selected"]
     if day_luminary not in table["day_columns"]:
         raise ValueError("印本直日曜须为日月火水木金土之一")
-    else:
-        pass
     if night_part not in {None, "upper", "lower"}:
         raise ValueError("夜分仅支持upper或lower，不接受桧尾前后半代称")
-    else:
-        pass
     column = table["day_columns"].index(day_luminary)
     if branch in table["day_branches"]:
         if night_part is not None:
             raise ValueError("此印本昼分支只占一行，不能指定夜分上下刻")
-        else:
-            pass
         indices = [table["day_branches"].index(branch)]
         phase = "day"
     elif branch in table["night_branches"]:

@@ -22,7 +22,7 @@
 
 本轮修复两处实际问题。原八卦返回值与全局表共用可变爻数组，直接使用 Python 领域函数的调用者改动结果后会污染下一次计算；现在由共同交付函数复制爻数组，152个预先固定的隔离探针从全部失败降至0。该问题不表示远程 JSON 客户端可以修改服务器内存。原名称查询拒绝部分标准短名和繁体全名；现在从既有卦图和已归属的《周易》篇名派生精确索引，支持 `临`、`臨`、`天澤履`、`雷風恆`、`天山遯` 等，不另维护一套手写64卦别名表。八纯卦单名在 `auto` 模式仍取八卦，明确 `hexagram` 才取六爻卦；批量查询可用全名或六码选六爻卦。无法识别的爻序不再默认套用乾卦。
 
-参考在对应修复前固定，原始失败、不同实现的原返回及脚本错误记录均保留。来源包括[《梅花易數》卷一固定转录](https://zh.wikisource.org/w/index.php?oldid=2690596&title=梅花易數/卷一)、[《周易》公布卦图表](https://zh.wikisource.org/wiki/周易)和[《臨》固定转录](https://zh.wikisource.org/w/index.php?title=周易/臨&oldid=2106146)，并实际执行 [muyen 原作者实现的固定提交](https://github.com/muyen/meihua-yishu/tree/8a9a5e0f482dd225bfe4a1c52c2ae5546228607a) 与 [handsomejustin 原作者实现的固定提交](https://github.com/handsomejustin/meihua-yi/tree/7ea8b1371c316340c453531f1bbb7b1778cbd6b6)。这些开源实现是独立比较对象，不因此获得权威认证。新增原典依据是数字转录，未据此宣称完整影印校勘。
+参考在对应修复前固定，原始失败、不同实现的原返回及脚本错误记录均保留。来源包括[《梅花易數》卷一固定转录](https://zh.wikisource.org/w/index.php?oldid=2690596&title=梅花易數/卷一)、[《周易》公布卦图表](https://zh.wikisource.org/wiki/周易)和[《臨》固定转录](https://zh.wikisource.org/w/index.php?title=周易/臨&oldid=2106146)，并实际执行 [muyen 原作者实现的固定提交](https://github.com/muyen/meihua-yishu) 与 [handsomejustin 原作者实现的固定提交](https://github.com/handsomejustin/meihua-yi)。这些开源实现是独立比较对象，不因此获得权威认证。新增原典依据是数字转录，未据此宣称完整影印校勘。
 
 | 固定范围 | 当前结果与界限 |
 | --- | --- |
@@ -571,7 +571,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 
 ### 失物占的体用与变用方位类象
 
-显式选 `interpretation_topic=lost_property`，使用 `topic` 或 `topic_audit` 字段卡。该分支采用文明书局本卷二《失物占第十五》，PDF 索引69为题目、70为正文，原PDF SHA-256为 `af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0`。五种初始体用条款和八卦方位类象分别保留；旧四题篇20条及出行、谒见10条没有改写。
+显式选 `interpretation_topic=lost_property`，使用 `topic` 或 `topic_audit` 字段卡。该分支采用文明书局本卷二《失物占第十五》，PDF 索引69为题目、70为正文。五种初始体用条款和八卦方位类象分别保留；旧四题篇20条及出行、谒见10条没有改写。
 
 `interpretation.topic_reading` 按原体、初用匹配五种关系，`chapter_qualifications` 单列位置条款。原文“又以變卦為失物之所在”在此明确采用变动的三爻经卦，即 `changed_use`，并提供实际动爻及 `trigram_fact_path`。卷一观梅例区分“初爻變咸”和“變為艮土”的用语支持这一操作性读法，尚未独立裁定为失物章的唯一解释。方向直接取失物原文，不从先天卦序数字换算角度。乾卦初爻或四爻动时均为变用巽、东南；不会把仍为乾的另一半卦误取为西北。
 

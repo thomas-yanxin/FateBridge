@@ -33,10 +33,6 @@ class ClashContributor(PartialOutput):
         if self.branch is not None and self.stem is not None:
             if self.stem not in BRANCH_HIDDEN_STEMS.get(self.branch, ()):
                 raise ValueError("Clash contributor must be an actual hidden stem")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -51,8 +47,6 @@ class ClashPower(PartialOutput):
             keys = [(r.pillar, r.stem) for r in self.contributors]
             if all(None not in k for k in keys) and len(keys) != len(set(keys)):
                 raise ValueError("A physical hidden stem cannot contribute twice")
-            else:
-                pass
             if self.element is not None:
                 for row in self.contributors:
                     if (
@@ -62,10 +56,6 @@ class ClashPower(PartialOutput):
                         raise ValueError(
                             "Contributor element does not match comparison"
                         )
-                    else:
-                        pass
-            else:
-                pass
             budgets = [r.initial_budget for r in self.contributors]
             if self.raw_budget is not None and all(v is not None for v in budgets):
                 if not isclose(
@@ -75,12 +65,6 @@ class ClashPower(PartialOutput):
                     abs_tol=1e-12,
                 ):
                     raise ValueError("Power must equal its supplied initial budgets")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -113,30 +97,18 @@ class ClashDecision(PartialOutput):
         if self.positions is not None:
             if len(self.positions) != 2 or self.positions[0] == self.positions[1]:
                 raise ValueError("A clash needs two different physical positions")
-            else:
-                pass
             if self.distance is not None and self.distance != abs(
                 ORDER.index(self.positions[0]) - ORDER.index(self.positions[1])
             ):
                 raise ValueError("Clash distance must match its positions")
-            else:
-                pass
-        else:
-            pass
         if self.branches is not None:
             if (
                 len(self.branches) != 2
                 or BRANCH_CONFLICTS.get(self.branches[0]) != self.branches[1]
             ):
                 raise ValueError("Branches must be an actual clash pair")
-            else:
-                pass
-        else:
-            pass
         if self.powers is not None and len(self.powers) != 2:
             raise ValueError("A power comparison has exactly two sides")
-        else:
-            pass
         if self.powers is not None and self.branches is not None:
             for power, branch in zip(self.powers, self.branches):
                 if (
@@ -144,10 +116,6 @@ class ClashDecision(PartialOutput):
                     and power.element != BRANCH_ELEMENTS[branch][0].value
                 ):
                     raise ValueError("Power sides must follow the actual branch order")
-                else:
-                    pass
-        else:
-            pass
         if (
             self.calculation_branch
             in {
@@ -158,8 +126,6 @@ class ClashDecision(PartialOutput):
             and self.powers is not None
         ):
             raise ValueError("This calculation branch did not compare raw powers")
-        else:
-            pass
         if self.calculation_branch is not None and self.event_status is not None:
             expected_status = {
                 "combination_resolution": "resolved_by_combination",
@@ -171,15 +137,9 @@ class ClashDecision(PartialOutput):
                 raise ValueError(
                     "Calculation branch must match the supplied event status"
                 )
-            else:
-                pass
-        else:
-            pass
         if self.calculation_branch == "ordered_generation_path_resolution":
             if self.applied_root_retention is not None:
                 raise ValueError("通关免冲分支不能同时施加根损系数")
-            else:
-                pass
             if self.positions is not None and self.intermediary_positions is not None:
                 left, right = sorted(ORDER.index(p) for p in self.positions)
                 if (
@@ -187,25 +147,13 @@ class ClashDecision(PartialOutput):
                     or self.intermediary_positions != list(ORDER[left + 1 : right])
                 ):
                     raise ValueError("通关中介必须为冲支之间实际有序柱位")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         if self.applied_root_retention is not None:
             if any(not 0 <= v <= 1 for v in self.applied_root_retention.values()):
                 raise ValueError("Retention must be a finite fraction")
-            else:
-                pass
             if self.positions is not None and set(self.applied_root_retention) != set(
                 self.positions
             ):
                 raise ValueError("Retention must refer to the same two positions")
-            else:
-                pass
-        else:
-            pass
         return self
 
 

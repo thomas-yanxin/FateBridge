@@ -89,8 +89,6 @@ def build_liuyao_evidence(
                     "sources": [SOURCES[7], SOURCES[29]],
                 }
             )
-        else:
-            pass
         rows.append(row)
         trace.append(
             {
@@ -282,8 +280,6 @@ def build_liuyao_evidence(
                 scope="分别核实际动土来源资格、排除被判断金爻的独立根与受方门槛；不由长生资格解除空破回头克或裁定现实成败。",
             )
         )
-    else:
-        pass
     moving_si_contexts = [
         r["moving_si"]
         for r in conditional["growth_conditions"]["lines"]
@@ -301,8 +297,6 @@ def build_liuyao_evidence(
                 scope="独立生扶、每一动巳来源及原克制许可分别核对；同版第85、97页合并效力未裁定，不以遇长生自动取消克制或断现实成败。",
             )
         )
-    else:
-        pass
     own_si_contexts = [
         r["own_changed_si"]
         for r in conditional["growth_conditions"]["lines"]
@@ -323,8 +317,6 @@ def build_liuyao_evidence(
                 scope="实际本位金化巳另核独立生扶与变支门槛；原生克关系保留，未核不写成已克或已生，不跨位使用变巳。",
             )
         )
-    else:
-        pass
     trace.append(
         {
             "rule_id": "si_yin_shen_scoped_growth_exclusion",

@@ -29,22 +29,16 @@ def classification_evidence(
     def path(start: str, end: str) -> dict[str, Any] | None:
         if start not in defined or end not in defined:
             return None
-        else:
-            pass
         pending: deque[tuple[list[str], list[str]]] = deque([([start], [])])
         seen = {start}
         while pending:
             centers, ids = pending.popleft()
             if centers[-1] == end:
                 return {"centers": centers, "channel_ids": ids}
-            else:
-                pass
             for neighbor, channel_id in sorted(adjacency.get(centers[-1], [])):
                 if neighbor not in seen:
                     seen.add(neighbor)
                     pending.append((centers + [neighbor], ids + [channel_id]))
-                else:
-                    pass
         return None
 
     motor_paths = [
@@ -57,8 +51,6 @@ def classification_evidence(
         priority_checks.append({"center": center, "defined": center in defined})
         if center in defined:
             break
-        else:
-            pass
     endpoints = {
         "ego_manifested": ("ego", "throat"),
         "ego_projected": ("ego", "g"),
@@ -85,21 +77,15 @@ def authority_structure_text(evidence: dict[str, Any]) -> str:
     authority = evidence["selected_authority"]
     if authority == "lunar_no_inner_authority":
         return "结构依据：没有完整通道，九中心均未定义；月亮过程不属于内在权威。"
-    else:
-        pass
     if authority == "environment_no_inner_authority":
         names = "、".join(CENTER_NAMES[c] for c in evidence["defined_centers"])
         return (
             f"结构依据：仅{names}有定义，喉以下中心均未定义；讨论过程不属于内在权威。"
         )
-    else:
-        pass
     prefix = "、".join(absent) + "均未定义；" if absent else ""
     paths = evidence["authority_paths"]
     if paths:
         witness = paths[0]
         route = "→".join(CENTER_NAMES[c] for c in witness["centers"])
         return f"结构依据：{prefix}完整通道{'、'.join(witness['channel_ids'])}形成{route}连接。"
-    else:
-        pass
     return f"结构依据：{prefix}{'、'.join(defined)}已定义，按权威优先序选中。"

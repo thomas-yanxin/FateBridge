@@ -26,15 +26,11 @@ COUNTER_BASIS = "named_unwrapped_cycle_day"
 def _integer(value: int) -> None:
     if type(value) is not int:
         raise TypeError("日期标签及序号须为整数，不接收布尔或隐式转换")
-    else:
-        pass
 
 
 def _calendar(calendar: str) -> None:
     if calendar not in CALENDARS:
         raise ValueError("须明确选择前推格里历或前推儒略历，不自动采用1582切换")
-    else:
-        pass
 
 
 def calendar_label_noon_jdn(year: int, month: int, day: int, *, calendar: str) -> int:
@@ -44,18 +40,12 @@ def calendar_label_noon_jdn(year: int, month: int, day: int, *, calendar: str) -
         _integer(value)
     if not 1 <= year <= 9999 or not 1 <= month <= 12:
         raise ValueError("仅支持公元1至9999年的有效日期标签")
-    else:
-        pass
     if calendar == "proleptic_gregorian":
         return date(year, month, day).toordinal() + 1721425
-    else:
-        pass
     leap = year % 4 == 0
     lengths = (31, 29 if leap else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
     if not 1 <= day <= lengths[month - 1]:
         raise ValueError("无效的前推儒略历日期标签")
-    else:
-        pass
     a = (14 - month) // 12
     y = year + 4800 - a
     m = month + 12 * a - 3
@@ -72,13 +62,9 @@ def calendar_label_from_noon_jdn(jdn: int, *, calendar: str) -> list[int]:
         <= calendar_label_noon_jdn(9999, 12, 31, calendar=calendar)
     ):
         raise ValueError("序号超出公元1至9999年的日期标签范围")
-    else:
-        pass
     if calendar == "proleptic_gregorian":
         label = date.fromordinal(jdn - 1721425)
         return [label.year, label.month, label.day]
-    else:
-        pass
     c = jdn + 32082
     d = (4 * c + 3) // 1461
     e = c - (1461 * d) // 4
@@ -123,13 +109,9 @@ class CalendarDateBridge:
     ) -> dict[str, Any]:
         if search_policy != SEARCH_POLICY:
             raise ValueError("未支持的搜索政策，不扩大窗口或移锚以凑合冬至")
-        else:
-            pass
         _integer(source_year)
         if not 1281 <= source_year <= 9999:
             raise ValueError("具名历书标年仅支持1281至9999，不推断上考")
-        else:
-            pass
         context = guolao_year_labels.shoushi_year_context(source_year=source_year)
         winter_year = context["preceding_winter_year_label_ce"]
         matches = []
@@ -146,8 +128,6 @@ class CalendarDateBridge:
                         "ganzhi": label["ganzhi"],
                     }
                 )
-            else:
-                pass
         return {
             "profile_id": PROFILE,
             "source_data_sha256": self.fingerprint,
@@ -179,12 +159,8 @@ class CalendarDateBridge:
         """Preserve an explicitly unwrapped source fraction without clock mapping."""
         if not isinstance(counter, F):
             raise TypeError("须传入精确Fraction原历完整循环日数")
-        else:
-            pass
         if counter_basis != COUNTER_BASIS:
             raise ValueError("须声明未取模的具名循环日数，不把干支余数猜成完整日数")
-        else:
-            pass
         winter = self.winter_candidates(
             source_year=source_year, search_policy=search_policy
         )
@@ -196,8 +172,6 @@ class CalendarDateBridge:
         )
         if not 0 <= day_offset <= 365:
             raise ValueError("日数超出具名冬至日开始的366日标签窗口，不取模或补上一岁")
-        else:
-            pass
         candidate = winter["candidates"]
         labels = None
         if len(candidate) == 1:
@@ -211,8 +185,6 @@ class CalendarDateBridge:
                 ),
                 "calendar_label_noon_jdn": serial,
             }
-        else:
-            pass
         return {
             "winter_mapping": winter,
             "counter_basis": counter_basis,
@@ -229,8 +201,6 @@ class CalendarDateBridge:
 def load_calendar_date_bridge(profile: str) -> CalendarDateBridge:
     if profile != PROFILE:
         raise ValueError("未支持的具名日期标签政策")
-    else:
-        pass
     blob = DATA.read_bytes()
     source = json.loads(blob)
     anchor = source["anchor"]
@@ -254,6 +224,4 @@ def load_calendar_date_bridge(profile: str) -> CalendarDateBridge:
         or source["native_birth_chart_integration"] is not False
     ):
         raise ValueError("固定纪日锚点或具名来源不一致，不移动锚点以凑合算例")
-    else:
-        pass
     return CalendarDateBridge(source, hashlib.sha256(blob).hexdigest())

@@ -8,8 +8,6 @@ from typing import Any
 def ren_calendar_snapshot_lines(policy: dict[str, Any]) -> list[str]:
     if policy.get("mode") != "civil_instant_checked":
         return ["历法依据：符号推演，未核验真实民用时刻"]
-    else:
-        pass
     providers = sorted({term["provider"] for term in policy["solar_term_dependencies"]})
     models = sorted(
         {
@@ -60,6 +58,4 @@ def ren_calendar_snapshot_lines(policy: dict[str, Any]) -> list[str]:
             f"民用钟消歧：{resolution['timezone']} {resolution['resolved_utc_offset']}，"
             f"{selection}；对应UTC {resolution['instant_utc']}",
         )
-    else:
-        pass
     return lines

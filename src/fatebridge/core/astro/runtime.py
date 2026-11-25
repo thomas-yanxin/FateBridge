@@ -33,8 +33,6 @@ def _log_swe_runtime_failure(call: str, error: BaseException) -> None:
     global _SWE_RUNTIME_FAILURE_LOGGED
     if _SWE_RUNTIME_FAILURE_LOGGED:
         return
-    else:
-        pass
     _SWE_RUNTIME_FAILURE_LOGGED = True
     logger.warning(
         "Swiss Ephemeris %s raised %s; inspect calculation provenance "

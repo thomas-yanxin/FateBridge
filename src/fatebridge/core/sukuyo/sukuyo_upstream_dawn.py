@@ -30,8 +30,6 @@ def validate_upstream_reference(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("上游来源、语境、文本层或未定控制改变，须重新核验")
-    else:
-        pass
 
 
 def upstream_reference() -> dict[str, Any]:
@@ -39,8 +37,6 @@ def upstream_reference() -> dict[str, Any]:
     loaded = load_source(SOURCE)
     if loaded.sha256 != DATA_SHA256:
         raise ValueError("上游原文资料身份改变，须重新冻结来源")
-    else:
-        pass
     validate_upstream_reference(loaded.data)
     return {
         "id": loaded.data["id"],

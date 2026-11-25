@@ -96,12 +96,8 @@ def _table(path: Path) -> _Table:
             )
         ):
             raise ValueError("Invalid NAOJ historical reference month")
-        else:
-            pass
         if previous_end is not None and ordinal != previous_end:
             raise ValueError("NAOJ historical month periods are not contiguous")
-        else:
-            pass
         if previous_label is not None:
             py, pm, pl = previous_label
             expected = (py + 1, 1) if pm == 12 else (py, pm + 1)
@@ -109,10 +105,6 @@ def _table(path: Path) -> _Table:
                 not leap and (year, month) != expected
             ):
                 raise ValueError("NAOJ historical lunar month sequence changed")
-            else:
-                pass
-        else:
-            pass
         starts.append(ordinal)
         rows.append((year, month, leap, length))
         previous_end = ordinal + length
@@ -130,15 +122,11 @@ def _table(path: Path) -> _Table:
         != bundle["reference_day_count"]
     ):
         raise ValueError("NAOJ historical table does not cover its declared domain")
-    else:
-        pass
     query_hashes = bundle["source_query_response_sha256"]
     if set(query_hashes) != {str(year) for year in range(1873)} or any(
         not re.fullmatch(r"[0-9a-f]{64}", value) for value in query_hashes.values()
     ):
         raise ValueError("Historical source query fingerprints are incomplete")
-    else:
-        pass
     anchor = bundle["day_cycle_anchor"]
     if (
         not isinstance(anchor, dict)
@@ -157,8 +145,6 @@ def _table(path: Path) -> _Table:
         or anchor["source_response_sha256"] != query_hashes[str(rows[0][0])]
     ):
         raise ValueError("Historical day-cycle anchor is not bound to its source month")
-    else:
-        pass
     differences = bundle["cross_source_disagreement_intervals"]
     difference_starts, serialized = [], []
     previous_end = 0
@@ -172,8 +158,6 @@ def _table(path: Path) -> _Table:
             raise ValueError(
                 "Historical source-variant intervals overlap or exceed the domain"
             )
-        else:
-            pass
         difference_starts.append(begin.toordinal())
         serialized.append(json.dumps(row, ensure_ascii=False))
         previous_end = end.toordinal()
@@ -222,16 +206,12 @@ def source_independence_reference() -> dict[str, Any]:
     rows = data["provider_statements"]
     if len(rows) != 2 or {row["provider"] for row in rows} != {"NAOJ", "HuTime"}:
         raise ValueError("历日来源关系须保留两家提供方的具名说明")
-    else:
-        pass
     shared = sorted(
         set(rows[0]["selected_bibliographic_titles"])
         & set(rows[1]["selected_bibliographic_titles"])
     )
     if shared != data["shared_bibliographic_titles"]:
         raise ValueError("共同书目未绑定两家提供方的实际声明")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 
@@ -240,8 +220,6 @@ def _fields(table: _Table, civil: date) -> tuple[int, int, int, bool, int]:
         raise ValueError(
             f"NAOJ日本历史参考仅支持{table.first}至{table.last}；不补其他历法或延长被改历截断的月份"
         )
-    else:
-        pass
     index = bisect_right(table.starts, civil.toordinal()) - 1
     year, month, leap, _ = table.rows[index]
     return year, month, civil.toordinal() - table.starts[index] + 1, leap, index
@@ -279,15 +257,11 @@ def compatibility_reference_notes(
                     f"{source['retained_disagreement_interval_count']}个区间；两提供方的方法说明均列《{shared_titles}》，"
                     "两来源部分共用历史文献仅指这项已声明的共同书目，不证明具体版本或逐条依赖相同，也未完成全范围独立核验。"
                 )
-            else:
-                pass
             label = f"{name}的参考日期{branch['calendar_date']}"
             if source.get("edo_calendar_method_reference") is not None:
 
                 lines.append(label + "：")
                 lines.extend(reading_lines(source["edo_calendar_method_reference"]))
-            else:
-                pass
             cycle = source["day_ganzhi_reference"]
             anchor = cycle["source_anchor"]
             lines.append(
@@ -303,8 +277,6 @@ def compatibility_reference_notes(
                         source["early_weekday_documentary_comparison"]
                     )
                 )
-            else:
-                pass
             if source.get("early_weekday_editorial_comparison"):
 
                 lines.append(label + "：")
@@ -313,8 +285,6 @@ def compatibility_reference_notes(
                         source["early_weekday_editorial_comparison"]
                     )
                 )
-            else:
-                pass
             if source.get("manuscript_month_header"):
                 lines.extend(
                     header_reading(
@@ -322,54 +292,36 @@ def compatibility_reference_notes(
                         branch.get("profile_calculation"),
                     )
                 )
-            else:
-                pass
             if source.get("manuscript_daily_annotations"):
                 lines.append(label + "：")
                 lines.extend(
                     daily_annotation_reading(source["manuscript_daily_annotations"])
                 )
-            else:
-                pass
             research = source.get("dayan_advance_research_comparison")
             adjustment = source.get("published_calendar_adjustment_reference")
             if adjustment is not None:
                 lines.append(label + "：")
                 lines.extend(adjustment_lines(adjustment))
-            else:
-                pass
             if research is not None:
                 lines.append(label + "：")
                 lines.extend(comparison_lines(research))
-            else:
-                pass
             nominal_moon = source.get("dayan_nominal_new_moon_model")
             if nominal_moon is not None:
                 lines.append(label + "：")
                 lines.extend(reconstruction_lines(nominal_moon))
-            else:
-                pass
             research_context = source.get("dayan_advance_research_scope")
             if research_context is not None:
                 lines.extend(scope_lines(research_context, research))
-            else:
-                pass
             edict = source.get("sandaikaku_edict_reference")
             if edict is not None or research_context is not None:
                 lines.extend(sandaikaku_lines(edict))
-            else:
-                pass
             if (
                 source["date_provenance"]
                 == "naoj_reconstructed_gihou_mean_new_moons_not_contemporary_observation"
             ):
                 lines.append(f"{label}属仪凤历平朔回推，非当年实测或已证实颁历。")
-            else:
-                pass
             if source["month_truncated_by_calendar_reform"]:
                 lines.append(f"{label}所在旧历十二月因明治改历截为两天。")
-            else:
-                pass
             comparison = source.get("cross_source_comparison")
             if comparison:
                 primary, control = (
@@ -422,8 +374,6 @@ def date_reference(civil: date) -> dict[str, Any]:
             alternative = variant["hutime_first_fields"]
             if alternative is not None:
                 alternative[2] += (civil - begin).days
-            else:
-                pass
             comparison = {
                 "reference_provider": "NAOJ",
                 "control_provider": "HuTime 1001.1",
@@ -435,10 +385,6 @@ def date_reference(civil: date) -> dict[str, Any]:
                 ),
                 "scope": "Separate publisher/implementation control; retained disagreement is not resolved by replacing the selected NAOJ facts.",
             }
-        else:
-            pass
-    else:
-        pass
     result = {
         **metadata,
         "source_independence_reference": lineage,
@@ -505,27 +451,17 @@ def date_reference(civil: date) -> dict[str, Any]:
     edo = calendar_method_reference(year, month, leap)
     if edo is not None:
         result["edo_calendar_method_reference"] = edo
-    else:
-        pass
 
     documentary = dated_weekday_reference(civil, (year, month, day, leap), result)
     if documentary is not None:
         result["early_weekday_documentary_comparison"] = documentary
-    else:
-        pass
     editorial = editorial_weekday_reference(civil, (year, month, day, leap), result)
     if editorial is not None:
         result["early_weekday_editorial_comparison"] = editorial
-    else:
-        pass
     header = month_header_reference(year, month, leap, day)
     if header is not None:
         result["manuscript_month_header"] = header
-    else:
-        pass
     daily = daily_annotation_reference(year, month, leap, day)
     if daily is not None:
         result["manuscript_daily_annotations"] = daily
-    else:
-        pass
     return result

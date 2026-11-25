@@ -45,8 +45,6 @@ def strength_context(
                 "fact_path": f"{base}.summary.{planet}",
             }
         ]
-    else:
-        pass
     values = [row["value"] for row in scenarios if row["value"] is not None]
     if any(
         isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v)
@@ -55,8 +53,6 @@ def strength_context(
         raise ValueError(
             "Strength evidence requires finite numeric branches or missing values"
         )
-    else:
-        pass
     if len(values) != len(scenarios):
         status = "partially_computed" if values else "unavailable"
         expected = None
@@ -68,8 +64,6 @@ def strength_context(
         raise ValueError(
             "Strength summary contradicts its same-run conditional branches"
         )
-    else:
-        pass
     missing = []
     for name, part in component.get("components", {}).items():
         rows = part.get("scenarios")
@@ -89,8 +83,6 @@ def strength_context(
             )
         if paths:
             missing.append({"component": name, "missing_value_paths": paths})
-        else:
-            pass
     context_paths = [
         f"{base}.{name}"
         for name in (
@@ -136,8 +128,6 @@ def strength_context(
             and name == "model_context"
         ):
             continue
-        else:
-            pass
         for field in fields:
             if field in component.get(name, {}):
                 constraints.append(
@@ -146,8 +136,6 @@ def strength_context(
                         "value": component[name][field],
                     }
                 )
-            else:
-                pass
     return {
         "planet": planet,
         "value_status": status,
@@ -174,8 +162,6 @@ def cheshta_ruler_provenance(
     base = "india.strengths"
     if component["source_id"] != SOURCE_ID:
         raise ValueError("Cheshta source receipt contradicts its declared source")
-    else:
-        pass
     inputs = [
         {"fact_path": f"{base}.cheshta_bala.source_id", "value": component["source_id"]}
     ]
@@ -235,8 +221,6 @@ def cheshta_ruler_provenance(
                 raise ValueError(
                     "Cheshta model provenance contradicts its computed status"
                 )
-            else:
-                pass
             evidence = verified_planet_evidence(model, planet)
             expected = {
                 name: evidence["arc"]["value"] for name in component["scenarios"]
@@ -260,8 +244,6 @@ def cheshta_ruler_provenance(
                 ("outside_validated_model_window", MODEL),
             }:
                 raise ValueError("Unrecognized uncomputed Cheshta model state")
-            else:
-                pass
             expected = dict.fromkeys(component["scenarios"])
     else:
         raise ValueError("Cheshta provenance covers seven physical rulers only")
@@ -270,8 +252,6 @@ def cheshta_ruler_provenance(
         for name, value in expected.items()
     ):
         raise ValueError("Cheshta ruler value contradicts its same-run upstream inputs")
-    else:
-        pass
     return {
         "rule_id": rule,
         "source_section": section,
@@ -298,8 +278,6 @@ def birth_reading_basis(
         moon_options = [
             {k: nakshatras["Moon"][k] for k in ("index", "name", "lord", "pada")}
         ]
-    else:
-        pass
     return {
         "reference": "nominal_birth_instant",
         "options_basis": (

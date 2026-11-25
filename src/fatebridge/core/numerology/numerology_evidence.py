@@ -662,10 +662,6 @@ def canping_evidence(calculation: dict) -> dict:
                     "verses": deepcopy(selected["verses"]),
                 }
             )
-        else:
-            pass
-    else:
-        pass
     result["unresolved_rules"] = [
         "卷六未唯一指定配运系统；默认明确选用卷七附子平月柱法，不与河洛阳九阴六大限混同。",
         "卷七三日折岁借除规则未细定日内分数；默认民用日期差整日借除、连续折算另具规则名，现代日期相加及DST是工程约定。",
@@ -678,12 +674,8 @@ def canping_evidence(calculation: dict) -> dict:
             "legacy命宫顺行、固定一岁起运仅为继承实现，未获本次原典证明。",
             "legacy流年仅为与出生年柱对应的立春年标签，无已核定日期区间；不支持时刻查询。",
         ]
-    else:
-        pass
     if method == "ming":
         result["unresolved_rules"].append(
             "ming 以月支反向替日支，与卷六不用月令的起数段落不符；仅保留显式变法。"
         )
-    else:
-        pass
     return result

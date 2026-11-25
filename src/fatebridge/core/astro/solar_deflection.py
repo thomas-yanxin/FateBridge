@@ -45,8 +45,6 @@ def _parameters() -> Parameters:
         raise RuntimeError(
             "Solar deflection parameters differ from the declared source"
         )
-    else:
-        pass
     data: Parameters = json.loads(raw)
     return data
 
@@ -55,12 +53,8 @@ def effective_solar_mass(radius_fraction: float) -> tuple[float, float | None]:
     """Mass and local slope; unequal adjacent slopes have no unique derivative."""
     if radius_fraction <= 0:
         return 0.0, None if radius_fraction == 0 else 0.0
-    else:
-        pass
     if radius_fraction >= 1:
         return 1.0, None if radius_fraction == 1 else 0.0
-    else:
-        pass
     profile = _parameters()["mass_profile_radius_fraction_and_effective_mass"]
     index = 1
     while profile[index][0] > radius_fraction:
@@ -72,10 +66,6 @@ def effective_solar_mass(radius_fraction: float) -> tuple[float, float | None]:
         r2, m2 = profile[index + 1]
         if slope != (m2 - m1) / (r2 - r1):
             slope = None
-        else:
-            pass
-    else:
-        pass
     return m0 + (radius_fraction - r0) / (r1 - r0) * (m1 - m0), slope
 
 
@@ -149,8 +139,6 @@ def finite_source_solar_deflection(
     x, y, z = (radius * (a + weight * b) for a, b in zip(p, direction))
     if any(direction) and (mass_corner or (mass != 0 and limiter_corner)):
         return CartesianMotion((x, y, z), None)
-    else:
-        pass
     weight_d = (
         srs / em / limited * (mass_d - mass * em_d / em - mass * limited_d / limited)
     )

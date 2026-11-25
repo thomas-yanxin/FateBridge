@@ -38,12 +38,8 @@ class LifeStageProfile(PartialOutput):
     def preserve_lookup_digest(self) -> "LifeStageProfile":
         if self.branch_cycle is not None and len(set(self.branch_cycle)) != 12:
             raise ValueError("十二支查表顺序不能丢失或重复地支")
-        else:
-            pass
         if self.stage_cycle is not None and len(set(self.stage_cycle)) != 12:
             raise ValueError("十二阶段查表顺序不能丢失或重复阶段")
-        else:
-            pass
         if (
             self.lookup_sha256 is not None
             and self.branch_cycle is not None
@@ -74,8 +70,4 @@ class LifeStageProfile(PartialOutput):
             ).hexdigest()
             if actual != self.lookup_sha256:
                 raise ValueError("阶段查表参数必须与同次查表散列一致")
-            else:
-                pass
-        else:
-            pass
         return self

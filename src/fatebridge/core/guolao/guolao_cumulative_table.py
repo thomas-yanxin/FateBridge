@@ -46,8 +46,6 @@ def _table() -> tuple[dict[str, Any], str]:
         or [r["limit_index"] for r in rows] != list(range(169))
     ):
         raise ValueError("具名积度与损益表须保留169限原序")
-    else:
-        pass
     for i, row in enumerate(rows):
         for key, empty in [
             ("cumulative_ancient_du", i in (0, 168)),
@@ -57,25 +55,15 @@ def _table() -> tuple[dict[str, Any], str]:
             if empty:
                 if value is not None:
                     raise ValueError("原刊累计起点及末限空格不能改作刊载数字")
-                else:
-                    pass
             elif not isinstance(value, str) or not re.fullmatch(r"-?\d+\.\d{8}", value):
                 raise ValueError("积度与损益须保留规范化八位十进制古度，不补造精度")
-            else:
-                pass
         if row["cumulative_mark"] != ("空" if i in (0, 168) else "numeric"):
             raise ValueError("积度空格须保留所见标记")
-        else:
-            pass
         expected = "空" if i == 168 else "益" if i < 84 else "損"
         if row["increment_label"] != expected:
             raise ValueError("损益原字及限序不符")
-        else:
-            pass
         if i < 168 and (F(row["signed_increment_ancient_du"]) > 0) != (i < 84):
             raise ValueError("有符号损益须与原刊损益字对应")
-        else:
-            pass
     if (
         F(data["interpolation_divisor_days"]) != F(".082")
         or data["origin_policy"]
@@ -86,8 +74,6 @@ def _table() -> tuple[dict[str, Any], str]:
         raise ValueError(
             "本方法只登记单人全字段转录及明示起点政策，不更改除数或升级校勘等级"
         )
-    else:
-        pass
     return data, hashlib.sha256(raw).hexdigest()
 
 
@@ -101,8 +87,6 @@ def _literal_lunar_from_lookup(lookup: dict[str, Any]) -> dict[str, Any]:
     data, digest = _table()
     if lookup["source_data_sha256"] != data["day_rate_data_sha256"]:
         raise ValueError("日率资料指纹不符，不能跨见证混用取限")
-    else:
-        pass
     index = lookup["whole_limit_index"]
     row = data["rows"][index] if index is not None else None
     origin = index == 0
@@ -112,16 +96,12 @@ def _literal_lunar_from_lookup(lookup: dict[str, Any]) -> dict[str, Any]:
     if index is not None and index < 168:
         if increment is None or (cumulative is None and not origin):
             raise ValueError("缺少原刊积度或损益，不从相邻格或公式代填")
-        else:
-            pass
         base = F(cumulative) if cumulative is not None else F()
         fraction = (
             F(lookup["within_half_days_exact"])
             - F(lookup["selected_effective_day_rate_days"])
         ) / F(data["interpolation_divisor_days"])
         angle = base + F(increment) * fraction
-    else:
-        pass
     signed = -angle if angle is not None and lookup["phase"] == "疾" else angle
     return {
         **lookup,
@@ -224,8 +204,6 @@ def _literal_conjunction_from_components(
             )
             / F(value)
         )
-    else:
-        pass
     offset = F(old["mean_conjunction_offset_from_winter_days_exact"])
     mean_total = zhongji_days + F("55.06") + offset
     total = mean_total + correction if correction is not None else None
@@ -280,8 +258,6 @@ def audit_gujin45_cumulative_table() -> dict[str, Any]:
     rate_bytes = RATE_DATA.read_bytes()
     if hashlib.sha256(rate_bytes).hexdigest() != data["day_rate_data_sha256"]:
         raise ValueError("日率资料指纹不符，不能跨见证审计")
-    else:
-        pass
     rates = json.loads(rate_bytes)
     rows = data["rows"]
     cumulative_disagreements = []
@@ -297,8 +273,6 @@ def audit_gujin45_cumulative_table() -> dict[str, Any]:
                     "previous_integer_formula_exact": str(_integer_angle(i, previous)),
                 }
             )
-        else:
-            pass
         if (
             i < 168
             and value is not None
@@ -318,10 +292,6 @@ def audit_gujin45_cumulative_table() -> dict[str, Any]:
                         "printed_increment_replaced": False,
                     }
                 )
-            else:
-                pass
-        else:
-            pass
         if 0 < i < 168:
             left = F() if i == 1 else F(rows[i - 1]["cumulative_ancient_du"])
             duration = F(rates["rows"][i]["day_rate_days"]) - F(
@@ -335,8 +305,6 @@ def audit_gujin45_cumulative_table() -> dict[str, Any]:
                     "preceding_day_rate_interval_increasing": duration > 0,
                 }
             )
-        else:
-            pass
     return {
         "model_id": "gujin_literal_cumulative_increment_audit_v1",
         "profile_id": PROFILE,

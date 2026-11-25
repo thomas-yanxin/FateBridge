@@ -140,8 +140,6 @@ QIMEN_EARTH_PLATE_YANG = tuple("戊己庚辛壬癸丁丙乙")
 def rotate_gua_sequence(yinyang: str) -> tuple[str, ...]:
     if yinyang == "阴":
         return tuple(reversed(QIMEN_CLOCKWISE_GUA_SEQUENCE))
-    else:
-        pass
     return QIMEN_CLOCKWISE_GUA_SEQUENCE
 
 
@@ -163,8 +161,6 @@ def build_qimen_leaders(
     door = QIMEN_DOOR_ROUTE[QIMEN_GUA_SEQUENCE.index(origin)]
     if door == "中":
         door = "死"
-    else:
-        pass
     stem = hidden if time_ganzhi[0] == "甲" else time_ganzhi[0]
     raw_star_gong = earth_palaces_by_stem[stem]
     elapsed = sexagenary_index_for(time_ganzhi) % 10
@@ -189,8 +185,6 @@ def build_qimen_leaders(
 def build_earth_plate(ju_text: str) -> dict[str, str]:
     if not re.fullmatch(r"[阴阳]遁[一二三四五六七八九]局[上中下]元", ju_text):
         raise ValueError(f"无效奇门局：{ju_text!r}")
-    else:
-        pass
     step = -1 if ju_text[0] == "阴" else 1
     start = QIMEN_CN_NUMBERS.index(ju_text[2])
     return {
@@ -236,13 +230,9 @@ def build_palace_geometry(
         heaven_stems = [earth[origin]] if origin else []
         if origin == "坤":
             heaven_stems.append(earth["中"])
-        else:
-            pass
         earth_stems = [earth[trigram]]
         if trigram == "坤":
             earth_stems.append(earth["中"])
-        else:
-            pass
         door = None if is_center else QIMEN_DOOR_DISPLAY[doors[trigram]]
         hexagram = (
             build_hexagram(upper_name=trigram, lower_name=QIMEN_DOOR_TO_TRIGRAM[door])

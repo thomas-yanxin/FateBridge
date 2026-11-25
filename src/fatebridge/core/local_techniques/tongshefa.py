@@ -69,8 +69,6 @@ def _trigram_from_lines(lines: list[int]) -> TrigramPayload:
     for name, source in BAGUA_BY_NAME.items():
         if list(source["lines"]) == list(lines):
             return _bagua(name)
-        else:
-            pass
     raise AssertionError("Validated binary lines must form one of the eight trigrams")
 
 
@@ -108,24 +106,14 @@ def _opposite_hexagram(hexagram: HexagramPayload) -> HexagramPayload:
 def _element_relationship(left_element: str, right_element: str) -> str:
     if left_element == right_element:
         return "思同实"
-    else:
-        pass
     if ELEMENT_GENERATES[left_element] == right_element:
         return "思生实"
-    else:
-        pass
     if ELEMENT_CONTROLS[left_element] == right_element:
         return "思克实"
-    else:
-        pass
     if ELEMENT_GENERATES[right_element] == left_element:
         return "实生思"
-    else:
-        pass
     if ELEMENT_CONTROLS[right_element] == left_element:
         return "实克思"
-    else:
-        pass
     return "思同实"
 
 
@@ -187,8 +175,6 @@ def build_tongshefa_result(
     ):
         if value is None or value not in BAGUA_BY_NAME:
             raise ValueError(f"{field}必须为乾、兑、离、震、巽、坎、艮或坤")
-        else:
-            pass
         selected[field] = value
     taiyin_gua = _bagua(selected["taiyin"])
     taiyang_gua = _bagua(selected["taiyang"])

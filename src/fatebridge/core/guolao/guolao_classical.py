@@ -43,8 +43,6 @@ NIGHT_NOBLES = dict(zip(STEMS, "丑子亥酉未申未午巳卯"))
 def _branch_index(branch: str) -> int:
     if len(branch) != 1 or branch not in BRANCHES:
         raise ValueError("须提供单个有效地支")
-    else:
-        pass
     return BRANCHES.index(branch)
 
 
@@ -57,17 +55,11 @@ def counting_anchor(solar_longitude: float) -> str:
     """
     if not math.isfinite(solar_longitude):
         raise ValueError("太阳黄经须有限")
-    else:
-        pass
     longitude = Fraction(solar_longitude) % 360
     if 270 <= longitude < 300:
         return "辰"
-    else:
-        pass
     if 90 <= longitude < 105:
         return "寅"
-    else:
-        pass
     return "卯"
 
 
@@ -102,8 +94,6 @@ def month_limit_branch(annual_branch: str, birth_month: int, target_month: int) 
             raise ValueError(
                 "月限须显式提供1至12的整数月序，不以公历月份或闰月自动代入"
             )
-        else:
-            pass
     return BRANCHES[(start - (target_month - birth_month)) % 12]
 
 
@@ -115,8 +105,6 @@ def year_god_branches(year_stem: str, year_branch: str) -> dict[str, str]:
     """
     if year_stem not in DAY_NOBLES:
         raise ValueError("须提供单个有效年干")
-    else:
-        pass
     _branch_index(year_branch)
     return {
         "天贵": DAY_NOBLES[year_stem],
@@ -141,8 +129,6 @@ def purple_cycle_reference(zhongji_days: Fraction) -> dict[str, Fraction]:
     """
     if not isinstance(zhongji_days, Fraction):
         raise TypeError("中积须以Fraction明确提供原典日数，不接收现代儒略日浮点值")
-    else:
-        pass
     corrected_period = SHOUSHI_1281.circle_du * PURPLE_SOURCE_DAYS_PER_DU
     elapsed = zhongji_days + PURPLE_SOURCE_OFFSET_DAYS
     return {
@@ -169,33 +155,21 @@ class HistoricalMansions:
             "source_ecliptic",
         }:
             raise ValueError("历史宿表须明确为原历赤道、原历黄道或未指定坐标系")
-        else:
-            pass
         if not isinstance(self.circle_du, Fraction) or any(
             not isinstance(width, Fraction) for width in self.widths_du
         ):
             raise TypeError("历史周天与宿宽须均以Fraction提供，不能混入浮点或隐式单位")
-        else:
-            pass
         if self.circle_du <= 0:
             raise ValueError("历史周天须为正")
-        else:
-            pass
         if len(self.widths_du) != 28 or any(w <= 0 for w in self.widths_du):
             raise ValueError("历史宿表须包含28个正宿宽")
-        else:
-            pass
         if sum(self.widths_du) != self.circle_du:
             raise ValueError("历史宿度未闭合，不能分摊残差或强制归一化")
-        else:
-            pass
 
     def locate(self, angle_from_jiao_du: Fraction) -> tuple[str, Fraction]:
         """Exact half-open source intervals; no physical epoch conversion."""
         if not isinstance(angle_from_jiao_du, Fraction):
             raise TypeError("历史坐标须以Fraction明确表示古度，不能混入现代浮点度")
-        else:
-            pass
         starts = [sum(self.widths_du[:i], Fraction()) for i in range(28)]
         angle = angle_from_jiao_du % self.circle_du
         index = bisect_right(starts, angle) - 1

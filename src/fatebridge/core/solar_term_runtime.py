@@ -47,8 +47,6 @@ def solar_term_cache_context(
         raise ValueError(
             f"Explicit {label} solar mode conflicts with strict JPL selection"
         )
-    else:
-        pass
     # An explicit native reobservation must not load an unrelated configured
     # analytic/SPK source merely to fingerprint its native data candidates.
     solar_model = (
@@ -64,8 +62,6 @@ def solar_term_cache_context(
         raise ModuleNotFoundError(
             "Swiss Ephemeris is required for explicitly selected JPL mode"
         )
-    else:
-        pass
     clock_profile = loaded_clock_profile_key()
     selected = effective_ephemeris_search_path()
     search_path = selected or "."
@@ -88,20 +84,14 @@ def solar_term_cache_context(
             )
             if jpl_file is not None:
                 candidates.add(path / jpl_file)
-            else:
-                pass
             for candidate in sorted(candidates):
                 name = candidate.name
                 if name not in depths:
                     depths[name] = len(
                         ephemeris_search_directories(search_path, filename=name)
                     )
-                else:
-                    pass
                 if index >= depths[name]:
                     continue
-                else:
-                    pass
                 try:
                     stat = candidate.stat()
                     files.append(

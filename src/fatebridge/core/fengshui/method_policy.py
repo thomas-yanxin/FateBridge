@@ -47,12 +47,8 @@ def _input_scopes(request: AssessRequest) -> dict[Method, list[dict[str, Any]]]:
         or natal_house.north_reference != "magnetic"
     ):
         natal_missing.append("xuankong_natal.house.facing_degrees_magnetic")
-    else:
-        pass
     if natal is None or natal.period is None:
         natal_missing.append("xuankong_natal.period")
-    else:
-        pass
 
     features = request.features
 
@@ -81,8 +77,6 @@ def _input_scopes(request: AssessRequest) -> dict[Method, list[dict[str, Any]]]:
         fresh = candidate.features
         if not fresh and candidate.object_id not in current_feature_ids:
             continue
-        else:
-            pass
         feature_scopes.append(
             {
                 "scope": "candidate_environment",
@@ -99,13 +93,9 @@ def _input_scopes(request: AssessRequest) -> dict[Method, list[dict[str, Any]]]:
         house.sitting_trigram is None and house.facing_degrees is None
     ):
         personal_missing.append("house.sitting_trigram_or_confirmed_facing")
-    else:
-        pass
     occupants = request.occupants
     if not occupants:
         personal_missing.append("occupants")
-    else:
-        pass
     for occupant in occupants:
         prefix = f"occupants.{occupant.subject_id}"
         if (
@@ -116,12 +106,8 @@ def _input_scopes(request: AssessRequest) -> dict[Method, list[dict[str, Any]]]:
             personal_missing.append(
                 f"{prefix}.birth_date_or_birth_at_or_effective_birth_year"
             )
-        else:
-            pass
         if occupant.gender_convention is None:
             personal_missing.append(f"{prefix}.gender_convention")
-        else:
-            pass
     scopes: dict[Method, list[dict[str, Any]]] = {
         "annual_stars": [{**chart_scope, "missing_inputs": annual_missing}],
         "xuankong_natal": [{**chart_scope, "missing_inputs": natal_missing}],
@@ -203,8 +189,6 @@ def method_policy(
         family = layer_families[method]
         if family not in selected_families:
             selected_families.append(family)
-        else:
-            pass
     input_scopes = _input_scopes(request)
     candidate_ids = [
         candidate.candidate_id for candidate in request.layout_alternatives
@@ -330,17 +314,11 @@ def method_policy(
     for priority in preferred:
         if explicit_methods is True and not priority["selected_engine_layers"]:
             continue
-        else:
-            pass
         if explicit_methods is None and not priority["selected_engine_layers"]:
             evidence_pending = True
             continue
-        else:
-            pass
         if priority["available_engine_layers"]:
             continue
-        else:
-            pass
         if (
             layer_results is None
             and priority["selected_engine_layers"]
@@ -368,16 +346,10 @@ def method_policy(
         for priority in preferred:
             if explicit_methods is True and not priority["selected_engine_layers"]:
                 continue
-            else:
-                pass
             if candidate_results is None:
                 continue
-            else:
-                pass
             if priority["available_candidate_engine_layers"][candidate_id]:
                 continue
-            else:
-                pass
             calculations = [
                 record
                 for row in priority["layer_availability"]

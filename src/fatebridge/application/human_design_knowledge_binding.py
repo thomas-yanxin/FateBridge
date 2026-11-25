@@ -28,12 +28,8 @@ def require_human_design_reference_binding(
                 for row in result.get("domains", [])
             )
         )
-    else:
-        pass
     if not active:
         return
-    else:
-        pass
     if isinstance(request, KnowledgeReadRequest):
         matches = (
             selected == result.get("domain") == DOMAIN
@@ -47,5 +43,3 @@ def require_human_design_reference_binding(
         )
     if not matches:
         raise EphemerisSourceError("human_design_reference_changed")
-    else:
-        pass

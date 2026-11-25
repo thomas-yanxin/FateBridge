@@ -42,8 +42,6 @@ def _captured_model() -> tuple[dict[str, Any], str]:
     ).encode()
     if hashlib.sha256(canonical).hexdigest() != CANONICAL_SHA256:
         raise ValueError("大衍复算的常数、系数或方法来源已改变，须重新核验")
-    else:
-        pass
     return bundle, loaded.sha256
 
 
@@ -96,8 +94,6 @@ def reconstruction_scope_lines(
             or comparison != research_scope()
         ):
             raise ValueError("全表研究方向、不利结果或未知行与具名来源不一致")
-        else:
-            pass
         unknown = "、".join(str(n) for n in comparison["unknown_direction_rows"])
         lines.append(
             f"既有具名研究表{comparison['complete_selected_research_rows']}行与固定NAOJ月首的方向对照，"
@@ -110,8 +106,6 @@ def reconstruction_scope_lines(
             "这些行不是独立古代观察或现实样本，也未完成全部原记录校勘、"
             "裁定古代钟界、原典半日或闰小月补配先后。"
         )
-    else:
-        pass
     return lines
 
 
@@ -126,8 +120,6 @@ def _solar(
         )
         if elapsed <= width:
             break
-        else:
-            pass
         elapsed -= width
     else:
         raise ValueError("大衍太阳订正未能定位具名区间")
@@ -173,8 +165,6 @@ def _lunar(elapsed_units: Fraction, rows: list[dict[str, Any]]) -> dict[str, Any
                 "fractional_correction_exact": _ratio(fractional),
                 "correction_units": accumulated + _nearest(fractional),
             }
-        else:
-            pass
         start = end
         accumulated += row["segment_increment_units"]
     raise ValueError("大衍月行订正未能定位具名区间")
@@ -191,8 +181,6 @@ def reconstruct_new_moon(
     """
     if type(host_month_start_ordinal) is not int or type(lunar_year) is not int:
         raise ValueError("大衍复算须明确宿主月首序数日和农历年份整数")
-    else:
-        pass
     bundle, digest = _captured_model()
     constants = bundle["constants"]
     units = constants["day_units"]
@@ -206,8 +194,6 @@ def reconstruct_new_moon(
     distance = mean + Fraction(1, 2) - host_jdn
     if abs(distance) > constants["host_selector_max_nominal_days"]:
         raise ValueError("宿主月首距最近经朔超出固定三日选择界限，未猜换其他朔")
-    else:
-        pass
     elapsed = mean - epoch
     solar = _solar(elapsed, bundle["solar_rows"], year_length, units)
     a = _lunar((elapsed % anomaly_period) * units, bundle["lunar_rows"])

@@ -40,16 +40,12 @@ def _load() -> LunarPrefix:
         or raw["is_leap_month"] is not False
     ):
         raise ValueError("紫台1900年一月农历补表的版本、月序或范围不一致")
-    else:
-        pass
     return raw
 
 
 def convert(solar_date: date) -> tuple[int, int, int, bool] | None:
     if not START <= solar_date <= END:
         return None
-    else:
-        pass
     raw = _load()
     return raw["lunar_year"], raw["lunar_month"], (solar_date - START).days + 1, False
 
@@ -57,7 +53,5 @@ def convert(solar_date: date) -> tuple[int, int, int, bool] | None:
 def source_for(solar_date: date) -> dict[str, str] | None:
     if not START <= solar_date <= END:
         return None
-    else:
-        pass
     raw = _load()
     return {"method_id": raw["method_id"], **raw["source"]}

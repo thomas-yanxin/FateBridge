@@ -55,8 +55,6 @@ class _MonthRule:
         day = 1 + (self.weekday - first_weekday - 1) % 7 + (self.week - 1) * 7
         if day > length:
             day -= 7
-        else:
-            pass
         ordinal = gregorian_ordinal(year, self.month, day)
         return (ordinal - _EPOCH.ordinal) * _DAY_SECONDS + self.utc_shift
 
@@ -81,8 +79,6 @@ class TZifTransitions:
         beyond = not self.seconds or (last, last_microsecond) > (self.seconds[-1], 0)
         if beyond and not self.fixed_tail and self.recurring is None:
             return None
-        else:
-            pass
         left, right = bisect_right(self.seconds, first), bisect_right(
             self.seconds, last
         )
@@ -99,8 +95,6 @@ class TZifTransitions:
                 for second in sorted(rule.utc_second(year) for rule in rules)
                 if floor < second <= last
             )
-        else:
-            pass
         return tuple(
             UTCCalendar(
                 _EPOCH.ordinal + second // _DAY_SECONDS,
@@ -123,19 +117,13 @@ def read_tzif_transitions(data: bytes) -> TZifTransitions | None:
         or data[4:5] not in {b"\0", b"2", b"3", b"4"}
     ):
         return None
-    else:
-        pass
 
     def header(at: int) -> tuple[int, ...]:
         if data[at : at + 4] != b"TZif" or len(data) < at + 44:
             raise ValueError("Incomplete TZif header")
-        else:
-            pass
         counts = struct.unpack_from(">6I", data, at + 20)
         if counts[2] or not counts[4] or counts[4] > 256:
             raise ValueError("Unsupported TZif counts")
-        else:
-            pass
         return counts
 
     try:
@@ -146,28 +134,18 @@ def read_tzif_transitions(data: bytes) -> TZifTransitions | None:
             at += times * 5 + types * 6 + chars + leaps * 8 + isstd + isut
             counts = header(at)
             at, size, code = at + 44, 8, "q"
-        else:
-            pass
         isut, isstd, leaps, times, types, chars = counts
         end = at + times * (size + 1) + types * 6 + chars + isstd + isut
         if end > len(data):
             return None
-        else:
-            pass
         values = struct.unpack_from(f">{times}{code}", data, at)
         if any(a >= b for a, b in zip(values, values[1:])):
             return None
-        else:
-            pass
         footer = _FOOTER.fullmatch(data[end:]) if size == 8 else None
         if footer is None:
             return TZifTransitions(values, False)
-        else:
-            pass
         if (start := footer["start"]) is None:
             return TZifTransitions(values, True)
-        else:
-            pass
         # POSIX offset signs map local time to UTC. End rules use the
         # daylight offset even in places where that offset is smaller.
         standard = -_signed_seconds(footer["standard"])

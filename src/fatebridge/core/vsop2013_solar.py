@@ -39,8 +39,6 @@ def _pairs(items: list[tuple[str, Any]]) -> dict[str, Any]:
     for key, value in items:
         if key in result:
             raise ValueError("Duplicate VSOP2013 manifest field")
-        else:
-            pass
         result[key] = value
     return result
 
@@ -50,8 +48,6 @@ def _signature(path: Path) -> tuple[int, ...]:
         stat = path.stat()
         if not path.is_file():
             raise OSError("not a file")
-        else:
-            pass
         return (
             stat.st_dev,
             stat.st_ino,
@@ -82,16 +78,12 @@ def _loaded_image(function: Any, expected: Path, digest: str) -> str:
         or not info.filename
     ):
         raise ValueError("Actual VSOP2013 coordinate entry could not be observed")
-    else:
-        pass
     actual = Path(os.fsdecode(info.filename)).resolve()
     if (
         actual != expected.resolve()
         or hashlib.sha256(actual.read_bytes()).hexdigest() != digest
     ):
         raise ValueError("Actual VSOP2013 calculation image differs")
-    else:
-        pass
     return digest
 
 
@@ -108,8 +100,6 @@ class _Source:
             manifest = json.loads(raw, object_pairs_hook=_pairs)
             if not isinstance(manifest, dict):
                 raise ValueError("VSOP2013 manifest must be an object")
-            else:
-                pass
             expected = dict(
                 model_id=MODEL_ID,
                 version=self.profile["version"],
@@ -127,26 +117,18 @@ class _Source:
                 raise ValueError(
                     "VSOP2013 manifest does not match profile/ABI/platform"
                 )
-            else:
-                pass
             name = manifest["binary"]
             if not isinstance(name, str) or not name or Path(name).name != name:
                 raise ValueError("VSOP2013 binary must be a sibling filename")
-            else:
-                pass
             binary = (path.parent / name).resolve()
             if binary.parent != path.parent:
                 raise ValueError("VSOP2013 binary escaped its manifest directory")
-            else:
-                pass
             self.binary_path = binary
             self.binary_signature = _signature(binary)
             data = binary.read_bytes()
             self.binary_sha256 = hashlib.sha256(data).hexdigest()
             if self.binary_sha256 != manifest.get("binary_sha256"):
                 raise ValueError("VSOP2013 binary does not match its receipt")
-            else:
-                pass
             self.manifest_sha256 = hashlib.sha256(raw).hexdigest()
             # dlopen must not silently return an old image for a replaced name.
             self._temporary = tempfile.TemporaryDirectory(
@@ -156,8 +138,6 @@ class _Source:
             loaded.write_bytes(data)
             if hashlib.sha256(loaded.read_bytes()).hexdigest() != self.binary_sha256:
                 raise ValueError("VSOP2013 private loaded bytes differ")
-            else:
-                pass
             self.library = ctypes.CDLL(str(loaded))
             for symbol, value in (
                 ("fatebridge_vsop2013_model_id", MODEL_ID),
@@ -168,14 +148,10 @@ class _Source:
                 function.restype = ctypes.c_char_p
                 if function() != value.encode("ascii"):
                     raise ValueError("Loaded VSOP2013 identity marker differs")
-                else:
-                    pass
             self.library.fatebridge_vsop2013_abi_version.argtypes = []
             self.library.fatebridge_vsop2013_abi_version.restype = ctypes.c_int
             if self.library.fatebridge_vsop2013_abi_version() != 1:
                 raise ValueError("Loaded VSOP2013 ABI differs")
-            else:
-                pass
             self.library.fatebridge_vsop2013_native_version.argtypes = [ctypes.c_char_p]
             self.library.fatebridge_vsop2013_native_version.restype = ctypes.c_char_p
             version = ctypes.create_string_buffer(256)
@@ -183,8 +159,6 @@ class _Source:
             self.native_version = version.value.decode("ascii")
             if self.native_version != self.profile["native_core_version"]:
                 raise ValueError("Loaded VSOP2013 native reduction version differs")
-            else:
-                pass
             self.library.fatebridge_vsop2013_solar.argtypes = [
                 ctypes.c_double,
                 ctypes.POINTER(ctypes.c_double),
@@ -206,16 +180,12 @@ class _Source:
                 raise ValueError(
                     "Loaded VSOP2013 image did not reject uninitialized use"
                 )
-            else:
-                pass
             self.library.fatebridge_vsop2013_initialize.argtypes = []
             self.library.fatebridge_vsop2013_initialize.restype = ctypes.c_int
             if self.library.fatebridge_vsop2013_initialize() != 0:
                 raise ValueError(
                     "Loaded VSOP2013 embedded series initialization failed"
                 )
-            else:
-                pass
             self.check_unchanged()
         except (
             OSError,
@@ -229,8 +199,6 @@ class _Source:
         ) as error:
             if self._temporary is not None:
                 self._temporary.cleanup()
-            else:
-                pass
             raise EphemerisSourceError("solar_vsop2013_invalid") from error
 
     def check_unchanged(self, *, check_environment: bool = True) -> None:
@@ -242,8 +210,6 @@ class _Source:
                 or _signature(self.binary_path) != self.binary_signature
             ):
                 raise EphemerisSourceError("solar_vsop2013_changed")
-            else:
-                pass
         except (OSError, EphemerisSourceError) as error:
             raise EphemerisSourceError("solar_vsop2013_changed") from error
 
@@ -251,8 +217,6 @@ class _Source:
         low, high = self.profile["working_jd_tt"]
         if not math.isfinite(jd_tt) or not low <= jd_tt <= high:
             raise EphemerisSourceError("solar_vsop2013_range")
-        else:
-            pass
         values = (ctypes.c_double * 6)()
         error = ctypes.create_string_buffer(1024)
         flags = self.library.fatebridge_vsop2013_solar(jd_tt, values, error)
@@ -262,8 +226,6 @@ class _Source:
             or not 0.9 < values[3] < 1.1
         ):
             raise EphemerisSourceError("solar_vsop2013_calculation")
-        else:
-            pass
         return tuple(float(x) for x in values)
 
     def receipt(self) -> dict[str, Any]:
@@ -315,8 +277,6 @@ def _selected() -> _Source:
     configured = os.environ.get(MANIFEST_ENV, "").strip()
     if not configured:
         raise EphemerisSourceError("solar_vsop2013_unavailable")
-    else:
-        pass
     path = Path(configured).expanduser().resolve()
     source = _load(path, _signature(path))
     try:
@@ -324,8 +284,6 @@ def _selected() -> _Source:
     except EphemerisSourceError as error:
         if error.reason != "solar_vsop2013_changed":
             raise
-        else:
-            pass
         _load.cache_clear()
         source = _load(path, _signature(path))
         source.check_unchanged()
@@ -345,8 +303,6 @@ def source_receipt() -> dict[str, Any]:
 def solar_longitudes_tt(jd_tts: list[float]) -> dict[str, Any]:
     if not all(_finite(value) for value in jd_tts):
         raise ValueError("VSOP2013 observations require finite numeric TT points")
-    else:
-        pass
     with _LOCK:
         source = _selected()
         observed = [source.position(float(value))[0] for value in jd_tts]
@@ -367,15 +323,11 @@ def longitude_crossing_tt(
         raise ValueError(
             "VSOP2013 crossing requires finite target and increasing TT bracket"
         )
-    else:
-        pass
     target, low, high = float(target), float(low), float(high)
     with _LOCK:
         source = _selected()
         if expected_source_key is not None and source.key() != expected_source_key:
             raise EphemerisSourceError("solar_configuration_changed")
-        else:
-            pass
 
         def residual(epoch: float) -> tuple[float, float]:
             values = source.position(epoch)
@@ -386,8 +338,6 @@ def longitude_crossing_tt(
             raise ValueError(
                 "VSOP2013 bracket does not contain a forward solar crossing"
             )
-        else:
-            pass
         epoch = (low + high) / 2
         for _ in range(8):
             value, speed = residual(epoch)
@@ -409,30 +359,20 @@ def longitude_crossing_tt(
                     if fa < 0 <= fb:
                         low, high, found = a, b, True
                         break
-                    else:
-                        pass
                 if found:
                     break
-                else:
-                    pass
-            else:
-                pass
             epoch = trial if low < trial < high else (low + high) / 2
         # Preserve the exact binary64 termination, never a coarse time stop.
         for _ in range(48):
             middle = (low + high) / 2
             if middle == low or middle == high:
                 break
-            else:
-                pass
             if residual(middle)[0] < 0:
                 low = middle
             else:
                 high = middle
         if not residual(low)[0] < 0 <= residual(high)[0]:
             raise EphemerisSourceError("solar_vsop2013_calculation")
-        else:
-            pass
         source.check_unchanged()
         return dict(
             jd_tt=(low + high) / 2,

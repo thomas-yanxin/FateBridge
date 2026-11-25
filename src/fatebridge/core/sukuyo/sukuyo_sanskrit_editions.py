@@ -26,16 +26,12 @@ def validate_edition_data(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("梵文版本、条件单位链或未定控制改变，须重新核验")
-    else:
-        pass
 
 
 def sanskrit_edition_reference() -> dict[str, Any]:
     loaded = load_source(SOURCE)
     if loaded.sha256 != DATA_SHA256:
         raise ValueError("梵文来源身份改变，须重新冻结捕获与参考")
-    else:
-        pass
     data = loaded.data["source_data"]
     validate_edition_data(data)
     products = {}
@@ -52,8 +48,6 @@ def sanskrit_edition_reference() -> dict[str, Any]:
                 + words["hundred_thousand"] * 100_000
                 + words["thousand"] * 1000
             )
-        else:
-            pass
         products[edition["id"]] = values
     return {
         **loaded.data,

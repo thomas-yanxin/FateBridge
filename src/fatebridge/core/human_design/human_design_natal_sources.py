@@ -60,8 +60,6 @@ class NatalSourceTrace(CycleSourceTrace):
             or not math.isfinite(tt)
         ):
             raise ValueError("Invalid Human Design native source observation")
-        else:
-            pass
         getter = getattr(runtime.swe, "get_current_file_data", None)
         ids = []
         unresolved = []
@@ -88,22 +86,16 @@ class NatalSourceTrace(CycleSourceTrace):
                 if unusable:
                     unresolved.append(slot)
                     continue
-                else:
-                    pass
                 identity = self._file(slot, metadata, jpl=model == "jpl" and slot == 0)
                 edition = self._files[identity]["de_number"]
                 key = body, model, slot
                 if key in self._editions and self._editions[key] != edition:
                     raise EphemerisSourceError("edition_changed")
-                else:
-                    pass
                 self._editions[key] = edition
                 ids.append(identity)
             status = "file_contexts_observed" if ids else "identity_unavailable"
         if self._require_files and unresolved:
             raise EphemerisSourceError("unavailable_during")
-        else:
-            pass
         key_context = body, role, model, status, tuple(sorted(ids)), tuple(unresolved)
         if key_context not in self._context_indices:
             self._context_indices[key_context] = len(self._contexts)
@@ -120,8 +112,6 @@ class NatalSourceTrace(CycleSourceTrace):
                     "maximum_jd_tt": tt,
                 }
             )
-        else:
-            pass
         context = self._contexts[self._context_indices[key_context]]
         context["observed_evaluation_count"] += 1
         context["minimum_jd_tt"] = min(context["minimum_jd_tt"], tt)
@@ -179,8 +169,6 @@ def observe_native_source(
     trace = _ACTIVE.get()
     if trace is not None:
         trace.observe_native(body, tt, flags, role, analytical)
-    else:
-        pass
 
 
 def guard_natal_sources(

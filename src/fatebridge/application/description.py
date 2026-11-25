@@ -27,10 +27,6 @@ def unwrap_optional(annotation: object) -> object:
         non_none = [a for a in get_args(annotation) if a is not type(None)]
         if non_none:
             return non_none[0]
-        else:
-            pass
-    else:
-        pass
     return annotation
 
 
@@ -52,22 +48,14 @@ def field_type_name(annotation: object) -> str:
         non_none = [a for a in get_args(annotation) if a is not type(None)]
         if len(non_none) > 1:
             return " | ".join(field_type_name(a) for a in non_none)
-        else:
-            pass
-    else:
-        pass
     base = unwrap_optional(annotation)
     origin = get_origin(base)
     if origin is list:
         args = get_args(base)
         inner = getattr(args[0], "__name__", str(args[0])) if args else "str"
         return f"list[{inner}]"
-    else:
-        pass
     if isinstance(base, type):
         return base.__name__
-    else:
-        pass
     return str(base)
 
 
@@ -210,13 +198,9 @@ def describe_input_spec(spec: ToolSpec) -> dict[str, Any]:
     fields = suggested_fields(spec)
     if fields is not None:
         record["suggested_fields"] = fields
-    else:
-        pass
     default_fields = compact_fields(spec)
     if default_fields != fields:
         record["compact_fields"] = default_fields
-    else:
-        pass
     record["projection_note"] = (
         "首次摘要使用 detail=compact 并省略 fields。"
         "suggested_fields 是可显式请求的业务字段参考，按问题取用。"

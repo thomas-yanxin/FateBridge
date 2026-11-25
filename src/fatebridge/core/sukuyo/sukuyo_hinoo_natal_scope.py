@@ -23,16 +23,10 @@ def natal_scope_reference(
     ).encode()
     if hashlib.sha256(canonical).hexdigest() != FACTS_SHA256:
         raise ValueError("桧尾本命适用推论、学术归属或未定范围改变，须重新核验")
-    else:
-        pass
     if meanings.get("source_bundle_sha256") != data["meaning_reference_bundle_sha256"]:
         raise ValueError("桧尾本命适用推论与当前句义参考不一致，须重新核验")
-    else:
-        pass
     if any(taisho.get(key) != value for key, value in data["primary_binding"].items()):
         raise ValueError("桧尾本命适用推论与大正原文或校记不一致，须重新核验")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 

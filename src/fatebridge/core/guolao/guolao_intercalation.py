@@ -69,8 +69,6 @@ def _profile() -> tuple[dict[str, Any], str]:
         Fraction("55.06"),
     ):
         raise ValueError("具名气策、朔实与诸应不符，不自动混用或缩放")
-    else:
-        pass
     return data, hashlib.sha256(raw).hexdigest()
 
 
@@ -87,25 +85,17 @@ def assign_civil_sui(
     """
     if not isinstance(conjunctions, tuple) or not isinstance(principal_terms, tuple):
         raise TypeError("须提供原历日数元组，不接收隐式排序或可变序列")
-    else:
-        pass
     if len(conjunctions) < 3 or len(principal_terms) != 13:
         raise ValueError("须有足够邻朔和含两端冬至的13个中气")
-    else:
-        pass
     if any(t is not None and not isinstance(t, Fraction) for t in conjunctions) or any(
         not isinstance(t, Fraction) for t in principal_terms
     ):
         raise TypeError("朔气须为Fraction原历日数，缺朔只可显式为None")
-    else:
-        pass
     known = [t for t in conjunctions if t is not None]
     if any(a >= b for a, b in zip(known, known[1:])) or any(
         a >= b for a, b in zip(principal_terms, principal_terms[1:])
     ):
         raise ValueError("朔气必须按未取模日数严格递增，不自动排序或展开60日余数")
-    else:
-        pass
     days = [t // 1 if t is not None else None for t in conjunctions]
     qi_days = [t // 1 for t in principal_terms]
     result: dict[str, Any] = {
@@ -138,20 +128,14 @@ def assign_civil_sui(
             "winter_civil_day_not_bracketed_by_known_adjacent_conjunctions"
         )
         return result
-    else:
-        pass
     count = last - first
     result["month_count"] = count
     if count not in (12, 13):
         result["reason"] = "winter_cycle_has_neither_12_nor_13_months"
         return result
-    else:
-        pass
     if any(t is None for t in conjunctions[first : last + 1]):
         result["reason"] = "missing_required_conjunction_boundary"
         return result
-    else:
-        pass
     rows: list[dict[str, Any]] = []
     for i in range(first, last):
         start, stop = days[i], days[i + 1]
@@ -177,16 +161,12 @@ def assign_civil_sui(
     if any(row["length_days"] not in (29, 30) for row in rows):
         result["reason"] = "source_month_length_outside_29_or_30_not_repaired"
         return result
-    else:
-        pass
     empty = [i for i, row in enumerate(rows) if not row["principal_term_indices"]]
     if len(empty) != count - 12 or any(
         len(row["principal_term_indices"]) > 1 for row in rows
     ):
         result["reason"] = "principal_term_pattern_not_unique_for_this_mean_qi_policy"
         return result
-    else:
-        pass
     expected = 11
     for row in rows:
         indices = row["principal_term_indices"]
@@ -195,8 +175,6 @@ def assign_civil_sui(
             if number != expected:
                 result["reason"] = "principal_term_month_sequence_conflict"
                 return result
-            else:
-                pass
             expected = number % 12 + 1
             row.update(month_number=number, is_leap_month=False)
         else:
@@ -213,12 +191,8 @@ def gujin_fixed_qice_months(
     """Keep the printed qi interval fixed; never silently century-rescale it."""
     if not isinstance(zhongji_days, Fraction):
         raise TypeError("中积须为Fraction原历日数，不接收现代JD浮点值")
-    else:
-        pass
     if zhongji_days < 0:
         raise ValueError("这里只重建下算，上考不借负中积套用")
-    else:
-        pass
 
     validate_method(conjunction_method)
     conjunction = (
@@ -353,8 +327,6 @@ def gujin_four_extras_calendar(zhongji_days: Fraction) -> dict[str, Any]:
                 "day": total // 1 - row["start_source_day_integer"] + 1,
                 "lunation_index": row["lunation_index"],
             }
-        else:
-            pass
         factors[key] = {
             "event_source_day_counter_exact": str(total),
             "source_calendar_date_under_named_policy": date,

@@ -29,8 +29,6 @@ def _profile() -> dict[str, Any]:
         or profile["bili_supplement"]["automatic_same_element_supplement"] is not False
     ):
         raise ValueError("Unknown or incomplete selected marriage profile")
-    else:
-        pass
     return profile
 
 
@@ -54,8 +52,6 @@ def marriage_qualifications(
         "changed_use",
     ]:
         raise ValueError("Marriage qualifications require all four auxiliary roles")
-    else:
-        pass
     profile = _profile()
     strengths = {
         row["role"]: (index, row)
@@ -87,8 +83,6 @@ def marriage_qualifications(
                 raise ValueError(
                     "Marriage strength must belong to this candidate's role"
                 )
-            else:
-                pass
             strength = actual["strength"]
             strength_path = f"{strength_prefix}.trigrams.{index}.strength"
         else:

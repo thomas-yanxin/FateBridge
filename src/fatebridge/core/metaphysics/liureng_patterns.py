@@ -40,12 +40,8 @@ def classify_transmission_pattern(
                 if len(thieves) == 1 and not killers
                 else "重审" if thieves else "元首"
             )
-        else:
-            pass
         if detail == "知一":
             return "比用" if thieves else "知一"
-        else:
-            pass
         return "缀瑕" if detail == "复等" else detail
 
     if style == "伏吟":
@@ -81,8 +77,6 @@ def classify_transmission_pattern(
         final_detail = detail if detail == "复等" else labels[0]
         if style == "比用":
             final_method = labels[0]
-        else:
-            pass
         reason = f"下贼上课{thieves}、上克下课{killers}，实际选第{selected_lesson}课{initial}发用，细分为{labels[0]}。"
     elif style == "八专":
         labels = ["八专"] + (["独足"] if len(set(transmissions)) == 1 else [])
@@ -96,8 +90,6 @@ def classify_transmission_pattern(
     note = liuren_annotation_note(day_ganzhi, lessons[0]["upper_branch"])
     if note:
         reason += f" 影印表注{note['annotation']}；{note['explanation']}"
-    else:
-        pass
     return {
         "ruleset_id": "tanyuan_jiuzong_names_v1",
         "source_url": TANYUAN_TRANSCRIPTION,

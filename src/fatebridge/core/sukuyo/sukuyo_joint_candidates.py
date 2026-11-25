@@ -40,8 +40,6 @@ def _identity(context: dict[str, Any]) -> dict[str, Any] | None:
         }
         if not signature["source_bundle_sha256"]:
             return None
-        else:
-            pass
         signatures.append(signature)
     return signatures[0] if all(s == signatures[0] for s in signatures) else None
 
@@ -65,8 +63,6 @@ def _states(context: dict[str, Any], model: str) -> tuple[list[dict[str, Any]], 
             if len(records) != len(MODELS) or {r["id"] for r in records} != set(MODELS):
                 covered = False
                 continue
-            else:
-                pass
             record = next(r for r in records if r["id"] == model)
             for half, key in (
                 ("first_half", "first_half_calculation"),
@@ -78,19 +74,13 @@ def _states(context: dict[str, Any], model: str) -> tuple[list[dict[str, Any]], 
                 ):
                     covered = False
                     continue
-                else:
-                    pass
                 if selected is None or selected == half:
                     alternatives.append((half, calculation["direct_mansion"], model))
-                else:
-                    pass
         elif assignment:
             for slot in assignment["slots"]:
                 if selected is None or selected == slot["day_part"]:
                     for name in slot["candidate_mansions"]:
                         alternatives.append((slot["day_part"], name, slot["origin"]))
-                else:
-                    pass
         else:
             # A non-discriminating day is compatible with either rule model.
             # Missing predecessor evidence is caught by the coverage flag below.
@@ -101,8 +91,6 @@ def _states(context: dict[str, Any], model: str) -> tuple[list[dict[str, Any]], 
         actual = _names(leaf)
         if not {name for _, name, _ in alternatives}.issubset(actual):
             covered = False
-        else:
-            pass
         for state_half, name, origin in alternatives:
             if name in actual:
                 state = {
@@ -113,10 +101,6 @@ def _states(context: dict[str, Any], model: str) -> tuple[list[dict[str, Any]], 
                 }
                 if state not in states:
                     states.append(state)
-                else:
-                    pass
-            else:
-                pass
         covered = (
             covered and profile["candidate_set_complete_under_declared_reconstructions"]
         )
@@ -129,8 +113,6 @@ def add_shared_reconstruction_support(
     """Preserve the marginal envelope and expose a separate shared-model join."""
     if not any(_precedence(leaf) for c in (first, second) for leaf in _leaves(c)):
         return analysis
-    else:
-        pass
     result = deepcopy(analysis)
     identity = _identity(first)
     shared: dict[str, Any] = {
@@ -151,8 +133,6 @@ def add_shared_reconstruction_support(
     if identity is None or identity != _identity(second):
         shared["reason"] = "profile_algorithm_source_or_calendar_identity_not_shared"
         return result
-    else:
-        pass
     supports: dict[tuple[str, str], list[dict[str, Any]]] = {}
     complete = analysis["candidate_set_complete_within_profile"]
     marginal_coverage: list[set[tuple[str, str]]] = [set(), set()]
@@ -170,8 +150,6 @@ def add_shared_reconstruction_support(
                 support = {"reconstruction_id": model, "person1": a, "person2": b}
                 if support not in supports.setdefault(key, []):
                     supports[key].append(support)
-                else:
-                    pass
     for index, context in enumerate((first, second)):
         expected = {
             (leaf["calendar_date"], name)
@@ -185,8 +163,6 @@ def add_shared_reconstruction_support(
         shared["resolved_support"] = [s for values in supports.values() for s in values]
         shared["reason"] = "resolved_mansions_do_not_establish_a_reconstruction_model"
         return result
-    else:
-        pass
     annotated = []
     for row in result["rows"]:
         key = (row["person1_su27"], row["person2_su27"])
@@ -212,8 +188,6 @@ def add_shared_reconstruction_support(
         )
         result["candidate_set_complete_within_profile"] = False
         return result
-    else:
-        pass
     result["rows"] = [r for r in annotated if r["joint_support"]]
     for row in result["rows"]:
         # These are projections of actual joint supports, not independent lists

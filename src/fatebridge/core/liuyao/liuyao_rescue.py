@@ -112,8 +112,6 @@ def build_back_generation_conditions(
             and not support["changed_void"]
         ):
             month_qualified = True
-        else:
-            pass
         qualified = qualify_yin_generation(
             month_qualified, support["changed_branch"] or "", context
         )
@@ -132,8 +130,6 @@ def build_back_generation_conditions(
             )
         elif month_qualified is not raw:
             support["status"] = "changed_day_value_excludes_month_only_obstruction"
-        else:
-            pass
     focus = (
         deepcopy(sources[selected["position"] - 1])
         if selected and selected["location"] == "visible"

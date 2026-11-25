@@ -45,15 +45,11 @@ def _independent_sources(
         p, element = row["position"], row["element"]
         if p == excluded_position or assessed["strength"]["oppositions"]:
             continue
-        else:
-            pass
         anchors = []
         for i, actor in enumerate(assessed["strength"]["supports"]):
             location, branch = actor["location"], actor["branch"]
             if element == "土" and location in ("day", "changed") and branch == "巳":
                 continue
-            else:
-                pass
             if (
                 location in ("month", "day")
                 and element_relation(ELEMENTS[branch], element) in ("生爻", "比和")
@@ -67,12 +63,8 @@ def _independent_sources(
                         "support_fact_path": f"liuyao_evidence.conditional_analysis.classical_assessment.lines.{p-1}.strength.supports.{i}",
                     }
                 )
-            else:
-                pass
         if anchors:
             proofs[p] = anchors
-        else:
-            pass
     changed = True
     while changed:
         changed = False
@@ -80,8 +72,6 @@ def _independent_sources(
             p = row["position"]
             if p == excluded_position or p in proofs:
                 continue
-            else:
-                pass
             for i, actor in enumerate(assessed["strength"]["supports"]):
                 source = actor.get("position")
                 if (
@@ -102,8 +92,6 @@ def _independent_sources(
                     ]
                     changed = True
                     break
-                else:
-                    pass
     return proofs
 
 

@@ -27,8 +27,6 @@ def validate_quotation(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("引书身份、卷次、文字层或未定条件改变，须重新核验")
-    else:
-        pass
 
 
 def quotation_reference() -> dict[str, Any]:
@@ -36,8 +34,6 @@ def quotation_reference() -> dict[str, Any]:
     loaded = load_source(SOURCE)
     if loaded.sha256 != DATA_SHA256:
         raise ValueError("引书比较资料字节改变，须重新冻结来源")
-    else:
-        pass
     data = loaded.data
     validate_quotation(data)
     return {
@@ -72,13 +68,9 @@ def quotation_lines(reference: dict[str, Any]) -> list[str]:
     ]
     if reference.get("kanbun_witness_round") == 88:
         lines += kanbun_lines(reference["kanbun_printed_witness"])
-    else:
-        pass
     if reference.get("upstream_context_round") == 89:
 
         lines += zhidu_lines(reference["upstream_calendar_context"])
-    else:
-        pass
     return lines
 
 
@@ -88,16 +80,12 @@ def validate_kanbun(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != KANBUN_FACTS_SHA256:
         raise ValueError("京都印页读法、首读分歧、实物身份或未定条件改变，须重新核验")
-    else:
-        pass
 
 
 def kanbun_reference() -> dict[str, Any]:
     loaded = load_source(KANBUN_SOURCE)
     if loaded.sha256 != KANBUN_DATA_SHA256:
         raise ValueError("京都选页资料身份改变，须重新冻结")
-    else:
-        pass
     data = loaded.data
     validate_kanbun(data)
     return {

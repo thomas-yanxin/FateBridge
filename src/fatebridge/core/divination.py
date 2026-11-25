@@ -222,8 +222,6 @@ def _bagua_from_lines(lines: list[int]) -> TrigramDefinition:
     for item in BAGUA_BY_NAME.values():
         if ",".join(str(bit) for bit in item["lines"]) == target:
             return item
-        else:
-            pass
     raise ValueError("未匹配到八卦爻序列")
 
 
@@ -292,24 +290,14 @@ def build_changed_hexagram(
 def relationship_by_element(left_element: str, right_element: str) -> str:
     if left_element == right_element:
         return "同气相应"
-    else:
-        pass
     if ELEMENT_GENERATES[left_element] == right_element:
         return "上生下"
-    else:
-        pass
     if ELEMENT_CONTROLS[left_element] == right_element:
         return "上制下"
-    else:
-        pass
     if ELEMENT_GENERATES[right_element] == left_element:
         return "下生上"
-    else:
-        pass
     if ELEMENT_CONTROLS[right_element] == left_element:
         return "下制上"
-    else:
-        pass
     return "关系未明"
 
 
@@ -361,14 +349,10 @@ def build_meihua_interpretation(
         interpretation["wealth_components"] = None
         interpretation["classical_text_reference"] = None
         return interpretation
-    else:
-        pass
     if options.interpretation_topic != "general":
         from fatebridge.core.meihua.meihua_topics import build_topic_interpretation
 
         return build_topic_interpretation(meihua, options.interpretation_topic)
-    else:
-        pass
     base = meihua["base_hexagram"]
     changed = meihua["changed_hexagram"]
     moving_line = meihua["seed"]["moving_line"]
@@ -447,8 +431,6 @@ def lookup_hexagram_by_code(code: str) -> dict[str, Any]:
         or set(normalized) - {"0", "1"}
     ):
         raise ValueError("卦码必须是 6 位 0/1 字符串，例如 111111。")
-    else:
-        pass
     lower = _bagua_from_lines([int(bit) for bit in normalized[:3]])
     upper = _bagua_from_lines([int(bit) for bit in normalized[3:]])
     hexagram = build_hexagram(upper["name"], lower["name"])
@@ -465,8 +447,6 @@ def lookup_trigram_by_code(code: str) -> dict[str, Any]:
         or set(normalized) - {"0", "1"}
     ):
         raise ValueError("八卦码必须是 3 位 0/1 字符串，例如 111。")
-    else:
-        pass
     trigram = _bagua_from_lines([int(bit) for bit in normalized])
     return {**trigram, "lines": list(trigram["lines"]), "code": normalized}
 
@@ -488,8 +468,6 @@ def _hexagram_name_index() -> tuple[dict[str, tuple[str, str]], dict[int, str]]:
         source_name: object = classical_hexagram(code)["name"]
         if not isinstance(source_name, str):
             raise RuntimeError("周易资料中的卦名必须为字符串")
-        else:
-            pass
         short_name = full_name[0] if upper_name == lower_name else full_name[2:]
         variants.update(zip(source_name, short_name))
         for alias in (full_name, short_name):
@@ -502,8 +480,6 @@ def lookup_hexagram_by_name(name: str) -> dict[str, Any]:
     pair = index.get(_gua_name_key(name).translate(variants))
     if pair is None:
         raise ValueError(f"未识别的六十四卦名称：{name}")
-    else:
-        pass
     hexagram = build_hexagram(*pair)
     hexagram["classical"] = classical_hexagram(hexagram["binary_code"])
     hexagram["code"] = hexagram["binary_code"]
@@ -514,8 +490,6 @@ def lookup_trigram_by_name(name: str) -> dict[str, Any]:
     normalized = _gua_name_key(name)
     if normalized not in BAGUA_BY_NAME:
         raise ValueError(f"未识别的八卦名称：{name}")
-    else:
-        pass
     trigram = BAGUA_BY_NAME[normalized]
     return lookup_trigram_by_code("".join(str(bit) for bit in trigram["lines"]))
 
@@ -524,14 +498,10 @@ def lookup_gua(query: str, lookup_mode: str = "auto") -> dict[str, Any]:
     normalized_mode = (lookup_mode or "auto").strip().lower()
     if normalized_mode not in {"auto", "hexagram", "trigram"}:
         raise ValueError("lookup_mode 必须是 auto、hexagram 或 trigram。")
-    else:
-        pass
 
     query_text = (query or "").strip()
     if not query_text:
         raise ValueError("query 不能为空。")
-    else:
-        pass
 
     binary_digits = sum(ch in {"0", "1"} for ch in query_text)
     if normalized_mode in {"auto", "hexagram"} and binary_digits == 6:
@@ -568,8 +538,6 @@ def compose_meihua_hexagram(
     ):
         if type(value) is not int or not 1 <= value <= limit:
             raise ValueError(f"{name}必须为1至{limit}的整数。")
-        else:
-            pass
     upper = _bagua_from_number(upper_number)
     lower = _bagua_from_number(lower_number)
     base = build_hexagram(upper["name"], lower["name"])
@@ -600,16 +568,10 @@ def derive_meihua_hexagram(
 ) -> dict[str, Any]:
     if year_branch not in EARTHLY_BRANCHES or hour_branch not in EARTHLY_BRANCHES:
         raise ValueError("年支和时支必须是子至亥的十二地支。")
-    else:
-        pass
     if type(lunar_month) is not int or not 1 <= lunar_month <= 12:
         raise ValueError("农历月数必须为1至12；闰月沿用本月数。")
-    else:
-        pass
     if type(lunar_day) is not int or not 1 <= lunar_day <= 30:
         raise ValueError("农历日数必须为1至30。")
-    else:
-        pass
     year_number = EARTHLY_BRANCHES.index(year_branch) + 1
     hour_number = EARTHLY_BRANCHES.index(hour_branch) + 1
     upper_number = (year_number + lunar_month + lunar_day) % 8 or 8

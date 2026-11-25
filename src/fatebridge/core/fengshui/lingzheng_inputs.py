@@ -41,8 +41,6 @@ class LingzhengObservation(_DeferredModel):
             )
         ):
             raise ValueError("零正形势须至少有一项明确存在或不存在的事实")
-        else:
-            pass
         return self
 
 
@@ -98,10 +96,6 @@ class FixedLingzhengRequest(_DeferredModel):
     def explicit_half_and_unique_directions(self) -> "FixedLingzhengRequest":
         if (self.five_period_half is None) != (self.half_evidence is None):
             raise ValueError("五运分段与half_evidence必须一起提供")
-        else:
-            pass
         if len({o.direction for o in self.observations}) != len(self.observations):
             raise ValueError("零正外局同一方向不可重复")
-        else:
-            pass
         return self

@@ -96,8 +96,6 @@ def ziwei_prerequisite_source_evidence(
         or year_stem not in stems
     ):
         raise ValueError("命身宫原文比较要求有效的农历月、时支与年干")
-    else:
-        pass
     wanted_month = lunar_month + int(is_leap)
     seed = next(
         r
@@ -183,8 +181,6 @@ def ziwei_day_source_evidence(
     """
     if bureau not in range(2, 7) or lunar_day not in range(1, 31):
         raise ValueError("安紫微原文比较要求五行局 2..6、农历日 1..30")
-    else:
-        pass
     source = _ming_day_source()
     row = next(
         row
@@ -213,8 +209,6 @@ def ziwei_day_source_evidence(
         result["printed_label_unresolved"] = True
     elif row["branch"] is None:
         result["source_resolution"] = "No unique expectation; do not score as a match"
-    else:
-        pass
     review = _ming_day_review()
     reading = next(
         r for r in review["records"] if r["bureau"] == bureau and r["day"] == lunar_day
@@ -265,8 +259,6 @@ def ziwei_day_source_evidence(
             "external_human_experts": 0,
             "whole_day_table_certified": False,
         }
-    else:
-        pass
     return result
 
 
@@ -291,12 +283,8 @@ def sihua_source_comparison(
                         "compared_star": compared_star,
                     }
                 )
-            else:
-                pass
     if compared_assignments_applied and differences:
         raise ValueError("已选择明刊四化，但实际四化表与来源不符")
-    else:
-        pass
     return {
         "method_id": source["id"],
         "version": source["version"],
@@ -336,8 +324,6 @@ def natal_sihua_source_comparison(
         ]
         if len(matches) != 1:
             raise ValueError(f"四化版本比较要求唯一的本命星位：{name}")
-        else:
-            pass
         i, j, palace, star = matches[0]
         return {
             "natal_palace_name": palace["name"],
@@ -359,12 +345,8 @@ def natal_sihua_source_comparison(
                     "compared_position": position(compared_star),
                 }
             )
-        else:
-            pass
     if compared_assignments_applied and differences:
         raise ValueError("已选择明刊四化，但实际生年四化与来源不符")
-    else:
-        pass
     return {
         "method_id": source["id"],
         "compared_source": source["source_url"],

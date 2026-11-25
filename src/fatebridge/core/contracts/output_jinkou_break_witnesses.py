@@ -36,20 +36,12 @@ class BreakPairWitness(PartialOutput):
                 "寅破巳" in self.literal_break_sequence
             ):
                 raise ValueError("字句旁证须符合实际转写，不增写第二个寅")
-            else:
-                pass
-        else:
-            pass
         if (
             "literal_break_sequence" in self.model_fields_set
             and self.literal_break_sequence is None
         ):
             if self.extra_phrase_present is not None:
                 raise ValueError("未读清的见证不能改成支持或否定")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -80,8 +72,6 @@ class BreakPairWitnessEvidence(PartialOutput):
         ):
             if key in self.model_fields_set and getattr(self, key) is not False:
                 raise ValueError("本次目读未建立盲验、独立专家、传承独立或全书符合")
-            else:
-                pass
         if self.witnesses is not None and all(
             "extra_phrase_present" in w.model_fields_set for w in self.witnesses
         ):
@@ -92,15 +82,9 @@ class BreakPairWitnessEvidence(PartialOutput):
                 and self.readable_corroboration_count != positive
             ):
                 raise ValueError("可读旁证计数不一致")
-            else:
-                pass
             if (
                 self.unresolved_witness_count is not None
                 and self.unresolved_witness_count != unknown
             ):
                 raise ValueError("未读清见证不能从分母删除")
-            else:
-                pass
-        else:
-            pass
         return self

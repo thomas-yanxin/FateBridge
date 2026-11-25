@@ -46,8 +46,6 @@ def determinate_calculation(board: dict[str, Any], mode: str) -> dict[str, Any]:
             "status": "not_computed_for_selected_mode",
             "reason": "时计合神现用日支，定计时支加临尚待同派独立课例，未把年/月例混入。",
         }
-    else:
-        pass
     core = board["core_board"]
     ruler = core["suijun"] if mode == "year" else core["ruler_branch"]
     hegod = core["heshen"]
@@ -84,8 +82,6 @@ def determinate_calculation(board: dict[str, Any], mode: str) -> dict[str, Any]:
         result["source_comparison_scope"] = (
             "图45/46庚戌课例同一时计相位的定计数值参照；日期匹配另见calendar_rules.historical_date_reference，不认证完整古历、门盘或应验。"
         )
-    else:
-        pass
     core.update(
         dingmu=marker,
         set_count=result["count"],
@@ -100,20 +96,14 @@ def attach_gate_board(
 ) -> None:
     if mode not in {"year", "month", "day", "hour"}:
         raise ValueError("太乙八门仅接受本盘明确的year/month/day/hour计法")
-    else:
-        pass
     if (
         mode == "day"
         and board.get("calendar_rules", {}).get("day_profile")
         != "key_day_winter_jiazi_v1"
     ):
         raise ValueError("日计门盘仅支持明确的金钥匙积日配置")
-    else:
-        pass
     if mode == "year" and (type(year) is not int or not 1 <= year <= 9999):
         raise ValueError("年计八门必须沿用本盘已确定的整数农历年")
-    else:
-        pass
     core = board["core_board"]
     determinate = determinate_calculation(board, mode)
     board["determinate_calculation"] = determinate
@@ -121,8 +111,6 @@ def attach_gate_board(
         core.update(
             dingmu=None, set_count=None, set_general=None, set_vice_general=None
         )
-    else:
-        pass
     if determinate["status"] == "computed":
         marks = {
             p["palace"]: p["markers"]
@@ -135,10 +123,6 @@ def attach_gate_board(
         ]:
             if label not in marks[position]:
                 marks[position].append(label)
-            else:
-                pass
-    else:
-        pass
     source = {
         "id": "jinjing_wang_gates_240_v1",
         "version": "1.1.0",
@@ -308,14 +292,8 @@ def attach_gate_board(
                         name + "，不是本盘所用积月，不能择优替换"
                     )
                     gates["source_counter_alternatives"].append(alternative)
-            else:
-                pass
-        else:
-            pass
         update_conjunction(board["condition_assessment"])
         return
-    else:
-        pass
     if mode == "hour":
         gates.update(
             status="not_computed_for_selected_mode",
@@ -330,8 +308,6 @@ def attach_gate_board(
         }
         update_conjunction(board["condition_assessment"])
         return
-    else:
-        pass
     accumulation = (
         3361 + year - 724
         if mode == "year" and year is not None
@@ -397,8 +373,6 @@ def attach_gate_board(
             "frame_source_path": "taiyi.gates.old_open_frames.determinate",
         }
         old_frames["determinate"] = frame
-    else:
-        pass
     gates.update(
         status="computed",
         selected_profile=(
@@ -427,8 +401,6 @@ def attach_gate_board(
             determinate["marker"],
         )
         gates["dingmu_comparison_source"] = KEY
-    else:
-        pass
     board["gates"] = gates
     assessment = board["condition_assessment"]
     assessment["three_gates"] = selected_check

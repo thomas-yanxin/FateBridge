@@ -31,8 +31,6 @@ def polynomial_weights(
                 matrix[row] = [
                     a - factor * b for a, b in zip(matrix[row], matrix[column])
                 ]
-            else:
-                pass
     coefficients = [row[-1] for row in matrix]
     return tuple(
         sum((c * x**i for i, c in enumerate(coefficients)), Fraction(0)) for x in nodes

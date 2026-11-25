@@ -109,8 +109,6 @@ def _meihua_evidence_views(
     ]
     if include_casting:
         fields.append("interpretation.casting_readings")
-    else:
-        pass
     views["chapter_qualitative_motion"] = {
         "fields": fields,
         "scope": "Requires interpretation_topic=travel or traveler. A declared NLC1925 grammatical reading selects the candidate's initial body for travel and initial use for traveler. Preserve 多 as an unquantified qualifier; distinguish it from inner-role motion and field observations. Existing occurrence-count readings remain unresolved. No probability, route, location, safety or return-time certificate.",

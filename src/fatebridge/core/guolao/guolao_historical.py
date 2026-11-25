@@ -45,17 +45,11 @@ def shoushi_winter_cycle(elapsed_years: int) -> ShoushiWinterCycle:
     """
     if isinstance(elapsed_years, bool) or not isinstance(elapsed_years, int):
         raise TypeError("距算须为非负整数年数，不接收现代日期或小数年")
-    else:
-        pass
     if elapsed_years < 0:
         raise ValueError("这里只复原授时下算；上考不能借负距算套用")
-    else:
-        pass
     year_days = Fraction("365.2425") - Fraction(elapsed_years // 100, 10000)
     if year_days <= 0:
         raise ValueError("距算超出此古历算式的有效年长范围")
-    else:
-        pass
     middle = elapsed_years * year_days
     winter = (middle + Fraction("55.06")) % 60
     day = winter.numerator // winter.denominator
@@ -120,8 +114,6 @@ _ENDS_DAYS = tuple(
 )
 if _ENDS_DAYS[-1] != PURPLE_SOURCE_PERIOD_DAYS:
     raise ValueError("刊载紫气宿表与刊载周积不符，禁止强制归一化")
-else:
-    pass
 
 
 @dataclass(frozen=True)
@@ -145,8 +137,6 @@ def purple_historical_position(zhongji_days: Fraction) -> PurpleHistoricalPositi
     """
     if not isinstance(zhongji_days, Fraction):
         raise TypeError("中积须以Fraction明确提供原历日数，不接收现代JD浮点值")
-    else:
-        pass
     phase = (zhongji_days + PURPLE_SOURCE_OFFSET_DAYS) % PURPLE_SOURCE_PERIOD_DAYS
     index = bisect_right(_ENDS_DAYS, phase)
     start = _ENDS_DAYS[index - 1] if index else Fraction()

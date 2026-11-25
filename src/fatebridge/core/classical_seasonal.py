@@ -52,8 +52,6 @@ def _source_profile(day_stem: str) -> dict[str, Any]:
             .joinpath("bazi_seasonal_qiongtong_bing_input_notes_v1.json")
             .read_text(encoding="utf-8")
         )
-    else:
-        pass
     return profile
 
 
@@ -77,8 +75,6 @@ def seasonal_reference_layers(
         layers = deepcopy(profile["months"][month_branch])
         if "general_fire_context" in profile:
             layers["general_fire_context"] = deepcopy(profile["general_fire_context"])
-        else:
-            pass
         if "input_witness_notes" in profile:
             witness = profile["input_witness_notes"]
             matching = [
@@ -89,10 +85,6 @@ def seasonal_reference_layers(
                     **{k: deepcopy(v) for k, v in witness.items() if k != "notes"},
                     "notes": deepcopy(matching),
                 }
-            else:
-                pass
-        else:
-            pass
         source_context = profile.get("month_sources", {}).get(month_branch, profile)
         result.update(
             source_review_status=source_context.get(
@@ -104,8 +96,6 @@ def seasonal_reference_layers(
         )
         candidates.update(layers["body"]["stem_sequence"])
         candidates.update(layers["body"].get("condition_stems", []))
-    else:
-        pass
     if pillars is not None:
         result["stem_observations"] = [
             {
@@ -127,6 +117,4 @@ def seasonal_reference_layers(
             "只核对本次四柱的干见与支藏，含日干时保留实际位置；"
             "有字不等于得用，不裁定力量、合化或半月分界。"
         )
-    else:
-        pass
     return result

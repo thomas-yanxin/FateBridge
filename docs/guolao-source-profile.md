@@ -4,10 +4,10 @@
 
 ## 来源与范围
 
-规则与软件语义来源是 At Home Projects 的 Moira1.50Final，固定提交 `9bb126fd84997aa26fed6e91b4bdf438fceb0e38`：
+规则与软件语义来源是 At Home Projects 的 Moira1.50Final。来源如下。
 
-- [原规则文件](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/moira_s.prop)。原 UTF-16 文件 SHA-256 为 `9e484843e3d2d433851fa6fb8a0c5ff3062f0114476493ecbacb5931f5518a93`。
-- [原 RuleEntry](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/src/org/athomeprojects/base/RuleEntry.java)、[RuleParse](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/src/org/athomeprojects/base/RuleParse.java) 和 [EvalRule](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/src/org/athomeprojects/base/EvalRule.java)。原 RuleEntry SHA-256 为 `2538427eba44c5fbff6f56a8dff5370797bc8592e401afec7d7428681091b219`。
+- [原规则文件](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM)。规则文件采用 UTF-16。
+- [原 RuleEntry](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM)、[RuleParse](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM) 和 [EvalRule](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM)。
 
 完整所选目录含 298 条源声明，展开为 547 个条件和 163 条逻辑别名。原程序还创建反向别名，且五组正常目标存在后写覆盖，因此原生映射表实际为 321 项，不能将它强行改成 163 项。软件作者参考只裁定该软件版本的行为，不等于果老原典认证、完整整盘天文复现或预测有效性证据。
 
@@ -50,7 +50,7 @@ R23 的 16 个完整事实上下文另逐一查询全部 547 个条件；246 个
 
 ## 显式来源提供器
 
-`guolao_moira_provider` 读取外置、具名版本的资源，分别处理原生年表、年干／支、月支、月时、卦气、分组、主表资格及成对别名。资源仍来自同一 [Moira1.50Final 源版本](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/moira_s.prop)，不随项目打包。历法字段是明确前提；提供器不从公历日期推断原软件的年月日时，也不认证该版本是原典唯一标准。
+`guolao_moira_provider` 读取外置、具名版本的资源，分别处理原生年表、年干／支、月支、月时、卦气、分组、主表资格及成对别名。资源仍来自同一 [Moira1.50Final 源版本](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM)，不随项目打包。历法字段是明确前提；提供器不从公历日期推断原软件的年月日时，也不认证该版本是原典唯一标准。
 
 `MoiraNativeProvider(profile, calendar)` 只能与同源的显式规则 profile 一起注入 `build_chart`。没有传 calendar 对象时，只沿用本次已有的立春研究年柱和实际选定时支，并回显其研究政策；月柱和农历日保持缺失。传入 calendar 对象后，其每个 `None` 都保持缺失，不补入本次年柱。未知前提和已知无位置分别记录；来源提供器先移除其命名空间中的旧研究值，再覆盖已知事实。源月柱缺失时，旧太阳节气四季布尔也被移除。陆位 `god_positions` 及其证据保持独立。
 

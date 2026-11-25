@@ -37,8 +37,6 @@ def fixed_star_catalogue(native: ModuleType, catalogue_bytes: bytes) -> Iterator
                     raise ValueError(
                         "Temporary fixed-star directory is not a valid Swiss path"
                     )
-                else:
-                    pass
                 (path / "sefstars.txt").write_bytes(catalogue_bytes)
                 operator = os.environ.pop("SE_EPHE_PATH", None)
                 try:
@@ -47,8 +45,6 @@ def fixed_star_catalogue(native: ModuleType, catalogue_bytes: bytes) -> Iterator
                 finally:
                     if operator is not None:
                         os.environ["SE_EPHE_PATH"] = operator
-                    else:
-                        pass
                     # Release Swiss's open catalogue handle before removing
                     # the temporary file. The parsed records stay loaded.
                     native.set_ephe_path(selected)

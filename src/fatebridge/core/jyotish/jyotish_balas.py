@@ -80,8 +80,6 @@ def _aspect_virupas(aspector: str, angle: Fraction) -> tuple[Fraction, int]:
         extra = 30
     elif aspector == "Saturn" and (60 <= angle < 90 or 270 <= angle < 300):
         extra = 45
-    else:
-        pass
     return base, extra
 
 
@@ -90,8 +88,6 @@ def aspect_value(
 ) -> dict[str, float]:
     if aspector not in PLANETS:
         raise ValueError("Quantitative aspects cover the seven physical grahas only")
-    else:
-        pass
     angle = directed_angle(aspector_longitude, aspected_longitude)
     base, extra = _aspect_virupas(aspector, angle)
     return {
@@ -384,16 +380,12 @@ def _same_drik_value(actual: Any, expected: Any) -> bool:
             and actual.keys() == expected.keys()
             and all(_same_drik_value(actual[k], v) for k, v in expected.items())
         )
-    else:
-        pass
     if isinstance(expected, list):
         return (
             isinstance(actual, list)
             and len(actual) == len(expected)
             and all(_same_drik_value(a, b) for a, b in zip(actual, expected))
         )
-    else:
-        pass
     return type(actual) is type(expected) and actual == expected
 
 
@@ -410,15 +402,11 @@ def verify_drik_evidence(component: dict[str, Any], d1: dict[str, Any]) -> None:
             or d1["method"] != "rasi_whole_sign"
         ):
             raise ValueError("The physical D1 is required for natal Drik")
-        else:
-            pass
         longitudes = {}
         for row in d1["planets"]:
             planet = row["id"]
             if planet not in PLANETS:
                 continue
-            else:
-                pass
             value = row["longitude"]
             if (
                 planet in longitudes
@@ -427,15 +415,11 @@ def verify_drik_evidence(component: dict[str, Any], d1: dict[str, Any]) -> None:
                 or not 0 <= value < 360
             ):
                 raise ValueError("Unique finite physical D1 operands are required")
-            else:
-                pass
             longitudes[planet] = value
         if set(longitudes) != set(PLANETS) or not _same_drik_value(
             component, aspect_strength(longitudes)
         ):
             raise ValueError("The Drik calculation and its receipt disagree")
-        else:
-            pass
     except (KeyError, TypeError, ValueError, OverflowError) as error:
         raise JyotishCalculationError("drik_chain_inconsistent") from error
 

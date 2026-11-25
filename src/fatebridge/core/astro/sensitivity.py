@@ -62,8 +62,6 @@ def time_sensitivity(
             "status": "not_assessed",
             "reason": "No user-confirmed interval; missing uncertainty is not zero",
         }
-    else:
-        pass
     sampling_radius(uncertainty_minutes)
     if runtime.swe is None:
         return {
@@ -71,8 +69,6 @@ def time_sensitivity(
             "status": "unavailable",
             "reason": "Swiss Ephemeris is required for sensitivity recalculation",
         }
-    else:
-        pass
     times = (
         _times
         if _times is not None
@@ -97,8 +93,6 @@ def time_sensitivity(
                 element_source = native["hypothetical_element_source"]
             elif native["hypothetical_element_source"] != element_source:
                 raise EphemerisSourceError("fictitious_changed_across")
-            else:
-                pass
             models.update(native["ephemeris_models"])
             physical_source_index = physical_cohort.add(
                 native["physical_ephemeris_source"]
@@ -124,8 +118,6 @@ def time_sensitivity(
                         "factors"
                     ],
                 }
-            else:
-                pass
             samples.append(
                 {
                     "offset_seconds": (
@@ -196,8 +188,6 @@ def time_sensitivity(
                 "backend_convention_span": convention,
                 "unresolved_sample_count": unresolved,
             }
-        else:
-            pass
     label_offsets = [offset for offset in offsets if offset is not None]
     complete_label_grid = len(label_offsets) == len(offsets)
     return {
@@ -273,22 +263,16 @@ def enrich_specialty_sensitivity(
         layer["time_sensitivity"] = sensitivity
         if "meridian_houses" in layer:
             attach_meridian_sensitivity(layer["meridian_houses"], sensitivity)
-        else:
-            pass
         if sensitivity["status"] != "sampled":
             layer["comparative_geometry"] = build_comparative_geometry(
                 layer, sensitivity
             )
             return None
-        else:
-            pass
         if (
             sensitivity["hypothetical_element_source"]
             != layer["profile"]["hypothetical_element_source"]
         ):
             raise EphemerisSourceError("fictitious_nominal_mismatch")
-        else:
-            pass
         nominal_cohort = PhysicalSourceCohort()
         nominal_cohort.add(layer["profile"]["physical_ephemeris_source"])
         for source in sensitivity["physical_ephemeris_sources"]:
@@ -315,14 +299,10 @@ def enrich_specialty_sensitivity(
             for row in dial["four_factor_contacts"]:
                 if "source_interpretation" in row:
                     row["source_interpretation"]["birth_time_sampled_status"] = state
-                else:
-                    pass
     else:
         payload["time_sensitivity"] = sensitivity
         if sensitivity["status"] != "sampled":
             return None
-        else:
-            pass
         # Native sample coherence alone does not cover the already computed
         # nominal equal13 positions. Different models are not pure clock effects.
         nominal_cohort = PhysicalSourceCohort()

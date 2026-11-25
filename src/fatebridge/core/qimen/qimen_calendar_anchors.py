@@ -28,6 +28,4 @@ def zhirun_calendar_anchors(year: int, timezone_name: str) -> tuple[SolarTerm, .
                 f"unresolved local time：时区规则未定义奇门置闰锚点{term.name}的当地日序。",
                 [{"path": "request", "code": "unresolved_timezone_offset"}],
             )
-        else:
-            pass
     return anchors

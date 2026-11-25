@@ -49,38 +49,22 @@ def _motion_snapshot_line(obj: dict[str, Any]) -> str:
         line += f"；原生日速 {motion['native_longitude_speed']} 度/日"
         if "light_time_correction" in motion:
             line += f"，光行时链式修正 {motion['light_time_correction']} 度/日"
-        else:
-            pass
         if "spatial_aberration_correction" in motion:
             line += f"，空间光行差修正 {motion['spatial_aberration_correction']} 度/日"
-        else:
-            pass
         if "lunar_source_remainder_correction" in motion:
             line += f"，月球固定框架源导数余项 {motion['lunar_source_remainder_correction']} 度/日"
-        else:
-            pass
         if "sidereal_origin_wrap_correction" in motion:
             line += f"，恒星黄道原点整圈差分修正 {motion['sidereal_origin_wrap_correction']} 度/日"
-        else:
-            pass
         if "rotation_correction" in motion:
             line += f"，黄道旋转导数修正 {motion['rotation_correction']} 度/日"
-        else:
-            pass
         if "analytic_frame_correction" in motion:
             line += (
                 f"，日期框架解析导数修正 {motion['analytic_frame_correction']} 度/日"
             )
-        else:
-            pass
         if "position_derivative_correction" in motion:
             line += (
                 f"，完整视位置导数余项 {motion['position_derivative_correction']} 度/日"
             )
-        else:
-            pass
-    else:
-        pass
     return line
 
 
@@ -142,16 +126,10 @@ def build_otherbu_result(
     normalized_house = normalize_house(house)
     if type(hsys) is not int or hsys not in range(9):
         raise ValueError("hsys必须为0..8的整数，仅用于附加天象盘")
-    else:
-        pass
     if type(zodiacal) is not int or zodiacal not in {0, 1}:
         raise ValueError("zodiacal必须为0或1的整数，仅用于附加天象盘")
-    else:
-        pass
     if fortune_method not in FORTUNE_METHODS:
         raise ValueError("fortune_method必须为sect_reversing或ptolemy_iii10")
-    else:
-        pass
     validate_context(
         date=date,
         time=time,
@@ -229,8 +207,6 @@ def build_otherbu_result(
         )
         base_chart["params"]["chartKind"] = "astronomical_context_only"
         evidence["validation"]["calendar"] = "separate_astronomical_context_computed"
-    else:
-        pass
     snapshot = [
         (
             "骰子结果",
@@ -312,15 +288,9 @@ def build_otherbu_result(
                     ),
                 )
             )
-        else:
-            pass
         solar_policy = params["chart_profile"].get("apparent_position_policy")
         if solar_policy is not None:
             snapshot.append(("天象视位置约定", _solar_position_snapshot(solar_policy)))
-        else:
-            pass
-    else:
-        pass
     return {
         "analysis_type": "西洋游戏 / 占星骰子",
         "input_normalized": inputs,

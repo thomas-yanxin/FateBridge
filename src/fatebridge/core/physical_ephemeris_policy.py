@@ -22,14 +22,10 @@ from fatebridge.core.physical_source_observation import (
 def data_file_policy(mode: str) -> Iterator[DataFilePolicy | None]:
     if mode not in {"auto", "require_data_files"}:
         raise ValueError("ephemeris_policy must be auto or require_data_files")
-    else:
-        pass
     active = current_policy()
     if active is not None or mode == "auto":
         yield active
         return
-    else:
-        pass
     from fatebridge.core.ephemeris_runtime import lock_ephemeris_configuration, swe
 
     state = DataFilePolicy()
@@ -37,8 +33,6 @@ def data_file_policy(mode: str) -> Iterator[DataFilePolicy | None]:
     try:
         if swe is None:
             state.fail("required_data_files_unavailable")
-        else:
-            pass
         with lock_ephemeris_configuration():
             yield state
             state.finish()

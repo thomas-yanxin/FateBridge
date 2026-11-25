@@ -35,8 +35,6 @@ def _profile() -> dict[str, Any]:
         or {r["id"] for r in profile["rules"]} != expected
     ):
         raise ValueError("Unknown selected volume-three strength clauses")
-    else:
-        pass
     return profile
 
 
@@ -47,12 +45,8 @@ def strength_exception_ruleset() -> dict[str, Any]:
 def _condition_status(structural: bool, strength: str | None, required: str) -> str:
     if not structural:
         return "not_matched"
-    else:
-        pass
     if strength not in {"旺", "衰"}:
         return "pending_strength"
-    else:
-        pass
     return (
         "matched_selected_month_conditions" if strength == required else "not_matched"
     )
@@ -80,30 +74,22 @@ def build_strength_exceptions(
         or [r["role"] for r in control["qualifications"]] != list(ROLES)
     ):
         raise ValueError("Strength exceptions require the same five actual roles")
-    else:
-        pass
     for row, node in zip(roles, control["nodes"], strict=True):
         if any(
             row[key] != node[key]
             for key in ["trigram", "element", "relation_to_body", "fact_path"]
         ):
             raise ValueError("Strength and control facts belong to different casts")
-        else:
-            pass
         if row["strength"] not in {None, "旺", "衰", "原文未定"}:
             raise ValueError(
                 "Unknown strength is not an invented weak or neutral label"
             )
-        else:
-            pass
     for row, qualification in zip(roles[1:], control["qualifications"], strict=True):
         if (row["relation_to_body"], row["fact_path"]) != (
             qualification["original_relation_to_body"],
             qualification["target_fact_path"],
         ):
             raise ValueError("Strength exception qualifications belong to another cast")
-        else:
-            pass
     profile = _profile()
     rules = {r["id"]: r for r in profile["rules"]}
     body = roles[0]
@@ -164,8 +150,6 @@ def build_strength_exceptions(
     for row in checks:
         if row["status"] != "matched_selected_month_conditions":
             continue
-        else:
-            pass
         if row["rule_id"] == "wang_body_receives_control":
             parts.append(
                 f"原体{body['trigram']}标旺且见克体，卷三所选句另列亦無大害的传统限定；原克体仍保留。"
@@ -185,19 +169,13 @@ def build_strength_exceptions(
             "、".join(LABELS[r["role"]] + r["trigram"] for r in favorable)
             + "符合所选用互变乘旺句的角色条件。"
         )
-    else:
-        pass
     if excepted:
         parts.append(
             "、".join(LABELS[r["role"]] + r["trigram"] for r in excepted)
             + "既克体又标旺，属于原句明示例外，不引用乘旺皆吉。"
         )
-    else:
-        pass
     if not parts:
         parts.append("所列卷三条件未触发或旺衰待定，不把未知当衰。")
-    else:
-        pass
     parts.append(
         "本层仅核所选月令与原始内卦关系，制约、卷二条件及日气另核；未综合净作用、现实安全或成败。"
     )

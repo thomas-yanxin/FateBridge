@@ -105,21 +105,15 @@ def full_backend_report(
 def compare_full_backends(chart: dict[str, Any], node_mode: str) -> dict[str, Any]:
     if node_mode not in {"true", "mean"}:
         raise ValueError("node_mode 必须为 true 或 mean")
-    else:
-        pass
     base = backend_report_base(chart, node_mode)
     if base["selected_physical_models"] == ["moshier"]:
         return {**base, "status": "same_backend_not_independent"}
-    else:
-        pass
     if runtime.swe is None:
         return {
             **base,
             "status": "reference_unavailable",
             "unavailable_reason": "native_reference_unavailable",
         }
-    else:
-        pass
     if configured_jpl_file() is not None:
         return {
             **base,
@@ -127,8 +121,6 @@ def compare_full_backends(chart: dict[str, Any], node_mode: str) -> dict[str, An
             "reference_computation_performed": False,
             "unavailable_reason": "jpl_mixed_request",
         }
-    else:
-        pass
     try:
         alternate = chart_at_tt(
             chart["time_scales"]["personality"]["jd_tt"], node_mode, backend="moshier"

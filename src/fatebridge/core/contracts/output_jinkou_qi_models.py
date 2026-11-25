@@ -63,16 +63,12 @@ class JinkouQiEvidence(PartialOutput):
         for item in self.month_building_checks or []:
             if item.position is not None:
                 positions.append(item.position)
-            else:
-                pass
             month = item.month_building_branch or self.month_building_branch
             if (
                 item.month_building_branch is not None
                 and self.month_building_branch is not None
             ):
                 compare_present(item.month_building_branch, self.month_building_branch)
-            else:
-                pass
             if (
                 item.position is not None
                 and item.branch is not None
@@ -80,10 +76,6 @@ class JinkouQiEvidence(PartialOutput):
             ):
                 expected = month_building_check(item.position, item.branch, month)
                 compare_present(item.model_dump(exclude_unset=True), expected)
-            else:
-                pass
         if len(positions) != len(set(positions)):
             raise ValueError("神将建旺不可重复同一位置")
-        else:
-            pass
         return self

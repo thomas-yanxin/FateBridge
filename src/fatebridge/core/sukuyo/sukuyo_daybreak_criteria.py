@@ -31,21 +31,15 @@ def validate_reference(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("明相来源、引文层或未定控制改变，须重新核验")
-    else:
-        pass
 
 
 def _quantity(text: str, pattern: str) -> int:
     match = re.search(pattern, re.sub(r"[。，]", "", text))
     if match is None:
         raise ValueError("所选时分数值没有原文支持")
-    else:
-        pass
     values = {"五": 5, "六": 6, "五十": 50}
     if match[1] not in values:
         raise ValueError("所选原文数词尚未核定")
-    else:
-        pass
     return values[match[1]]
 
 
@@ -54,8 +48,6 @@ def daybreak_reference() -> dict[str, Any]:
     loaded = load_source(SOURCE)
     if loaded.sha256 != DATA_SHA256:
         raise ValueError("明相及校勘资料身份变化，须重新冻结来源")
-    else:
-        pass
     data = loaded.data["source_data"]
     validate_reference(data)
     sources = {row["id"]: row for row in data["sources"]}
@@ -69,8 +61,6 @@ def daybreak_reference() -> dict[str, Any]:
             "day_night_parts": parts,
         }:
             raise ValueError("时分控制与引用原字不一致")
-        else:
-            pass
         products[name] = per_part * parts
     divisor = gcd(products["X0744"], products["T2087"])
     return {

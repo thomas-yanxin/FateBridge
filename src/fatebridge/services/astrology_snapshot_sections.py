@@ -56,8 +56,6 @@ def _format_zodiac_degree(value: Any) -> str:
         degree = float(value) % 30.0
         if degree < 30 and round(degree, 2) == 30:
             return "29.99…°"
-        else:
-            pass
         return _format_degree(degree)
     except (TypeError, ValueError):
         return "—"
@@ -67,8 +65,6 @@ def _build_balance_line(balance: dict[str, Any], labels: dict[str, str]) -> str:
     ordered_keys = [key for key in labels if key in balance]
     if not ordered_keys:
         return "无"
-    else:
-        pass
     return "，".join(f"{labels[key]} {balance.get(key, 0)}" for key in ordered_keys)
 
 
@@ -105,20 +101,12 @@ def _build_planet_lines(planets: list[dict[str, Any]]) -> str:
             "fall",
         }:
             extras.append(f"{dignity['status_zh']}（{dignity['dignity']}）")
-        else:
-            pass
         if item.get("sector13") is not None:
             extras.append(f"13扇区 {item['sector13']}")
-        else:
-            pass
         if item.get("nakshatra"):
             extras.append(f"宿 {item['nakshatra']}")
-        else:
-            pass
         if item.get("su28"):
             extras.append(f"二十八宿 {item['su28']}")
-        else:
-            pass
         extras_text = f"，{'，'.join(extras)}" if extras else ""
         lines.append(
             f"{PLANET_LABELS_ZH.get(item['id'], item['id'])}："
@@ -132,8 +120,6 @@ def _build_planet_lines(planets: list[dict[str, Any]]) -> str:
 def _build_aspect_lines(aspects: list[dict[str, Any]]) -> str:
     if not aspects:
         return "无"
-    else:
-        pass
     return "\n".join(
         f"{PLANET_LABELS_ZH.get(item['planet_a'], item['planet_a'])}"
         f" 与 {PLANET_LABELS_ZH.get(item['planet_b'], item['planet_b'])}"
@@ -157,8 +143,6 @@ def _chart_calculation_notes(payload: dict[str, Any]) -> list[str]:
         note = qualification.get("note_zh")
         if note and note not in notes:
             notes.append(note)
-        else:
-            pass
     return notes
 
 
@@ -197,20 +181,14 @@ def _build_guolao_snapshot_sections(payload: dict[str, Any]) -> list[tuple[str, 
             )
             + "；不视为民用时区"
         )
-    else:
-        pass
     if profile["reference_geometry"]["houses_status"] != "available":
         setup_lines.append("天文参考宫头未分配，未替换为其他宫制。")
-    else:
-        pass
 
     life_lines = [
         f"命宫：{life['branch']}，宫主{life['palace_lord']}，生时{life['birth_hour_branch']}。",
     ]
     if life["longitude"] is None and life["mansion"] is None:
         life_lines.append("原典命度与命宿未定。")
-    else:
-        pass
 
     shensha_lines = [
         f"星期主星：{PLANET_LABELS_ZH.get(guolao.get('weekday_ruler', ''), guolao.get('weekday_ruler', '未知'))}",
@@ -229,8 +207,6 @@ def _build_guolao_snapshot_sections(payload: dict[str, Any]) -> list[tuple[str, 
         if monthly := timing.get("month_limit"):
             month_branch = monthly["branch"] or "未分配"
             limits.append(f"月限（{monthly['month_basis']}）：{month_branch}。")
-        else:
-            pass
         calendar_datetime = timing["calendar_datetime"]
         calendar_timezone = timing["calendar_timezone"]
         calendar_label = (
@@ -257,8 +233,6 @@ def _build_guolao_snapshot_sections(payload: dict[str, Any]) -> list[tuple[str, 
                 ),
             )
         )
-    else:
-        pass
 
     return [
         ("起盘信息", "\n".join(setup_lines).strip()),

@@ -243,8 +243,6 @@ class OrderedSihuaKey(str):
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, str):
             return NotImplemented
-        else:
-            pass
         return (
             SIHUA_DISPLAY_ORDER.get(str(self), 99),
             str(self),

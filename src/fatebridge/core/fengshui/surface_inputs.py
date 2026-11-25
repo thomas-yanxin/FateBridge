@@ -78,19 +78,13 @@ class SurfaceItem(_DeferredModel):
     def meaningful_evidence(self) -> "SurfaceItem":
         if not self.label.strip() or not self.evidence.strip():
             raise ValueError("物件名称与观察依据不能空白")
-        else:
-            pass
         if (self.zone is None) != (self.zone_observation_basis is None):
             raise ValueError("zone与zone_observation_basis必须成对，未知位置两者省略")
-        else:
-            pass
         if (
             self.healthy is not None
             and self.representation not in PLANT_REPRESENTATIONS
         ):
             raise ValueError("植物/鲜花/剪枝状态条件不能套到其他物件")
-        else:
-            pass
         return self
 
 
@@ -112,13 +106,9 @@ class SurfaceLayout(_DeferredModel):
     def surface_evidence(self) -> "SurfaceLayout":
         if not self.evidence.strip():
             raise ValueError("桌面边界与使用参考系需观察依据")
-        else:
-            pass
         ids = [item.object_id for item in self.items]
         if len(ids) != len(set(ids)):
             raise ValueError("同一桌面的物件 ID 不能重复")
-        else:
-            pass
         return self
 
 
@@ -141,8 +131,6 @@ class SurfaceConstraints(_DeferredModel):
     def separate_feasibility(self) -> "SurfaceConstraints":
         if not self.evidence.strip():
             raise ValueError("动作约束需用户依据")
-        else:
-            pass
         for values in (
             self.locked_item_ids,
             self.unavailable_zones,
@@ -150,10 +138,6 @@ class SurfaceConstraints(_DeferredModel):
         ):
             if len(values) != len(set(values)):
                 raise ValueError("动作约束不能重复")
-            else:
-                pass
         if set(self.unavailable_zones) & set(self.feasible_zones):
             raise ValueError("同一区域不能同时可行与不可用")
-        else:
-            pass
         return self

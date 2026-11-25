@@ -98,8 +98,6 @@ def ming_property_evidence(
             ):
                 if (kind, name) not in lookup:
                     continue
-                else:
-                    pass
                 located.add((kind, name))
                 occurrences.append(
                     dict(
@@ -127,8 +125,6 @@ def ming_property_evidence(
                     calculation_path=f"ziwei_birth.palaces.{i}.boshi12",
                 )
             )
-        else:
-            pass
     return {
         "method_id": source["id"],
         "version": source["version"],

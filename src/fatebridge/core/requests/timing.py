@@ -108,8 +108,6 @@ class DayunAnalysisRequest(BaziClockRequest):
                 "analysis_age年龄参考不能与analysis_*分析日期同时使用",
                 {"path": "analysis_age"},
             )
-        else:
-            pass
         return self
 
     selected_sections: list[str] = Field(

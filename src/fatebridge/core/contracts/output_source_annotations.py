@@ -86,8 +86,6 @@ class SourceNameCorrection(PartialOutput):
     def exact_boolean_facts(cls, value: object) -> object:
         if value is not None and type(value) is not bool:
             raise ValueError("姓名校读的布尔事实必须保留JSON布尔类型")
-        else:
-            pass
         return value
 
 
@@ -108,8 +106,6 @@ class SourceIdentityRevision(PartialOutput):
     def exact_integer_facts(cls, value: object) -> object:
         if value is not None and type(value) is not int:
             raise ValueError("来源校读的整数事实必须保留JSON整数类型")
-        else:
-            pass
         return value
 
     @field_validator("source_strength_label_assigned_or_regraded", mode="before")
@@ -117,8 +113,6 @@ class SourceIdentityRevision(PartialOutput):
     def exact_boolean_fact(cls, value: object) -> object:
         if value is not None and type(value) is not bool:
             raise ValueError("来源校读的布尔事实必须保留JSON布尔类型")
-        else:
-            pass
         return value
 
 
@@ -174,16 +168,12 @@ class RegisteredSourceRecord(PartialOutput):
             if self.reference_id is not None and review.review_id is not None:
 
                 validate_review_record(self.reference_id, review.review_id)
-            else:
-                pass
             if (
                 self.case_id is not None
                 and review.case_id is not None
                 and self.case_id != review.case_id
             ):
                 raise ValueError("原典条件不可接到另一来源记录")
-            else:
-                pass
             if (
                 self.pillars is not None
                 and review.pillars is not None
@@ -191,10 +181,6 @@ class RegisteredSourceRecord(PartialOutput):
                 and self.pillars != review.pillars
             ):
                 raise ValueError("来源记录与条件校读四柱不符")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -265,8 +251,6 @@ class SourceCurrentCalculation(PartialOutput):
             bind_assessment(
                 self.energy_provenance, self.assessment or {}, self.method_id
             )
-        else:
-            pass
         index = self.engineering_index
         if index is not None and (
             (
@@ -281,8 +265,6 @@ class SourceCurrentCalculation(PartialOutput):
             )
         ):
             raise ValueError("原典比较的工程档及方法须来自同次工程索引")
-        else:
-            pass
         return self
 
     @model_validator(mode="after")
@@ -291,15 +273,11 @@ class SourceCurrentCalculation(PartialOutput):
         method = self.method_id or assessment.get("method_id")
         if method is not None and method not in CURRENT_PUNISHMENT_METHODS:
             raise ValueError("只接收当前旺衰计算回执")
-        else:
-            pass
         if method in CURRENT_PUNISHMENT_METHODS:
             policy = assessment.get("punishment_resolution_policy")
             expected_policy = PUNISHMENT_POLICY
             if policy is not None and policy != expected_policy:
                 raise ValueError("解刑策略须忠于已声明的旺衰版本")
-            else:
-                pass
             relations = assessment.get("relations")
             if isinstance(relations, list):
                 raw_ledger = assessment.get("hidden_stem_ledger")
@@ -315,16 +293,8 @@ class SourceCurrentCalculation(PartialOutput):
                     ) in self.branch_combination_candidates.known_branches().items():
                         if p in branches and branches[p] != b:
                             raise ValueError("候选与同次物理根账本不能混用四支")
-                        else:
-                            pass
                         branches[p] = b
-                else:
-                    pass
                 validate_punishment_resolution(str(method), relations, branches)
-            else:
-                pass
-        else:
-            pass
         return self
 
     @model_validator(mode="after")
@@ -332,8 +302,6 @@ class SourceCurrentCalculation(PartialOutput):
         inventory = self.branch_combination_candidates
         if inventory is None:
             return self
-        else:
-            pass
         assessment = self.assessment or {}
         methods = [
             m
@@ -346,13 +314,9 @@ class SourceCurrentCalculation(PartialOutput):
         ]
         if methods and any(m != methods[0] for m in methods):
             raise ValueError("候选清单与旺衰计算不能混用不同方法")
-        else:
-            pass
         relations = assessment.get("relations")
         if isinstance(relations, list):
             validate_effect_links(inventory, relations)
-        else:
-            pass
         ledger = assessment.get("hidden_stem_ledger")
         if isinstance(ledger, list) and inventory.branches_by_position is not None:
             for row in ledger:
@@ -364,12 +328,6 @@ class SourceCurrentCalculation(PartialOutput):
                         and inventory.known_branches().get(str(pillar)) != branch
                     ):
                         raise ValueError("候选四支须忠于同次物理根账本")
-                    else:
-                        pass
-                else:
-                    pass
-        else:
-            pass
         return self
 
 

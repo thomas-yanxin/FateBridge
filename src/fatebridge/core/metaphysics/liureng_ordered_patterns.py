@@ -28,8 +28,6 @@ def ordered_transmission_patterns(branches: list[str]) -> dict[str, Any]:
         )
     ):
         raise ValueError("传序课体需要按初中末排列的三个有效地支")
-    else:
-        pass
     evaluations = [
         dict(
             id=key,

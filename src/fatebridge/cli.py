@@ -54,8 +54,6 @@ def _describe_spec(spec: ToolSpec, detail: str = "full") -> ServiceResult:
             descriptor["example_input"] = example
             descriptor["cli_example"] = _cli_example(spec, example)
             descriptor["example_note"] = "虚构演示资料；使用时替换为已确认的用户输入。"
-        else:
-            pass
     else:
         descriptor["cli_hint"] = _unsupported_hint(spec)
     return descriptor
@@ -66,14 +64,10 @@ def _cli_usage(spec: ToolSpec) -> str:
     parts = ["fatebridge", spec.tool_name]
     if spec.cli_request_file:
         return " ".join(parts + ["--request-file request.json"])
-    else:
-        pass
     for name, field in spec.request_model.model_fields.items():
         if field.is_required():
             flag = "--" + name.replace("_", "-")
             parts.append(f"{flag} <{_type_name(field.annotation)}>")
-        else:
-            pass
     return " ".join(parts)
 
 
@@ -97,8 +91,6 @@ def _print_tools(names: set[str] | None = None) -> None:
     for spec in CATALOG:
         if names is not None and spec.tool_name not in names:
             continue
-        else:
-            pass
         mark = "" if _cli_safe(spec) else "  (CLI 不支持: 含嵌套结构)"
         rows.append(f"  {spec.tool_name:<28} {spec.operation_label_zh}{mark}")
     print("可用工具命令：\n" + "\n".join(rows))
@@ -115,8 +107,6 @@ def _run_describe(tool_name: str | None, detail: str = "full") -> int:
             },
             2,
         )
-    else:
-        pass
     spec = resolve_spec(CATALOG, tool_name)
     if spec is None:
         return emit_error(
@@ -128,8 +118,6 @@ def _run_describe(tool_name: str | None, detail: str = "full") -> int:
             },
             2,
         )
-    else:
-        pass
     print(
         json.dumps(
             _describe_spec(spec, detail), ensure_ascii=False, indent=2, default=str
@@ -157,8 +145,6 @@ def run(argv: list[str] | None = None) -> int:
     relaxed = set(subject_data) if subject_data else set()
     if request_data is not None:
         relaxed.update(request_data)
-    else:
-        pass
     parser = build_parser(relaxed)
     try:
         args = parser.parse_args(argv)
@@ -169,8 +155,6 @@ def run(argv: list[str] | None = None) -> int:
     if not args.command:
         _print_tools()
         return 0
-    else:
-        pass
 
     if args.command == "result-read":
         try:
@@ -191,8 +175,6 @@ def run(argv: list[str] | None = None) -> int:
             return emit_error(exc.as_result(), 1)
         print(json.dumps(page, ensure_ascii=False, separators=(",", ":")))
         return 0
-    else:
-        pass
 
     if args.command in {"list", "discover"}:
         filters = {
@@ -211,13 +193,9 @@ def run(argv: list[str] | None = None) -> int:
         except ParameterError as exc:
             return emit_error(exc.as_result(), 1)
         return 0
-    else:
-        pass
 
     if args.command == "describe":
         return _run_describe(args.tool, args.detail)
-    else:
-        pass
 
     if args.command == "doctor":
         # note (startup): Ordinary tool calls do not need installation diagnostics.
@@ -229,20 +207,14 @@ def run(argv: list[str] | None = None) -> int:
         )
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0 if result["ok"] else 1
-    else:
-        pass
 
     if args.command == "profile":
         return run_profile(args, subject_data, execute_tool=execute_tool)
-    else:
-        pass
 
     spec: ToolSpec | None = getattr(args, "_spec", None)
     if spec is None:
         parser.error(f"未知工具: {args.command}")
         return 2
-    else:
-        pass
 
     if getattr(args, "_cli_unsupported", False):
         return emit_error(
@@ -254,8 +226,6 @@ def run(argv: list[str] | None = None) -> int:
             },
             2,
         )
-    else:
-        pass
 
     field_names = set(spec.request_model.model_fields)
     provided = {
@@ -271,14 +241,10 @@ def run(argv: list[str] | None = None) -> int:
             if k in field_names and k not in provided
         }
         provided = {**defaults, **provided}
-    else:
-        pass
 
     if request_data is not None and spec.cli_request_file:
         # note (validation): Model validation must see unknown request-file fields.
         provided = {**provided, **request_data, **explicit_fields}
-    else:
-        pass
 
     include_snapshot_text = args.include_snapshot_text
     try:
@@ -331,5 +297,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-else:
-    pass

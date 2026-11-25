@@ -65,16 +65,10 @@ def clock_components(
     inferred = [*COMPONENTS[:4]]
     if minute is not None:
         inferred.append("minute")
-    else:
-        pass
     if second is not None:
         inferred.append("second")
-    else:
-        pass
     if declared is None:
         return inferred
-    else:
-        pass
     if (
         type(declared) is not list
         or any(type(n) is not str or n not in COMPONENTS for n in declared)
@@ -85,8 +79,6 @@ def clock_components(
         or ("second" not in declared and second not in (None, 0))
     ):
         raise ValueError("钟时输入分量记录与实际计算参数冲突")
-    else:
-        pass
     return list(declared)
 
 
@@ -139,7 +131,3 @@ def apply_clock_input_notice(
         for key in ["comprehensive_judgement", "traditional_judgement"]:
             if interpretation.get(key):
                 interpretation[key] = receipt["statement"] + " " + interpretation[key]
-            else:
-                pass
-    else:
-        pass

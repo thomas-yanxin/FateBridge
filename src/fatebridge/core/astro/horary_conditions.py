@@ -151,8 +151,6 @@ def evaluate_lilly_conditions(
                         "Positive essential dignity at question instant; debility is a separate condition",
                     )
                 )
-            else:
-                pass
             if direct["aspect"] == "opposition":
                 mutual_house = "rulership" in principal["mutual_same_kind"]
                 conditions.append(
@@ -163,8 +161,6 @@ def evaluate_lilly_conditions(
                         "The p125 opposition case specifically calls for reciprocal houses, not one directional reception or arbitrary dignity",
                     )
                 )
-            else:
-                pass
             add(
                 "direct",
                 [querent, quesited],
@@ -172,30 +168,22 @@ def evaluate_lilly_conditions(
                 principal["directions"],
                 aspect=direct,
             )
-        else:
-            pass
 
         for third in LIGHT_WEIGHT_ORDER:
             if third in {querent, quesited}:
                 continue
-            else:
-                pass
             current = states[third]
             to_a, to_b = phase(current, states[querent]), phase(
                 current, states[quesited]
             )
             if not to_a or not to_b:
                 continue
-            else:
-                pass
             weights = [LIGHT_WEIGHT_ORDER.index(p) for p in (querent, quesited)]
             third_weight = LIGHT_WEIGHT_ORDER.index(third)
             velocities = [states[p]["speed"] for p in (querent, quesited)]
             speed = current["speed"]
             if speed is None or any(v is None for v in velocities):
                 continue
-            else:
-                pass
             separating = to_a["phase"] == "separating" and to_b["phase"] == "applying"
             reversed_separation = (
                 to_b["phase"] == "separating" and to_a["phase"] == "applying"
@@ -265,8 +253,6 @@ def evaluate_lilly_conditions(
                     carrier=third,
                     next_lunar_contact=event,
                 )
-            else:
-                pass
             if (
                 third_weight < min(weights)
                 and all(abs(speed) < abs(v) for v in velocities)
@@ -305,10 +291,6 @@ def evaluate_lilly_conditions(
                     collection_receipts,
                     collector=third,
                 )
-            else:
-                pass
-    else:
-        pass
     mutual = principal["mutual"]
     reading = (
         "依第112页互纳规则，当前双向接纳提供成事支持；这是该条传统规则的条件性解读，不是全书判断或现实结果认证。"

@@ -114,8 +114,6 @@ def _prepare_chart(
         natal_reference["calculation_basis"] = {
             "angle_definition": subject.calculation_basis["angle_definition"],
         }
-    else:
-        pass
     sect = determine_sect(subject)
     return birth_info, subject, natal_reference, sect
 
@@ -235,8 +233,6 @@ def calculate_planetary_ages(
             analysis_day=analysis_day,
         )
         current_age = calculate_age_years(birth_info, analysis_datetime)
-    else:
-        pass
     payload = build_planetary_ages_payload(
         natal_reference, current_age_years=current_age
     )
@@ -261,8 +257,6 @@ def calculate_planetary_ages(
     )
     if analysis_datetime is not None:
         context["analysis_datetime"] = analysis_datetime.isoformat()
-    else:
-        pass
     sections = [
         ("起盘信息", format_snapshot_json(context)),
         ("年龄段表", format_snapshot_json(payload["bands"])),
@@ -718,8 +712,6 @@ def _persian_directed_table(payload: dict[str, Any]) -> str:
     hits = payload.get("hits", [])
     if not hits:
         return "（本盘无波斯向运应期）"
-    else:
-        pass
     lines = [
         "黄经象征向运（1°/年）：日、月、水、金、火、木、土七曜各顺行 1°/年。"
         "表中列出向运星与固定的十颗本命星体及十二宫头形成相位的年龄和日期。",
@@ -796,8 +788,6 @@ def _age_point_table(payload: dict[str, Any]) -> str:
     points = payload.get("points", [])
     if not points:
         return "（本盘无年龄推进点数据）"
-    else:
-        pass
     contacts = payload.get("contacts", [])
     lines = [
         "年龄点自上升点起，沿 Koch 宫顺行，每宫 6 年、72 年回归上升；"
@@ -809,8 +799,6 @@ def _age_point_table(payload: dict[str, Any]) -> str:
             "关键岁数（合本命）："
             + "；".join(f"{c['age']}岁合{c['body_label']}" for c in contacts)
         )
-    else:
-        pass
     lines.append("")
     lines.append("| 年龄 | 落座 | 宫 | 合本命 |")
     lines.append("| --- | --- | --- | --- |")
@@ -958,8 +946,6 @@ def _body_declinations(utc: datetime | UTCCalendar) -> dict[str, float]:
         state = _swisseph_planet_state(body, julian_day_tt=times.jd_tt)
         if state is not None and state[0].get("declination") is not None:
             declinations[body] = float(state[0]["declination"])
-        else:
-            pass
     return declinations
 
 

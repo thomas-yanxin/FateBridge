@@ -149,10 +149,6 @@ def _source_disagreements(
                         ],
                     }
                 )
-            else:
-                pass
-        else:
-            pass
     if ju.startswith("阴遁三局") and hour == "壬辰":
         palace = next(p for p in board["palaces"] if p["trigram"] == "离")
         if palace["door"] != "杜门":
@@ -180,10 +176,6 @@ def _source_disagreements(
                     ],
                 }
             )
-        else:
-            pass
-    else:
-        pass
     if ju.startswith("阳遁五局") and hour == "壬申":
         geng = next(p for p in board["palaces"] if "庚" in p["heaven_stems"])
         if geng["trigram"] != "离":
@@ -206,10 +198,6 @@ def _source_disagreements(
                     "evidence_paths": ["qimen.palaces", "qimen.stem_context.day"],
                 }
             )
-        else:
-            pass
-    else:
-        pass
     return result
 
 
@@ -425,8 +413,6 @@ def enrich_qimen_evidence(
                 "evidence_paths": ["qimen.dun_type", "qimen.ju_number"],
             }
         )
-    else:
-        pass
     trace.append(
         {
             "rule_id": "chapter_profiles",
@@ -460,8 +446,6 @@ def enrich_qimen_evidence(
                 "note": "中宫保留地盘干；无独立八门八神，天禽与寄干在芮星宫列出。",
             }
             continue
-        else:
-            pass
         path = f"qimen.palaces.{index}"
         door = palace["door"]
         void = [
@@ -559,8 +543,6 @@ def enrich_qimen_evidence(
             )
             if name in {"大格", "小格"}:
                 patterns[-1]["source_scan_pages"] = [29]
-            else:
-                pass
 
         if door_pressure:
             match(
@@ -584,8 +566,6 @@ def enrich_qimen_evidence(
                 "overall_judgment": "requires_whole_board",
                 "outcome_inference_allowed": False,
             }
-        else:
-            pass
         for sky in palace["heaven_stems"]:
             if sky in evidence["wonder_tomb"]["selected_matched_stems"]:
                 match(
@@ -605,8 +585,6 @@ def enrich_qimen_evidence(
                     "overall_judgment": "requires_whole_board",
                     "outcome_inference_allowed": False,
                 }
-            else:
-                pass
             punishment = evidence["six_instrument_punishment"]
             if any(r["hidden_stem"] == sky for r in punishment["geometric_matches"]):
                 instrument = next(
@@ -638,8 +616,6 @@ def enrich_qimen_evidence(
                     "overall_judgment": "requires_whole_board",
                     "outcome_inference_allowed": False,
                 }
-            else:
-                pass
             for earth in palace["earth_stems"]:
                 if (sky, earth) in STEM_PATTERNS:
                     name, meaning = STEM_PATTERNS[(sky, earth)]
@@ -649,8 +625,6 @@ def enrich_qimen_evidence(
                         {"heaven_stem": sky, "earth_stem": earth},
                         meaning,
                     )
-                else:
-                    pass
     outer = [palace for palace in board["palaces"] if palace["trigram"] != "中"]
     hour_branch_tomb = build_hour_branch_tomb(board["time_ganzhi"], source=SOURCE)
     board["structure"] = {
@@ -691,8 +665,6 @@ def enrich_qimen_evidence(
             pattern["qualification"]["source_disagreements"] = list(
                 board["source_disagreements"]
             )
-        else:
-            pass
     day_hour_context, stem_patterns = build_stem_context(
         board, leader=leader, source=SOURCE
     )

@@ -81,8 +81,6 @@ def resolve_solar_context(anchor: datetime, zone: str) -> ResolvedSolarContext:
     local = localize_datetime(anchor, zone)
     if local.utcoffset() is None:
         raise ValueError("节气上下文需要带时区的真实时刻。")
-    else:
-        pass
     birth_utc = utc_calendar(local)
     at = birth_utc.julian_day_exact()
     environment = get_solar_term_environment_key(year=local.year)
@@ -104,8 +102,6 @@ def resolve_solar_context(anchor: datetime, zone: str) -> ResolvedSolarContext:
         raise NumerologySourceError("runtime_heluo_solar_context_conflict") from exc
     if get_solar_term_environment_key(year=local.year) != environment:
         raise NumerologySourceError("runtime_heluo_solar_context_conflict")
-    else:
-        pass
     return ResolvedSolarContext(
         selected[0][1], selected[1][1], selected[2][1], local.year, zone, birth_utc
     )
@@ -116,12 +112,8 @@ def _record_day(record: dict) -> Fraction:
     if "civil_point" in record:
         point = record["civil_point"]
         return Fraction(int(point["numerator"]), int(point["denominator"]))
-    else:
-        pass
     if record.get("comparison_policy") == COMPARISON_POLICY:
         raise ValueError("精确民用比较政策缺少已保留的主点。")
-    else:
-        pass
     return ZonedCalendar.from_isoformat(
         record["datetime_with_offset"]
     ).utc.julian_day_exact()
@@ -131,8 +123,6 @@ def bind_solar_context(solar: dict, calendar_context: dict, birth: datetime) -> 
     try:
         if birth.utcoffset() is None:
             raise ValueError("出生时刻必须带时区。")
-        else:
-            pass
         context = solar["boundary_context"]
         current, solstice, following = context["dependencies"]
         instant = utc_calendar(birth)
@@ -172,8 +162,6 @@ def bind_solar_context(solar: dict, calendar_context: dict, birth: datetime) -> 
             or solar["tuyong"] != (start <= at < end)
         ):
             raise ValueError("所用节气上下文、出生瞬间与分类结果不一致。")
-        else:
-            pass
     except (KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("runtime_heluo_solar_context_conflict") from exc
     context["calendar_context_match"] = True
@@ -196,8 +184,6 @@ def bind_seasonal_context(solar: dict, seasonal: dict) -> None:
             or rows[0]["start_source"] != solstice["record"]
         ):
             raise ValueError("二数时令与化工／阴阳令不是同一节气上下文。")
-        else:
-            pass
     except (KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("runtime_heluo_solar_context_conflict") from exc
 
@@ -285,8 +271,6 @@ def solar_term_huagong(prev_jieqi_name: str, tuyong: bool) -> dict[str, Any]:
     """据真实节气名 + 土用标志，返回 {hg,fh,quarter,tuyong} 化工/反化工候选。"""
     if type(tuyong) is not bool:
         raise ValueError("土用标志须为布尔值。")
-    else:
-        pass
     quarter = JIEQI_QUARTER.get(prev_jieqi_name)
     base = (
         QUARTER_HG.get(quarter, {"hg": "", "fh": ""})
@@ -300,8 +284,6 @@ def solar_term_huagong(prev_jieqi_name: str, tuyong: bool) -> dict[str, Any]:
     # Keep both literal conditions rather than assuming one opposite per quarter.
     if quarter == "震":
         fh.insert(0, "離")
-    else:
-        pass
     fanhua_rule_ids = {
         "坎": ["winter_to_summer_li"],
         "震": ["winter_to_summer_li", "spring_xun"],
@@ -312,8 +294,6 @@ def solar_term_huagong(prev_jieqi_name: str, tuyong: bool) -> dict[str, Any]:
         hg += ["坤", "艮"]
         fh += ["乾", "兌"]
         fanhua_rule_ids.append("seasonal_earth_qian_dui")
-    else:
-        pass
     return {
         "hg": hg,
         "fh": fh,
@@ -342,8 +322,6 @@ def solar_term(
     )
     if anchor.tzinfo is None or anchor.utcoffset() is None:
         raise ValueError("节气计算需要带时区的出生时刻。")
-    else:
-        pass
     context = resolve_solar_context(anchor, timezone_name)
     prev_name = context.current_term.name
     next_li = context.next_four_li.point

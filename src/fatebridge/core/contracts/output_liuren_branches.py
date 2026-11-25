@@ -43,8 +43,6 @@ class LiurenBranchPair(PartialOutput):
                 self.facts.model_dump(exclude_unset=True),
                 branch_pair_facts(self.left_branch, self.right_branch),
             )
-        else:
-            pass
         return self
 
 
@@ -79,23 +77,15 @@ class LiurenBranchRelations(PartialOutput):
     def ledger_matches_context(self) -> "LiurenBranchRelations":
         if self.rows is not None and len(self.rows) != 47:
             raise ValueError("六壬支位关系须保留47个比较对象")
-        else:
-            pass
         if self.calendar_branches is not None and self.day_ganzhi is not None:
             if (
                 self.calendar_branches.get("day", self.day_ganzhi[-1:])
                 != self.day_ganzhi[-1:]
             ):
                 raise ValueError("六壬支位关系日支与日干支不一致")
-            else:
-                pass
-        else:
-            pass
         value = self.model_dump(exclude_unset=True)
         if context_available(value):
             compare_present_branches(value, rebuild(value))
-        else:
-            pass
         return self
 
 
@@ -104,19 +94,13 @@ def compare_present_branches(actual: Any, expected: Any) -> None:
         for k, v in actual.items():
             if k in expected:
                 compare_present_branches(v, expected[k])
-            else:
-                pass
     elif isinstance(actual, list) and isinstance(expected, list):
         if len(actual) != len(expected):
             raise ValueError("六壬支位关系队列缺项或重复")
-        else:
-            pass
         for a, b in zip(actual, expected):
             compare_present_branches(a, b)
     elif actual != expected:
         raise ValueError("六壬支位关系与同次支位或并存关系不一致")
-    else:
-        pass
 
 
 def context_available(value: dict[str, Any]) -> bool:
@@ -163,8 +147,6 @@ def align_branch_relations(board: Any, pillars: Any = None) -> None:
     evidence = _get(board, "branch_relations")
     if evidence is None:
         return
-    else:
-        pass
     day = _get(evidence, "day_ganzhi")
     cal = _get(evidence, "calendar_branches") or {}
     if pillars is not None:
@@ -172,8 +154,6 @@ def align_branch_relations(board: Any, pillars: Any = None) -> None:
             actual = _get(_get(pillars, role), "branch")
             if actual is not None and role in cal and cal[role] != actual:
                 raise ValueError("六壬支位关系年月日时支与四柱不一致")
-            else:
-                pass
         stem = _get(_get(pillars, "day"), "stem")
         branch = _get(_get(pillars, "day"), "branch")
         if (
@@ -183,62 +163,40 @@ def align_branch_relations(board: Any, pillars: Any = None) -> None:
             and day != stem + branch
         ):
             raise ValueError("六壬支位关系占日与四柱不一致")
-        else:
-            pass
-    else:
-        pass
     general = _get(_get(board, "month_general"), "branch")
     own_general = _get(evidence, "month_general_branch")
     if general is not None and own_general is not None and own_general != general:
         raise ValueError("六壬支位关系月将与本课不一致")
-    else:
-        pass
     sky = _get(evidence, "sky_by_earth") or {}
     for row in _get(board, "twelve_board") or []:
         earth, upper = _get(row, "earth_branch"), _get(row, "sky_branch")
         if earth in sky and upper is not None and sky[earth] != upper:
             raise ValueError("六壬支位关系与同时返回的天地盘不一致")
-        else:
-            pass
     lessons = _get(evidence, "lesson_branches")
     if lessons is not None:
         actual_lessons = _get(board, "four_lessons")
         if actual_lessons is not None:
             if len(lessons) != len(actual_lessons):
                 raise ValueError("六壬支位关系四课队列不一致")
-            else:
-                pass
             for own, actual in zip(lessons, actual_lessons):
                 for k in ("index", "lower_branch", "upper_branch"):
                     a, b = _get(own, k), _get(actual, k)
                     if a is not None and b is not None and a != b:
                         raise ValueError("六壬支位关系与同时返回的四课不一致")
-                    else:
-                        pass
-        else:
-            pass
-    else:
-        pass
     transmissions = _get(evidence, "transmission_branches") or {}
     actual_transmissions = _get(board, "three_transmissions")
     for position, branch in transmissions.items():
         actual = _get(_get(actual_transmissions, position), "branch")
         if actual is not None and branch != actual:
             raise ValueError("六壬支位关系与同时返回的三传不一致")
-        else:
-            pass
 
 
 def require_complete_branch_relations(board: dict[str, Any]) -> None:
     evidence = board.get("branch_relations")
     if not isinstance(evidence, dict) or not context_available(evidence):
         raise ValueError("完整六壬输出缺少支位关系依据")
-    else:
-        pass
     if evidence != rebuild(evidence):
         raise ValueError("完整六壬支位关系依据缺项或不一致")
-    else:
-        pass
     align_branch_relations(board)
     traces = [
         r
@@ -261,5 +219,3 @@ def require_complete_branch_relations(board: dict[str, Any]) -> None:
     }
     if traces != [expected_trace]:
         raise ValueError("六壬支位关系轨迹与本次条件不一致")
-    else:
-        pass

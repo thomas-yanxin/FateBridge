@@ -67,14 +67,10 @@ def _profile() -> dict[str, Any]:
         or profile["version"] != "1.0.0"
     ):
         raise ValueError("Unknown selected Meihua topic profile")
-    else:
-        pass
     if len(profile["rules"]) != 20 or {
         (r["topic"], r["relation"]) for r in profile["rules"]
     } != {(t, r) for t in TOPICS for r in RELATIONS}:
         raise ValueError("Each selected topic must retain all five relation clauses")
-    else:
-        pass
     return profile
 
 
@@ -85,24 +81,14 @@ def topic_ruleset() -> dict[str, Any]:
 def _selected_profile(topic: str) -> dict[str, Any]:
     if topic == DINING_TOPIC:
         return dining_ruleset()
-    else:
-        pass
     if topic == MARRIAGE_TOPIC:
         return marriage_ruleset()
-    else:
-        pass
     if topic in HOUSEHOLD_TOPICS:
         return household_ruleset()
-    else:
-        pass
     if topic == TRAVELER_TOPIC:
         return traveler_ruleset()
-    else:
-        pass
     if topic == LOST_PROPERTY_TOPIC:
         return lost_property_ruleset()
-    else:
-        pass
     return journey_ruleset() if topic in JOURNEY_TOPICS else topic_ruleset()
 
 
@@ -154,8 +140,6 @@ def _clause(cast: dict[str, Any], topic: str, *, fact_prefix: str) -> dict[str, 
         result["chapter_qualifications"] = household_qualifications(
             cast, topic, fact_prefix=fact_prefix
         )
-    else:
-        pass
     return result
 
 
@@ -183,8 +167,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
         DINING_TOPIC,
     ):
         raise ValueError("Select one of the published Meihua topic chapters")
-    else:
-        pass
     selected = _clause(cast, topic, fact_prefix="meihua")
     stages = meihua_stage_relations(cast)
     seasonal = cast.get("seasonal_strength")
@@ -206,8 +188,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
             fact_prefix="meihua",
             interpretation_prefix="interpretation",
         )
-    else:
-        pass
     if topic == MARRIAGE_TOPIC:
         selected["chapter_qualifications"] = marriage_qualifications(
             cast,
@@ -216,8 +196,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
             fact_prefix="meihua",
             strength_prefix="meihua.seasonal_strength",
         )
-    else:
-        pass
     if topic == "travel":
         selected["chapter_qualifications"] = travel_qualifications(
             cast,
@@ -227,14 +205,10 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
             strength_prefix="meihua.seasonal_strength",
             interpretation_prefix="interpretation",
         )
-    else:
-        pass
     if topic == LOST_PROPERTY_TOPIC:
         selected["chapter_qualifications"] = lost_property_qualifications(
             cast, stages, fact_prefix="meihua"
         )
-    else:
-        pass
     if topic == TRAVELER_TOPIC:
         selected["chapter_qualifications"] = traveler_qualifications(
             cast,
@@ -243,8 +217,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
             fact_prefix="meihua",
             strength_prefix="meihua.seasonal_strength",
         )
-    else:
-        pass
     wealth = (
         build_wealth_components(stages, seasonal, control)
         if topic == "wealth"
@@ -264,8 +236,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
                 fact_prefix=f"meihua.counting_variants.{index}",
                 interpretation_prefix=f"interpretation.casting_readings.{index}",
             )
-        else:
-            pass
         if topic == MARRIAGE_TOPIC:
             row["topic_clause"]["chapter_qualifications"] = marriage_qualifications(
                 cast["counting_variants"][index],
@@ -274,8 +244,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
                 fact_prefix=f"meihua.counting_variants.{index}",
                 strength_prefix=f"interpretation.casting_readings.{index}.seasonal_strength",
             )
-        else:
-            pass
         if topic == "travel":
             row["topic_clause"]["chapter_qualifications"] = travel_qualifications(
                 cast["counting_variants"][index],
@@ -285,8 +253,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
                 strength_prefix=f"interpretation.casting_readings.{index}.seasonal_strength",
                 interpretation_prefix=f"interpretation.casting_readings.{index}",
             )
-        else:
-            pass
         if topic == "wealth":
             row["wealth_components"] = build_wealth_components(
                 row["stage_relations"],
@@ -295,8 +261,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
                 fact_prefix=f"meihua.counting_variants.{index}",
                 interpretation_prefix=f"interpretation.casting_readings.{index}",
             )
-        else:
-            pass
         if topic == LOST_PROPERTY_TOPIC:
             row["topic_clause"]["chapter_qualifications"] = (
                 lost_property_qualifications(
@@ -305,8 +269,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
                     fact_prefix=f"meihua.counting_variants.{index}",
                 )
             )
-        else:
-            pass
         if topic == TRAVELER_TOPIC:
             row["topic_clause"]["chapter_qualifications"] = traveler_qualifications(
                 cast["counting_variants"][index],
@@ -315,8 +277,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
                 fact_prefix=f"meihua.counting_variants.{index}",
                 strength_prefix=f"interpretation.casting_readings.{index}.seasonal_strength",
             )
-        else:
-            pass
     for row in alternatives["casting_readings"]:
         # The explicitly chosen chapter owns this candidate's initial judgement.
         # General-stage context remains available in its separate source fields.
@@ -345,16 +305,12 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
             single_real_location=None,
             location_candidates_used_as_outcome_votes=False,
         )
-    else:
-        pass
     reference = classical_hexagram(cast["base_hexagram"]["binary_code"])
     line = cast["seed"]["moving_line"]
     verse = next(v for v in reference["yaoci"] if v["position"] == line)
     summary = _summary(selected) + control["summary"] + strength_reading["summary"]
     if wealth is not None:
         summary += wealth["summary"]
-    else:
-        pass
     if clauses:
         summary += " 各取数候选另列：" + "".join(
             ("原数口径" if row["line_sum_basis"] == "raw_counts" else "卦序数口径")
@@ -366,8 +322,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
             + (row["wealth_components"]["summary"] if topic == "wealth" else "")
             for row in alternatives["casting_readings"]
         )
-    else:
-        pass
     summary += (
         " 以上为所选版本的初始体用条款及已列求财补充依据；互变与旺衰另列，尚未综合为现实成败、收益概率或具体应期。"
         if wealth is not None

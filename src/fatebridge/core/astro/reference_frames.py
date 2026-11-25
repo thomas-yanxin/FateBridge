@@ -57,8 +57,6 @@ _COEFFICIENT_BYTES = (
 ).read_bytes()
 if hashlib.sha256(_COEFFICIENT_BYTES).hexdigest() != COEFFICIENT_SHA256:
     raise RuntimeError("Reference frame coefficients differ from the declared source")
-else:
-    pass
 DATA: ReferenceFrameParameters = json.loads(_COEFFICIENT_BYTES)
 AS2R = math.pi / 648000.0
 
@@ -99,8 +97,6 @@ def rotate_spherical(
     longitude_degrees = math.degrees(math.atan2(y, x)) % 360
     if longitude_degrees == 360:
         longitude_degrees = math.nextafter(360.0, 0.0)
-    else:
-        pass
     return (
         longitude_degrees,
         math.degrees(math.atan2(z, math.hypot(x, y))),
@@ -213,8 +209,6 @@ def _polynomial(t: float, coefficients: Sequence[float]) -> float:
 def precession_angles(date1: float, date2: float = 0.0) -> Tuple[float, ...]:
     if not math.isfinite(date1) or not math.isfinite(date2):
         raise ValueError("Frame epoch must be finite")
-    else:
-        pass
     # Reduce the two-part epoch before rounding the century argument once.
     t = float((Fraction(date1) - 2451545 + Fraction(date2)) / 36525)
     return tuple(
@@ -256,8 +250,6 @@ def rotate(
     co, si = math.cos(angle), math.sin(angle)
     if axis == "x":
         return x, co * y + si * z, -si * y + co * z
-    else:
-        pass
     return co * x + si * y, -si * x + co * y, z
 
 
@@ -298,8 +290,6 @@ def native_equatorial_frame(
         for x in (mean_obliquity, nutation_longitude, nutation_obliquity)
     ):
         raise ValueError("Native frame inputs must be finite")
-    else:
-        pass
     precessed = native_precession_frame(tt)
     nutated: Matrix = tuple(
         tuple(float(value) for value in row)
@@ -365,8 +355,6 @@ def equatorial_reduction(
     """
     if not math.isfinite(true_obliquity):
         raise ValueError("Native true obliquity must be finite")
-    else:
-        pass
     native = native_equatorial_frame(
         tt, mean_obliquity, nutation_longitude, nutation_obliquity
     )

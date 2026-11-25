@@ -100,8 +100,6 @@ class JointSnapshotCache:
         key = self.key(chart)
         if key in self.snapshots:
             return self.snapshots[key]
-        else:
-            pass
         projected = _activation_projection(chart)
         gate_key = tuple(
             sorted({row["gate"] for side in SIDES for row in projected[side]})
@@ -109,12 +107,8 @@ class JointSnapshotCache:
         line_key = tuple(row[:4] for row in key)
         if gate_key not in self.bridges:
             self.bridges[gate_key] = definition_bridging(chart["bodygraph"])
-        else:
-            pass
         if line_key not in self.depth:
             self.depth[line_key] = depth_evidence(chart)
-        else:
-            pass
         variables = _variables(projected)
         result: dict[str, Any] = {
             "projection_format": "gate_line_tone_personality_color_v2",
@@ -257,8 +251,6 @@ def joint_evidence_summary(
                 "removed_gate_set_count": len(removed),
                 "preview_is_truncated": len(added) > 3 or len(removed) > 3,
             }
-        else:
-            pass
     return {
         "status": "sampled_joint_evidence_compared",
         "distinct_joint_projection_count": len(variants),

@@ -237,23 +237,15 @@ def positions(
     require_recorded_instant(birth)
     if node_mode not in {"mean", "true"}:
         raise ValueError("node_mode 必须为 mean 或 true。")
-    else:
-        pass
     if ephemeris_policy not in {"auto", "require_data_files"}:
         raise ValueError("ephemeris_policy 必须为 auto 或 require_data_files。")
-    else:
-        pass
     require_clock_policy(birth, ephemeris_policy)
     if cheshta_model not in MOTION_MODELS:
         raise ValueError("不支持的五星运动力模型。")
-    else:
-        pass
     if runtime.swe is None:
         raise ValueError(
             "印占核心需要可用的 Swiss Ephemeris；不以近似轨道生成分盘或达沙。"
         )
-    else:
-        pass
     swe = runtime.swe
     instant = (
         moment.utc_datetime
@@ -262,8 +254,6 @@ def positions(
     )
     if instant is not None and instant.utcoffset() is None:
         raise ValueError("印占计算时刻必须带时区。")
-    else:
-        pass
     models = set()
     values: Dict[str, float] = {}
     equatorial: Dict[str, Dict[str, Any]] = {}
@@ -288,16 +278,12 @@ def positions(
         tt, jd = times.tt, times.ut1
         if tt is None:
             raise ValueError("印占不以缺失的 TT 时间尺度计算星位。")
-        else:
-            pass
         jd_tt = tt.as_float()
         source_session = current_source_session()
         if source_session is None:
             raise RuntimeError(
                 "India coordinate interpretation requires a source session"
             )
-        else:
-            pass
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0.0, 0.0)
         flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL | swe.FLG_SPEED
         attitude = earth_attitude(swe, jd, julian_day_tt=tt)
@@ -306,8 +292,6 @@ def positions(
         )
         if ayan < 0:
             raise ValueError("Swiss Ephemeris 无法计算 Lahiri 岁差。")
-        else:
-            pass
         for planet in GRAHAS[:-1]:
             planet_id = (
                 (swe.MEAN_NODE if node_mode == "mean" else swe.TRUE_NODE)
@@ -318,12 +302,8 @@ def positions(
             context = coordinate_context_evidence()
             if planet != "Rahu" and context is not None:
                 coordinate_contexts[f"ecliptic_{planet}"] = context
-            else:
-                pass
             if flag < 0 or not all(math.isfinite(coords[i]) for i in (0, 1, 3)):
                 raise ValueError(f"Swiss Ephemeris 无法计算 {planet}。")
-            else:
-                pass
             model = runtime.ephemeris_model_from_retflag(flag)
             if planet != "Rahu":
                 models.add(model)
@@ -332,8 +312,6 @@ def positions(
             body_models[planet] = native_factor_model(planet_id, flag)
             if planet != "Rahu":
                 observe_physical(f"ecliptic_{planet}", model)
-            else:
-                pass
             if (
                 ephemeris_policy == "require_data_files"
                 and planet != "Rahu"
@@ -342,8 +320,6 @@ def positions(
                 raise ValueError(
                     f"{planet} 实际使用 {model}；require_data_files 禁止星历降级，请配置覆盖目标日期的数据文件。"
                 )
-            else:
-                pass
             values[planet] = float(coords[0]) % 360.0
             continuous = (
                 continuous_state_evidence(
@@ -394,8 +370,6 @@ def positions(
                             ),
                         )
                     )
-                else:
-                    pass
             states[planet] = (
                 float(coords[1]),
                 motion[planet]["longitude_speed_degrees_per_day"],
@@ -407,12 +381,8 @@ def positions(
                 context = coordinate_context_evidence()
                 if context is not None:
                     coordinate_contexts[f"equatorial_{planet}"] = context
-                else:
-                    pass
                 if eq_flag < 0 or not all(math.isfinite(eq[i]) for i in (0, 1)):
                     raise ValueError(f"Swiss Ephemeris 无法计算 {planet} 赤道坐标。")
-                else:
-                    pass
                 eq_model = runtime.ephemeris_model_from_retflag(eq_flag)
                 observe_physical(f"equatorial_{planet}", eq_model)
                 if ephemeris_policy == "require_data_files" and eq_model not in {
@@ -422,8 +392,6 @@ def positions(
                     raise ValueError(
                         f"{planet} 赤道坐标实际使用 {eq_model}；require_data_files 禁止星历降级。"
                     )
-                else:
-                    pass
                 models.add(eq_model)
                 right_ascension, declination = rotate_spherical(
                     attitude.reduction.native_to_target, float(eq[0]), float(eq[1])
@@ -433,8 +401,6 @@ def positions(
                     "declination": declination,
                     "ephemeris_model": eq_model,
                 }
-            else:
-                pass
         _, angles = runtime.ephemeris_call(
             "houses_ex",
             jd,
@@ -494,15 +460,11 @@ def positions(
                     ),
                     coordinate_backends=known_backends[p],
                 )
-            else:
-                pass
         if (
             configured_ephemeris_path() != selected_path
             or configured_jpl_file() != selected_jpl
         ):
             raise EphemerisSourceError("physical_configuration_changed")
-        else:
-            pass
     values["Ketu"] = combine_longitudes(values["Rahu"], 180.0)
     states["Ketu"] = (-states["Rahu"][0], states["Rahu"][1])
     motion["Ketu"] = node_motion(
@@ -534,10 +496,6 @@ def positions(
                 "historical_utc_source": source["source_url"],
                 "historical_utc_source_sha256": source["source_sha256"],
             }
-        else:
-            pass
-    else:
-        pass
     return {
         "longitudes": values,
         "native_execution_context": context_evidence(),
@@ -644,8 +602,6 @@ def partition_longitudes(raw: Dict[str, Any]) -> Dict[str, float | Fraction]:
         == "derived_antipode_of_Rahu"
     ):
         return {**longitudes, "Ketu": (Fraction(longitudes["Rahu"]) + 180) % 360}
-    else:
-        pass
     return longitudes
 
 
@@ -677,20 +633,12 @@ def divisional_chart(
             )
             if interpretation is not None:
                 planet["native_position_interpretation"] = interpretation
-            else:
-                pass
             if planet["id"] in raw.get("physical_states", {}):
                 planet["physical_state"] = raw["physical_states"][planet["id"]]
-            else:
-                pass
             if planet["id"] in EXALTATION:
                 planet["dispositor_relationship"] = relationship(
                     planet["id"], LORDS[signs[planet["id"]]], signs
                 )
-            else:
-                pass
-    else:
-        pass
     houses = []
     for house in range(1, 13):
         sign = (asc_sign + house - 1) % 12
@@ -710,8 +658,6 @@ def divisional_chart(
     for planet in planets:
         if planet["id"] in {"Rahu", "Ketu"}:
             continue  # Node aspect doctrines differ; this ruleset assigns none.
-        else:
-            pass
         for distance in ASPECT_OFFSETS.get(planet["id"], [7]):
             target = (planet["house"] + distance - 2) % 12 + 1
             aspects.append(
@@ -974,8 +920,6 @@ def topic_evidence(
 ) -> Dict[str, Any]:
     if "D1" in charts and additional_balas is not None:
         verify_drik_evidence(additional_balas["drik_bala"], charts["D1"])
-    else:
-        pass
     topics = {}
     for topic, scopes in [
         ("personality", [("D1", 1)]),
@@ -1019,8 +963,6 @@ def topic_evidence(
                             name, charts[name], house, ashtakavarga
                         )
                     )
-                else:
-                    pass
                 state = placed.get("physical_state")
                 if name == "D1" and sthana is not None:
                     values = sthana["summary"][fact["lord"]]
@@ -1038,8 +980,6 @@ def topic_evidence(
                             ],
                         }
                     )
-                else:
-                    pass
                 if name == "D1" and additional_balas is not None:
                     for key, rule_id in [
                         ("dig_bala", "jyotish.dig_bala.v1"),
@@ -1058,14 +998,10 @@ def topic_evidence(
                         )
                         if provenance is not None:
                             rule_id = provenance["rule_id"]
-                        else:
-                            pass
                         value = component["summary"][fact["lord"]]
                         context = strength_context(key, fact["lord"], component)
                         if provenance is not None:
                             context["method_context"] = provenance["method_context"]
-                        else:
-                            pass
                         factors.append(
                             {
                                 "chart": name,
@@ -1095,8 +1031,6 @@ def topic_evidence(
                                 ),
                             }
                         )
-                else:
-                    pass
                 if "dispositor_relationship" in placed:
                     factors.append(
                         {
@@ -1108,8 +1042,6 @@ def topic_evidence(
                             "source_section": "II.16-18, pp.21-22",
                         }
                     )
-                else:
-                    pass
                 if state is not None:
                     point_path = f"india.charts.{name}.planets.{charts[name]['planets'].index(placed)}.physical_state"
                     condition = state["degree_condition"]
@@ -1144,10 +1076,6 @@ def topic_evidence(
                                 "source_section": "7.28-29 translator commentary, printed p.100 / PDF p.99",
                             }
                         )
-                    else:
-                        pass
-                else:
-                    pass
                 influences = [
                     a
                     for a in charts[name]["graha_aspects"]
@@ -1162,8 +1090,6 @@ def topic_evidence(
                         "source_section": "10.2 Graha Drishti",
                     }
                 )
-            else:
-                pass
         topics[topic] = {
             "engine_facts": facts,
             "factors": factors,
@@ -1200,15 +1126,11 @@ def build_india(
         raise ValueError(
             "divisions 仅接受不重复的十六分盘（2、3、4、7、9、10、12、16、20、24、27、30、40、45、60）；D1 始终计算。"
         )
-    else:
-        pass
     if (
         birth_time_uncertainty_minutes is not None
         and not 0 <= birth_time_uncertainty_minutes <= 120
     ):
         raise ValueError("出生时间不确定范围须在 0–120 分钟内。")
-    else:
-        pass
     birth, display_context = normalize_solar_display(birth, ephemeris_policy)
     raw = positions(
         birth,
@@ -1285,8 +1207,6 @@ def build_india(
             sensitivity["scope"] = (
                 "Recorded solar-wall endpoints on the physical TT axis; coordinates and ruleset held fixed"
             )
-        else:
-            pass
         seen: Dict[str, Dict[str, set]] = {
             name: {p: set() for p in ["Ascendant", *GRAHAS]} for name in charts
         }
@@ -1356,12 +1276,8 @@ def build_india(
             endpoint_subset = index in {0, grid.nominal_index, last_index}
             if _dasha_grid is not None:
                 _dasha_grid.observe(offset, recorded, sample, endpoint_subset)
-            else:
-                pass
             if _sample_observer is not None:
                 _sample_observer(offset, sample)
-            else:
-                pass
             ashtakavarga_grid.observe(offset, sample)
             sample_longitudes = (
                 nominal_longitudes if at_nominal_epoch else partition_longitudes(sample)
@@ -1416,8 +1332,6 @@ def build_india(
                         dig=sample_directional,
                     )
                 )
-            else:
-                pass
             solar_state = sampled_balas["kala_bala"]["solar_context"]
             bracket_state = (
                 solar_state["sunrise_day_status"],
@@ -1454,8 +1368,6 @@ def build_india(
                     for p, value in values.items():
                         if value is not None:
                             bucket[p].append(value)
-                        else:
-                            pass
             for key in time_lord_samples:
                 time_lord_samples[key].add(
                     sampled_balas["kala_bala"]["components"][key]["ruler"]
@@ -1488,8 +1400,6 @@ def build_india(
                         "utc_is_leap_second": recorded.epoch.utc_is_leap_second,
                     }
                 )
-            else:
-                pass
         alternatives = {
             name: {
                 p: [{"sign": SIGNS[s], "house": h} for s, h in sorted(values)]
@@ -1649,8 +1559,6 @@ def build_india(
                 "moon_samples": moon_samples,
             }
         )
-    else:
-        pass
     panchanga = compute_panchanga(
         nominal_longitudes["Sun"],
         nominal_longitudes["Moon"],

@@ -76,8 +76,6 @@ def five_jia_context(
         raise ValueError(
             "五假须读取实际外八宫、天盘主寄干、门和所选八神；不猜六合身份或补缺项"
         )
-    else:
-        pass
     matches = []
     for rule, name, wanted_door, stems, wanted_god in DEFINITIONS:
         eligible = [s for s in heaven_stems if s in stems]
@@ -94,8 +92,6 @@ def five_jia_context(
                     ],
                 }
             )
-        else:
-            pass
     auxiliary = (
         f"du_ding_ji_gui_{'liuhe' if god == '六合' else 'taiyin'}_unnamed"
         if door == "杜门"
@@ -135,8 +131,6 @@ def build_five_jia(
     for index, palace in enumerate(board["palaces"]):
         if palace["trigram"] == "中":
             continue
-        else:
-            pass
         context = five_jia_context(
             palace["trigram"], palace["heaven_stems"], palace["door"], palace["god"]
         )

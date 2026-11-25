@@ -46,8 +46,6 @@ def validate_cycle_reference(
                 {**arguments, "cycle_reference_datetime": cycle_reference_datetime},
             )
             return
-        else:
-            pass
         from fatebridge.core.human_design.human_design_cycles import reference_epoch
 
         clock = resolve_birth_clock(**arguments)
@@ -63,5 +61,3 @@ def validate_cycle_reference(
             == "before"
         ):
             raise ValueError("周期评估时刻不能早于出生瞬间")
-        else:
-            pass

@@ -146,26 +146,16 @@ def _decode_trigrams(code: str) -> tuple[str, str]:
 def _liuqin_against_palace(palace_element: str, line_element: str) -> str:
     if palace_element == line_element:
         return "兄弟"
-    else:
-        pass
     generates = {"金": "水", "水": "木", "木": "火", "火": "土", "土": "金"}
     controls = {"金": "木", "木": "土", "土": "水", "水": "火", "火": "金"}
     if generates.get(line_element) == palace_element:
         return "父母"  # 生宫者
-    else:
-        pass
     if generates.get(palace_element) == line_element:
         return "子孙"  # 宫所生
-    else:
-        pass
     if controls.get(line_element) == palace_element:
         return "官鬼"  # 克宫者
-    else:
-        pass
     if controls.get(palace_element) == line_element:
         return "妻财"  # 宫所克
-    else:
-        pass
     return "平"
 
 
@@ -222,8 +212,6 @@ def build_sixyao_enrichment(
             shi_ying = "世"
         elif position_num == ying_line:
             shi_ying = "应"
-        else:
-            pass
         liushen = _LIUSHEN_CYCLE[(offset + i) % 6]
         enriched_lines.append(
             {

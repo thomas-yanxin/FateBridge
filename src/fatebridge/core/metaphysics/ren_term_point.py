@@ -29,13 +29,9 @@ def _bad() -> ValueError:
 def _finite_number(number: object) -> float:
     if type(number) is not int and type(number) is not float:
         raise _bad()
-    else:
-        pass
     try:
         if not math.isfinite(number):
             raise _bad()
-        else:
-            pass
         return float(number)
     except OverflowError as error:
         raise _bad() from error
@@ -44,8 +40,6 @@ def _finite_number(number: object) -> float:
 def _numerical_pair(pair: object) -> tuple[float, float]:
     if not isinstance(pair, (list, tuple)) or len(pair) != 2:
         raise _bad()
-    else:
-        pass
     return _finite_number(pair[0]), _finite_number(pair[1])
 
 
@@ -66,31 +60,21 @@ def validate_term_point(
     """
     if details is None and not complete:
         return
-    else:
-        pass
     if not isinstance(details, dict) or (complete and not _REQUIRED <= details.keys()):
         raise _bad()
-    else:
-        pass
     representation = details.get("numerical_epoch_representation")
     if "numerical_epoch_representation" in details and representation not in (
         _SCALAR,
         _PARTS,
     ):
         raise _bad()
-    else:
-        pass
     if "root_time_scale" in details and details["root_time_scale"] != "TT":
         raise _bad()
-    else:
-        pass
     if (
         "numerical_resolution_is_physical_accuracy" in details
         and details["numerical_resolution_is_physical_accuracy"] is not False
     ):
         raise _bad()
-    else:
-        pass
     scope = (
         {
             _SCALAR: "exact_value_of_selected_ieee_float",
@@ -101,8 +85,6 @@ def validate_term_point(
     )
     if scope and "scalar_jd_scope" in details and details["scalar_jd_scope"] != scope:
         raise _bad()
-    else:
-        pass
 
     scalar = (
         _finite_number(details["selected_crossing_jd_tt"])
@@ -114,10 +96,6 @@ def validate_term_point(
         display_bracket = _numerical_pair(details["root_bracket_tt"])
         if display_bracket[0] > display_bracket[1]:
             raise _bad()
-        else:
-            pass
-    else:
-        pass
     point = None
     bracket = None
     if representation == _SCALAR:
@@ -126,16 +104,10 @@ def validate_term_point(
             or "root_bracket_tt_parts" in details
         ):
             raise _bad()
-        else:
-            pass
         if scalar is not None:
             point = TTInstant.from_float(scalar)
-        else:
-            pass
         if display_bracket is not None:
             bracket = tuple(TTInstant.from_float(x) for x in display_bracket)
-        else:
-            pass
     elif representation == _PARTS:
         if (
             complete
@@ -143,22 +115,14 @@ def validate_term_point(
             <= details.keys()
         ):
             raise _bad()
-        else:
-            pass
         if "selected_crossing_tt_parts" in details:
             point = _tt_instant_from_parts(details["selected_crossing_tt_parts"])
             if scalar is not None and scalar != point.as_float():
                 raise _bad()
-            else:
-                pass
-        else:
-            pass
         if "root_bracket_tt_parts" in details:
             bracket_parts = details["root_bracket_tt_parts"]
             if not isinstance(bracket_parts, (list, tuple)) or len(bracket_parts) != 2:
                 raise _bad()
-            else:
-                pass
             bracket = (
                 _tt_instant_from_parts(bracket_parts[0]),
                 _tt_instant_from_parts(bracket_parts[1]),
@@ -167,47 +131,27 @@ def validate_term_point(
                 x.as_float() for x in bracket
             ):
                 raise _bad()
-            else:
-                pass
-        else:
-            pass
-    else:
-        pass
 
     width = None
     if "root_bracket_seconds" in details:
         width = _finite_number(details["root_bracket_seconds"])
         if width < 0:
             raise _bad()
-        else:
-            pass
-    else:
-        pass
     if bracket is not None:
         low, high = bracket
         if low.days > high.days or (
             point is not None and not low.days <= point.days <= high.days
         ):
             raise _bad()
-        else:
-            pass
         # Compare the width of the exact input doubles, never rounded large-JD
         # display sums. This is a numerical identity, not an accuracy tolerance.
         if width is not None and width != float((high.days - low.days) * 86400):
             raise _bad()
-        else:
-            pass
-    else:
-        pass
     if complete and (point is None or bracket is None or moment is None):
         raise _bad()
-    else:
-        pass
     if point is not None and moment is not None:
         if isinstance(moment, datetime) and moment.utcoffset() is None:
             raise _bad()
-        else:
-            pass
         actual = (
             moment.utc if isinstance(moment, ZonedCalendar) else utc_calendar(moment)
         )
@@ -216,7 +160,3 @@ def validate_term_point(
         expected = utc_calendar_from_tt(point)
         if actual != expected:
             raise _bad()
-        else:
-            pass
-    else:
-        pass

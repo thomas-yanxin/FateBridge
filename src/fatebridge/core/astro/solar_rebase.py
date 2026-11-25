@@ -27,8 +27,6 @@ def rebase_solar_datetime(recorded: datetime, correction_minutes: float) -> date
     offset = recorded.utcoffset()
     if offset is None:
         raise ValueError("Solar rebasing requires a confirmed aware record")
-    else:
-        pass
     return recorded.replace(tzinfo=timezone(offset), fold=0) + timedelta(
         minutes=correction_minutes
     )
@@ -43,8 +41,6 @@ def solar_rebase_correction(
         raise ModuleNotFoundError(
             "Western solar-clock rebasing requires a native clock"
         )
-    else:
-        pass
     # time_equ(UT1) internally chooses calc_ut's TT and native sidereal time.
     # Use the already resolved TT and the chart's adopted GAST instead, as in
     # the existing explicit LAT/LMT clock path. The source session also covers

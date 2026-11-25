@@ -28,8 +28,6 @@ def _fact_hash(data: dict[str, Any]) -> str:
     # Version/scope annotations may change; source facts and review status may not.
     if not isinstance(data, dict):
         raise ValueError("卦月校勘根对象必须为字典。")
-    else:
-        pass
     facts = {k: v for k, v in data.items() if k not in {"version", "scope"}}
     return sha256(
         json.dumps(
@@ -45,8 +43,6 @@ def _front_table() -> dict[str, Any]:
         data: dict[str, Any] = json.loads(raw)
         if _fact_hash(data) != FRONT_FACT_SHA256:
             raise ValueError("卷首月表事实与封存校勘不一致。")
-        else:
-            pass
         data["loaded_sha256"] = sha256(raw).hexdigest()
         return data
     except (OSError, KeyError, TypeError, ValueError) as exc:
@@ -58,8 +54,6 @@ def _load_collation() -> dict[str, Any]:
     data: dict[str, Any] = json.loads(raw)
     if _fact_hash(data) != INTRO_FACT_SHA256:
         raise ValueError("卦条月份事实与封存校勘不一致。")
-    else:
-        pass
     assigned = data["assigned_months"]
     windows = data["windows"]
     clauses = data["natal_najia_clauses"]
@@ -101,8 +95,6 @@ def _load_collation() -> dict[str, Any]:
         )
     ):
         raise ValueError("河洛卦月校勘索引重复或月份无效。")
-    else:
-        pass
     data["loaded_sha256"] = sha256(raw).hexdigest()
     return data
 
@@ -145,8 +137,6 @@ def _window(source: dict[str, Any], month: int) -> dict[str, Any]:
     }
     if source.get("natal_najia_clause_id"):
         result["natal_najia_clause_id"] = source["natal_najia_clause_id"]
-    else:
-        pass
     for key in (
         "first_month_number",
         "last_month_number",
@@ -155,8 +145,6 @@ def _window(source: dict[str, Any], month: int) -> dict[str, Any]:
     ):
         if key in source:
             result[key] = source[key]
-        else:
-            pass
     return result
 
 
@@ -166,12 +154,8 @@ def _najia_index(
     """Reuse actual six-line results, validating phase/year and their match list."""
     if assessments is None:
         return {}
-    else:
-        pass
     if not isinstance(assessments, list) or len(assessments) != 2:
         raise ValueError("卦月纳甲依据须包含先后天各一项实际六爻结果。")
-    else:
-        pass
     result = {}
     for row in assessments:
         if (
@@ -181,8 +165,6 @@ def _najia_index(
             or row["phase"] in result
         ):
             raise ValueError("卦月纳甲依据阶段缺失或重复。")
-        else:
-            pass
         phase = row["phase"]
         year = row.get("year_ganzhi")
         lines = row.get("lines")
@@ -198,8 +180,6 @@ def _najia_index(
             or any(type(line["pos"]) is not int for line in lines)
         ):
             raise ValueError("卦月纳甲依据与实际卦名、年干支或六爻位置不一致。")
-        else:
-            pass
         expected = []
         for line in lines:
             if (
@@ -208,16 +188,10 @@ def _najia_index(
                 or any(not isinstance(x, str) for x in line["borrowed"])
             ):
                 raise ValueError("卦月纳甲依据须保留正纳及借用。")
-            else:
-                pass
             if line["direct"] == year:
                 expected.append({"pos": line["pos"], "kind": "direct"})
-            else:
-                pass
             if year in line["borrowed"]:
                 expected.append({"pos": line["pos"], "kind": "borrowed"})
-            else:
-                pass
         matches = row.get("matches")
         if not isinstance(matches, list) or any(
             not isinstance(m, dict)
@@ -226,8 +200,6 @@ def _najia_index(
             for m in matches
         ):
             raise ValueError("卦月纳甲命中位置与类型必须明确。")
-        else:
-            pass
         if (
             row.get("matches") != expected
             or type(row.get("present")) is not bool
@@ -236,16 +208,12 @@ def _najia_index(
             raise ValueError(
                 "卦月纳甲命中必须来自该阶段实际六爻，不能以另一阶段或合并布尔代替。"
             )
-        else:
-            pass
         result[phase] = {
             k: deepcopy(row[k])
             for k in ("phase", "gua", "year_ganzhi", "matches", "present")
         }
     if len({row["year_ganzhi"] for row in result.values()}) != 1:
         raise ValueError("先后天卦月纳甲依据必须使用同一出生年干支。")
-    else:
-        pass
     return result
 
 
@@ -268,12 +236,8 @@ def month_affinity(
         or month_branch not in MONTH_BRANCHES
     ):
         raise ValueError("卦月匹配需要明确的出生月支。")
-    else:
-        pass
     if assignment_method not in ("intro_preferred_v1", "volume_one_table_v1"):
         raise ValueError("卦属月方法须明确为intro_preferred_v1或volume_one_table_v1。")
-    else:
-        pass
     birth_month = MONTH_BRANCHES.index(month_branch) + 1
     data = _collation()
     front = _front_table()
@@ -287,8 +251,6 @@ def month_affinity(
         )
         if table_anchor is None:
             raise NumerologySourceError("invalid_month_source_data")
-        else:
-            pass
         selected_section = (
             "hexagram_intro"
             if assignment_method == "intro_preferred_v1" and anchor is not None
@@ -303,10 +265,6 @@ def month_affinity(
             legacy = [b for b, names in assigned_table.items() if short in names]
             if legacy != [assigned]:
                 raise NumerologySourceError("runtime_month_assignment_conflict")
-            else:
-                pass
-        else:
-            pass
         readings = [
             {
                 "section": "hexagram_intro",

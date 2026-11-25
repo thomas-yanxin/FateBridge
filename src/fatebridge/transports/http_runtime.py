@@ -46,8 +46,6 @@ class ApiKeyAuthenticator:
         submitted_secret = request.headers.get(self.header_name)
         if not submitted_secret:
             return None
-        else:
-            pass
 
         # note (authentication): Compare every credential so a match does not end the scan early.
         submitted_bytes = submitted_secret.encode("utf-8")
@@ -55,8 +53,6 @@ class ApiKeyAuthenticator:
         for credential in self.known_credentials:
             if hmac.compare_digest(submitted_bytes, credential.secret_bytes):
                 matched_credential_id = credential.credential_id
-            else:
-                pass
         return matched_credential_id
 
 

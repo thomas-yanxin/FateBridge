@@ -47,8 +47,6 @@ def apply_permission(
 ) -> None:
     if constraint is None:
         return
-    else:
-        pass
     state = permission_state(constraint, routes)
     action["permission_status"] = state
     action["constraint_evidence"] = constraint.evidence
@@ -56,8 +54,6 @@ def apply_permission(
         action[status_key] = "blocked"
         action["pending_confirmations"] = []
         action["blocked_reason"] = "explicit_action_constraint"
-    else:
-        pass
 
 
 def sharp_corner_target_actions(
@@ -117,8 +113,6 @@ def sharp_corner_target_actions(
                     "required_for": "optional_action",
                 },
             )
-        else:
-            pass
         action = {
             "action_id": action_id,
             "action": action_name,

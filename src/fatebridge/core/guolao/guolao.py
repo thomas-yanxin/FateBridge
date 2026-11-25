@@ -113,24 +113,14 @@ def relation(target: str, other: str) -> str:
     """Directional 五星生克: `other` acts on the designated target lord."""
     if target == other:
         return "同主"
-    else:
-        pass
     if target not in GENERATES or other not in GENERATES:
         return "未分配"
-    else:
-        pass
     if GENERATES[other] == target:
         return "生我"
-    else:
-        pass
     if OVERCOMES[other] == target:
         return "克我"
-    else:
-        pass
     if GENERATES[target] == other:
         return "我生"
-    else:
-        pass
     return "我克"
 
 
@@ -151,8 +141,6 @@ def mansion_at(
         or not math.isfinite(right_ascension)
     ):
         raise ValueError("宿界须为28个不同的有限赤经")
-    else:
-        pass
     starts = [Fraction(v) for v in values]
     exact_ra = Fraction(right_ascension) % 360
     ra = min(float(exact_ra), math.nextafter(360.0, 0.0))
@@ -202,13 +190,9 @@ def positions(
     """Compute positions and optional source-derived longitude-rate corrections."""
     if runtime.swe is None:
         raise ValueError("果老研究盘需要 Swiss Ephemeris；不以近似轨道生成宿度和格局。")
-    else:
-        pass
     native = native_birth_epoch(birth)
     if native is None:
         validate_local_clock(birth.local_datetime)
-    else:
-        pass
     swe = runtime.swe
     hi = _resolve_core_chart_house_system(hsys, chart_variant="guolao_chart")
     zi = _resolve_core_chart_zodiacal_mode(zodiacal, chart_variant="guolao_chart")
@@ -223,8 +207,6 @@ def positions(
     catalogue_hash = hashlib.sha256(catalogue_bytes).hexdigest()
     if catalogue_hash != sources["catalogue_sha256"]:
         raise ValueError("果老距星表与来源指纹不一致")
-    else:
-        pass
     with runtime.preserve_ephemeris_path():
         # Swiss C state may be thread-local; initialize inside this worker.
         selected_path = configured_ephemeris_path()
@@ -234,8 +216,6 @@ def positions(
         times = birth_time_scales(birth)
         if times.tt is None:
             raise ValueError("果老研究盘需要可用的TT/UT1转换")
-        else:
-            pass
         tt, ut = times.tt, times.ut1
         # Native coordinates keep their scalar source epoch; only the
         # physical target geometry consumes the retained TT point.
@@ -264,8 +244,6 @@ def positions(
             equatorial_model = runtime.ephemeris_model_from_retflag(eq_flag)
             if model != equatorial_model:
                 raise EphemerisSourceError("coordinate_model_changed")
-            else:
-                pass
             motion_sources.observe(name, equatorial_model)
             models.update((model, equatorial_model))
             body_provenance[name] = {
@@ -295,8 +273,6 @@ def positions(
                 states[name][
                     "longitude_speed_reference_frame"
                 ] = "tropical_ecliptic_of_date"
-            else:
-                pass
         # This read set concerns the seven physical states and derivative
         # probes. The subsequent star-observer transaction has its own receipt.
         motion_metadata.update(
@@ -310,15 +286,11 @@ def positions(
                 " Moshier rates differentiate its own analytical positions;"
                 " this does not remove the underlying physical-model error."
             )
-        else:
-            pass
         if not correct_motion:
             motion_metadata.update(
                 status="not_requested",
                 scope="Position-only consumer did not request rate corrections. Native rates are retained without a precision claim; no auxiliary derivative epochs are evaluated. Physical-position source checks still apply.",
             )
-        else:
-            pass
         extra: dict[str, Any] = {}
         for name, body in [("罗", swe.MEAN_NODE), ("孛", swe.MEAN_APOG)]:
             coords, flag = runtime.ephemeris_call("calc", jd_tt, body, flags)
@@ -367,8 +339,6 @@ def positions(
             or not all(math.isfinite(value) for value in obliquity[:4])
         ):
             raise EphemerisSourceError("coordinate_values_unavailable")
-        else:
-            pass
         purple_ra, _, _ = swe.cotrans((purple, 0, 1), -obliquity[0])
         extra["炁"] = {
             "longitude": purple,
@@ -391,8 +361,6 @@ def positions(
                 _julian_day_tt=tt,
             )
             require_altitude(altitude)
-        else:
-            pass
         solar_clock = None
         solar_clock_native_to_physical: Matrix | None = None
         if observer_geometry and apparent_clock_required(birth):
@@ -423,10 +391,6 @@ def positions(
                 solar_clock["total_correction_scope"] = (
                     "apparent_label_minus_input_solar_label_not_a_civil_epoch_shift"
                 )
-            else:
-                pass
-        else:
-            pass
         ayanamsha = 0.0
         zodiac_layout: dict[str, Any] = {
             "ascendant": asc,
@@ -442,10 +406,6 @@ def positions(
             )
             if flag < 0 or not math.isfinite(ayanamsha):
                 raise ValueError("目标时刻Lahiri偏移计算失败")
-            else:
-                pass
-        else:
-            pass
         if observer_geometry:
             zodiac_layout = reference_geometry(
                 jd_ut1=ut,
@@ -463,10 +423,6 @@ def positions(
             cusps = zodiac_layout["house_cusps"]
             if asc is not None:
                 asc_ra, _, _ = swe.cotrans((asc, 0, 1), -obliquity[0])
-            else:
-                pass
-        else:
-            pass
         # The star flag may echo SWIEPH even with an analytical Earth.
         with fixed_star_catalogue(swe, catalogue_bytes):
             earth, earth_flags = runtime.ephemeris_call(
@@ -474,8 +430,6 @@ def positions(
             )
             if earth_flags < 0 or not all(math.isfinite(v) for v in earth):
                 raise EphemerisSourceError("coordinate_values_unavailable")
-            else:
-                pass
             boundaries = []
             star_flags = set()
             for index, star in enumerate(sources["stars"]):
@@ -501,8 +455,6 @@ def positions(
             or configured_jpl_file() != selected_jpl
         ):
             raise EphemerisSourceError("physical_configuration_changed")
-        else:
-            pass
     return {
         "states": states,
         "extra": extra,
@@ -563,8 +515,6 @@ def body_placement(
         right_ascension = (
             Fraction(state["derivation_source_right_ascension"]) + 180
         ) % 360
-    else:
-        pass
     # Compare the exact supplied doubles before rounding the rotated value.
     # A tiny negative remainder otherwise rounds to 360 and indexes palace 12.
     exact = (source_longitude - Fraction(ayanamsha)) % 360
@@ -598,27 +548,17 @@ def build_chart(
 
     if seasonal_anchor_policy is not None and seasonal_anchor_policy not in POLICIES:
         raise ValueError("未知果老安命交节政策")
-    else:
-        pass
     if seasonal_anchor_policy in POLICIES[1:] and not apparent_clock_required(birth):
         raise ValueError("太阳日安命须明确use_true_solar_time=true")
-    else:
-        pass
     if moira_provider is not None:
         if moira_profile is None:
             raise ValueError("Moira源提供器须与显式源规则profile一起选择")
-        else:
-            pass
         if (
             moira_provider.profile.source_commit != moira_profile.source_commit
             or moira_provider.profile.source_property_sha256
             != moira_profile.source_property_sha256
         ):
             raise ValueError("Moira规则与提供器须来自同一已声明源版本")
-        else:
-            pass
-    else:
-        pass
     require_resolved_birth_timezone(birth.timezone_source)
     if birth.recorded_datetime is not None:
         birth = replace(
@@ -626,8 +566,6 @@ def build_chart(
             local_datetime=birth.recorded_datetime,
             utc_datetime=utc_calendar(birth.recorded_datetime).as_datetime(),
         )
-    else:
-        pass
     raw = positions(birth, hsys=hsys, zodiacal=zodiacal)
     input_clock = solar_input_context(birth, raw)
     shift = raw["ayanamsha"]
@@ -651,8 +589,6 @@ def build_chart(
                 else Fraction(state["longitude"])
             )
             moira_longitudes[chinese] = (source_longitude - Fraction(shift)) % 360
-        else:
-            pass
         signs[chinese] = int(body["zodiac_longitude"] // 30)
         mansion = body["mansion"]
         mansions.append({"id": name, **mansion})
@@ -706,8 +642,6 @@ def build_chart(
             record["dignity"] = None
             record["su28"] = mansion["su28"]
             planets.append(record)
-        else:
-            pass
     # Apply the edition's ordinal algorithm to declared research inputs. Neither
     # a palace branch nor an astronomical ASC establishes the original 命度.
     solar_clock = raw["solar_clock"]
@@ -717,8 +651,6 @@ def build_chart(
     elif apparent_clock_required(birth):
         if solar_clock is None:
             raise ValueError("请求真太阳钟面时必须有同次太阳/UT1计算，不以民用钟时补位")
-        else:
-            pass
         hour_branch = solar_clock["birth_hour_branch"]
         birth_clock = solar_clock["display"]
     else:
@@ -742,8 +674,6 @@ def build_chart(
             policy=seasonal_anchor_policy,
         )
         anchor = anchor_evidence["anchor_branch"]
-    else:
-        pass
     ruleset_id = DAY_RULESET if anchor_evidence else RULESET
     life_branch = guolao_classical.life_branch(sun_branch, hour_branch, anchor)
     life_idx = PALACE_BRANCHES.index(life_branch)
@@ -886,8 +816,6 @@ def build_chart(
                         "month_lunar_day": "unresolved_not_filled_from_solar_season",
                     },
                 )
-            else:
-                pass
             source_provider = resolve_source_provider_facts(
                 profile=moira_provider.profile,
                 calendar=calendar,
@@ -909,8 +837,6 @@ def build_chart(
                 "provenance": dict(source_provider.facts.provenance),
                 "scope": "explicit source god/calendar facts; modern star backend not admitted",
             }
-        else:
-            pass
         source_facts = native_source_facts(
             longitudes=moira_longitudes,
             palace_indices=signs,
@@ -997,8 +923,6 @@ def build_chart(
             0,
             "所选天文参考宫头不可用，行星参考落宫留空且未换用其他宫制；七政四余、研究宿位与逆布功能宫仍有效",
         )
-    else:
-        pass
     moon = next(m for m in mansions if m["id"] == "Moon")
     guolao = {
         "lunar_mansion_system": "modern_equatorial_research_anchors_v1",
@@ -1143,8 +1067,6 @@ def build_chart(
                 "verified_subset": "完整源声明目录与规则图；事实提供范围和独立比较结论分别记录",
             }
         )
-    else:
-        pass
     if source_provider_record is not None and moira_provider is not None:
         guolao["moira_source_provider"] = source_provider_record
         guolao["rulesets"].append(
@@ -1155,8 +1077,6 @@ def build_chart(
                 "verified_subset": "源年/月/时表、分组、资格与别名；本次历法字段及缺项另列，不认证原历法或星位模型",
             }
         )
-    else:
-        pass
     if solar_clock:
         guolao["rulesets"].append(
             {
@@ -1166,8 +1086,6 @@ def build_chart(
                 "verified_subset": "复用同次地心视太阳赤经与所选UT1视恒星角；两处独立JPL参照，不认证实测亚秒精度或原典钟时政策",
             }
         )
-    else:
-        pass
 
     if input_clock:
         guolao["weekday_ruler"] = _week_ruler(
@@ -1199,14 +1117,10 @@ def build_chart(
                 "placement_classical_acceptance": False,
             }
         )
-    else:
-        pass
 
     def angle(value: float | None) -> dict[str, Any]:
         if value is None:
             return {"longitude": None, "sign": None, "sign_zh": None}
-        else:
-            pass
         return {
             "longitude": value,
             "sign": _sign_name(value),

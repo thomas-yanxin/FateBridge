@@ -58,16 +58,12 @@ def _action(
     if not blocked:
         if permission is not True:
             pending.append(f"layout_constraints.{object_id}.{permission_field}")
-        else:
-            pass
         pending.extend(
             [
                 "independently_confirmed_candidate_relation_geometry",
                 "independently_confirmed_candidate_physical_feasibility",
             ]
         )
-    else:
-        pass
     return {
         "action_id": f"interior:{relation.relation_id}:{object_id}:{operation}",
         "relation_id": relation.relation_id,
@@ -132,10 +128,6 @@ def analyze_interior_relations(
                 result["rulesets"].append(
                     provenance("workstation_source_boundaries_v1")
                 )
-            else:
-                pass
-        else:
-            pass
         present = relation.present
         basis = relation.observation_basis
         relation_id = relation.relation_id
@@ -222,8 +214,6 @@ def analyze_interior_relations(
                 )
             )
             result["action_options"].extend(deepcopy(actions))
-        else:
-            pass
         result["findings"].append(finding)
         result["missing_inputs"].extend(missing)
         result["rule_trace"].append(
@@ -244,6 +234,4 @@ def analyze_interior_relations(
     if result["missing_inputs"]:
         result["status"] = "partial"
         result["rule_coverage_status"] = "needs_confirmation"
-    else:
-        pass
     return result

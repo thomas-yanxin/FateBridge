@@ -97,8 +97,6 @@ SOURCES: list[dict[str, Any]] = [
 def _angle(value: float) -> Fraction:
     if not math.isfinite(value):
         raise ValueError("Midpoint coordinates must be finite")
-    else:
-        pass
     return Fraction(value) % 360
 
 
@@ -136,8 +134,6 @@ def midpoint_geometry(
     """
     if not math.isfinite(orb_degrees) or not 0 <= orb_degrees <= 5:
         raise ValueError("Midpoint orb must be within 0..5 degrees")
-    else:
-        pass
     points = {name: _angle(value) for name, value in longitudes.items()}
     axes = []
     catalogue = []
@@ -180,18 +176,12 @@ def midpoint_geometry(
                         "rule_id": "hamburg.two_factor_hard_contacts.v1",
                     }
                 )
-            else:
-                pass
         for a, b, axis in axes:
             if a == b:
                 continue
-            else:
-                pass
             for point, value in points.items():
                 if point in (a, b):
                     continue
-                else:
-                    pass
                 delta = _residual(value, axis, period)
                 if abs(delta) <= orb:
                     triples.append(
@@ -208,13 +198,9 @@ def midpoint_geometry(
                             "rule_id": "hamburg.three_factor_symmetry.v1",
                         }
                     )
-                else:
-                    pass
         for (a, b, left), (c, d, right) in combinations(axes, 2):
             if len({a, b, c, d}) != 4:
                 continue
-            else:
-                pass
             delta = _residual(left, right, period)
             if abs(delta) <= orb:
                 quadruples.append(
@@ -245,8 +231,6 @@ def midpoint_geometry(
                         ),
                     }
                 )
-            else:
-                pass
         for contacts in (doubles, triples, quadruples):
             contacts.sort(key=lambda row: (row["orb"], row["equation"]))
         dials[str(period)] = {
@@ -278,14 +262,10 @@ def _native_factors(
     swe = runtime.swe
     if swe is None:
         raise ValueError("Native midpoint factors require Swiss Ephemeris")
-    else:
-        pass
     times = epoch.time if epoch is not None else birth.time_scales
     tt = times.tt
     if tt is None:
         raise ValueError("Native midpoint factors require dynamical TT")
-    else:
-        pass
     jd_tt, jd_ut1 = tt.as_float(), times.ut1
     factors = []
     meridian_inputs = []
@@ -327,16 +307,10 @@ def _native_factors(
                 raise ValueError(
                     f"Swiss Ephemeris cannot calculate midpoint factor {name}"
                 )
-            else:
-                pass
             if name in PHYSICAL_BODIES:
                 models.add(runtime.ephemeris_model_from_retflag(flag))
-            else:
-                pass
             if name in PHYSICAL_BODIES:
                 physical_trace.observe(name, runtime.ephemeris_model_from_retflag(flag))
-            else:
-                pass
             element_name = None
             if hypothetical:
                 element_name = swe.get_planet_name(body_id)
@@ -347,10 +321,6 @@ def _native_factors(
                 )
                 if element_name.strip().casefold() not in allowed_names:
                     raise EphemerisSourceError("fictitious_identity")
-                else:
-                    pass
-            else:
-                pass
             factors.append(
                 {
                     "id": name,
@@ -384,8 +354,6 @@ def _native_factors(
                     raise RuntimeError(
                         "Native meridian factor has no valid ecliptic latitude"
                     )
-                else:
-                    pass
                 meridian_inputs.append(
                     {
                         **{
@@ -395,8 +363,6 @@ def _native_factors(
                         "latitude": float(coords[1]),
                     }
                 )
-            else:
-                pass
         reference_house_code = b"E"
         reference_house_flags = swe.FLG_SIDEREAL if sidereal else 0
         _, angles = runtime.ephemeris_call(
@@ -445,8 +411,6 @@ def _native_factors(
             )
             if ayan_flag < 0:
                 raise ValueError("Swiss Ephemeris cannot calculate Lahiri ayanamsha")
-            else:
-                pass
         else:
             ayan = 0.0
         for name, longitude in (
@@ -486,12 +450,8 @@ def _native_factors(
             attach_factor_placement(
                 meridian, meridian_inputs, factor_ayanamsha=float(ayan)
             )
-        else:
-            pass
         if include_hypothetical and fictitious_element_source() != element_source:
             raise EphemerisSourceError("fictitious_changed_during")
-        else:
-            pass
         physical_source = physical_trace.finish()
     return {
         "factors": factors,
@@ -531,8 +491,6 @@ def build_midpoint_analysis(
             "sources": SOURCES,
             "real_world_efficacy": "not_tested",
         }
-    else:
-        pass
     native = _native_factors(birth, sidereal, include_meridian_houses=True)
     result = midpoint_geometry(
         {row["id"]: row["longitude"] for row in native["factors"]}
@@ -554,8 +512,6 @@ def build_midpoint_analysis(
                 if "source_interpretation" in row:
                     reading = row["source_interpretation"]
                     interpretations[reading["claim_id"]] = reading
-                else:
-                    pass
                 row["contains_hypothetical"] = any(
                     value in HYPOTHETICAL_BODIES
                     for key, value in row.items()

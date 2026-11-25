@@ -53,13 +53,9 @@ def resolve_calendar_stems(seed: MetaphysicsSeed) -> dict[str, Any]:
     # their placeholder seed date into an asserted historical year/month.
     if "lunar_calendar_support" not in seed.calendar_context:
         return contexts
-    else:
-        pass
     lunar = get_lunar_context(civil, timezone_name=seed.timezone)
     if lunar is None:
         return contexts
-    else:
-        pass
     solar_year = seed.pillars.get("year")
     lunar_year = cast(int, lunar["year"])
     lunar_ganzhi = sexagenary_text((lunar_year - 4) % 60)
@@ -76,8 +72,6 @@ def resolve_calendar_stems(seed: MetaphysicsSeed) -> dict[str, Any]:
         candidates.insert(
             0, {"policy": "lichun", "ganzhi": ganzhi, "literal_stem": ganzhi[0]}
         )
-    else:
-        pass
     agreed = len(candidates) == 2 and len({c["ganzhi"] for c in candidates}) == 1
     contexts["year"] = {
         "status": (
@@ -112,8 +106,6 @@ def resolve_calendar_stems(seed: MetaphysicsSeed) -> dict[str, Any]:
             "note"
         ] = "回推月初不能核成同一农历月初一；不回退为八字月干。"
         return contexts
-    else:
-        pass
     start_ganzhi = get_day_ganzhi(start.year, start.month, start.day)
     stem = start_ganzhi[0]
     contexts["lunar_month_start"] = {
@@ -186,8 +178,6 @@ def match_calendar_stems(
         if context["status"] == "unresolved_jia_identity":
             context["candidates"] = jia_candidates(context["ganzhi"], role)
             match_lists = [c["candidate_matches"] for c in context["candidates"]]
-        else:
-            pass
         boundary_candidates = context.get("boundary_candidates", [])
         for candidate in boundary_candidates:
             stem = candidate["literal_stem"]
@@ -205,25 +195,17 @@ def match_calendar_stems(
                     match_lists.extend(c["candidate_matches"] for c in alternatives)
                 else:
                     match_lists.append(matches)
-            else:
-                pass
         if match_lists:
             context["candidate_outcomes"] = {
                 rule_id: compare_candidate_palaces(match_lists)
             }
-        else:
-            pass
         if context["status"] != "literal_stem_resolved":
             continue
-        else:
-            pass
         stem = context["effective_stem"]
         context["evaluations"] = matching(stem)
         for index, palace in outer:
             if palace["name"] not in context["evaluations"]:
                 continue
-            else:
-                pass
             result.append(
                 {
                     "rule_id": rule_id,

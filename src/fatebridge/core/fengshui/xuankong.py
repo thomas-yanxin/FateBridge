@@ -36,8 +36,6 @@ def validate_replacement_catalog(bundle: dict[str, Any]) -> None:
         or set(catalog) != {m["name"] for m in mountains}
     ):
         raise ValueError("替星表须完整登记二十四山，缺项不能默认保留原星")
-    else:
-        pass
     changed = {}
     for mountain in mountains:
         name = mountain["name"]
@@ -53,20 +51,14 @@ def validate_replacement_catalog(bundle: dict[str, Any]) -> None:
             or entry["changes_number"] != (star != original)
         ):
             raise ValueError(f"替星表{name}原星、替星或改数状态不完整或冲突")
-        else:
-            pass
         if star != original:
             changed[name] = star
-        else:
-            pass
     if (
         len(changed) != 13
         or any(type(n) is not int for n in bundle["replacement_stars"].values())
         or changed != bundle["replacement_stars"]
     ):
         raise ValueError("完整替星表须与十三改数山位及十一同数山位一致")
-    else:
-        pass
 
 
 def natal_rules() -> dict[str, Any]:
@@ -120,8 +112,6 @@ def period_context(period: HousePeriod) -> dict[str, Any]:
             "valid_from": None,
             "valid_until": None,
         }
-    else:
-        pass
     time = year_context(
         period.effective_event_year, period.event_at, period.timezone_name
     )
@@ -141,16 +131,12 @@ def period_context(period: HousePeriod) -> dict[str, Any]:
             "provisional_effective_event_year": time["provisional_effective_year"],
             "candidate_period_numbers": [index % 9 + 1 for index in indices],
         }
-    else:
-        pass
     event_boundary = None
     if period.event_at is not None:
         local_year = period.event_at.astimezone(
             parse_timezone_name(period.timezone_name)
         ).year
         event_boundary = lichun_resolution(local_year, period.timezone_name)
-    else:
-        pass
     if len(indices) > 1:
         reason = time.get("boundary_resolution", {}).get("uncertainty_reason", "")
         if reason.startswith("moshier"):
@@ -198,18 +184,12 @@ def period_context(period: HousePeriod) -> dict[str, Any]:
             "valid_from": None,
             "valid_until": None,
         }
-    else:
-        pass
     window = _period_interval(indices[0], period.timezone_name)
     timing = window["timing"]
     if event_boundary is not None:
         timing["event_year_boundary"] = event_boundary
-    else:
-        pass
     if year_uncertain:
         event_fields["resolution_scope"] = "period_number_only_event_year_unconfirmed"
-    else:
-        pass
     return {
         **result,
         "number": window["number"],
@@ -242,16 +222,12 @@ def _selector(angle: float) -> tuple[int, str, str]:
     offset = (angle - mountain["center_degrees"] + 180) % 360 - 180
     if abs(offset) < _bundle()["central_half_width_degrees"]:
         return index, "lower", "central_nine_degrees"
-    else:
-        pass
     neighbour = mountains[(index + (1 if offset > 0 else -1)) % 24]
     if (
         mountain["direction"] == neighbour["direction"]
         and mountain["polarity"] == neighbour["polarity"]
     ):
         return index, "lower", "same_palace_same_polarity_no_replacement"
-    else:
-        pass
     return index, "replacement", "cross_palace_or_different_polarity"
 
 
@@ -296,8 +272,6 @@ def _selector_regions(
                         },
                     )
                 )
-            else:
-                pass
     return regions
 
 
@@ -323,8 +297,6 @@ def _star_trace(
     replacement = rules["replacement_catalog"][mapped]["replacement_star_number"]
     if mode == "replacement" and seed != 5:
         center = replacement
-    else:
-        pass
     decision = (
         "lower_chart_not_using_replacement"
         if mode != "replacement"
@@ -415,17 +387,11 @@ def xuankong_natal(req: XuankongRequest) -> dict[str, Any]:
     missing = []
     if house is None or house.facing_degrees is None:
         missing.append("xuankong_natal.house.facing_degrees_magnetic")
-    else:
-        pass
     if req.period is None:
         missing.append("xuankong_natal.period")
-    else:
-        pass
     period = period_context(req.period) if req.period is not None else None
     if period is not None and period["resolution_status"] != "resolved":
         missing.append("xuankong_natal.period.effective_year_or_period_confirmation")
-    else:
-        pass
     result: dict[str, Any] = {
         "status": "partial",
         "subject_id": house.object_id if house is not None else "house",
@@ -464,8 +430,6 @@ def xuankong_natal(req: XuankongRequest) -> dict[str, Any]:
                     != house.sitting_trigram
                 ):
                     continue
-                else:
-                    pass
                 if index not in orientations:
                     orientations[index] = {
                         "orientation_candidate_id": "city-gate-facing:"
@@ -475,25 +439,15 @@ def xuankong_natal(req: XuankongRequest) -> dict[str, Any]:
                         "bearing_regions": [],
                         "natal_modes_not_used": [],
                     }
-                else:
-                    pass
                 orientations[index]["bearing_regions"].append(region)
                 if mode not in orientations[index]["natal_modes_not_used"]:
                     orientations[index]["natal_modes_not_used"].append(mode)
-                else:
-                    pass
-        else:
-            pass
         result["city_gate_analysis"] = analyze_city_gate(
             req.city_gate, list(orientations.values()), _bundle()
         )
-    else:
-        pass
     if missing:
         result["source_comparison"] = compare_natal_sources([])
         return result
-    else:
-        pass
     assert house is not None and house.facing_degrees is not None and period is not None
     supported: dict[tuple[int, str], dict[str, Any]] = {}
     for selector, region in _selector_regions(
@@ -522,21 +476,15 @@ def xuankong_natal(req: XuankongRequest) -> dict[str, Any]:
                 "scope": "angle_support_only_not_probability_or_measurement_certification",
             }
             supported[key] = chart
-        else:
-            pass
         support = supported[key]["bearing_support"]
         support["regions"].append(region)
         if selector[2] not in support["mode_reasons"]:
             support["mode_reasons"].append(selector[2])
-        else:
-            pass
     candidates = list(supported.values())
     for chart in candidates:
         reasons = chart["bearing_support"]["mode_reasons"]
         if len(reasons) > 1:
             chart["mode_reason"] = "multiple_supported_angle_regions"
-        else:
-            pass
     if house.sitting_trigram is not None:
         directions = rule_data("directions")
         candidates = [
@@ -544,8 +492,6 @@ def xuankong_natal(req: XuankongRequest) -> dict[str, Any]:
             for c in candidates
             if directions[c["sitting"]["direction"]]["trigram"] == house.sitting_trigram
         ]
-    else:
-        pass
     result["candidates"] = candidates
     result["source_comparison"] = compare_natal_sources(candidates)
     if len(candidates) == 1:

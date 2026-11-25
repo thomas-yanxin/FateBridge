@@ -168,8 +168,6 @@ ZR_PHASE_LABELS = {
 def ensure_predictive_backend_available() -> None:
     if swe is None:
         raise ModuleNotFoundError("Swiss Ephemeris 未安装，无法启用西占推运能力。")
-    else:
-        pass
 
 
 def build_predictive_birth_info(
@@ -223,10 +221,6 @@ def build_analysis_datetime(
         month = now.month if month is None else month
         if day is None:
             day = min(now.day, monthrange(year, month)[1])
-        else:
-            pass
-    else:
-        pass
     target = datetime(
         year,
         month,
@@ -276,8 +270,6 @@ def resolve_local_birthday_anniversary(
         validate_local_clock(
             moment, allow_ambiguous=True, clock_label="计算所得的周年钟时"
         )
-    else:
-        pass
     return moment
 
 
@@ -299,8 +291,6 @@ def resolve_last_birthday(
     analysis_utc = utc_calendar(analysis_datetime)
     if analysis_utc < birth_info.utc_calendar:
         raise ValueError("分析时刻不能早于出生时刻。")
-    else:
-        pass
     zone = parse_timezone_name(birth_info.timezone)
     analysis_local = ZonedCalendar(analysis_utc, zone).require_datetime()
     birth_local = birth_info.local_datetime
@@ -347,8 +337,6 @@ def resolve_egyptian_bound(sign_name: str, degree_in_sign: float) -> dict[str, A
                 "segment_start_degree": round(start_degree, 4),
                 "segment_end_degree": round(end_degree, 4),
             }
-        else:
-            pass
     raise ValueError("Egyptian bounds require a known sign and a degree in [0, 30)")
 
 
@@ -359,8 +347,6 @@ def planet_label(planet_name: str) -> str:
 def house_number(house_name: str | None) -> int | None:
     if house_name is None:
         return None
-    else:
-        pass
     return HOUSE_NAME_TO_NUMBER.get(house_name)
 
 
@@ -368,8 +354,6 @@ def house_label(house_name: str | None) -> str | None:
     number = house_number(house_name)
     if number is None:
         return None
-    else:
-        pass
     return f"第{number}宫"
 
 
@@ -407,8 +391,6 @@ def longitude_to_point_dict(point_name: str, absolute_degree: Angle) -> dict[str
         # Preserve ownership of whole-degree table intervals in the public record.
         if int(displayed_degree) != int(degree):
             displayed_degree = math.nextafter(displayed_degree, -math.inf)
-        else:
-            pass
     else:
         normalized_degree = normalize_angle(absolute_degree)
         sign_index = int(normalized_degree // 30)
@@ -628,8 +610,6 @@ def collect_aspect_hits(
 ) -> list[dict[str, Any]]:
     if not math.isfinite(orb_limit) or not 0 <= orb_limit <= 180:
         raise ValueError("Aspect orb must be finite and within 0..180 degrees")
-    else:
-        pass
     limit = Fraction(orb_limit)
     hits = []
     for source_name, source_longitude in source_longitudes.items():
@@ -652,8 +632,6 @@ def collect_aspect_hits(
                             },
                         )
                     )
-                else:
-                    pass
     hits.sort(key=lambda item: item[0])
     return [row for _, row in hits]
 
@@ -662,6 +640,4 @@ def normalize_signed_angle(angle: float) -> float:
     normalized = normalize_angle(angle)
     if normalized >= 180.0:
         normalized -= 360.0
-    else:
-        pass
     return normalized

@@ -67,8 +67,6 @@ class LiurenGodYin(PartialOutput):
             and value["complete_classical_conformance"] is not False
         ):
             raise ValueError("类神阴神查法不认证完整原典")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -76,23 +74,15 @@ class LiurenGodYin(PartialOutput):
         value = self.model_dump(exclude_unset=True)
         if self.rows is not None and len(self.rows) != 12:
             raise ValueError("类神阴神须保留十二天将队列")
-        else:
-            pass
         if self.lesson_uppers is not None and len(self.lesson_uppers) != 4:
             raise ValueError("类神阴神四课依据需要四个位置")
-        else:
-            pass
         if (
             self.transmission_branches is not None
             and len(self.transmission_branches) != 3
         ):
             raise ValueError("类神阴神三传依据需要三个位置")
-        else:
-            pass
         if context_available(value):
             compare_present_branches(value, rebuild(value))
-        else:
-            pass
         return self
 
 
@@ -132,23 +122,15 @@ def align_god_yin(board: Any, pillars: Any = None, runyear: Any = None) -> None:
     value = get(board, "god_yin")
     if value is None:
         return
-    else:
-        pass
     if pillars is not None:
         stem, branch = get(get(pillars, "day"), "stem"), get(
             get(pillars, "day"), "branch"
         )
         if stem and branch and get(value, "day_ganzhi") not in (None, stem + branch):
             raise ValueError("类神阴神与同次日干支不一致")
-        else:
-            pass
         month = get(get(pillars, "month"), "branch")
         if month and get(value, "month_branch") not in (None, month):
             raise ValueError("类神阴神季节条件与同次月建不一致")
-        else:
-            pass
-    else:
-        pass
     meta = get(board, "meta")
     for own, other in [
         ("guiren_profile", "guiren_profile"),
@@ -157,8 +139,6 @@ def align_god_yin(board: Any, pillars: Any = None, runyear: Any = None) -> None:
         actual, expected = get(value, own), get(meta, other)
         if actual is not None and expected is not None and actual != expected:
             raise ValueError("类神阴神与所选贵人配置或昼夜不一致")
-        else:
-            pass
     sky, gods = get(value, "sky_by_earth"), get(value, "god_by_sky")
     for row in get(board, "twelve_board") or []:
         earth, upper, god = (get(row, k) for k in ["earth_branch", "sky_branch", "god"])
@@ -169,8 +149,6 @@ def align_god_yin(board: Any, pillars: Any = None, runyear: Any = None) -> None:
             and sky[earth] != upper
         ):
             raise ValueError("类神阴神与本课天地盘不一致")
-        else:
-            pass
         if (
             gods is not None
             and upper in gods
@@ -178,40 +156,26 @@ def align_god_yin(board: Any, pillars: Any = None, runyear: Any = None) -> None:
             and gods[upper] != god
         ):
             raise ValueError("类神阴神与本课天将盘不一致")
-        else:
-            pass
     lessons = get(value, "lesson_uppers")
     if lessons is not None:
         for row in get(board, "four_lessons") or []:
             index, upper = get(row, "index"), get(row, "upper_branch")
             if index is not None and upper is not None and lessons[index - 1] != upper:
                 raise ValueError("类神阴神与本课四课不一致")
-            else:
-                pass
-    else:
-        pass
     transmissions = get(value, "transmission_branches")
     if transmissions is not None:
         for i, p in enumerate(["initial", "middle", "final"]):
             upper = get(get(get(board, "three_transmissions"), p), "branch")
             if upper is not None and upper != transmissions[i]:
                 raise ValueError("类神阴神与本课三传不一致")
-            else:
-                pass
-    else:
-        pass
     if runyear is not None and get(value, "year_fate_uppers") is not None:
         roles = get(value, "year_fate_uppers")
         for role in ["natal", "annual"]:
             if role not in roles:
                 continue
-            else:
-                pass
             item = get(get(runyear, "year_fate"), role)
             if item is None:
                 continue
-            else:
-                pass
             expected = get(item, "sky_branch")
             present = (
                 "sky_branch" in item
@@ -220,14 +184,8 @@ def align_god_yin(board: Any, pillars: Any = None, runyear: Any = None) -> None:
             )
             if not present:
                 continue
-            else:
-                pass
             if roles.get(role) != expected:
                 raise ValueError("类神阴神与同次年命上神不一致")
-            else:
-                pass
-    else:
-        pass
 
 
 def require_complete_god_yin(board: Any) -> None:
@@ -235,16 +193,10 @@ def require_complete_god_yin(board: Any) -> None:
     value = get(board, "god_yin")
     if not isinstance(value, dict) or not context_available(value):
         raise ValueError("完整六壬须保留类神阴神原始依据")
-    else:
-        pass
     expected = rebuild(value)
     if value != expected:
         raise ValueError("完整六壬类神阴神须保留全部可空条件及十二天将")
-    else:
-        pass
     align_god_yin(board)
     traces = [t for t in get(board, "rule_trace") or [] if get(t, "rule_id") == RULE_ID]
     if len(traces) != 1 or traces[0] != god_yin_trace(expected):
         raise ValueError("完整六壬须保留唯一且一致的类神阴神轨迹")
-    else:
-        pass

@@ -34,12 +34,8 @@ def printed_month_reference(
         or any(c["day"] != i + 1 or len(c["text"]) != 12 for i, c in enumerate(columns))
     ):
         raise ValueError("具名印本月序或360格上下文不完整")
-    else:
-        pass
     if (upper["lunar_month"], upper["lunar_day"]) != (month, day):
         raise ValueError("具名印本与大正异表的比较月日不一致")
-    else:
-        pass
     slot = bundle["month_order"].index(month)
     column = columns[day - 1]
     literal = column["text"][slot]

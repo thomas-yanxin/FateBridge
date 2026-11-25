@@ -51,8 +51,6 @@ FIRDARIA_NIGHT_NODES_AFTER_MARS_SEQUENCE = [
 def _validate_calendar_clock(moment: datetime, role: str) -> None:
     if moment.tzinfo is None or moment.utcoffset() is None:
         raise ValueError(f"法达公历周年模式的{role}必须带时区")
-    else:
-        pass
     validate_local_clock(moment, clock_label=f"法达公历周年模式的{role}")
 
 
@@ -64,8 +62,6 @@ def validate_calendar_firdaria_inputs(
     _validate_calendar_clock(analysis_datetime, "分析钟时")
     if utc_calendar(analysis_datetime) < birth_info.utc_calendar:
         raise ValueError("法达公历周年模式的分析时刻不能早于出生时刻")
-    else:
-        pass
 
 
 def _calendar_anniversary(birth: datetime, nominal_age: int) -> datetime:
@@ -108,20 +104,14 @@ def _build_calendar_payload(
     for planet, years in cycle(sequence):
         if start_utc > horizon:
             break
-        else:
-            pass
         end_age = age + years
         if birth.year + end_age > datetime.max.year:
             # Earlier preview periods and the current period are already complete.
             if start_utc > target and len(timeline) >= 12:
                 break
-            else:
-                pass
             raise ValueError(
                 "Civil calendar label is outside Python datetime's year range"
             )
-        else:
-            pass
         end = _calendar_anniversary(birth, end_age)
         end_utc = utc_calendar(end)
         major = {
@@ -148,14 +138,8 @@ def _build_calendar_payload(
                 major["subperiods"].append(sub)
                 if boundaries[k] <= target < boundaries[k + 1]:
                     current_sub = sub
-                else:
-                    pass
-        else:
-            pass
         if start_utc <= target < end_utc:
             current_major = major
-        else:
-            pass
         timeline.append(major)
         start, start_utc, age = end, end_utc, end_age
 
@@ -196,16 +180,10 @@ def build_firdaria_for_sect(
     """Calendar arithmetic with an explicit sect; no surrogate natal houses."""
     if sect not in {"day", "night"}:
         raise ValueError("法达计算需要明确的 day／night 宗派")
-    else:
-        pass
     if firdaria_night_order not in {"nodes_at_end", "nodes_after_mars"}:
         raise ValueError("无效的 firdaria_night_order")
-    else:
-        pass
     if firdaria_year_basis not in {"fixed_365_2425", "calendar_anniversary"}:
         raise ValueError("无效的 firdaria_year_basis")
-    else:
-        pass
     sequence = (
         FIRDARIA_DAY_SEQUENCE
         if sect == "day"
@@ -255,8 +233,6 @@ def _build_fixed_year_payload(
     for planet, years in cycle(sequence):
         if cursor > horizon or (len(timeline) == 12 and cursor > target):
             break
-        else:
-            pass
         start = cursor
         duration = timedelta(days=years * TROPICAL_YEAR_DAYS)
         cursor = start.shifted(duration)
@@ -264,8 +240,6 @@ def _build_fixed_year_payload(
         in_preview = len(timeline) < 12
         if not (current or in_preview):
             continue
-        else:
-            pass
 
         main_period: dict[str, Any] = {
             "planet": planet,
@@ -291,20 +265,12 @@ def _build_fixed_year_payload(
                 main_period["subperiods"].append(sub_period)
                 if sub_cursor <= target < sub_end:
                     current_sub = sub_period
-                else:
-                    pass
                 sub_cursor = sub_end
-        else:
-            pass
 
         if current:
             current_major = main_period
-        else:
-            pass
         if in_preview:
             timeline.append(main_period)
-        else:
-            pass
 
     return {
         "sect": sect,

@@ -26,22 +26,14 @@ def kinship(palace: str, element: str) -> str:
 def role_against_focus(element: str, focus: str) -> str:
     if element == focus:
         return "同类"
-    else:
-        pass
     if GENERATES[element] == focus:
         return "元神"
-    else:
-        pass
     if CONTROLS[element] == focus:
         return "忌神"
-    else:
-        pass
     yuan = next(e for e in GENERATES if GENERATES[e] == focus)
     ji = next(e for e in CONTROLS if CONTROLS[e] == focus)
     if CONTROLS[element] == yuan and GENERATES[element] == ji:
         return "仇神"
-    else:
-        pass
     return "用神所生"
 
 
@@ -60,20 +52,12 @@ def resolve_focus(
         type(focus_line) is not int or not 1 <= focus_line <= 6
     ):
         raise ValueError("focus_line 必须是1至6的整数")
-    else:
-        pass
     if focus_kind is not None and focus_kind not in FOCUS_KINDS:
         raise ValueError("focus_kind 必须为visible、changed、hidden、month或day")
-    else:
-        pass
     if focus_kinship is not None and focus_kinship not in KINSHIPS:
         raise ValueError("focus_kinship 必须为父母、兄弟、子孙、妻财或官鬼")
-    else:
-        pass
     if focus_kind in ("day", "month") and focus_line is not None:
         raise ValueError("日月取用不能同时指定爻位")
-    else:
-        pass
     if (
         focus_line is None
         and focus_kinship is None
@@ -81,8 +65,6 @@ def resolve_focus(
     ):
         if focus_kind is not None:
             raise ValueError("指定爻类取用还须提供focus_line或focus_kinship")
-        else:
-            pass
         return {
             "status": "not_requested",
             "selected": None,
@@ -90,8 +72,6 @@ def resolve_focus(
             "roles": [],
             "scope": "未根据问题关键词自动选用神",
         }
-    else:
-        pass
 
     def candidate(
         location: str,
@@ -134,8 +114,6 @@ def resolve_focus(
             raise ValueError(
                 "所选爻位不存在该类用爻；静爻不能作为变爻，未列伏神不能凭空取用"
             )
-        else:
-            pass
         selected = matching[0]
         status = (
             "explicit_line" if location == "visible" else f"explicit_{location}_line"
@@ -148,11 +126,7 @@ def resolve_focus(
     if selected is not None:
         if focus_kinship is not None and selected["liuqin"] != focus_kinship:
             raise ValueError("所选用爻的六亲与focus_kinship不一致")
-        else:
-            pass
         focus_kinship = selected["liuqin"]
-    else:
-        pass
     matching_visible = [r for r in visible if r["liuqin"] == focus_kinship]
     matching_changed = [r for r in changed if r["liuqin"] == focus_kinship]
     if focus_kind is not None:
@@ -165,8 +139,6 @@ def resolve_focus(
                 if candidates
                 else f"no_{focus_kind}_candidate"
             )
-        else:
-            pass
     elif matching_visible:
         candidates = [*matching_visible, *matching_changed]
         if selected is None and len(candidates) == 1:
@@ -177,8 +149,6 @@ def resolve_focus(
                 if matching_changed
                 else "multiple_visible_candidates"
             )
-        else:
-            pass
     else:
         alternatives = [r for r in day_month if r["liuqin"] == focus_kinship]
         candidates = [*matching_changed, *alternatives]

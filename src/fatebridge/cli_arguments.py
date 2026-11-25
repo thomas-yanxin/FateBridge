@@ -71,8 +71,6 @@ class _BooleanFlagAction(argparse.Action):
             expanded.append(option)
             if option.startswith("--"):
                 expanded.append("--no-" + option[2:])
-            else:
-                pass
         super().__init__(
             option_strings=expanded,
             dest=dest,
@@ -96,8 +94,6 @@ class _BooleanFlagAction(argparse.Action):
                 parser.error(
                     f"{option_string} 为关闭开关，不接受取值（直接用 {option_string}）"
                 )
-            else:
-                pass
             result = False
         elif values is None:
             result = True
@@ -119,26 +115,16 @@ def _argument_type(annotation: object) -> object:
     """Unwrap field types for lexical parsing before Pydantic validates values."""
     if get_origin(annotation) is Annotated:
         return _argument_type(get_args(annotation)[0])
-    else:
-        pass
     # note (unions): Keep textual branches lexical so named house systems reach validation.
     if get_origin(annotation) in (Union, UnionType):
         members = [a for a in get_args(annotation) if a is not type(None)]
         resolved = [_argument_type(a) for a in members]
         if str in resolved:
             return str
-        else:
-            pass
         if len(resolved) == 1:
             return resolved[0]
-        else:
-            pass
         if get_origin(annotation) is Union and resolved:
             return resolved[0]
-        else:
-            pass
-    else:
-        pass
     return annotation
 
 
@@ -203,8 +189,6 @@ def _add_field_argument(
                 and all(type(choice) is type(choices[0]) for choice in choices)
                 else str
             )
-        else:
-            pass
         is_nullable_integer = element_type is int and type(None) in get_args(
             element_annotation
         )
@@ -300,8 +284,6 @@ def build_parser(
                 _spec=spec, _cli_unsupported=True, _hint=_unsupported_hint(spec)
             )
             continue
-        else:
-            pass
         for fname, field in spec.request_model.model_fields.items():
             _add_field_argument(
                 sp,
@@ -316,8 +298,6 @@ def build_parser(
                 metavar="PATH",
                 help="完整住宅请求 JSON 文件；显式字段参数覆盖文件中的同名顶层字段，仍按公开模型校验",
             )
-        else:
-            pass
         _add_transport_flags(sp)
         sp.set_defaults(_spec=spec)
     return parser

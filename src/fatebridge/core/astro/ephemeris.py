@@ -52,8 +52,6 @@ def _swisseph_angles(
 ) -> Optional[Dict[str, Any]]:
     if runtime.swe is None:
         return None
-    else:
-        pass
     try:
         with runtime.preserve_ephemeris_path():
             _, ascmc = runtime.ephemeris_call(
@@ -91,20 +89,14 @@ def _swisseph_angles(
     }
     if definition is not None:
         result["angle_definition"] = definition
-    else:
-        pass
     if convention is not None:
         result["house_axis_convention"] = convention
-    else:
-        pass
     return result
 
 
 def _planet_set(chart_variant: str) -> List[str]:
     if chart_variant in {"hellen_chart", "guolao_chart"}:
         return list(TRADITIONAL_PLANETS)
-    else:
-        pass
     return list(PLANET_SEQUENCE)
 
 
@@ -128,8 +120,6 @@ def _swisseph_planet_state(
     """
     if runtime.swe is None or planet not in PLANET_SWISSEPH_IDS:
         return None
-    else:
-        pass
     operation = "calc" if julian_day_tt is not None else "calc_ut"
     epoch = (
         TTInstant.from_value(julian_day_tt).as_float()
@@ -138,8 +128,6 @@ def _swisseph_planet_state(
     )
     if epoch is None or not math.isfinite(epoch):
         raise ValueError("A finite TT or UT1 Julian day is required")
-    else:
-        pass
     trace = source_trace if source_trace is not None else PhysicalEphemerisTrace()
     physical = planet not in {"North Node", "South Node"}
     with runtime.preserve_ephemeris_path():
@@ -163,8 +151,6 @@ def _swisseph_planet_state(
         if flag < 0:
             runtime._log_swe_runtime_failure(operation, RuntimeError(f"retflag={flag}"))
             return None
-        else:
-            pass
         model = runtime.ephemeris_model_from_retflag(flag)
         longitude_speed = require_longitude_speed(
             coordinates, flag, runtime.swe.FLG_SPEED
@@ -174,8 +160,6 @@ def _swisseph_planet_state(
         )
         if physical:
             trace.observe(planet, model)
-        else:
-            pass
         state = {
             "longitude": normalize_angle(longitude),
             "latitude": latitude,
@@ -221,10 +205,6 @@ def _swisseph_planet_state(
                 motion_metadata.setdefault("lunar_source_windows", {})[
                     "tropical"
                 ] = policy
-            else:
-                pass
-        else:
-            pass
         if correct_motion:
             state.update(
                 corrected_longitude_motion(
@@ -236,8 +216,6 @@ def _swisseph_planet_state(
                     context=motion_metadata,
                 )
             )
-        else:
-            pass
         if include_declination:
             try:
                 if planet == "Moon":
@@ -253,8 +231,6 @@ def _swisseph_planet_state(
                         motion_metadata.setdefault("lunar_source_windows", {})[
                             "equatorial"
                         ] = eq_policy
-                    else:
-                        pass
                 else:
                     equatorial, eq_flag = runtime.ephemeris_call(
                         operation,
@@ -270,25 +246,15 @@ def _swisseph_planet_state(
                 if eq_flag >= 0:
                     if runtime.ephemeris_model_from_retflag(eq_flag) != model:
                         raise EphemerisSourceError("coordinate_model_changed")
-                    else:
-                        pass
                     if physical:
                         trace.observe(planet, model)
-                    else:
-                        pass
                     _, declination, _ = require_spherical_coordinates(
                         equatorial, eq_flag, native=runtime.swe, equatorial=True
                     )
                     state["declination"] = declination
-                else:
-                    pass
-        else:
-            pass
         assert_physical_configuration(selected)
         if source_trace is None:
             trace.finish()
-        else:
-            pass
         return state, native_factor_model(PLANET_SWISSEPH_IDS[planet], flag)
 
 
@@ -315,8 +281,6 @@ def _build_planet_states(
         raise ModuleNotFoundError(
             "Swiss Ephemeris is required for explicitly selected JPL mode"
         )
-    else:
-        pass
     planet_names = _planet_set(chart_variant)
     ephemeris_states: Dict[str, Dict[str, float]] = {}
     models: Dict[str, str] = {}
@@ -343,21 +307,15 @@ def _build_planet_states(
                 # fallback has its own coherent Earth/Sun/frame calculation.
                 if fallback is None:
                     fallback = ApproximateEphemeris(julian_day, julian_day_tt)
-                else:
-                    pass
                 ephemeris_states[planet] = fallback.state(planet)
                 models[planet] = (
                     MEAN_NODE_MODEL if planet == "North Node" else ORBITAL_MODEL
                 )
                 if planet not in {"North Node", "South Node"}:
                     trace.observe(planet, models[planet])
-                else:
-                    pass
             assert_physical_configuration(selected)
         if source_trace is None:
             trace.finish()
-        else:
-            pass
 
     if native_count == len(planet_names):
         return PlanetStateBatch(
@@ -368,8 +326,6 @@ def _build_planet_states(
             models,
             None,
         )
-    else:
-        pass
     return PlanetStateBatch(
         ephemeris_states,
         (

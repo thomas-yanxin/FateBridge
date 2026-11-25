@@ -53,8 +53,6 @@ def _atan_degrees(ratio: Fraction) -> Fraction:
     """Retain the small residual before adding an exact axis or diagonal."""
     if ratio == 0:
         return Fraction(0)
-    else:
-        pass
     context = mp.clone()
     context.dps = WORKING_DIGITS
     value = context.atan(context.mpf(ratio.numerator) / ratio.denominator)
@@ -69,8 +67,6 @@ def angular_radius(radius: float, distance_squared: Fraction) -> Fraction:
     """
     if radius == 0:
         return Fraction(0)
-    else:
-        pass
     error = Fraction(radius)
     tangent_squared = distance_squared - error * error
     numerator = isqrt(tangent_squared.numerator)
@@ -80,8 +76,6 @@ def angular_radius(radius: float, distance_squared: Fraction) -> Fraction:
         and denominator * denominator == tangent_squared.denominator
     ):
         return _atan_degrees(error / Fraction(numerator, denominator))
-    else:
-        pass
     context = mp.clone()
     context.dps = WORKING_DIGITS
     ratio = (context.mpf(error.numerator) / error.denominator) / context.sqrt(
@@ -107,8 +101,6 @@ def direction_support(bearing: Angle, radius: Angle) -> list[CompassDirection]:
     center = Fraction(bearing) % 360
     if radius == 0:
         return [DIRECTIONS[int((center + Fraction(45, 2)) // 45) % 8]]
-    else:
-        pass
     lower, upper = center - Fraction(radius), center + Fraction(radius)
     return [
         direction

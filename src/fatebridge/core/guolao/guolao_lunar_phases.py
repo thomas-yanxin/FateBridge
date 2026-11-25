@@ -41,8 +41,6 @@ def _profile() -> tuple[dict[str, Any], str]:
         or p["sunrise_default"] is not None
     ):
         raise ValueError("具名弦策、古度及日出退日规则不符，不自动混参或补日出分")
-    else:
-        pass
     return p, hashlib.sha256(raw).hexdigest()
 
 
@@ -55,23 +53,13 @@ def assign_source_phase_day(
     """Inclusive 已下 applies to 弦望 only; a missing threshold stays missing."""
     if phase_kind not in KINDS:
         raise ValueError("须明确为朔、上弦、望或下弦")
-    else:
-        pass
     if total_source_days is not None and not isinstance(total_source_days, F):
         raise TypeError("加时须为Fraction原历未折回日数，缺值须为None")
-    else:
-        pass
     if source_sunrise_fraction is not None:
         if not isinstance(source_sunrise_fraction, F):
             raise TypeError("日出分须为Fraction原历日内份额，不套现代日出")
-        else:
-            pass
         if not 0 <= source_sunrise_fraction < 1:
             raise ValueError("日出份额须在0至1之间，不接收日周分原整数或自动取模")
-        else:
-            pass
-    else:
-        pass
     requires_sunrise = phase_kind != "new_moon"
     midnight = total_source_days // 1 if total_source_days is not None else None
     fraction = total_source_days % 1 if total_source_days is not None else None
@@ -131,12 +119,8 @@ def source_lunar_phase(
     """Compute an exact quarter-step from initial mean new moon, not interpolation."""
     if isinstance(phase_index, bool) or not isinstance(phase_index, int):
         raise TypeError("朔弦望序号须为非负整数，0为天正经朔")
-    else:
-        pass
     if phase_index < 0:
         raise ValueError("朔弦望序号须非负，不以负序号推定上考")
-    else:
-        pass
     p, digest = _profile()
     lunation, quarter = divmod(phase_index, 4)
     components = _source_phase_components(

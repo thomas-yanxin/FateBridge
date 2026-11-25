@@ -31,8 +31,6 @@ def reference_geometry(
     swe = runtime.swe
     if swe is None:
         raise ValueError("果老天文参考计算需要Swiss Ephemeris")
-    else:
-        pass
     ayanamsha = 0.0
     if sidereal:
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
@@ -41,10 +39,6 @@ def reference_geometry(
         )
         if flag < 0 or not math.isfinite(ayanamsha):
             raise ValueError("Lahiri偏移计算失败，不能误标所选黄道")
-        else:
-            pass
-    else:
-        pass
     code = house_info.get("swisseph_code", b"W")
     available = {
         "status": "unavailable",
@@ -73,8 +67,6 @@ def reference_geometry(
     if abs(latitude) == 90:
         available["reason"] = "geographic_pole_no_unique_rising_point"
         return layout
-    else:
-        pass
 
     def calculate(selected_code: bytes) -> dict[str, Any]:
         cusps, angles = runtime.ephemeris_call(
@@ -108,8 +100,6 @@ def reference_geometry(
                 house_cusps=native["house_cusps"],
                 method=native["sidereal_house_method"],
             )
-        else:
-            pass
         return result
 
     try:
@@ -134,13 +124,9 @@ def reference_geometry(
     ):
         available["reason"] = "invalid_reference_angles"
         return layout
-    else:
-        pass
     available["angles_status"] = "available"
     if available["angle_method"] is None:
         available["angle_method"] = "swisseph_ascmc"
-    else:
-        pass
     cusps = candidate["house_cusps"]
     if cusps:
         if (
@@ -154,8 +140,6 @@ def reference_geometry(
         else:
             available["houses_status"] = "available"
             available["house_method"] = candidate["method"]
-    else:
-        pass
     available["status"] = (
         "available" if available["houses_status"] == "available" else "partial"
     )

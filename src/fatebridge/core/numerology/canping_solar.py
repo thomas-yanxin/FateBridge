@@ -70,16 +70,10 @@ def _extended_event_profile(
 ) -> str | None:
     if mode != "de440" and not (mode == "auto" and jpl is None):
         return None
-    else:
-        pass
     if origin == 1700 and year == 1699:
         return de440_solar.EXTENDED_MODEL_ID
-    else:
-        pass
     if 2201 <= origin <= 2300 and 2301 <= year <= 2420:
         return de440_solar.CANPING_EXTENDED_MODEL_ID
-    else:
-        pass
     return None
 
 
@@ -110,8 +104,6 @@ def _extended_event(
         key,
     ):
         raise EphemerisSourceError("solar_configuration_changed")
-    else:
-        pass
     details = {
         **root["model"],
         "root_bracket_tt": [sum(p) for p in root["tt_bracket_parts"]],
@@ -153,34 +145,22 @@ def _root(year: int, mode: str, profile: str, identity: tuple) -> dict[str, Any]
         return vsop2013_solar.longitude_crossing_tt(
             315.0, low, high, expected_source_key=identity
         )
-    else:
-        pass
     if mode == "aa1996":
         return aa1996_solar.longitude_crossing_tt(
             315.0, low, high, expected_source_key=identity, projection_year=year
         )
-    else:
-        pass
     if mode == "analytic":
         return analytic_solar.longitude_crossing_tt(315.0, low, high)
-    else:
-        pass
     return de440_solar.longitude_crossing_tt(315.0, low, high, profile_id=profile)
 
 
 def _source_key(mode: str, profile: str) -> tuple:
     if mode == "vsop2013":
         return vsop2013_solar.cache_key()
-    else:
-        pass
     if mode == "aa1996":
         return aa1996_solar.cache_key()
-    else:
-        pass
     if mode == "analytic":
         return (analytic_solar.loaded_sha256(),)
-    else:
-        pass
     return de440_solar.cache_key(profile)
 
 
@@ -197,16 +177,12 @@ def resolve_projection_boundary(
         or not origin_bazi_year <= year <= origin_bazi_year + horizon
     ):
         raise ValueError("投影边界必须属于已给出生年与原有1至120年范围。")
-    else:
-        pass
     mode, jpl = solar_model_policy(), configured_jpl_file()
     if mode == "vsop2013":
         from fatebridge.core.solar_term_runtime import solar_term_cache_context
 
         # Validate the real origin and strict-JPL policy before any derived cache.
         solar_term_cache_context(almanac.swe, year=origin_civil_year)
-    else:
-        pass
     extended = _extended_event_profile(year, origin_civil_year, mode, jpl)
     if extended is not None:
         return _extended_event(
@@ -219,8 +195,6 @@ def resolve_projection_boundary(
             jpl,
             extended,
         )
-    else:
-        pass
     low_year, high_year = (
         VSOP2013_SOFTWARE_YEARS if mode == "vsop2013" else VALIDATED_SOFTWARE_YEARS
     )
@@ -239,8 +213,6 @@ def resolve_projection_boundary(
         if mode == "swiss" and not low_year <= year <= high_year:
             if year not in {low_year - 1, high_year + 1}:
                 raise EphemerisSourceError("solar_swiss_range")
-            else:
-                pass
             terms = almanac._solar_terms_for_context_year(
                 year, zone, low_year if year < low_year else high_year, term_index=2
             )
@@ -264,8 +236,6 @@ def resolve_projection_boundary(
             and not high_year + 1 <= year <= high_year + 120
         ):
             raise ValueError("该立春不在已冻结的有界派生事件范围内。")
-        else:
-            pass
         profile = (
             vsop2013_solar.MODEL_ID
             if mode == "vsop2013"
@@ -296,8 +266,6 @@ def resolve_projection_boundary(
             raise EphemerisSourceError("solar_configuration_changed") from exc
         if after != (mode, jpl, key):
             raise EphemerisSourceError("solar_configuration_changed")
-        else:
-            pass
         details = {
             **root["model"],
             "root_bracket_tt": root["bracket_tt"],

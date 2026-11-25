@@ -76,8 +76,6 @@ def iers2010_gast(
     ut1 = UT1Instant.from_value(jd_ut1)
     if not all(math.isfinite(x) for x in (nutation_longitude, mean_obliquity)):
         raise ValueError("Rotation inputs must be finite")
-    else:
-        pass
     # Keep the published affine rotation and the supplied UT1 point exact
     # until the final angular sum. A scalar still denotes only its IEEE point.
     era_turn = _era_turn(ut1)

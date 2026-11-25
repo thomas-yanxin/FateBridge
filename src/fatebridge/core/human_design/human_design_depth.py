@@ -77,8 +77,6 @@ def fixing_reading(record: Dict[str, Any]) -> str:
             text += f"该线正文另将{BODY_NAMES[basis['additional_planet']]}列入{role}（PDF第{basis['source_pdf_page_one_based']}页），本次触发包含这一附加依据。"
         if kind == "unitary":
             text += "这是原典单极性类别，须另查本盘是否实际触发。"
-        else:
-            pass
         state = record["fixing_state"]
         text += {
             "exaltation": "本盘触发上升极性。",
@@ -97,8 +95,6 @@ def fixing_reading(record: Dict[str, Any]) -> str:
                 text += f"{label}依据为{source_side}{BODY_NAMES[source['body']]} {source['gate']}.{source['line']}（{relation}，{source['calculation_path']}）。"
     if record["recipient_kind"] == "node_activation":
         text += "交点位置可接受固定；交点本身不充当固定其他位置的星体。"
-    else:
-        pass
     return (
         text
         + "极性不表示吉凶、能力高低或现实事件结果；这里只解释固定机制，未提供该线完整原典线义。"
@@ -132,8 +128,6 @@ def cross_identifier(personality_sun_gate: int, angle: str) -> Dict[str, Any]:
     row = depth_reference()["gates"][personality_sun_gate - 1]
     if row["gate"] != personality_sun_gate or angle not in row["cross_identifiers"]:
         raise ValueError("轮回交叉目录的门号或角度无效")
-    else:
-        pass
     return {
         "name": row["cross_identifiers"][angle],
         "name_status": "primary_2001_angle_identifier",
@@ -149,8 +143,6 @@ def line_fixings(activations: Dict[str, List[Dict[str, Any]]]) -> List[Dict[str,
     side_items = [(side, activations[side]) for side in SIDES if side in activations]
     if len(side_items) != len(activations):
         raise ValueError("Unknown activation side")
-    else:
-        pass
     # JSON object order is not semantic. Recipient and donor *arrays* keep their
     # actual indices; only the two named sides have a fixed traversal order.
     for side, items in side_items:
@@ -177,18 +169,12 @@ def line_fixings(activations: Dict[str, List[Dict[str, Any]]]) -> List[Dict[str,
                 )
                 if not planets:
                     continue
-                else:
-                    pass
                 for source_side, sources in side_items:
                     for source_index, source in enumerate(sources):
                         if source["body"] not in planets or source["body"] in NODES:
                             continue
-                        else:
-                            pass
                         if source["gate"] not in harmonics | {gate}:
                             continue
-                        else:
-                            pass
                         relation = (
                             "same_line"
                             if source["gate"] == gate and source["line"] == line
@@ -251,8 +237,6 @@ def line_fixings(activations: Dict[str, List[Dict[str, Any]]]) -> List[Dict[str,
             basis = triggered_basis(additional, triggers)
             if basis:
                 result[-1]["additional_polarity_basis"] = basis
-            else:
-                pass
             result[-1]["reading"] = fixing_reading(result[-1])
     return result
 

@@ -44,8 +44,8 @@
 | S11 | [八卦九星吉凶之源原文段](https://bazhaimingjing.5000yan.com/23/) | 累计七变56组关系；累计步骤不是净变化爻数，也不是流年 |
 | S12 | [九星五行原文段](https://bazhaimingjing.5000yan.com/64996.html) | 辅弼随门而化语境，与S10并列；本版本未自动依门改变伏位五行 |
 | S13 | [Larry Sang / AFSI 五行循环图](https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf) | 印刷第19、20页／PDF第36、37页，只核对有向生克，不认证物件处方与效力 |
-| V1 | [fengshui-master 固定提交的命卦脚本](https://github.com/JackieL233/fengshui-master/blob/2666304c5cb4ac13091c8c1fcdd4e40c218b275a/fengshui-master/scripts/minggua.py) | 独立代码对照，支持1900–2099；没有出生时刻换年处理，V1为本页验证文献标识 |
-| V2 | [同提交的飞星脚本](https://github.com/JackieL233/fengshui-master/blob/2666304c5cb4ac13091c8c1fcdd4e40c218b275a/fengshui-master/scripts/flying_stars.py) | 实际只有运盘洛书骨架，未实现年度、月度及宅命山向盘，V2不冒充运行规则来源 |
+| V1 | [fengshui-master 固定提交的命卦脚本](https://github.com/JackieL233/fengshui-master) | 独立代码对照，支持1900–2099；没有出生时刻换年处理，V1为本页验证文献标识 |
+| V2 | [同提交的飞星脚本](https://github.com/JackieL233/fengshui-master) | 实际只有运盘洛书骨架，未实现年度、月度及宅命山向盘，V2不冒充运行规则来源 |
 
 这些资料支持有限范围的基础引擎，尚不足以替所有流派给出唯一完整解释。声称某原典／师承的完整版前，还须锁定底本、页码、转录校勘与完整规则清单。
 

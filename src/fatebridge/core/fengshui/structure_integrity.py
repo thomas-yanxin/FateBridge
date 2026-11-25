@@ -17,8 +17,6 @@ PARENTAL = ([1, 4, 7], [2, 5, 8], [3, 6, 9])
 def _require(condition: bool) -> None:
     if not condition:
         raise FengshuiCalculationError("natal_structure_inconsistent")
-    else:
-        pass
 
 
 def _record(actual: Any, expected: Any) -> None:

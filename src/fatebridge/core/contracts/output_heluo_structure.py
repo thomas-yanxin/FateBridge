@@ -59,25 +59,15 @@ class HeluoSourceYouyuan(PartialOutput):
             )
             if self.corresponding_pos != expected:
                 raise ValueError("有援原句须使用同卦实际对应爻位。")
-            else:
-                pass
-        else:
-            pass
         if self.selected_yang is not None and self.corresponding_yang is not None:
             if self.polarity_opposed is not None and self.polarity_opposed != (
                 self.selected_yang != self.corresponding_yang
             ):
                 raise ValueError("相应阴阳事实不一致。")
-            else:
-                pass
             if self.clause_match is not None and self.clause_match != (
                 not self.selected_yang and self.corresponding_yang
             ):
                 raise ValueError("有援所选主本原句不能用通用相应或反向相应替代。")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -98,29 +88,21 @@ class HeluoLineConditionRow(PartialOutput):
         aid = self.source_youyuan
         if aid is None:
             return self
-        else:
-            pass
         if (
             self.pos is not None
             and aid.selected_pos is not None
             and self.pos != aid.selected_pos
         ):
             raise ValueError("有援原句的元堂须属于本阶段。")
-        else:
-            pass
         if (
             self.yang is not None
             and aid.selected_yang is not None
             and self.yang != aid.selected_yang
         ):
             raise ValueError("有援原句的元堂阴阳须属于本阶段。")
-        else:
-            pass
         if self.lines is not None:
             if len(self.lines) != 6:
                 raise ValueError("有援原句需要同卦六爻事实。")
-            else:
-                pass
             for pos, yang in [
                 (aid.selected_pos, aid.selected_yang),
                 (aid.corresponding_pos, aid.corresponding_yang),
@@ -131,10 +113,6 @@ class HeluoLineConditionRow(PartialOutput):
                     and bool(self.lines[pos - 1]) != yang
                 ):
                     raise ValueError("有援原句的爻阴阳与本阶段六爻不一致。")
-                else:
-                    pass
-        else:
-            pass
         return self
 
 
@@ -195,8 +173,6 @@ class HeluoStructureRecord(PartialOutput):
         ]
         if self.arity is not None:
             arities.append(self.arity)
-        else:
-            pass
         if self.kind is not None:
             expected = dict(OPERATORS)[self.kind]
             arities.append(len(expected))
@@ -204,21 +180,11 @@ class HeluoStructureRecord(PartialOutput):
                 expected
             ):
                 raise ValueError("卦体结构须保留实际取爻次序。")
-            else:
-                pass
-        else:
-            pass
         if any(arity not in (3, 6) for arity in arities) or len(set(arities)) > 1:
             raise ValueError("卦体结构的种类、爻数、原位与爻形不能混用三爻或六爻。")
-        else:
-            pass
         if self.lines is not None and self.name is not None:
             if _name(self.lines) != self.name:
                 raise ValueError("卦体结构名称与爻形不一致。")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -239,17 +205,11 @@ class HeluoWholeReversal(PartialOutput):
             1,
         ]:
             raise ValueError("全卦倒序须保留六爻次序。")
-        else:
-            pass
         if self.lines is not None:
             if len(self.lines) != 6 or (
                 self.name is not None and _name(self.lines) != self.name
             ):
                 raise ValueError("全卦倒序名称与六爻不一致。")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -276,17 +236,11 @@ class HeluoStructurePhase(PartialOutput):
         if self.gua is not None and self.literal_case_match is not None:
             if self.literal_case_match != (self.gua == "風山漸"):
                 raise ValueError("不能把其他卦标为所核渐卦原例。")
-            else:
-                pass
-        else:
-            pass
         if (
             self.literal_case_match is False
             and self.literal_names_reproduced is not None
         ):
             raise ValueError("其他卦的推演不冒充新增原例核对。")
-        else:
-            pass
         if self.literal_case_match is not None and self.source_application is not None:
             expected_basis = (
                 "named_jian_paragraph"
@@ -295,20 +249,12 @@ class HeluoStructurePhase(PartialOutput):
             )
             if self.source_application != expected_basis:
                 raise ValueError("原例与算子推演的来源标签不一致。")
-            else:
-                pass
-        else:
-            pass
         if self.records is not None:
             if len(self.records) != 8:
                 raise ValueError("所列结构应保留八条记录，包括重复名称。")
-            else:
-                pass
             for row, (kind, _) in zip(self.records, OPERATORS):
                 if row.kind is not None and row.kind != kind:
                     raise ValueError("结构记录次序不一致。")
-                else:
-                    pass
             if (
                 self.literal_case_match is True
                 and self.literal_names_reproduced is not None
@@ -328,41 +274,23 @@ class HeluoStructurePhase(PartialOutput):
                 ] and self.whole_reversal.name == "雷澤歸妹"
                 if self.literal_names_reproduced != reproduced:
                     raise ValueError("原例复现标记与实际结构名称不一致。")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         if self.input_lines is not None:
             if len(self.input_lines) != 6 or (
                 self.gua is not None and _name(self.input_lines) != self.gua
             ):
                 raise ValueError("同阶段卦名与输入六爻不一致。")
-            else:
-                pass
             for row in self.records or []:
                 if row.original_positions is not None and row.lines is not None:
                     if row.lines != [
                         self.input_lines[p - 1] for p in row.original_positions
                     ]:
                         raise ValueError("结构记录不能借用另一阶段爻形或翻转阴阳。")
-                    else:
-                        pass
-                else:
-                    pass
             if (
                 self.whole_reversal is not None
                 and self.whole_reversal.lines is not None
             ):
                 if self.whole_reversal.lines != self.input_lines[::-1]:
                     raise ValueError("全卦倒序不能变爻。")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         return self
 
 

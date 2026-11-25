@@ -36,14 +36,10 @@ def classify_timeliness(number: int, current: int | None) -> dict[str, Any]:
     """
     if type(number) is not int or number not in range(1, 10):
         raise ValueError("star number must be an integer from 1 through 9")
-    else:
-        pass
     if current is not None and (
         type(current) is not int or current not in range(1, 10)
     ):
         raise ValueError("current period must be an integer from 1 through 9")
-    else:
-        pass
     offset = None if current is None else (number - current) % 9
     phase = (
         "unknown"

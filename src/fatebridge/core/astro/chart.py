@@ -95,8 +95,6 @@ def build_core_chart_payload(
     """Keep one physical chart on one managed ephemeris configuration."""
     if chart_variant != "guolao_chart":
         require_resolved_birth_timezone(birth_info.timezone_source)
-    else:
-        pass
     with runtime.preserve_ephemeris_path():
         selected = configured_ephemeris_path()
         result = _build_core_chart_payload(
@@ -132,8 +130,6 @@ def _build_core_chart_payload(
         raise ValueError(
             "guolao_seasonal_anchor_policy requires chart_variant=guolao_chart"
         )
-    else:
-        pass
     if chart_variant == "guolao_chart":
         from fatebridge.core.guolao.guolao import build_chart
 
@@ -143,8 +139,6 @@ def _build_core_chart_payload(
             zodiacal=zodiacal,
             seasonal_anchor_policy=guolao_seasonal_anchor_policy,
         )
-    else:
-        pass
     times = birth_info.time_scales
     julian_day = times.ut1
     house_system_info = _resolve_core_chart_house_system(
@@ -194,8 +188,6 @@ def _build_core_chart_payload(
     ):
         engine_precision = "mixed_precision_runtime_model"
         engine_backend = "swisseph_api_with_approximate_geometry"
-    else:
-        pass
     chart_sect = _sect(planet_states["Sun"]["altitude"])
     native_planets = [
         name for name, model in planetary_models.items() if model not in FALLBACK_MODELS
@@ -232,8 +224,6 @@ def _build_core_chart_payload(
                     planet_states[name]["longitude"], -ayanamsha
                 ),
             }
-    else:
-        pass
     interpretation_states = (
         {
             name: {
@@ -278,16 +268,12 @@ def _build_core_chart_payload(
             state = interpretation_states[name]
             if "longitude_speed" not in state:
                 continue
-            else:
-                pass
             interpretation_states[name] = {
                 **state,
                 "longitude_speed_tropical": state["longitude_speed"],
                 "longitude_speed_sidereal_origin_correction": -fallback_origin_rate,
                 "longitude_speed": state["longitude_speed"] - fallback_origin_rate,
             }
-    else:
-        pass
     house_projection = (
         build_ecliptic_house_projection(
             julian_day_ut1=times.ut1,
@@ -354,8 +340,6 @@ def _build_core_chart_payload(
             longitude=birth_info.longitude,
             latitude=birth_info.latitude,
         )
-    else:
-        pass
     angle_definition = geographic_pole_angle_definition(
         birth_info.latitude, frame=pole_frame
     ) or layout.get("angle_definition")
@@ -525,8 +509,6 @@ def _build_core_chart_payload(
                 + [f"classical.lots.{key}" for key in result["classical"]["lots"]],
             )
         )
-    else:
-        pass
     if house_projection is not None:
         result["chart_profile"][
             "house_position_projection"
@@ -536,17 +518,11 @@ def _build_core_chart_payload(
         )
         if projection_note:
             result["summary"].append(projection_note)
-        else:
-            pass
-    else:
-        pass
     if layout.get("house_axis_convention") is not None:
         result["chart_profile"]["house_axis_convention"] = layout[
             "house_axis_convention"
         ]
         result["summary"].append(layout["house_axis_convention"]["note_zh"])
-    else:
-        pass
     if approximate_planets:
         assert batch.fallback is not None
         result["chart_profile"]["planetary_models"] = planetary_models
@@ -592,8 +568,6 @@ def _build_core_chart_payload(
         result["summary"].append(
             "轨道近似天体：" + "、".join(approximate_planets) + "。"
         )
-    else:
-        pass
     result["classical"]["source_profile"] = "mixed_dorothean_egyptian_lilly"
     if sidereal:
         result["chart_profile"].update(
@@ -625,10 +599,6 @@ def _build_core_chart_payload(
                 )
                 for name in planetary_models
             }
-        else:
-            pass
-    else:
-        pass
     result["classical"]["ptolemy"] = build_ptolemy_layer(
         {planet: state["longitude"] for planet, state in planet_states.items()},
         chart_sect,
@@ -639,8 +609,6 @@ def _build_core_chart_payload(
     if angle_definition is not None:
         result["chart_profile"]["angle_definition"] = angle_definition
         result["summary"].append(angle_definition["note_zh"])
-    else:
-        pass
 
     if include_context_geometry:
         result["context_geometry"] = build_context_geometry(
@@ -677,8 +645,6 @@ def _build_core_chart_payload(
                 "complete_position_derivatives", {}
             ),
         )
-    else:
-        pass
     if chart_variant == "chart13":
         result["thirteen_sectors"] = thirteen_sectors(effective_ascendant)
         result["sector_profile"] = sector_profile(effective_ascendant)
@@ -701,12 +667,6 @@ def _build_core_chart_payload(
                         backend_convention_sector=planet["sector13"],
                     )
                     planet["sector13"] = None
-            else:
-                pass
-        else:
-            pass
-    else:
-        pass
     if chart_variant == "hellen_chart":
         fortune = result["classical"]["lots"].get("fortune")
         result["hellenistic"] = {
@@ -732,8 +692,6 @@ def _build_core_chart_payload(
                 else None
             ),
         }
-    else:
-        pass
     if chart_variant == "india_chart":
         result["india"] = {
             "ayanamsha": round(ayanamsha, 4),
@@ -747,8 +705,6 @@ def _build_core_chart_payload(
                 None,
             ),
         }
-    else:
-        pass
     result["chart_profile"]["apparent_position_policy"] = apparent_position_policy(
         times.jd_tt, planetary_models, physical_trace
     )
@@ -759,8 +715,6 @@ def _build_core_chart_payload(
         or configured_jpl_file() is not None
     ):
         result["chart_profile"]["physical_ephemeris_source"] = source
-    else:
-        pass
     return result
 
 

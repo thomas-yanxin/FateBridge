@@ -43,14 +43,10 @@ class ClassicalRoot(PartialOutput):
     def preserve_distinct_root_observations(self) -> "ClassicalRoot":
         if self.hidden_element_present is False and self.matching_hidden_stems:
             raise ValueError("无同气藏干与存在匹配藏干不能同时成立")
-        else:
-            pass
         if self.kind == "yin_growth_reference" and (
             self.hidden_element_present is True or self.matching_hidden_stems
         ):
             raise ValueError("阴长生原典参考不能补造成同气藏干根")
-        else:
-            pass
         return self
 
 

@@ -74,10 +74,6 @@ class RenAnchoredOutput(PartialOutput):
             _liuren(_get(sub, "liureng"), subpillars, complete=complete)
             if pillars is None:
                 pillars = subpillars
-            else:
-                pass
-        else:
-            pass
         _liuren(board, pillars, _get(self, "runyear"), complete=complete)
         _jinkou(_get(self, "jinkou"), pillars, board)
         _jinkou(_get(self, "jinkou", "year_fate", "course"), pillars, board)
@@ -100,15 +96,11 @@ def require_complete_ren_anchors(
     """Only full service output: projection models deliberately stay partial."""
     if key not in REN_ANCHOR_TOOLS:
         return
-    else:
-        pass
 
     def require(obj: Any, paths: tuple[str, ...]) -> None:
         for path in paths:
             if _get(obj, *path.split(".")) is None:
                 raise ValueError(f"完整六壬金口诀输出缺少计算依据：{path}")
-            else:
-                pass
 
     def pillars(obj: Any) -> None:
         for role in ("year", "month", "day", "hour"):
@@ -124,20 +116,14 @@ def require_complete_ren_anchors(
                 placement = _get(result, "runyear", "year_fate", role)
                 if not isinstance(placement, dict) or "sky_branch" not in placement:
                     raise ValueError("完整类神阴神须保留同次年命上神及可空年命事实")
-                else:
-                    pass
                 if yin_roles[role] != placement["sky_branch"]:
                     raise ValueError("完整类神阴神不能替换同次年命上神")
-                else:
-                    pass
             natal_earth = _get(result, "runyear", "year_fate", "natal", "earth_branch")
             annual_earth = _get(
                 result, "runyear", "year_fate", "annual", "earth_branch"
             )
         elif yin_roles != {"natal": None, "annual": None}:
             raise ValueError("未提供六壬年命计算的入口不能给阴神编造年命上神")
-        else:
-            pass
 
         require_complete_seasonal(obj)
 
@@ -182,17 +168,11 @@ def require_complete_ren_anchors(
             sub_board = _get(sub, "liureng")
             if sub_board is not None and sub_board is not board:
                 liuren(sub_board)
-            else:
-                pass
         else:
             pillars(_get(result, "four_pillars"))
         liuren(board)
-    else:
-        pass
     if key == "liureng_runyear":
         require(result, ("runyear.year_fate.day_ganzhi",))
-    else:
-        pass
     if key == "jinkou":
 
         align_branch_breaks(result["jinkou"], complete=True)
@@ -235,8 +215,6 @@ def require_complete_ren_anchors(
             key not in natal for key in ("right_branch", "matched", "element")
         ):
             raise ValueError("完整金口诀须保留大绝的本命支及可空判定")
-        else:
-            pass
         traces = [
             t
             for t in _get(result, "jinkou", "rule_trace") or []
@@ -257,8 +235,6 @@ def require_complete_ren_anchors(
             )
         ):
             raise ValueError("完整金口诀须保留唯一的将命大绝规则轨迹")
-        else:
-            pass
         if not _year_course:
 
             require_complete_natal_course(result["jinkou"])
@@ -267,8 +243,6 @@ def require_complete_ren_anchors(
                 require_complete_ren_anchors(
                     key, dict(result, jinkou=natal_child), _year_course=True
                 )
-            else:
-                pass
             annual = _get(result, "jinkou", "year_fate")
             if not isinstance(annual, dict) or any(
                 name not in annual
@@ -303,15 +277,7 @@ def require_complete_ren_anchors(
                 )
             ):
                 raise ValueError("完整金口诀须保留京本行年资料及可空另课")
-            else:
-                pass
             if annual["course"] is not None:
                 require(annual["course"], ("overview.di_fen_source",))
                 child = dict(result, jinkou=annual["course"])
                 require_complete_ren_anchors(key, child, _year_course=True)
-            else:
-                pass
-        else:
-            pass
-    else:
-        pass

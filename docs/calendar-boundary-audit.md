@@ -60,8 +60,8 @@
 ## 来源与复现
 
 - [Temporal原实现及版本](https://github.com/js-temporal/temporal-polyfill/tree/v0.5.1)与[ZonedDateTime定义](https://tc39.es/proposal-temporal/docs/zoneddatetime.html)。[冻结输入、包完整性及生成器](../tests/data/zoned_calendar_temporal_v1/README.md)保留于测试资料。
-- [Swiss2.10.03固定C求根器](https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c)使用1毫角秒内部停止线；[ERFA](https://github.com/liberfa/erfa/tree/v2.0.1/src)提供独立TT／TAI／UTC钟时链。
-- [lunar-python固定Solar历制](https://github.com/6tail/lunar-python/blob/1645ad3b3653635e5cb31b0c6df22b5e4298f8ce/lunar_python/Solar.py)和[sxtwl固定JD历制](https://github.com/yuangu/sxtwl_cpp/blob/f78cd5e0cfca4661cfe5af2f06d630fff5b0c051/src/JD.cpp)。离散规则及原73,414日队列另见[八字关系核对](bazi-relations-audit.md)。
+- [Swiss2.10.03固定C求根器](https://github.com/astrorigin/swisseph)使用1毫角秒内部停止线；[ERFA](https://github.com/liberfa/erfa/tree/v2.0.1/src)提供独立TT／TAI／UTC钟时链。
+- [lunar-python固定Solar历制](https://github.com/6tail/lunar-python)和[sxtwl固定JD历制](https://github.com/yuangu/sxtwl_cpp)。离散规则及原73,414日队列另见[八字关系核对](bazi-relations-audit.md)。
 - [IANA2026f原始发行记录](https://github.com/eggert/tz/blob/2026f/NEWS)、[官方代码包](https://data.iana.org/time-zones/releases/tzcode2026f.tar.gz)与[官方资料包](https://data.iana.org/time-zones/releases/tzdata2026f.tar.gz)。本机使用Homebrew LLVM／LLD、现有CLT SDK实际重编C实现，未接受或修改Xcode许可；原编译失败日志和所有归档指纹保留。
 
 持久回归见[时区算术](../tests/astronomy/test_zoned_calendar.py)与[历法边界](../tests/astronomy/test_calendar_year_edges.py)。后者的实时336点原生比较标记`local_data`，需要固定Swiss文件；普通窗口回归使用独立冻结钟时字段，不冒称现场重新求根。原始请求、源码前像、参考生成器、失败输出与完整比较在本轮外部审查档案`fatebridge-calendar-boundary-oracle-20261111`保留。
@@ -107,7 +107,7 @@
 
 固定参考保留全部597个时区名称及别名，对应344种文件字节身份；1901至2099年的40,195个显式转换点各取七个预声明秒偏移，共281,365条记录。加上597个各时区控制、60日乘24小时的1,440个排柱控制、120个晚子时控制及3个最初见证，总计283,525条。其中51条使用`-00`未知本地时间标签，单列观察，不认证当地法定钟时。别名、重叠时刻和控制记录不能相加为独立样本。
 
-日柱、时柱和纳音通过实际执行固定[6tail/lunar-python原作者代码](https://github.com/6tail/lunar-python/tree/1645ad3b3653635e5cb31b0c6df22b5e4298f8ce)取得，提交为`1645ad3b3653635e5cb31b0c6df22b5e4298f8ce`，明确选择23:00换日口径。查询实际钟时、时柱和纳音是修改前已固定的门槛；原有整点时间字符串的差异另列观察，没有事后将它全部算成数值错误。
+日柱、时柱和纳音通过实际执行固定[6tail/lunar-python原作者代码](https://github.com/6tail/lunar-python)取得，明确选择23:00换日口径。查询实际钟时、时柱和纳音是修改前已固定的门槛；原有整点时间字符串的差异另列观察，没有事后将它全部算成数值错误。
 
 | 原固定队列 | 修改前 | 修改后源码及独立Python 3.10安装包 |
 | --- | --- | --- |
@@ -207,7 +207,7 @@
 
 同一队列的三同刻原生成员控制2/3→3/3，其余11例的完整时刻输出不变。前后各40,660条实际motion记录完整保留，只有修正案例末尾两次结果核验查询改变，不能称全部调用相同。另四次真实领域服务调用复用原四季交点与原北京地点，实际起盘TT均等于冻结的求根点，原入宫标签均不变，完整JSON无需回退编码器即可序列化；它们不是四个新独立输入，也不是完整服务前像比较。公开同刻请求已在REST、新stdio MCP及CLI的修改前完整复现，三端业务事实仅排除顶层`run_metadata`后相同；修改后及春分服务的三端观察另按共同源码冻结记录，不以领域观察冒充协议验收。
 
-三项聚焦回归已补入原事件／多重回归文件但未运行；未执行项目测试、收集、CI、格式、类型、构建或清单检查，也没有重跑原65,536队列。原[Round14十六次标量别名](precision-acceptance.md#retained-target-tt)、连续／停滞擦触完备性、钟时与物理误差及旧模型比较失败均保留。来源前像、全部12例、原生逐次记录和有界消费者证据保存在外部档案`fatebridge-audit-20261117-round17/calendar-events`；协议观察由同轮`astrology-event-protocols`单列，不能据此宣布全算法或预测SOTA。
+三项聚焦回归已补入原事件／多重回归文件但未运行；未执行项目测试、收集、CI、格式、类型、构建或清单检查，也没有重跑原65,536队列。原[Round14十六次标量别名](precision-acceptance.md#retained-target-tt)、连续／停滞擦触完备性、钟时与物理误差及旧模型比较失败均保留。独立参考涵盖全部 12 例，另检查了限定范围内的三端行为单列，不能据此宣布全算法或预测SOTA。
 
 共同最终源码冻结后，原返照请求的三端after及春分盘三端after共6次均成功，各场景完整业务仅排顶层`run_metadata`后三端相同，1,482生产Python／JSON路径在窗口内稳定。原返照每端13处完整变化包括土星、木星、北交点的最近／下次UTC与本地标签及摘要，全部保留；春分UTC为2026-03-20T14:45:57.445059，只有after观察。此协议范围不替代独立源比较，也不改变连续物理端点未决。
 
@@ -243,9 +243,9 @@ AFTER 固定四例各一次：两个奇门均返回完整九宫，实际标签�
 
 另选9个受影响工具的12个固定场景经 REST、新 stdio MCP 和独立 CLI，共36次实际调用，全部领域与协议成功；同场景完整业务仅去顶层 run_metadata 后三端0差异。原两奇门与现代六壬／金口诀四请求直接沿用；河洛、参评、三式、太乙月／日／金钥匙时计、农历与有界紫微共八例仅作 AFTER 控制，不造旧版或独立精度比较。十二份保存体的 strict_fields 投影及部分输出模型均接受，没有再次调用引擎。9份 input Schema 与 R32 声明相同；实际 output Schema 与完整 MCP 定义只核同窗稳定，不捏造历史 outputSchema。1490生产源码和133冻结资产含全部37 se1 前后相同；Pydantic 原 warning、各端日志和完整返回保留，真实模型、常驻聊天进程、安装与部署未验。
 
-累计独立根因仍26，本轮是既有历法表示家族的共享传播闭包，字段、函数和样例数量不增信用。原测试仅迁 owner、真实 carrier 与相关 spy，原规则断言和失败保留；新八输入回归只固定 source／BEFORE 条件操作数，不使用 AFTER 结果，仍未运行。pytest、collection、CI、格式／类型、build、合同／清单 checker 继续0。B1、原物理精度线、奇门九义务、太乙六壬异文及现实效度均未改判。完整来源、所有前像、失败和观察保存在外置`fatebridge-audit-20261117-round33/`。
+累计独立根因仍26，本轮是既有历法表示家族的共享传播闭包，字段、函数和样例数量不增信用。原测试仅迁 owner、真实 carrier 与相关 spy，原规则断言和失败保留；新八输入回归只固定 source／BEFORE 条件操作数，不使用 AFTER 结果，仍未运行。pytest、collection、CI、格式／类型、build、合同／清单 checker 继续0。B1、原物理精度线、奇门九义务、太乙六壬异文及现实效度均未改判。
 
-上述8领域与36协议观察对应生产 v1 的1490路径 canonical SHA256 `9d40117704e42023afd49e238e62f80c3b767f3ee5cbde29b330f8ef2d030b4f`。窗口结束后的独立静态 peer 另发现新五字段`SolarTimeAdjustment`需要沿西占`solar_rebase_adjustment`的返回注解传播，最终 v2 仅增加该类型 import 并将首 tuple 元素注解从任意可写 dict 改为该 TypedDict。原装饰器、参数及完整函数体 AST 不变，没有新计算或公开字段；它不算数值优化，也没有为纯类型传播重跑业务。v1 完整封印与 v2 静态类型差异分别保存，不能将 v1 的字节窗口冒称最终 v2 全字节未变。
+上述8领域与36协议观察对应当时生产实现的计算范围。窗口结束后的独立静态 peer 另发现新五字段`SolarTimeAdjustment`需要沿西占`solar_rebase_adjustment`的返回注解传播，最终 v2 仅增加该类型 import 并将首 tuple 元素注解从任意可写 dict 改为该 TypedDict。原装饰器、参数及完整函数体 AST 不变，没有新计算或公开字段；它不算数值优化，也没有为纯类型传播重跑业务。v1 完整封印与 v2 静态类型差异分别保存，不能将 v1 的字节窗口冒称最终 v2 全字节未变。
 
 <a id="retained-domain-carriers-round34"></a>
 ## 河洛、参评与六壬来源的端点闭包（R34）
@@ -258,7 +258,7 @@ R34从R33最终1490生产Python／JSON路径零漂移继续，固定六个无太
 
 金口诀上端的独立来源适用域根因见[河洛、参评与六壬的来源端点](#retained-domain-carriers-round34)。连续配运profile共享TimingAnalysis的UTC datetime往返另列未观察义务，本轮不复制算法或宣称它已支持该端点；年9999后的生日、上端默认120年序和其他来源域也未由当前六例证明。
 
-共同运行版本为1490路径canonical SHA256 `f3b8962b35d49d8023327874df2048a6f9340f2d7d3cf0aad7861779d060f54f`，领域六例的52资产及全部37配置se1即时前后无漂移，不是原生原子读集。完整证据在外置`fatebridge-audit-20261118-round34/calendar-domain-discovery/`；R33严格EOT B1、原太阳／物理门槛、奇门九义务和传统异文未改判。
+共同运行版本为已登记的源码与资料版本，领域六例的52资产及全部37配置se1即时前后无漂移，不是原生原子读集。较早的严格 EOT B1、原太阳／物理门槛、奇门九义务和传统异文未改判。
 
 <a id="continuous-carrier-round35"></a>
 ## 连续配运的合法下端与比较载体（R35）
@@ -269,4 +269,4 @@ R34从R33最终1490生产Python／JSON路径零漂移继续，固定六个无太
 
 固定三输入AFTER各一次REST，另仅C01各一次fresh MCP／CLI，共五调用：均领域完整，C01三端全业务0差且条件参考／13界标签和24点字段符合。原63门中的61通过、2个控制全业务连续性失败保持；C02／M01分别177／961差，均为既有public_output完整性字段移除，共同字段type／float.hex差0。实际未变public_value只作用于两份保存的内部BEFORE，派生同边界差0／0；这不是观察到的公开BEFORE、重放或原门改判。
 
-该观察窗为1493路径／778d974382aa77dcc1123d9b64aa9e8b19b7d639f83d769d055abeb37d846f7c，仍实际运行v3来源；73资产（含37se1与14v3块）前后0漂移。随后v4切换不冒作本五调用的来源。旧111fold／124gap、上端120年、物理太阳根与未来时区等未重跑；本修复属既有日历载体根因传播，新增独立根因0。完整证据在外置R35的canping-continuous-discovery。
+该观察窗为已登记的源码与资料版本，仍实际运行v3来源；73资产（含37se1与14v3块）前后0漂移。随后v4切换不冒作本五调用的来源。旧111fold／124gap、上端120年、物理太阳根与未来时区等未重跑；本修复属既有日历载体根因传播，新增独立根因0。完整证据在外置R35的canping-continuous-discovery。

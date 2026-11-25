@@ -49,8 +49,6 @@ def palace_wonder_tombs(trigram: str, heaven_stems: list[str]) -> dict[str, Any]
         )
     ):
         raise ValueError("三奇入墓须读取实际外八宫及有效天盘主干、寄干")
-    else:
-        pass
     observed = [s for s in heaven_stems if s in SELECTED_TOMBS]
     selected = [s for s in observed if SELECTED_TOMBS[s] == trigram]
     candidate = [s for s in observed if LITERAL_PROSE_CANDIDATE[s] == trigram]

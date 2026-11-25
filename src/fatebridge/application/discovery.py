@@ -59,22 +59,14 @@ def select_specs(
                     }
                 ],
             )
-        else:
-            pass
         selected = [spec for spec in selected if spec.family in families]
-    else:
-        pass
     if tool is not None:
         resolved = resolve_spec(specs, tool)
         if resolved is None:
             raise ParameterError(
                 "工具名称无效", [{"path": "tool", "code": "unknown_tool"}]
             )
-        else:
-            pass
         selected = [spec for spec in selected if spec is resolved]
-    else:
-        pass
     if surface:
         available = {
             "rest": lambda spec: bool(spec.rest_path),
@@ -82,12 +74,8 @@ def select_specs(
             "cli": spec_is_cli_safe,
         }
         selected = [spec for spec in selected if available[surface](spec)]
-    else:
-        pass
     if allowed_names is not None:
         selected = [spec for spec in selected if spec.tool_name in allowed_names]
-    else:
-        pass
     if q:
         needle = q.strip().casefold()
         selected = [
@@ -103,8 +91,6 @@ def select_specs(
                 )
             ).casefold()
         ]
-    else:
-        pass
     return selected
 
 

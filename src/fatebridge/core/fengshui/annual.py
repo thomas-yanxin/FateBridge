@@ -19,8 +19,6 @@ def annual_stars(req: AnnualRequest) -> dict[str, Any]:
                 "annual_stars.confirmed_effective_year_due_to_boundary_precision"
             ],
         }
-    else:
-        pass
     if year is None:
         return {
             "status": "partial",
@@ -28,8 +26,6 @@ def annual_stars(req: AnnualRequest) -> dict[str, Any]:
             "palaces": {},
             "missing_inputs": ["annual_stars.query_at_or_effective_year"],
         }
-    else:
-        pass
     center = wrap9(1 - (year - 1864))
     directions = rule_data("directions")
     stars = rule_data("annual_stars")

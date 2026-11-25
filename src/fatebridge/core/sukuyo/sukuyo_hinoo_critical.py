@@ -45,8 +45,6 @@ def critical_calendar_reference(
         or taisho["downloaded_calendar_windows"] != bundle["taisho_calendar_windows"]
     ):
         raise ValueError("桧尾校勘参考与本次所用大正原文不一致，须重新核验")
-    else:
-        pass
     examples = {(row["lunar_month"], row["lunar_day"]): row for row in host_examples}
     controls = bundle["taisho_selected_controls"]
     manuscript_rows = [
@@ -62,8 +60,6 @@ def critical_calendar_reference(
         or len(manuscript_rows) != len(manuscript)
     ):
         raise ValueError("桧尾所选原文例题的计算上下文不完整或重复")
-    else:
-        pass
     comparisons = []
     for control in controls:
         key = (control["month"], control["day"])
@@ -94,8 +90,6 @@ def critical_calendar_reference(
         examples
     ):
         raise ValueError("善通寺桧尾所选原文例题不完整或重复")
-    else:
-        pass
     supplemental_comparisons = []
     for control in controls:
         key = control["month"], control["day"]

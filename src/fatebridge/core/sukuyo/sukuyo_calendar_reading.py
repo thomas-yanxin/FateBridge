@@ -34,8 +34,6 @@ def _input_reference_lines(calendar: dict[str, Any]) -> list[str]:
     reference_zone = calendar.get("calendar_timezone")
     if not reference_zone:
         return []
-    else:
-        pass
     if (
         calendar.get("input_origin")
         == "derived_calendar_date_candidate_not_observed_birth_date"
@@ -44,8 +42,6 @@ def _input_reference_lines(calendar: dict[str, Any]) -> list[str]:
             f"此支为{reference_zone}参考历日{reference_date}的推导候选；"
             "不是另一个已观测的出生日期，也没有补造出生钟时。"
         ]
-    else:
-        pass
     moment = calendar.get("input_datetime")
     precision = input_timezone_reading(calendar)
     prefix = [precision] if precision else []
@@ -64,15 +60,11 @@ def _input_reference_lines(calendar: dict[str, Any]) -> list[str]:
             "这是两种输入模式的区别说明，本次未另算未知钟时结果。",
             "已知民用钟时不表示已确定古代平明日界，也不据此自动判定原典前后半日。",
         ]
-    else:
-        pass
     if calendar.get("input_date"):
         return prefix + [
             f"仅知输入当地日期{calendar['input_date']}（输入时区{calendar['input_timezone']}），"
             f"未提供出生钟时；本支查表按{reference_zone}参考历日{reference_date}，未补造钟时或古代日界。"
         ]
-    else:
-        pass
     return []
 
 
@@ -121,8 +113,6 @@ def render_day_reading(day: dict[str, Any]) -> str:
     if reconstruction_scope is not None:
 
         lines.extend(reconstruction_scope_lines(reconstruction_scope, calendar))
-    else:
-        pass
     if calendar.get("calendar_system") == "modern_chinese_lunisolar":
         lines.append(
             "本次声明的现代中国历日采用HKO（香港天文台）年度历表参考，"
@@ -130,8 +120,6 @@ def render_day_reading(day: dict[str, Any]) -> str:
             "本次返回未附现代中国历日的全域独立验收范围，不能仅据年度来源链接认证古代日界、"
             "桧尾半日、闰小月次序或现实预测效力。"
         )
-    else:
-        pass
     profile = calendar.get("profile_calculation") or {}
     lines.extend(hinoo_unassigned_month_start_lines(calendar, profile))
     if calendar.get("calendar_day_part") in {"first_half", "second_half"}:
@@ -154,8 +142,6 @@ def render_day_reading(day: dict[str, Any]) -> str:
                 "本日未触发小月缺日补配的半日分配，"
                 f"未声明半日没有阻止本档案算得{name}宿；这不表示古代半日钟界已确定。"
             )
-        else:
-            pass
     else:
         lines.append(
             "本次实际原典半日字段calendar_day_part=null（未声明）；"
@@ -189,8 +175,6 @@ def render_day_reading(day: dict[str, Any]) -> str:
         lines.append(
             f"采用HuTime 1002.1冻结逐日参考；本日来源为{labels[origin]}。固定UTC+09为明示参考日界，不是历史日本地方时复原；出生时区与所选历法分别保留。"
         )
-    else:
-        pass
     lines.extend(daily_source_reading_lines(day, calendar, name, reference_zone))
     special = day.get("special_day_evidence")
     selection = calendar.get("profile_calculation")
@@ -226,8 +210,6 @@ def render_day_reading(day: dict[str, Any]) -> str:
                     )
                     + "不补作氐或亢，标签集合未定，空匹配不表示确定没有特殊日。"
                 )
-            else:
-                pass
             reference = printed["source_reference"]
             lines.append(
                 f"该印本共保留21个所选宿字位置，其中{reference['accepted_mansion_readings']}项已识别，"
@@ -241,24 +223,16 @@ def render_day_reading(day: dict[str, Any]) -> str:
                     "该影印上卷甘露火曜井、金刚峰火曜昴水曜壁；"
                     "下卷分别为尾、壁、昴，上下卷互异没有合成一张表。"
                 )
-            else:
-                pass
-    else:
-        pass
     lines.extend(profile_calculation_lines(selection))
     variant = calendar.get("source_table_variant")
     if variant:
         lines.append(
             f"印本月建28宿表此格为{variant['table_mansion_28']}（{variant['locator']}）；此异表未代入27宿三九，也不是物理月亮宿位。"
         )
-    else:
-        pass
     printed = calendar.get("printed_edition_reference")
     if printed:
 
         lines.extend(printed_reference_lines(printed))
-    else:
-        pass
     named = day["calendar_day"]
     lines.append(
         f"黑白月日名：{named['lunar_half']}月第{named['half_day']}日，上卷称{named['upper_name']}日，下卷称{named['lower_name']}日。"
@@ -314,15 +288,11 @@ def render_day_reading(day: dict[str, Any]) -> str:
             "这是该来源的八条昼夜证言，未换算现代钟时，不代入本次事项；"
             "一般吉日名单与所列时段限制分别保留。"
         )
-    else:
-        pass
     if named["prose_verse_time_variant"]:
         resolution = named["verse_abbreviation_resolution"]
         lines.append(
             f"偈文保留白一夜／白十一夜的字面差别；下卷夹注明确一夜指十一夜（{resolution['locator']}），上卷同偈由平行散文及此注互证；未据省文另加初一夜限制。"
         )
-    else:
-        pass
     for restriction in named["time_restrictions"]:
         witness = {
             "upper_prose": "上卷散文",

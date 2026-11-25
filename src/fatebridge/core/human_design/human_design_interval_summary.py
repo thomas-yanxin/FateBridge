@@ -42,8 +42,6 @@ def interval_summary(report: dict[str, Any]) -> dict[str, Any]:
         result["coordinate_probe_unresolved_directions"] = sum(
             p["status"] == "direction_not_inferred" for p in probes["probes"]
         )
-    else:
-        pass
     return result
 
 
@@ -65,8 +63,6 @@ def unassessed_interval() -> dict[str, Any]:
 def interval_reading(summary: dict[str, Any]) -> str:
     if summary["status"] == "not_assessed":
         return "本次未请求出生时间范围评估，说明只针对名义时刻；不能据此声称出生钟已核实或附近时刻的结果稳定。"
-    else:
-        pass
     changes = summary["changed_joint_fields"]
     joint = (
         ("联合门线／八个Tone投影变化字段为" + "、".join(changes) + "。")

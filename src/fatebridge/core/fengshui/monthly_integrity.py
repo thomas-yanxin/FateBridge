@@ -24,8 +24,6 @@ FIXED = {"C": 5, "N": 1, "NE": 8, "E": 3, "SE": 4, "S": 9, "SW": 2, "W": 7, "NW"
 def _check(condition: bool) -> None:
     if not condition:
         raise FengshuiCalculationError("monthly_plate_inconsistent")
-    else:
-        pass
 
 
 class PrintedCenterColumn(TypedDict):
@@ -88,8 +86,6 @@ def _window(
     _check(start < end)
     if query is not None:
         _check(start <= query < end)
-    else:
-        pass
 
 
 def validate_monthly_layer(
@@ -110,8 +106,6 @@ def validate_monthly_layer(
             _check(time["local_moment"] is None)
             label = time["utc_moment"]
             _check(label.endswith("Z"))
-        else:
-            pass
         query = (
             ZonedCalendar.from_isoformat(label).utc.julian_day_exact()
             if label is not None
@@ -142,8 +136,6 @@ def validate_monthly_layer(
                 _check(time["local_moment"] is None and query is None)
             else:
                 _check(time["input_basis"] == "missing")
-        else:
-            pass
         if layer["status"] == "partial":
             _check(not layer["palaces"] and bool(layer["missing_inputs"]))
             _check(
@@ -180,11 +172,7 @@ def validate_monthly_layer(
                 )
                 _check(selected in identities)
                 _window(time, *selected, query=query, provisional=True)
-            else:
-                pass
             return {"numeric_palaces": 0}
-        else:
-            pass
         _check(layer["status"] == "complete" and not layer["missing_inputs"])
         year = _integer(time["effective_solar_year"], 1, 9998)
         month = _integer(time["solar_month_number"], 1, 12)

@@ -50,8 +50,6 @@ def analyze_application(
         )
         if status in {"needs_confirmation", "candidate_only"}:
             pending.append(path + "." + key)
-        else:
-            pass
     binding: dict[str, Any] = dict(
         status="not_requested", location_confirmed=False, effect="not_established"
     )
@@ -86,17 +84,11 @@ def analyze_application(
         )
         if binding["status"] in {"needs_computed_target", "candidate_only"}:
             pending.append(path + ".target_request_id.computed_target")
-        else:
-            pass
-    else:
-        pass
     failed = any(c["status"] == "does_not_match_condition" for c in checks)
     # A known failed condition already answers applicability; do not demand the
     # rest of the observations merely to finish a checklist.
     if failed or not eligible:
         pending = []
-    else:
-        pass
     return dict(
         ruleset_id=app.ruleset_id,
         rule_id="afsi_application_conditions_v1.application",

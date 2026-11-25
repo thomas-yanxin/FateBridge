@@ -48,13 +48,9 @@ def _source() -> dict[str, Any]:
             )
         ):
             raise ValueError("所选百刻原句或未定分制被改写。")
-        else:
-            pass
         for key in ("source_title", "source_url", "review_status", "scope"):
             if not isinstance(data[key], str) or not data[key].strip():
                 raise ValueError("百刻来源元数据缺失。")
-            else:
-                pass
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_heluo_clock_source") from exc
     data["loaded_sha256"] = sha256(raw).hexdigest()
@@ -77,8 +73,6 @@ def source_branch_partition(*, origin_branch: str) -> list[dict[str, Any]]:
         or origin_branch not in BRANCHES
     ):
         raise ValueError("须明确指定有效时支原点；不默认子初或子正。")
-    else:
-        pass
     start = BRANCHES.index(origin_branch)
     rows = []
     cursor = 0
@@ -97,8 +91,6 @@ def source_branch_partition(*, origin_branch: str) -> list[dict[str, Any]]:
         cursor += length
     if cursor != source["day_ke"]:
         raise NumerologySourceError("invalid_heluo_clock_source")
-    else:
-        pass
     return rows
 
 
@@ -106,14 +98,10 @@ def source_branch_at_ke(value: int | Fraction, *, origin_branch: str) -> dict[st
     """Locate an exact count in a single source cycle; do not wrap at100."""
     if isinstance(value, bool) or not isinstance(value, (int, Fraction)):
         raise ValueError("源刻须为整数或精确Fraction，不能用布尔或浮点近似。")
-    else:
-        pass
     value = Fraction(value)
     source = _source()
     if not 0 <= value < source["day_ke"]:
         raise ValueError("单周期源刻须在[0,100)；下一周期不能静默折回。")
-    else:
-        pass
     row = next(
         r
         for r in source_branch_partition(origin_branch=origin_branch)
@@ -132,8 +120,6 @@ def compare_daily_extra(*, fen_per_ke: int) -> dict[str, Any]:
     """Conditional equal-shi comparison, not verification of a historical scale."""
     if type(fen_per_ke) is not int or fen_per_ke <= 0:
         raise ValueError("比较用的每刻分数须明确给出正整数，不设默认分制。")
-    else:
-        pass
     source = _source()
     extra = Fraction(source["daily_extra_ke"]) + Fraction(
         source["daily_extra_fen"], fen_per_ke
@@ -160,8 +146,6 @@ def source_six_day_blocks(*, origin_branch: str, blocks: int) -> list[dict[str, 
     """
     if type(blocks) is not int or not 1 <= blocks <= 60:
         raise ValueError("须明确给出一至六十块；此处只推一个原式大数年。")
-    else:
-        pass
     source = _source()
     partition = source_branch_partition(origin_branch=origin_branch)
     result = []
@@ -312,8 +296,6 @@ def source_clock_snapshot(profile: dict[str, Any]) -> str:
     days = f"{source_days['numerator']}/{source_days['denominator']}"
     if source_days["denominator"] == 1:
         days = str(source_days["numerator"])
-    else:
-        pass
     return (
         f"[卷一百刻原式]\n{branches}各{long_ke}刻，其余各{ordinary}刻，合{profile['day_ke']}刻。每日添{literal['ke']}刻{literal['fen']}分的分制仍未核定。\n"
         f"以支初为相对原点，六日进一支的{shift['year_blocks']}块推演合{days}源日；日内添分和实际节月仍未接通。\n"

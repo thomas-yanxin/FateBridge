@@ -56,8 +56,6 @@ def assign_cusp_virtue(
     """
     if occupied_house is not None and occupied_house not in range(1, 13):
         raise ValueError("Occupied house must be1..12 or unknown")
-    else:
-        pass
     result: dict[str, Any] = {
         "rule_id": "lilly_1647_p33_nearest_cusp_virtue_v1",
         "source_url": SOURCE_URL,
@@ -87,8 +85,6 @@ def assign_cusp_virtue(
         or next_cusp is None
     ):
         return result
-    else:
-        pass
     lon, lower, upper = [
         angle_fraction(v) % 360 for v in (longitude, lower_cusp, next_cusp)
     ]
@@ -103,8 +99,6 @@ def assign_cusp_virtue(
             "local_arc_not_prograde_short_or_occupancy_inconsistent"
         )
         return result
-    else:
-        pass
     previous_gap, next_gap = offset, span - offset
     result.update(
         previous_cusp_gap_degrees=float(previous_gap),
@@ -115,8 +109,6 @@ def assign_cusp_virtue(
     if previous_gap == next_gap and next_gap <= 5:
         result["unavailable_reason"] = "equal_nearest_cusps_within_five_degrees"
         return result
-    else:
-        pass
     assigned = (
         occupied_house % 12 + 1
         if next_gap <= 5 and next_gap < previous_gap
@@ -161,19 +153,13 @@ def assign_from_cusps(
     )
     if longitude is None or cusps is None:
         return empty
-    else:
-        pass
     if len(cusps) != 12:
         raise ValueError("Twelve actual house cusps are required")
-    else:
-        pass
     values = [angle_fraction(v) % 360 for v in cusps]
     spans = [(values[(i + 1) % 12] - v) % 360 for i, v in enumerate(values)]
     if sum(spans) != 360 or any(not 0 < v < 180 for v in spans):
         empty["unavailable_reason"] = "cusps_not_one_prograde_short_arc_partition"
         return empty
-    else:
-        pass
     lon = angle_fraction(longitude) % 360
     index = next(i for i, v in enumerate(values) if (lon - v) % 360 < spans[i])
     if native_occupied_house is not None and index + 1 != native_occupied_house:
@@ -181,8 +167,6 @@ def assign_from_cusps(
             "native_occupancy_disagrees_with_zodiacal_cusp_partition"
         )
         return empty
-    else:
-        pass
     return assign_cusp_virtue(
         lon,
         index + 1,

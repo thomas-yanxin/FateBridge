@@ -74,8 +74,6 @@ def _load_subject_file(path: str) -> dict[str, object]:
             f"subject 档案 {path} 必须是键值映射（字段名→值），"
             f"实际得到 {type(subject).__name__}"
         )
-    else:
-        pass
     return subject
 
 
@@ -93,8 +91,6 @@ def preload_subject(
     path = pre_args.subject_file
     if not path:
         return None
-    else:
-        pass
     return _load_subject_file(path)
 
 
@@ -108,8 +104,6 @@ def preload_request(argv: list[str] | None) -> dict[str, object] | None:
         return None
     if not args.request_file:
         return None
-    else:
-        pass
     try:
         data = json.loads(
             Path(args.request_file).expanduser().read_text(encoding="utf-8")
@@ -118,8 +112,6 @@ def preload_request(argv: list[str] | None) -> dict[str, object] | None:
         raise ValueError("request-file 必须为可读的合法 JSON 文件") from exc
     if not isinstance(data, dict):
         raise ValueError("request-file 顶层必须是 JSON 对象")
-    else:
-        pass
     return data
 
 
@@ -134,8 +126,6 @@ def profile_field_objects() -> dict[str, FieldInfo]:
             if field is not None:
                 resolved[name] = field
                 break
-            else:
-                pass
     return resolved
 
 
@@ -145,8 +135,6 @@ def validate_subject_fields(
     """Reject keys outside the chosen requests and shared person fields."""
     if subject_data is None:
         return
-    else:
-        pass
     allowed = set(profile_field_objects())
     for spec in specs:
         allowed.update(spec.request_model.model_fields)
@@ -159,5 +147,3 @@ def validate_subject_fields(
                 for key in unexpected
             ],
         )
-    else:
-        pass

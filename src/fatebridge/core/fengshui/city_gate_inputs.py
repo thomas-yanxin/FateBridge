@@ -90,8 +90,6 @@ class CityGateObservation(_DeferredModel):
     def coherent_observation(self) -> "CityGateObservation":
         if not any(getattr(self, key) is not None for key in _FACTS):
             raise ValueError("城门观察须至少提供一项明确形势事实")
-        else:
-            pass
         if self.water_present is False and any(
             getattr(self, key) is True
             for key in (
@@ -101,15 +99,11 @@ class CityGateObservation(_DeferredModel):
             )
         ):
             raise ValueError("无水与明确水口/三叉水/水光事实不得冲突")
-        else:
-            pass
         if (
             self.sole_opening_with_water is True
             and self.multiple_openings_present is True
         ):
             raise ValueError("唯一缺口与多个缺口不得同时为真")
-        else:
-            pass
         return self
 
 
@@ -146,6 +140,4 @@ class CityGateRequest(_DeferredModel):
         values = [o.mountain for o in self.observations]
         if len(values) != len(set(values)):
             raise ValueError("同一城门山位不可重复或覆盖观察")
-        else:
-            pass
         return self

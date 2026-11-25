@@ -53,8 +53,6 @@ LIURENG_GUIREN_REVERSED_EARTH = frozenset("巳午未申酉戌")
 def _liureng_month_general_for_term(current_term: str) -> str:
     if current_term not in LIURENG_MONTH_GENERAL_BY_TERM:
         raise ValueError(f"未知节气 {current_term!r}，不能用月建代替月将")
-    else:
-        pass
     return LIURENG_MONTH_GENERAL_BY_TERM[current_term]
 
 
@@ -99,8 +97,6 @@ def twelve_god_layout(
         or type(is_diurnal) is not bool
     ):
         raise ValueError("十二神将布置需要明确的时支、月将、日干与昼夜条件")
-    else:
-        pass
     start = noble_start(day_stem, is_diurnal, guiren_profile)
     sky = _liureng_month_general_on_hour(
         hour_branch=hour_branch, month_general_branch=month_general_branch
@@ -168,8 +164,6 @@ def pair_layout_necessity(day_stem: str, stage: str, god: str) -> dict[str, Any]
     cycle = life_stage_cycle(day_stem)
     if stage not in cycle.values() or god not in GUI_REN_SEQUENCE:
         raise ValueError("配将必要条件需要有效十二运与天将")
-    else:
-        pass
     required_branch = next(b for b, s in cycle.items() if s == stage)
     rank = GUI_REN_SEQUENCE.index(god)
     candidates = set()

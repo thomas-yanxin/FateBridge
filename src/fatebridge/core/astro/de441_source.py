@@ -97,8 +97,6 @@ def _parameters() -> Parameters:
         )
         if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
             raise ValueError("DE441 source identity changed")
-        else:
-            pass
         result: Parameters = json.loads(raw)
     except (OSError, ValueError) as error:
         raise EphemerisSourceError("jpl_kinematics_invalid") from error
@@ -155,16 +153,12 @@ def _coefficients(index: int, archive_dir: str | None) -> array[float]:
         packed = base.joinpath(chunk["file"]).read_bytes()
         if hashlib.sha256(packed).hexdigest() != chunk["compressed_sha256"]:
             raise ValueError("DE441 coefficient archive changed")
-        else:
-            pass
         data = unpack_records(
             packed,
             [RecordBlock(chunk["record_count"], parameters["record_size_words"] * 8)],
         )
         if hashlib.sha256(data).hexdigest() != chunk["uncompressed_sha256"]:
             raise ValueError("DE441 coefficient words changed")
-        else:
-            pass
     except (FileNotFoundError, NotADirectoryError) as error:
         raise EphemerisSourceError("de441_archive_missing") from error
     except (OSError, ValueError, EOFError, zlib.error) as error:
@@ -173,8 +167,6 @@ def _coefficients(index: int, archive_dir: str | None) -> array[float]:
     result.frombytes(data)
     if sys.byteorder != "little":
         result.byteswap()
-    else:
-        pass
     return result
 
 
@@ -186,13 +178,9 @@ def barycentric_state(
     start, end = (jd - 2451545.0 for jd in p["source_TDB_JD_bounds"])
     if not math.isfinite(tdb_days_from_j2000):
         raise ValueError("TDB relative epoch must be finite")
-    else:
-        pass
     epoch = Fraction(tdb_days_from_j2000)
     if not start <= epoch <= end:
         raise EphemerisSourceError("jpl_kinematics_outside_source")
-    else:
-        pass
     span = p["record_days"]
     index = min(
         int((epoch - Fraction(start)) // Fraction(span)),
@@ -230,8 +218,6 @@ def barycentric_state(
         resolved = [e.minus(m, 1 + p["source_EMRAT"]) for e, m in zip(emb, moon)]
         if body == "Moon":
             resolved = [e.plus(m) for e, m in zip(resolved, moon)]
-        else:
-            pass
     else:
         resolved = states[0]
     vectors = [axis.rounded() for axis in resolved]

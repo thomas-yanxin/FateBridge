@@ -104,20 +104,12 @@ def _dignity(planet: str, sign: str) -> str:
     opposite = SIGNS[(SIGNS.index(sign) + 6) % 12]
     if RULER_BY_SIGN.get(sign) == planet:
         return "rulership"
-    else:
-        pass
     if EXALTATION_SIGNS.get(planet) == sign:
         return "exaltation"
-    else:
-        pass
     if RULER_BY_SIGN.get(opposite) == planet:
         return "detriment"
-    else:
-        pass
     if EXALTATION_SIGNS.get(planet) == opposite:
         return "fall"
-    else:
-        pass
     return "no_major_dignity"
 
 
@@ -129,8 +121,6 @@ def _planet_view(subject: Any, planet: str) -> dict[str, Any]:
     speed = None if raw_speed is None else float(raw_speed)
     if speed is not None and not math.isfinite(speed):
         raise RuntimeError("Nonfinite native longitude speed")
-    else:
-        pass
     return {
         "planet": planet,
         "sign": sign,
@@ -147,8 +137,6 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
     """Return observable conditions for the requested candidate moment."""
     if topic_id not in TOPIC_MASTER:
         raise ValueError("不支持的择日主题；医疗择时不开放")
-    else:
-        pass
     topic = TOPIC_MASTER[topic_id]
 
     views = {planet: _planet_view(subject, planet) for planet in PLANET_ATTRIBUTES}
@@ -187,8 +175,6 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
         )
     elif moon_voc:
         factors.append({"code": "moon_void_of_course", "body": "Moon"})
-    else:
-        pass
 
     elongation = (Fraction(moon["longitude"]) - Fraction(sun["longitude"])) % 360
     phase = (
@@ -199,12 +185,8 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
     solar_state = combustion_state(moon["longitude"], sun["longitude"])
     if solar_state == "combust":
         factors.append({"code": "moon_combust", "body": "Moon"})
-    else:
-        pass
     if Fraction(195) <= Fraction(moon["longitude"]) <= Fraction(225):
         factors.append({"code": "moon_via_combusta", "body": "Moon"})
-    else:
-        pass
 
     for planets, kind in ((MALEFICS, "malefic"), (BENEFICS, "benefic")):
         for planet in planets:
@@ -217,8 +199,6 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
                 and angular_separation_fraction(longitude, asc_lon) <= ANGLE_ORB
             ):
                 hit_axes.append("Ascendant")
-            else:
-                pass
             if hit_axes:
                 factors.append(
                     {"code": code, "body": planet, "resolved_hit_axes": hit_axes}
@@ -230,14 +210,10 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
                         "reason": "No MC hit; physical ASC remains unresolved",
                     }
                 )
-            else:
-                pass
             if unresolved_reference:
                 backend_axes = ["Midheaven"] if on_midheaven else []
                 if angular_separation_fraction(longitude, backend_asc) <= ANGLE_ORB:
                     backend_axes.append("Ascendant")
-                else:
-                    pass
                 if backend_axes:
                     backend_reference_factors.append(
                         {
@@ -246,10 +222,6 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
                             "resolved_hit_axes": backend_axes,
                         }
                     )
-                else:
-                    pass
-            else:
-                pass
 
     asc_ruler = None if asc_sign is None else RULER_BY_SIGN[asc_sign]
     asc_ruler_dignity = None if asc_ruler is None else views[asc_ruler]["dignity"]
@@ -260,8 +232,6 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
                 "reason": "Unresolved physical ASC cannot select its ruler",
             }
         )
-    else:
-        pass
     significator = topic["significator"]
     for planet, code in (
         ("Mercury", "mercury_retrograde"),
@@ -269,8 +239,6 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
     ):
         if code == "significator_retrograde" and planet == "Mercury":
             continue
-        else:
-            pass
         retrograde = views[planet]["retrograde"]
         if retrograde is None:
             unresolved.append(
@@ -278,8 +246,6 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
             )
         elif retrograde:
             factors.append({"code": code, "body": planet})
-        else:
-            pass
 
     payload: dict[str, Any] = {
         "system": "election",
@@ -423,8 +389,6 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
                         "contact": contact,
                     }
                 )
-        else:
-            pass
         payload["marriage_significators"] = {
             "method_id": "ramesey_1653_p175_marriage_significators_v2",
             "status": (
@@ -455,8 +419,6 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
             "scope": "Four angular-house rulers, natural Sun/Venus roles and the Moon's adjacent physical contacts in the declared Regiomontanus tropical framework. Source party roles do not identify real people. Lunar roles require established order within the disclosed finite event history; missing or ambiguous contacts remain unknown. Ruler state reuses the sign-only major summary. Complete fortification, reception, transfer, radix conditions and source judgement remain unaccepted.",
             "full_original_text_acceptance": False,
         }
-    else:
-        pass
     if unresolved_reference:
         nominal_ruler = RULER_BY_SIGN[backend_sign]
         payload["backend_convention"] = {
@@ -478,9 +440,5 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
             payload["planets"] = {p: {**v, "house": None} for p, v in views.items()}
             payload["axes"]["first_house_cusp"] = None
             payload["axes"]["tenth_house_cusp"] = None
-        else:
-            pass
         payload["reference_geometry"] = reference_qualification(subject)
-    else:
-        pass
     return payload

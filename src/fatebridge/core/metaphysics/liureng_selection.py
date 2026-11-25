@@ -29,20 +29,12 @@ def _branch_relation(
 ) -> str:
     if left_branch == right_branch:
         return same_label
-    else:
-        pass
     if SIX_HARMONY_BRANCHES.get(left_branch) == right_branch:
         return "六合"
-    else:
-        pass
     if SIX_CLASH_BRANCHES.get(left_branch) == right_branch:
         return "六冲"
-    else:
-        pass
     if SIX_HARM_BRANCHES.get(left_branch) == right_branch:
         return "六害"
-    else:
-        pass
     return "平"
 
 
@@ -61,20 +53,12 @@ def _liureng_judge_lesson(
     # "上下六合、上神冲日" 这种组合误判为返吟。
     if with_lower == "伏吟":
         return "伏吟", "上神与下神同位，伏吟取象。", with_day, with_lower
-    else:
-        pass
     if with_lower == "六冲":
         return "返吟", "上神与下神相冲，取返吟往复之象。", with_day, with_lower
-    else:
-        pass
     if with_lower == "六害":
         return "六害", "上下见六害关系；这不是九宗门涉害取传。", with_day, with_lower
-    else:
-        pass
     if relation == "官鬼":
         return "官鬼", "上神与日干为官鬼关系，不代替九宗门取传。", with_day, with_lower
-    else:
-        pass
     if with_lower == "六合":
         return (
             "六合",
@@ -82,8 +66,6 @@ def _liureng_judge_lesson(
             with_day,
             with_lower,
         )
-    else:
-        pass
     return (
         "课内关系",
         "本课关系供取传参照，不单独决定课体或发用。",
@@ -101,20 +83,12 @@ def _liureng_upper_lower_relation(upper_branch: str, lower_branch: str) -> str:
     )
     if upper_element == lower_element:
         return "比和"
-    else:
-        pass
     if ELEMENT_CONTROLS[upper_element] == lower_element:
         return "上克下"
-    else:
-        pass
     if ELEMENT_CONTROLS[lower_element] == upper_element:
         return "下贼上"
-    else:
-        pass
     if ELEMENT_GENERATES[upper_element] == lower_element:
         return "上生下"
-    else:
-        pass
     # The five-element cycle leaves only lower-generates-upper at this point.
     return "下生上"
 
@@ -201,8 +175,6 @@ def derive_selection(day_ganzhi: str, sky_to_earth: dict[str, str]) -> dict[str,
     )
     if initial_lesson is not None:
         initial_lesson["use_candidate"] = True
-    else:
-        pass
     return {
         "four_lessons": four_lessons,
         "board_style": style,

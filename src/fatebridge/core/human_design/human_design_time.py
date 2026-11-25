@@ -64,20 +64,12 @@ def sun_at_tt(
 ) -> float:
     if runtime.swe is None:
         raise RuntimeError("人类图需要 Swiss Ephemeris")
-    else:
-        pass
     if backend not in {"swieph", "moshier"}:
         raise ValueError("人类图星历请求后端必须为 swieph 或 moshier")
-    else:
-        pass
     if backend == "moshier" and require_swiss_files:
         raise ValueError("强制 Moshier 与要求 Swiss 数据文件冲突")
-    else:
-        pass
     if require_swiss_files and configured_jpl_file() is not None:
         raise EphemerisSourceError("jpl_swiss_file_requirement_conflict")
-    else:
-        pass
     coordinates, return_flags = runtime.ephemeris_call(
         "calc",
         jd_tt,
@@ -94,16 +86,10 @@ def sun_at_tt(
     longitude_degrees = float(coordinates[0])
     if not math.isfinite(longitude_degrees):
         raise RuntimeError("Swiss Ephemeris 太阳位置或实际后端标记无效")
-    else:
-        pass
     if require_swiss_files and model != "swieph":
         raise RuntimeError("设计时刻求解要求 Swiss Ephemeris 数据文件")
-    else:
-        pass
     if backend == "moshier" and model != "moshier":
         raise RuntimeError("设计时刻参考后端未实际采用 Moshier")
-    else:
-        pass
     observe_native_source("Sun", jd_tt, return_flags, role="solar_root")
     return longitude_degrees % 360
 
@@ -119,14 +105,10 @@ def solve_design_epoch(
     """Solve 88 degrees in TT, which remains continuous across UTC leap seconds."""
     if birth.utcoffset() is None:
         raise ValueError("出生瞬间必须带时区")
-    else:
-        pass
     birth = birth.astimezone(timezone.utc)
     time = ephemeris_time(birth)
     if time.jd_tt is None:
         raise RuntimeError("人类图需要可用的 TT 星历时刻")
-    else:
-        pass
     return _solve_design_epoch_tt(time.jd_tt, birth, require_swiss_files)
 
 
@@ -136,8 +118,6 @@ def solve_design_epoch_tt(
     """Physical-epoch variant for interval samples, including UTC second 60."""
     if not math.isfinite(birth_jd_tt):
         raise ValueError("出生 TT 必须为有限数值")
-    else:
-        pass
     _, moment, _ = utc_from_tt(birth_jd_tt)
     return _solve_design_epoch_tt(birth_jd_tt, moment, require_swiss_files, backend)
 
@@ -199,8 +179,6 @@ def _solve_design_epoch_tt(
     error = root["residual_degrees"]
     if abs(error) > 1e-7:
         raise RuntimeError("设计时刻太阳弧残差超出容差")
-    else:
-        pass
     label, moment, leap_second = utc_from_tt(solved)
     context = _epoch_time_context(
         solved,

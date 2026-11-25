@@ -69,8 +69,6 @@ def _solve(
         above = delta <= 90 or delta >= 270
         if not above:
             delta = (delta + 180) % 360
-        else:
-            pass
         western = delta > 180
         root = 360 - delta if western else delta
         kind = (
@@ -89,8 +87,6 @@ def _solve(
             kind=kind,
             bracket_width=Fraction(0),
         )
-    else:
-        pass
     cp, sp = ctx.cospi(p / 180), ctx.sinpi(p / 180)
     ct, st = ctx.cospi(t / 180), ctx.sinpi(t / 180)
     ce, se = ctx.cospi(e / 180), ctx.sinpi(e / 180)
@@ -107,27 +103,19 @@ def _solve(
     above = height >= 0
     if not above:
         meridian, east, z = -meridian, -east, -z
-    else:
-        pass
     western = east < 0
     east = abs(east)
     scale = max(abs(cp * east), abs(cp * meridian), abs(sp * z))
     if not scale:
         raise ArithmeticError("Topocentric position line has no resolved direction")
-    else:
-        pass
     a, b, c = cp * east / scale, cp * meridian / scale, sp * z / scale
     end = -abs(height) / scale
 
     def residual(y: Fraction) -> Any:
         if y == 0:
             return a
-        else:
-            pass
         if y == 1:
             return end
-        else:
-            pass
         value = ctx.mpf(y.numerator) / y.denominator
         return a * ctx.cospi(value / 2) - b * ctx.sinpi(value / 2) - c * value
 
@@ -138,12 +126,8 @@ def _solve(
     alternatives = []
     if a == 0:
         alternatives.append(Fraction(0))
-    else:
-        pass
     if end == 0:
         alternatives.append(Fraction(1))
-    else:
-        pass
     budget = 1024 + scale_bits
     # This numerical sign bracket is checked across private contexts; it is
     # not an outward-rounded transcendental interval certificate.
@@ -152,16 +136,12 @@ def _solve(
     def resolved(lower: Fraction, upper: Fraction) -> bool:
         if 90 * (upper - lower) > radius:
             return False
-        else:
-            pass
         first, last = sorted(
             (_phase(90 * lower, above, western), _phase(90 * upper, above, western))
         )
         # A short bracket crossing the circular seam must continue refining.
         if last - first > 180:
             return False
-        else:
-            pass
         return (
             first // 30 == last // 30
             and float(first) == float(last)
@@ -186,30 +166,22 @@ def _solve(
             for _ in range(budget):
                 if residual(lower) > 0:
                     break
-                else:
-                    pass
                 lower /= 2
             else:
                 raise ArithmeticError(
                     "No positive side of the interior T position line"
                 )
-        else:
-            pass
         if end == 0:
             delta = Fraction(1, 2)
             for _ in range(budget):
                 upper = 1 - delta
                 if residual(upper) < 0:
                     break
-                else:
-                    pass
                 delta /= 2
             else:
                 raise ArithmeticError(
                     "No negative side of the interior T position line"
                 )
-        else:
-            pass
         x = (lower + upper) / 2
         for iteration in range(budget):
             value = residual(x)
@@ -220,28 +192,18 @@ def _solve(
                     lower, upper = left, right
                     if resolved(lower, upper):
                         break
-                    else:
-                        pass
                     if value == 0:
                         # Numerical zero is not a proved singleton root.
                         x = (2 * lower + upper) / 3
                         continue
-                    else:
-                        pass
                 elif value == 0:
                     raise ArithmeticError("T root sign bracket needs more precision")
-                else:
-                    pass
-            else:
-                pass
             if value > 0:
                 lower = x
             else:
                 upper = x
             if resolved(lower, upper):
                 break
-            else:
-                pass
             slope = derivative(x)
             if slope:
                 working_x = ctx.mpf(x.numerator) / x.denominator
@@ -250,8 +212,6 @@ def _solve(
                 proposal = (lower + upper) / 2
             if iteration % 3 == 2 or not lower < proposal < upper:
                 proposal = (lower + upper) / 2
-            else:
-                pass
             x = proposal
         else:
             raise ArithmeticError("Bounded T position solve did not converge")
@@ -282,12 +242,8 @@ def _position(phase: Fraction) -> tuple[float, int]:
     position = float(phase / 30 + 1)
     if math.floor(position) > house:
         position = math.nextafter(position, -math.inf)
-    else:
-        pass
     if not 1 <= position < 13 or math.floor(position) != house:
         raise ArithmeticError("T position cannot represent its half-open house")
-    else:
-        pass
     return position, house
 
 
@@ -301,14 +257,10 @@ def checked_topocentric_position(
 ) -> TopocentricPosition:
     if not all(math.isfinite(x) for x in (latitude, armc, obliquity, longitude)):
         raise ValueError("Topocentric precision requires finite model inputs")
-    else:
-        pass
     if abs(latitude) >= 90:
         raise ArithmeticError(
             "An exact geographic pole requires an explicit limit convention"
         )
-    else:
-        pass
     previous = None
     scale_bits = 0
     for angle in (latitude, armc, obliquity, longitude):
@@ -318,8 +270,6 @@ def checked_topocentric_position(
             numerator, denominator = offset.numerator, offset.denominator
             bits = max(0, denominator.bit_length() - numerator.bit_length())
             scale_bits = max(scale_bits, bits + int(numerator << bits < denominator))
-        else:
-            pass
     extra_digits = (scale_bits * 30103 + 99999) // 100000
     for digits in (value + extra_digits for value in WORKING_DIGITS):
         try:
@@ -356,10 +306,6 @@ def checked_topocentric_position(
                 and deliveries_agree
             ):
                 break
-            else:
-                pass
-        else:
-            pass
         previous = digits, high
     else:
         raise ArithmeticError(
@@ -375,8 +321,6 @@ def checked_topocentric_position(
     phase = float(high["phase"])
     if phase == 360:
         phase = math.nextafter(360.0, 0.0)
-    else:
-        pass
     branch = dict(
         above_horizon=high["above"],
         reflected_western=high["western"],

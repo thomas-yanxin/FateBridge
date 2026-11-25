@@ -36,16 +36,10 @@ def month_context(
     """Map the recorded physical instant, never a shifted true-solar display."""
     if basis not in BASES:
         raise ValueError("须显式选择jie_month或chinese_lunar_utc8月序政策")
-    else:
-        pass
     if isinstance(moment, PhysicalEpoch):
         return native_month_context(moment, basis)
-    else:
-        pass
     if moment.tzinfo is None or moment.utcoffset() is None:
         raise ValueError("月限月序换算须提供带偏移的物理瞬间")
-    else:
-        pass
     clocks: dict[str, Any] = {
         "instant_utc": utc_calendar(moment).isoformat(),
         "calendar_datetime": None,
@@ -62,16 +56,12 @@ def month_context(
             "is_leap_month": None,
             "unavailable_reason": "fixed_utc8_label_outside_datetime_range",
         }
-    else:
-        pass
     clocks["calendar_datetime"] = calendar.isoformat()
     if basis == "jie_month":
         context = get_bazi_month_context(moment, MONTH_TIMEZONE)
         index = context["month_index"]
         if type(index) is not int or not 0 <= index < 12:
             raise ValueError("节月换算未给出有效月序，不能据此分配月限")
-        else:
-            pass
         # The shared calendar indexes 寅 at zero. Keep actual term boundaries.
         return {
             "status": "available",
@@ -83,8 +73,6 @@ def month_context(
             "boundary_basis": "calculated_jie_instants_half_open",
             "is_leap_month": False,
         }
-    else:
-        pass
     lunar_label: datetime | NominalClockLabel = moment
     if source_calendar is not None:
         # A pre-atomic mean-solar carrier rounds to microseconds for display.
@@ -97,10 +85,6 @@ def month_context(
                 calendar_date=f"{year:04d}-{month:02d}-{day:02d}",
                 calendar_lookup_basis="retained_nominal_source_point_fixed_utc8_date",
             )
-        else:
-            pass
-    else:
-        pass
     lunar_context = get_lunar_context(
         lunar_label, timezone_name=MONTH_TIMEZONE, civil_datetime=moment
     )
@@ -111,8 +95,6 @@ def month_context(
             **clocks,
             "boundary_basis": "shared_chinese_lunar_table_utc8_civil_date",
         }
-    else:
-        pass
     return {
         "status": "available",
         "month_number": lunar_context["month"],

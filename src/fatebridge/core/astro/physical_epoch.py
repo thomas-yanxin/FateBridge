@@ -60,8 +60,6 @@ def _extended_utc_label(point: TTInstant) -> str | None:
     if point.days >= Fraction(_julian_day(effective)) + offset / 86400:
         candidate = _calendar_from_jd(point.days - offset / 86400)
         return candidate.isoformat() if candidate.as_datetime() is None else None
-    else:
-        pass
     candidate = _calendar_from_jd(resolve_ut1_from_tt(point).days)
     return candidate.isoformat() if candidate.date_parts[0] < 1 else None
 
@@ -86,8 +84,6 @@ def utc_from_tt(
         delta = current["tai_minus_utc_seconds"] - previous["tai_minus_utc_seconds"]
         if delta <= 0:
             continue
-        else:
-            pass
         effective = datetime.fromisoformat(current["effective_date"]).replace(
             tzinfo=timezone.utc
         )
@@ -104,8 +100,6 @@ def utc_from_tt(
         if start <= point.days < stop:
             if delta != 1:
                 raise RuntimeError("未支持连续插入多个 UTC 闰秒的表示")
-            else:
-                pass
             fraction = int((point.days - start) * 86_400_000_000)
             prior_day = effective - timedelta(days=1)
             label = prior_day.strftime("%Y-%m-%dT23:59:60") + f".{fraction:06d}+00:00"
@@ -116,8 +110,6 @@ def utc_from_tt(
                 utc_is_leap_second=True,
             )
             return label, None, True
-        else:
-            pass
     try:
         calendar = utc_calendar_from_tt(point, legacy_pre_utc=legacy_pre_utc)
     except EphemerisSourceError:
@@ -134,8 +126,6 @@ def utc_from_tt(
         extended_label = _extended_utc_label(point)
         if extended_label is None:
             raise
-        else:
-            pass
         observe_clock(
             "tt_to_utc_display",
             jd_tt=scalar_tt,
@@ -160,8 +150,6 @@ def local_leap_second_label(utc_label: str, zone: tzinfo) -> str | None:
     sample = local.rule_sample()
     if is_unspecified_local_time(sample) or local.offset % timedelta(minutes=1):
         return None
-    else:
-        pass
     return sample.isoformat(timespec="microseconds").replace(":59.", ":60.", 1)
 
 
@@ -204,14 +192,10 @@ class PhysicalEpoch:
             math.isfinite(x) for x in (self.time.jd_ut1, self.time.jd_tt)
         ):
             raise ValueError("Physical epoch requires finite TT and UT1")
-        else:
-            pass
         if self.utc_is_leap_second and (
             self.utc_datetime is not None or self.time.jd_utc is not None
         ):
             raise ValueError("UTC second60 cannot have a datetime or uniform UTC JD")
-        else:
-            pass
 
     @classmethod
     def from_civil(cls, moment: datetime | UTCCalendar) -> PhysicalEpoch:
@@ -293,8 +277,6 @@ class PhysicalEpoch:
                     else "Solved physical event has no unique supported UTC datetime"
                 )
             )
-        else:
-            pass
         return self.utc_datetime
 
     def representation(self) -> dict[str, Any]:

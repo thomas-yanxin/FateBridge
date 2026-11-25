@@ -22,8 +22,6 @@ def natal_course_metadata(
         or natal_branch not in "子丑寅卯辰巳午未申酉戌亥"
     ):
         raise ValueError("本命另课需要明确且合法的本命支")
-    else:
-        pass
     natal = confirmed_natal_branch(birth_year_ganzhi, natal_branch, None)
     return dict(
         method_id="jingben_natal_branch_course_v1",
@@ -80,8 +78,6 @@ def build_natal_course(
         child["engine"] = "fatebridge-offline"
         child["overview"]["di_fen_source"] = "natal_branch_derived_course"
         result["course"] = child
-    else:
-        pass
     return result
 
 

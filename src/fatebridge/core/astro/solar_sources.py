@@ -35,8 +35,6 @@ class SunSourceCohort:
         model = source["by_factor"]["equatorial_Sun"]["model"]
         if self._model is not None and self._model != model:
             raise EphemerisSourceError("model_changed")
-        else:
-            pass
         self._model = model
         editions: dict[int, set[int]] = {}
         for file in source["files"]:
@@ -44,17 +42,11 @@ class SunSourceCohort:
             key = (file["slot"], file["filename"])
             if key in self._hashes and self._hashes[key] != file["sha256"]:
                 raise EphemerisSourceError("changed_across")
-            else:
-                pass
             self._hashes[key] = file["sha256"]
         for slot, values in editions.items():
             if slot in self._editions and self._editions[slot] != values:
                 raise EphemerisSourceError("edition_changed")
-            else:
-                pass
             self._editions[slot] = values
         if source not in self.sources:
             self.sources.append(source)
-        else:
-            pass
         return self.sources.index(source)

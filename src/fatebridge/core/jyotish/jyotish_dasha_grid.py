@@ -84,8 +84,6 @@ def _context(chart: dict[str, Any], planet: dict[str, Any]) -> dict[str, Any]:
             "dispositor_relationship": planet.get("dispositor_relationship"),
             "scope": "same sampled D1; motion calculation bases remain separate context groups. Discrete conditions only, not complete strength",
         }
-    else:
-        pass
     if "native_position_interpretation" in planet:
         # Retain discrete source meanings in the grouping key. Continuous ray
         # geometry belongs to the source policy, otherwise every birth sample
@@ -102,8 +100,6 @@ def _context(chart: dict[str, Any], planet: dict[str, Any]) -> dict[str, Any]:
             )
             if key in source
         }
-    else:
-        pass
     return result
 
 
@@ -149,8 +145,6 @@ class DashaGrid:
             and (point := recorded.nominal_calendar) is not None
         ):
             calendar_key = point.as_calendar()
-        else:
-            pass
         self.instants.add(recorded.tt)
         self.methods.add(raw["time_scale_context"]["method"])
         if calendar_key is None or utc_calendar(self.analysis) < calendar_key:
@@ -164,17 +158,11 @@ class DashaGrid:
             }
             if calendar_key is None:
                 omitted["physical_epoch"] = epoch.representation()
-            else:
-                pass
             self.omitted.append(omitted)
             if endpoint_subset:
                 self.endpoint_omitted.append(omitted)
-            else:
-                pass
             self.previous = None
             return
-        else:
-            pass
         self.valid_instants.add(recorded.tt)
         period = vimshottari(
             calendar_key,
@@ -198,13 +186,9 @@ class DashaGrid:
                     ),
                 }
             )
-        else:
-            pass
         key = (period["current_major"]["lord"], period["current_sub"]["lord"])
         if self.dasha_depth > 2:
             key = tuple(row["lord"] for row in period["subdivisions"]["current_levels"])
-        else:
-            pass
         row = self.variants.setdefault(
             key,
             {
@@ -229,8 +213,6 @@ class DashaGrid:
                     period["subdivisions"]["current_levels"][2:], 2
                 )
             )
-        else:
-            pass
         boundary_ranges: dict[str, PeriodBoundaryRange] = row["period_boundary_ranges"]
         for level_path, level in levels:
             for boundary in ("start", "end"):
@@ -250,8 +232,6 @@ class DashaGrid:
                     "upper_stage": list(key),
                 }
             )
-        else:
-            pass
         self.previous = (offset, key)
         groups = self.contexts.setdefault(key, {})
         longitudes = partition_longitudes(raw)
@@ -260,8 +240,6 @@ class DashaGrid:
             for planet in chart["planets"]:
                 if planet["id"] not in key:
                     continue
-                else:
-                    pass
                 context = _context(chart, planet)
                 context["roles"] = [
                     role

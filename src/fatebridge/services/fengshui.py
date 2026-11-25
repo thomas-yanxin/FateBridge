@@ -46,8 +46,6 @@ def calculate_directions(**kwargs: Any) -> dict[str, Any]:
     if req.bearing_degrees is not None:
         assert req.north_reference is not None
         bearing = bearing_context(req.bearing_degrees, req.north_reference)
-    else:
-        pass
     result = {
         "status": "complete",
         "directions": rule_data("directions"),
@@ -59,8 +57,6 @@ def calculate_directions(**kwargs: Any) -> dict[str, Any]:
         result["geomagnetic_reference"] = geomagnetic_reference(
             req.geomagnetic_reference, req.bearing_degrees, req.north_reference
         )
-    else:
-        pass
     return compose_fengshui_result({"directions": _layer(result, req.ruleset_id)}, [])
 
 
@@ -114,8 +110,6 @@ def _natal_layer(
             layer,
             expected_selected=req.interpretation.host_guest_ruleset_id is not None,
         )
-    else:
-        pass
     return layer
 
 
@@ -137,8 +131,6 @@ def _differences(layers: dict[str, Any]) -> list[dict[str, Any]]:
     if bazhai_layer.get("house"):
         house = bazhai_layer["house"]
         charts.append((house["object_id"], "house", house["sectors"]))
-    else:
-        pass
     for occupant in bazhai_layer.get("occupants", []):
         # Unknown birth convention produces alternatives, never a confirmed
         # conflict between imaginary residents.
@@ -150,8 +142,6 @@ def _differences(layers: dict[str, Any]) -> list[dict[str, Any]]:
                     occupant["candidates"][0]["sectors"],
                 )
             )
-        else:
-            pass
     for a, b in combinations(charts, 2):
         for direction in rule_data("directions"):
             first, second = a[2][direction]["star"], b[2][direction]["star"]
@@ -177,8 +167,6 @@ def _differences(layers: dict[str, Any]) -> list[dict[str, Any]]:
                         "source_ids": ["S3"],
                     }
                 )
-            else:
-                pass
     if (
         all(name in layers for name in ("bazhai", "jinsuo", "annual_stars"))
         and bazhai_layer.get("house")
@@ -207,8 +195,6 @@ def _differences(layers: dict[str, Any]) -> list[dict[str, Any]]:
                     "source_ids": ["S3", "S4", "S5"],
                 }
             )
-    else:
-        pass
     return differences
 
 
@@ -218,13 +204,9 @@ def assess(**kwargs: Any) -> dict[str, Any]:
     geometry = None
     if req.workstation_layout is not None:
         req, geometry = prepare_spatial_request(req, req.workstation_layout.scene)
-    else:
-        pass
     layers = {}
     if "bazhai" in req.selected_methods:
         layers["bazhai"] = _layer(bazhai(req), req.ruleset_id)
-    else:
-        pass
     if "jinsuo" in req.selected_methods:
         layers["jinsuo"] = _layer(
             jinsuo(
@@ -232,8 +214,6 @@ def assess(**kwargs: Any) -> dict[str, Any]:
             ),
             req.jinsuo_ruleset_id,
         )
-    else:
-        pass
     if "annual_stars" in req.selected_methods:
         layers["annual_stars"] = _layer(
             annual_stars(
@@ -246,8 +226,6 @@ def assess(**kwargs: Any) -> dict[str, Any]:
             ),
             req.annual_ruleset_id,
         )
-    else:
-        pass
     if "xuankong_natal" in req.selected_methods:
         if req.xuankong is None:
             natal = XuankongRequest(house=req.house)
@@ -263,15 +241,11 @@ def assess(**kwargs: Any) -> dict[str, Any]:
         else:
             natal = req.xuankong
         layers["xuankong_natal"] = _natal_layer(natal, req.placements)
-    else:
-        pass
     if "monthly_stars" in req.selected_methods:
         monthly = req.monthly or MonthlyRequest(
             query_at=req.query_at, timezone_name=req.timezone_name
         )
         layers["monthly_stars"] = monthly_stars(monthly)
-    else:
-        pass
     layers = {name: layers[name] for name in req.selected_methods}
     layout = (
         analyze_layout(req, layers)
@@ -297,8 +271,6 @@ def assess(**kwargs: Any) -> dict[str, Any]:
             TypeAdapter(dict[str, JsonValue]).validate_python(layers),
             TypeAdapter(dict[str, JsonValue]).validate_python(layout),
         )
-    else:
-        pass
     if layout is not None and req.layout_alternatives:
         alternatives = evaluate_alternatives(req, layers)
         layout["alternatives_analysis"] = alternatives
@@ -308,8 +280,6 @@ def assess(**kwargs: Any) -> dict[str, Any]:
                 if ruleset["ruleset_id"] not in registered:
                     layout["supplemental_rulesets"].append(ruleset)
                     registered.add(ruleset["ruleset_id"])
-                else:
-                    pass
         previous = layout["analysis_progress"]
         states = {
             "ready": "ready",
@@ -349,8 +319,6 @@ def assess(**kwargs: Any) -> dict[str, Any]:
             alternatives["findings"]
         )
         layout["analysis_progress"] = progress
-    else:
-        pass
     scene_scope = None
     if req.scene is not None:
         scene_scope = {
@@ -384,8 +352,6 @@ def assess(**kwargs: Any) -> dict[str, Any]:
                 "complete_classical_landforms",
             ],
         }
-    else:
-        pass
     policy_selected = req.scene is not None or req.environmental_context is not None
     return compose_fengshui_result(
         layers,

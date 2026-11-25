@@ -22,19 +22,13 @@ JAPANESE_CALENDAR_BASES = frozenset(
 def basis_identifiers(basis: str) -> tuple[str, str]:
     if basis == DEFAULT_CALENDAR_BASIS:
         return "modern_chinese_lunisolar", "lunardate"
-    else:
-        pass
     if basis == JAPANESE_CALENDAR_BASIS:
         return "japanese_hutime_old_calendar_reference", "frozen_hutime_daily_reference"
-    else:
-        pass
     if basis == HISTORICAL_CALENDAR_BASIS:
         return (
             "japanese_naoj_historical_month_start_reference",
             "frozen_naoj_historical_month_starts",
         )
-    else:
-        pass
     raise ValueError("未知的宿曜宿主历法标识")
 
 
@@ -43,22 +37,16 @@ def japanese_calendar_reader(basis: str) -> ModuleType:
         from fatebridge.core.sukuyo import sukuyo_japanese_calendar
 
         return sukuyo_japanese_calendar
-    else:
-        pass
     if basis == HISTORICAL_CALENDAR_BASIS:
         from fatebridge.core.sukuyo import sukuyo_historical_calendar
 
         return sukuyo_historical_calendar
-    else:
-        pass
     raise ValueError("未知的日本参考历法，不能回退其他资料")
 
 
 def basis_parameters(basis: str) -> tuple[int, date, date, str]:
     if basis == DEFAULT_CALENDAR_BASIS:
         return 8, date(1901, 1, 1), date(2099, 12, 31), "中国"
-    else:
-        pass
     if basis in JAPANESE_CALENDAR_BASES:
         first, last = japanese_calendar_reader(basis).supported_range()
         return (
@@ -71,8 +59,6 @@ def basis_parameters(basis: str) -> tuple[int, date, date, str]:
                 else "日本旧历参考"
             ),
         )
-    else:
-        pass
     raise ValueError(
         "calendar_basis仅支持chinese_hko_utc08、japanese_hutime_1002_1_utc09或japanese_naoj_historical_utc09"
     )
@@ -96,8 +82,6 @@ def range_provenance(basis: str) -> str:
     }
     if basis not in labels:
         raise ValueError("未知宿主历法，不能推定范围来源")
-    else:
-        pass
     selected, provider = labels[basis]
     return (
         f"此限制仅指{selected}（calendar_basis={basis}），"

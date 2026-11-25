@@ -53,8 +53,6 @@ def _number(text: str) -> int:
         )
         if text == printed:
             return n
-        else:
-            pass
     raise ValueError("原表数字未释或不是已声明的规范汉字，不按邻格填数")
 
 
@@ -62,21 +60,15 @@ def _date(text: str, context_year: int | None) -> tuple[NominalSourceDate, int |
     match = _LABEL.fullmatch(text)
     if match is None:
         raise ValueError("原表日期格式未释，不猜缺月、缺日或整年")
-    else:
-        pass
     explicit = _number(match["year"]) if match["year"] else None
     year = explicit if explicit is not None else context_year
     if year is None:
         raise ValueError("必须先见明确序年，不能默取一年")
-    else:
-        pass
     month = 1 if match["month"] == "正" else _number(match["month"])
     day_text = match["day"]
     day = _number(day_text.removeprefix("初"))
     if day_text.startswith("初") and day > 10:
         raise ValueError("初字仅按本表初一至初十规范释读")
-    else:
-        pass
     return NominalSourceDate(year, month, day), explicit
 
 
@@ -132,8 +124,6 @@ class PrintedLimitTable:
             or source["used_in_native_birth_chart"] is not False
         ):
             raise ValueError("原表须完整保持七行各30格及明确的年份承接政策")
-        else:
-            pass
         self.source = source
         self.fingerprint = fingerprint
         self.rows: dict[str, tuple[LiteralLimitCell, ...]] = {}
@@ -144,8 +134,6 @@ class PrintedLimitTable:
                 pieces = text.split("|")
                 if len(pieces) != 2:
                     raise ValueError("每格须独立录读起日和末日")
-                else:
-                    pass
                 start, start_marker = _date(pieces[0], context)
                 context = start.year
                 last, last_marker = _date(pieces[1], context)
@@ -154,8 +142,6 @@ class PrintedLimitTable:
                     raise ValueError(
                         "原格起末日倒置；不能以自动进年修复，须另列未释来源"
                     )
-                else:
-                    pass
                 cells.append(
                     LiteralLimitCell(
                         row["group"], i, text, start, last, start_marker, last_marker
@@ -166,8 +152,6 @@ class PrintedLimitTable:
     def _group(self, group: str) -> tuple[LiteralLimitCell, ...]:
         if not isinstance(group, str) or group not in GROUPS:
             raise ValueError("须明确选择具名的七行之一，不跨行或按别名猜组")
-        else:
-            pass
         return self.rows[group]
 
     def _provenance(self, group: str) -> dict[str, Any]:
@@ -192,22 +176,16 @@ class PrintedLimitTable:
         row = self._group(group)
         if type(column) is not int or not 1 <= column <= 30:
             raise ValueError("原表列号须为1至30的明确整数")
-        else:
-            pass
         return dict(self._provenance(group), cell=row[column - 1].as_dict())
 
     def lookup(self, group: str, date: NominalSourceDate) -> dict[str, Any]:
         row = self._group(group)
         if not isinstance(date, NominalSourceDate):
             raise TypeError("须明确使用本限名义日期，不接收公历、年龄或字符串")
-        else:
-            pass
         t = date.elapsed_days
         end = max(c.end_exclusive_days for c in row)
         if t < min(c.start.elapsed_days for c in row) or t > end:
             raise ValueError("日期超出本地原刊限表；不能将公历年份代入名义序年")
-        else:
-            pass
         matches = [
             c.as_dict() for c in row if c.start.elapsed_days <= t < c.end_exclusive_days
         ]
@@ -254,8 +232,6 @@ class PrintedLimitTable:
                             "automatically_repaired": False,
                         }
                     )
-                else:
-                    pass
             rows.append(
                 dict(
                     self._provenance(group),
@@ -281,18 +257,12 @@ class PrintedLimitTable:
 def load_printed_limit_table(profile: str) -> PrintedLimitTable:
     if profile != PROFILE:
         raise ValueError("须明确选择nlc3150_literal210_v1，不默取底本")
-    else:
-        pass
     blob = DATA.read_bytes()
     fingerprint = hashlib.sha256(blob).hexdigest()
     if fingerprint != REFERENCE_SHA256:
         raise ValueError("完整原格资料哈希变化，须保留旧版重新核验")
-    else:
-        pass
     source = json.loads(blob)
     old = DATA.with_name("ruler-calendar-nlc3150-v1.json")
     if hashlib.sha256(old.read_bytes()).hexdigest() != source["old_rate_data_sha256"]:
         raise ValueError("此前条文资料发生漂移，不能混用公式版本")
-    else:
-        pass
     return PrintedLimitTable(source, fingerprint)

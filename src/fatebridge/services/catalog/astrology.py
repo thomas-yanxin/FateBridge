@@ -71,8 +71,6 @@ def _compact_relationship(result: ServiceResult) -> ServiceResult:
             view[role] = {**view[role], "chart": positions(view[role]["chart"])}
     elif "chart" in view:
         view["chart"] = positions(view["chart"])
-    else:
-        pass
     return view
 
 
@@ -81,8 +79,6 @@ def _relative_evidence_views(
 ) -> EvidenceViews | None:
     if views is None:
         return None
-    else:
-        pass
     from fatebridge.core.astro.reference import (
         RELATIVE_MODE_EXACT_ALIASES,
         RELATIVE_MODE_FALLBACK_ALIASES,
@@ -99,8 +95,6 @@ def _relative_evidence_views(
     for name, card in views.items():
         if "relative_mode" in card:
             card["aliases"] = [a for a, target in aliases.items() if target == name]
-        else:
-            pass
     return views
 
 

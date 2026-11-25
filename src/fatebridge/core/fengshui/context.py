@@ -110,8 +110,6 @@ def analyze_environmental_context(
     }
     if context is None:
         return result
-    else:
-        pass
 
     supported = 0
     unsupported = 0
@@ -143,11 +141,7 @@ def analyze_environmental_context(
         ):
             if orientation is None or not getattr(orientation, name):
                 orientation_missing.append(f"environmental_context.orientation.{name}")
-            else:
-                pass
         missing.extend(orientation_missing)
-    else:
-        pass
     result["orientation_review"] = {
         "status": "confirmed" if ready else "not_confirmed",
         "north_reference": (
@@ -161,8 +155,6 @@ def analyze_environmental_context(
     trace_keys.append("orientation")
     if orientation is not None and ready:
         supported += 1
-    else:
-        pass
 
     resident_members = [m for m in context.household_members if m.co_resident]
     members = {m.subject_id: m for m in context.household_members}
@@ -183,8 +175,6 @@ def analyze_environmental_context(
                 if r != "parent"
             ]
             rank_basis = "explicitly_following_spouse_rank"
-        else:
-            pass
         if member.co_resident:
             for role in roles:
                 if role == "parent":
@@ -199,8 +189,6 @@ def analyze_environmental_context(
                             "environmental_context.household_composition_confirmed"
                         )
                         continue
-                    else:
-                        pass
                     if member.generation != oldest_generation:
                         withheld_roles.append(
                             {
@@ -209,10 +197,6 @@ def analyze_environmental_context(
                             }
                         )
                         continue
-                    else:
-                        pass
-                else:
-                    pass
                 palace = _bundle()["role_palaces"][member.gender_role][role]
                 associations.append(
                     {
@@ -250,8 +234,6 @@ def analyze_environmental_context(
                 )
                 supported += 1
                 trace_keys.append("zodiac")
-            else:
-                pass
             if (
                 not roles
                 and member.zodiac is None
@@ -262,10 +244,6 @@ def analyze_environmental_context(
                 missing.append(
                     f"environmental_context.household_members.{member.subject_id}.family_roles"
                 )
-            else:
-                pass
-        else:
-            pass
         result["household_correspondences"].append(
             {
                 **_association_scope(methods, context.household_scope),
@@ -286,8 +264,6 @@ def analyze_environmental_context(
         )
     if context.household_members:
         trace_keys.extend(["family", "opposite"])
-    else:
-        pass
 
     floors = {floor.floor_id: floor for floor in context.floors}
     for floor in context.floors:
@@ -298,13 +274,9 @@ def analyze_environmental_context(
             )
         elif floor.uses_shared_orientation is False:
             unsupported += 1
-        else:
-            pass
         for name in ("center_confirmed", "floorplan_alignment_confirmed"):
             if getattr(floor, name) is not True:
                 missing.append(f"environmental_context.floors.{floor.floor_id}.{name}")
-            else:
-                pass
         result["floor_review"]["floors"].append(
             {
                 "floor_id": floor.floor_id,
@@ -355,8 +327,6 @@ def analyze_environmental_context(
             missing.append(
                 f"environmental_context.floor_influences.{influence.influence_id}.extent"
             )
-        else:
-            pass
         for subject_id in subject_ids:
             used = [f for f in context.floors if subject_id in f.subject_ids]
             if influence.extent == "shared_confirmed":
@@ -397,8 +367,6 @@ def analyze_environmental_context(
                         missing.append(
                             f"environmental_context.floors.{floor.floor_id}.suitability"
                         )
-                    else:
-                        pass
             assignments.append(
                 {
                     "subject_id": subject_id,
@@ -425,8 +393,6 @@ def analyze_environmental_context(
     )
     if context.floors:
         trace_keys.append("floors")
-    else:
-        pass
 
     for observation in context.observations:
         modern = observation.category == "modern_design"

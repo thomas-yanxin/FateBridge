@@ -46,15 +46,9 @@ class MonthUseWitness(PartialOutput):
             self.stem is not None or self.ten_god is not None
         ):
             raise ValueError("会支十神类不能伪作唯一化干或确定正偏十神")
-        else:
-            pass
         if self.ten_god is not None and self.possible_ten_gods is not None:
             if self.possible_ten_gods != [self.ten_god]:
                 raise ValueError("已确定透干的十神身份须保持精确，不扩成另一正偏")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -82,13 +76,9 @@ class MonthUseMatch(PartialOutput):
     def preserve_match_identity(self) -> "MonthUseMatch":
         if self.status == "matched" and self.witness_ids == []:
             raise ValueError("月用资格matched须有同次见证，不以旧单锚补空")
-        else:
-            pass
         if (
             self.status == "requires_identity_adjudication"
             and self.pending_witness_ids == []
         ):
             raise ValueError("具体身份待判须保实际未决见证")
-        else:
-            pass
         return self

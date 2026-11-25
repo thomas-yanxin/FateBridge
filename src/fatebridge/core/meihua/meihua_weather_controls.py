@@ -27,8 +27,6 @@ def weather_frequency_views(
 ) -> list[dict[str, Any]]:
     if type(moving_line) is not int or not 1 <= moving_line <= 6:
         raise ValueError("Weather frequency diagnostics require the actual moving line")
-    else:
-        pass
     static_position = "upper" if moving_line <= 3 else "lower"
     repeated_static = f"{fact_prefix}.changed_hexagram.{static_position}"
     five_slots = [row for row in slots if row["path"] != repeated_static]
@@ -36,8 +34,6 @@ def weather_frequency_views(
         raise ValueError(
             "Weather frequency diagnostics require the six actual positions"
         )
-    else:
-        pass
     variants = []
     for name, selected, rows in [
         ("six_positions", True, slots),
@@ -71,8 +67,6 @@ def assess_weather_controls(
             groupings = {"combined_controllers": sum(controller_counts)}
             if len(controller_counts) > 1:
                 groupings["either_controller_trigram"] = max(controller_counts)
-            else:
-                pass
             for grouping, count in groupings.items():
                 variants.append(
                     {
@@ -137,8 +131,6 @@ def qualify_weather_rules(
         dependencies.update(conditions.get("present_any", []))
         if "many" in conditions:
             dependencies.add(conditions["many"])
-        else:
-            pass
         for pair in conditions.get("pairs", []):
             dependencies.update(pair)
         checks = []
@@ -153,8 +145,6 @@ def qualify_weather_rules(
             }
             if not affected_tags:
                 continue
-            else:
-                pass
             checks.append(
                 {
                     "rule_id": control["rule_id"],
@@ -166,8 +156,6 @@ def qualify_weather_rules(
                 controlled.update(affected_tags)
             elif control["status"] in {"scope_unresolved", "pending_threshold"}:
                 conditional.update(affected_tags)
-            else:
-                pass
         row["control_checks"] = checks
         row["qualification_reasons"] = []
         row["controlled_tags"] = (
@@ -185,8 +173,6 @@ def qualify_weather_rules(
         row["effective_reading"] = row["traditional_reading"]
         if row["status"] != "matched":
             continue
-        else:
-            pass
         if controlled:
             row["qualification_reasons"].append("source_control")
             row["effective_status"] = "qualified_by_source_control"
@@ -195,14 +181,10 @@ def qualify_weather_rules(
                 + "、".join(_WEATHER_LABELS[t] for t in sorted(controlled))
                 + "象在本次明示阈值及所列计数候选下受制，不作未受制的独立判断"
             )
-        else:
-            pass
         if conditional - controlled:
             row["qualification_reasons"].append("unresolved_control")
             if not controlled:
                 row["effective_status"] = "conditional_on_unresolved_control"
-            else:
-                pass
             row["effective_reading"] += (
                 "；其中"
                 + "、".join(
@@ -210,5 +192,3 @@ def qualify_weather_rules(
                 )
                 + "象的制约阈值或计数范围尚未确定"
             )
-        else:
-            pass

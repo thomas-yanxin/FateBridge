@@ -39,8 +39,6 @@ def _catalogue(
         raw = CATALOGUE_PATH.read_bytes()
         if hashlib.sha256(raw).hexdigest() != CATALOGUE_SHA256:
             raise ValueError("Gate4 editorial catalogue changed")
-        else:
-            pass
         supplement = json.loads(
             raw, object_pairs_hook=base._object, parse_constant=base._nonfinite
         )
@@ -62,8 +60,6 @@ def _catalogue(
             != [f"4.{line}" for line in range(1, 7)]
         ):
             raise ValueError("Invalid Gate4 coverage or source claim")
-        else:
-            pass
         for i, row in enumerate(supplement["rows"]):
             original = data["rows"][18 + i]
             meaning = row["editorial_paraphrase"]
@@ -94,8 +90,6 @@ def _catalogue(
                 != "not_automated_nonmechanical_source_qualifier"
             ):
                 raise ValueError("Invalid Gate4 locator or invented applicability")
-            else:
-                pass
             original.update(deepcopy(row))
         data.update(
             version=5,
@@ -104,8 +98,6 @@ def _catalogue(
         )
         if base._coverage(data)["local_editorial_paraphrases"] != 24:
             raise ValueError("Invalid actual Gate4 semantic coverage")
-        else:
-            pass
         snapshot[CATALOGUE_PATH] = raw
         provenance.update(
             source_catalogue_version=5,
@@ -187,8 +179,6 @@ def read_reference(*, key: str | None) -> dict:
             tips.append(
                 "引导语尚未转成可计算的个人条件，适用性未知；未列条件不表示无条件。"
             )
-        else:
-            pass
         tips.extend(
             [record["selection_policy"], base._scope(data), parent.SCOPE, SCOPE]
         )

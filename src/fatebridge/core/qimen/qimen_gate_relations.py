@@ -85,8 +85,6 @@ def gate_palace_relation(door: str, trigram: str) -> dict[str, Any]:
         or trigram == "中"
     ):
         raise ValueError("门宫关系须使用实际八门与外八宫，不给中宫补门")
-    else:
-        pass
     d, p = DOOR_ELEMENTS[door], PALACE_ELEMENTS[trigram]
     if d == p:
         relation = "same_element"

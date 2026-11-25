@@ -99,8 +99,6 @@ def _select_structure_god(
     if month_branch == LU_SEATS[day_stem]:
         lu_god = next(c for c in candidates if c["ten_god"] == "比肩")
         return {**lu_god, "is_special": True, "selection_rule": "qualified_lu_seat"}
-    else:
-        pass
     if month_branch == YANG_BLADE_SEATS.get(day_stem):
         blade_god = next(c for c in candidates if c["ten_god"] == "劫财")
         return {
@@ -108,8 +106,6 @@ def _select_structure_god(
             "is_special": True,
             "selection_rule": "qualified_yang_blade_seat",
         }
-    else:
-        pass
 
     transparent = [
         c
@@ -141,8 +137,6 @@ def _select_structure_god(
             "is_special": False,
             "selection_rule": "officer_with_wealth_seal_support",
         }
-    else:
-        pass
     # 杂气透干会支: preserve a revealed candidate supported by an actual
     # full/peak-containing half triad. This does not certify 合化 or 成格.
     meeting_supported = []
@@ -160,10 +154,6 @@ def _select_structure_god(
                 ):
                     meeting_supported.append(candidate)
                     break
-                else:
-                    pass
-    else:
-        pass
     chosen = (
         meeting_supported[0]
         if len(meeting_supported) == 1
@@ -208,8 +198,6 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> dict[str, 
     label = _TEN_GOD_TO_STRUCTURE.get(god["ten_god"], f"{god['ten_god']}格")
     if not god["is_special"] and god["ten_god"] in ("比肩", "劫财"):
         label = "比劫待取格"
-    else:
-        pass
 
     legacy_label = label
     use_resolution = build_month_use_resolution(
@@ -222,8 +210,6 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> dict[str, 
             **god,
             "reference_scope": "旧单锚历史参考，不代表本次完整取用见证或最终格局。",
         }
-    else:
-        pass
     transparency = "透干" if god["transparent"] else "未透（本气取格）"
     if god["is_special"]:
         basis = (
@@ -241,8 +227,6 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> dict[str, 
             or "暂无已建模透干/完整会支见证"
         )
         basis = f"月令{month_branch}：{observed}；资格并存，不裁成格、合化或全局喜忌。"
-    else:
-        pass
 
     return {
         "method_id": "month_command_qualified_officer_v3",
@@ -436,8 +420,6 @@ def seasonal_climate_god(
     if entry is None:
         lookup: dict[str, Any] = {"primary": None, "secondary": [], "available": False}
         return seasonal_reference_layers(day_stem, month_branch, lookup, pillars)
-    else:
-        pass
     primary, secondary = entry
     return seasonal_reference_layers(
         day_stem,
@@ -483,8 +465,6 @@ def classical_snapshot_lines(overview: dict[str, Any]) -> list[str]:
         lines.append(
             f"月令本气为{original.get('ten_god')}，有限规则所选为{selected.get('ten_god')}；变格、兼格及是否仍用本格须另判。"
         )
-    else:
-        pass
 
     if climate["available"]:
         secondary = "、".join(climate["secondary"]) if climate["secondary"] else "无"
@@ -519,7 +499,5 @@ def classical_snapshot_lines(overview: dict[str, Any]) -> list[str]:
         )
         lines.append(f"原典根类（未判根损）：{categories}")
         lines.append("根类不替代全局旺衰；阴长生参考不补造藏干，冲只列候选。")
-    else:
-        pass
 
     return lines

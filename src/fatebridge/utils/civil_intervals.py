@@ -33,8 +33,6 @@ def _rule_utc(zone: ZoneInfo, point: UTCCalendar) -> datetime:
         actual = point.as_datetime()
         assert actual is not None
         return actual
-    else:
-        pass
     return ZonedCalendar(point, zone).utc_rule_proxy()[0]
 
 
@@ -50,8 +48,6 @@ def _clock_cuts_on_utc_day(zone: ZoneInfo, ordinal: int) -> tuple[UTCCalendar, .
         current = local.utcoffset(), is_unspecified_local_time(local)
         if seconds and current != previous:
             cuts.append(UTCCalendar(ordinal, seconds * 1_000_000))
-        else:
-            pass
         previous = current
     return tuple(cuts)
 
@@ -75,8 +71,6 @@ def local_interval_preimages(
         for bound in (start, end)
     ):
         raise ValueError("Local interval requires ordered naive clock bounds")
-    else:
-        pass
     first, last = (
         (
             NominalClockLabel.from_local_datetime(bound)
@@ -89,17 +83,11 @@ def local_interval_preimages(
     wall_end = UTCCalendar(last.ordinal, last.microseconds_of_day)
     if wall_end <= wall_start:
         raise ValueError("Local interval requires ordered naive clock bounds")
-    else:
-        pass
     if isinstance(zone, timezone):
         fixed_offset = zone.utcoffset(None)
         return [(wall_start.shifted(-fixed_offset), wall_end.shifted(-fixed_offset))]
-    else:
-        pass
     if not isinstance(zone, ZoneInfo):
         raise ValueError("Local intervals require ZoneInfo or a fixed UTC offset")
-    else:
-        pass
     # Every Python timezone offset is strictly less than 24 hours in magnitude.
     lower, upper = wall_start.shifted(-DAY), wall_end.shifted(DAY)
     if lower.ordinal <= FIRST_UTC.ordinal or upper.ordinal >= LAST_UTC.ordinal:
@@ -111,10 +99,6 @@ def local_interval_preimages(
             source_zone = None
         if zone is not source_zone:
             raise EphemerisSourceError("timezone_rules_unavailable")
-        else:
-            pass
-    else:
-        pass
     cuts = timezone_transition_calendar_candidates(zone, lower, upper)
     if cuts is None:
         cuts = tuple(
@@ -123,8 +107,6 @@ def local_interval_preimages(
             for at in _clock_cuts_on_utc_day(zone, ordinal)
             if lower < at < upper
         )
-    else:
-        pass
     points = (lower, *(at for at in cuts if lower < at < upper), upper)
     result: list[tuple[UTCCalendar, UTCCalendar]] = []
     has_unspecified_support = False
@@ -136,13 +118,9 @@ def local_interval_preimages(
         high = min(segment_end, wall_end.shifted(-offset))
         if low >= high:
             continue
-        else:
-            pass
         if is_unspecified_local_time(local):
             has_unspecified_support = True
             continue
-        else:
-            pass
         if result and result[-1][1] == low:
             result[-1] = result[-1][0], high
         else:
@@ -151,6 +129,4 @@ def local_interval_preimages(
         raise PydanticCustomError(
             "unresolved_timezone_offset", UNRESOLVED_OFFSET_MESSAGE
         )
-    else:
-        pass
     return result

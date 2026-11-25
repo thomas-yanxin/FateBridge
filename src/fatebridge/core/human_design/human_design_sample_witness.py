@@ -67,8 +67,6 @@ def _clock(label: str | None, time: dict[str, Any]) -> None:
     optional = {"utc_is_leap_second", "utc_label_status"}
     if not required <= set(time) or set(time) - required - optional:
         raise ValueError("Unexpected sample clock fields")
-    else:
-        pass
     if (
         any(
             type(time[k]) is not float or not math.isfinite(time[k])
@@ -77,8 +75,6 @@ def _clock(label: str | None, time: dict[str, Any]) -> None:
         or type(time["method"]) is not str
     ):
         raise ValueError("Malformed sample time scalars")
-    else:
-        pass
     future = False
     is_leap = isinstance(label, str) and label[17:19] == "60"
     if label is None:
@@ -88,27 +84,19 @@ def _clock(label: str | None, time: dict[str, Any]) -> None:
             or time["jd_tt"] >= 2441317.5 + (10 + 32.184) / 86400
         ):
             raise ValueError("Invalid missing historical UTC label")
-        else:
-            pass
     elif is_leap:
         anchor = datetime.fromisoformat(label[:17] + "59" + label[19:])
         offset = anchor.utcoffset()
         if offset is None or offset.total_seconds() != 0:
             raise ValueError("Sample label must use UTC")
-        else:
-            pass
         expected = ConfirmedLeapSecond.from_utc_anchor(anchor).tt.as_float()
         if abs(time["jd_tt"] - expected) * 86400 > 0.0002:
             raise ValueError("Inserted-second label detached from frozen TT")
-        else:
-            pass
     else:
         moment = datetime.fromisoformat(label)
         offset = moment.utcoffset()
         if offset is None or offset.total_seconds() != 0:
             raise ValueError("Sample label must use UTC")
-        else:
-            pass
         future = moment >= datetime.fromisoformat(leap_table()["expires_at"])
         if moment.year >= 1972:
             rows = [
@@ -122,24 +110,16 @@ def _clock(label: str | None, time: dict[str, Any]) -> None:
             )
             if abs(time["jd_tt"] - expected) * 86400 > 0.0002:
                 raise ValueError("Modern UTC label detached from frozen TT")
-            else:
-                pass
-        else:
-            pass
     if (
         type(time["future_leap_seconds_assumed_unchanged"]) is not bool
         or time["future_leap_seconds_assumed_unchanged"] != future
     ):
         raise ValueError("Sample future leap assumption contradicts its label")
-    else:
-        pass
     if "utc_is_leap_second" in time and (
         type(time["utc_is_leap_second"]) is not bool
         or time["utc_is_leap_second"] != is_leap
     ):
         raise ValueError("Sample inserted-second flag contradicts its label")
-    else:
-        pass
     expected_status = (
         "unrepresentable_historical_fractional_UTC_adjustment"
         if label is None
@@ -147,8 +127,6 @@ def _clock(label: str | None, time: dict[str, Any]) -> None:
     )
     if "utc_label_status" in time and time["utc_label_status"] != expected_status:
         raise ValueError("Sample label status contradicts its label")
-    else:
-        pass
 
 
 def unpack_sample_witnesses(
@@ -168,15 +146,11 @@ def unpack_sample_witnesses(
         != ["longitude", "longitude_speed", "return_flags"]
     ):
         raise ValueError("Invalid interval witness layout or scope")
-    else:
-        pass
     if node_mode not in {"true", "mean"} or physical_backend_policy not in {
         "auto",
         "strict_jpl",
     }:
         raise ValueError("Invalid interval source policy")
-    else:
-        pass
     charts: dict[float, dict[str, Any]] = {}
     graph_cache: dict[tuple[Any, ...], dict[str, Any]] = {}
     for sample in witness["samples"]:
@@ -193,8 +167,6 @@ def unpack_sample_witnesses(
             or set(sample["native_positions"]) != set(SIDES)
         ):
             raise ValueError("Invalid sample fields")
-        else:
-            pass
         sides = {}
         for side in SIDES:
             _clock(
@@ -222,21 +194,15 @@ def unpack_sample_witnesses(
             > 1e-7
         ):
             raise ValueError("Invalid sample solar/profile relationship")
-        else:
-            pass
         birth = sample["time_scales"]["personality"]["jd_tt"]
         design = sample["time_scales"]["design"]["jd_tt"]
         if not 70 < birth - design < 110 or (
             charts and birth <= next(reversed(charts))
         ):
             raise ValueError("Unsorted, duplicate or invalid sample epochs")
-        else:
-            pass
         keys = tuple(tuple(sorted({r["gate"] for r in sides[s]})) for s in SIDES)
         if keys not in graph_cache:
             graph_cache[keys] = bodygraph(keys[0], keys[1])
-        else:
-            pass
         angle = (
             "juxtaposition"
             if profile == "4/1"
@@ -287,6 +253,4 @@ def unpack_sample_witnesses(
             }
         )["errors"]:
             raise ValueError("Invalid sample root or actual design endpoint witnesses")
-        else:
-            pass
     return charts

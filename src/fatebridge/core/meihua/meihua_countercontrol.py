@@ -29,8 +29,6 @@ def _profile() -> dict[str, Any]:
         or profile["version"] != "1.0.0"
     ):
         raise ValueError("Unknown internal Meihua control profile")
-    else:
-        pass
     return profile
 
 
@@ -46,8 +44,6 @@ def build_internal_countercontrol(
         raise ValueError(
             "Internal control requires all four actual stage roles in order"
         )
-    else:
-        pass
     first = stages[0]
     nodes = [
         {
@@ -127,11 +123,7 @@ def build_internal_countercontrol(
                     + "、".join(LABELS[c] + by_role[c]["trigram"] for c in leaking)
                     + "对原体同时为体生用，耗泄关系仍须同看。"
                 )
-            else:
-                pass
             parts.append(text)
-        else:
-            pass
         qualifications.append(
             {
                 "role": row["role"],

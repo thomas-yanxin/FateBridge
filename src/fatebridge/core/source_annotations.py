@@ -29,36 +29,24 @@ def _index() -> Tuple[Dict[tuple, list], Dict[str, Any]]:
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != SOURCE_DATA_SHA256:
         raise ValueError("当前来源数据与已核书影记录不一致")
-    else:
-        pass
     data = json.loads(raw)
     if data["schema_version"] != 1 or len(data["records"]) != data["record_count"]:
         raise ValueError("原典参考索引结构或记录数不一致")
-    else:
-        pass
     grouped: Dict[tuple, list] = {}
     records_by_id = {r["reference_id"]: r for r in data["records"]}
     if len(records_by_id) != len(data["records"]):
         raise ValueError("原典参考编号重复")
-    else:
-        pass
     constraints = data["strength_constraints"]
     if len(constraints) != data["strength_constraint_count"]:
         raise ValueError("原典集合约束数不一致")
-    else:
-        pass
     if len({c["constraint_id"] for c in constraints}) != len(constraints):
         raise ValueError("原典集合约束编号重复")
-    else:
-        pass
     for constraint in constraints:
         record = records_by_id[constraint["reference_id"]]
         record.setdefault("bounded_strength_constraints", []).append(constraint)
     for record in data["records"]:
         if record["retained_strength_annotation"] not in GRADES | {None}:
             raise ValueError("原典参考含未登记的强弱编释")
-        else:
-            pass
         grouped.setdefault(tuple(record["pillars"]), []).append(record)
     readings = [r for r in data["records"] if "input_reading_evidence" in r]
     for record in readings:
@@ -69,13 +57,9 @@ def _index() -> Tuple[Dict[tuple, list], Dict[str, Any]]:
             or evidence["new_independent_validation_credit"] != 0
         ):
             raise ValueError("输入校读不得补定强弱或增加独立验证信用")
-        else:
-            pass
     notes = [r for r in data["records"] if "editorial_annotation_provenance" in r]
     if len(notes) != data["editorial_annotation_count"]:
         raise ValueError("登记编辑说明投影数不一致")
-    else:
-        pass
     for record in notes:
         provenance = record["editorial_annotation_provenance"]
         if (
@@ -89,19 +73,13 @@ def _index() -> Tuple[Dict[tuple, list], Dict[str, Any]]:
             != provenance["annotation_sha256"]
         ):
             raise ValueError("编辑说明不得冒充原典引文、重判标签或丢失原说明")
-        else:
-            pass
     if len(grouped) != data["literal_input_count"]:
         raise ValueError("原典参考字面输入数不一致")
-    else:
-        pass
     validate_identity_index(data)
     reviews, condition_metadata = condition_reviews(data)
     for record in data["records"]:
         if record["reference_id"] in reviews:
             record["source_condition_review"] = reviews[record["reference_id"]]
-        else:
-            pass
     metadata = {
         **condition_metadata,
         "method_id": data["method_id"],
@@ -137,8 +115,6 @@ def compare_strength_bounds(
                 or any(not isinstance(v, str) or v not in GRADES for v in forbidden)
             ):
                 raise ValueError("原典集合约束必须保留明确有效的禁止等级")
-            else:
-                pass
             remaining -= set(forbidden)
             claim["comparison"] = (
                 "current_grade_missing"
@@ -187,8 +163,6 @@ def compare_records(records: list, computed_strength: Optional[str]) -> Dict[str
     """Keep conflicting and unknown annotations; a match never certifies a book."""
     if computed_strength not in GRADES | {None}:
         raise ValueError("当前强弱必须为强、中和、弱或明确未提供")
-    else:
-        pass
     rows = deepcopy(records)
     expected = {r["retained_strength_annotation"] for r in rows} - {None}
     known = [r for r in rows if r["retained_strength_annotation"] is not None]
@@ -252,27 +226,17 @@ def _exact_annotation_comparison_summary(comparison: Mapping[str, Any]) -> str:
     status = comparison["status"]
     if status == "no_registered_literal_case":
         return f"当前模型判{current}；未发现已登记同四柱记录，原典符合度未核实。"
-    else:
-        pass
     if status == "unadjudicated_records_only":
         return (
             f"当前模型判{current}；同柱参考未裁定日主三档强弱，不能据此认证原典符合。"
         )
-    else:
-        pass
     labels = "、".join(comparison["retained_expected_strengths"])
     if status == "conflicting_registered_annotations":
         return f"当前模型判{current}；保留标注有{labels}等不同意见，不能只选相符记录。"
-    else:
-        pass
     if status == "known_annotation_mismatch":
         return f"当前模型判{current}，同柱保留编释为{labels}，存在已知差异；未改写计算，原典符合仍未认证。"
-    else:
-        pass
     if status == "current_grade_missing":
         return f"当前计算未提供强弱；同柱保留编释为{labels}，尚不能比较。"
-    else:
-        pass
     return f"当前模型判{current}，与已知同柱编释相符；另有{comparison['unknown_or_unannotated_count']}条未裁定，有限相符不认证完整原典。"
 
 
@@ -280,29 +244,19 @@ def annotation_comparison_summary(comparison: Mapping[str, Any]) -> str:
     summary = _exact_annotation_comparison_summary(comparison)
     if any("source_identity_revision" in r for r in comparison["records"]):
         summary += PUBLISHER_NOTE
-    else:
-        pass
     if any("name_as_printed" in r for r in comparison["records"]):
         summary += NAME_NOTE
-    else:
-        pass
     if any("editorial_annotation_provenance" in r for r in comparison["records"]):
         summary += "已附登记编辑说明，须与原典引文分开；说明未重判强弱。"
-    else:
-        pass
     revisions = sum("input_reading_evidence" in r for r in comparison["records"])
     if revisions:
         summary += (
             f"其中{revisions}条参考输入已按图版校读修订，原录文与修订依据均保留；"
             "校读未补定强弱标签。"
         )
-    else:
-        pass
     bounds = comparison.get("bounded_comparison", {})
     if not bounds.get("claim_count"):
         return summary
-    else:
-        pass
     if bounds["status"] == "contradictory_registered_bounds":
         suffix = "已登记的编释集合约束彼此冲突，返回了全部约束。"
     elif bounds["status"] == "current_grade_missing":
@@ -313,8 +267,6 @@ def annotation_comparison_summary(comparison: Mapping[str, Any]) -> str:
         suffix = "当前工程档符合已登记的编释集合约束，原典三档强弱另待裁定。"
     if bounds["conflicts_with_retained_exact_annotations"]:
         suffix += "集合约束与保留三档编释也有冲突，均已保留。"
-    else:
-        pass
     return summary + suffix
 
 
@@ -329,8 +281,6 @@ def pillar_values(case: Mapping[str, Any]) -> list[str]:
         for p in values
     ):
         raise ValueError("Literal source pillars are malformed; do not guess a repair")
-    else:
-        pass
     return values
 
 

@@ -117,6 +117,4 @@ def timing_root_snapshot_lines(context: TimingRootContext) -> list[str]:
         lines.append(
             "根类与冲合刑触点分列；未裁定行运后的有效旺衰，不能把阴长生名当真实藏根或把未见根直接判弱。"
         )
-    else:
-        pass
     return lines

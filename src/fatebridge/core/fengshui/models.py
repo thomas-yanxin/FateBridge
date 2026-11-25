@@ -64,8 +64,6 @@ class TimeInput(_DeferredModel):
             raise ValueError(
                 "nonexistent local time：该地区时区不存在此钟时；请提供有效当地钟时或明确UTC偏移。"
             )
-        else:
-            pass
         # A valid aware datetime already identifies a fold through its UTC
         # offset/fold flag. Preserve that explicit instant instead of rejecting
         # an otherwise valid repeated wall clock.
@@ -123,23 +121,13 @@ class MingguaRequest(TimeInput):
             > 1
         ):
             raise ValueError("effective_birth_year、birth_at、birth_date 只能提供一项")
-        else:
-            pass
         if self.birth_date is not None and not 1801 <= self.birth_date.year <= 2199:
             raise ValueError("birth_date 支持 1801–2199 年")
-        else:
-            pass
         if self.birth_at is not None:
             if self.birth_at.tzinfo is None or self.birth_at.utcoffset() is None:
                 raise ValueError("birth_at 必须包含时区")
-            else:
-                pass
             if not 1801 <= self.birth_at.year <= 2199:
                 raise ValueError("birth_at 支持 1801–2199 年")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -211,16 +199,10 @@ class House(_DeferredModel):
     def bearing_reference(self) -> "House":
         if self.bearing_uncertainty_degrees is not None and self.facing_degrees is None:
             raise ValueError("宅向误差半径须同时提供 facing_degrees")
-        else:
-            pass
         if self.facing_degrees is not None and self.north_reference is None:
             raise ValueError("角度输入必须明确 north_reference")
-        else:
-            pass
         if self.bearing_uncertainty_degrees is not None:
             self.check_sitting_trigram(self.bearing_uncertainty_degrees)
-        else:
-            pass
         return self
 
     def check_sitting_trigram(self, radius: float) -> None:
@@ -233,10 +215,6 @@ class House(_DeferredModel):
             )
             if self.sitting_trigram not in {c["sitting_trigram"] for c in supported}:
                 raise ValueError("宅向推导的坐山与 sitting_trigram 不一致")
-            else:
-                pass
-        else:
-            pass
 
 
 _PLACEMENT_FACING_ROLES = {
@@ -334,37 +312,25 @@ class Placement(_DeferredModel):
         """Use one scope predicate for findings and inverse direction options."""
         if self.subject_ids is not None:
             return subject_id in self.subject_ids
-        else:
-            pass
         return self.subject_id is None or self.subject_id == subject_id
 
     @model_validator(mode="after")
     def facing_semantics(self) -> "Placement":
         if self.subject_id is not None and self.subject_ids is not None:
             raise ValueError("subject_id 和 subject_ids 只能提供一项")
-        else:
-            pass
         if self.subject_ids is not None and len(set(self.subject_ids)) != len(
             self.subject_ids
         ):
             raise ValueError("对象共用住户 subject_ids 必须唯一")
-        else:
-            pass
         if self.location_direction is None and self.facing_direction is None:
             raise ValueError("布局对象至少提供位置或朝向，不猜测缺失位置")
-        else:
-            pass
         if (self.facing_direction is None) != (self.facing_role is None):
             raise ValueError("facing_direction 和 facing_role 必须一起提供")
-        else:
-            pass
         if (
             self.facing_role is not None
             and self.facing_role != _PLACEMENT_FACING_ROLES[self.purpose]
         ):
             raise ValueError("facing_role 与 purpose 不匹配")
-        else:
-            pass
         return self
 
 
@@ -394,8 +360,6 @@ class BazhaiRequest(_DeferredModel):
             self.house.check_sitting_trigram(
                 self.house.bearing_uncertainty_degrees or 0
             )
-        else:
-            pass
         ids = [o.subject_id for o in self.occupants]
         context = getattr(self, "environmental_context", None)
         known_subjects = set(ids) | (
@@ -404,16 +368,10 @@ class BazhaiRequest(_DeferredModel):
         objects = [p.object_id for p in self.placements]
         if len(set(ids)) != len(ids) or len(set(objects)) != len(objects):
             raise ValueError("住户及布局对象 ID 必须分别唯一")
-        else:
-            pass
         if self.house is not None and self.house.object_id in ids:
             raise ValueError("住宅 ID 不得与住户 ID 重复")
-        else:
-            pass
         if self.house is not None and self.house.object_id in objects:
             raise ValueError("布局对象 ID 不得与住宅 ID 重复")
-        else:
-            pass
         if any(
             referenced not in known_subjects
             for p in self.placements
@@ -424,8 +382,6 @@ class BazhaiRequest(_DeferredModel):
             )
         ):
             raise ValueError("布局对象引用了未提供的住户")
-        else:
-            pass
         return self
 
 
@@ -459,8 +415,6 @@ class JinsuoRequest(_DeferredModel):
         ids = [f.object_id for f in self.features]
         if len(set(ids)) != len(ids):
             raise ValueError("环境特征 object_id 必须唯一")
-        else:
-            pass
         return self
 
 
@@ -483,19 +437,11 @@ class AnnualRequest(TimeInput):
     def validate_query(self) -> "AnnualRequest":
         if self.effective_year is not None and self.query_at is not None:
             raise ValueError("effective_year 与 query_at 不能同时提供")
-        else:
-            pass
         if self.query_at is not None:
             if self.query_at.tzinfo is None or self.query_at.utcoffset() is None:
                 raise ValueError("query_at 必须包含时区")
-            else:
-                pass
             if not 1801 <= self.query_at.year <= 2199:
                 raise ValueError("query_at 支持 1801–2199 年")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -560,23 +506,13 @@ class MonthlyRequest(TimeInput):
     def selected_month_clock(self) -> "MonthlyRequest":
         if (self.effective_solar_year is None) != (self.solar_month_number is None):
             raise ValueError("effective_solar_year与solar_month_number必须成对")
-        else:
-            pass
         if self.query_at is not None:
             if self.effective_solar_year is not None:
                 raise ValueError("query_at与已确认有效年/节月不能同时提供")
-            else:
-                pass
             if self.query_at.tzinfo is None or self.query_at.utcoffset() is None:
                 raise ValueError("query_at必须包含时区")
-            else:
-                pass
             if not 1801 <= self.query_at.year <= 2199:
                 raise ValueError("query_at支持1801–2199年")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -607,31 +543,19 @@ class HousePeriod(TimeInput):
             raise ValueError(
                 "定运需且仅需 period_number、effective_event_year、event_at 之一"
             )
-        else:
-            pass
         if not self.evidence.strip():
             raise ValueError("定运 evidence 不得为空白")
-        else:
-            pass
         if self.event_at is not None:
             AnnualRequest(query_at=self.event_at, timezone_name=self.timezone_name)
-        else:
-            pass
         if self.basis == "expert_confirmed" and self.period_number is None:
             raise ValueError("expert_confirmed 必须显式确认 period_number")
-        else:
-            pass
         if self.basis == "confirmed_major_renovation":
             if self.qualifies_for_period_reset is not True:
                 raise ValueError(
                     "大修换运须明确 qualifies_for_period_reset=true 并记录依据"
                 )
-            else:
-                pass
         elif self.qualifies_for_period_reset is not None:
             raise ValueError("qualifies_for_period_reset 仅用于已确认的大修换运")
-        else:
-            pass
         return self
 
 
@@ -656,12 +580,8 @@ class ExternalFormObservation(_DeferredModel):
     def explicit_observation(self) -> "ExternalFormObservation":
         if self.mountain_present is None and self.water_present is None:
             raise ValueError("外局须至少明确山形或水形的一项存在/不存在观察")
-        else:
-            pass
         if not self.evidence.strip():
             raise ValueError("外局 evidence 不得为空白")
-        else:
-            pass
         return self
 
 
@@ -806,8 +726,6 @@ class XuankongInterpretationRequest(_DeferredModel):
                 and self.current_period_number != 5
             ):
                 raise ValueError("零正五运分段仅可用于明确评价五运")
-            else:
-                pass
             old_water = {o.direction: o.water_present for o in self.external_forms}
             for observation in self.fixed_lingzheng.observations:
                 old = old_water.get(observation.direction)
@@ -815,23 +733,13 @@ class XuankongInterpretationRequest(_DeferredModel):
                     raise ValueError(
                         "同一全宅方向的有水事实不能在飞星与固定零正观察中冲突"
                     )
-                else:
-                    pass
-        else:
-            pass
         if (self.current_period_number is None) != (self.period_evidence is None):
             raise ValueError("current_period_number 与 period_evidence 必须一起提供")
-        else:
-            pass
         if self.period_evidence is not None and not self.period_evidence.strip():
             raise ValueError("period_evidence 不得为空白")
-        else:
-            pass
         directions = [o.direction for o in self.external_forms]
         if len(set(directions)) != len(directions):
             raise ValueError("同一全宅外局方向不能重复或互相覆盖")
-        else:
-            pass
         return self
 
 
@@ -884,22 +792,14 @@ class XuankongRequest(_DeferredModel):
         ):
             if self.house.bearing_uncertainty_degrees > 7.5:
                 raise ValueError("本玄空版本的宅向误差半径最多支持7.5度")
-            else:
-                pass
-        else:
-            pass
         if self.house is not None:
             self.house.check_sitting_trigram(self.effective_bearing_uncertainty)
-        else:
-            pass
         if (
             self.house is not None
             and self.house.facing_degrees is not None
             and self.house.north_reference != "magnetic"
         ):
             raise ValueError("本玄空版本使用磁北宅向；真北需先由用户完成磁偏角校正")
-        else:
-            pass
         return self
 
     @property
@@ -909,8 +809,6 @@ class XuankongRequest(_DeferredModel):
             and self.house.bearing_uncertainty_degrees is not None
         ):
             return self.house.bearing_uncertainty_degrees
-        else:
-            pass
         return 0.0
 
 
@@ -928,8 +826,6 @@ class LayoutConstraint(_DeferredModel):
     def nonblank_evidence(cls, value: str) -> str:
         if not value.strip():
             raise ValueError("动作约束依据不得为空白")
-        else:
-            pass
         return value
 
 
@@ -975,8 +871,6 @@ class LayoutAlternative(_DeferredModel):
     def consistent_candidate(self) -> "LayoutAlternative":
         if not self.evidence.strip() or len(set(self.changes)) != len(self.changes):
             raise ValueError("候选依据不得空白，changes 不得重复")
-        else:
-            pass
         observations = [self.placement, self.form_observation]
         supplied = [o for o in observations if o is not None]
         related = self.environmental_context is not None and any(
@@ -997,33 +891,21 @@ class LayoutAlternative(_DeferredModel):
                     for r in review.entry_barriers
                 )
             )
-        else:
-            pass
         if (not supplied and not related) or any(
             o.object_id != self.object_id for o in supplied
         ):
             raise ValueError("候选需独立位置或形态观察，且 object_id 必须一致")
-        else:
-            pass
         if supplied and len({o.purpose for o in supplied}) != 1:
             raise ValueError("候选位置与形态用途必须一致")
-        else:
-            pass
         JinsuoRequest(features=self.features)
         if any(feature.object_id != self.object_id for feature in self.features):
             raise ValueError("候选砂水只能引用本候选 object_id")
-        else:
-            pass
         if self.placement is not None and self.placement.location_direction is not None:
             if any(
                 feature.direction != self.placement.location_direction
                 for feature in self.features
             ):
                 raise ValueError("同一候选对象的砂水方向与已确认位置必须一致")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -1033,8 +915,6 @@ def _validate_floor_sector_assignments(
     for floor in context.floors:
         if not set(floor.object_ids) & location_object_ids:
             continue
-        else:
-            pass
         if (
             context.orientation is None
             or not context.orientation.ready_for_sectors()
@@ -1045,8 +925,6 @@ def _validate_floor_sector_assignments(
             raise ValueError(
                 f"楼层 {floor.floor_id} 的共用方向、独立中心及户型偏移未确认，不能提交该层实际落宫"
             )
-        else:
-            pass
 
 
 def _validate_floor_user_assignments(
@@ -1055,13 +933,9 @@ def _validate_floor_user_assignments(
     for floor in context.floors:
         if not floor.usage_confirmed:
             continue
-        else:
-            pass
         for placement in placements:
             if placement.object_id not in floor.object_ids:
                 continue
-            else:
-                pass
             explicit_users = placement.subject_ids or (
                 [placement.subject_id] if placement.subject_id is not None else []
             )
@@ -1069,8 +943,6 @@ def _validate_floor_user_assignments(
                 raise ValueError(
                     f"楼层 {floor.floor_id} 的完整使用名单与对象 {placement.object_id} 明确使用人矛盾"
                 )
-            else:
-                pass
 
 
 def _validate_static_floor_frames(
@@ -1089,8 +961,6 @@ def _validate_static_floor_frames(
         and current.orientation.north_reference != proposed.orientation.north_reference
     ):
         raise ValueError("家具候选不得改变已确认的全局 north_reference")
-    else:
-        pass
     original_floors = {f.floor_id: f for f in current.floors} if current else {}
     original_objects = {
         object_id: floor
@@ -1119,33 +989,23 @@ def _validate_static_floor_frames(
         )
     ):
         raise ValueError("候选楼层或空间归属变化必须声明location搬位并核对搬位许可")
-    else:
-        pass
     for floor in proposed.floors:
         previous = original_floors.get(floor.floor_id)
         if previous is not None and any(
             getattr(previous, field) != getattr(floor, field) for field in frame_fields
         ):
             raise ValueError("家具候选不得改写已有楼层的身份或坐标参考系")
-        else:
-            pass
         for object_id in set(floor.object_ids) - {target_id}:
             before = original_objects.get(object_id)
             if before is None:
                 if object_id in static_feature_ids:
                     raise ValueError("候选不得将未移动的既有砂水特征改为新的楼层坐标")
-                else:
-                    pass
                 continue
-            else:
-                pass
             if any(
                 getattr(before, field) != getattr(floor, field)
                 for field in frame_fields
             ):
                 raise ValueError("候选不得改变未移动对象的楼层或坐标参考系")
-            else:
-                pass
 
 
 def _context_roles(context: EnvironmentalContext | None) -> dict[str, set[str]]:
@@ -1273,21 +1133,13 @@ class AssessRequest(BazhaiRequest):
         """Select layers from validated inputs while retaining explicit order."""
         if self.methods is not None:
             return self.methods
-        else:
-            pass
         selected: list[Method] = []
         if self.xuankong is not None:
             selected.append("xuankong_natal")
-        else:
-            pass
         if self.effective_year is not None or self.query_at is not None:
             selected.append("annual_stars")
-        else:
-            pass
         if self.monthly is not None:
             selected.append("monthly_stars")
-        else:
-            pass
         if (
             self.features
             or any(candidate.features for candidate in self.layout_alternatives)
@@ -1300,12 +1152,8 @@ class AssessRequest(BazhaiRequest):
             )
         ):
             selected.append("jinsuo")
-        else:
-            pass
         if self.house is not None or self.occupants:
             selected.append("bazhai")
-        else:
-            pass
         return selected
 
     @model_validator(mode="after")
@@ -1321,73 +1169,49 @@ class AssessRequest(BazhaiRequest):
             raise ValueError(
                 "至少选择一层计算；独立形态/桌面作者计算可用 methods=[] 并提供相应观察"
             )
-        else:
-            pass
         surfaces = {s.object_id: s for s in self.surface_layouts}
         if len(surfaces) != len(self.surface_layouts):
             raise ValueError("桌面对象不能重复")
-        else:
-            pass
         constraints = {c.object_id: c for c in self.surface_constraints}
         if len(constraints) != len(self.surface_constraints):
             raise ValueError("同一桌面的动作约束不能重复")
-        else:
-            pass
         if set(constraints) - set(surfaces):
             raise ValueError("桌面约束必须关联已提供桌面")
-        else:
-            pass
         for constraint in self.surface_constraints:
             item_ids = {i.object_id for i in surfaces[constraint.object_id].items}
             if set(constraint.locked_item_ids) - item_ids:
                 raise ValueError("固定物件必须属于关联桌面")
-            else:
-                pass
         for placement in self.placements:
             if placement.object_id in surfaces and placement.purpose != "desk":
                 raise ValueError("桌面作者规则只能关联实际书桌，不能套用其他家具")
-            else:
-                pass
         if any(
             a.target_method not in self.selected_methods
             for a in self.element_adjustments
         ):
             raise ValueError("元素目标须属于本次选中的计算方法")
-        else:
-            pass
         forms = {o.object_id: o for o in self.form_observations}
         if len(forms) != len(self.form_observations):
             raise ValueError("同一对象形态观察不能重复或互相覆盖")
-        else:
-            pass
         for object_id in set(forms) & set(surfaces):
             if forms[object_id].purpose != "desk":
                 raise ValueError(
                     "同一对象的桌面与形态用途不一致；桌面作者规则只能用于书桌"
                 )
-            else:
-                pass
         for placement in self.placements:
             if (
                 placement.object_id in forms
                 and placement.purpose != forms[placement.object_id].purpose
             ):
                 raise ValueError("同一对象的形态用途与布局用途不一致")
-            else:
-                pass
             if placement.location_direction is not None and any(
                 feature.object_id == placement.object_id
                 and feature.direction != placement.location_direction
                 for feature in self.features
             ):
                 raise ValueError("同一对象的砂水方向与已确认位置必须一致")
-            else:
-                pass
         request_ids = [a.request_id for a in self.element_adjustments]
         if len(request_ids) != len(set(request_ids)):
             raise ValueError("元素调节请求 ID 必须唯一")
-        else:
-            pass
         objects = {p.object_id for p in self.placements}
         known = objects | set(forms)
         if self.workstation_layout is not None:
@@ -1400,15 +1224,11 @@ class AssessRequest(BazhaiRequest):
                 for seat in scene.seats
             ):
                 raise ValueError("实测工位subject_ids须引用本次明确提供的使用人")
-            else:
-                pass
             desktop_ids = {s.desk_id for s in scene.desktops}
             if desk_ids & (objects | set(forms)) or desktop_ids & set(surfaces):
                 raise ValueError(
                     "实测工位的位置/形态/桌面由空间层负责；同一对象不能同时提交另一份位置或形态"
                 )
-            else:
-                pass
             geometry_ids = {b.object_id for b in scene.bodies}
             geometry_ids.update(o.object_id for o in scene.openings)
             geometry_ids.update(i.object_id for d in scene.desktops for i in d.items)
@@ -1416,21 +1236,15 @@ class AssessRequest(BazhaiRequest):
                 raise ValueError(
                     "实测场景对象不能同时提交另一份位置/形态；候选关系须由自己的新几何重算"
                 )
-            else:
-                pass
             known.update(geometry_ids)
             if any(f.object_id in geometry_ids for f in self.features):
                 raise ValueError(
                     "实测对象砂水分类用scene.bodies[].sand_water，方区由所选实测参考系计算，不重复提交features"
                 )
-            else:
-                pass
             if any(c.object_id in geometry_ids for c in self.layout_alternatives):
                 raise ValueError(
                     "实测对象候选通过workstation_layout.search提供，避免旧关系与新几何混用"
                 )
-            else:
-                pass
             if self.environmental_context:
                 if any(
                     set(floor.object_ids) & geometry_ids
@@ -1439,8 +1253,6 @@ class AssessRequest(BazhaiRequest):
                     raise ValueError(
                         "实测对象的参考层级与中心由scene.compass独立确认，不叠加另一份floors坐标绑定"
                     )
-                else:
-                    pass
                 if any(
                     observation.object_id in geometry_ids
                     for observation in self.environmental_context.observations
@@ -1448,16 +1260,12 @@ class AssessRequest(BazhaiRequest):
                     raise ValueError(
                         "实测对象的形态由场景重算，不继承旧environmental_context.observations"
                     )
-                else:
-                    pass
                 if {
                     obj.object_id for obj in self.environmental_context.objects
                 } & geometry_ids:
                     raise ValueError(
                         "实测空间对象身份由scene负责，不同时提交environmental_context.objects中的另一份身份"
                     )
-                else:
-                    pass
                 if any(
                     {r.source_object_id, r.target_object_id} & geometry_ids
                     for r in self.environmental_context.interior_relations
@@ -1465,8 +1273,6 @@ class AssessRequest(BazhaiRequest):
                     raise ValueError(
                         "实测对象的室内关系由空间层重算，不同时接受另一份关系判断"
                     )
-                else:
-                    pass
                 review = self.workstation_review
                 if review and (
                     any(a.object_id in desk_ids for a in review.activities)
@@ -1478,10 +1284,6 @@ class AssessRequest(BazhaiRequest):
                     raise ValueError(
                         "实测工位活动/入口关系由空间层负责，不重复提交作者观察"
                     )
-                else:
-                    pass
-            else:
-                pass
             interpretation = self.xuankong.interpretation if self.xuankong else None
             if (
                 interpretation
@@ -1490,8 +1292,6 @@ class AssessRequest(BazhaiRequest):
                 and spatial.evaluation_period != interpretation.current_period_number
             ):
                 raise ValueError("工位评价运与明确的玄空评价运不得矛盾")
-            else:
-                pass
             if scene.compass and scene.compass.chart_binding_confirmed:
                 for house in (
                     self.house,
@@ -1505,12 +1305,6 @@ class AssessRequest(BazhaiRequest):
                         raise ValueError(
                             "已绑定宅盘的图纸北基准须与宅向一致，不自动换算"
                         )
-                    else:
-                        pass
-            else:
-                pass
-        else:
-            pass
         if self.environmental_context is not None:
             self.environmental_context.validate_references(
                 known | set(surfaces) | {f.object_id for f in self.features},
@@ -1574,14 +1368,10 @@ class AssessRequest(BazhaiRequest):
                     raise ValueError(
                         "户型方位、偏移及中心未确认，不能同时提交实际落宫、砂水分宫或外局分宫；原始盘与独立形态仍可计算"
                     )
-                else:
-                    pass
                 if not orientation.direction_confirmed and any(
                     p.facing_direction is not None for p in placements
                 ):
                     raise ValueError("方位未确认，不能同时提交已确认家具朝向")
-                else:
-                    pass
                 for house in (
                     self.house,
                     self.xuankong.house if self.xuankong else None,
@@ -1593,20 +1383,12 @@ class AssessRequest(BazhaiRequest):
                         and house.north_reference != orientation.north_reference
                     ):
                         raise ValueError("环境方位与宅向的 north_reference 不一致")
-                    else:
-                        pass
-            else:
-                pass
-        else:
-            pass
         constraint_ids = [c.object_id for c in self.layout_constraints]
         if (
             len(set(constraint_ids)) != len(constraint_ids)
             or set(constraint_ids) - known
         ):
             raise ValueError("家具动作约束须唯一且引用已提供对象")
-        else:
-            pass
         for furniture_constraint in self.layout_constraints:
             surface_constraint = constraints.get(furniture_constraint.object_id)
             if (
@@ -1617,23 +1399,15 @@ class AssessRequest(BazhaiRequest):
                 != surface_constraint.can_add_items
             ):
                 raise ValueError("同一对象的家具与桌面新增许可不得冲突")
-            else:
-                pass
         candidates = [c.candidate_id for c in self.layout_alternatives]
         if len(set(candidates)) != len(candidates):
             raise ValueError("布局候选 candidate_id 必须唯一")
-        else:
-            pass
         current = {p.object_id: p for p in self.placements}
         for candidate in self.layout_alternatives:
             if candidate.features and "jinsuo" not in self.selected_methods:
                 raise ValueError("候选砂水特征须在 methods 中选择 jinsuo")
-            else:
-                pass
             if candidate.object_id not in known:
                 raise ValueError("布局候选须引用已有位置或形态对象")
-            else:
-                pass
             base = current.get(candidate.object_id) or forms.get(candidate.object_id)
             base_purpose = (
                 base.purpose
@@ -1652,8 +1426,6 @@ class AssessRequest(BazhaiRequest):
             for obs in (candidate.placement, candidate.form_observation):
                 if obs is not None and obs.purpose != base_purpose:
                     raise ValueError("候选不得改变对象用途")
-                else:
-                    pass
             proposal = candidate.placement
             candidate_context = candidate.environmental_context
             if candidate_context is not None:
@@ -1669,8 +1441,6 @@ class AssessRequest(BazhaiRequest):
                         for field in ("kind", "purpose", "role")
                     ):
                         raise ValueError("候选不得更换已确认物件的类型或角色")
-                    else:
-                        pass
                 prior_uses = (
                     {
                         fact.object_id: fact.element_use
@@ -1686,8 +1456,6 @@ class AssessRequest(BazhaiRequest):
                         prior_uses[fact.object_id],
                     ):
                         raise ValueError("搬转候选不得更换已明确的元素代表物用途问题")
-                    else:
-                        pass
                     for old_fact in (
                         self.environmental_context.material_facts
                         if self.environmental_context is not None
@@ -1698,8 +1466,6 @@ class AssessRequest(BazhaiRequest):
                             or old_fact.observation_basis == "image_observed"
                         ):
                             continue
-                        else:
-                            pass
                         if (
                             old_fact.application
                             and fact.application
@@ -1708,8 +1474,6 @@ class AssessRequest(BazhaiRequest):
                             != fact.application.target_request_id
                         ):
                             raise ValueError("搬转候选不得更换已绑定的材料调节目标")
-                        else:
-                            pass
                         for attribute in ("material", "shape", "colour", "plant_alive"):
                             previous_value, new_value = getattr(
                                 old_fact, attribute
@@ -1721,8 +1485,6 @@ class AssessRequest(BazhaiRequest):
                                 raise ValueError(
                                     "搬位/转向候选不得改写同一物件已确认的材质、器形、颜色或存活状态"
                                 )
-                            else:
-                                pass
                 current_members = (
                     {
                         m.subject_id: m
@@ -1738,8 +1500,6 @@ class AssessRequest(BazhaiRequest):
                         != current_members[member.subject_id].model_dump()
                     ):
                         raise ValueError("候选不得新增或更换家庭人物身份")
-                    else:
-                        pass
                 candidate_context.validate_references(
                     known
                     | set(surfaces)
@@ -1792,8 +1552,6 @@ class AssessRequest(BazhaiRequest):
                 ):
                     # A proposal cannot erase an explicitly known uncertainty.
                     orientation = self.environmental_context.orientation
-                else:
-                    pass
                 if orientation is not None:
                     if (
                         (
@@ -1810,8 +1568,6 @@ class AssessRequest(BazhaiRequest):
                         and not orientation.direction_confirmed
                     ):
                         raise ValueError("候选环境方位未确认，不能提交已确认位置或朝向")
-                    else:
-                        pass
                     for house in (
                         self.house,
                         self.xuankong.house if self.xuankong else None,
@@ -1823,12 +1579,6 @@ class AssessRequest(BazhaiRequest):
                             and house.north_reference != orientation.north_reference
                         ):
                             raise ValueError("候选环境与宅向的 north_reference 不一致")
-                        else:
-                            pass
-                else:
-                    pass
-            else:
-                pass
             if proposal is not None:
                 known_subjects = {o.subject_id for o in self.occupants} | (
                     {m.subject_id for m in self.environmental_context.household_members}
@@ -1840,8 +1590,6 @@ class AssessRequest(BazhaiRequest):
                 )
                 if set(referenced) - known_subjects:
                     raise ValueError("候选引用了未提供的住户")
-                else:
-                    pass
                 before = current.get(candidate.object_id)
                 if before is not None:
                     if any(
@@ -1850,8 +1598,6 @@ class AssessRequest(BazhaiRequest):
                         for subject_id in known_subjects
                     ):
                         raise ValueError("候选不得更换对象使用人范围")
-                    else:
-                        pass
                     for aspect in ("location", "facing"):
                         old = getattr(before, f"{aspect}_direction")
                         new = getattr(proposal, f"{aspect}_direction")
@@ -1862,27 +1608,15 @@ class AssessRequest(BazhaiRequest):
                             and aspect not in candidate.changes
                         ):
                             raise ValueError("候选方向变化必须在 changes 中明确声明")
-                        else:
-                            pass
-                else:
-                    pass
-            else:
-                pass
         if any(a.object_id not in objects for a in self.element_adjustments):
             raise ValueError("元素调节须引用已提供的布局对象")
-        else:
-            pass
         if (
             self.annual_remedy_ruleset_id is not None
             and "annual_stars" not in self.selected_methods
         ):
             raise ValueError("作者年度调节规则须显式选择 annual_stars")
-        else:
-            pass
         if len(set(self.selected_methods)) != len(self.selected_methods):
             raise ValueError("methods 不得重复")
-        else:
-            pass
         AnnualRequest(
             effective_year=self.effective_year,
             query_at=self.query_at,
@@ -1892,22 +1626,14 @@ class AssessRequest(BazhaiRequest):
         JinsuoRequest(features=self.features, ruleset_id=self.jinsuo_ruleset_id)
         if self.xuankong is not None and "xuankong_natal" not in self.selected_methods:
             raise ValueError("提供 xuankong 时须在 methods 中选择 xuankong_natal")
-        else:
-            pass
         if "xuankong_natal" in self.selected_methods:
             natal = self.xuankong or XuankongRequest()
             if self.house is not None and natal.house is not None:
                 if self.house.model_dump() != natal.house.model_dump():
                     raise ValueError("合参顶层 house 与 xuankong.house 必须一致")
-                else:
-                    pass
-            else:
-                pass
             XuankongRequest.model_validate(
                 {**natal.model_dump(), "house": natal.house or self.house}
             )
-        else:
-            pass
         contexts = [(self.environmental_context, None)] + [
             (c.environmental_context, c) for c in self.layout_alternatives
         ]
@@ -1915,8 +1641,6 @@ class AssessRequest(BazhaiRequest):
         for review_context, review_candidate in contexts:
             if review_context is None:
                 continue
-            else:
-                pass
             for fact in review_context.material_facts:
                 if (
                     fact.application
@@ -1924,8 +1648,6 @@ class AssessRequest(BazhaiRequest):
                     and fact.application.target_request_id not in target_ids
                 ):
                     raise ValueError("材料施用引用未知 element_adjustments.request_id")
-                else:
-                    pass
             if review_context.workstation_review:
                 evaluation = review_context.workstation_review.evaluation_period
                 original_evaluation = (
@@ -1943,8 +1665,6 @@ class AssessRequest(BazhaiRequest):
                     and evaluation.number != natal_interpretation.current_period_number
                 ):
                     raise ValueError("同次活动与玄空解释的评价运不得矛盾")
-                else:
-                    pass
                 if (
                     review_candidate
                     and evaluation
@@ -1952,8 +1672,6 @@ class AssessRequest(BazhaiRequest):
                     and evaluation.number != original_evaluation.number
                 ):
                     raise ValueError("搬转候选不得更换本次评价运")
-                else:
-                    pass
                 if review_candidate and self.workstation_review:
                     old_activities = {
                         a.object_id: a for a in self.workstation_review.activities
@@ -1969,8 +1687,6 @@ class AssessRequest(BazhaiRequest):
                             raise ValueError(
                                 "搬转候选不得改写已确认的实际活动；事实更正先更新现状"
                             )
-                        else:
-                            pass
                     old_barriers = {
                         r.barrier_id: r for r in self.workstation_review.entry_barriers
                     }
@@ -1982,10 +1698,6 @@ class AssessRequest(BazhaiRequest):
                             and previous_barrier.barrier_kind != relation.barrier_kind
                         ):
                             raise ValueError("搬转候选不得改写隔挡物件种类")
-                        else:
-                            pass
-                else:
-                    pass
                 placements = [
                     p
                     for p in self.placements
@@ -1998,12 +1710,8 @@ class AssessRequest(BazhaiRequest):
                 ]
                 if review_candidate and review_candidate.placement:
                     placements.append(review_candidate.placement)
-                else:
-                    pass
                 if review_candidate and review_candidate.form_observation:
                     review_forms.append(review_candidate.form_observation)
-                else:
-                    pass
                 validate_review(
                     review_context.workstation_review,
                     placements,
@@ -2011,8 +1719,6 @@ class AssessRequest(BazhaiRequest):
                     review_context,
                     self.environmental_context,
                 )
-            else:
-                pass
         return self
 
 
@@ -2041,6 +1747,4 @@ class DirectionsRequest(_DeferredModel):
     def validate_reference(self) -> "DirectionsRequest":
         if self.bearing_degrees is not None and self.north_reference is None:
             raise ValueError("角度输入必须明确 north_reference")
-        else:
-            pass
         return self

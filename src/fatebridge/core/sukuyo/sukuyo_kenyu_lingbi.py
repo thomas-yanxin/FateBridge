@@ -23,16 +23,10 @@ def _lookup(
 ) -> dict[str, Any]:
     if type(month) is not int or not 1 <= month <= 12:
         raise ValueError("陵逼表只接受月序整数1至12")
-    else:
-        pass
     if month_start_luminary not in LUMINARIES or len(month_start_luminary) != 1:
         raise ValueError("陵逼表朔曜须为日月火水木金土之一")
-    else:
-        pass
     if type(day) is not int or not 1 <= day <= 30:
         raise ValueError("陵逼表只接受实际入月日整数1至30")
-    else:
-        pass
     rows = [
         row
         for row in source["printed_rows"]
@@ -101,8 +95,6 @@ def conditional_lingbi_reference(
             "t1299_planetary_condition_evaluated": False,
             "applied_to_primary_or_activities": False,
         }
-    else:
-        pass
     month, day = calendar["lunar_month"], calendar["lunar_day"]
     lookups = [_lookup(source, month, ruler, day) for ruler in LUMINARIES]
     try:

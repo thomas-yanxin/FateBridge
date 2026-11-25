@@ -230,8 +230,6 @@ def shiji_derivation(core: dict[str, Any]) -> dict[str, Any]:
             "status": "not_assessed",
             "reason": "缺单一有效实际始击，不用推步终位填补原盘。",
         }
-    else:
-        pass
     profile = str(core.get("shiji_profile") or DEFAULT_SHIJI_PROFILE)
     ju = core.get("kook_number")
     variants = None
@@ -273,8 +271,6 @@ def shiji_derivation(core: dict[str, Any]) -> dict[str, Any]:
 def shiji_derivation_text(assessment: dict[str, Any]) -> str:
     if assessment["status"] == "not_assessed":
         return str(assessment["reason"])
-    else:
-        pass
     profile = assessment.get("shiji_profile", DEFAULT_SHIJI_PROFILE)
     text = (
         f"始击口径：{profile}；推步：天盘计神{assessment['jishen']}加地盘和德艮，"

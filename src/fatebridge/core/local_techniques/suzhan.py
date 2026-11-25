@@ -32,20 +32,12 @@ def _build_suzhan_snapshot_text(
     latitude = params.get("birthLatitude")
     if longitude is None:
         longitude = input_normalized.get("gpsLon")
-    else:
-        pass
     if latitude is None:
         latitude = input_normalized.get("gpsLat")
-    else:
-        pass
     if longitude is None:
         longitude = input_normalized.get("lon", "未提供")
-    else:
-        pass
     if latitude is None:
         latitude = input_normalized.get("lat", "未提供")
-    else:
-        pass
     astronomy = response.get("astronomy") or {}
     epoch_text = (
         join_lines(
@@ -77,8 +69,6 @@ def _build_suzhan_snapshot_text(
                 phase["scope"],
             ]
         )
-    else:
-        pass
     prediction_note = (
         "计算结果未建立现实预测效力；未获权威认证。"
         if validation.get("real_world_prediction") == "not_established"
@@ -95,8 +85,6 @@ def _build_suzhan_snapshot_text(
     unassigned = [item for item in objects if item.get("house") is None]
     if unassigned:
         house_groups.append(("参考宫位未定；以下星曜未分配落宫", unassigned))
-    else:
-        pass
     house_lines: List[str] = []
     for heading, in_house in house_groups:
         house_lines.append(heading)
@@ -104,8 +92,6 @@ def _build_suzhan_snapshot_text(
             house_lines.append("星曜：无")
             house_lines.append("")
             continue
-        else:
-            pass
         for item in in_house:
             su28 = str(item.get("su28") or "").strip()
             # A zodiac-sign degree is not a degree within a 360/28 band.
@@ -123,8 +109,6 @@ def _build_suzhan_snapshot_text(
                 # the zodiac-sign modulo.
                 if value is None:
                     raise ValueError("宿位缺少可显示的宿内度数")
-                else:
-                    pass
                 degree = int(float(value))
                 minute = int((float(value) - degree) * 60)
             else:
@@ -234,8 +218,6 @@ def build_suzhan_result(
         raise ValueError("计算宿占星图需要完整经纬度，请提供lat/lon或gps_lat/gps_lon。")
     if mansion_method not in {"equatorial_research28", "legacy_equal28"}:
         raise ValueError("mansion_method仅支持equatorial_research28或legacy_equal28")
-    else:
-        pass
     normalized_szchart = 1 if szchart else 0
     normalized_szshape = 1 if szshape else 0
     normalized_house_start_mode = 2 if house_start_mode == 2 else 1
@@ -243,8 +225,6 @@ def build_suzhan_result(
     chart_variant = "guolao_chart" if normalized_szchart else "chart"
     if compute_chart and normalized_szchart and (hsys != 8 or zodiacal != 0):
         raise ValueError("宿占果老盘模式暂仅支持固定离线宫制 / 黄道语义。")
-    else:
-        pass
     input_normalized = {
         "date": _normalize_date_text(date),
         "time": _normalize_time_text(time) if time is not None else None,
@@ -270,8 +250,6 @@ def build_suzhan_result(
     }
     if calendar_basis != "chinese_hko_utc08":
         input_normalized["calendar_basis"] = calendar_basis
-    else:
-        pass
     if not compute_chart:
         clock_known = time is not None
         layer_status = (
@@ -393,8 +371,6 @@ def build_suzhan_result(
         )
         astronomy = build_equatorial_mansions(birth)
         apply_equatorial_mansions(chart, astronomy)
-    else:
-        pass
     response["sukuyo"] = day_evidence(
         calendar_mansion(
             input_normalized["date"],
@@ -432,8 +408,6 @@ def build_suzhan_result(
     }
     if "validation" in response:
         validation["chart_source"] = response["validation"]
-    else:
-        pass
     if (
         response["params"].get("houseGeometryStatus")
         == "unavailable_selected_reference"

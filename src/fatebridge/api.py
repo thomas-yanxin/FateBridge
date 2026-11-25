@@ -84,8 +84,6 @@ class FateBridgeApi(FastAPI):
                 description=self.description,
                 routes=self.routes,
             )
-        else:
-            pass
         schema = deepcopy(self.openapi_schema)
         schema.setdefault("components", {}).setdefault("securitySchemes", {})[
             "APIKey"
@@ -99,10 +97,6 @@ class FateBridgeApi(FastAPI):
                 if path not in API_KEY_EXEMPT_PATHS:
                     for operation in operations.values():
                         operation["security"] = [{"APIKey": []}]
-                else:
-                    pass
-        else:
-            pass
         return schema
 
 
@@ -153,8 +147,6 @@ def _metrics_route_path(request: Request) -> str:
             return route_path
         elif route_match == Match.PARTIAL and partial_route_path is None:
             partial_route_path = route_path
-        else:
-            pass
     return partial_route_path or "/unknown"
 
 
@@ -191,8 +183,6 @@ async def instrument_request_lifecycle(
             )
         else:
             request.state.api_key_id = authenticated_key_id
-    else:
-        pass
 
     started_at = time.perf_counter()
     try:
@@ -292,8 +282,6 @@ def _get_heavy_calc_semaphore() -> asyncio.Semaphore:
         HEAVY_CALC_SEMAPHORE = asyncio.Semaphore(
             heavy_calculation_budget().max_concurrency
         )
-    else:
-        pass
     HEAVY_CALC_SEMAPHORE_LOOP = event_loop
     return HEAVY_CALC_SEMAPHORE
 
@@ -370,8 +358,6 @@ with warnings.catch_warnings():
         if isinstance(route, APIRoute):
             for body_parameter in route.dependant.body_params:
                 body_parameter._type_adapter.rebuild()
-        else:
-            pass
 
 
 @app.get("/api/results/{result_id}")
@@ -470,5 +456,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-else:
-    pass

@@ -25,13 +25,9 @@ def format_birth_datetime_display(
     display = f"{year:04d}年{month:02d}月{day:02d}日 {hour:02d}时"
     if include_minutes or include_seconds:
         display += f"{minute:02d}分"
-    else:
-        pass
     if include_seconds:
         fraction = f".{microsecond:06d}" if microsecond else ""
         display += f"{second:02d}{fraction}秒"
-    else:
-        pass
     return display
 
 
@@ -41,8 +37,6 @@ def format_clock_datetime(
     """Retain computed subminute values without changing old whole-minute labels."""
     if include_seconds is False:
         return moment.strftime("%Y-%m-%d %H:%M")
-    else:
-        pass
     timespec = (
         "microseconds"
         if moment.microsecond
@@ -71,6 +65,4 @@ def format_json_response(
     """Serialize JSON with Unicode text and the chosen spacing."""
     if compact:
         return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
-    else:
-        pass
     return json.dumps(data, ensure_ascii=False, indent=2)

@@ -27,16 +27,12 @@ class StorageRootEffect(PartialOutput):
             and self.event_retention_multiplier != 1
         ):
             raise ValueError("四墓土冲动事件不能虚构其他藏干的统一减损或增量")
-        else:
-            pass
         if (
             self.combined_loss_multiplier is not None
             and self.event_retention_multiplier is not None
             and self.combined_loss_multiplier > self.event_retention_multiplier
         ):
             raise ValueError("最终损耗因子不能撤销本事件已经记录的减损")
-        else:
-            pass
         return self
 
 
@@ -63,10 +59,6 @@ class StorageMovementEffect(PartialOutput):
                     and root.event_retention_multiplier != self.water_retention_policy
                 ):
                     raise ValueError("水根事件因子与实际记录的工程政策不一致")
-                else:
-                    pass
-        else:
-            pass
         return self
 
 

@@ -67,12 +67,8 @@ def _minute_sensitivity(
                 strategy=normalized.solar_time_strategy or SOLAR_TIME_STRATEGY_APPARENT,
             )
             last_wall += timedelta(minutes=adjustment["total_correction_minutes"])
-        else:
-            pass
         placement.append(last_wall)
         seconds.append(59.999999)
-    else:
-        pass
     branches = "子丑寅卯辰巳午未申酉戌亥"
     hours = [branches[((label.hour + 1) // 2) % 12] for label in placement]
     return dict(
@@ -120,8 +116,6 @@ def birth_clock_receipt(
     advisories = []
     if normalized.resolution_advisory:
         advisories.append(normalized.resolution_advisory)
-    else:
-        pass
     if normalized.timezone_source == "longitude_standard_meridian_assumption":
         advisories.append(
             "未从地点确认时区，当前仅按经度邻近的整数UTC偏移作假设，未据此确认当地历史夏令时；请核对birth_timezone。"
@@ -130,8 +124,6 @@ def birth_clock_receipt(
         advisories.append(
             "未从输入或地点确认时区，当前采用默认Asia/Shanghai；请核对出生钟表记录的实际时区。"
         )
-    else:
-        pass
     if not normalized.applied:
         # Zero applied correction is not evidence that the astronomical
         # equation of time or historical daylight saving offset was zero.
@@ -141,8 +133,6 @@ def birth_clock_receipt(
             "daylight_saving_minutes",
         ):
             result[key] = None
-    else:
-        pass
     result.update(
         method_id="ziwei_birth_clock_receipt_v1",
         status=status,

@@ -39,8 +39,6 @@ def definition_bridging(graph: dict[str, Any]) -> dict[str, Any]:
     groups = graph["definition"]["components"]
     if groups != _components(active):
         raise ValueError("桥接输入的定义分组与实际完整通道不一致")
-    else:
-        pass
     names = sorted(set(GATE_CENTER.values()))
     center_bits = {name: 1 << index for index, name in enumerate(names)}
     edges = [
@@ -69,8 +67,6 @@ def definition_bridging(graph: dict[str, Any]) -> dict[str, Any]:
                 if not known & neighbor and mask & gates == gates:
                     known |= neighbor
                     pending.append(neighbor)
-                else:
-                    pass
         return known
 
     def witness(added: list[int]) -> dict[str, Any]:
@@ -107,45 +103,29 @@ def definition_bridging(graph: dict[str, Any]) -> dict[str, Any]:
             count, added = heapq.heappop(pending)
             if best is not None and count > best:
                 break
-            else:
-                pass
             expanded += 1
             region = reachable(active_mask | added)
             if region & required == required:
                 best = count
                 solutions.append(_gate_list(added))
                 continue
-            else:
-                pass
             for gates, a, b in edges:
                 if bool(region & a) == bool(region & b):
                     continue
-                else:
-                    pass
                 candidate = added | (gates & ~active_mask)
                 if candidate in seen:
                     continue
-                else:
-                    pass
                 cost = candidate.bit_count()
                 if best is not None and cost > best:
                     continue
-                else:
-                    pass
                 seen.add(candidate)
                 heapq.heappush(pending, (cost, candidate))
         if best is None:
             raise ValueError("完整通道图中未找到连接原定义分组的桥接方案")
-        else:
-            pass
-    else:
-        pass
     solutions.sort()
     witnesses = [witness(added) for added in solutions]
     if any(not row["connects_all_original_components"] for row in witnesses):
         raise ValueError("最小桥接见证未连接全部原定义分组")
-    else:
-        pass
     return {
         "method_id": METHOD_ID,
         "status": (
@@ -193,8 +173,6 @@ def definition_bridging(graph: dict[str, Any]) -> dict[str, Any]:
 def bridging_reading(report: dict[str, Any]) -> str:
     if report["status"] == "not_applicable_no_split":
         return f"本次有{report['original_component_count']}组已定义中心，未形成分离定义，桥接分析不适用。"
-    else:
-        pass
     return (
         f"本次有{report['original_component_count']}组分离定义；在固定通道表下，"
         f"使这些原有分组连通最少需假设增加{report['minimum_added_gate_count']}个不同门，"

@@ -156,25 +156,17 @@ def activity_detail_closure(details: Sequence[str]) -> tuple[list[str], list[dic
             if parent not in effective:
                 effective.append(parent)
                 inferences.append({"from_detail": child, "implied_detail": parent})
-            else:
-                pass
     return effective, inferences
 
 
 def validate_activity_details(activity: Optional[str], details: Sequence[str]) -> None:
     if isinstance(details, (str, bytes)):
         raise ValueError("activity_details必须为明确条件的列表")
-    else:
-        pass
     for detail in details:
         if not isinstance(detail, str) or detail not in DETAIL_TOPICS:
             raise ValueError("未知的宿占事项细节")
-        else:
-            pass
         if activity != DETAIL_TOPICS[detail]:
             raise ValueError(f"事项细节{detail}只适用于{DETAIL_TOPICS[detail]}")
-        else:
-            pass
 
 
 def source_bundle() -> dict[str, Any]:
@@ -190,8 +182,6 @@ def lower_mansion_evidence(mansion: Optional[str]) -> dict[str, Any]:
     record = next((r for r in bundle["records"] if r["mansion"] == mansion), None)
     if mansion is not None and record is None:
         raise ValueError("下卷逐宿证据只支持27宿（不含牛）")
-    else:
-        pass
     return {
         "status": "source_record_available" if record else "not_evaluated",
         "mansion": mansion,
@@ -224,8 +214,6 @@ def conjunction_doctrine(
         group = next((g for g in doctrine["groups"] if name in g["members"]), None)
         if group is None:
             raise ValueError("宿月配合分类只支持27宿（不含牛）")
-        else:
-            pass
         return deepcopy(cast(dict[str, Any], group))
 
     return {

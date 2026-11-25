@@ -37,8 +37,6 @@ class Dual:
         self.v, self.d = number(value), number(derivative)
         if not self.v.is_finite() or not self.d.is_finite():
             raise SourceDerivativeUnavailable("nonfinite_source_scalar")
-        else:
-            pass
 
     @staticmethod
     def cast(value: Any) -> Dual:
@@ -69,8 +67,6 @@ class Dual:
         other = self.cast(other)
         if not other.v:
             raise SourceDerivativeUnavailable("zero_source_denominator")
-        else:
-            pass
         return Dual(
             self.v / other.v,
             (self.d * other.v - self.v * other.d) / (other.v * other.v),
@@ -82,8 +78,6 @@ class Dual:
     def sqrt(self) -> Dual:
         if self.v <= 0:
             raise SourceDerivativeUnavailable("singular_source_norm")
-        else:
-            pass
         root = self.v.sqrt()
         return Dual(root, self.d / (2 * root))
 
@@ -141,13 +135,9 @@ def group(reader: SourceRecords, epoch: Dual, index: int) -> List[Dual]:
     part = min(int((epoch.v - start) // width), parts - 1)
     if not 0 <= part < parts:
         raise SourceDerivativeUnavailable("source_subcell_unavailable")
-    else:
-        pass
     reader.cells.add((index, values[0], part, count))
     if epoch.v == start + part * width or epoch.v == end:
         raise SourceDerivativeUnavailable("source_polynomial_boundary_unqualified")
-    else:
-        pass
     x = 2 * (epoch - start - part * width) / width - 1
     positions = []
     velocities = []
@@ -163,16 +153,12 @@ def state(reader: SourceRecords, epoch: Dual, body: str) -> List[Dual]:
     if body == "Earth":
         emb, moon = group(reader, epoch, 2), group(reader, epoch, 9)
         return sub(emb, scale(moon, 1 / (Dual(reader.emrat) + 1)))
-    else:
-        pass
     return group(reader, epoch, {"Mercury": 0, "Venus": 1, "Sun": 10}[body])
 
 
 def apparent_source(reader: SourceRecords, body: str, epoch: float) -> Dict[str, Any]:
     if body not in {"Mercury", "Venus"}:
         raise SourceDerivativeUnavailable("unsupported_source_body")
-    else:
-        pass
     with localcontext() as context:
         context.prec = PRECISION
         t = Dual(epoch, 1)
@@ -198,8 +184,6 @@ def apparent_source(reader: SourceRecords, body: str, epoch: float) -> Dict[str,
         branch = stable_interpolation_cell(impact.v, angular_radius.v, (re / radius).v)
         if impact.v <= 0 or branch["cell"] is None:
             raise SourceDerivativeUnavailable("solar_axis_or_mass_knot_unqualified")
-        else:
-            pass
         if impact.v >= 1:
             mass = Dual(1)
         else:
@@ -208,8 +192,6 @@ def apparent_source(reader: SourceRecords, body: str, epoch: float) -> Dict[str,
                 if r1 < impact.v < r0:
                     mass = m0 + (impact - r0) * (m1 - m0) / (r1 - r0)
                     break
-                else:
-                    pass
             else:
                 raise SourceDerivativeUnavailable("solar_mass_cell_unqualified")
         strength = 2 * Dual(1.32712440017987e20) * mass / light / light / au / re

@@ -201,8 +201,6 @@ def patterns_from_symbols(
     positions = ("人元", "贵神", "将神", "地分")
     if len(rows) != 4 or [r.get("label") for r in rows] != list(positions):
         raise ValueError("课钤核对需要按次序排列的四位原始符号")
-    else:
-        pass
     empty = kongwang_for_ganzhi(day_ganzhi)
     empty_phase = {"甲子": "水", "甲午": "水", "甲寅": "金", "甲申": "金"}.get(
         xun_head_for_ganzhi(day_ganzhi)
@@ -213,8 +211,6 @@ def patterns_from_symbols(
         symbols = HEAVENLY_STEMS if i == 0 else EARTHLY_BRANCHES
         if not isinstance(content, str) or content not in symbols:
             raise ValueError("课钤四位需要合法的人元天干及神将地分地支")
-        else:
-            pass
         phase = (stem_element_text if i == 0 else branch_element_text)(content)
         inputs.append(
             dict(
@@ -234,8 +230,6 @@ def structural_patterns(
 ) -> dict[str, Any]:
     if len(rows) != 4 or [r["label"] for r in rows] != ["人元", "贵神", "将神", "地分"]:
         raise ValueError("格局需要按人元、贵神、将神、地分排列的四位")
-    else:
-        pass
 
     condition_facts, condition_groups, values = condition_evidence(
         rows, day_ganzhi=day_ganzhi
@@ -247,8 +241,6 @@ def structural_patterns(
     forward = all((b - a) % 12 == 1 for a, b in zip(indices, indices[1:]))
     if set(values) != set(CONDITIONS) or len(values) + len(UNRESOLVED) != len(CATALOG):
         raise RuntimeError("格局规则清单不完整")
-    else:
-        pass
     facts = "、".join(f"{r['label']}{r['content']}({r['element']})" for r in rows)
     matches = []
     evaluations = []
@@ -259,8 +251,6 @@ def structural_patterns(
             reason = (
                 "所选定义明确，但本次原始条件有缺项；不将缺少遁干或空亡旗标当作不成立"
             )
-        else:
-            pass
         # Absence from the implemented definitions means unknown, never false.
         # Both lists consume this one result, so the complete ledger cannot
         # disagree with the legacy list of positive matches.
@@ -303,8 +293,6 @@ def structural_patterns(
                     + (f"；{'逆' if forward else '顺'}连茹" if index == 33 else ""),
                 }
             )
-        else:
-            pass
     metadata = pattern_metadata()
     return {
         "ruleset_id": metadata["ruleset_id"],

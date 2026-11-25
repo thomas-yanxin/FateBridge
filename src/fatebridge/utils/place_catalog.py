@@ -118,8 +118,6 @@ def _index_qualifier(alias: str, jurisdiction: tuple[str, str]) -> None:
     if "," in folded:
         signature = "".join(c for c in folded if c.isalnum() or c == ",")
         PLACE_CONTEXT_COMMAS[signature].append(jurisdiction)
-    else:
-        pass
 
 
 for _entry in KNOWN_BIRTH_PLACE_ENTRIES:
@@ -136,5 +134,3 @@ for _preferred_id in _MANIFEST["preferred_aliases"].values():
     if _preferred_id in PLACE_BY_ID:
         for _alias in PLACE_BY_ID[_preferred_id]["normalized_aliases"]:
             PREFERRED_PLACE_ALIASES[_alias] = _preferred_id
-    else:
-        pass

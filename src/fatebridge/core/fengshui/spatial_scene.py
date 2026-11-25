@@ -115,8 +115,6 @@ def location_support(scene: SpatialScene, anchor: PlanPoint) -> list[CompassDire
     compass = scene.compass
     if compass is None:
         return []
-    else:
-        pass
     dx, dy = (
         Fraction(anchor.x) - Fraction(compass.sector_origin.x),
         Fraction(anchor.y) - Fraction(compass.sector_origin.y),
@@ -124,8 +122,6 @@ def location_support(scene: SpatialScene, anchor: PlanPoint) -> list[CompassDire
     distance_squared = dx * dx + dy * dy
     if distance_squared <= Fraction(scene.coordinate_uncertainty_m) ** 2:
         return []
-    else:
-        pass
     bearing = heading(compass.sector_origin, anchor)
     assert bearing is not None
     radius = min(
@@ -213,8 +209,6 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
     for left, right in combinations(scene.bodies, 2):
         if min(left.top_m, right.top_m) <= max(left.bottom_m, right.bottom_m):
             continue
-        else:
-            pass
         area = footprints[left.object_id].intersection(footprints[right.object_id]).area
         checks.append(
             GeometryCheck(
@@ -233,8 +227,6 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
     for body in scene.bodies:
         if body.kind == "beam":
             continue
-        else:
-            pass
         for index, zone in enumerate(clear_zones):
             checks.append(
                 GeometryCheck(
@@ -276,8 +268,6 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
                     desk.top_m + item.height_m, obstacle.top_m
                 ) <= max(desk.top_m, obstacle.bottom_m):
                     continue
-                else:
-                    pass
                 checks.append(
                     GeometryCheck(
                         check_id="desktop_body_collision_free",
@@ -316,8 +306,6 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
                     )
                     if shape.intersection(cell).area > AREA_EPSILON:
                         zones.append(f"{prefix}_{suffix}")
-                    else:
-                        pass
             directions = []
             if scene.compass:
                 directions = footprint_direction_support(
@@ -329,8 +317,6 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
                     scene.coordinate_uncertainty_m,
                     scene.compass.uncertainty_degrees,
                 )
-            else:
-                pass
             desktop_placements.append(
                 DesktopPlacement(
                     desk_id=desktop.desk_id,
@@ -349,8 +335,6 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
                         desk.top_m + item.height_m,
                     )
                 )
-            else:
-                pass
         for left_item, right_item in combinations(desktop.items, 2):
             area = (
                 item_shapes[left_item.object_id]
@@ -421,8 +405,6 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
                         ),
                     ]
                 )
-            else:
-                pass
         blockers: list[Polygon | LineString] = [
             footprints[b.object_id]
             for b in scene.bodies
@@ -473,8 +455,6 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
                 and line.intersects(footprints[b.object_id])
                 and not footprints[b.object_id].covers(point_xy(position))
             ]
-        else:
-            pass
         passage_direct = False
         for passage in scene.passages:
             # Extend only beyond the declared end; side traffic is not a clash.
@@ -482,8 +462,6 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
             bearing = heading(passage.centerline.start, end)
             if bearing is None:
                 continue
-            else:
-                pass
             extended = ray_xy(end, bearing, reach)
             passage_direct |= (
                 extended.buffer(passage.width_m / 2, cap_style="flat")
@@ -536,8 +514,6 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
             window_position = (
                 window_positions[0] if len(window_positions) == 1 else None
             )
-        else:
-            pass
         observed = dict(
             object_id=seat.desk_id,
             purpose="desk",
@@ -610,13 +586,9 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
                 compose_degrees(facing, compass.y_axis_bearing_degrees),
                 compass.uncertainty_degrees,
             )
-        else:
-            pass
         published_facing = float(facing)
         if published_facing == 360:
             published_facing = nextafter(360.0, 0.0)
-        else:
-            pass
         seats.append(
             SeatGeometry(
                 desk_id=seat.desk_id,

@@ -29,8 +29,6 @@ def _source() -> dict[str, Any]:
             != "wenming_primary_yin_line_reading; counterpart_yin_position_wording_retained; no_outcome_selection"
         ):
             raise ValueError("河洛爻位规则来源身份或所选有援读法不一致。")
-        else:
-            pass
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_line_condition_source_data") from exc
     data["loaded_sha256"] = sha256(raw).hexdigest()
@@ -58,8 +56,6 @@ def line_conditions(chart: dict[str, Any]) -> dict[str, Any]:
             or pos not in range(1, 7)
         ):
             raise ValueError("河洛爻位规则需要六个明确阴阳爻与1至6的实际元堂。")
-        else:
-            pass
         yang_count = sum(bits)
         minority = 1 if yang_count == 1 else 0 if yang_count == 5 else None
         minority_pos = bits.index(minority) + 1 if minority is not None else None

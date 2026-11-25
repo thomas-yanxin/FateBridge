@@ -36,8 +36,6 @@ def query_stage(
         or any(s not in PHASES for s in expected)
     ):
         raise ValueError("阶段查询只接受已发布五行、地支及生旺墓绝")
-    else:
-        pass
     table = stages[element]
     known = table.get(branch)
     missing = [p for p in PHASES if p not in table.values()]

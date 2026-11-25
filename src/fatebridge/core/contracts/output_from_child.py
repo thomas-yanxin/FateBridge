@@ -92,20 +92,14 @@ class FromChildReference(PartialOutput):
             or any(r.matched is False for r in self.observed_conditions or [])
         ):
             raise ValueError("从儿可观察前提或透干阻碍不能被改写为已满足")
-        else:
-            pass
         if self.ordinary_fuyi_requires_review is True and self.status in {
             "observable_obstruction",
             "observable_prerequisite_not_met",
         }:
             raise ValueError("从儿审查标记与可观察状态不一致")
-        else:
-            pass
         if (
             self.status == "requires_force_adjudication"
             and self.ordinary_fuyi_requires_review is False
         ):
             raise ValueError("从儿审查标记与可观察状态不一致")
-        else:
-            pass
         return self

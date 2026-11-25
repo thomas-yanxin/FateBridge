@@ -43,12 +43,8 @@ def meihua_ruleset() -> dict[str, Any]:
 def _season(branch: str) -> tuple[str, str, str]:
     if branch not in set("子丑寅卯辰巳午未申酉戌亥"):
         raise ValueError("季令月支必须为十二地支之一。")
-    else:
-        pass
     if branch in {"辰", "戌", "丑", "未"}:
         return "四季土月", "土", "水"
-    else:
-        pass
     for branches, season, strong, weak in (
         ("寅卯", "春", "木", "土"),
         ("巳午", "夏", "火", "金"),
@@ -57,8 +53,6 @@ def _season(branch: str) -> tuple[str, str, str]:
     ):
         if branch in branches:
             return season, strong, weak
-        else:
-            pass
     raise ValueError("季令月支必须为十二地支之一。")
 
 
@@ -122,8 +116,6 @@ def meihua_seasonal_strength(
     """Apply the same declared month to each cast's own body and mutuals."""
     if month_branch is None:
         return None
-    else:
-        pass
     season, strong, weak = _season(month_branch)
     body = meihua["body_trigram"]
     roles = [
@@ -184,19 +176,13 @@ def meihua_traditional_readings(
         if internal_countercontrol is None:
 
             internal_countercontrol = build_internal_countercontrol(stages)
-        else:
-            pass
         text += internal_countercontrol["summary"]
-    else:
-        pass
     if seasonal:
         body = next(row for row in seasonal["trigrams"] if row["role"] == "body")
         text += (
             f"按已声明的节月约定，{seasonal['month_branch']}月取{seasonal['season']}，"
             f"体卦{body['trigram']}的季令标记为{body['strength']}。"
         )
-    else:
-        pass
     if stages:
         if seasonal_qualification is None:
 
@@ -204,11 +190,7 @@ def meihua_traditional_readings(
             seasonal_qualification = build_seasonal_qualification(
                 stages, seasonal, internal_countercontrol
             )
-        else:
-            pass
         text += seasonal_qualification["summary"]
-    else:
-        pass
     return readings, text
 
 
@@ -236,8 +218,6 @@ def build_meihua_evidence(
         hour_number = "子丑寅卯辰巳午未申酉戌亥".index(seed["hour_branch"]) + 1
         upper_sum = year_number + seed["lunar_month"] + seed["lunar_day"]
         total_sum = upper_sum + hour_number
-    else:
-        pass
     pure = base["binary_code"] in {"111111", "000000"}
     mutual_source = changed if pure else base
     trace = (

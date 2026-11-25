@@ -45,8 +45,6 @@ def _catalogue(
         raw = CATALOGUE_PATH.read_bytes()
         if hashlib.sha256(raw).hexdigest() != CATALOGUE_SHA256:
             raise ValueError("Gate6 editorial catalogue changed")
-        else:
-            pass
         supplement = json.loads(
             raw, object_pairs_hook=base._object, parse_constant=base._nonfinite
         )
@@ -68,8 +66,6 @@ def _catalogue(
             != [f"6.{line}" for line in range(1, 7)]
         ):
             raise ValueError("Invalid Gate6 coverage or source claim")
-        else:
-            pass
         for i, row in enumerate(supplement["rows"]):
             if set(row) != {
                 "key",
@@ -88,8 +84,6 @@ def _catalogue(
                 "source_polarity_text_note",
             }:
                 raise ValueError("Gate6 supplement cannot override inherited fields")
-            else:
-                pass
             original = data["rows"][30 + i]
             meaning = row["editorial_paraphrase"]
             (qualifier,) = row["source_qualifiers"]
@@ -145,13 +139,9 @@ def _catalogue(
                 != "not_automated_nonmechanical_source_qualifier"
             ):
                 raise ValueError("Invalid Gate6 locator or invented applicability")
-            else:
-                pass
             glyph = base.depth_reference()["gates"][5]["line_polarities"][i]
             if (glyph["exaltation_planet"], glyph["detriment_planet"]) != POLES[i]:
                 raise ValueError("Gate6 glyph and reference inventory disagree")
-            else:
-                pass
             original.update(deepcopy(row))
         data.update(
             version=7,
@@ -160,8 +150,6 @@ def _catalogue(
         )
         if base._coverage(data)["local_editorial_paraphrases"] != 36:
             raise ValueError("Invalid actual Gate6 semantic coverage")
-        else:
-            pass
         snapshot[CATALOGUE_PATH] = raw
         provenance.update(
             source_catalogue_version=7,
@@ -233,8 +221,6 @@ def read_reference(*, key: str | None) -> dict:
                 + label
                 + "；未列侧不补造爻义或个人触发。实际固定状态仍读取原盘，来源图符与正文约定未独立裁定，不由参考代选。"
             )
-        else:
-            pass
         entry["category"] = CATEGORY
         entry["title"] = f"人类图{entry['key']}（v7）：" + (
             meaning["theme_zh"] if meaning else "极性索引／爻义待整理"
@@ -246,8 +232,6 @@ def read_reference(*, key: str | None) -> dict:
             for role, label in (("exaltation", "上升"), ("detriment", "下降")):
                 if meaning[role] is not None:
                     tips.append(label + "极性局部转述：" + meaning[role])
-                else:
-                    pass
         else:
             tips.append("此线具体爻义尚未整理；不以角色通用线主题替代。")
         tips.extend(record["source_reading_notes"])
@@ -259,8 +243,6 @@ def read_reference(*, key: str | None) -> dict:
             tips.append(
                 "引导语尚未转成可计算的个人条件，适用性未知；未列条件不表示无条件。"
             )
-        else:
-            pass
         tips.extend(
             [record["selection_policy"], base._scope(data), parent.SCOPE, SCOPE]
         )

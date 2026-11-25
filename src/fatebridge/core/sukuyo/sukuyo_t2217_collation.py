@@ -26,8 +26,6 @@ def validate_collation(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("T2217印字、见证身份或未定控制改变，须重新校核")
-    else:
-        pass
 
 
 def collation_reference() -> dict[str, Any]:
@@ -35,8 +33,6 @@ def collation_reference() -> dict[str, Any]:
     loaded = load_source(SOURCE)
     if loaded.sha256 != DATA_SHA256:
         raise ValueError("T2217印页来源身份改变，须重新冻结")
-    else:
-        pass
     data = loaded.data
     validate_collation(data)
     return {
@@ -65,8 +61,6 @@ def witness_reference(work_id: str, siglum: str) -> dict[str, Any]:
     data = collation_reference()["source_data"]
     if work_id != data["work"]["id"]:
         raise KeyError((work_id, siglum))
-    else:
-        pass
     witness: dict[str, Any] = data["witness_key"]["witnesses"][siglum]
     return witness
 
@@ -90,6 +84,4 @@ def collation_lines(reference: dict[str, Any]) -> list[str]:
     if reference.get("subsequent_research_round") == 88:
         lines[0] = "第87轮所选印页快照：" + lines[0]
         lines += quotation_lines(reference["subsequent_quotation_comparison"])
-    else:
-        pass
     return lines

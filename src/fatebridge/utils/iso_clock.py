@@ -37,25 +37,17 @@ def parse_iso_datetime(value: str, *, portable: bool = True) -> datetime:
         parser_value = (
             value[: match.start()] + match[1] + "00:00:00." + match[2][:6].ljust(6, "0")
         )
-    else:
-        pass
     parsed = datetime.fromisoformat(parser_value)
     if match is not None and parsed.utcoffset() == timedelta(0):
         sign, fraction = match.groups()
         if not portable and len(fraction) > 6:
             raise ValueError("ISO UTC offset fractional seconds support at most6digits")
-        else:
-            pass
         microseconds = int(fraction[:6].ljust(6, "0"))
         if microseconds:
             offset = timedelta(
                 microseconds=-microseconds if sign == "-" else microseconds
             )
             return parsed.replace(tzinfo=timezone(offset))
-        else:
-            pass
-    else:
-        pass
     return parsed
 
 
@@ -64,24 +56,16 @@ def _iso_date_end(value: str) -> int:
     if value[4] == "-":
         if value[5] != "W":
             return 10
-        else:
-            pass
         # YYYY-Www-HH uses a dash separator after the reduced week date.
         return 10 if value[8:9] == "-" and not "0" <= value[10:11] <= "9" else 8
-    else:
-        pass
     if value[4] != "W":
         return 8
-    else:
-        pass
     # CPython resolves a digit separator in a basic week date by parity.
     digits = _ASCII_DIGITS.match(value, 7)
     assert digits is not None
     end = digits.end()
     if end < 9:
         return end
-    else:
-        pass
     return 7 if end % 2 == 0 else 8
 
 
@@ -100,8 +84,6 @@ def parse_microsecond_iso_datetime(value: str) -> tuple[datetime, int]:
     """
     if value.endswith("Z"):
         value = value[:-1] + "+00:00"
-    else:
-        pass
     clock_start = _iso_date_end(value) + 1 if len(value) > 8 else len(value)
     # ISO 8601-1 §5.4.1 requires a complete date in a datetime. A week
     # without a weekday uses Python's legacy Monday and clock semantics.
@@ -124,8 +106,6 @@ def parse_microsecond_iso_datetime(value: str) -> tuple[datetime, int]:
         whole_minutes, whole_seconds = divmod(int(whole), 60)
         wall = f"{hour}:{minute or f'{whole_minutes:02d}'}:{whole_seconds:02d}.{tail}"
         value = value[:clock_start] + wall + value[reduced.end() :]
-    else:
-        pass
     parser_value = value
     portable = _PORTABLE_ISO.fullmatch(value) if sys.version_info < (3, 11) else None
     if portable is not None:
@@ -135,29 +115,17 @@ def parse_microsecond_iso_datetime(value: str) -> tuple[datetime, int]:
         parser_value = wall
         if fraction is not None:
             parser_value += "." + fraction[:6].ljust(6, "0")
-        else:
-            pass
         if hours_minutes is not None:
             parser_value += hours_minutes + (seconds or "")
-        else:
-            pass
         if offset_fraction is not None:
             parser_value += "." + offset_fraction[:6].ljust(6, "0")
-        else:
-            pass
-    else:
-        pass
     moment = parse_iso_datetime(parser_value)
     clock = value[clock_start:]
     offset = moment.utcoffset()
     if offset is None:
         if _fraction_digits(clock)[6:].rstrip("0"):
             raise ValueError("Local ISO clock must be representable to the microsecond")
-        else:
-            pass
         return moment, 0
-    else:
-        pass
 
     sign = _OFFSET_SIGN.search(clock)
     assert sign is not None
@@ -171,8 +139,6 @@ def parse_microsecond_iso_datetime(value: str) -> tuple[datetime, int]:
         micros = int(offset_digits[:6].ljust(6, "0"))
         offset = timedelta(microseconds=-micros if negative else micros)
         moment = moment.replace(tzinfo=timezone(offset))
-    else:
-        pass
 
     # A positive offset's tail must cancel the wall tail. A negative
     # offset's tail must add to the wall tail to reach the next microsecond.
@@ -182,10 +148,6 @@ def parse_microsecond_iso_datetime(value: str) -> tuple[datetime, int]:
             10 - int(offset_tail[-1])
         )
         carry = 1
-    else:
-        pass
     if wall_tail != offset_tail:
         raise ValueError("UTC instant must be representable to the microsecond")
-    else:
-        pass
     return moment, carry

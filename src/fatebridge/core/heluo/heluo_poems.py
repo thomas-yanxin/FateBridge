@@ -106,8 +106,6 @@ def _collation() -> dict[str, Any]:
             or len(data["entries"]) != 6 * len(LAYOUTS)
         ):
             raise ValueError("河洛卷三诗诀来源或覆盖范围不符。")
-        else:
-            pass
         expected = [
             (gua, pos, heading, text_pages)
             for gua, rows in LAYOUTS.items()
@@ -128,8 +126,6 @@ def _collation() -> dict[str, Any]:
                 or len(entry["poems"]) != len(text_pages)
             ):
                 raise ValueError("河洛诗诀分组或页界不符。")
-            else:
-                pass
             for index, poem in enumerate(entry["poems"], 1):
                 label = None if index == 1 else ("其二" if index == 2 else "其三")
                 if (
@@ -141,16 +137,12 @@ def _collation() -> dict[str, Any]:
                     or not poem["text"].strip()
                 ):
                     raise ValueError("河洛诗诀字序、首序或原页缺失。")
-                else:
-                    pass
                 if gua != "乾為天" and (
                     not isinstance(poem["printed_clauses"], list)
                     or poem["printed_clauses"]
                     != [s for s in re.split("[，。]", poem["text"]) if s]
                 ):
                     raise ValueError("河洛诗诀转录句读与所录原印边界不符。")
-                else:
-                    pass
         content_sha = sha256(
             json.dumps(
                 data,
@@ -162,8 +154,6 @@ def _collation() -> dict[str, Any]:
         ).hexdigest()
         if content_sha != CONTENT_SHA256:
             raise ValueError("该版本诗诀正文、标签或来源元数据被改写。")
-        else:
-            pass
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_heluo_poem_collation") from exc
     data["_loaded_sha256"] = sha256(raw).hexdigest()
@@ -238,8 +228,6 @@ def _review_supplement() -> dict[str, Any]:
             != [(1, 1), (2, 2), (4, 2), (5, 3), (6, 1)]
         ):
             raise ValueError("河洛五首复核内容身份或范围不符。")
-        else:
-            pass
         for review in data["entries"]:
             entry = poems_for_line(review["hexagram"], review["line"])
             if (
@@ -248,8 +236,6 @@ def _review_supplement() -> dict[str, Any]:
                 != review["current_text"]
             ):
                 raise ValueError("后续读稿复核与当前所录诗文不符。")
-            else:
-                pass
     except (OSError, IndexError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_heluo_poem_collation") from exc
     return cast(dict[str, Any], data)
@@ -258,8 +244,6 @@ def _review_supplement() -> dict[str, Any]:
 def _apply_review_supplement(gua: str, pos: int, result: dict) -> None:
     if gua != "天水訟" or pos not in (1, 2, 4, 5, 6):
         return
-    else:
-        pass
     data = _review_supplement()
     selected = [e for e in data["entries"] if e["line"] == pos]
     if any(
@@ -267,8 +251,6 @@ def _apply_review_supplement(gua: str, pos: int, result: dict) -> None:
         for e in selected
     ):
         raise NumerologySourceError("invalid_heluo_poem_collation")
-    else:
-        pass
     result["poem_review_supplement"] = deepcopy(
         {
             **{key: value for key, value in data.items() if key != "entries"},
@@ -282,8 +264,6 @@ def apply_poems(gua: str, pos: int, result: dict, provenance: dict) -> None:
     entry = poems_for_line(gua, pos)
     if entry is None:
         return
-    else:
-        pass
     summary = collation_summary()
     inherited = result["shige"]
     first, _, _ = inherited.partition("\n")
@@ -302,8 +282,6 @@ def apply_poems(gua: str, pos: int, result: dict, provenance: dict) -> None:
     )
     if "heading_text" in entry:
         provenance["poem_heading_text"] = entry["heading_text"]
-    else:
-        pass
     result["poem_sections"] = [dict(p, applicability=None) for p in entry["poems"]]
     result["shige"] = "\n".join(p["text"] for p in entry["poems"])
     result["poem_selection"] = {

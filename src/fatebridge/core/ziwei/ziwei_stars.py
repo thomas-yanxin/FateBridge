@@ -193,8 +193,6 @@ def natal_star_placement(
         # the software profile retains its independent birth-hour walk.
         minor_star_branches["火星"] = huoxing_start_by_year_branch[year_branch]
         minor_star_branches["铃星"] = lingxing_start_by_year_branch[year_branch]
-    else:
-        pass
     for star_name, target_branch in minor_star_branches.items():
         stars_by_branch[target_branch].append(star_name)
 
@@ -434,10 +432,6 @@ def natal_star_placement(
         for branch in displayed_xunkong:
             if "旬空" not in stars_by_branch[branch]:
                 stars_by_branch[branch].append("旬空")
-            else:
-                pass
-    else:
-        pass
     return ZiweiNatalStarPlacement(
         stars_by_branch=stars_by_branch,
         ziwei_branch=ZIWEI_BRANCH_SEQUENCE[ziwei_index],

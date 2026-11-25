@@ -85,8 +85,6 @@ def terrestrial_frame(
                 math.sin(phi),
             ),
         )
-    else:
-        pass
     lam = math.radians(longitude)
     local_itrs = (
         (-math.sin(lam), math.cos(lam), 0.0),
@@ -127,8 +125,6 @@ def house_site(
     """ARMC and vertical latitude for the house model's actual equator."""
     if attitude.equator.polar_motion is None:
         return (attitude.house_sidereal_degrees + longitude) % 360, latitude
-    else:
-        pass
     frame = terrestrial_frame(attitude.equator, longitude=longitude, latitude=latitude)
     right_ascension, declination = frame.equatorial_site()
     origin = math.degrees(
@@ -201,8 +197,6 @@ def native_observer_site(
     values, returned = module.calc(equator.jd_tt, module.ECL_NUT, ephemeris_flags)
     if returned < 0:
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     internal_ut1 = equator.jd_tt - module.deltat_ex(equator.jd_tt, ephemeris_flags)
     internal_phase = module.sidtime0(internal_ut1, values[1], 0.0) * 15
     return (

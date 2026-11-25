@@ -73,16 +73,12 @@ class InteriorRelation(_DeferredModel):
     def nonblank(cls, value: str) -> str:
         if not value.strip():
             raise ValueError("室内关系的对象、ID与依据不能为空白")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
     def different_objects(self) -> "InteriorRelation":
         if self.source_object_id == self.target_object_id:
             raise ValueError("室内关系的来源物件与目标物件不能相同")
-        else:
-            pass
         return self
 
 
@@ -105,8 +101,6 @@ def validate_relation_references(
     for relation in relations:
         if relation.relation_id in relation_ids:
             raise ValueError("interior_relations.relation_id 不可重复")
-        else:
-            pass
         relation_ids.add(relation.relation_id)
         predicate = (
             relation.kind,
@@ -115,8 +109,6 @@ def validate_relation_references(
         )
         if predicate in predicates:
             raise ValueError("相同种类及端点的室内关系不可重复")
-        else:
-            pass
         predicates.add(predicate)
         for object_id, required_role in zip(
             (relation.source_object_id, relation.target_object_id),
@@ -124,36 +116,22 @@ def validate_relation_references(
         ):
             if object_id not in roles:
                 raise ValueError(f"室内关系引用未知对象 {object_id}")
-            else:
-                pass
             if required_role not in roles[object_id]:
                 raise ValueError(f"{object_id} 必须明确具有角色 {required_role}")
-            else:
-                pass
         if (
             relation.present is not True
             or relation.observation_basis == "image_observed"
         ):
             continue
-        else:
-            pass
         source_floor = floor_maps.get(relation.source_object_id)
         target_floor = floor_maps.get(relation.target_object_id)
         if source_floor is None or target_floor is None:
             continue
-        else:
-            pass
         source_level, target_level = _level(source_floor), _level(target_floor)
         if source_level is None or target_level is None:
             continue
-        else:
-            pass
         if relation.kind == "bed_above_stove":
             if source_level <= target_level:
                 raise ValueError("已确认床在灶上方时，床的楼层必须高于灶的楼层")
-            else:
-                pass
         elif source_level != target_level:
             raise ValueError("已确认的室内水平/顶上关系不能跨已知不同楼层")
-        else:
-            pass

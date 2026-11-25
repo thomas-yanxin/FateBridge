@@ -29,8 +29,6 @@ def house_condition(
 ) -> dict[str, Any]:
     if occupied_house is not None and occupied_house not in _HOUSE_ORDER:
         raise ValueError("Occupied house must be 1..12 or unknown")
-    else:
-        pass
     return {
         "occupied_house": occupied_house,
         "house_class": (
@@ -126,8 +124,6 @@ def dwelling_clause(
             else target_phase["phase"] == "applying"
             and target_phase["aspect"] == following["aspect"]
         )
-    else:
-        pass
     lunar_sequence = (
         _all([last_source, next_target, separates, applies]) if distinct else None
     )

@@ -123,8 +123,6 @@ def bound_lord(sign: str, degree_in_sign: Angle) -> str | None:
     for lord, start, end in EGYPTIAN_BOUNDS_BY_SIGN.get(sign, []):
         if start <= degree_in_sign < end:
             return lord
-        else:
-            pass
     return None
 
 
@@ -133,8 +131,6 @@ def face_lord(sign: str, degree_in_sign: Angle) -> str | None:
     faces = CHALDEAN_FACES.get(sign)
     if not faces:
         return None
-    else:
-        pass
     return faces[min(2, int(degree_in_sign // 10))]
 
 
@@ -143,8 +139,6 @@ def triplicity_ruler(sign: str, is_day: bool | None) -> str | None:
     rulers = DOROTHEAN_TRIPLICITY.get(ELEMENT_BY_SIGN.get(sign, ""))
     if not rulers or is_day is None:
         return None
-    else:
-        pass
     return rulers["day"] if is_day else rulers["night"]
 
 
@@ -163,40 +157,24 @@ def essential_dignities(
     """
     if planet not in TRADITIONAL_PLANETS:
         return None
-    else:
-        pass
 
     held: list[str] = []
     if sign in DOMICILE_RULERS.get(planet, ()):
         held.append("rulership")
-    else:
-        pass
     if EXALTATION_SIGNS.get(planet) == sign:
         held.append("exaltation")
-    else:
-        pass
     if triplicity_ruler(sign, is_day) == planet:
         held.append("triplicity")
-    else:
-        pass
     if bound_lord(sign, degree_in_sign) == planet:
         held.append("bound")
-    else:
-        pass
     if face_lord(sign, degree_in_sign) == planet:
         held.append("face")
-    else:
-        pass
 
     debilities: list[str] = []
     if sign in _detriment_signs(planet):
         debilities.append("detriment")
-    else:
-        pass
     if sign == _opposite_sign(EXALTATION_SIGNS.get(planet, "")):
         debilities.append("fall")
-    else:
-        pass
 
     score = sum(DIGNITY_SCORE[d] for d in held) + sum(
         DIGNITY_SCORE[d] for d in debilities
@@ -234,16 +212,10 @@ def angularity(house: int | None) -> str | None:
     """Angular (1/4/7/10) · succedent (2/5/8/11) · cadent (3/6/9/12)."""
     if not house:
         return None
-    else:
-        pass
     if house in (1, 4, 7, 10):
         return "angular"
-    else:
-        pass
     if house in (2, 5, 8, 11):
         return "succedent"
-    else:
-        pass
     return "cadent"
 
 
@@ -251,24 +223,16 @@ def combustion_state(planet_lon: Angle, sun_lon: Angle | None) -> str | None:
     """Lilly p.113 definitions with explicit interval/zero-sign policies."""
     if sun_lon is None:
         return None
-    else:
-        pass
     distance = _angular_distance(planet_lon, sun_lon)
     if distance <= _COMBUST_CAZIMI:
         return "cazimi"
-    else:
-        pass
     same_sign = (angle_fraction(planet_lon) % 360) // 30 == (
         angle_fraction(sun_lon) % 360
     ) // 30
     if distance < _COMBUST_LIMIT and same_sign:
         return "combust"
-    else:
-        pass
     if distance < _UNDER_BEAMS_LIMIT:
         return "under_beams"
-    else:
-        pass
     return None
 
 
@@ -298,13 +262,9 @@ def orientality(planet_lon: Angle, sun_lon: Angle | None) -> str | None:
     """
     if sun_lon is None:
         return None
-    else:
-        pass
     phase = (angle_fraction(planet_lon) - angle_fraction(sun_lon)) % 360
     if phase == 0:
         return None
-    else:
-        pass
     return "oriental" if phase >= 180 else "occidental"
 
 
@@ -326,23 +286,13 @@ def planet_sect(planet: str, orientality_value: str | None) -> str | None:
     """Natural sect of a planet; Mercury follows its orientality."""
     if planet in DIURNAL_PLANETS:
         return "day"
-    else:
-        pass
     if planet in NOCTURNAL_PLANETS:
         return "night"
-    else:
-        pass
     if planet == "Mercury":
         if orientality_value == "oriental":
             return "day"
-        else:
-            pass
         if orientality_value == "occidental":
             return "night"
-        else:
-            pass
-    else:
-        pass
     return None
 
 
@@ -353,8 +303,6 @@ def sect_placement(
     own = planet_sect(planet, orientality_value)
     if own is None or chart_sect is None:
         return None
-    else:
-        pass
     return "of_sect" if own == chart_sect else "contrary_to_sect"
 
 
@@ -372,16 +320,10 @@ def in_halb(
     own = planet_sect(planet, orientality_value)
     if own is None or chart_sect is None or above_horizon is None:
         return None
-    else:
-        pass
     if own != chart_sect:
         return False
-    else:
-        pass
     if chart_sect == "day":
         return above_horizon if own == "day" else not above_horizon
-    else:
-        pass
     return not above_horizon if own == "day" else above_horizon
 
 
@@ -398,8 +340,6 @@ def is_retrograde(longitude_speed: float | None) -> bool | None:
     """
     if longitude_speed is None:
         return None
-    else:
-        pass
     return longitude_speed < 0.0
 
 
@@ -415,8 +355,6 @@ def out_of_bounds(
     """
     if declination is None or obliquity is None:
         return None
-    else:
-        pass
     return abs(declination) > abs(obliquity)
 
 
@@ -486,8 +424,6 @@ def _almuten_winner(totals: dict[str, int]) -> str | None:
     """
     if not totals:
         return None
-    else:
-        pass
     return max(
         totals,
         key=lambda p: (
@@ -510,8 +446,6 @@ def almuten_of(sign: str, degree_in_sign: Angle, is_day: bool) -> dict[str, Any]
         lord = lords[dignity]
         if lord:
             totals[lord] = totals.get(lord, 0) + weight
-        else:
-            pass
     return {"winner": _almuten_winner(totals), "totals": totals, "lords": lords}
 
 
@@ -528,8 +462,6 @@ def planetary_hour_sequence(day_ruler: str) -> list[str]:
     """
     if day_ruler not in _CHALDEAN_ORDER:
         return []
-    else:
-        pass
     start = _CHALDEAN_ORDER.index(day_ruler)
     return [_CHALDEAN_ORDER[(start + offset) % 7] for offset in range(24)]
 
@@ -561,14 +493,10 @@ def build_almuten_figuris(
         placement = points.get(point_id)
         if not placement:
             continue
-        else:
-            pass
         sign = placement.get("sign")
         degree = placement.get("degree_in_sign")
         if not sign or degree is None:
             continue
-        else:
-            pass
         result = almuten_of(sign, float(degree), is_day)
         per_point[point_id] = {
             "sign": sign,
@@ -659,18 +587,12 @@ def dispositor_chain(planet: str, placements: dict[str, str]) -> dict[str, Any]:
         ruler = domicile_ruler(sign) if sign else None
         if ruler is None:
             return {"chain": chain, "terminal": None, "terminal_type": "unknown"}
-        else:
-            pass
         if ruler == current:
             return {"chain": chain, "terminal": current, "terminal_type": "domicile"}
-        else:
-            pass
         if ruler in seen:
             # Loop: a planet rules its own dispositor (mutual reception if length 2).
             kind = "mutual_reception" if ruler == planet and len(chain) == 2 else "loop"
             return {"chain": chain + [ruler], "terminal": ruler, "terminal_type": kind}
-        else:
-            pass
         chain.append(ruler)
         seen.add(ruler)
         current = ruler
@@ -704,8 +626,6 @@ def build_topic_almutens(
         degree = cusp.get("degree_in_sign")
         if not sign or degree is None:
             continue
-        else:
-            pass
         result = almuten_of(sign, degree, is_day)
         topic[str(house_number)] = {"sign": sign, "winner": result["winner"]}
     return topic
@@ -751,8 +671,6 @@ def lot_longitude(formula: list[str], lons: dict[str, float]) -> Fraction | None
     c = lons.get(formula[2])
     if a is None or b is None or c is None:
         return None
-    else:
-        pass
     return combine_longitudes_exact(a, b, -c)
 
 
@@ -775,12 +693,8 @@ def build_lots_layer(
         lon = lot_longitude(formula, lons)
         if lon is None:
             continue
-        else:
-            pass
         if lot_longitudes is not None:
             lot_longitudes[lot_id] = lon
-        else:
-            pass
         sign_index, degree = divmod(lon, 30)
         sign = SIGNS[sign_index]
         displayed_degree = float(degree)
@@ -788,8 +702,6 @@ def build_lots_layer(
         # the working degree's interval when delivering it to table consumers.
         if int(displayed_degree) != int(degree):
             displayed_degree = math.nextafter(displayed_degree, -math.inf)
-        else:
-            pass
         out[lot_id] = {
             "cn": definition["cn"],
             "longitude": longitude_float(lon),
@@ -829,8 +741,6 @@ def whole_sign_aspect(sign_a: str, sign_b: str) -> str | None:
     """Classical whole-sign aspect between two signs (None = aversion)."""
     if sign_a not in _SIGN_INDEX or sign_b not in _SIGN_INDEX:
         return None
-    else:
-        pass
     distance = (_SIGN_INDEX[sign_b] - _SIGN_INDEX[sign_a]) % 12
     return _WHOLE_SIGN_ASPECT.get(distance)
 
@@ -839,8 +749,6 @@ def overcomes(sign_a: str, sign_b: str) -> bool:
     """True if A overcomes B — A in the 10th sign from B (superior dexter square)."""
     if sign_a not in _SIGN_INDEX or sign_b not in _SIGN_INDEX:
         return False
-    else:
-        pass
     return (_SIGN_INDEX[sign_a] - _SIGN_INDEX[sign_b]) % 12 == 9
 
 
@@ -870,16 +778,10 @@ def _aspect_phase(
     """
     if speed_a is None or speed_b is None:
         return "unavailable"
-    else:
-        pass
     if not all(math.isfinite(value) for value in (speed_a, speed_b, exact_angle)):
         raise ValueError("Aspect speeds and angle must be finite")
-    else:
-        pass
     if not 0 <= exact_angle <= 180:
         raise ValueError("Aspect angle must be within 0..180 degrees")
-    else:
-        pass
     delta = (angle_fraction(lon_b) - angle_fraction(lon_a)) % 360
     angle = Fraction(exact_angle)
     residuals: list[Fraction] = []
@@ -889,13 +791,9 @@ def _aspect_phase(
     gap = min(abs(value) for value in residuals)
     if gap == 0:
         return "exact"
-    else:
-        pass
     relative_speed = Fraction(speed_b) - Fraction(speed_a)
     if relative_speed == 0:
         return "stationary"
-    else:
-        pass
     approaching = any(
         residual * relative_speed < 0 for residual in residuals if abs(residual) == gap
     )
@@ -929,8 +827,6 @@ def ptolemy_latitude_condition(
         raise ValueError(
             "Physical ecliptic latitudes must be finite and within -90..90"
         )
-    else:
-        pass
     if angle != 0:
         status = "not_required_for_aspect_ray"
     elif first is None or second is None:
@@ -979,14 +875,10 @@ def build_classical_patterns(
         for b in ids[i + 1 :]:
             if whole_sign_aspect(by_id[a]["sign"], by_id[b]["sign"]) is None:
                 aversions.append([a, b])
-            else:
-                pass
         # overcoming is directional — check both orders
         for b in ids:
             if a != b and overcomes(by_id[a]["sign"], by_id[b]["sign"]):
                 overcoming.append({"overcomer": a, "overcome": b})
-            else:
-                pass
 
     # --- besiegement / enclosure by body (immediate longitude neighbours) ---
     # Enclosure by body requires the flanking bodies within ~15° on each side;
@@ -997,8 +889,6 @@ def build_classical_patterns(
     for index, planet in enumerate(ordered):
         if planet["id"] in BENEFICS or planet["id"] in MALEFICS:
             continue
-        else:
-            pass
         prev_p = ordered[(index - 1) % n]
         next_p = ordered[(index + 1) % n]
         within_orb = (
@@ -1009,15 +899,11 @@ def build_classical_patterns(
         )
         if not within_orb:
             continue
-        else:
-            pass
         prev_id, next_id = prev_p["id"], next_p["id"]
         if prev_id in MALEFICS and next_id in MALEFICS:
             besiegement[planet["id"]] = "besieged_by_malefics"
         elif prev_id in BENEFICS and next_id in BENEFICS:
             besiegement[planet["id"]] = "enclosed_by_benefics"
-        else:
-            pass
 
     # --- bonification / maltreatment by aspect to benefics / malefics ---
     bonification: dict[str, dict[str, list[str]]] = {
@@ -1028,14 +914,10 @@ def build_classical_patterns(
         for source, target in ((a, b), (b, a)):
             if target not in bonification:
                 continue
-            else:
-                pass
             if source in BENEFICS:
                 bonification[target]["bonified_by"].append(source)
             elif source in MALEFICS:
                 bonification[target]["maltreated_by"].append(source)
-            else:
-                pass
 
     # --- translation & collection of light (need applying/separating) ---
     # Aspect angle between two traditional planets, keyed by the unordered pair.
@@ -1079,8 +961,6 @@ def build_classical_patterns(
                     ),
                 }
             )
-        else:
-            pass
 
     def faster(p: str, q: str) -> bool:
         """``p`` outpaces ``q`` in longitude (by absolute speed)."""
@@ -1094,8 +974,6 @@ def build_classical_patterns(
         angle = pair_angle.get(frozenset((source, target)))
         if angle is None:
             return None
-        else:
-            pass
         return _aspect_is_applying(
             by_id[source]["longitude"],
             speeds.get(source),
@@ -1115,16 +993,10 @@ def build_classical_patterns(
                 for sink in ids:
                     if len({translator, source, sink}) < 3:
                         continue
-                    else:
-                        pass
                     if frozenset((translator, source)) not in pair_angle:
                         continue
-                    else:
-                        pass
                     if frozenset((translator, sink)) not in pair_angle:
                         continue
-                    else:
-                        pass
                     if not (
                         lighter(translator, source)
                         and lighter(translator, sink)
@@ -1132,16 +1004,12 @@ def build_classical_patterns(
                         and faster(translator, sink)
                     ):
                         continue
-                    else:
-                        pass
                     if applying(translator, source) is False and applying(
                         translator, sink
                     ):
                         translation.append(
                             {"translator": translator, "from": source, "to": sink}
                         )
-                    else:
-                        pass
         # Collection: a slower Z is applied to by two faster planets that are in
         # aversion to each other — Z gathers their light.
         for collector in ids:
@@ -1158,13 +1026,9 @@ def build_classical_patterns(
                 for second in contributors[i + 1 :]:
                     if frozenset((first, second)) in pair_angle:
                         continue
-                    else:
-                        pass
                     collection.append(
                         {"collector": collector, "from": sorted((first, second))}
                     )
-    else:
-        pass
 
     # --- nodal bending (a planet square the nodal axis) ---
     nodal_bending: list[dict[str, Any]] = []
@@ -1184,10 +1048,6 @@ def build_classical_patterns(
                             "orb": float(separation),
                         }
                     )
-                else:
-                    pass
-    else:
-        pass
 
     return {
         "sect_benefic": _SECT_BENEFIC.get(chart_sect or ""),
@@ -1392,8 +1252,6 @@ def dodekatemorion(sign: str, degree_in_sign: float) -> str | None:
     the planet's own sign (each 30° sign carries all 12 in 2.5° steps)."""
     if sign not in _SIGN_INDEX:
         return None
-    else:
-        pass
     step = int((degree_in_sign % 30.0) // 2.5)
     return SIGNS[(_SIGN_INDEX[sign] + step) % 12]
 
@@ -1424,8 +1282,6 @@ def ninth_part(sign: str, degree_in_sign: float) -> str | None:
     start = _NINTH_PART_START.get(ELEMENT_BY_SIGN.get(sign, ""))
     if start is None:
         return None
-    else:
-        pass
     step = int((angle_fraction(degree_in_sign) % 30) * 9 // 30)
     return SIGNS[(_SIGN_INDEX[start] + step) % 12]
 
@@ -1434,12 +1290,8 @@ def _degree_position(degree_in_sign: float) -> str:
     deg = degree_in_sign % 30.0
     if deg < 10:
         return "上方"
-    else:
-        pass
     if deg < 20:
         return "中间"
-    else:
-        pass
     return "下方"
 
 

@@ -27,8 +27,6 @@ def named_rizang_reference(xuanying: dict[str, Any]) -> dict[str, Any]:
     data = loaded.data
     if data["compared_xuanying_capture_sha256"] != xuanying["capture_sha256"]:
         raise ValueError("日藏对照与玄应捕获版本不一致，须重新核验")
-    else:
-        pass
     rows = data["literal_slots"]
     keys = {(r["textual_month"], r["fortnight"], r["day"]) for r in rows}
     expected = {
@@ -40,8 +38,6 @@ def named_rizang_reference(xuanying: dict[str, Any]) -> dict[str, Any]:
     }
     if len(rows) != 330 or keys != expected:
         raise ValueError("日藏具名字面表槽不完整或重复，不能沿用对照")
-    else:
-        pass
     return {
         **data,
         "source_bundle_sha256": loaded.sha256,
@@ -60,8 +56,6 @@ def literal_cell(reference: dict[str, Any], month: int, half: str, day: int) -> 
     ]
     if len(rows) != 1:
         raise ValueError("该具名日藏表槽未唯一列出；不能从相邻月或宿序补值")
-    else:
-        pass
     return str(rows[0]["mansion_literal"])
 
 

@@ -136,41 +136,27 @@ def calculate_core_chart_analysis(
             raise ValueError(
                 "guolao_seasonal_anchor_policy requires chart_variant=guolao_chart"
             )
-        else:
-            pass
         if guolao_seasonal_anchor_policy not in POLICIES:
             raise ValueError("Unknown guolao_seasonal_anchor_policy")
-        else:
-            pass
         if guolao_seasonal_anchor_policy in POLICIES[1:] and not (
             use_true_solar_time or birth_clock_basis == "local_apparent_solar"
         ):
             raise ValueError(
                 "Solar-day anchors require an apparent clock: use_true_solar_time=true or explicit LAT input"
             )
-        else:
-            pass
-    else:
-        pass
     if guolao_month_basis is not None and (
         chart_variant != "guolao_chart" or analysis_datetime is None
     ):
         raise ValueError(
             "guolao_month_basis requires chart_variant=guolao_chart and analysis_datetime"
         )
-    else:
-        pass
     if guolao_month_basis is not None and guolao_month_basis not in {
         "jie_month",
         "chinese_lunar_utc8",
     }:
         raise ValueError("guolao_month_basis must be jie_month or chinese_lunar_utc8")
-    else:
-        pass
     if chart_variant != "india_chart" and drekkana_profile != "santhanam_27_6":
         raise ValueError("drekkana_profile requires chart_variant=india_chart")
-    else:
-        pass
     if birth_clock_basis != "civil" and chart_variant not in {
         "germany",
         "chart13",
@@ -180,8 +166,6 @@ def calculate_core_chart_analysis(
         raise ValueError(
             "Noncivil birth_clock_basis requires chart_variant=germany, chart13, india_chart or guolao_chart"
         )
-    else:
-        pass
     if birth_second and chart_variant not in {
         "germany",
         "chart13",
@@ -191,14 +175,10 @@ def calculate_core_chart_analysis(
         raise ValueError(
             "nonzero birth_second requires chart_variant=germany, chart13, india_chart or guolao_chart"
         )
-    else:
-        pass
     if birth_microsecond and chart_variant not in {"india_chart", "guolao_chart"}:
         raise ValueError(
             "nonzero birth_microsecond requires chart_variant=india_chart or guolao_chart"
         )
-    else:
-        pass
     if chart_variant == "germany":
         return calculate_germany_chart_analysis(
             birth_year=birth_year,
@@ -220,22 +200,16 @@ def calculate_core_chart_analysis(
             birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
             analysis_datetime=analysis_datetime,
         )
-    else:
-        pass
 
     if analysis_datetime is not None and chart_variant != "guolao_chart":
         raise ValueError(
             "analysis_datetime requires chart_variant=germany or guolao_chart"
         )
-    else:
-        pass
     if chart_variant not in SUPPORTED_CHART_VARIANTS:
         raise ValueError(
             f"不支持的 chart_variant: {chart_variant}。"
             f"可选值：{', '.join(sorted(SUPPORTED_CHART_VARIANTS))}"
         )
-    else:
-        pass
 
     birth_info = _build_birth_info(
         {
@@ -271,16 +245,12 @@ def calculate_core_chart_analysis(
         # legacy constructor's independent display is unused and can fail
         # before that valid calculation. Keep only the requested clock policy.
         birth_info = replace(birth_info, applied_true_solar=use_true_solar_time)
-    else:
-        pass
     if chart_variant == "india_chart":
         from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
 
         birth_info, _ = normalize_solar_display(
             birth_info, ephemeris_policy, requested=use_true_solar_time
         )
-    else:
-        pass
     anchor_options: dict[str, Any] = (
         {"guolao_seasonal_anchor_policy": guolao_seasonal_anchor_policy}
         if guolao_seasonal_anchor_policy is not None
@@ -327,8 +297,6 @@ def calculate_core_chart_analysis(
             divisions=divisions,
             birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
         )
-    else:
-        pass
     if chart_variant == "chart13":
         from fatebridge.core.astro.sensitivity import enrich_specialty_sensitivity
 
@@ -338,8 +306,6 @@ def calculate_core_chart_analysis(
             kind="chart13",
             uncertainty_minutes=birth_time_uncertainty_minutes,
         )
-    else:
-        pass
     result.update(_build_chart_snapshot(result, chart_variant))
     if apparent_model == "opaque_solar":
         from fatebridge.core.astro.opaque_solar import opaque_solar_positions
@@ -347,8 +313,6 @@ def calculate_core_chart_analysis(
         result["apparent_model_positions"] = opaque_solar_positions(
             result["chart_profile"]["julian_day_tt"]
         )
-    else:
-        pass
     return result
 
 
@@ -460,6 +424,4 @@ def calculate_relative_chart_analysis(
         payload["snapshot_export"] = parse_export_content(
             technique="relative", content=snapshot_text
         )
-    else:
-        pass
     return payload

@@ -72,8 +72,6 @@ def collect_dayun_birth_event_probes(
     low, high = utc_instant(start), utc_instant(end)
     if high < low or high - low > timedelta(minutes=240):
         raise ValueError("大运出生事件需要顺序明确且不超过240分钟的实际范围")
-    else:
-        pass
     clocks = dict(known_clocks or {})
     low_day = utc_calendar(low).julian_day_exact()
     high_day = utc_calendar(high).julian_day_exact()
@@ -81,8 +79,6 @@ def collect_dayun_birth_event_probes(
     def clock_at(at: datetime) -> NormalizedBirthTime:
         if at not in clocks:
             clocks[at] = rebase_birth_clock(template, at)
-        else:
-            pass
         return clocks[at]
 
     cuts = {low}
@@ -119,10 +115,6 @@ def collect_dayun_birth_event_probes(
                 if low <= at <= high:
                     cuts.add(at)
                     jie_guards.add(at)
-                else:
-                    pass
-        else:
-            pass
     ordered = sorted(cuts | {high})
     intervals = list(zip(ordered, ordered[1:])) or [(low, high)]
     seen = set()
@@ -145,21 +137,15 @@ def collect_dayun_birth_event_probes(
         last = distances[1] // Fraction(1, 4)
         if last - first > 2:
             raise ValueError("名义月进位跨度异常，不能静默裁剪")
-        else:
-            pass
         for index in range(first, last + 1):
             point = CivilPoint(root.day + (-1 if forward else 1) * Fraction(index, 4))
             if not (
                 low_day <= point.day <= high_day and left_day <= point.day <= right_day
             ):
                 continue
-            else:
-                pass
             key = (point.day, root.day, forward)
             if key in seen:
                 continue
-            else:
-                pass
             seen.add(key)
             lower, upper = point.nominal_calendar_bracket()
             left_label = ZonedCalendar(lower, timezone.utc).require_datetime()
@@ -167,8 +153,6 @@ def collect_dayun_birth_event_probes(
             cuts.update((left_label, right_label))
             if low <= right_label + timedelta(microseconds=1) <= high:
                 cuts.add(right_label + timedelta(microseconds=1))
-            else:
-                pass
             events.append(
                 {
                     "kind": "dayun_nominal_month_carry",
@@ -222,8 +206,6 @@ def collect_dayun_birth_event_probes(
             probe = at + timedelta(microseconds=displacement)
             if low <= probe <= high:
                 instants.add(probe)
-            else:
-                pass
     probes = []
     records: list[BirthEventProbeRecord] = []
     for instant in sorted(instants):

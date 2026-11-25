@@ -32,8 +32,6 @@ STARTS = dict(zip("甲乙丙丁戊己庚辛壬癸", "亥午寅酉寅酉巳子申
 def life_stage_cycle(day_stem: str) -> dict[str, str]:
     if day_stem not in STARTS:
         raise ValueError("十二运需要有效日干")
-    else:
-        pass
     start = EARTHLY_BRANCHES.index(STARTS[day_stem])
     direction = 1 if day_stem in "甲丙戊庚壬" else -1
     return {
@@ -47,16 +45,12 @@ def build_life_stages(day_stem: str, sky_by_earth: dict[str, str]) -> dict[str, 
     branches = set(EARTHLY_BRANCHES)
     if set(sky_by_earth) != branches or set(sky_by_earth.values()) != branches:
         raise ValueError("十二运需要完整且不重复的天地盘")
-    else:
-        pass
     offsets = {
         (EARTHLY_BRANCHES.index(sky) - EARTHLY_BRANCHES.index(earth)) % 12
         for earth, sky in sky_by_earth.items()
     }
     if len(offsets) != 1:
         raise ValueError("天地盘须按同一支序顺布")
-    else:
-        pass
     by_stage = {stage: branch for branch, stage in cycle.items()}
     earth_by_sky = {sky: earth for earth, sky in sky_by_earth.items()}
     placements = []

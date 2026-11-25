@@ -84,8 +84,6 @@ def build_jinkou_snapshot_text(
                 f"本命另课阴阳用位：{natal['course']['overview']['use_position']}；综合取用尚未裁定。",
             ]
         natal_lines += [natal["scope"]]
-    else:
-        pass
     year_fate = jinkou.get("year_fate")
     year_fate_lines = []
     if year_fate:
@@ -119,8 +117,6 @@ def build_jinkou_snapshot_text(
                 + "；未另起行年课。"
             )
         year_fate_lines.extend([year_fate["relation_note"], year_fate["scope"]])
-    else:
-        pass
     definitions = jinkou["definition_evidence"]
     route_names = {
         "intrinsic_god": "贵神固有干",
@@ -186,8 +182,6 @@ def build_jinkou_snapshot_text(
                 "四绝依京本书影配对，不套一般十二长生。四败只列临地分一层，不等同于旺衰或现实结局。",
             ]
         )
-    else:
-        pass
     stars = jinkou["branch_stars"]
     shensha_lines.append(
         f"京本所选神煞：年支{stars['year_branch']}、月建{stars['month_building_branch']}（名义{stars['nominal_month']}月）、占日{stars['day_ganzhi']}。"
@@ -210,8 +204,6 @@ def build_jinkou_snapshot_text(
     for trine in jinkou["combinations"]["trines"]:
         if len(trine["present_branches"]) < 2:
             continue
-        else:
-            pass
         name = trine["partial_name"] if trine["missing_branches"] else trine["name"]
         combination_lines.append(f"{name}：{trine['basis']}")
         conditions = [

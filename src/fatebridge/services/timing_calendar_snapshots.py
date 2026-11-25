@@ -10,8 +10,6 @@ from fatebridge.services.snapshot_builders import (
 def term_clock_text(term: Mapping[str, object]) -> str:
     if (utc := term.get("datetime_utc")) is not None:
         return f"{utc} UTC（当地钟时未定义）"
-    else:
-        pass
     return str(term.get("datetime", "未知"))
 
 
@@ -25,14 +23,10 @@ def _format_location_line(
     parts: list[str] = []
     if lat or lon:
         parts.append(f"文本提示：{lat or '未提供'} / {lon or '未提供'}")
-    else:
-        pass
     if gps_lat is not None or gps_lon is not None:
         parts.append(
             f"GPS：{gps_lat if gps_lat is not None else '未提供'} / {gps_lon if gps_lon is not None else '未提供'}"
         )
-    else:
-        pass
     return "；".join(parts) if parts else "位置：未提供"
 
 
@@ -60,8 +54,6 @@ def build_jieqi_year_snapshot_text(
     ]
     if missing_terms:
         query_lines.append(f"未识别节气：{'、'.join(missing_terms)}")
-    else:
-        pass
 
     def term_line(item: dict[str, Any]) -> str:
         day = item.get("day_ganzhi", "未定义" if "datetime_utc" in item else "未知")
@@ -134,8 +126,6 @@ def build_nongli_time_snapshot_text(
     ]
     if lunar_calendar.get("meihua"):
         lunar_lines.append("梅花时卦辅助：已生成")
-    else:
-        pass
 
     pillar_lines = [
         f"年柱：{year_ganzhi}",

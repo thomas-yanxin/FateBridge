@@ -28,8 +28,6 @@ def validate_zhidu(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("日月岁原文、校记归属或未定条件改变，须重新核验")
-    else:
-        pass
 
 
 def _number(literal: str) -> int:
@@ -42,8 +40,6 @@ def _number(literal: str) -> int:
     )
     if not literal or match is None:
         raise ValueError("所选月长数词不在已核语法内")
-    else:
-        pass
     hundreds, tens, ones = match.groups()
     return (
         (digits[hundreds] * 100 if hundreds else 0)
@@ -61,33 +57,23 @@ def _month_quantity(row: dict[str, Any]) -> Fraction:
     prefix = row["main_term"] + "者"
     if not literal.startswith(prefix):
         raise ValueError("月名与该位次的定义不一致")
-    else:
-        pass
     match = re.fullmatch(
         rf"({NUMERAL})日(?:(半)|加({NUMERAL})分之({NUMERAL}))?",
         literal[len(prefix) :],
     )
     if match is None:
         raise ValueError("所选月长缺少可核的原句")
-    else:
-        pass
     whole, half, denominator, numerator = match.groups()
     kind = (
         "half_increment" if half else "fraction_increment" if denominator else "whole"
     )
     if row["definition_kind"] != kind:
         raise ValueError("月长运算类型不符合该位次原句")
-    else:
-        pass
     result = Fraction(_number(whole))
     if half:
         return result + Fraction(1, 2)
-    else:
-        pass
     if denominator is not None and numerator is not None:
         return result + Fraction(_number(numerator), _number(denominator))
-    else:
-        pass
     return result
 
 
@@ -101,8 +87,6 @@ def _nominal_ledger(data: dict[str, Any]) -> dict[str, Any]:
     for source_id, rows in data["month_definitions"].items():
         if [row["slot_id"] for row in rows] != [f"month_{i}" for i in range(1, 5)]:
             raise ValueError("四种月的位次不得按重名合并或重排")
-        else:
-            pass
         values[source_id] = {row["slot_id"]: _month_quantity(row) for row in rows}
         models[source_id] = [
             {"slot_id": row["slot_id"], **_rational(values[source_id][row["slot_id"]])}
@@ -114,8 +98,6 @@ def _nominal_ledger(data: dict[str, Any]) -> dict[str, Any]:
         )
         if year is None or _number(year[1]) != 366:
             raise ValueError("名义岁数未保留所选原字")
-        else:
-            pass
     # This deliberately added uniform-cycle hypothesis uses the first two
     # T1509 definitions. It is not a reconstruction of either book's calendar.
     first12 = 12 * values["T1509"]["month_1"]
@@ -142,8 +124,6 @@ def zhidu_reference() -> dict[str, Any]:
     loaded = load_source(SOURCE)
     if loaded.sha256 != DATA_SHA256:
         raise ValueError("日月岁资料字节改变，须重新冻结来源")
-    else:
-        pass
     data = loaded.data
     validate_zhidu(data)
     return {
@@ -163,19 +143,13 @@ def zhidu_lines(reference: dict[str, Any]) -> list[str]:
         for key in ["source_bundle_sha256", "before_code_reference_sha256"]
     ):
         raise ValueError("日月岁说明的来源身份与已冻结原文不一致")
-    else:
-        pass
     if not strict_reference_equal(
         reference["nominal_arithmetic"], _nominal_ledger(data)
     ):
         raise ValueError("名义月长诊断与本次所选来源不一致")
-    else:
-        pass
     scope = pointer_count_scope(data, reference["source_bundle_sha256"])
     if not strict_reference_equal(reference.get("apparatus_pointer_scope"), scope):
         raise ValueError("校记定位说明与本次来源口径不一致")
-    else:
-        pass
     return [
         "上游日月岁语境：《大智度論》卷48《四念處品第十九》所选日段作从旦至旦，"
         "并列五月至、十一月至及具体昼夜数。后出的《演密鈔》和《指心鈔》所选引段"

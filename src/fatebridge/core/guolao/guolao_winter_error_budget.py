@@ -27,8 +27,6 @@ def century_year_diagnostic(elapsed_years: int) -> dict[str, Any]:
     """Keep source year parameter separate from successive winter intervals."""
     if type(elapsed_years) is not int or not 0 <= elapsed_years < 400:
         raise ValueError("本诊断仅覆盖明确的0至399年距算")
-    else:
-        pass
     current = shoushi_winter_cycle(elapsed_years)
     previous = shoushi_winter_cycle(elapsed_years - 1) if elapsed_years else None
     interval = current.zhongji_days - previous.zhongji_days if previous else None
@@ -77,12 +75,8 @@ def shoushi_winter_error_budget(
     )
     if any(not isinstance(v, F) for v in values):
         raise TypeError("外部TT和地方钟标签须明确提供Fraction，不作隐式转换")
-    else:
-        pass
     if clock_hypothesis not in CLOCK_HYPOTHESES:
         raise ValueError("须分别声明地方平太阳时或地方真太阳时假设")
-    else:
-        pass
     for tt, year in (
         (reference_tt_jd, 1280 + elapsed_years),
         (reference_epoch_tt_jd, 1280),
@@ -90,8 +84,6 @@ def shoushi_winter_error_budget(
         label = calendar_label_from_noon_jdn(int(tt + F(1, 2)), calendar=CALENDARS[0])
         if label[0] != year or label[1] != 12 or not 19 <= label[2] <= 24:
             raise ValueError("参考TT须属于对应冬至年的固定12月19至24日窗口")
-        else:
-            pass
     # Reference clocks must describe the same local day as their TT. This broad
     # guard is not a historical clock accuracy bound or a fitted tolerance.
     if any(
@@ -102,15 +94,11 @@ def shoushi_winter_error_budget(
         )
     ):
         raise ValueError("地方钟标签与对应TT相差整日，不能混用日序")
-    else:
-        pass
     if elapsed_years == 0 and (
         reference_tt_jd != reference_epoch_tt_jd
         or reference_local_label_serial != reference_epoch_local_label_serial
     ):
         raise ValueError("距算0的参考必须与参考历元相同，不能隐式拟合起点")
-    else:
-        pass
     source_zhongji = F(diagnostic["source_zhongji_days_exact"])
     tt_interval = reference_tt_jd - reference_epoch_tt_jd
     local_interval = reference_local_label_serial - reference_epoch_local_label_serial
@@ -126,8 +114,6 @@ def shoushi_winter_error_budget(
     )
     if sum(terms.values(), F()) != difference:
         raise ArithmeticError("冬至误差分解未闭合")
-    else:
-        pass
     return {
         "profile_id": PROFILE,
         "source_year": 1281 + elapsed_years,

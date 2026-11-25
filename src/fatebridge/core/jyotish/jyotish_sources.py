@@ -37,8 +37,6 @@ def coherent_sources(function: Callable[_P, _R]) -> Callable[_P, _R]:
     def wrapped(*args: _P.args, **kwargs: _P.kwargs) -> _R:
         if native_execution.in_native_worker():
             return local(*args, **kwargs)
-        else:
-            pass
         with source_session():
             return cast(
                 _R,
@@ -58,8 +56,6 @@ def coherent_india_call(function: Callable[_P, _R]) -> Callable[_P, _R]:
     def wrapped(*args: _P.args, **kwargs: _P.kwargs) -> _R:
         if kwargs.get("chart_variant") == "india_chart":
             return coherent(*args, **kwargs)
-        else:
-            pass
         return function(*args, **kwargs)
 
     return wrapped
@@ -71,8 +67,6 @@ def observe_physical(factor: str, model: str) -> None:
     if session is not None and point is not None:
         session.check()
         point[factor] = session.trace.observe(factor, model)
-    else:
-        pass
 
 
 class PositionCalculation(Protocol):
@@ -98,8 +92,6 @@ def traced_positions(calculate_positions: PositionCalculation) -> PositionCalcul
         session = current_source_session()
         if session is None:
             raise RuntimeError("Position tracing requires a source session")
-        else:
-            pass
         point: dict[str, Any] = {}
         token = _POINT.set(point)
         try:
@@ -124,8 +116,6 @@ def traced_positions(calculate_positions: PositionCalculation) -> PositionCalcul
             )
             if clock_sources is not None:
                 result["clock_source_comparison"] = clock_sources
-            else:
-                pass
             return result
         finally:
             _POINT.reset(token)
@@ -161,13 +151,9 @@ class SourceComparison:
         for key, row in source["by_factor"].items():
             if not key.startswith("geometric_j2000_"):
                 continue
-            else:
-                pass
             model = row["model"]
             if key in self.motion_models and self.motion_models[key] != model:
                 raise EphemerisSourceError("model_changed")
-            else:
-                pass
             self.motion_models[key] = model
             self.motion_counts[key] = self.motion_counts.get(key, 0) + 1
         return index

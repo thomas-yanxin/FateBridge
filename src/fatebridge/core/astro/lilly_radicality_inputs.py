@@ -49,17 +49,11 @@ def collect_radicality_hour(
     )
     if at is None or lng is None or lat is None or tz is None or runtime.swe is None:
         return result
-    else:
-        pass
     scalar = at.as_float() if isinstance(at, UT1Instant) else at
     if not all(math.isfinite(v) for v in (scalar, lng, lat)):
         raise ValueError("Planetary hour epoch and location must be finite")
-    else:
-        pass
     if not -180 <= lng <= 180 or not -90 < lat < 90:
         raise ValueError("Invalid planetary-hour location")
-    else:
-        pass
     selected = configured_ephemeris_path()
     outcome = (
         _resolve_planetary_hour(at, lng, lat, tz)

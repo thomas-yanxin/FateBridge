@@ -47,16 +47,8 @@ def overflow_response(
                     )
                     if isinstance(files, list):
                         summary["ephemeris_files_count"] = len(files)
-                    else:
-                        pass
-                else:
-                    pass
                 metadata[key] = summary
                 deferred_metadata.append(path)
-            else:
-                pass
-    else:
-        pass
 
     fields = [key for key in payload if key != "run_metadata"]
     if (
@@ -76,8 +68,6 @@ def overflow_response(
         }
         if fits(candidate):
             return candidate
-        else:
-            pass
         reference = {
             key: value
             for key, value in reference.items()
@@ -96,8 +86,6 @@ def overflow_response(
                 reference.pop(key)
             if fits(candidate):
                 return candidate
-            else:
-                pass
         # note (budget): Deferred receipt fields can only come from a receipt object.
         assert isinstance(metadata, dict)
         receipt = dict(metadata)
@@ -110,12 +98,6 @@ def overflow_response(
                 paths.append(f"run_metadata.{key}")
                 if fits(candidate):
                     return candidate
-                else:
-                    pass
-            else:
-                pass
-    else:
-        pass
 
     deferred: list[JsonValue] = [*fields, *deferred_metadata]
     delivery["deferred_fields"] = deferred
@@ -132,24 +114,14 @@ def overflow_response(
                 is_output_within_budget = fits(output)
                 if is_output_within_budget:
                     break
-                else:
-                    pass
-            else:
-                pass
-    else:
-        pass
     if not is_output_within_budget:
         raise ParameterError(
             "回执超过响应预算，请增大 response_char_limit",
             [{"path": "response_char_limit", "code": "response_limit_too_small"}],
         )
-    else:
-        pass
     for key in dict.fromkeys([*INLINE_FIELD_PRIORITY, *fields]):
         if key not in fields:
             continue
-        else:
-            pass
         paths = [name for name in deferred if name != key]
         candidate = {
             **output,
@@ -158,8 +130,6 @@ def overflow_response(
         }
         if fits(candidate):
             output, deferred = candidate, paths
-        else:
-            pass
 
     projected_roots = {
         path.partition(".")[0] for path in selected_fields or () if "." in path
@@ -169,8 +139,6 @@ def overflow_response(
         value = payload[key]
         if key in output or not isinstance(value, dict):
             continue
-        else:
-            pass
         nested = value.get("first_view")
         if len(value) == 1 and isinstance(nested, dict):
             view, prefix = nested, f"{key}.first_view"
@@ -193,6 +161,4 @@ def overflow_response(
             }
             if fits(candidate):
                 selected, output, deferred = trial, candidate, paths
-            else:
-                pass
     return output

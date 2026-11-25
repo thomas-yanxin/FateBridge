@@ -28,8 +28,6 @@ def childhood_limit(chart: dict[str, Any], age: int) -> dict[str, Any]:
     """
     if age < 1:
         raise ValueError("童限需要正整数岁序")
-    else:
-        pass
     source = _source()
     row = next((r for r in source["ordinal_rows"] if r["age"] == age), None)
     palace = (

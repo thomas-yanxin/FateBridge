@@ -144,5 +144,3 @@ def augment_weather_cast_variants(
             + "各候选分列，不合并为单一预报。以下为本次所选候选的解读。"
             + result["comprehensive_judgement"]
         )
-    else:
-        pass

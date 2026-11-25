@@ -63,8 +63,6 @@ def native_meridian_houses(
     swe = runtime.swe
     if swe is None:
         raise ValueError("Native meridian houses require Swiss Ephemeris")
-    else:
-        pass
     point = TTInstant.from_value(julian_day_tt)
     shared_tt = point.as_float()
     if len(physical_angles) < 3 or not all(
@@ -81,14 +79,10 @@ def native_meridian_houses(
         )
     ):
         raise ValueError("Meridian houses require finite angle inputs")
-    else:
-        pass
     flags = swe.FLG_SIDEREAL if sidereal else 0
     with runtime.preserve_ephemeris_path():
         if sidereal:
             swe.set_sid_mode(swe.SIDM_LAHIRI, 0.0, 0.0)
-        else:
-            pass
         cusps, angles = runtime.ephemeris_call(
             "houses_ex",
             julian_day_ut1,
@@ -107,18 +101,12 @@ def native_meridian_houses(
             )
             if ayanflag < 0 or not math.isfinite(offset):
                 raise ValueError("Native meridian houses have no valid Lahiri offset")
-            else:
-                pass
-        else:
-            pass
     if (
         len(cusps) != 12
         or len(angles) < 3
         or not all(math.isfinite(value) for value in (*cusps, angles[2]))
     ):
         raise ValueError("Native meridian houses require twelve finite cusps")
-    else:
-        pass
     rows = [
         {
             "house": index,
@@ -209,8 +197,6 @@ def attach_meridian_sensitivity(
         samples = sensitivity["samples"]
         if not samples or len(samples) != sensitivity["sample_count"]:
             raise ValueError("Every confirmed birth-time sample needs meridian cusps")
-        else:
-            pass
         spans = []
         for index, cusp in enumerate(meridian["cusps"]):
             nominal = Fraction(cusp["longitude"])
@@ -239,12 +225,8 @@ def attach_meridian_sensitivity(
                 else {}
             ),
         )
-    else:
-        pass
     meridian["birth_time_sensitivity"] = result
     if sensitivity["status"] == "sampled":
         result["factor_placement_summary"] = placement_sample_summaries(
             meridian, sensitivity
         )
-    else:
-        pass

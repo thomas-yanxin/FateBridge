@@ -36,18 +36,12 @@ def evaluate(predicate: Any, atoms: dict[str, bool | None]) -> bool | None:
     """Kleene all/any: unknown strength must not become false or true by default."""
     if isinstance(predicate, str):
         return atoms[predicate]
-    else:
-        pass
     operator, *arguments = predicate
     values = [evaluate(argument, atoms) for argument in arguments]
     if operator == "all":
         return False if False in values else (None if None in values else True)
-    else:
-        pass
     if operator == "any":
         return True if True in values else (None if None in values else False)
-    else:
-        pass
     raise ValueError(f"Unknown role predicate operator: {operator}")
 
 
@@ -91,13 +85,9 @@ def build_role_effects(
                 ],
                 "scope": "保留第53页五字异文；三墓机制按同版明确定义，不凭五字增造机制",
             }
-        else:
-            pass
     if selected is None:
         result["status"] = "requires_selected_focus"
         return result
-    else:
-        pass
     if selected["location"] in ("month", "day", "changed"):
         result["status"] = (
             "changed_focus_calendar_only"
@@ -105,8 +95,6 @@ def build_role_effects(
             else "calendar_focus_not_subject_to_line_control"
         )
         return result
-    else:
-        pass
     result["status"] = "condition_evidence_only"
     roles = {r["position"]: r["role"] for r in focus["roles"]}
     active = {
@@ -141,8 +129,6 @@ def build_role_effects(
         role = roles.get(row["position"])
         if role not in ("元神", "忌神"):
             continue
-        else:
-            pass
         position, element = row["position"], row["element"]
         assessed = assessment["lines"][position - 1]
         growth = growth_conditions["lines"][position - 1] if growth_conditions else None
@@ -205,8 +191,6 @@ def build_role_effects(
                     control_status=scoped["status"],
                     control_source_path=scoped["fact_path"],
                 )
-            else:
-                pass
         controls = (
             True
             if any(
@@ -304,8 +288,6 @@ def build_role_effects(
         if progress:
             atom = "advance" if progress["structural_pair"] == "进神" else "retreat"
             adjusted_atoms[atom] = progress["condition_now"]
-        else:
-            pass
         conditional_atoms = dict(adjusted_atoms)
         current_month_obstruction = month_opposition_applies(branch, month, day)
         conditional_atoms["void_or_break"] = (
@@ -324,12 +306,8 @@ def build_role_effects(
                 if True in calendar_values
                 else None if None in calendar_values else False
             )
-        else:
-            pass
         if growth:
             conditional_atoms["day_growth_peak"] = growth["condition_match"]
-        else:
-            pass
         cessation = (
             cessation_conditions["lines"][position - 1]
             if cessation_conditions
@@ -347,8 +325,6 @@ def build_role_effects(
             conditional_atoms["changed_adverse"] = (
                 True if True in causes else None if changed else False
             )
-        else:
-            pass
         if generation_conditions:
             generation_source = generation_conditions["sources"][position - 1]
             conditional_atoms["back_generate"] = generation_source[
@@ -370,8 +346,6 @@ def build_role_effects(
                     else False
                 )
             )
-        else:
-            pass
         conditional_controls = (
             (
                 True
@@ -423,8 +397,6 @@ def build_role_effects(
         ):
             conditional_atoms["active"] = None
             conditional_atoms["static"] = None
-        else:
-            pass
         conditional_atoms["paired_active"] = co_motion(
             position, "忌神" if role == "元神" else "元神"
         )
@@ -552,8 +524,6 @@ def build_role_effects(
         }
         if pending_obstructions and not blocked:
             chain["status"] = "own_si_qualification_requires_routing_review"
-        else:
-            pass
         result["chains"].append(chain)
         if not blocked and selected["location"] == "visible":
             for edge in edges:
@@ -567,11 +537,5 @@ def build_role_effects(
                         edge["effect_status"] = (
                             "direct_control_requires_yuan_routing_review"
                         )
-                    else:
-                        pass
                     edge.setdefault("routing_chain_ids", []).append(chain_id)
-                else:
-                    pass
-        else:
-            pass
     return result

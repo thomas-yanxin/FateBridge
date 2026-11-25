@@ -22,8 +22,6 @@ def calculate_analysis_age(
 ) -> int:
     if explicit_age is not None:
         return explicit_age
-    else:
-        pass
 
     age = analysis_date.year - birth_datetime.year
     if (analysis_date.month, analysis_date.day) < (
@@ -31,8 +29,6 @@ def calculate_analysis_age(
         birth_datetime.day,
     ):
         age -= 1
-    else:
-        pass
     return age
 
 
@@ -136,8 +132,6 @@ def build_current_timing_state(
             "stem": dayun_analysis["dayun_info"]["stem"],
             "branch": dayun_analysis["dayun_info"]["branch"],
         }
-    else:
-        pass
     combined_timing_pillars["liunian"] = {
         "stem": liunian_analysis["liunian_info"]["stem"],
         "branch": liunian_analysis["liunian_info"]["branch"],
@@ -218,8 +212,6 @@ def enrich_liuyue_timeline(
     for item in liuyue_timeline:
         if "analysis_anchor" not in item:
             continue
-        else:
-            pass
         anchor = datetime.strptime(item["analysis_anchor"], "%Y-%m-%d %H:%M:%S")
         liuyue_effect = TimingEffectsAnalysis.analyze_liuyue_effects(
             birth_context.birth_pillars,
@@ -249,8 +241,6 @@ def enrich_jieqi_timeline(
     for item in jieqi_timeline:
         if "analysis_anchor" not in item:
             continue
-        else:
-            pass
         anchor = datetime.strptime(item["analysis_anchor"], "%Y-%m-%d %H:%M:%S")
         liuyue_pillar = item["liuyue"]
         liuri_pillar = item["liuri"]

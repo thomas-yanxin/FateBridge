@@ -102,8 +102,6 @@ def refine_joint_transitions(
         if value not in ids:
             ids[value] = len(states)
             states.append(value)
-        else:
-            pass
         return ids[value]
 
     seeds = [(jd, state(cache[jd])) for jd in sorted(cache)]
@@ -148,8 +146,6 @@ def refine_joint_transitions(
     ]
     if len(cache) != initial_count + additional:
         raise RuntimeError("联合过渡细查的缓存与实际计算计数不一致")
-    else:
-        pass
     return {
         "summary": refinement_summary(
             initial_count, additional, len(roots), len(states), unresolved

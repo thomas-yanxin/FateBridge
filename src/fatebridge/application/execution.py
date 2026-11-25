@@ -54,8 +54,6 @@ def execute_spec(
         bound_call = BoundServiceCall(*spec.bind(request))
         if spec.optional_snapshot and not render_snapshot:
             bound_call.keyword_arguments["render_snapshot"] = False
-        else:
-            pass
         return bound_call.service(
             *bound_call.positional_arguments, **bound_call.keyword_arguments
         )
@@ -119,11 +117,7 @@ def execute_tool(
                     seed = secrets.randbits(32)
                     request = request.model_copy(update={seed_field: seed})
                     seed_was_generated = True
-                else:
-                    pass
                 replay_overrides[seed_field] = seed
-            else:
-                pass
             result = (
                 execute_spec(spec, request)
                 if render_snapshot
@@ -136,12 +130,8 @@ def execute_tool(
         elapsed_ms = (perf_counter() - started) * 1000
         if result_is_error(result):
             return correlate_error(result, controls)
-        else:
-            pass
         if not include_metadata:
             return public_payload(result)
-        else:
-            pass
         try:
             receipt = replay_metadata.execution_receipt(
                 spec,
@@ -164,13 +154,9 @@ def execute_tool(
             )
             if base_metadata["engine_is_approximate"]:
                 receipt["warnings"].append("approximate_engine")
-            else:
-                pass
             metadata: ServiceResult = {**base_metadata, **receipt}
             if controls.trace_id is not None:
                 metadata["trace_id"] = controls.trace_id
-            else:
-                pass
             RunMetadata.model_validate(metadata)
             result = {**result, "run_metadata": metadata}
         except DomainSourceError as exc:
@@ -201,27 +187,17 @@ def validate_output(
             raise OutputContractError("工具错误输出不符合公开契约") from exc
         if error_envelope.error is None or not error_envelope.error_code.strip():
             raise OutputContractError("工具错误输出缺少错误事实")
-        else:
-            pass
         return
-    else:
-        pass
     if any(
         field not in result or result[field] is None or result[field] == {}
         for field in spec.required_output_fields
     ):
         raise OutputContractError("完整工具输出缺少必需业务事实或仅有空对象")
-    else:
-        pass
     required_validator = spec.required_output_validator
     if required_validator is not None and request is not None:
         required_validator(spec, result, request)
-    else:
-        pass
     if not strict:
         return
-    else:
-        pass
     validated = None
     if spec.output_model is not None:
         try:
@@ -230,12 +206,8 @@ def validate_output(
             )
         except ValidationError as exc:
             raise OutputContractError("工具输出不符合公开契约") from exc
-    else:
-        pass
     if required_validator is not None and request is None:
         required_validator(spec, result, None)
-    else:
-        pass
     try:
         for validator in spec.output_validators:
             validator(spec, result, request, validated)

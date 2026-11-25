@@ -43,8 +43,6 @@ def cross_harmony_metadata() -> dict[str, Any]:
 def cross_harmony(day_ganzhi: str, sky_by_earth: dict[str, str]) -> dict[str, Any]:
     if not isinstance(day_ganzhi, str) or day_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("交车合条件需要有效占日干支")
-    else:
-        pass
     branches = set(EARTHLY_BRANCHES)
     if (
         not isinstance(sky_by_earth, dict)
@@ -62,8 +60,6 @@ def cross_harmony(day_ganzhi: str, sky_by_earth: dict[str, str]) -> dict[str, An
         != 1
     ):
         raise ValueError("交车合条件需要完整顺布天地盘")
-    else:
-        pass
     house, branch = STEM_HOUSES[day_ganzhi[0]], day_ganzhi[1]
     stem_upper, branch_upper = sky_by_earth[house], sky_by_earth[branch]
     pairs = [

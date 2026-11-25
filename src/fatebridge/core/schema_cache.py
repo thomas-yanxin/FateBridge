@@ -29,8 +29,6 @@ def _revision(model: type[BaseModel]) -> _SchemaRevision:
     # replaces the core schema, so it also invalidates the cached contract.
     if not model.__pydantic_complete__:
         model.model_rebuild()
-    else:
-        pass
     return _SchemaRevision(model.__pydantic_core_schema__)
 
 

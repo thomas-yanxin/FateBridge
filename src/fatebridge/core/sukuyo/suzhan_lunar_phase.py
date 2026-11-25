@@ -33,16 +33,12 @@ DEFINITIONS = [
 def _finite(value: Any) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     try:
         result = float(value)
     except OverflowError as error:
         raise EphemerisSourceError("coordinate_values_unavailable") from error
     if not math.isfinite(result):
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     return result
 
 
@@ -55,8 +51,6 @@ def lunar_phase_reference(raw: dict[str, Any]) -> dict[str, Any]:
     native = runtime.swe
     if native is None:
         raise ModuleNotFoundError("现代月日黄经差需要Swiss Ephemeris坐标来源。")
-    else:
-        pass
     coordinate_mask = 0
     for name in COORDINATE_FLAGS:
         coordinate_mask |= getattr(native, name)
@@ -70,8 +64,6 @@ def lunar_phase_reference(raw: dict[str, Any]) -> dict[str, Any]:
             value = _finite(raw["states"][body]["longitude"])
             if not 0 <= value < 360:
                 raise EphemerisSourceError("coordinate_values_unavailable")
-            else:
-                pass
             receipt = raw["ephemeris_provenance"]["by_body"][body]
             flags = receipt["ecliptic_return_flags"]
             if (
@@ -81,18 +73,12 @@ def lunar_phase_reference(raw: dict[str, Any]) -> dict[str, Any]:
                 or flags & coordinate_mask
             ):
                 raise EphemerisSourceError("coordinate_contract_changed")
-            else:
-                pass
             bits = flags & source_mask
             if bits not in (native.FLG_SWIEPH, native.FLG_MOSEPH, native.FLG_JPLEPH):
                 raise EphemerisSourceError("coordinate_model_changed")
-            else:
-                pass
             model = runtime.ephemeris_model_from_retflag(flags)
             if receipt["ecliptic_model"] != model:
                 raise EphemerisSourceError("coordinate_model_changed")
-            else:
-                pass
             longitudes[body] = value
             sources[body] = {
                 "ecliptic_model": model,

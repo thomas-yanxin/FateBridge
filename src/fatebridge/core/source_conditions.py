@@ -21,8 +21,6 @@ def _published_plan() -> dict[str, Any]:
     ).read_bytes()
     if hashlib.sha256(raw).hexdigest() != PLAN_SHA256:
         raise ValueError("原典条件校读层散列不符")
-    else:
-        pass
     result: dict[str, Any] = json.loads(raw)
     return result
 
@@ -36,8 +34,6 @@ def validate_known_review(value: dict[str, Any]) -> None:
     )
     if row is None:
         raise ValueError("未登记的原典条件校读编号")
-    else:
-        pass
     expected = row["review"]
 
     def known(actual: Any, registered: Any) -> bool:
@@ -45,31 +41,23 @@ def validate_known_review(value: dict[str, Any]) -> None:
             return isinstance(registered, dict) and all(
                 k in registered and known(v, registered[k]) for k, v in actual.items()
             )
-        else:
-            pass
         if isinstance(actual, list):
             return isinstance(registered, list) and (
                 (not registered)
                 if not actual
                 else all(any(known(v, r) for r in registered) for v in actual)
             )
-        else:
-            pass
         return type(actual) is type(registered) and actual == registered
 
     supplied = {k: v for k, v in value.items() if k != "provenance"}
     if not known(supplied, expected):
         raise ValueError("已给原典条件必须忠于同一登记校读，不可拼接或改写")
-    else:
-        pass
     if (
         "pillars" in value
         and len(value["pillars"]) == 4
         and value["pillars"] != expected["pillars"]
     ):
         raise ValueError("完整四柱顺序与同一登记校读不符")
-    else:
-        pass
     provenance = value.get("provenance", {})
     expected_provenance = {
         "method_id": METHOD_ID,
@@ -77,8 +65,6 @@ def validate_known_review(value: dict[str, Any]) -> None:
     }
     if any(expected_provenance.get(k) != v for k, v in provenance.items()):
         raise ValueError("原典条件校读来源回执不符")
-    else:
-        pass
 
 
 def validate_review_record(reference_id: str, review_id: str) -> None:
@@ -87,8 +73,6 @@ def validate_review_record(reference_id: str, review_id: str) -> None:
         for row in _published_plan()["reviews"]
     ):
         raise ValueError("条件校读与当前来源记录编号不符")
-    else:
-        pass
 
 
 def condition_reviews(
@@ -109,8 +93,6 @@ def condition_reviews(
                 or record["pillars"] != review["pillars"]
             ):
                 raise ValueError("原典条件不可拼接其他命式或重复来源")
-            else:
-                pass
             result[identifier] = {
                 **deepcopy(review),
                 "provenance": {

@@ -83,8 +83,6 @@ def point_mass_positions(
             "status": "unavailable",
             "reason": "install_jpl_extra",
         }
-    else:
-        pass
     import erfa  # type: ignore[import-untyped]  # optional C extension has no stubs
 
     flags = (
@@ -102,8 +100,6 @@ def point_mass_positions(
         coordinates, returned = runtime.ephemeris_call("calc", epoch, body, flags)
         if returned & 7 not in (1, 2):
             raise EphemerisSourceError("point_mass_requires_barycentric_file_states")
-        else:
-            pass
         return tuple(coordinates), int(returned)
 
     earth, earth_flags = state(jd_tt, runtime.swe.EARTH)
@@ -126,8 +122,6 @@ def point_mass_positions(
             next_emission = jd_tt - light_time
             if next_emission == emission:
                 break
-            else:
-                pass
             emission = next_emission
         else:
             raise EphemerisSourceError("point_mass_light_time_did_not_stabilize")
@@ -159,8 +153,6 @@ def point_mass_positions(
                     DEFLECTION_LIMITER,
                 )
             ]
-        else:
-            pass
         apparent = erfa.ab(natural, velocity, em, bm1)
         true = matrix @ apparent
         ecliptic_y = math.cos(eps) * float(true[1]) + math.sin(eps) * float(true[2])
@@ -215,8 +207,6 @@ def solve_point_mass_design_root(
     initial = point_mass_positions(birth_tt, bodies=("Sun",))
     if initial["status"] != "computed":
         return initial
-    else:
-        pass
     birth_position: PointMassPositions = initial
 
     def sun(jd_tt: float) -> float:
@@ -231,8 +221,6 @@ def solve_point_mass_design_root(
             samples[jd_tt] = position["longitude"]
             input_flags.update(sample["input_state_return_flags"])
             input_flags.update(position["input_state_return_flags"])
-        else:
-            pass
         return samples[jd_tt]
 
     root = solve_solar_root(birth_tt, sun)

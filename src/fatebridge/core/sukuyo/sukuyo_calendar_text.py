@@ -56,12 +56,8 @@ def month_table_variant(
 ) -> dict[str, Any]:
     if type(month) is not int or not 1 <= month <= 12:
         raise ValueError("原表农历月须为1至12的整数")
-    else:
-        pass
     if type(day) is not int or not 1 <= day <= 30:
         raise ValueError("原表农历日须为1至30的整数")
-    else:
-        pass
     bundle = source_bundle()
     row = bundle["printed_month_table_28"][day - 1]
     literal = row["mansions_by_month"][month - 1]
@@ -89,12 +85,8 @@ def calendar_day_evidence(
 ) -> dict[str, Any]:
     if type(day) is not int or not 1 <= day <= 30:
         raise ValueError("黑白月入月日须为1至30的整数")
-    else:
-        pass
     if host_calendar_label not in {"中国农历", "日本旧历参考"}:
         raise ValueError("未知的日名宿主历法")
-    else:
-        pass
     bundle = source_bundle()
     named = bundle["named_days"][(day - 1) % 15]
     general_days = general_day_evidence(day)
@@ -126,8 +118,6 @@ def calendar_day_evidence(
                     "release_excerpt": witness["release_excerpt"],
                 }
             )
-        else:
-            pass
     literal_variant = any(
         literal_phases[f"{volume}_prose"] != literal_phases[f"{volume}_verse"]
         for volume in ("upper", "lower")

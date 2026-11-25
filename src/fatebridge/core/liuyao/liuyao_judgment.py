@@ -109,22 +109,14 @@ def month_strength(branch: str, month: str) -> dict[str, Any]:
 def binding_cues(line: dict[str, Any], month: str, day: str) -> list[str]:
     if not line["change"]:
         return []
-    else:
-        pass
     old, new = line["branch"], line["changed_branch"]
     cues = []
     if COMBINES[old] == new and day not in (clash(old), clash(new)):
         cues.append("动化合未见日冲开")
-    else:
-        pass
     if COMBINES[old] == day:
         cues.append("动逢日合")
-    else:
-        pass
     if COMBINES[old] == month and day not in (clash(old), clash(month)):
         cues.append("动逢月合未见日冲开")
-    else:
-        pass
     return cues
 
 
@@ -141,16 +133,12 @@ def timing_candidates(
 ) -> dict[str, Any]:
     if type(days) is not int or not 0 <= days <= 60:
         raise ValueError("timing_days 必须是0至60的整数")
-    else:
-        pass
     if not days:
         return {
             "status": "not_requested",
             "windows": [],
             "granularity": "sexagenary_day",
         }
-    else:
-        pass
     if selected and selected["location"] not in ("visible", "changed"):
         return {
             "status": "nonvisible_focus_requires_separate_timing_rules",
@@ -158,21 +146,15 @@ def timing_candidates(
             "granularity": "sexagenary_day",
             "scope": "日月及伏神的取用已明确，但未用可见动静爻的应期表替代出伏或日月专门规则",
         }
-    else:
-        pass
     if selected is None or line is None:
         return {
             "status": "requires_unambiguous_visible_focus",
             "windows": [],
             "granularity": "sexagenary_day",
         }
-    else:
-        pass
     zone = moment.tzinfo
     if zone is None or moment.utcoffset() is None:
         raise ValueError("日级条件窗口需要带时区的起卦时刻")
-    else:
-        pass
     cast_utc = ZonedCalendar.from_datetime(moment).utc
     _, next_month, _, _ = get_bazi_month_boundaries(moment, timezone_name)
     next_month_day = next_month.point.day
@@ -192,8 +174,6 @@ def timing_candidates(
         except PydanticCustomError as error:
             if error.type != "unresolved_timezone_offset":
                 raise
-            else:
-                pass
             intervals = []
             exclusion_status = error.type
         pillar = "".join(
@@ -207,37 +187,25 @@ def timing_candidates(
             matches.append("变爻逢值")
         elif selected["location"] == "visible" and day == branch:
             matches.append("动逢值" if line["change"] else "静逢值")
-        else:
-            pass
         if (
             selected["location"] == "visible"
             and line["change"]
             and day == COMBINES[branch]
         ):
             matches.append("动逢合")
-        else:
-            pass
         if (
             selected["location"] == "visible"
             and not line["change"]
             and day == clash(branch)
         ):
             matches.append("静逢冲")
-        else:
-            pass
         if original_void and day in (branch, clash(branch)):
             matches.append("旬空填实" if day == branch else "旬空逢冲")
-        else:
-            pass
         if original_void and not left_original_xun and pillar[0] == "甲" and index > 0:
             matches.append("离开起卦日所在旬")
             left_original_xun = True
-        else:
-            pass
         if clash(month) == branch and day == COMBINES[branch]:
             matches.append("原局月破逢合")
-        else:
-            pass
         partners = (
             [COMBINES[branch]]
             if COMBINES[branch]
@@ -246,15 +214,11 @@ def timing_candidates(
         )
         if partners and day in (clash(branch), clash(partners[0])):
             matches.append("原局六合逢冲开候选")
-        else:
-            pass
         if selected["location"] == "visible" and any(
             day == clash(t["branch"]) and t["status"] != "not_true_tomb_broken"
             for t in (tombs or [])
         ):
             matches.append("三墓关系逢冲开候选")
-        else:
-            pass
         if not intervals:
             calendar_exclusions.append(
                 dict(
@@ -267,18 +231,12 @@ def timing_candidates(
                     method=METHOD_ID,
                 )
             )
-        else:
-            pass
         if not matches:
             continue
-        else:
-            pass
         for interval_index, (low, high) in enumerate(intervals, start=1):
             clipped = max(low, cast_utc)
             if clipped >= high:
                 continue
-            else:
-                pass
             start = ZonedCalendar(clipped, zone)
             end = ZonedCalendar(high, zone)
             end_is_unspecified = is_unspecified_local_time(end.rule_sample())
@@ -314,8 +272,6 @@ def timing_candidates(
                     "timezone": getattr(zone, "key", str(zone)),
                     "scope": "沿用当地钟面23点换日的既有规则，保留其全部实际UTC分段。effective_date是日柱标签，不证明该民用日期存在；真实时长不必为24小时，不把分段间隙补成连续窗口。",
                 }
-            else:
-                pass
             windows.append((clipped, window))
     # A rollback across 23:00 can interleave two effective-day labels. Sort by
     # actual instants rather than the civil label or the repeated wall clock.
@@ -330,8 +286,6 @@ def timing_candidates(
     }
     if calendar_exclusions:
         result["calendar_exclusions"] = calendar_exclusions
-    else:
-        pass
     return result
 
 
@@ -353,8 +307,6 @@ def build_conditional_analysis(
 
     if event_horizon not in (None, "near", "long_term"):
         raise ValueError("event_horizon 必须是 near、long_term 或省略。")
-    else:
-        pass
     day = day_ganzhi[1]
     monthly = {r["position"]: month_strength(r["branch"], month) for r in lines}
     binds = {r["position"]: binding_cues(r, month, day) for r in lines}
@@ -381,8 +333,6 @@ def build_conditional_analysis(
                 if context["condition_match"] is True
                 else ["本位金化巳的长生或回头克资格待审"]
             )
-        else:
-            pass
     rows, edges = [], []
     all_static = not any(line["change"] for line in lines)
     for line in lines:
@@ -432,21 +382,13 @@ def build_conditional_analysis(
         cautions = []
         if element == "金" and day == "巳":
             cautions.append("金生于巳与巳火克金并见；须判旺相生扶，不能见长生即作得生")
-        else:
-            pass
         if element == "土" and day == "巳":
             cautions.append("土绝于巳与巳火生土并见；旺相有扶论生不论绝，不直接判真绝")
-        else:
-            pass
         if element == "金" and day == "丑":
             cautions.append("金墓于丑亦遇土生；须审动土生扶或冲开，不直接判入墓无用")
-        else:
-            pass
         row["stage_cautions"] = cautions
         if own_contexts[position] is not None:
             row[OWN_SI_KEY] = own_contexts[position]
-        else:
-            pass
         if line["change"]:
             new = line["changed_branch"]
             row["changed_stage"] = STAGES[element].get(new)
@@ -458,8 +400,6 @@ def build_conditional_analysis(
             if pair:
                 # Resolve after the same-run strength assessment is built.
                 row["progress_conditions"] = {"structural_pair": pair}
-            else:
-                pass
             edges.append(
                 {
                     "source_kind": "changed",
@@ -471,8 +411,6 @@ def build_conditional_analysis(
                     "source_url": SOURCES["15"],
                 }
             )
-        else:
-            pass
         rows.append(row)
     focus = resolve_focus(
         focus_line=focus_line,
@@ -549,8 +487,6 @@ def build_conditional_analysis(
                     else ["本位金化巳的长生或回头克资格待审"]
                 )
                 condition["outgoing_obstructions"] = outgoing[p]
-            else:
-                pass
             context = moving_support_context(
                 element=line["element"],
                 subject_position=p,
@@ -562,8 +498,6 @@ def build_conditional_analysis(
             )
             if context is not None:
                 condition[METAL_KEY] = context
-            else:
-                pass
         after_metal = tuple(moving_growth_qualified(c) for c in rows)
         after_own_si = tuple(
             c.get(OWN_SI_KEY, {}).get("condition_match", False) for c in rows
@@ -580,8 +514,6 @@ def build_conditional_analysis(
             and before_own_si == after_own_si
         ):
             break
-        else:
-            pass
         unresolved_activity |= newly_pending
     else:
         raise RuntimeError("日冲活动、三支及金巳长生条件未能在六爻有限闭包内稳定")
@@ -599,8 +531,6 @@ def build_conditional_analysis(
                 and element_relation(other["element"], line["element"])
                 in ("生爻", "比和")
             ]
-        else:
-            pass
     for edge in edges:
         if edge["source_kind"] == "changed":
             context = rows[edge["source_position"] - 1].get(OWN_SI_KEY)
@@ -616,10 +546,6 @@ def build_conditional_analysis(
                     ],
                     own_si_growth_source_path=context["source_path"],
                 )
-            else:
-                pass
-        else:
-            pass
     generation_conditions = assessment.pop("generation_conditions")
     generation_pairs = {
         (g["source_position"], g["target_position"]): g
@@ -633,13 +559,9 @@ def build_conditional_analysis(
         for target in lines:
             if origin["position"] == target["position"]:
                 continue
-            else:
-                pass
             relation = element_relation(origin["element"], target["element"])
             if relation not in ("生爻", "克爻"):
                 continue
-            else:
-                pass
             active = activity_candidate(origin, rows[origin["position"] - 1])
             static_condition = (
                 all_static
@@ -654,12 +576,8 @@ def build_conditional_analysis(
             if control is not None:
                 if not control["emit_edge"]:
                     continue
-                else:
-                    pass
             elif not active and not static_condition:
                 continue
-            else:
-                pass
             edges.append(
                 {
                     "source_kind": "base",
@@ -744,8 +662,6 @@ def build_conditional_analysis(
                     generation_status=generation["status"],
                     target_reception_status=generation["target_status"],
                 )
-            else:
-                pass
     clash_conditions = build_clash_conditions(
         lines=lines,
         conditions=rows,
@@ -799,8 +715,6 @@ def build_conditional_analysis(
                 stages=STAGES,
                 event_horizon=event_horizon,
             )
-        else:
-            pass
     cessation_conditions = build_cessation_conditions(
         lines=lines,
         assessment=assessment,
@@ -858,8 +772,6 @@ def build_conditional_analysis(
         text = penalty_explanation(context)
         if text is not None:
             row["stage_cautions"].append(text)
-        else:
-            pass
     moving_si_applicable = any(MOVING_SI_KEY in row for row in rows)
     for row in rows:
         row.pop(INTERNAL_KEY)

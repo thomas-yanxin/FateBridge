@@ -54,8 +54,6 @@ def _inspect_runtime(
             record_identity = id(current)
             if record_identity in seen_dictionary_ids:
                 continue
-            else:
-                pass
             seen_dictionary_ids.add(record_identity)
 
             if engine is None:
@@ -70,22 +68,12 @@ def _inspect_runtime(
                             if isinstance(engine_backend, str) and engine_backend:
                                 engine = engine_backend
                                 break
-                            else:
-                                pass
                             engine_precision = profile.get("engine_precision")
                             if isinstance(engine_precision, str) and engine_precision:
                                 engine = engine_precision
                                 break
-                            else:
-                                pass
-                        else:
-                            pass
                 if engine is not None and not should_check_downgrade:
                     return RuntimeInspection(engine=engine, has_downgraded_model=False)
-                else:
-                    pass
-            else:
-                pass
 
             if should_check_downgrade and not has_downgraded_model:
                 model = current.get("ephemeris_model")
@@ -93,12 +81,8 @@ def _inspect_runtime(
                     isinstance(model, str)
                     and model.lower() in _DOWNGRADED_EPHEMERIS_MODELS
                 ) or (approximate_record is not None and approximate_record(current))
-            else:
-                pass
             if engine is not None and has_downgraded_model:
                 return RuntimeInspection(engine=engine, has_downgraded_model=True)
-            else:
-                pass
 
             queue.extend(
                 value
@@ -106,15 +90,11 @@ def _inspect_runtime(
                 if isinstance(value, (dict, list, tuple))
             )
             continue
-        else:
-            pass
 
         if isinstance(current, (list, tuple)):
             queue.extend(
                 value for value in current if isinstance(value, (dict, list, tuple))
             )
-        else:
-            pass
 
     return RuntimeInspection(
         engine=engine or DEFAULT_ENGINE, has_downgraded_model=has_downgraded_model
@@ -140,8 +120,6 @@ def build_run_metadata(
     existing = payload.get("run_metadata")
     if isinstance(existing, dict):
         return existing
-    else:
-        pass
 
     run_id = uuid4().hex
     trace_id = uuid4().hex
@@ -165,8 +143,6 @@ def attach_run_metadata(
 ) -> ServiceResult:
     if isinstance(payload.get("run_metadata"), dict):
         return payload
-    else:
-        pass
     return {
         **payload,
         "run_metadata": build_run_metadata(

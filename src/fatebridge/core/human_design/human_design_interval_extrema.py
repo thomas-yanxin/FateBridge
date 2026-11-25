@@ -26,8 +26,6 @@ def zero_speed_components(
         if speeds[i] != 0:
             i += 1
             continue
-        else:
-            pass
         start = i
         while i + 1 < len(grid) and speeds[i + 1] == 0:
             i += 1
@@ -79,8 +77,6 @@ def probe_station_coordinates(
             if tt not in cache:
                 if added >= MAX_ADDITIONAL_EVALUATIONS:
                     raise BudgetExhausted
-                else:
-                    pass
                 chart = at(tt)
                 added += 1
             else:
@@ -119,8 +115,6 @@ def probe_station_coordinates(
                         if nextafter(lo, hi) >= hi:
                             status = "adjacent_float_or_quantized_bracket"
                             break
-                        else:
-                            pass
                         fx, fy = objective(xr), objective(yr)
                         if fx < fy:
                             hi, y, yr = y, x, xr
@@ -128,8 +122,6 @@ def probe_station_coordinates(
                             if not lo < x < y:
                                 status = "adjacent_float_or_quantized_bracket"
                                 break
-                            else:
-                                pass
                             xr = row(x)
                         elif fy < fx:
                             lo, x, xr = x, y, yr
@@ -137,8 +129,6 @@ def probe_station_coordinates(
                             if not x < y < hi:
                                 status = "adjacent_float_or_quantized_bracket"
                                 break
-                            else:
-                                pass
                             yr = row(y)
                         else:
                             lo, hi = x, y
@@ -147,14 +137,10 @@ def probe_station_coordinates(
                             if not lo < x < y < hi:
                                 status = "adjacent_float_or_quantized_bracket"
                                 break
-                            else:
-                                pass
                             xr = row(x)
                             yr = row(y)
             except BudgetExhausted:
                 status = "evaluation_budget_exhausted"
-        else:
-            pass
         selected = min(observations.values(), key=lambda r: (objective(r), r[0]))
         selected_chart = cache[selected[0]]
         gain = objective(baseline) - objective(selected)

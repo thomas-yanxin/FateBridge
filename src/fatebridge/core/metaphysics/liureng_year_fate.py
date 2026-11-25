@@ -22,8 +22,6 @@ def natal_year_ganzhi(birth_lunar_year: int) -> str:
     """Use the declared civil-lunar birth year, not the birth pillar year."""
     if type(birth_lunar_year) is not int:
         raise ValueError("本命需要有效的出生农历年")
-    else:
-        pass
     return sexagenary_text(birth_lunar_year - 4)
 
 
@@ -38,8 +36,6 @@ def build_year_fate(
     """Never invert earth/heaven lookup or reuse 年命 stems as 旬遁 stems."""
     if day_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("年命上神需要有效的占日干支")
-    else:
-        pass
     rows = board["twelve_board"]
     if (
         len(rows) != 12
@@ -47,8 +43,6 @@ def build_year_fate(
         or {row["sky_branch"] for row in rows} != set(EARTHLY_BRANCHES)
     ):
         raise ValueError("年命上神需要完整且不重复的天地盘")
-    else:
-        pass
     by_earth = {row["earth_branch"]: row for row in rows}
     dun = xun_dun_stems(day_ganzhi)
     day_element = stem_element_text(day_ganzhi[0])
@@ -68,12 +62,8 @@ def build_year_fate(
                 "earth_xun_kong": None,
                 "reason": runyear_reason or "行年未计算",
             }
-        else:
-            pass
         if subject not in SEXAGENARY_INDEX:
             raise ValueError("年命落盘需要有效干支")
-        else:
-            pass
         earth = subject[1]
         row = by_earth[earth]
         sky = row["sky_branch"]
@@ -126,18 +116,12 @@ def build_liureng_runyear(
     target_lunar = get_lunar_context(target_civil, timezone_name=age_zone)
     if target_lunar is None:
         raise ValueError("行年需要分析日期的农历年")
-    else:
-        pass
     target_lunar_year = target_lunar["year"]
     if not isinstance(target_lunar_year, int):
         raise ValueError("行年需要有效的农历年")
-    else:
-        pass
     age = target_lunar_year - birth_lunar_year + 1
     if birth_lunar_year not in (birth_year - 1, birth_year) or age < 1:
         raise ValueError("行年分析日期不能早于出生年")
-    else:
-        pass
     normalized_gender = normalize_gender(gender)
     basis = {
         "age": age,
@@ -164,8 +148,6 @@ def build_liureng_runyear(
             "status": "not_calculated",
             "reason": "未提供男女行年分支，不默认套用男式",
         }
-    else:
-        pass
     if normalized_gender == "女":
         start_index = sexagenary_index_for("壬申")
         direction = -1

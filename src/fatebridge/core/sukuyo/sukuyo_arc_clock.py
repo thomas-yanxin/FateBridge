@@ -16,6 +16,4 @@ def arc_clock_reference() -> dict[str, Any]:
     loaded = load_source(SOURCE)
     if loaded.sha256 != SOURCE_SHA256:
         raise ValueError("ARC所选计时页来源改变，须重新核验")
-    else:
-        pass
     return {**loaded.data, "source_bundle_sha256": loaded.sha256}

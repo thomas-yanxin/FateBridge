@@ -57,8 +57,6 @@ def _catalogue() -> Mapping[str, PublishedTermDate]:
     )
     if hashlib.sha256(catalogue_bytes).hexdigest() != CATALOGUE_SHA:
         raise RuntimeError("香港天文台节气日期资料散列不符")
-    else:
-        pass
     terms = json.loads(catalogue_bytes)["terms"]
     expected_term_ids = {
         f"{year}:{term}"
@@ -67,8 +65,6 @@ def _catalogue() -> Mapping[str, PublishedTermDate]:
     }
     if set(terms) != expected_term_ids:
         raise RuntimeError("香港天文台节气日期资料分母不完整")
-    else:
-        pass
     return MappingProxyType(
         {
             term_id: PublishedTermDate(
@@ -88,8 +84,6 @@ def published_date_reference(
         isinstance(moment, datetime) and moment.utcoffset() is None
     ):
         raise ValueError("官方节气日期对照需要有效节气名与有时区的交气瞬间")
-    else:
-        pass
     calendar = (
         moment
         if isinstance(moment, ZonedCalendar)

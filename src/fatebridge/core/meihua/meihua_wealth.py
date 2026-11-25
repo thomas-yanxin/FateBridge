@@ -24,8 +24,6 @@ def _profile() -> dict[str, Any]:
         or profile["version"] != "1.0.0"
     ):
         raise ValueError("Unknown selected wealth component profile")
-    else:
-        pass
     return profile
 
 
@@ -44,8 +42,6 @@ def build_wealth_components(
     """Expose literal named relations; do not decide how 及 combines them."""
     if [row["role"] for row in stages] != list(ROLES):
         raise ValueError("Wealth components require all four actual stage roles")
-    else:
-        pass
     profile = _profile()
     qualifications = {q["role"]: q for q in countercontrol["qualifications"]}
     strengths = {
@@ -118,8 +114,6 @@ def build_wealth_components(
     summary = "所选《求財占》补充句另核实际内卦关系：" + "".join(parts)
     if both:
         summary += "原文有财相关成分与破财相关成分同时出现，须并列保留。"
-    else:
-        pass
     summary += (
         "这些是原文所列关系成分，不替换初始体用条款；"
         "及的组合含义及旺衰、制约尚未综合，未据此断实际财增减或日期。"

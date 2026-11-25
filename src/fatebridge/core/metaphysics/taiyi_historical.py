@@ -92,18 +92,12 @@ def julian_to_proleptic_gregorian(year: int, month: int, day: int) -> date:
         or not 1 <= day <= 31
     ):
         raise ValueError("须明确给出有效的正整数儒略历年月日")
-    else:
-        pass
     if swe is None:
         raise ValueError("儒略历转换需要 Swiss Ephemeris 的日历算术接口")
-    else:
-        pass
     julian_day_at_noon = swe.julday(year, month, day, 12.0, swe.JUL_CAL)
     # note (date validation): Swiss Ephemeris normalizes overflowing dates such as February 30.
     if swe.revjul(julian_day_at_noon, swe.JUL_CAL)[:3] != (year, month, day):
         raise ValueError("无效儒略历日期，不能自动进位")
-    else:
-        pass
     gregorian_year, gregorian_month, gregorian_day, _ = swe.revjul(
         julian_day_at_noon, swe.GREG_CAL
     )
@@ -151,8 +145,6 @@ def source_date_reference(
     )
     if row is None:
         return None
-    else:
-        pass
     source_hour_branch = row["source_hour_branch"] if row["mode"] == "hour" else None
     return {
         "case_id": row["id"],

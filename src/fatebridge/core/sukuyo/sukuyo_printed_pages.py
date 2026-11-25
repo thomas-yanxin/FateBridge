@@ -18,13 +18,9 @@ def printed_page_reference(parent_sha256: str) -> dict[str, Any]:
     loaded = load_source(SOURCE)
     if loaded.sha256 != CANONICAL_SHA256:
         raise ValueError("所选印页来源已改变，须重新核验")
-    else:
-        pass
     data = loaded.data
     if parent_sha256 != data["parent_witness_data_sha256"]:
         raise ValueError("所选印页与电子校勘层版本不一致")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 

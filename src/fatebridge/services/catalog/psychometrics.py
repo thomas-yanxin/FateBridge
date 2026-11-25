@@ -43,24 +43,14 @@ def _validate_ipip_output(
         items = result.get("items")
         if not isinstance(items, list) or not items:
             raise OutputContractError("IPIP-50 list_items 输出缺少题项列表")
-        else:
-            pass
         return
-    else:
-        pass
     if mode == "score":
         domains = result.get("domains")
         if not isinstance(domains, dict) or len(domains) != 5:
             raise OutputContractError("IPIP-50 score 输出缺少完整五因子结果")
-        else:
-            pass
         if result.get("scale_raw_sum") is None or result.get("scale_mean") is None:
             raise OutputContractError("IPIP-50 score 输出缺少总量表原始分或均分")
-        else:
-            pass
         return
-    else:
-        pass
     raise OutputContractError(f"IPIP-50 输出 mode 非法：{mode}")
 
 

@@ -51,8 +51,6 @@ def _source() -> dict[str, Any]:
             or data["wording_variants"][0]["counterpart_reading"] != "以八卦言之"
         ):
             raise ValueError("卦体原例来源身份不一致。")
-        else:
-            pass
         for key in (
             "version",
             "source_url",
@@ -62,14 +60,10 @@ def _source() -> dict[str, Any]:
         ):
             if not isinstance(data[key], str) or not data[key].strip():
                 raise ValueError("卦体原例来源元数据缺失。")
-            else:
-                pass
         if data["source_pdf_pages"] != [75, 76, 77, 78] or data[
             "calculation_source_pdf_pages"
         ] != [77, 78]:
             raise ValueError("卦体原例原页范围不一致。")
-        else:
-            pass
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_body_structure_source_data") from exc
     data["loaded_sha256"] = sha256(raw).hexdigest()
@@ -96,8 +90,6 @@ def body_structure(chart: dict[str, Any]) -> dict[str, Any]:
             or _name(bits) != original["name"]
         ):
             raise ValueError("卦体结构需要同阶段一致的卦名与六个整数阴阳爻。")
-        else:
-            pass
         literal_case = original["name"] == source["source_case_gua"]
         records = []
         for kind, positions in OPERATORS:

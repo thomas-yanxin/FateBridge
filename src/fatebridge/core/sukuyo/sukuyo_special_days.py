@@ -38,13 +38,9 @@ def scope_for_weekday_basis(scope: str, weekday_basis: str) -> str:
     }
     if weekday_basis not in zones:
         raise ValueError("特殊日须明确已支持的UTC+08或UTC+09民用七曜依据")
-    else:
-        pass
     marker = "现代UTC+08历日"
     if scope.count(marker) != 1:
         raise ValueError("特殊日说明的宿主日界占位已改变，须重新核验")
-    else:
-        pass
     return scope.replace(marker, f"现代{zones[weekday_basis]}历日")
 
 
@@ -57,21 +53,15 @@ def special_day_evidence(
 ) -> dict[str, Any]:
     if type(weekday) is not int or not 0 <= weekday <= 6:
         raise ValueError("七曜索引须为日曜零起的0至6整数")
-    else:
-        pass
     if weekday_basis not in {
         "modern_utc_plus08_civil_midnight",
         "modern_utc_plus09_civil_midnight",
     }:
         raise ValueError("特殊日须明确已支持的UTC+08或UTC+09民用七曜依据")
-    else:
-        pass
     if (mansion is not None and mansion not in MANSIONS) or any(
         name not in MANSIONS for name in candidates
     ):
         raise ValueError("特殊日查表只支持27宿（不含牛）")
-    else:
-        pass
     bundle = source_bundle()
 
     def evaluate(witness: dict[str, Any], name: Optional[str]) -> dict[str, Any]:
@@ -98,8 +88,6 @@ def special_day_evidence(
     for witness in bundle["witnesses"]:
         if witness["id"] == selected["id"]:
             continue
-        else:
-            pass
         result = evaluate(witness, mansion)
         result["disagrees_with_primary"] = (
             result["matched_labels"] != primary["matched_labels"]

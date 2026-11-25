@@ -46,8 +46,6 @@ def _changed(
         result = list(args)
         result[index] = value
         return tuple(result), dict(kwargs)
-    else:
-        pass
     return args, {**kwargs, name: value}
 
 
@@ -71,8 +69,6 @@ def native_rotation_call(
         # Seed it and invert within this single managed runtime call.
         module.houses_armc(*args[:3], args[4], sun_declination)
         return backend(*args, **options)
-    else:
-        pass
     supported = {
         "sidtime",
         "houses",
@@ -82,8 +78,6 @@ def native_rotation_call(
     }
     if operation not in supported:
         return backend(*args, **kwargs)
-    else:
-        pass
     options = dict(kwargs)
     julian_day_tt = options.pop("_julian_day_tt", None)
     return_sun_declination = options.pop("_return_sun_declination", False)
@@ -91,13 +85,9 @@ def native_rotation_call(
     ut1 = _argument(args, kwargs, 0, "tjdut")
     if ut1 is None:
         return backend(*args, **kwargs)
-    else:
-        pass
     jd = ut1.as_float() if isinstance(ut1, UT1Instant) else ut1
     if isinstance(ut1, UT1Instant):
         args, kwargs = _changed(args, kwargs, 0, "tjdut", jd)
-    else:
-        pass
     if operation in {"azalt", "azalt_rev"} and _extension(module, jd):
         attitude = earth_attitude(module, ut1, julian_day_tt=julian_day_tt)
         geopos = _argument(args, kwargs, 2, "geopos")
@@ -151,8 +141,6 @@ def native_rotation_call(
                 updated, options = _changed(
                     updated, options, 3, "azimuth", (azimuth - twist) % 360
                 )
-            else:
-                pass
             ra, dec = backend(*updated, **options)
             longitude, latitude = ra, dec
             matrix = (
@@ -171,19 +159,13 @@ def native_rotation_call(
         result = rotate_spherical(matrix, longitude, latitude)
         if reverse:
             return result
-        else:
-            pass
         updated, options = _changed(
             updated, options, 5, "xin", (*result, coordinates[2])
         )
         horizontal = backend(*updated, **options)
         if attitude.equator.polar_motion is not None:
             return ((horizontal[0] + twist) % 360, *horizontal[1:])
-        else:
-            pass
         return horizontal
-    else:
-        pass
     if operation in {"houses", "houses_ex"} and _extension(module, jd):
         attitude = earth_attitude(module, ut1, julian_day_tt=julian_day_tt)
         latitude = _argument(args, kwargs, 1, "lat")
@@ -207,8 +189,6 @@ def native_rotation_call(
             _, sun_declination = rotate_spherical(
                 attitude.reduction.native_to_target, ra, dec
             )
-        else:
-            pass
         cusp_values, angle_values = module.houses_armc(
             armc,
             latitude,
@@ -221,11 +201,7 @@ def native_rotation_call(
             returned, ayanamsha = module.get_ayanamsa_ex(attitude.equator.jd_tt, flags)
             if returned < 0:
                 raise ValueError("Sidereal house origin is unavailable")
-            else:
-                pass
             origin -= Fraction(ayanamsha)
-        else:
-            pass
         cusps = tuple(
             float((Fraction(value) + origin) % 360) % 360 for value in cusp_values
         )
@@ -238,20 +214,12 @@ def native_rotation_call(
             cusps = tuple(float((start + index * 30) % 360) for index in range(12))
         elif house_code.upper() == b"N":
             cusps = tuple(index * 30.0 for index in range(12))
-        else:
-            pass
         if flags & module.FLG_RADIANS:
             cusps = tuple(map(math.radians, cusps))
             angles = tuple(map(math.radians, angles))
-        else:
-            pass
         if return_sun_declination:
             return cusps, angles, sun_declination
-        else:
-            pass
         return cusps, angles
-    else:
-        pass
     if operation == "sidtime" and _extension(module, jd):
         return (
             physical_equator(
@@ -259,6 +227,4 @@ def native_rotation_call(
             ).greenwich_sidereal_degrees
             / 15
         )
-    else:
-        pass
     return backend(*args, **kwargs)

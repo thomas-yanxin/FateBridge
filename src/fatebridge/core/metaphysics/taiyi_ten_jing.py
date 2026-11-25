@@ -28,8 +28,6 @@ def _held_ring(start: str, held: str) -> tuple[str, ...]:
 def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
     if type(accumulation) is not int or accumulation < 1 or type(yin) is not bool:
         raise ValueError("金钥匙十精须正整数积数及明确阴阳遁")
-    else:
-        pass
     sequences = {
         "emperor": ("天皇", _held_ring("申", "乾艮巽坤"), "武德起，四维重留"),
         "earth": ("地符", _held_ring("戌", "子午卯酉"), "阴主起，四正重留"),
@@ -73,8 +71,6 @@ def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
                 if yang_position == "中"
                 else RING[(RING.index(yang_position) + 8) % 16]
             )
-        else:
-            pass
         records[key] = {
             "label": label,
             "status": "computed" if palace is not None else "not_assessed",
@@ -119,8 +115,6 @@ def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
                 "source": KEY_SOURCE,
             }
         ]
-    else:
-        pass
     records["taiyi_ordinal"] = {
         "label": "太乙数",
         "status": "computed_ordinal_only",
@@ -144,8 +138,6 @@ def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
             }
             for value, scope in (("乾", "图42正文：阴德"), ("艮", "图43课式：三宫"))
         ]
-    else:
-        pass
     return {
         "status": "partial_with_source_disagreements",
         "accumulation": accumulation,
@@ -173,8 +165,6 @@ def attach_ten_jing(board: dict[str, Any]) -> None:
     for record in data["records"].values():
         if record["palace"] is not None:
             marks[record["palace"]].append(record["label"])
-        else:
-            pass
 
 
 def ten_jing_text(data: dict[str, Any]) -> str:
@@ -192,8 +182,6 @@ def ten_jing_text(data: dict[str, Any]) -> str:
                 f"{record['label']}取法依据：{evidence['basis']}；未决：{evidence['unresolved']}；补证来源："
                 + "；".join(f"{k}={v}" for k, v in evidence["sources"].items())
             )
-        else:
-            pass
         for comparison in record.get("source_comparisons", []):
             lines.append(
                 f"{comparison['scope']}作{comparison['source_value']}；本盘规则推算{comparison['rule_derived_value']}，两者并列，未改通则。"

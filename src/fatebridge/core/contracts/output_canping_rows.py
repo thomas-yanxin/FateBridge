@@ -64,8 +64,6 @@ class CanpingRow(CanpingInterval):
             and not exact
         ):
             raise ValueError("实际日期配运行缺少主点比较政策。")
-        else:
-            pass
         if (
             full
             and exact
@@ -82,8 +80,6 @@ class CanpingRow(CanpingInterval):
             )
         ):
             raise ValueError("精确查询缺少实际年份或立春边界。")
-        else:
-            pass
         if self.status == "not_started" and any(
             value is not None
             for value in (
@@ -96,8 +92,6 @@ class CanpingRow(CanpingInterval):
             )
         ):
             raise ValueError("未起运区间不能附活动大运或条文。")
-        else:
-            pass
         start = self.start_point.known_day() if self.start_point is not None else None
         end = self.end_point.known_day() if self.end_point is not None else None
         at = (
@@ -109,16 +103,12 @@ class CanpingRow(CanpingInterval):
             (start is not None and at < start) or (end is not None and at >= end)
         ):
             raise ValueError("查询时刻不在所选数值半开区间。")
-        else:
-            pass
         for boundary, ending in (
             (self.year_start_boundary, False),
             (self.year_end_boundary, True),
         ):
             if boundary is None:
                 continue
-            else:
-                pass
             if (
                 full
                 and exact
@@ -131,24 +121,14 @@ class CanpingRow(CanpingInterval):
                 )
             ):
                 raise ValueError("精确查询缺少实际立春主点。")
-            else:
-                pass
             if self.year is not None and boundary.year is not None:
                 if boundary.year != self.year + int(ending):
                     raise ValueError("所选年与实际立春边界年份不一致。")
-                else:
-                    pass
-            else:
-                pass
             point = boundary.record.civil_point if boundary.record is not None else None
             day = point.known_day() if point is not None else None
             if day is not None and at is not None:
                 if (ending and at >= day) or (not ending and at < day):
                     raise ValueError("查询时刻不在所选立春年内。")
-                else:
-                    pass
-            else:
-                pass
         if self.segments is not None:
             previous_end = start
             for segment in self.segments:
@@ -158,8 +138,6 @@ class CanpingRow(CanpingInterval):
                     and segment.comparison_policy != self.comparison_policy
                 ):
                     raise ValueError("精确年序的分段缺少同一比较政策。")
-                else:
-                    pass
                 if (
                     full
                     and exact
@@ -180,8 +158,6 @@ class CanpingRow(CanpingInterval):
                     )
                 ):
                     raise ValueError("精确年序分段缺少活动状态或实际配运事实。")
-                else:
-                    pass
                 lower = (
                     segment.start_point.known_day()
                     if segment.start_point is not None
@@ -198,22 +174,16 @@ class CanpingRow(CanpingInterval):
                     and lower != previous_end
                 ):
                     raise ValueError("配运年内分段没有连续覆盖父区间。")
-                else:
-                    pass
                 if (lower is not None and start is not None and lower < start) or (
                     upper is not None and end is not None and upper > end
                 ):
                     raise ValueError("配运分段超出父年区间。")
-                else:
-                    pass
                 if (
                     self.year is not None
                     and segment.year is not None
                     and segment.year != self.year
                 ):
                     raise ValueError("配运分段的年份与父年不一致。")
-                else:
-                    pass
                 previous_end = upper
             if (
                 self.segments
@@ -222,26 +192,14 @@ class CanpingRow(CanpingInterval):
                 and previous_end != end
             ):
                 raise ValueError("配运分段末端没有到达父年终点。")
-            else:
-                pass
             if full and self.comparison_policy is not None and not self.segments:
                 raise ValueError("精确年序不能缺少分段。")
-            else:
-                pass
             expected_status = None
             if self.segments:
                 expected_status = (
                     "split" if len(self.segments) > 1 else self.segments[0].status
                 )
-            else:
-                pass
             if self.status is not None and expected_status is not None:
                 if self.status != expected_status:
                     raise ValueError("配运年状态与实际分段不一致。")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         return self

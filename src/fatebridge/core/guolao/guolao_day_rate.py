@@ -34,8 +34,6 @@ def validate_method(method: str) -> None:
         raise ValueError(
             "须明确选择floor_table、day_rate或literal_table具名方法，不按吻合程度自动换法"
         )
-    else:
-        pass
 
 
 def _table() -> tuple[dict[str, Any], str]:
@@ -44,32 +42,20 @@ def _table() -> tuple[dict[str, Any], str]:
     rows = data["rows"]
     if data["profile_id"] != PROFILE or len(rows) != 169:
         raise ValueError("日率具名表须保留全部169限")
-    else:
-        pass
     if [r["limit_index"] for r in rows] != list(range(169)):
         raise ValueError("原刊日率不能重排或去重")
-    else:
-        pass
     for i, row in enumerate(rows):
         if row.get("printed_empty_origin") is not (i == 0):
             raise ValueError("原刊日率空格须仅标在初限，不能删标或将数值格改作空格")
-        else:
-            pass
         if not re.fullmatch(r"\d+\.\d{4}", row["day_rate_days"]):
             raise ValueError("日率须为原刊四位小数，不自行延长精度")
-        else:
-            pass
         if not F() <= F(row["day_rate_days"]) <= F("13.7773"):
             raise ValueError("原刊日率须在转中范围内")
-        else:
-            pass
     anchors = data["collated_cumulative_anchors"]
     if [r["limit_index"] for r in anchors] != [82, 83, 84, 85, 86] or any(
         not re.fullmatch(r"\d+\.\d{8}", r["cumulative_ancient_du"]) for r in anchors
     ):
         raise ValueError("仅登记82至86限五个八位小数积度核读值")
-    else:
-        pass
     if (
         F(data["anomalistic_month_days"]),
         F(data["half_anomalistic_month_days"]),
@@ -78,12 +64,8 @@ def _table() -> tuple[dict[str, Any], str]:
         F(rows[-1]["day_rate_days"]),
     ) != (F("27.5546"), F("13.7773"), F(".082"), F(), F("13.7773")):
         raise ValueError("转终、转中、插值除数和日率端点须保留具名参数")
-    else:
-        pass
     if data["full_angular_table_independently_collated"]:
         raise ValueError("本方法只重建整数积度，不能冒称已全表校勘")
-    else:
-        pass
     return data, hashlib.sha256(raw).hexdigest()
 
 
@@ -97,8 +79,6 @@ def _integer_angle(index: int, data: dict[str, Any]) -> F:
                 if r["limit_index"] == index
             )
         )
-    else:
-        pass
     argument = min(index, 168 - index)
     return F(argument * (11110000 - argument * (28100 + 325 * argument)), 100000000)
 
@@ -107,8 +87,6 @@ def gujin45_day_rate(anomaly_days: F) -> dict[str, Any]:
     """Use literal adjacent bounds; conflicting reversed spans stay unresolved."""
     if not isinstance(anomaly_days, F):
         raise TypeError("入转须为Fraction原历日数")
-    else:
-        pass
     data, digest = _table()
     phase = anomaly_days % F(data["anomalistic_month_days"])
     half = F(data["half_anomalistic_month_days"])
@@ -190,10 +168,6 @@ def gujin_day_rate_lunar(anomaly_days: F) -> dict[str, Any]:
                 - F(lookup["selected_effective_day_rate_days"])
             ) / F(data["interpolation_divisor_days"])
             angle += slope * fraction
-        else:
-            pass
-    else:
-        pass
     signed = -angle if angle is not None and lookup["phase"] == "疾" else angle
     return {
         **lookup,
@@ -275,8 +249,6 @@ def gujin_day_rate_conjunction(zhongji_days: F, lunation_index: int) -> dict[str
             )
             / F(value)
         )
-    else:
-        pass
     offset = F(old["mean_conjunction_offset_from_winter_days_exact"])
     mean_total = zhongji_days + F("55.06") + offset
     total = mean_total + correction if correction is not None else None
@@ -340,8 +312,6 @@ def audit_day_rate_table() -> dict[str, Any]:
                     "diagnostic_used_to_replace_source": False,
                 }
             )
-        else:
-            pass
         if 0 < i < 168:
             before = _integer_angle(i - 1, data)
             slope = _integer_angle(i, data) - before
@@ -355,8 +325,6 @@ def audit_day_rate_table() -> dict[str, Any]:
                     "preceding_day_rate_interval_increasing": rates[i - 1] < rate,
                 }
             )
-        else:
-            pass
     return {
         "model_id": "gujin_literal_day_rate_table_audit_v2",
         "profile_id": PROFILE,

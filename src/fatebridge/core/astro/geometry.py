@@ -32,12 +32,8 @@ def angle_fraction(value: Angle) -> Fraction:
     """
     if isinstance(value, Fraction):
         return value
-    else:
-        pass
     if not math.isfinite(value):
         raise ValueError("Angle must be finite")
-    else:
-        pass
     return Fraction(value)
 
 
@@ -53,16 +49,12 @@ def longitude_float(value: Fraction) -> float:
     result = float(reduced)
     if result // 30 != reduced // 30:
         result = math.nextafter(result, -math.inf)
-    else:
-        pass
     return result
 
 
 def normalize_angle(angle: float) -> float:
     if not math.isfinite(angle):
         raise ValueError("Angle must be finite")
-    else:
-        pass
     wrapped = angle % 360.0
     # A tiny negative double can round its modulo to 360.0. Keep the
     # representable result on the original side of the half-open boundary.
@@ -108,12 +100,8 @@ def is_prograde_house_partition(house_cusps: list[float]) -> bool:
     """
     if len(house_cusps) != 12:
         raise ValueError("House placement requires twelve labelled cusps")
-    else:
-        pass
     if not all(math.isfinite(cusp) for cusp in house_cusps):
         raise ValueError("Angle must be finite")
-    else:
-        pass
     cusps = [Fraction(cusp) % 360 for cusp in house_cusps]
     return (
         len(set(cusps)) == 12
@@ -129,37 +117,25 @@ def _house_for_longitude(
 ) -> int:
     if not math.isfinite(longitude) or not math.isfinite(ascendant):
         raise ValueError("Angle must be finite")
-    else:
-        pass
     if house_cusps:
         if not is_prograde_house_partition(house_cusps):
             raise ValueError(
                 "宫头不构成单圈顺行黄经区间，须使用声明的原生宫位投影，不能展开多圈或默认第十二宫"
             )
-        else:
-            pass
         continuous_cusps = [Fraction(cusp) % 360 for cusp in house_cusps]
         for index in range(1, 12):
             if continuous_cusps[index] <= continuous_cusps[index - 1]:
                 continuous_cusps[index] += 360
-            else:
-                pass
         # Adding 360 to nextafter(60, -inf) can round it onto 420 and
         # promote house 12 to house 1. Compare the input doubles exactly.
         continuous_longitude = Fraction(longitude) % 360
         if continuous_longitude < continuous_cusps[0]:
             continuous_longitude += 360
-        else:
-            pass
         return bisect_right(continuous_cusps, continuous_longitude)
-    else:
-        pass
     if house_system == "whole_sign":
         asc_sign_index = int((Fraction(ascendant) % 360) // 30)
         sign_index = int((Fraction(longitude) % 360) // 30)
         return ((sign_index - asc_sign_index) % 12) + 1
-    else:
-        pass
     return int(((Fraction(longitude) - Fraction(ascendant)) % 360) // 30) + 1
 
 
@@ -178,27 +154,17 @@ def native_lahiri_ayanamsha(
     """Native apparent Lahiri offset; explicit TT is independent of UT1."""
     if julian_day_ut1 is not None and not math.isfinite(julian_day_ut1):
         raise ValueError("Finite UT1 Julian day required")
-    else:
-        pass
     if julian_day_tt is None and julian_day_ut1 is None:
         raise ValueError("A TT or UT1 Julian day is required")
-    else:
-        pass
     if runtime.swe is None:
         raise ModuleNotFoundError(
             "Swiss Ephemeris is required for native Lahiri coordinates"
         )
-    else:
-        pass
     selected = active_ut1.get()
     if julian_day_tt is None and selected is not None and julian_day_ut1 is not None:
         julian_day_tt = selected.tt_from_ut1(julian_day_ut1)
-    else:
-        pass
     if julian_day_tt is not None:
         julian_day_tt = TTInstant.from_value(julian_day_tt).as_float()
-    else:
-        pass
     try:
         with runtime.preserve_ephemeris_path():
             runtime.swe.set_sid_mode(runtime.swe.SIDM_LAHIRI, 0, 0)
@@ -213,8 +179,6 @@ def native_lahiri_ayanamsha(
             )
         if flags < 0 or not math.isfinite(value):
             raise RuntimeError("Native Lahiri ayanamsha unavailable")
-        else:
-            pass
         return float(value)
     except EphemerisSourceError:
         raise
@@ -305,8 +269,6 @@ def _angles(
     )
     if east_orientation < 0:
         ascendant = combine_longitudes(ascendant, 180.0)
-    else:
-        pass
     midheaven = math.degrees(
         math.atan2(
             _sin_deg(armc),
@@ -323,6 +285,4 @@ def _angles(
     )
     if definition is not None:
         result["angle_definition"] = definition
-    else:
-        pass
     return result

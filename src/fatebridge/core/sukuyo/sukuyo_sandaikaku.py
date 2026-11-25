@@ -19,8 +19,6 @@ def validate_bundle(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("京大三代格所选文书、被引日期及未载干支的绑定已改变")
-    else:
-        pass
 
 
 def month_reference(year: int, month: int, leap: bool) -> dict[str, Any] | None:
@@ -32,12 +30,8 @@ def month_reference(year: int, month: int, leap: bool) -> dict[str, Any] | None:
         or type(leap) is not bool
     ):
         raise ValueError("三代格文书须使用明确年月与闰月布尔键")
-    else:
-        pass
     if (year, month, leap) not in ((766, 2, False), (822, 3, False)):
         return None
-    else:
-        pass
     source = load_source(SOURCE)
     data = source.data
     validate_bundle(data)
@@ -66,8 +60,6 @@ def reference_lines(result: dict[str, Any] | None) -> list[str]:
             "不继承766年二月旧敕或822年三月文书的引文日期、数量或未载干支作为本月结论。"
             "已有NAOJ历日、研究选行和配宿仍按实际返回交付，未绑定不等于否定其他史料。"
         ]
-    else:
-        pass
     role = result["selected_month_binding_role"]
     return [
         "京大菊亭文库《类聚三代格》RB00028238卷第08的实际frame320—321所选影像，"

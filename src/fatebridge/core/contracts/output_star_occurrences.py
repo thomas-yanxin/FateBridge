@@ -21,8 +21,6 @@ class StarOccurrenceCount(PartialOutput):
             and self.total_count != self.visible_count + self.hidden_count
         ):
             raise ValueError("星位实数总量必须等于透干与藏干项数之和")
-        else:
-            pass
         return self
 
 

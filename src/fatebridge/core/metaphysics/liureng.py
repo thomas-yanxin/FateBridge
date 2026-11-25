@@ -106,8 +106,6 @@ def build_liureng_board(
         and month_general_override not in YUE_JIANG_NAMES
     ):
         raise ValueError("month_general_override 必须是十二地支之一")
-    else:
-        pass
     yuejiang_branch = month_general_override or _liureng_month_general_for_term(
         current_term_name,
     )
@@ -247,8 +245,6 @@ def build_liureng_board(
                 "basis": style_detail_basis,
             }
         )
-    else:
-        pass
 
     return {
         "month_general": {

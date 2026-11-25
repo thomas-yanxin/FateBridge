@@ -24,19 +24,13 @@ METHOD_ID = "nlc3150_printed_month_day_span_v1"
 def _integer(value: int, name: str, minimum: int, maximum: int | None = None) -> None:
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name}须为明确整数")
-    else:
-        pass
     if value < minimum or (maximum is not None and value > maximum):
         raise ValueError(f"{name}超出名义原尺范围")
-    else:
-        pass
 
 
 def _fraction(value: Fraction, name: str) -> None:
     if not isinstance(value, Fraction):
         raise TypeError(f"{name}须为Fraction，不接受隐式浮点或单位")
-    else:
-        pass
 
 
 @dataclass(frozen=True)
@@ -55,8 +49,6 @@ class NominalSourceDate:
         _fraction(self.fraction_of_day, "原尺日内分数")
         if not 0 <= self.fraction_of_day < 1:
             raise ValueError("日内分数须在[0,1)；不自动进位")
-        else:
-            pass
 
     @property
     def elapsed_days(self) -> Fraction:
@@ -70,8 +62,6 @@ class NominalSourceDate:
         _fraction(days, "已过名义日")
         if days < 0:
             raise ValueError("原尺已过日不能为负")
-        else:
-            pass
         whole = days.numerator // days.denominator
         year, remainder = divmod(whole, 360)
         month, day = divmod(remainder, 30)
@@ -101,20 +91,14 @@ class RulerCalendarScale:
         object.__setattr__(self, "palaces", tuple(self.palaces))
         if not self.palaces or len(set(self.palaces)) != len(self.palaces):
             raise ValueError("须明确给出不重复的具名宫限")
-        else:
-            pass
         _fraction(self.source_duration_years, "原刊宫限年数")
         _fraction(self.printed_annual_rate, "原刊年速率")
         if self.source_duration_years <= 0 or self.printed_annual_rate <= 0:
             raise ValueError("宫限年数及原刊年速率须为正")
-        else:
-            pass
         _integer(self.months_per_degree, "每度月数", 0)
         _integer(self.days_per_degree_remainder, "每度余日", 0, 29)
         if not self.nominal_days_per_degree:
             raise ValueError("每度所需名义日须为正")
-        else:
-            pass
 
     @property
     def nominal_days_per_degree(self) -> int:
@@ -128,8 +112,6 @@ class RulerCalendarScale:
         _fraction(degrees, "本限尺格度")
         if not 0 <= degrees <= 30:
             raise ValueError("本限位置须在[0,30]，不取模或推定下一宫")
-        else:
-            pass
 
     def days_from_degrees(self, degrees: Fraction) -> Fraction:
         self._degrees(degrees)
@@ -139,15 +121,11 @@ class RulerCalendarScale:
         _fraction(days, "已过名义日")
         if not 0 <= days <= self.total_nominal_days:
             raise ValueError("日期超出本局部限；不能将公历年份或周岁代入原尺序年")
-        else:
-            pass
         return days / self.nominal_days_per_degree
 
     def position(self, date: NominalSourceDate) -> dict[str, Any]:
         if not isinstance(date, NominalSourceDate):
             raise TypeError("须明确提供NominalSourceDate，不推断公历或出生年龄")
-        else:
-            pass
         days = date.elapsed_days
         degrees = self.degrees_from_days(days)
         complete = degrees == 30
@@ -231,8 +209,6 @@ def load_ruler_calendar() -> tuple[RulerCalendarScale, ...]:
     data = json.loads(DATA.read_bytes())
     if data["source_id"] != SOURCE_ID or data["method_id"] != METHOD_ID:
         raise ValueError("名义尺历须使用具名NLC3150来源，不跨底本替换")
-    else:
-        pass
     return tuple(
         RulerCalendarScale(
             palaces=tuple(row["palaces"]),
@@ -251,8 +227,6 @@ def ruler_calendar_scale(palace: str) -> RulerCalendarScale:
     for scale in load_ruler_calendar():
         if palace in scale.palaces:
             return scale
-        else:
-            pass
     raise ValueError("须明确提供本来源十一宫限之一；命宫起限尚未复原")
 
 

@@ -51,14 +51,10 @@ def resolve_numerology_timezone(value: object) -> str:
     """
     if value is None:
         return NUMEROLOGY_DEFAULT_TIMEZONE
-    else:
-        pass
     if not isinstance(value, str) or not value.strip():
         raise ValueError(
             "出生时区zone须为非空IANA名称或UTC偏移；未知时区不能用空白代替。"
         )
-    else:
-        pass
     zone = value.strip()
     parse_timezone_name(zone)
     return zone
@@ -68,8 +64,6 @@ def normalize_numerology_utc_offset(value: object) -> str | None:
     """Accept a separately confirmed offset, without inferring a birth region."""
     if value is None:
         return None
-    else:
-        pass
     match = (
         re.fullmatch(r"([+-])([0-9]{2}):([0-9]{2})(?::([0-9]{2}))?", value.strip())
         if type(value) is str
@@ -77,16 +71,12 @@ def normalize_numerology_utc_offset(value: object) -> str | None:
     )
     if match is None:
         raise ValueError("birth_utc_offset须为已确认的±HH:MM或±HH:MM:SS；未知时不填。")
-    else:
-        pass
     sign, hour, minute, second = match.groups()
     h, m, s = int(hour), int(minute), int(second or 0)
     # A confirmed regional offset is not a new fixed-zone specification.
     # IANA contains historical offsets beyond +/-15h, on both sides of UTC.
     if h >= 24 or m >= 60 or s >= 60:
         raise ValueError("birth_utc_offset超出有效UTC偏移范围。")
-    else:
-        pass
     return format_utc_offset(
         timedelta(hours=h, minutes=m, seconds=s) * (1 if sign == "+" else -1)
     )
@@ -103,8 +93,6 @@ def numerology_seed_time(
     """
     if birth_utc_offset is None:
         return clock
-    else:
-        pass
     wall = datetime.fromisoformat(f"{date_text}T{clock}")
     selected = resolve_civil_clock(
         wall, zone, birth_utc_offset, offset_field="birth_utc_offset"
@@ -123,8 +111,6 @@ def resolve_numerology_longitude(
     """
     if type(use_true_solar_time) is not bool:
         raise ValueError("use_true_solar_time须为布尔值。")
-    else:
-        pass
     source = "gps_lon" if gps_lon is not None else "lon"
     value = gps_lon if gps_lon is not None else lon
     longitude = parse_geo_coordinate(value, axis="longitude")
@@ -133,8 +119,6 @@ def resolve_numerology_longitude(
             "河洛与参评的真太阳时需要明确出生地经度lon或gps_lon，不能套用上海经度。"
             "不使用太阳时请明确设use_true_solar_time=false。"
         )
-    else:
-        pass
     return longitude, source if longitude is not None else None
 
 
@@ -184,11 +168,7 @@ def numerology_birth_clock(
             input_clock.normalized_clock
         ):
             raise ValueError("所给出生钟时与实际计算参考钟面不一致。")
-        else:
-            pass
         clock["input_representation"] = birth_clock_input_record(input_clock)
-    else:
-        pass
     if birth_utc_offset is not None:
         civil = seed.input_datetime
         clock.update(
@@ -204,8 +184,6 @@ def numerology_birth_clock(
                 "不推定出生地、记录精度、古代颁历或未来时区立法。"
             ),
         )
-    else:
-        pass
     return clock
 
 

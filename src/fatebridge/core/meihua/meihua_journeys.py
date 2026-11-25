@@ -30,8 +30,6 @@ def _profile() -> dict[str, Any]:
         != {(t, r) for t in JOURNEY_TOPICS for r in _RELATIONS}
     ):
         raise ValueError("Unknown or incomplete selected journey chapter profile")
-    else:
-        pass
     return profile
 
 

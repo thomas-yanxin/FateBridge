@@ -79,8 +79,6 @@ class JinkouInteractionRule(PartialOutput):
         expected = any(values) if self.quantifier == "any" else all(values)
         if self.matched != expected:
             raise ValueError("四位结构判断与所列条件不一致")
-        else:
-            pass
         return self
 
 
@@ -110,8 +108,6 @@ class JinkouPositionInteractions(PartialOutput):
     ) -> list[Position] | None:
         if value is not None and value != ["人元", "贵神", "将神", "地分"]:
             raise ValueError("四位上下次序不得颠倒")
-        else:
-            pass
         return value
 
     @field_validator("pairs")
@@ -123,8 +119,6 @@ class JinkouPositionInteractions(PartialOutput):
             expected = set(combinations(("人元", "贵神", "将神", "地分"), 2))
             if {(p.upper_position, p.lower_position) for p in value} != expected:
                 raise ValueError("四位关系须列全六对不同位置")
-            else:
-                pass
             order = ["人元", "贵神", "将神", "地分"]
             if any(
                 p.adjacent
@@ -132,10 +126,6 @@ class JinkouPositionInteractions(PartialOutput):
                 for p in value
             ):
                 raise ValueError("相邻与隔位标识须符合四位次序")
-            else:
-                pass
-        else:
-            pass
         return value
 
     @field_validator("rule_evaluations")
@@ -145,8 +135,6 @@ class JinkouPositionInteractions(PartialOutput):
     ) -> list[JinkouInteractionRule] | None:
         if value is not None and {r.id for r in value} != RULE_IDS:
             raise ValueError("四位关系须保留十四条不同来源规则")
-        else:
-            pass
         return value
 
     @field_validator("complete_classical_conformance", mode="before")
@@ -154,8 +142,6 @@ class JinkouPositionInteractions(PartialOutput):
     def no_full_book_claim(cls, value: object) -> Literal[False] | None:
         if value is not None and value is not False:
             raise ValueError("所选位置结构不能声明整书符合")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -163,23 +149,13 @@ class JinkouPositionInteractions(PartialOutput):
         if self.matched_rule_ids is not None:
             if len(self.matched_rule_ids) != len(set(self.matched_rule_ids)):
                 raise ValueError("命中规则标识不得重复")
-            else:
-                pass
             if self.rule_evaluations is not None and set(self.matched_rule_ids) != {
                 r.id for r in self.rule_evaluations if r.matched
             }:
                 raise ValueError("命中清单与十四条逐项事实不一致")
-            else:
-                pass
-        else:
-            pass
         if self.pairs is not None and self.has_any_control is not None:
             if self.has_any_control != any(
                 p.relation in {"上克下", "下克上"} for p in self.pairs
             ):
                 raise ValueError("有克标识与六对生克事实不一致")
-            else:
-                pass
-        else:
-            pass
         return self

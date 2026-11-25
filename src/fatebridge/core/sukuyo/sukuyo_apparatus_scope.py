@@ -21,16 +21,12 @@ def validate_apparatus_reference(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("校注关联、范围或未定控制改变，须重新核验")
-    else:
-        pass
 
 
 def apparatus_reference() -> dict[str, Any]:
     loaded = load_source(SOURCE)
     if loaded.sha256 != DATA_SHA256:
         raise ValueError("校注覆盖资料身份改变，须重新冻结来源")
-    else:
-        pass
     validate_apparatus_reference(loaded.data)
     return {
         "source_data": loaded.data,

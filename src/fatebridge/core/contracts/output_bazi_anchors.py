@@ -30,8 +30,6 @@ POSITIONS = ("year", "month", "day", "hour")
 def _object(value: Any) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError("完整八字结果缺少计算依据对象")
-    else:
-        pass
     return value
 
 
@@ -42,20 +40,14 @@ def _keys(
     for key in names.split():
         if key not in obj or (obj[key] is None and key not in (nullable or set())):
             raise ValueError("完整八字结果缺少计算依据字段：" + key)
-        else:
-            pass
         if isinstance(obj[key], str) and not obj[key].strip():
             raise ValueError("完整八字计算依据不能为空字符串：" + key)
-        else:
-            pass
     return obj
 
 
 def _rows(value: Any) -> list[Any]:
     if not isinstance(value, list):
         raise ValueError("完整八字结果缺少计算依据列表")
-    else:
-        pass
     return value
 
 
@@ -76,8 +68,6 @@ def _calendar(value: Any) -> None:
         _keys(support, "reason")
         if c["lunar_calendar"] is not None:
             raise ValueError("表外农历不能以完整计算结果交付")
-        else:
-            pass
     else:
         raise ValueError("完整八字结果须明示农历支持状态")
     month = _keys(
@@ -134,8 +124,6 @@ def _force(value: Any) -> None:
                     else "engineering_energy"
                 ),
             )
-        else:
-            pass
     _keys(f["source_root_observations"], "method_id source stems scope")
 
 
@@ -155,8 +143,6 @@ def _passage(value: Any) -> None:
         planes[row["plane"]].add(row["pillar"])
     if any(positions != set(POSITIONS) for positions in planes.values()):
         raise ValueError("完整八字通关依据须保留四柱实际干藏节点")
-    else:
-        pass
     for name in (
         "visible_paths",
         "principal_hidden_paths",
@@ -182,8 +168,6 @@ def _evidence(value: Any, *, topic: str | None) -> None:
     )
     if not _rows(e["rulesets"]):
         raise ValueError("完整八字结果缺少来源规则")
-    else:
-        pass
     _keys(e["ten_gods"], " ".join(g.value for g in TenGod))
     visible = _rows(e["visible_stems"])
     for row in visible:
@@ -193,8 +177,6 @@ def _evidence(value: Any, *, topic: str | None) -> None:
         )
     if len(visible) != 4 or {r["pillar"] for r in visible} != set(POSITIONS):
         raise ValueError("完整八字结果须保留四柱透干依据")
-    else:
-        pass
     for name in (
         "star_occurrences",
         "element_presence",
@@ -269,21 +251,13 @@ def _evidence(value: Any, *, topic: str | None) -> None:
             )
         if {n["node_id"] for n in nodes} != source_ids:
             raise ValueError("通关关系上下文必须保留同次全部实际节点")
-        else:
-            pass
         if context["passage_source_id"] != e["classical_passage"]["source"]["id"]:
             raise ValueError("通关关系上下文不能替换同次原典来源")
-        else:
-            pass
         if context["relations_status"] == "supplied":
             _keys(context, "source_relation_count events unclassified_event_refs")
             for event in _rows(context["events"]):
                 _keys(event, "id plane receipt")
                 _keys(event["receipt"], "kind positions status")
-        else:
-            pass
-    else:
-        pass
     if topic is not None:
         t = _keys(
             e.get("topic"),
@@ -291,14 +265,10 @@ def _evidence(value: Any, *, topic: str | None) -> None:
         )
         if t["topic"] != topic:
             raise ValueError("完整专题依据须对应实际专题")
-        else:
-            pass
         _keys(
             t["timing"],
             "scope pillar_carriers carrier_source carrier_scope hidden_target_reference hidden_target_carriers layers between_layers combined_groups",
         )
-    else:
-        pass
 
 
 def _timing(value: Any) -> None:
@@ -327,8 +297,6 @@ def require_complete_bazi_anchors(key: str, result: dict[str, Any]) -> None:
     """Only called on full successful results, before any transport projection."""
     if key not in BAZI_ANCHOR_TOOLS:
         return
-    else:
-        pass
     if key in {"analyze_destiny", "bazi_birth"}:
         root = result if key == "analyze_destiny" else result.get("bazi_birth")
         r = _keys(
@@ -359,8 +327,6 @@ def require_complete_bazi_anchors(key: str, result: dict[str, Any]) -> None:
             or dm["engineering_index"] != dm["assessment"]["engineering_index"]
         ):
             raise ValueError("日主工程索引必须与同次assessment的政策档及原索引一致")
-        else:
-            pass
         profile = _keys(
             r["structure_profile"],
             "resolution_policy assessment_status engineering_reference engineering_harmony_effects harmony_effects harmony_effects_status classical_adjudication dominant_structure candidate_selection from_child_reference evidence_chain",
@@ -372,8 +338,6 @@ def require_complete_bazi_anchors(key: str, result: dict[str, Any]) -> None:
             == profile["evidence_chain"]["strength_context"]["classical_adjudication"]
         ):
             raise ValueError("日主、取用与证据必须复用同次原典力量裁定")
-        else:
-            pass
     else:
         topic = key.removeprefix("bazi_")
         r = _keys(

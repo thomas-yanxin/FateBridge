@@ -15,8 +15,6 @@ def _datetime_from_julian_day(
     moment = calendar.as_datetime()
     if moment is None:
         raise ValueError("UTC calendar label is outside Python datetime's year range")
-    else:
-        pass
     return moment
 
 

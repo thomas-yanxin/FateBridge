@@ -83,8 +83,6 @@ def build_zodiacal_releasing_period(
         duration_value *= ZR_LEVEL_UNIT_DAYS[level]
     elif level == 4:
         duration_value *= ZR_LEVEL_UNIT_DAYS[level] * 24
-    else:
-        pass
     return {
         "sign": sign_name,
         "sign_label": sign_label(sign_name),
@@ -140,10 +138,6 @@ def build_releasing_level_preview(
             future_slots_remaining -= 1
             if future_slots_remaining <= 0:
                 break
-            else:
-                pass
-        else:
-            pass
         cursor = next_cursor
         current_sign = next_sign(current_sign)
 
@@ -171,8 +165,6 @@ def build_releasing_level_within_interval(
     for _ in range(max_periods):
         if cursor >= period_end:
             break
-        else:
-            pass
         duration_days = ZR_SIGN_PERIODS[current_sign] * ZR_LEVEL_UNIT_DAYS[level]
         next_cursor = min(period_end, cursor.shifted(timedelta(days=duration_days)))
         loosing_of_bond = pending_loosing_of_bond
@@ -213,8 +205,6 @@ def clean_releasing_period(
 ) -> dict[str, Any] | None:
     if period is None:
         return None
-    else:
-        pass
     return {
         **period,
         "start": format_local_time_or_utc(
@@ -288,8 +278,6 @@ def build_zodiacal_releasing_for_lot(
         current_level_2 = next(
             (item for item in level_two_timeline if item["active"]), None
         )
-    else:
-        pass
 
     level_three_timeline: list[dict[str, Any]] = []
     current_level_3 = None
@@ -307,8 +295,6 @@ def build_zodiacal_releasing_for_lot(
             (item for item in level_three_timeline if item["active"]),
             None,
         )
-    else:
-        pass
 
     return {
         "base_point": LOT_POINT_NAMES[lot_key],
@@ -414,8 +400,6 @@ def build_zodiacal_releasing_payload(
             "spirit": _unresolved_releasing_track("lot_of_spirit"),
             "fortune": _unresolved_releasing_track("lot_of_fortune"),
         }
-    else:
-        pass
 
     # Fixed elapsed periods use UTC coordinates, including auxiliary years.
     # The birth zone applies only when labeling the selected endpoints.
@@ -432,8 +416,6 @@ def build_zodiacal_releasing_payload(
     spirit_start_sign = lots["lot_of_spirit"]["sign"]
     if spirit_start_sign == fortune_sign:
         spirit_start_sign = next_sign(spirit_start_sign)
-    else:
-        pass
     return {
         "calculation_basis": _zr_calculation_basis(fortune_sign),
         "spirit": build_zodiacal_releasing_for_lot(

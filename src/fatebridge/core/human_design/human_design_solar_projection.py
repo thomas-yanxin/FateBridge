@@ -25,13 +25,9 @@ def _coordinates(values: Sequence[float]) -> tuple[float, float, float]:
         or any(type(x) not in (float, int) or not math.isfinite(x) for x in values)
     ):
         raise ValueError("Projection requires three finite numerical coordinates")
-    else:
-        pass
     longitude, latitude, distance = map(float, values)
     if not 0 <= longitude < 360 or not -90 <= latitude <= 90 or distance <= 0:
         raise ValueError("Invalid ecliptic coordinates or distance")
-    else:
-        pass
     return longitude, latitude, distance
 
 

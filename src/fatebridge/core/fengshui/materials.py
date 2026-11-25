@@ -50,13 +50,9 @@ def analyze_material_facts(
         pending = []
         if fact.observation_basis == "image_observed":
             pending.append(f"{path}.observation_basis")
-        else:
-            pass
         for field in ("material", "shape", "colour"):
             if getattr(fact, field) == "unknown":
                 pending.append(f"{path}.{field}")
-            else:
-                pass
         shape = data["shapes"].get(fact.shape)
         material = data["materials"].get(fact.material)
         colour = data["colours"].get(fact.colour)
@@ -77,16 +73,12 @@ def analyze_material_facts(
         if target is not None:
             if fact.material is None and fact.colour is None:
                 pending.append(f"{path}.material_or_colour")
-            else:
-                pass
             if (
                 fact.material == "living_plant"
                 and target == "木"
                 and fact.plant_alive is None
             ):
                 pending.append(f"{path}.plant_alive")
-            else:
-                pass
             if fact.material is None:
                 material_status = "not_provided"
             elif fact.material == "unknown":
@@ -135,15 +127,11 @@ def analyze_material_facts(
                     )
                 )
             )
-        else:
-            pass
         unknown = bool(pending)
         if unknown:
             counts["unknown"] += 1
         elif target is not None:
             counts["supported"] += 1
-        else:
-            pass
         rule_id = (
             "sourced_material_representation_v1.afsi_use_eligibility"
             if target is not None
@@ -211,8 +199,6 @@ def analyze_material_facts(
             extra_rules["workstation_source_boundaries_v1"] = provenance(
                 "workstation_source_boundaries_v1"
             )
-        else:
-            pass
         if fact.application is not None:
             application = analyze_application(fact, targets or [], material_status)
             finding_record["application_analysis"] = {
@@ -239,8 +225,6 @@ def analyze_material_facts(
                 )
                 for c in application["application_conditions"]
             )
-        else:
-            pass
         findings.append(finding_record)
         missing.extend(pending)
         trace.append(dict(rule_id=rule_id, source_ids=sources, fact_id=fact.fact_id))

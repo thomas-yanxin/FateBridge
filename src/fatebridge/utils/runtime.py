@@ -20,34 +20,24 @@ def load_runtime_env(
     env_path = Path(path) if path is not None else DEFAULT_ENV_PATH
     if not env_path.exists():
         return {}
-    else:
-        pass
 
     loaded: dict[str, str] = {}
     for raw_line in env_path.read_text(encoding="utf-8").splitlines():
         line = raw_line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
-        else:
-            pass
 
         key, raw_value = line.split("=", 1)
         key = key.strip()
         value = raw_value.strip()
         if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
             value = value[1:-1]
-        else:
-            pass
         if not key:
             continue
-        else:
-            pass
 
         if override or key not in os.environ:
             os.environ[key] = value
             loaded[key] = value
-        else:
-            pass
 
     return loaded
 
@@ -78,16 +68,12 @@ def parse_api_keys(
     )
     if not source.strip():
         return {}
-    else:
-        pass
 
     parsed: dict[str, str] = {}
     for index, entry in enumerate(source.split(","), start=1):
         token = entry.strip()
         if not token:
             raise ValueError(f"FATEBRIDGE_API_KEYS entry {index} is empty")
-        else:
-            pass
 
         if ":" in token:
             key_id, secret = token.split(":", 1)
@@ -101,13 +87,9 @@ def parse_api_keys(
             raise ValueError(
                 f"FATEBRIDGE_API_KEYS entry {index} requires a name and secret"
             )
-        else:
-            pass
 
         if key_id in parsed:
             raise ValueError(f"FATEBRIDGE_API_KEYS entry {index} has a duplicate name")
-        else:
-            pass
 
         parsed[key_id] = secret
 

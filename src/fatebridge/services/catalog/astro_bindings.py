@@ -32,8 +32,6 @@ def _astro_chart_bind(
     apparent_model = data.pop("apparent_model", "native")
     if variant == "chart":
         data["apparent_model"] = apparent_model
-    else:
-        pass
     if variant == "germany":
         for key in (
             "guolao_month_basis",

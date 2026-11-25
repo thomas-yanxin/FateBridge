@@ -14,8 +14,6 @@ def numeric_patterns(chart: dict[str, Any]) -> dict[str, Any]:
     directions = chart["flight_path"]
     if len(directions) != 9 or set(directions) != set(ground):
         raise ValueError("Numeric pattern comparison requires all nine unique palaces")
-    else:
-        pass
     for role in ("period", "mountain", "facing"):
         values = chart[f"{role}_chart"]
         if (
@@ -26,8 +24,6 @@ def numeric_patterns(chart: dict[str, Any]) -> dict[str, Any]:
             raise ValueError(
                 "Every pattern plate must retain the complete integer stars1-9"
             )
-        else:
-            pass
     parental_palaces = {}
     for direction in directions:
         values = [

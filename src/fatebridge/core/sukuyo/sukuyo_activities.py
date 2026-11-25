@@ -72,14 +72,10 @@ def assess_activity(
     effective_details, detail_inferences = activity_detail_closure(details)
     if activity is None:
         return None
-    else:
-        pass
     if activity not in ACTIVITIES:
         raise ValueError(
             "activity仅支持social/marriage/travel/relocation/commerce/study/clothing"
         )
-    else:
-        pass
     relative = (day.get("personal_day") or {}).get("relation")
     lower_special = next(
         w
@@ -116,8 +112,6 @@ def assess_activity(
         selectors["clothing_upper_mansion"] = (
             [day["day_mansion"]] if day.get("day_mansion") else []
         )
-    else:
-        pass
     bundle = source_bundle()
     topic_matches = [
         {**with_text_layers(rule), "source_url": bundle["source_url"]}
@@ -153,8 +147,6 @@ def assess_activity(
                 "topic_condition": f"下卷大正宿字{literal}未识别，未与输入日宿匹配；不以明本改字补定，不代入已匹配宜忌。",
             }
             topic_matches[index] = rule
-        else:
-            pass
         condition = rule.get("activity_conditions", {}).get(activity)
         if condition:
             topic_matches[index] = {
@@ -164,16 +156,12 @@ def assess_activity(
                 "activity_detail_all_of": condition.get("all_of", []),
                 "topic_condition": condition["condition"],
             }
-        else:
-            pass
     matches = []
     conditional = []
     for rule in topic_matches:
         if rule.get("applicability") != "activity_detail_required":
             matches.append(rule)
             continue
-        else:
-            pass
         any_of = rule.get("activity_detail_any_of", [])
         all_of = rule.get("activity_detail_all_of", [])
         matched_details = [d for d in effective_details if d in [*any_of, *all_of]]

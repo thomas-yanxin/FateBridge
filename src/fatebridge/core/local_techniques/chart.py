@@ -65,21 +65,15 @@ def _normalize_date_text(date_text: str) -> str:
     raw = (date_text or "").strip()
     if not raw:
         return raw
-    else:
-        pass
 
     canonical = raw.replace("/", "-")
     parts = canonical.split("-")
     if len(parts) != 3:
         return canonical
-    else:
-        pass
 
     year_text, month_text, day_text = (part.strip() for part in parts)
     if not (year_text.isdigit() and month_text.isdigit() and day_text.isdigit()):
         return canonical
-    else:
-        pass
 
     return f"{int(year_text):04d}-{int(month_text):02d}-{int(day_text):02d}"
 
@@ -90,20 +84,14 @@ def _normalize_time_text(time_text: str) -> str:
         raise ValueError(
             "time须提供已知钟时，空字符串不能补作00:00；未知钟时仅在支持的工具中省略或用null"
         )
-    else:
-        pass
     parts = value.split(":")
     if len(parts) < 2 or len(parts) > 3:
         return value
-    else:
-        pass
     hours_text = parts[0]
     minutes_text = parts[1]
     seconds_text = parts[2] if len(parts) == 3 else "0"
     if not all(p.isdigit() for p in (hours_text, minutes_text, seconds_text)):
         return value
-    else:
-        pass
     return f"{int(hours_text):02d}:{int(minutes_text):02d}:{int(seconds_text):02d}"
 
 
@@ -126,8 +114,6 @@ def parse_local_datetime(
         allow_ambiguous = False
     if validate_wall:
         validate_local_clock(moment, allow_ambiguous=allow_ambiguous)
-    else:
-        pass
     return moment
 
 
@@ -212,16 +198,12 @@ def _build_houses(
         ascendant = core_payload["angles"]["ascendant"]["longitude"]
         if ascendant is None:
             return [], None
-        else:
-            pass
         anchor = (angle_fraction(ascendant) // 30) * 30
     elif not base_houses:
         return [], None
     elif preserve_core_cusps:
         if reverse:
             base_houses = [base_houses[0], *reversed(base_houses[1:])]
-        else:
-            pass
         geometry = HouseGeometry(
             tuple(angle_fraction(house["lon"]) for house in base_houses),
             reverse=reverse,
@@ -278,12 +260,8 @@ def _build_point_object(
     }
     if projected_phase is not None:
         payload["ecliptic_house_phase_degrees_ratio"] = str(projected_phase)
-    else:
-        pass
     if include_su28:
         payload["su28"], payload["su28_degree"] = _su28_position(phase)
-    else:
-        pass
     return payload
 
 
@@ -306,8 +284,6 @@ def _adapt_chart_objects(
         point_id = item["id"]
         if tradition and point_id in OUTER_PLANETS:
             continue
-        else:
-            pass
         source_longitude = float(item["longitude"])
         phase_text = (
             context_points[point_id]["ecliptic_house_phase_degrees_ratio"]
@@ -333,12 +309,8 @@ def _adapt_chart_objects(
         }
         if projected_phase is not None:
             payload["ecliptic_house_phase_degrees_ratio"] = str(projected_phase)
-        else:
-            pass
         if include_su28:
             payload["su28"], payload["su28_degree"] = _su28_position(source_longitude)
-        else:
-            pass
         objects.append(payload)
 
     north_node = next((item for item in objects if item["id"] == "North Node"), None)
@@ -365,8 +337,6 @@ def _adapt_chart_objects(
                 ),
             )
         )
-    else:
-        pass
 
     # Reuse the canonical lot, computed from the true ASC and solar horizon.
     # First cusp != ASC for whole-sign/equal-MC/Vehlow; a Sun in H1 can be day.
@@ -389,8 +359,6 @@ def _adapt_chart_objects(
                 ),
             )
         )
-    else:
-        pass
 
     return objects
 
@@ -433,8 +401,6 @@ def _build_local_chart_response(
         resolved_zodiacal = 0 if zodiacal is None else int(zodiacal)
         if not allow_extended_hsys and resolved_hsys not in {0, 8}:
             raise ValueError("本地盘当前仅支持 hsys=0(整宫制) 或 hsys=8(等宫制)。")
-        else:
-            pass
         core_payload = build_core_chart_payload(
             birth_info,
             chart_variant,
@@ -482,16 +448,12 @@ def _build_local_chart_response(
             raise ValueError(
                 "Unrounded context geometry requires the original house layout and no mansion overlay"
             )
-        else:
-            pass
         houses = geometry["houses"]
         objects = [
             item
             for item in geometry["objects"]
             if not tradition or item["id"] not in OUTER_PLANETS
         ]
-    else:
-        pass
     params = {
         "date": _normalize_date_text(date_text),
         "time": _normalize_time_text(time_text),
@@ -557,43 +519,29 @@ def _build_local_chart_response(
         )
     if resolved_hsys is not None:
         params["hsys"] = resolved_hsys
-    else:
-        pass
     if resolved_hsys is not None:
         params["zodiacal"] = (core_payload.get("chart_profile") or {}).get("zodiacal")
         params["zodiacLabelZh"] = (core_payload.get("chart_profile") or {}).get(
             "zodiac_label_zh"
         )
-    else:
-        pass
     ayanamsha = (core_payload.get("chart_profile") or {}).get("ayanamsha")
     if ayanamsha:
         params["ayanamsha"] = ayanamsha
-    else:
-        pass
     if extra_params:
         params.update(extra_params)
-    else:
-        pass
     angle_definition = core_payload["chart_profile"].get("angle_definition")
     if angle_definition is not None:
         params["angleDefinition"] = angle_definition
-    else:
-        pass
     if house_geometry is not None and house_geometry.projected:
         projection = core_payload["context_geometry"]["house_position_projection"]
         params["housePositionMethod"] = projection["method"]
         params["housePositionProjection"] = projection
-    else:
-        pass
     if include_calculation_metadata:
         params["chart_profile"] = dict(core_payload.get("chart_profile") or {})
         params["calculationTimeLocal"] = birth_info.local_datetime.isoformat()
         params["calculationTimeUtc"] = birth_info.utc_isoformat
         if house_geometry is not None:
             params["houseAssignmentBasis"] = "core_geometry_before_display_rounding"
-        else:
-            pass
         params["auxiliaryPointSources"] = {
             "Pars Fortuna": "core.classical.lots.fortune"
         }
@@ -606,27 +554,17 @@ def _build_local_chart_response(
             params["fortuneDefinition"] = geometry["fortune_definition"]
             if "motion_policy" in geometry:
                 params["motionPolicy"] = geometry["motion_policy"]
-            else:
-                pass
             if "ephemeris_reference_points" in geometry:
                 params["ephemerisReferencePoints"] = geometry[
                     "ephemeris_reference_points"
                 ]
-            else:
-                pass
             params["housePositionMethod"] = "ecliptic_longitude_cusp_intervals"
             if "house_position_projection" in geometry:
                 projection = geometry["house_position_projection"]
                 params["housePositionMethod"] = projection["method"]
                 params["housePositionProjection"] = projection
                 params["houseOrientation"] = "native_nonprograde_cusps"
-            else:
-                pass
             params["lunarNodeModel"] = "mean_node_and_its_opposite"
-        else:
-            pass
-    else:
-        pass
     response: dict[str, object] = {
         "params": params,
         "chart": {
@@ -646,8 +584,6 @@ def _build_local_chart_response(
     if chart_variant == "guolao_chart":
         response["rulesets"] = core_payload["guolao"]["rulesets"]
         response["validation"] = core_payload["guolao"]["validation"]
-    else:
-        pass
     return response
 
 
@@ -702,8 +638,6 @@ def _render_qimen_palace_sections(qimen: dict[str, Any]) -> list[tuple[str, str]
     for palace in qimen.get("palaces", []) or []:
         if not isinstance(palace, dict):
             continue
-        else:
-            pass
         evidence = palace.get("evidence") or {}
         god_meaning = evidence.get("god_interpretation") or {}
         tomb = evidence.get("wonder_tomb") or {}
@@ -717,8 +651,6 @@ def _render_qimen_palace_sections(qimen: dict[str, Any]) -> list[tuple[str, str]
             or content_trigram != palace.get("trigram")
         ):
             content_line = f"内容来源：{content_palace} / {content_trigram or '无'}"
-        else:
-            pass
         sections.append(
             (
                 palace.get("name", "宫位"),

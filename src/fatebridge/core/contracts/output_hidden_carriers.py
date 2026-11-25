@@ -33,8 +33,6 @@ class HiddenCarrierTarget(PartialOutput):
             != (self.relation == "stem_overcomes_hidden")
         ):
             raise ValueError("藏干盖头候选须忠于干克该藏干；不是全支或实际喜忌裁定")
-        else:
-            pass
         return self
 
 

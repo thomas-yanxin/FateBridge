@@ -37,13 +37,9 @@ _R = TypeVar("_R")
 def solar_input_basis(birth: AstroBirthInfo) -> str | None:
     if birth.clock_conversion is None:
         return None
-    else:
-        pass
     basis = birth.clock_conversion.get("input_clock_basis")
     if basis not in SOLAR_BASES:
         raise ValueError("果老太阳钟输入须明确LMT或LAT，不能推定未知钟制")
-    else:
-        pass
     return str(basis)
 
 
@@ -62,8 +58,6 @@ def coherent_guolao_solar_call(function: Callable[_P, _R]) -> Callable[_P, _R]:
         ):
             with source_session():
                 return function(*args, **kwargs)
-        else:
-            pass
         return function(*args, **kwargs)
 
     return wrapped
@@ -75,19 +69,13 @@ def solar_input_context(
     basis = solar_input_basis(birth)
     if basis is None:
         return None
-    else:
-        pass
     conversion = birth.clock_conversion
     assert conversion is not None
     if runtime.swe is None:
         raise ValueError("果老太阳钟换算需要Swiss Ephemeris")
-    else:
-        pass
     wall = datetime.fromisoformat(conversion["input_wall_datetime"])
     if wall.tzinfo is not None or birth.timezone_source != "solar_clock_conversion":
         raise EphemerisSourceError("birth_clock_source_mismatch")
-    else:
-        pass
     native = native_birth_epoch(birth)
     if native is not None:
         replay_epoch, replay_receipt = resolve_solar_epoch(
@@ -105,15 +93,11 @@ def solar_input_context(
             or abs(raw["julian_day_tt"] - native.time.jd_tt) * 86400 > 0.0002
         ):
             raise EphemerisSourceError("birth_clock_source_mismatch")
-        else:
-            pass
         difference = float((replay_epoch.time.ut1.days - native.time.ut1.days) * 86400)
     else:
         original = datetime.fromisoformat(conversion["converted_utc"])
         if utc_ordering_key(original) != utc_ordering_key(birth.physical_datetime):
             raise EphemerisSourceError("birth_clock_source_mismatch")
-        else:
-            pass
         replay, replay_receipt = resolve_solar_birth_clock(
             wall,
             birth.longitude,
@@ -133,15 +117,11 @@ def solar_input_context(
         runtime.swe.version
     ):
         raise EphemerisSourceError("birth_clock_source_mismatch")
-    else:
-        pass
     if (
         not math.isfinite(float(conversion["julian_day_ut1"]))
         or abs((conversion["julian_day_ut1"] - raw["julian_day_ut1"]) * 86400) > 0.0002
     ):
         raise EphemerisSourceError("birth_clock_source_mismatch")
-    else:
-        pass
 
     cohort = SunSourceCohort()
     original_sources = conversion["solar_source_comparison"][
@@ -155,8 +135,6 @@ def solar_input_context(
             or set(conversion["solar_ephemeris_models_observed"]) != {model}
         ):
             raise EphemerisSourceError("birth_clock_source_mismatch")
-        else:
-            pass
         try:
             for source in [
                 *original_sources,
@@ -171,10 +149,6 @@ def solar_input_context(
             raise EphemerisSourceError("birth_clock_source_mismatch") from error
         if any(source["has_unidentified_sources"] for source in cohort.sources):
             raise EphemerisSourceError("birth_clock_source_mismatch")
-        else:
-            pass
-    else:
-        pass
 
     if basis == "local_apparent_solar":
         clock = raw["solar_clock"]
@@ -190,8 +164,6 @@ def solar_input_context(
             or clock["sun_apparent_right_ascension"] != solar_ra
         ):
             raise EphemerisSourceError("birth_clock_source_mismatch")
-        else:
-            pass
         actual = (
             Fraction(
                 birth.local_datetime.toordinal() + clock["solar_day_offset_from_civil"]
@@ -216,8 +188,6 @@ def solar_input_context(
     residual = float(actual - requested)
     if abs(residual) > 0.0002:
         raise EphemerisSourceError("birth_clock_source_mismatch")
-    else:
-        pass
     input_branch = BRANCHES[((wall.hour + 1) // 2) % 12]
     use_label = basis == "local_apparent_solar" or not birth.applied_true_solar
     forward = raw["solar_clock"]

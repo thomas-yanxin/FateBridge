@@ -41,8 +41,6 @@ class LiurenEmptyRow(PartialOutput):
             self.earth_xun_kong and self.earth_is_day_stem_house
         ):
             raise ValueError("地盘日干寄宫空亡例外的条件不一致")
-        else:
-            pass
         return self
 
 
@@ -93,41 +91,27 @@ class LiurenEmptinessEvidence(PartialOutput):
             EARTHLY_BRANCHES
         ):
             raise ValueError("六壬空亡依据必须保留十二地盘位，不得删减或调序")
-        else:
-            pass
         if self.rows is not None and {r.sky_branch for r in self.rows} != set(
             EARTHLY_BRANCHES
         ):
             raise ValueError("六壬空亡依据的天盘须含十二个不同支位")
-        else:
-            pass
         if self.role_conditions is not None and [
             r.role for r in self.role_conditions
         ] != ["太岁", "月建", "月将"]:
             raise ValueError("六壬空亡角色条件不得删减、合并或调序")
-        else:
-            pass
         if self.day_ganzhi is not None:
             if self.day_ganzhi not in SEXAGENARY_INDEX:
                 raise ValueError("六壬空亡依据需要有效日干支")
-            else:
-                pass
             empty = kongwang_for_ganzhi(self.day_ganzhi)[:2]
             if self.xun_head is not None and self.xun_head != xun_head_for_ganzhi(
                 self.day_ganzhi
             ):
                 raise ValueError("六壬空亡旬首与占日不一致")
-            else:
-                pass
             if self.empty_branches is not None and self.empty_branches != list(empty):
                 raise ValueError("六壬空亡两支与占日不一致")
-            else:
-                pass
             house = STEM_HOUSES[self.day_ganzhi[0]]
             if self.day_stem_house is not None and self.day_stem_house != house:
                 raise ValueError("六壬空亡依据的日干寄宫不一致")
-            else:
-                pass
             for row in self.rows or []:
                 if (
                     row.sky_xun_kong != (row.sky_branch in empty)
@@ -135,23 +119,15 @@ class LiurenEmptinessEvidence(PartialOutput):
                     or row.earth_is_day_stem_house != (row.earth_branch == house)
                 ):
                     raise ValueError("天盘本空、地盘本空或日干地盘位与占日不一致")
-                else:
-                    pass
             for role in self.role_conditions or []:
                 if role.branch_xun_kong != (role.branch in empty):
                     raise ValueError("六壬空亡角色的本空事实与占日不一致")
-                else:
-                    pass
             if (
                 self.hour_branch is not None
                 and self.hour_branch_xun_kong is not None
                 and self.hour_branch_xun_kong != (self.hour_branch in empty)
             ):
                 raise ValueError("六壬占时本空与占日旬空不一致")
-            else:
-                pass
-        else:
-            pass
         role_branches = {
             "太岁": self.year_branch,
             "月建": self.month_building_branch,
@@ -161,8 +137,6 @@ class LiurenEmptinessEvidence(PartialOutput):
             branch = role_branches[role.role]
             if branch is not None and role.branch != branch:
                 raise ValueError("六壬空亡角色支位与本次依据不一致")
-            else:
-                pass
         if all(
             v is not None
             for v in (
@@ -207,8 +181,6 @@ class LiurenEmptinessEvidence(PartialOutput):
                     ):
                         row.pop(key)
             compare_present_empty(self.model_dump(exclude_unset=True), expected)
-        else:
-            pass
         return self
 
 
@@ -217,19 +189,13 @@ def compare_present_empty(actual: Any, expected: Any) -> None:
         for key, value in actual.items():
             if key in expected:
                 compare_present_empty(value, expected[key])
-            else:
-                pass
     elif isinstance(actual, list) and isinstance(expected, list):
         if len(actual) != len(expected):
             raise ValueError("六壬空亡依据队列与本课不一致")
-        else:
-            pass
         for left, right in zip(actual, expected):
             compare_present_empty(left, right)
     elif actual != expected:
         raise ValueError("六壬空亡依据与本课四柱、月将或天地盘不一致")
-    else:
-        pass
 
 
 def require_complete_emptiness(
@@ -247,8 +213,6 @@ def require_complete_emptiness(
     )
     if not isinstance(evidence, dict) or any(evidence.get(k) is None for k in required):
         raise ValueError("完整六壬输出缺少空亡计算依据")
-    else:
-        pass
     expected = emptiness_evidence(
         day_ganzhi=evidence["day_ganzhi"],
         year_branch=evidence["year_branch"],
@@ -259,9 +223,5 @@ def require_complete_emptiness(
     )
     if natal is not None or annual is not None:
         apply_year_fate_emptiness(expected, natal=natal, annual=annual)
-    else:
-        pass
     if evidence != expected:
         raise ValueError("完整六壬输出的空亡依据缺项或与计算条件不一致")
-    else:
-        pass

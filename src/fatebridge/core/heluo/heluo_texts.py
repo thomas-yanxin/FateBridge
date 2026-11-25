@@ -77,8 +77,6 @@ def _pin_content(data: dict[str, Any], expected: str) -> str:
     ).hexdigest()
     if digest != expected:
         raise ValueError("该版本的河洛原文、标签或来源元数据被改写。")
-    else:
-        pass
     return digest
 
 
@@ -94,20 +92,14 @@ def _source_identity(
         or data[total_key] != 384
     ):
         raise ValueError("所选河洛文本来源身份不一致。")
-    else:
-        pass
     for key in ("source_url", "review_status", "scope", "transcription_policy"):
         if not isinstance(data[key], str) or not data[key].strip():
             raise ValueError("河洛文本来源元数据缺失。")
-        else:
-            pass
 
 
 def _entry_keys(data: dict[str, Any], hexagrams: tuple[str, ...]) -> None:
     if not isinstance(data["entries"], list):
         raise ValueError("河洛文本索引必须为条目列表。")
-    else:
-        pass
     keys = [(e["hexagram"], e["line"]) for e in data["entries"]]
     expected = {(g, p) for g in hexagrams for p in range(1, 7)}
     if (
@@ -116,8 +108,6 @@ def _entry_keys(data: dict[str, Any], hexagrams: tuple[str, ...]) -> None:
         or any(type(p) is not int for _, p in keys)
     ):
         raise ValueError("已核河洛文本索引缺项、重复或爻位无效。")
-    else:
-        pass
 
 
 @lru_cache(maxsize=1)
@@ -137,8 +127,6 @@ def _collation() -> dict[str, Any]:
                 or not entry["yaoci"].strip()
             ):
                 raise ValueError("河洛爻辞缺原页或正文。")
-            else:
-                pass
         content_sha = _pin_content(data, HEADER_CONTENT_SHA256)
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_heluo_header_collation") from exc
@@ -236,8 +224,6 @@ def _commentary_collation() -> dict[str, Any]:
                 )
             ):
                 raise ValueError("河洛注文缺原页、段落或条件标签不一致。")
-            else:
-                pass
         content_sha = _pin_content(data, COMMENTARY_CONTENT_SHA256)
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_heluo_commentary_collation") from exc
@@ -596,8 +582,6 @@ def _commentary_cross_references(entry: dict[str, Any]) -> list[dict[str, Any]]:
     source = sources.get((entry["hexagram"], entry["line"]))
     if source is None:
         return []
-    else:
-        pass
 
     pos = entry["line"]
     before = heluo_hexagrams.gua_lines(source["up"], source["low"])
@@ -623,8 +607,6 @@ def _commentary_cross_references(entry: dict[str, Any]) -> list[dict[str, Any]]:
         or target != source["target"]
     ):
         raise NumerologySourceError("invalid_heluo_commentary_collation")
-    else:
-        pass
     return [
         {
             "source_hexagram": entry["hexagram"],
@@ -677,8 +659,6 @@ def _apply_commentary(
     )
     if entry is None:
         return
-    else:
-        pass
     sections = deepcopy(entry["sections"])
     for section in sections:
         section["applicability"] = None
@@ -718,8 +698,6 @@ def _apply_commentary(
         result["commentary_branch_selection"][
             "reason"
         ] += "本卦保留原印叶字，不機械改作葉；字形保存不選定命局叶否。"
-    else:
-        pass
     if (gua, pos) in SECTION_LAYOUT_EXCEPTIONS:
         result["commentary_branch_selection"][
             "condition_labels_not_separately_printed"
@@ -727,13 +705,9 @@ def _apply_commentary(
         result["commentary_branch_selection"][
             "reason"
         ] += "本爻原段未單列不葉者；未印標籤不表示條件為false，亦不將葉者段全判為吉。"
-    else:
-        pass
     references = _commentary_cross_references(entry)
     if references:
         result["commentary_cross_references"] = references
-    else:
-        pass
 
 
 def text_reading_notes_snapshot(text: dict[str, Any]) -> list[str]:
@@ -758,8 +732,6 @@ def text_reading_notes_snapshot(text: dict[str, Any]) -> list[str]:
                 f"第{entry['poem_index']}首后续复核：{note}"
                 for note in entry["review_notes"]
             )
-    else:
-        pass
     return notes
 
 
@@ -787,16 +759,10 @@ def text_status_snapshot(text: dict[str, Any]) -> str:
             for p in text.get("poem_sections", [])
         ):
             note += "；诗诀仍有字形未决，暂读与候选见逐首读稿说明"
-        else:
-            pass
         if "unresolved" in provenance.get("commentary_review_status", ""):
             note += "；本条仍有字形未决，暂读与候选见读稿说明"
-        else:
-            pass
         if "unresolved" in provenance.get("review_status", ""):
             note += "；爻辞仍有字形未决，暂读与候选见头辞读稿说明"
-        else:
-            pass
         for reference in text.get("commentary_cross_references", []):
             if reference["source_hexagram"] == "地水師":
                 note += "；师三引升三仅为有条件的单爻变引用，适用未定，不替代后天卦"
@@ -832,11 +798,7 @@ def text_status_snapshot(text: dict[str, Any]) -> str:
             "condition_labels_not_separately_printed"
         ):
             note += "；本爻未单列不葉者，未印标签不表示不匹配"
-        else:
-            pass
         return note
-    else:
-        pass
     return "摘要注文及诗歌尚未逐字核对，诗歌来源待核"
 
 
@@ -873,10 +835,6 @@ def collated_line(gua: str, pos: int, inherited: dict[str, Any]) -> dict[str, An
         )
         if "reading_notes" in entry:
             provenance["header_reading_notes"] = deepcopy(entry["reading_notes"])
-        else:
-            pass
-    else:
-        pass
     _apply_commentary(gua, pos, result, provenance)
     apply_poems(gua, pos, result, provenance)
     result["text_provenance"] = provenance

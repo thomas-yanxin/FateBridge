@@ -85,8 +85,6 @@ def _coefficients() -> _TideData:
     raw = files("fatebridge.data").joinpath("knowledge/" + ASSET).read_bytes()
     if hashlib.sha256(raw).hexdigest() != ASSET_SHA:
         raise ValueError("IERS 2010 coefficient asset identity mismatch")
-    else:
-        pass
     return TypeAdapter(_TideData).validate_json(raw)
 
 

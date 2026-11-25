@@ -56,8 +56,6 @@ def count_to_taiyi(marker: str, taiyi_number: int) -> CountTrace:
         or taiyi_number not in PALACE_ORDER
     ):
         raise ValueError("太乙计数需要十六神及非中五的太乙宫数")
-    else:
-        pass
     principal = {label: number for number, label in PALACES.items() if number != 5}
     path: list[CountStep] = []
     if marker not in principal:
@@ -72,14 +70,10 @@ def count_to_taiyi(marker: str, taiyi_number: int) -> CountTrace:
             path.append(
                 {"palace": position, "value": principal[position], "kind": "正宫"}
             )
-        else:
-            pass
         index = (index + 1) % 16
     is_same_principal_palace = not path
     if is_same_principal_palace:
         path.append({"palace": marker, "value": taiyi_number, "kind": "本宫数"})
-    else:
-        pass
     return {
         "count": sum(step["value"] for step in path),
         "path": path,

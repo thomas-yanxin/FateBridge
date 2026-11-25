@@ -53,14 +53,10 @@ def build_clash_conditions(
                     "status": "calendar_clash_fact",
                 }
             )
-        else:
-            pass
         for other in lines:
             q = other["position"]
             if q == p or not activity_candidate(other, conditions[q - 1]):
                 continue
-            else:
-                pass
             if branch_facts(b, month, other["branch"], void)["is_day_clash"]:
                 match = activity_condition(other, conditions[q - 1])
                 actors.append(
@@ -76,8 +72,6 @@ def build_clash_conditions(
                         ),
                     }
                 )
-            else:
-                pass
         changed = line.get("changed_branch") if line["change"] else None
         back_clash = bool(
             changed and branch_facts(b, month, changed, void)["is_day_clash"]
@@ -99,8 +93,6 @@ def build_clash_conditions(
                     ),
                 }
             )
-        else:
-            pass
         if not line["change"] and strength["day_clash_break_condition"] is None:
             qi = None
         elif strength["supports"] or (

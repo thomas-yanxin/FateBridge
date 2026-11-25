@@ -62,8 +62,6 @@ def qualify_hidden_reception(
         row, c = lines[p - 1], conditions[p - 1]
         if row["branch"] != fly:
             raise ValueError("伏神受生门槛的飞神与同位原爻不一致")
-        else:
-            pass
         hidden_moving = moving_support_context(
             element=ELEMENTS[branch],
             subject_position=None,
@@ -79,8 +77,6 @@ def qualify_hidden_reception(
                 application_source_sha256=PROFILE["source"]["sha256"],
                 application_interpretation="将同版第110页伏神得动爻生与第97页金逢巳条款合用；这是明示的跨章适用，不是原文逐字描述本开发结构，也不等于已出伏或全局受益。",
             )
-        else:
-            pass
         hidden_growth = metal_si_growth_supported(
             ELEMENTS[branch],
             month,
@@ -146,8 +142,6 @@ def qualify_hidden_reception(
                 if fg is False
                 else "hidden_si_yin_generation_activity_pending"
             )
-        else:
-            pass
         flying = dict(
             condition_match=fg,
             raw_condition_match=raw_flying_match,
@@ -212,13 +206,9 @@ def qualify_hidden_reception(
                 qualification_status=hidden_penalty["status"],
                 qualification_source_path=hidden_penalty["source_path"],
             )
-        else:
-            pass
         calendar_support = bool(calendar["supports"])
         if calendar_support:
             supports.append("calendar_support")
-        else:
-            pass
         for key, rule_id, target, monthly, path in (
             (
                 "supporting_conditions",
@@ -241,13 +231,9 @@ def qualify_hidden_reception(
             month_exception = day_value_exception(target, month, day)
             if not metal_exception and not month_exception:
                 continue
-            else:
-                pass
             if month_exception:
                 kind = "flying" if rule_id == "flying_struck" else "hidden"
                 path = f"liuyao_evidence.conditional_analysis.month_break_conditions.hidden.{i}.{kind}"
-            else:
-                pass
             condition = next(v for v in h[key] if v["rule_id"] == rule_id)
             values: list[bool | None] = []
             for actor in condition["actors"]:
@@ -299,8 +285,6 @@ def qualify_hidden_reception(
             )
         if fg is True:
             supports.append("qualified_flying_generation")
-        else:
-            pass
         generators = next(
             r
             for r in h["supporting_conditions"]
@@ -341,15 +325,11 @@ def qualify_hidden_reception(
         ]
         if generated:
             supports.append("qualified_moving_generation")
-        else:
-            pass
         release = month_opposition_applies(fly, month, day) or (
             ff["is_xunkong"] and not ff["is_day_clash"]
         )
         if release:
             supports.append("flying_void_or_month_break_release")
-        else:
-            pass
         if any(
             (
                 element_relation(ELEMENTS[b], ELEMENTS[fly]) == "克爻"
@@ -365,8 +345,6 @@ def qualify_hidden_reception(
             for location, b in (("month", month), ("day", day))
         ):
             supports.append("calendar_strikes_flying")
-        else:
-            pass
         calendar_harm = (
             month_opposition_applies(branch, month, day) or hf["is_day_clash"]
         ) or bool(calendar["oppositions"])
@@ -403,46 +381,26 @@ def qualify_hidden_reception(
         )
         if hf["is_month_clash"] and hf["day_element_relation"] == "克爻" and no_root:
             blocked.append("hidden_month_broken_day_controlled_without_root")
-        else:
-            pass
         if strong_flying_control and no_root:
             blocked.append("unopposed_strong_flying_control_without_hidden_support")
-        else:
-            pass
         if hf["is_xunkong"]:
             pending.append("hidden_current_void_requires_resolution")
-        else:
-            pass
         if month_opposition_applies(branch, month, day):
             pending.append("hidden_month_break_requires_resolution")
-        else:
-            pass
         if calendar_harm:
             pending.append("hidden_calendar_opposition_requires_resolution")
-        else:
-            pass
         if relation == "克爻" and not c.get("outgoing_obstructions"):
             pending.append("flying_control_requires_global_resolution")
-        else:
-            pass
         if possible_controls:
             pending.append("moving_control_of_hidden_requires_resolution")
-        else:
-            pass
         if h["stage_conditions"]["hidden_tomb_cessation"]["condition_match"] is True:
             pending.append("hidden_tomb_or_cessation_position_not_adjudicated")
-        else:
-            pass
         if h["stage_conditions"]["has_relevant_unknown"]:
             pending.append("fire_stage_table_gap")
-        else:
-            pass
         if not supports:
             pending.append("hidden_support_not_established")
         elif not (calendar_support or fg is True or generated):
             pending.append("hidden_independent_root_not_established")
-        else:
-            pass
         match = False if blocked else None if pending else True
         h["reception"] = dict(
             ruleset_id=PROFILE["ruleset_id"],

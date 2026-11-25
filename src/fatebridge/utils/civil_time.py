@@ -93,12 +93,8 @@ class NominalClockLabel:
         clock = f"{hour:02d}:{minute:02d}"
         if timespec != "minutes":
             clock += f":{second:02d}"
-        else:
-            pass
         if timespec == "microseconds" or (timespec == "auto" and microsecond):
             clock += f".{microsecond:06d}"
-        else:
-            pass
         return f"{self.date_isoformat()}{sep}{clock}"
 
 
@@ -112,10 +108,6 @@ def _parse_calendar_isoformat(value: str) -> tuple[int, datetime]:
             proxy_year = 400 + year % 400
             proxy = parse_iso_datetime(f"{proxy_year:04d}" + value[extended.end() :])
             return year, proxy
-        else:
-            pass
-    else:
-        pass
     parsed = parse_iso_datetime(value)
     return parsed.year, parsed
 
@@ -155,16 +147,12 @@ class UTCCalendar:
         year, month, day = self.date_parts
         if not 1 <= year <= 9999:
             return None
-        else:
-            pass
         return datetime(year, month, day, *self.time_parts, tzinfo=timezone.utc)
 
     def isoformat(self) -> str:
         normal = self.as_datetime()
         if normal is not None:
             return normal.isoformat()
-        else:
-            pass
         year, month, day = self.date_parts
         year_text = f"{year:04d}" if 0 <= year <= 9999 else f"{year:+07d}"
         hour, minute, second, microsecond = self.time_parts
@@ -233,8 +221,6 @@ class CivilPoint:
                 micros,
                 math.ceil((self.excluded_before - epoch) * _DAY_MICROSECONDS) - 1,
             )
-        else:
-            pass
         days, remainder = divmod(micros, _DAY_MICROSECONDS)
         return UTCCalendar(719163 + days, remainder)
 
@@ -278,8 +264,6 @@ class ZonedCalendar:
         zone = moment.tzinfo
         if zone is None:
             raise ValueError("Civil-zone conversion requires an aware datetime")
-        else:
-            pass
         return cls(utc_calendar(moment), zone)
 
     @classmethod
@@ -332,8 +316,6 @@ class ZonedCalendar:
         offset = proxy.utcoffset()
         if offset is None:
             raise ValueError("Civil-zone conversion requires a known UTC offset")
-        else:
-            pass
         return offset
 
     @property
@@ -344,8 +326,6 @@ class ZonedCalendar:
     def timezone_label(self) -> str | None:
         if isinstance(self.zone, ZoneInfo):
             return self.zone.key
-        else:
-            pass
         return self._local_proxy()[0].tzname()
 
     def as_datetime(self) -> datetime | None:
@@ -359,8 +339,6 @@ class ZonedCalendar:
             raise ValueError(
                 "Civil calendar label is outside Python datetime's year range"
             )
-        else:
-            pass
         return moment
 
     def matches_wall_label(self, value: str) -> bool:
@@ -391,8 +369,6 @@ def utc_calendar(moment: datetime) -> UTCCalendar:
     offset = moment.utcoffset()
     if offset is None:
         raise ValueError("UTC calendar normalization requires an aware datetime")
-    else:
-        pass
     offset_us = (offset.days * 86400 + offset.seconds) * 1000000 + offset.microseconds
     carry, utc_us = divmod(_wall_microseconds(moment) - offset_us, _DAY_MICROSECONDS)
     return UTCCalendar(moment.toordinal() + carry, utc_us)
@@ -403,8 +379,6 @@ def parse_civil_iso_clock(value: str) -> datetime | UTCCalendar:
     moment, carry = parse_microsecond_iso_datetime(value)
     if moment.tzinfo is None:
         return moment
-    else:
-        pass
     calendar = utc_calendar(moment)
     return calendar.shifted(timedelta(microseconds=carry)) if carry else calendar
 

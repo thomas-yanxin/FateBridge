@@ -141,12 +141,8 @@ def bodily_between(target: Fraction, first: Fraction, second: Fraction) -> bool 
     arc = (second - first) % 360
     if arc == 180:
         return None
-    else:
-        pass
     if arc > 180:
         first, arc = second, 360 - arc
-    else:
-        pass
     return 0 < (target - first) % 360 < arc
 
 
@@ -161,8 +157,6 @@ def evaluate_fortitudes(
     """Evaluate every printed row; unknown required facts never contribute zero."""
     if not set(states) <= PLANETS:
         raise ValueError("Lilly fortitudes require the seven traditional planets")
-    else:
-        pass
     longitudes = {p: _longitude(states.get(p, {})) for p in ORDER}
     own = {
         p: dignity_at(p, lon, sect) if lon is not None else None
@@ -189,21 +183,15 @@ def evaluate_fortitudes(
             for other in ORDER:
                 if other == planet:
                     continue
-                else:
-                    pass
                 other_lon = longitudes[other]
                 if lon is None or other_lon is None:
                     mutual.append(None)
                     continue
-                else:
-                    pass
                 pair = pair_reception(planet, lon, other, other_lon, sect)
                 present = kind in pair["mutual_same_kind"]
                 mutual.append(present)
                 if present:
                     witnesses.append(other)
-                else:
-                    pass
             local = None if essential is None else kind in essential["dignities"]
             put(
                 code,
@@ -243,8 +231,6 @@ def evaluate_fortitudes(
         )
         if house is not None and house not in range(1, 13):
             raise ValueError("Occupied house must be1..12 or unknown")
-        else:
-            pass
         for code, houses in [
             ("F01", [1, 10]),
             ("F02", [7, 4, 11]),
@@ -276,8 +262,6 @@ def evaluate_fortitudes(
         direction = motion.get("direction")
         if direction not in {None, "direct", "retrograde", "stationary"}:
             raise ValueError("Invalid motion direction")
-        else:
-            pass
         for code, name in [("F06", "direct"), ("D03", "retrograde")]:
             put(
                 code,
@@ -302,8 +286,6 @@ def evaluate_fortitudes(
             raise ValueError(
                 "Daily displacement and its exact supplied-value receipt differ"
             )
-        else:
-            pass
         magnitude = None if displacement is None else abs(displacement)
         mean = Fraction(MEAN_MOTION_ARCSECONDS[planet], 3600)
         for code, value in [
@@ -381,8 +363,6 @@ def evaluate_fortitudes(
             for other in others:
                 if other == planet:
                     continue
-                else:
-                    pass
                 other_lon = longitudes[other]
                 gap = (
                     None

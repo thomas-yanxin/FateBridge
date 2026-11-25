@@ -161,8 +161,6 @@ def _build_western_timing_module_summary(
         body = "太阳" if technique == "solarreturn" else "月亮"
         event_label = _return_event_label(payload)
         return f"{prefix} 西占{body}返照：返照发生于 {event_label}。"
-    else:
-        pass
 
     if technique == "transit":
         top_hit = payload["hits"][0] if payload.get("hits") else None
@@ -172,16 +170,10 @@ def _build_western_timing_module_summary(
                 f"，最紧密命中 "
                 f"{top_hit['source_label']}{top_hit['aspect_label']}{top_hit['target_label']}"
             )
-        else:
-            pass
         return summary + "。"
-    else:
-        pass
 
     if technique == "solararc":
         return f"{prefix} 西占太阳弧：当前太阳弧 {payload['arc_degrees']:.2f}°。"
-    else:
-        pass
 
     if technique == "givenyear":
         annual_profection = payload.get("annual_profection", {})
@@ -193,15 +185,11 @@ def _build_western_timing_module_summary(
                 f"年小限落第{annual_profection.get('activated_house')}宫"
                 f"{activated_sign_label}。"
             )
-        else:
-            pass
         return (
             f"{prefix} 西占指定年盘：上升 {asc_label}，"
             f"年小限落第{annual_profection.get('activated_house')}宫"
             "（本命上升未解析，落座与主星待定）。"
         )
-    else:
-        pass
 
     if technique == "profection":
         if (
@@ -212,14 +200,10 @@ def _build_western_timing_module_summary(
                 f"{prefix} 西占年小限：落第{payload['activated_house']}宫"
                 "（本命上升未解析，落座与主星待定）。"
             )
-        else:
-            pass
         return (
             f"{prefix} 西占年小限：落第{payload['activated_house']}宫"
             f"{payload['activated_sign_label']}，主星 {payload['lord_label']}。"
         )
-    else:
-        pass
 
     if technique == "primarydirect":
         return (
@@ -227,8 +211,6 @@ def _build_western_timing_module_summary(
             f"{payload['time_key_label']} {payload['coordinate_label']} "
             f"{payload['current_arc_degrees']:.2f}°。"
         )
-    else:
-        pass
 
     if technique == "primarydirchart":
         return (
@@ -236,21 +218,15 @@ def _build_western_timing_module_summary(
             f"{payload['time_key_label']} {payload['coordinate_label']} "
             f"{payload['current_arc_degrees']:.2f}°。"
         )
-    else:
-        pass
 
     if technique in {"zodialrelease", "zodiacal_releasing"}:
         if payload.get("status") == "underdetermined_ascendant":
             return f"{prefix} 西占黄道释放：本命上升未解析，无法计算福点与精神点释放。"
-        else:
-            pass
         spirit_level_1 = payload["spirit"].get("current_level_1") or {}
         return (
             f"{prefix} 西占黄道释放：Spirit L1 "
             f"{spirit_level_1.get('sign_label', '未知')}。"
         )
-    else:
-        pass
 
     if technique == "firdaria":
         current_major = payload.get("current_major") or {}
@@ -260,8 +236,6 @@ def _build_western_timing_module_summary(
             f"{current_major.get('planet_label', '未知')}/"
             f"{current_sub.get('planet_label', '未知')}。"
         )
-    else:
-        pass
 
     if technique == "decennials":
         current_level_1 = payload.get("current_level_1") or {}
@@ -272,11 +246,7 @@ def _build_western_timing_module_summary(
         )
         if current_level_2:
             summary += f"，L2 {current_level_2.get('planet_label', '未知')}"
-        else:
-            pass
         return summary + "。"
-    else:
-        pass
 
     raise ValueError(f"Unsupported western timing technique: {technique}")
 
@@ -342,8 +312,6 @@ def build_western_timing_module_payload(
             analysis_datetime=analysis_datetime,
         )
         return result
-    else:
-        pass
 
     if technique == "transit":
         transit_payload = build_transit_payload(
@@ -363,8 +331,6 @@ def build_western_timing_module_payload(
             analysis_datetime=analysis_datetime,
         )
         return result
-    else:
-        pass
 
     if technique == "solararc":
         progression_payload = build_secondary_progression_payload(
@@ -386,8 +352,6 @@ def build_western_timing_module_payload(
             analysis_datetime=analysis_datetime,
         )
         return result
-    else:
-        pass
 
     if technique == "primarydirect":
         primary_directions_payload = build_primary_directions_payload(
@@ -406,8 +370,6 @@ def build_western_timing_module_payload(
             analysis_datetime=analysis_datetime,
         )
         return result
-    else:
-        pass
 
     if technique == "primarydirchart":
         _, primary_direction_chart_payload = _build_primary_direction_pair(
@@ -429,8 +391,6 @@ def build_western_timing_module_payload(
             analysis_datetime=analysis_datetime,
         )
         return result
-    else:
-        pass
 
     if technique == "profection":
         profection_payload = build_annual_profection_payload(
@@ -445,8 +405,6 @@ def build_western_timing_module_payload(
             analysis_datetime=analysis_datetime,
         )
         return result
-    else:
-        pass
 
     if technique == "givenyear":
         profection_payload = build_annual_profection_payload(
@@ -472,8 +430,6 @@ def build_western_timing_module_payload(
             analysis_datetime=analysis_datetime,
         )
         return result
-    else:
-        pass
 
     if technique in {"zodialrelease", "zodiacal_releasing"}:
         zodiacal_releasing_payload = build_zodiacal_releasing_payload(
@@ -488,8 +444,6 @@ def build_western_timing_module_payload(
             analysis_datetime=analysis_datetime,
         )
         return result
-    else:
-        pass
 
     if technique == "firdaria":
         firdaria_payload = build_firdaria_payload(
@@ -506,8 +460,6 @@ def build_western_timing_module_payload(
             analysis_datetime=analysis_datetime,
         )
         return result
-    else:
-        pass
 
     if technique == "decennials":
         # Period allocation uses sect and natal longitude order. Keep chart
@@ -533,8 +485,6 @@ def build_western_timing_module_payload(
             analysis_datetime=analysis_datetime,
         )
         return result
-    else:
-        pass
 
     raise ValueError(f"Unsupported western timing technique: {technique}")
 

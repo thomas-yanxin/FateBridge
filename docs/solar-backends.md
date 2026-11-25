@@ -85,7 +85,7 @@ export FATEBRIDGE_SOLAR_TERM_MODEL=swiss
 
 旧 `fatebridge_complete_moshier_solar_v1/v2` 使用作者1996年地月质心级数及完整原生Moshier月球。原作者C算术对照、原96／576项通过、v1全队列15项一秒失败以及v2的21项DE440／16项同框架Swiss文件失败均保存在独立审查档案；v2最大误差分别约1.304962／1.281667秒。原13906项毫角秒失败及3656项不优于原版Moshier仍为旧修订结果，不因替换而通过。无调用方的旧Python太阳实现、重复地球系数与专属实现测试已移除；原数值参考、失败证据、原生Moshier行星和显式AA1996模型继续分别保留。替换是采用已独立对照的更完整动力学来源，不是给旧级数改名。
 
-来源：[JPL星历与TDB定义](https://ssd.jpl.nasa.gov/planets/eph_export.html)、[CALCEPH时间和读取接口](https://calceph.imcce.fr/docs/latest/html/c/calceph.multiple.cusage.html)、[Skyfield视位置](https://rhodesmill.org/skyfield/positions.html)和[固定Swiss源码](https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c)。共享轨道谱系和软件一致不证明全时域SOTA、历史／未来UTC或现实预测效度。
+来源：[JPL星历与TDB定义](https://ssd.jpl.nasa.gov/planets/eph_export.html)、[CALCEPH时间和读取接口](https://calceph.imcce.fr/docs/latest/html/c/calceph.multiple.cusage.html)、[Skyfield视位置](https://rhodesmill.org/skyfield/positions.html)和[固定Swiss源码](https://github.com/astrorigin/swisseph)。共享轨道谱系和软件一致不证明全时域SOTA、历史／未来UTC或现实预测效度。
 
 ## 模型与适用范围
 

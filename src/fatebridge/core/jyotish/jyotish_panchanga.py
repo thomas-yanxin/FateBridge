@@ -106,12 +106,8 @@ def _band_angle(value: Fraction, lower: int | Fraction, width: int | Fraction) -
     rendered = float(value)
     if rendered < lower:
         return math.nextafter(rendered, math.inf)
-    else:
-        pass
     if rendered >= lower + width:
         return math.nextafter(rendered, -math.inf)
-    else:
-        pass
     return rendered
 
 
@@ -191,14 +187,8 @@ def compute_panchanga(
         if isinstance(day_lord, str) and day_lord in _LORD_TO_SUN0:
             weekday_sun0 = _LORD_TO_SUN0[day_lord]
             before_sunrise = solar_context.get("before_local_sunrise")
-        else:
-            pass
-    else:
-        pass
     if weekday_sun0 is None and local_datetime is not None:
         weekday_sun0 = (local_datetime.weekday() + 1) % 7
-    else:
-        pass
 
     if weekday_sun0 is not None:
         sanskrit, english, zh, lord = _VARA_NAMES[weekday_sun0]

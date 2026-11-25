@@ -33,10 +33,6 @@ class HeluoSolarBoundary(PartialOutput):
             civil = self.record.display_with_offset if self.record is not None else None
             if civil is not None and ZonedCalendar.from_isoformat(civil).utc != at:
                 raise ValueError("实际交节记录与所列UTC瞬间不是同一时刻。")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -68,12 +64,6 @@ class HeluoSolarContext(PartialOutput):
                     raise ValueError(
                         "上下文年份须取已给时区的民用年，不能替换成UTC年。"
                     )
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -102,17 +92,11 @@ class HeluoSolarTermEvidence(PartialOutput):
         context = self.boundary_context
         if context is None:
             return self
-        else:
-            pass
         if self.anchor_utc is not None and context.birth_instant_utc is not None:
             if ZonedCalendar.from_isoformat(self.anchor_utc).utc != (
                 ZonedCalendar.from_isoformat(context.birth_instant_utc).utc
             ):
                 raise ValueError("节气上下文与出生锚点不一致。")
-            else:
-                pass
-        else:
-            pass
         roles = {r.role: r for r in context.dependencies or [] if r.role is not None}
         if (row := roles.get("current_term")) is not None and row.record is not None:
             if (
@@ -121,22 +105,12 @@ class HeluoSolarTermEvidence(PartialOutput):
                 and row.record.name != self.term
             ):
                 raise ValueError("实际交节记录与所列节气不一致。")
-            else:
-                pass
-        else:
-            pass
         if (
             row := roles.get("preceding_solstice")
         ) is not None and row.record is not None:
             if self.yang_ling is not None and row.record.name in {"冬至", "夏至"}:
                 if self.yang_ling != (row.record.name == "冬至"):
                     raise ValueError("阴阳令须与实际最近至点一致。")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         if self.anchor_utc is not None:
             anchor = ZonedCalendar.from_isoformat(
                 self.anchor_utc
@@ -149,12 +123,6 @@ class HeluoSolarTermEvidence(PartialOutput):
                         role != "next_four_li" and day > anchor
                     ):
                         raise ValueError("交节包含端点与下一四立的时序不一致。")
-                    else:
-                        pass
-                else:
-                    pass
-        else:
-            pass
         start = (
             self.tuyong_start_point.known_day()
             if self.tuyong_start_point is not None
@@ -168,27 +136,17 @@ class HeluoSolarTermEvidence(PartialOutput):
         if start is not None and end is not None:
             if start != end - 18:
                 raise ValueError("土用精确起点须为下一四立主点前十八个名义日。")
-            else:
-                pass
             if self.tuyong is not None and self.anchor_utc is not None:
                 anchor = ZonedCalendar.from_isoformat(
                     self.anchor_utc
                 ).utc.julian_day_exact()
                 if self.tuyong != (start <= anchor < end):
                     raise ValueError("土用匹配与所列精确民用边界不一致。")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         if (row := roles.get("next_four_li")) is not None:
             point = row.record.civil_point if row.record is not None else None
             source_end = point.known_day() if point is not None else None
             if source_end is not None and end is not None and source_end != end:
                 raise ValueError("土用终点与下一四立精确主点不一致。")
-            else:
-                pass
             if row.instant_utc is not None:
                 end_label = ZonedCalendar.from_isoformat(row.instant_utc).utc
                 start_label = UTCCalendar(
@@ -200,18 +158,10 @@ class HeluoSolarTermEvidence(PartialOutput):
                     != start_label
                 ):
                     raise ValueError("土用显示起点须为四立显示标签前十八个名义日。")
-                else:
-                    pass
                 if (
                     self.tuyong_end_utc is not None
                     and ZonedCalendar.from_isoformat(self.tuyong_end_utc).utc
                     != end_label
                 ):
                     raise ValueError("土用显示终点须为本次下一四立显示标签。")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         return self

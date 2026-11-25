@@ -19,16 +19,12 @@ def seasonal_power(month_branch: str, element: str) -> str:
         or len(element) != 1
     ):
         raise ValueError("四季旺衰须使用月建支及四位实际五行")
-    else:
-        pass
     return status_against_anchor(branch_element_text(month_branch), element)
 
 
 def seasonal_power_basis(month_branch: str) -> str:
     if month_branch not in EARTHLY_BRANCHES:
         raise ValueError("四季旺衰须使用月建支")
-    else:
-        pass
     phase = branch_element_text(month_branch)
     return (
         f"五行休旺：按月建{month_branch}之{phase}气，辰戌丑未按土旺月；不以地分定季节"

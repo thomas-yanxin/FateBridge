@@ -112,8 +112,6 @@ class TimingInteractions(PartialOutput):
             for row in self.pillar_carrier_summary:
                 if row.node_id not in detailed:
                     continue
-                else:
-                    pass
                 raw = detailed[row.node_id]
                 for key in (
                     "pillar",
@@ -126,18 +124,12 @@ class TimingInteractions(PartialOutput):
                     shown, actual = getattr(row, key), getattr(raw, key)
                     if shown is not None and actual is not None and shown != actual:
                         raise ValueError("承载摘要必须忠于同次明细")
-                    else:
-                        pass
                 if (
                     row.external_natal_root_count is not None
                     and raw.external_natal_roots is not None
                     and row.external_natal_root_count != len(raw.external_natal_roots)
                 ):
                     raise ValueError("外援根摘要数量必须忠于同次原局根明细")
-                else:
-                    pass
-        else:
-            pass
         if self.root_context is not None:
             roots = (self.root_context.day_master_roots or []) + (
                 self.root_context.timing_stem_natal_roots or []
@@ -151,56 +143,34 @@ class TimingInteractions(PartialOutput):
                 ):
                     if node_id is None or self.nodes is None:
                         continue
-                    else:
-                        pass
                     if node_id not in nodes:
                         if all(n.id is not None for n in self.nodes):
                             raise ValueError("时运根气必须引用同次实际节点")
-                        else:
-                            pass
                         continue
-                    else:
-                        pass
                     if root.classification is not None:
                         shown = getattr(root.classification, component)
                         actual = getattr(nodes[node_id], component)
                         if shown is not None and actual is not None and shown != actual:
                             raise ValueError("时运根类必须匹配所引用节点的干支")
-                        else:
-                            pass
-                    else:
-                        pass
                 for relation_id in root.branch_relation_ids or []:
                     if self.relations is None:
                         continue
-                    else:
-                        pass
                     relation = relations.get(relation_id)
                     if relation is None:
                         if all(r.id is not None for r in self.relations):
                             raise ValueError("根位触点必须引用同次地支关系")
-                        else:
-                            pass
                         continue
-                    else:
-                        pass
                     if (
                         relation.rule_id is not None
                         and relation.rule_id not in BRANCH_RELATION_KINDS
                     ):
                         raise ValueError("根位触点必须引用同次地支关系")
-                    else:
-                        pass
                     if (
                         root.branch_node_id is not None
                         and relation.participants is not None
                         and root.branch_node_id not in relation.participants
                     ):
                         raise ValueError("根位触点必须实际包含该地支节点")
-                    else:
-                        pass
-        else:
-            pass
         return self
 
 
@@ -255,8 +225,6 @@ class BirthTimeEvent(PartialOutput):
     def preserve_nominal_point_bracket(self, info: ValidationInfo) -> "BirthTimeEvent":
         if self.bracket_basis != "nominal_gregorian_microsecond_enclosure_v1":
             return self
-        else:
-            pass
         if info.context and info.context.get("full_result"):
             if (
                 self.civil_point is None
@@ -264,46 +232,26 @@ class BirthTimeEvent(PartialOutput):
                 or self.upper_utc is None
             ):
                 raise ValueError("完整名义事件括区间须保留主点及两端标签")
-            else:
-                pass
             if (
                 self.kind == "dayun_nominal_month_carry"
                 and self.reference_point is None
             ):
                 raise ValueError("完整名义月进位须保留同次实际参考节令主点")
-            else:
-                pass
-        else:
-            pass
         day = self.civil_point.known_day() if self.civil_point is not None else None
         if day is None:
             return self
-        else:
-            pass
         expected_lower, expected_upper = nominal_calendar_bracket(day)
         if self.lower_utc is not None:
             lower = ZonedCalendar.from_isoformat(self.lower_utc).utc
             if lower != expected_lower:
                 raise ValueError("名义事件下端须为保留坐标的微秒格点下包")
-            else:
-                pass
-        else:
-            pass
         if self.upper_utc is not None:
             upper = ZonedCalendar.from_isoformat(self.upper_utc).utc
             if upper != expected_upper:
                 raise ValueError("名义事件上端须为保留坐标的微秒格点上包")
-            else:
-                pass
-        else:
-            pass
         if self.at_utc is not None:
             if ZonedCalendar.from_isoformat(self.at_utc).utc != expected_upper:
                 raise ValueError("名义事件代表标签须为括区间上端，不冒充未舍入主点")
-            else:
-                pass
-        else:
-            pass
         if self.bracket_width_seconds is not None:
             width = float(
                 (expected_upper.julian_day_exact() - expected_lower.julian_day_exact())
@@ -311,10 +259,6 @@ class BirthTimeEvent(PartialOutput):
             )
             if self.bracket_width_seconds != width:
                 raise ValueError("名义事件括区间宽度须与所声明坐标外包一致")
-            else:
-                pass
-        else:
-            pass
         return self
 
 

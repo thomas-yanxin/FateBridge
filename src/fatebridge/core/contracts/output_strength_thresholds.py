@@ -37,10 +37,6 @@ class PhysicalRootUnitComparison(PartialOutput):
                 raise ValueError("实际藏干根预算门槛须为有限分数") from error
             if threshold != 1:
                 raise ValueError("实际藏干根预算的既定单位门槛不可改变")
-            else:
-                pass
-        else:
-            pass
         for element, raw in (self.masses_exact or {}).items():
             try:
                 mass = Fraction(raw)
@@ -48,16 +44,12 @@ class PhysicalRootUnitComparison(PartialOutput):
                 raise ValueError("实际藏干根预算须为有限分数") from error
             if mass < 0:
                 raise ValueError("实际藏干根预算不可为负")
-            else:
-                pass
             if (
                 self.at_least_unit is not None
                 and element in self.at_least_unit
                 and self.at_least_unit[element] != (mass >= 1)
             ):
                 raise ValueError("实际藏干根标记与精确单位门槛不符")
-            else:
-                pass
         return self
 
 
@@ -112,8 +104,6 @@ class StrengthThresholdArithmetic(PartialOutput):
             ):
                 if flags is None or controller not in flags or wealth not in flags:
                     continue
-                else:
-                    pass
                 expected_count = sum(
                     e == controller and flags[e]
                     for e in root.visible_non_day_elements.values()
@@ -124,14 +114,8 @@ class StrengthThresholdArithmetic(PartialOutput):
                 )
                 if count is not None and count != expected_count:
                     raise ValueError("官杀有根透干数与同次实际藏干根标记不符")
-                else:
-                    pass
                 if has_wealth is not None and has_wealth != expected_wealth:
                     raise ValueError("财有根标记与同次实际藏干根标记不符")
-                else:
-                    pass
-        else:
-            pass
         values = {}
         for field in (
             "support_exact",
@@ -152,11 +136,7 @@ class StrengthThresholdArithmetic(PartialOutput):
                     field not in {"support_exact", "weaken_exact"} and value > 1
                 ):
                     raise ValueError("阈值回执分数范围不符")
-                else:
-                    pass
                 values[field] = value
-            else:
-                pass
         energies: dict[str, Fraction] = {}
         for element, raw in (self.energies_exact or {}).items():
             try:
@@ -165,8 +145,6 @@ class StrengthThresholdArithmetic(PartialOutput):
                 raise ValueError("分量回执须为有限分数") from error
             if value < 0:
                 raise ValueError("分量回执不可为负")
-            else:
-                pass
             energies[element] = value
         if len(energies) == 5 and self.day_element is not None:
             cycle = {"木": "火", "火": "土", "土": "金", "金": "水", "水": "木"}
@@ -181,10 +159,6 @@ class StrengthThresholdArithmetic(PartialOutput):
             ):
                 if field in values and values[field] != expected:
                     raise ValueError("身印减身总量与精确五行分量不符")
-                else:
-                    pass
-        else:
-            pass
         if all(k in values for k in ("support_exact", "weaken_exact", "share_exact")):
             support, weaken = values["support_exact"], values["weaken_exact"]
             expected = (
@@ -192,10 +166,6 @@ class StrengthThresholdArithmetic(PartialOutput):
             )
             if values["share_exact"] != expected:
                 raise ValueError("精确份额与身印、减身总量不符")
-            else:
-                pass
-        else:
-            pass
         if "share_exact" in values:
             share = values["share_exact"]
             lower, upper = (
@@ -205,24 +175,16 @@ class StrengthThresholdArithmetic(PartialOutput):
             if lower is not None and upper is not None:
                 if (lower, upper) != (Fraction(3, 20), Fraction(17, 20)):
                     raise ValueError("特殊结构复核的既定严格边界不符")
-                else:
-                    pass
                 if (
                     self.requires_special_structure_review is not None
                     and self.requires_special_structure_review
                     != (share < lower or share > upper)
                 ):
                     raise ValueError("特殊结构复核标记与精确份额不符")
-                else:
-                    pass
-            else:
-                pass
             if self.support_above_half is not None and self.support_above_half != (
                 share > Fraction(1, 2)
             ):
                 raise ValueError("二分之一比较与精确份额不符")
-            else:
-                pass
             if all(
                 k in values for k in ("weak_threshold_exact", "strong_threshold_exact")
             ):
@@ -232,17 +194,9 @@ class StrengthThresholdArithmetic(PartialOutput):
                 )
                 if weak > strong:
                     raise ValueError("弱强阈值顺序不符")
-                else:
-                    pass
                 label = "强" if share > strong else "弱" if share < weak else "中和"
                 if self.numerical_label is not None and self.numerical_label != label:
                     raise ValueError("数值档与精确阈值不符")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         if (
             self.numerical_label is not None
             and self.float_numerical_label is not None
@@ -251,6 +205,4 @@ class StrengthThresholdArithmetic(PartialOutput):
             != (self.numerical_label != self.float_numerical_label)
         ):
             raise ValueError("浮点判档差异标记不符")
-        else:
-            pass
         return self

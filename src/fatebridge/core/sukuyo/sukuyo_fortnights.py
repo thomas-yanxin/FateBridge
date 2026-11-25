@@ -28,17 +28,11 @@ def declared_fortnight_ordinal(
         or white_length != 15
     ):
         raise ValueError("本对照须显式声明黑分十四或十五、白分十五；不能默认或扩用")
-    else:
-        pass
     if half not in ("black", "white") or type(day) is not int:
         raise ValueError("分日必须为已声明黑白分和整数日号")
-    else:
-        pass
     maximum = black_length if half == "black" else white_length
     if not 1 <= day <= maximum:
         raise ValueError("分日超出已声明半月长度；不能补造不存在的黑十五")
-    else:
-        pass
     return day if half == "black" else black_length + day
 
 
@@ -89,19 +83,13 @@ def _numbering_validation_scope(cases: list[dict[str, Any]]) -> dict[str, Any]:
         except ValueError:
             if row["valid"]:
                 raise ValueError("修改前有效编号被意外拒绝")
-            else:
-                pass
             rejected += 1
         else:
             if not row["valid"] or value != row["ordinal"]:
                 raise ValueError("编号与修改前声明矩阵不一致")
-            else:
-                pass
             valid += 1
     if (len(cases), valid, rejected) != (68, 59, 9):
         raise ValueError("声明编号矩阵范围发生变化，须完整重新核验")
-    else:
-        pass
     return {
         "declared_cases": len(cases),
         "valid": valid,
@@ -118,13 +106,9 @@ def fortnight_calendar_reference(rizang: dict[str, Any]) -> dict[str, Any]:
     loaded = load_source(SOURCE)
     if loaded.sha256 != CANONICAL_SHA256:
         raise ValueError("黑白分来源包已改变，须重新核验原录及编号参考")
-    else:
-        pass
     data = loaded.data
     if data["actual_sources"]["T13n0397.xml"]["sha256"] != rizang["source_sha256"]:
         raise ValueError("黑白分对照与日藏具名版本不一致，须重新核验")
-    else:
-        pass
     comparative = load_source(DATA_DIR / "sukuyo_comparative_time_units.json").data
     matches = [r for r in comparative["witnesses"] if r["id"] == "T51n2087"]
     if (
@@ -133,18 +117,12 @@ def fortnight_calendar_reference(rizang: dict[str, Any]) -> dict[str, Any]:
         != data["actual_sources"]["T51n2087.xml"]["sha256"]
     ):
         raise ValueError("黑白分对照与西域记具名版本不一致，须重新核验")
-    else:
-        pass
     t1299 = load_source(DATA_DIR / "sukuyo_t1299_days.json").data
     if t1299["source_sha256"] != data["actual_sources"]["T21n1299.xml"]["sha256"]:
         raise ValueError("黑白分对照与T1299具名版本不一致，须重新核验")
-    else:
-        pass
     ledger = _declared_yuga_ledger(data["five_year_diagnostic_assumptions"])
     if ledger != data["before_production_five_year_ledger"]:
         raise ValueError("五年原计数派生账本与修改前参考不一致")
-    else:
-        pass
     examples = [
         {
             "black_length": length,

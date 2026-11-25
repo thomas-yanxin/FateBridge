@@ -22,8 +22,6 @@ REFERENCE_YEAR = 1281
 def _integer_year(value: int) -> None:
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError("原历标年须为明确整数，不接收浮点、布尔、日期或隐式距算")
-    else:
-        pass
 
 
 def _ganzhi_label(year: int) -> str:
@@ -41,8 +39,6 @@ def shoushi_year_context(
     """
     if (source_year is None) == (winter_year is None):
         raise ValueError("须且只能明确选择历书标年source_year或岁前冬至年winter_year")
-    else:
-        pass
     if source_year is not None:
         _integer_year(source_year)
         nominal_year = source_year
@@ -60,8 +56,6 @@ def shoushi_year_context(
         or source["reference_winter_year_ce"] != REFERENCE_YEAR - 1
     ):
         raise ValueError("具名历元资料与1281年标年规则不一致，不能改元以凑合算例")
-    else:
-        pass
     return {
         "model_id": source["model_id"],
         "source_data_sha256": hashlib.sha256(blob).hexdigest(),

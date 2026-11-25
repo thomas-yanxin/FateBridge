@@ -59,8 +59,6 @@ def ordered_contact(
     ]
     if not rows:
         return None, None
-    else:
-        pass
     row = (max if past else min)(rows, key=lambda e: e["root_bracket_tt"][0])
     bracket = row["root_bracket_tt"]
     obstacles = [
@@ -94,6 +92,4 @@ def ordered_contact(
         or any(a in u["bodies"] for u in unresolved_intervals)
     ):
         return row, None
-    else:
-        pass
     return row, True

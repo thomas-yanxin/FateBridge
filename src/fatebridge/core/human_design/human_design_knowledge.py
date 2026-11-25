@@ -76,38 +76,28 @@ def read_reference(*, category: str | None, key: str | None) -> dict:
         )
 
         return read_v7(key=key)
-    else:
-        pass
     if category == "lines_v6":
         from fatebridge.core.human_design.human_design_knowledge_v6 import (
             read_reference as read_v6,
         )
 
         return read_v6(key=key)
-    else:
-        pass
     if category == "lines_v5":
         from fatebridge.core.human_design.human_design_knowledge_v5 import (
             read_reference as read_v5,
         )
 
         return read_v5(key=key)
-    else:
-        pass
     if category == "lines_v4":
         from fatebridge.core.human_design.human_design_knowledge_v4 import (
             read_reference as read_v4,
         )
 
         return read_v4(key=key)
-    else:
-        pass
     if category == "lines_v3":
         from fatebridge.core.human_design.human_design_knowledge_v3 import (
             read_reference as read_v3,
         )
 
         return read_v3(key=key)
-    else:
-        pass
     return read_base_reference(category=category, key=key)

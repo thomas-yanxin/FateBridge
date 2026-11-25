@@ -62,8 +62,6 @@ def limit_source_evidence(
                 (branches.index(ming) + sign * (1 + (nominal_age - first_age) // 10))
                 % 12
             ]
-        else:
-            pass
         xiao_start = next(
             r["branch"]
             for r in source["xiaoxian"]["anchors"]
@@ -73,8 +71,6 @@ def limit_source_evidence(
         expected_xiao = branches[
             (branches.index(xiao_start) + xiao_sign * (nominal_age - 1)) % 12
         ]
-    else:
-        pass
     birth = chart["lunar_date"]
     expected_doujun = (
         None

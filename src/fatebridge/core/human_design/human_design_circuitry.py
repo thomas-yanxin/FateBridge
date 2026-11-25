@@ -55,8 +55,6 @@ def circuitry_summary(
     unknown = set(counts) - set(CIRCUIT_GROUP)
     if unknown:
         raise ValueError("未支持的人类图通道回路分类")
-    else:
-        pass
     circuits = [
         {
             "id": circuit,

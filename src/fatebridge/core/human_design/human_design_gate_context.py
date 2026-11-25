@@ -65,8 +65,6 @@ def classify_gate_context(
     p, d = set(personality), set(design)
     if any(type(g) is not int or g not in GATE_CENTER for g in p | d):
         raise ValueError("Gate context requires integer gate numbers1..64")
-    else:
-        pass
     active = p | d
     pairs = sorted({tuple(sorted((a, b))) for a, b, _ in CHANNELS})
     complete = {edge for edge in pairs if set(edge) <= active}
@@ -134,8 +132,6 @@ def _context(value: dict[str, Any], path: str) -> dict[str, Any]:
     actual_pairs = sorted({tuple(sorted(c["gates"])) for c in graph["channels"]})
     if not _same_value(actual_pairs, expected_pairs):
         raise ValueError("Gate context channels disagree with actual activations")
-    else:
-        pass
     prefix = path + "." if path else ""
     basis = [
         {"path": f"{prefix}activations.{side}.{i}.gate", "value": a["gate"]}
@@ -183,23 +179,15 @@ def gate_context_report(chart: dict[str, Any]) -> dict[str, Any]:
             if value.get("projection_format") == "gate_line_tone_personality_color_v2":
                 witnesses.append(_context(value, path))
                 return
-            else:
-                pass
             if "bodygraph" in value and "activations" in value:
                 witnesses.append(_context(value, path))
-            else:
-                pass
             # JSON object order is not semantic; source arrays keep theirs.
             for key in sorted(value):
                 if key not in excluded:
                     walk(value[key], f"{path}.{key}" if path else key)
-                else:
-                    pass
         elif isinstance(value, list):
             for i, child in enumerate(value):
                 walk(child, f"{path}.{i}")
-        else:
-            pass
 
     for key in (
         "node_convention_comparison",
@@ -209,8 +197,6 @@ def gate_context_report(chart: dict[str, Any]) -> dict[str, Any]:
     ):
         if key in chart:
             walk(chart[key], key)
-        else:
-            pass
     return {
         "method_id": METHOD,
         "ruleset": ruleset(),

@@ -63,8 +63,6 @@ def historical_utc_source(moment: datetime) -> dict[str, Any]:
     """Select the historical coefficient source by the UTC calendar year."""
     if moment.utcoffset() is None:
         raise ValueError("Historical UTC requires an aware datetime")
-    else:
-        pass
     return (
         utc1960_table()
         if moment.astimezone(timezone.utc).year == 1960
@@ -155,16 +153,12 @@ def historical_tai_minus_utc_exact(moment: datetime) -> Optional[Fraction]:
     """One published-decimal offset for scalar and exact-point consumers."""
     if moment.utcoffset() is None:
         raise ValueError("Historical UTC requires an aware datetime")
-    else:
-        pass
     moment = moment.astimezone(timezone.utc)
     intervals = _utc_intervals()
     if not (
         intervals[0].start <= moment < _date(historical_utc_table()["valid_until"])
     ):
         return None
-    else:
-        pass
     interval = next(row for row in reversed(intervals) if row.start <= moment)
     micros = (
         moment.hour * 3600 + moment.minute * 60 + moment.second
@@ -178,8 +172,6 @@ def historical_tai_minus_utc_exact(moment: datetime) -> Optional[Fraction]:
         raise ValueError(
             "UTC clock label was removed by a historical negative adjustment"
         )
-    else:
-        pass
     return interval.offset_at_start + (day - interval.start_day) * interval.rate
 
 
@@ -218,8 +210,6 @@ def historical_utc_point_from_tt(
     if isinstance(julian_day_tt, TTInstant):
         if nominal_boundaries:
             raise ValueError("TTInstant cannot request nominal scalar boundary labels")
-        else:
-            pass
         point = julian_day_tt
     else:
         point = TTInstant.from_float(julian_day_tt)
@@ -227,10 +217,6 @@ def historical_utc_point_from_tt(
             for interval in intervals:
                 if julian_day_tt == float(interval.start_tt):
                     return CivilPoint(interval.start_day, interval.stop_day)
-                else:
-                    pass
-        else:
-            pass
     modern = Fraction(_date(historical_utc_table()["valid_until"]).toordinal())
     modern += (
         Fraction(3442849, 2)
@@ -242,8 +228,6 @@ def historical_utc_point_from_tt(
     )
     if not intervals[0].start_tt <= point.days < modern:
         return None
-    else:
-        pass
     candidates = [
         (
             interval.start_day
@@ -257,7 +241,5 @@ def historical_utc_point_from_tt(
         raise HistoricalUTCAdjustment(
             "TT lies in a historical UTC adjustment without a unique ordinary datetime label"
         )
-    else:
-        pass
     civil, stop = candidates[0]
     return CivilPoint(civil, stop)

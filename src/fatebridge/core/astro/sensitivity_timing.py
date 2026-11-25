@@ -61,8 +61,6 @@ class SpecialtySampleTimes:
             for value, label in zip(offsets, self.label_offsets)
         ):
             return None
-        else:
-            pass
         return {
             "nominal_sample_index": self.nominal_index,
             "radius_si_seconds": float(max(map(abs, offsets))),
@@ -79,19 +77,13 @@ def _effective_time(
     calendar = sample.nominal_calendar
     if not birth.applied_true_solar:
         return SpecialtySampleTime(sample, epoch, calendar)
-    else:
-        pass
     if calendar is None:
         raise ValueError(
             "Solar clock rebase requires a defined nominal UTC calendar coordinate"
         )
-    else:
-        pass
     clock = calendar.as_calendar().as_datetime()
     if clock is None:
         raise ValueError("Solar clock rebase is outside the supported civil calendar")
-    else:
-        pass
     # During :60 the rule state is the last ordinary second of that same UTC
     # day. The Sun still uses the actual TT/UT1 and the label translation
     # starts from the continuous nominal boundary, not this rule sample.
@@ -114,8 +106,6 @@ def _effective_time(
     }
     if not shift:
         return SpecialtySampleTime(sample, epoch, calendar, receipt)
-    else:
-        pass
     shifted = clock + shift
     effective = PhysicalEpoch(
         ephemeris_time(shifted), shifted.isoformat(), shifted, False
@@ -150,8 +140,6 @@ def specialty_sample_times(
             "recorded_interval_end_clock": (wall + radius).isoformat(),
             "requested_clock_radius_seconds": radius.total_seconds(),
         }
-    else:
-        pass
     return SpecialtySampleTimes(
         samples, grid.nominal_index, interval, offsets, birth.native_epoch is not None
     )

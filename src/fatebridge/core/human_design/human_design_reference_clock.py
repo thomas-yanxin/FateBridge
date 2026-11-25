@@ -31,8 +31,6 @@ def reference_leap_second(value: str) -> ConfirmedLeapSecond | None:
     leap = LEAP_REFERENCE.fullmatch(value)
     if leap is None:
         return None
-    else:
-        pass
     y, m, d, h, minute, fraction, offset = leap.groups()
     anchor = datetime(
         int(y),
@@ -66,10 +64,6 @@ def _portable_base(match: re.Match) -> datetime:
         offset = offset[0] + ":".join((whole[:2], whole[2:4], whole[4:]))
         if dot:
             offset += "." + fraction.ljust(6, "0")
-        else:
-            pass
-    else:
-        pass
     canonical = f"{day.isoformat()}T{clock[:2]}:{clock[2:] or '00'}:00{offset}"
     return datetime_fromisoformat_preserving_offset(canonical)
 
@@ -83,13 +77,9 @@ def reference_datetime(value: str) -> datetime:
     except ValueError:
         if match is None:
             raise
-        else:
-            pass
         parsed = _portable_base(match)
     if match is None:
         return parsed
-    else:
-        pass
     digits = match["fraction"]
     unit_seconds = 3600 if len(match["clock"]) == 2 else 60
     # At most six digits means every expanded value is an integer microsecond.

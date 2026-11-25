@@ -14,7 +14,7 @@
 
 此锚星集合是**明确列出的研究选择**，并未由陆位本逐星校定。天体与距星均用出生日期的地心视赤经， 按该日实际赤经排序形成首含尾不含区间，处理周回与恒星次序随年代变化的情况。它不采用 白羊零点起等分28宿，也不把黄经直接与赤经相减；输入Lahiri黄道不会移动这套赤经宿界。 现代角度按360度一周，不与历史周天古度直接混算。
 
-七政保留黄经、黄纬、赤经、赤纬和经度速度。罗为月球平交点、计为其对点、孛为平均远地点。 计都的黄经与赤经先按罗睺原始二进制值精确求对点，再交付浮点值；宫、宿归属继续使用精确对点，避免先舍入跨界。 本命与目标盘的计都条目保留`derived_from="罗"`、`derivation_source_longitude`和`derivation_source_right_ascension`。 原始`longitude`／`right_ascension`采用最终最近浮点值并规范360到0，`zodiac_longitude`及宿内交付另遵守已有半开区间约束；临界处应结合来源值读取。 12352组数学分量与独立FLINT参考的[计都对点核对](guolao-algorithm-audit.md#计都原始坐标与过早舍入)只验给定输入算术，不认证真实出生错误率、平均交点理论或古籍宿界。 紫气采用[Horosa固定提交的 `pcLon` 原公式](https://github.com/Horace-Maxwell/Horosa-Web-App-comprehensively-improved-MacOS/blob/10fb75de980bb0a6e0d1f50c7ee93cc97a88d7de/Horosa-Web/flatlib-ctrad2/flatlib/ephem/tools.py)：历元JD2451543.5、经度188.6849°、周期10226.78132日，按均速顺行取模360°。模型名为 `horosa_mean_purple_clouds_10fb75de_v1`；经度与日速共用这一周期，原四样本拟合已移除。`purple_model_audit` 返回实际软件来源、提交、历元、周期及 `fixture_fitting_used=false`。这是软件定义的非物理虚点，未校准为底本紫气历元。
+七政保留黄经、黄纬、赤经、赤纬和经度速度。罗为月球平交点、计为其对点、孛为平均远地点。 计都的黄经与赤经先按罗睺原始二进制值精确求对点，再交付浮点值；宫、宿归属继续使用精确对点，避免先舍入跨界。 本命与目标盘的计都条目保留`derived_from="罗"`、`derivation_source_longitude`和`derivation_source_right_ascension`。 原始`longitude`／`right_ascension`采用最终最近浮点值并规范360到0，`zodiac_longitude`及宿内交付另遵守已有半开区间约束；临界处应结合来源值读取。 12352组数学分量与独立FLINT参考的[计都对点核对](guolao-algorithm-audit.md#计都原始坐标与过早舍入)只验给定输入算术，不认证真实出生错误率、平均交点理论或古籍宿界。 紫气采用[Horosa固定提交的 `pcLon` 原公式](https://github.com/Horace-Maxwell/Horosa-Web-App-comprehensively-improved-MacOS)：历元JD2451543.5、经度188.6849°、周期10226.78132日，按均速顺行取模360°。模型名为 `horosa_mean_purple_clouds_10fb75de_v1`；经度与日速共用这一周期，原四样本拟合已移除。`purple_model_audit` 返回实际软件来源、提交、历元、周期及 `fixture_fitting_used=false`。这是软件定义的非物理虚点，未校准为底本紫气历元。
 
 实际执行该提交原函数，保留Python公历1至9999年间每年六个日期、共59994个共同JD标量；原拟合最大差约0.00039436°，新实现与这组原函数输出完全相同，原四样本0.01°容差不变。这是有限软件标量对照，不证明整个公开盘在该年域均可用、所有连续JD误差界、古历和现代黄经历元一致或现实预测。馆藏29年说法、古历周年与现代历元等问题分别保留；不以软件相同冒充原典或天文认证。本命与目标时刻、独立果老入口与聚合盘分支的模型身份在REST、原生MCP、CLI分别核对。冻结前后输出及源码哈希保存在本轮仓库外证据中。
 ## 时间与条件
@@ -66,7 +66,7 @@
 
 完整源目录的显式领域方法、原 Java 对照及未决公开接入见[Moira 完整源规则](guolao-source-profile.md)。当前公开默认仍是下述 v3 子集；完整源方法不是已发布的默认整盘能力。
 
-`profile.pattern_model_id=moira_conditions_with_seasonal_moon_v3`区分Horosa兼容子集与已核实的原程序月曜分支。原程序为At Home Projects的Moira1.50Final（版权2004–2015）；本轮冻结[Moira Apple Silicon仓库提交中的规则文件](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/moira_s.prop)及其[规则覆盖解释器](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/src/org/athomeprojects/base/RuleEntry.java)。月曜独居须完整十一曜位置：非冬夜为喜格“孤月独明”，冬昼为喜格“寒月单行”，冬夜为忌格“寒月单行”，并覆盖普通孤月喜格。其他组合不命中这三条；未知昼夜或季节不代入默认值。输出保留实际来源、昼夜、冬令、十一曜位置及同宫数量，同run的`rule_trace`也保留逐格来源。
+`profile.pattern_model_id=moira_conditions_with_seasonal_moon_v3`区分Horosa兼容子集与已核实的原程序月曜分支。原程序为At Home Projects的Moira1.50Final（版权2004–2015）；本轮冻结[Moira Apple Silicon仓库提交中的规则文件](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM)及其[规则覆盖解释器](https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM)。月曜独居须完整十一曜位置：非冬夜为喜格“孤月独明”，冬昼为喜格“寒月单行”，冬夜为忌格“寒月单行”，并覆盖普通孤月喜格。其他组合不命中这三条；未知昼夜或季节不代入默认值。输出保留实际来源、昼夜、冬令、十一曜位置及同宫数量，同run的`rule_trace`也保留逐格来源。
 
 实际编译并运行原程序的未改算法类，以其`EvalRule.setSign`计算十一曜是否同宫，再由原`RuleEntry`／`RuleParse`执行三条规则和覆盖关系。对27,108组独立位置／布尔输入，修复前9,624组不符，修复后全部相同；八种昼夜／冬令／孤月真假组合也分别核对。输入从预先声明的两两因子网格投影去重，并非全部高阶组合；适配使用宫中点，不验证实际本命星历、界线附近度数、原程序整盘或古籍格局。FateBridge实际昼夜与冬令仍采用上文太阳条件，未改成Horosa的民用钟时／公历月份近似。
 

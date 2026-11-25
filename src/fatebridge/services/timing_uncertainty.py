@@ -97,12 +97,8 @@ def analyze_birth_time_range(
         or not 0 <= minutes <= 120
     ):
         raise ValueError("出生时间范围须为0至120的整数分钟")
-    else:
-        pass
     if analysis_moment is None and analysis_age is None:
         raise ValueError("时间敏感性核对需要分析时刻或显式年龄")
-    else:
-        pass
     nominal = normalize_birth_time(person)
     zone = nominal.timezone
     center = localize_datetime(nominal.input_datetime, zone).astimezone(timezone.utc)
@@ -142,13 +138,9 @@ def analyze_birth_time_range(
         source = "minute_grid" if is_grid else event_source
         if source not in row["evidence_sources"]:
             row["evidence_sources"].append(source)
-        else:
-            pass
         if is_grid:
             if row["first_sample_at"] is None:
                 row["first_sample_at"] = local.isoformat()
-            else:
-                pass
             row["last_sample_at"] = local.isoformat()
             row["sample_count"] += 1
         elif is_new_event:
@@ -159,14 +151,10 @@ def analyze_birth_time_range(
             row["first_event_probe_at"] = localize_datetime(first, zone).isoformat()
             row["last_event_probe_at"] = localize_datetime(last, zone).isoformat()
             row["event_probe_count"] += 1
-        else:
-            pass
 
     def retain_dayun(local: datetime, pillars: dict[str, tuple[str, str]]) -> None:
         if not can_calculate_dayun:
             return
-        else:
-            pass
         result = TimingEffectsAnalysis.analyze_dayun_effects(
             pillars,
             local,
@@ -232,8 +220,6 @@ def analyze_birth_time_range(
         if instant not in known_clocks:
             retain_dayun(probe.normalized.input_datetime, probe.pillars)
             dayun_assessed_instants.add(instant)
-        else:
-            pass
     dayun_events = None
     if can_calculate_dayun:
         dayun_events = collect_dayun_birth_event_probes(
@@ -258,10 +244,6 @@ def analyze_birth_time_range(
             if instant not in dayun_assessed_instants:
                 retain_dayun(probe.normalized.input_datetime, probe.pillars)
                 dayun_assessed_instants.add(instant)
-            else:
-                pass
-    else:
-        pass
     periods: list[DayunBoundaryRange] = [
         {
             "direction": key[0],
@@ -277,16 +259,10 @@ def analyze_birth_time_range(
     affected = []
     if len(candidates) > 1:
         affected.append("birth_pillars")
-    else:
-        pass
     if len(directions) > 1:
         affected.append("dayun_direction")
-    else:
-        pass
     if len(current) > 1:
         affected.append("current_dayun")
-    else:
-        pass
     return {
         "method_id": "birth_clock_grid_natal_and_dayun_events_v3",
         "status": (

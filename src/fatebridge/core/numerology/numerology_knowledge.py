@@ -49,17 +49,11 @@ def _heluo_reference_notes(record: dict[str, Any]) -> list[str]:
         # existing glyph warning. Other editorial qualifications matter too.
         if "unresolved" not in review:
             notes.extend(f"{label}读文说明：{n}" for n in status.get(notes_field, []))
-        else:
-            pass
         if "independent_second_review_pending" in review:
             notes.append(f"{label}的独立复核尚未完成。")
-        else:
-            pass
     branch = record.get("commentary_branch_selection")
     if branch:
         notes.append(f"注文取用说明：{branch['reason']}")
-    else:
-        pass
     selection = record.get("poem_selection")
     if selection:
         notes.append(f"爻诗取用说明：{selection['reason']}")
@@ -70,10 +64,6 @@ def _heluo_reference_notes(record: dict[str, Any]) -> list[str]:
             )
         if "independent_second_review_pending" in status.get("poem_review_status", ""):
             notes.append("爻诗的独立复核尚未完成。")
-        else:
-            pass
-    else:
-        pass
     supplement = record.get("poem_review_supplement")
     if supplement:
         notes.append("后续五首复核范围：" + supplement["scope_note"])
@@ -82,13 +72,9 @@ def _heluo_reference_notes(record: dict[str, Any]) -> list[str]:
                 f"第{entry['poem_index']}首后续复核：{note}"
                 for note in entry["review_notes"]
             )
-    else:
-        pass
     xiang = record.get("inherited_xiang_reference", {})
     if "unverified" in xiang.get("status", ""):
         notes.append("继承象辞的特定来源仍待核；本诗卷目校不将其转为已核原文。")
-    else:
-        pass
     for reference in record.get("commentary_cross_references", []):
         parts = [
             f"引卦原句：{reference['source_quote']}",
@@ -97,32 +83,18 @@ def _heluo_reference_notes(record: dict[str, Any]) -> list[str]:
         ]
         if reference.get("target_quote"):
             parts.append(f"所引文字：{reference['target_quote']}")
-        else:
-            pass
         if reference.get("source_condition_label"):
             parts.append(f"所属条件段：{reference['source_condition_label']}")
-        else:
-            pass
         if reference.get("source_context_text"):
             parts.append(f"原段上下文：{reference['source_context_text']}")
-        else:
-            pass
         if reference.get("target_line_source_status") == "not_printed":
             parts.append("原文未印目标爻位，不把结构对照补作原印爻位")
-        else:
-            pass
         if reference.get("applicability") is None:
             parts.append("引用条件的适用性未裁定")
-        else:
-            pass
         if reference.get("automatic_application") is False:
             parts.append("不自动应用")
-        else:
-            pass
         if reference.get("replaces_chart") is False:
             parts.append("不替代正式卦盘")
-        else:
-            pass
         parts.append("本条引文不单独证明目标卦全文")
         notes.append("有条件引文说明：" + "；".join(parts) + "。")
     return notes
@@ -133,8 +105,6 @@ def _catalogue() -> dict[str, Any]:
         data: dict[str, Any] = json.loads(CATALOGUE_PATH.read_bytes())
         if sha256(canonical_bytes(data)).hexdigest() != CATALOGUE_CONTENT_SHA256:
             raise ValueError("Reference catalogue identity changed")
-        else:
-            pass
         return data
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_numerology_knowledge_sources") from exc
@@ -149,8 +119,6 @@ def _source(domain: str, key: str) -> tuple[dict[str, Any], dict[str, Any]]:
         ]
         if len(entries) != 1:
             raise ValueError("Unknown registered source")
-        else:
-            pass
         entry = entries[0]
         path = DATA_ROOT / entry["source_path"]
         raw = path.read_bytes()
@@ -160,8 +128,6 @@ def _source(domain: str, key: str) -> tuple[dict[str, Any], dict[str, Any]]:
             raise ValueError(
                 "Source words or identity differ from reviewed reference revision"
             )
-        else:
-            pass
         meta = {
             **deepcopy(entry),
             "loaded_file_sha256": sha256(raw).hexdigest(),
@@ -176,8 +142,6 @@ def _source(domain: str, key: str) -> tuple[dict[str, Any], dict[str, Any]]:
         }
         if "sources" in data:
             meta["source_witnesses"] = deepcopy(data["sources"])
-        else:
-            pass
         return data, meta
     except NumerologySourceError:
         raise
@@ -236,12 +200,8 @@ def _category(
     )
     if len(keys) <= 20:
         result["keys"] = ordered
-    else:
-        pass
     if coverage is not None:
         result["coverage"] = coverage
-    else:
-        pass
     return result
 
 
@@ -328,8 +288,6 @@ def build_registry(domain: str) -> dict[str, Any]:
             code="knowledge.unknown_domain",
             details={"domain": domain},
         )
-    else:
-        pass
     snapshots = _snapshots(domain)
     provenance = _provenance(domain, snapshots)
     return {
@@ -362,8 +320,6 @@ def parse_cell_key(key: str) -> tuple[str, int, str | None] | None:
     )
     if match is None:
         return None
-    else:
-        pass
     element, number, kind = match.groups()
     return element, int(number), None if kind == "unselected" else kind
 
@@ -375,19 +331,13 @@ def read_reference(
     category, key = str(category or "").strip(), str(key or "").strip()
     if domain not in DOMAINS:
         _unknown(domain, category, key)
-    else:
-        pass
     if not category:
         available = [e["key"] for e in _catalogue()["sources"] if e["domain"] == domain]
         matches = ["source_collections"] if key in available else []
         if domain == "canping" and parse_cell_key(key):
             matches.append("text_cells")
-        else:
-            pass
         if domain == "heluo" and re.fullmatch(r".+:[1-6]", key):
             matches.append("line_texts")
-        else:
-            pass
         if domain == "canping":
             if key in {"bazi_appendix_v1", "bazi_continuous_v1", "legacy_minggong_v1"}:
                 matches.append("schedule_profiles")
@@ -395,20 +345,10 @@ def read_reference(
                 basis, _ = _source(domain, "schedule_basis")
                 if key in {c["id"] for c in basis["clauses"]}:
                     matches.append("schedule_clauses")
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         matches = sorted(set(matches))
         if len(matches) != 1:
             _unknown(domain, category, key)
-        else:
-            pass
         category = matches[0]
-    else:
-        pass
     needed = {
         "source_collections": [key],
         "line_texts": [
@@ -433,14 +373,10 @@ def read_reference(
     )
     if category not in permitted:
         _unknown(domain, category, key)
-    else:
-        pass
     if category == "source_collections" and not any(
         e["domain"] == domain and e["key"] == key for e in _catalogue()["sources"]
     ):
         _unknown(domain, category, key)
-    else:
-        pass
     snapshots = _snapshots(domain, needed[category])
     title = f"{domain} · {category} · {key}"
     tips = []
@@ -459,13 +395,9 @@ def read_reference(
         gua, _, pos = key.rpartition(":")
         if pos not in snapshots["heluoTiaowen"][0].get(gua, {}).get("yao", {}):
             _unknown(domain, category, key)
-        else:
-            pass
         line_record = yao_text(gua, int(pos))
         if line_record is None:
             _unknown(domain, category, key)
-        else:
-            pass
         record = line_record
         title = f"河洛·{gua}·第{pos}爻（参考）"
         status = record["text_provenance"]
@@ -487,8 +419,6 @@ def read_reference(
                 pending_notes.append(
                     f"{label}字形未决：" + "；".join(status.get(notes_field, []))
                 )
-            else:
-                pass
         tips.extend(pending_notes)
         tips.extend(_heluo_reference_notes(record))
         citation = f"{title}；各部分原典网址、书影身份与页码分别见reference_details.record.text_provenance"
@@ -497,8 +427,6 @@ def read_reference(
         parsed = parse_cell_key(key)
         if parsed is None:
             _unknown(domain, category, key)
-        else:
-            pass
         element, number, kind = parsed
         key = f"{element}.{number}.{kind or 'unselected'}"
         record = lookup_record(element, number, kind)
@@ -514,24 +442,16 @@ def read_reference(
         )
         if selection.get("reading_uncertainties"):
             tips.extend(selection["reading_uncertainties"])
-        else:
-            pass
         if selection.get("editorial_unknown_marker") == "□":
             tips.append("□是编辑未定字标记，不认作原书圈空。")
-        else:
-            pass
         if selection.get("number_attribution_status") == "provisional_inherited_key":
             tips.append(
                 "原图编号仍有未定字，查询键仅沿用暂定归属；可读正文不证明编号已核。"
             )
-        else:
-            pass
         if selection.get("row_status") == "retired_inherited_number":
             tips.append(
                 f"旧转录号已退役，所核新号为{selection['corrected_number']}；不据此改写实际计算所得编号。"
             )
-        else:
-            pass
         witnesses = selection.get("witnesses", [])
         if any(w.get("number_occurrence_ambiguous") for w in witnesses):
             tips.append(
@@ -542,8 +462,6 @@ def read_reference(
                 tips.append(
                     f"文明書局本对读（单次目读，PDF第{pages}页）：{witness['text']}；未替换主选文。"
                 )
-        else:
-            pass
         tips.append(SCOPE)
         meta = snapshots["text_collation"][1]
         citation = f"{meta['source_title']}；{meta['source_url']}；PDF页{selection.get('source_pdf_page', '未定位')}；另本对读身份另列，不替主本认证。"
@@ -554,8 +472,6 @@ def read_reference(
             clause = next((c for c in data["clauses"] if c["id"] == key), None)
             if clause is None:
                 _unknown(domain, category, key)
-            else:
-                pass
             source = data["sources"][clause["source_id"]]
             record = {
                 **clause,
@@ -572,8 +488,6 @@ def read_reference(
         else:
             if key not in APPLIED:
                 _unknown(domain, category, key)
-            else:
-                pass
             record = {
                 "profile_id": key,
                 "summary": SUMMARIES[key],

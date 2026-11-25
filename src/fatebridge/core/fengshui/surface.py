@@ -55,21 +55,13 @@ def summarize_analysis_progress(
         key = status_keys.get(action.get("status", ""))
         if key:
             action_counts[key] += 1
-        else:
-            pass
     readiness = set()
     if action_counts["ready"]:
         readiness.add("ready")
-    else:
-        pass
     if action_counts["conditional"] or action_counts["candidate"]:
         readiness.add("needs_confirmation")
-    else:
-        pass
     if action_counts["blocked"]:
         readiness.add("blocked")
-    else:
-        pass
     calculation_complete = not missing and not counts["unknown"]
     # A partial calculation can still support an explanation. Unknown values
     # alone are not a conditional basis: callers count actual observed facts.
@@ -164,8 +156,6 @@ def evaluate_surfaces(req: AssessRequest) -> dict[str, Any]:
                     "required_for": "assessment",
                 }
             )
-        else:
-            pass
         for observed_item in surface.items:
             matches = [
                 e
@@ -198,8 +188,6 @@ def evaluate_surfaces(req: AssessRequest) -> dict[str, Any]:
                         "required_for": "assessment",
                     }
                 )
-            else:
-                pass
             item_findings.append(
                 {
                     "object_id": observed_item.object_id,
@@ -230,8 +218,6 @@ def evaluate_surfaces(req: AssessRequest) -> dict[str, Any]:
                 missing.append(
                     f"surface_layouts.{surface.object_id}.items.{observed_item.object_id}.confirmed_representation"
                 )
-            else:
-                pass
         for entry in selected:
             items = [
                 i for i in surface.items if i.representation in entry["representations"]
@@ -262,30 +248,16 @@ def evaluate_surfaces(req: AssessRequest) -> dict[str, Any]:
                 )
                 if application_conditions_met is False:
                     blocks.append("representation_condition_not_met")
-                else:
-                    pass
                 if constraint:
                     if entry["zone"] in constraint.unavailable_zones:
                         blocks.append("target_zone_unavailable")
-                    else:
-                        pass
                     if item is None and constraint.can_add_items is False:
                         blocks.append("additions_forbidden")
-                    else:
-                        pass
                     if item is not None and not retain:
                         if constraint.can_move_items is False:
                             blocks.append("moving_items_forbidden")
-                        else:
-                            pass
                         if item.object_id in constraint.locked_item_ids:
                             blocks.append("item_locked")
-                        else:
-                            pass
-                    else:
-                        pass
-                else:
-                    pass
                 candidate = surface.observation_basis == "image_observed" or (
                     item is not None and item.observation_basis == "image_observed"
                 )
@@ -342,39 +314,27 @@ def evaluate_surfaces(req: AssessRequest) -> dict[str, Any]:
                             ),
                             "confirm_botanical_health_or_freshness",
                         )
-                    else:
-                        pass
                     if surface.observation_basis == "image_observed":
                         need(
                             f"surface_layouts.{surface.object_id}.observation_basis",
                             "confirm_surface_boundary_and_anchor",
                         )
-                    else:
-                        pass
                     if item is not None and item.observation_basis == "image_observed":
                         need(
                             f"surface_layouts.{surface.object_id}.items.{item.object_id}.representation",
                             "confirm_item_representation",
                         )
-                    else:
-                        pass
                     if not permission and not retain:
                         need(
                             f"surface_constraints.{surface.object_id}."
                             + ("can_add_items" if item is None else "can_move_items"),
                             "confirm_action_permission",
                         )
-                    else:
-                        pass
                     if not feasible:
                         need(
                             f"surface_constraints.{surface.object_id}.feasible_zones",
                             "confirm_target_zone_feasibility",
                         )
-                    else:
-                        pass
-                else:
-                    pass
                 pending.extend(action_pending)
                 options.append(
                     {

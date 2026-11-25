@@ -38,6 +38,4 @@ def heavy_calculation_budget() -> HeavyCalculationBudget:
                 max_concurrency=max_concurrency,
                 semaphore=BoundedSemaphore(max_concurrency),
             )
-        else:
-            pass
         return _budget

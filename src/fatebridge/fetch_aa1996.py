@@ -30,8 +30,6 @@ def source_profile() -> tuple[dict[str, Any], str]:
     profile: dict[str, Any] = json.loads(raw)
     if profile.get("model_id") != MODEL_ID or profile.get("abi_version") != 1:
         raise ValueError("Invalid AA1996 source profile")
-    else:
-        pass
     return profile, hashlib.sha256(raw).hexdigest()
 
 
@@ -43,8 +41,6 @@ def _archive(source: dict[str, str], supplied: Path | None, target: Path) -> Pat
             archive_bytes = response.read()
     if hashlib.sha256(archive_bytes).hexdigest() != source["sha256"]:
         raise ValueError("AA1996 build archive does not match pinned source bytes")
-    else:
-        pass
     target.write_bytes(archive_bytes)
     return target
 
@@ -59,8 +55,6 @@ def build(
     system = platform.system()
     if system not in {"Darwin", "Linux"}:
         raise ValueError("AA1996 source builder currently supports macOS and Linux")
-    else:
-        pass
     profile, profile_sha = source_profile()
     output = output.expanduser().resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -85,12 +79,8 @@ def build(
                 member = bundle.extractfile(archive_member)
                 if member is None:
                     raise ValueError("Pinned native source member could not be read")
-                else:
-                    pass
                 with member:
                     (source / parts[2]).write_bytes(member.read())
-            else:
-                pass
     author = source / "author"
     author.mkdir()
     with zipfile.ZipFile(aa56) as bundle:
@@ -98,22 +88,16 @@ def build(
             base = Path(name).name
             if "author/" + base in expected:
                 (author / base).write_bytes(bundle.read(name))
-            else:
-                pass
     (author / "wrapper.c").write_text(profile["source_wrapper_c"])
     (author / "native_bridge.c").write_text(profile["native_bridge_c"])
     original = (source / "swemplan.c").read_text()
     needle = "int swi_moshplan2 (double J, int iplm, double *pobj)"
     if original.count(needle) != 1:
         raise ValueError("Unexpected pinned Moshier dispatch")
-    else:
-        pass
     patched = original.replace(needle, profile["native_declaration_c"] + "\n" + needle)
     needle = "  const struct plantbl *plan = planets[iplm];"
     if patched.count(needle) != 1:
         raise ValueError("Unexpected pinned Moshier Earth table selector")
-    else:
-        pass
     patched = patched.replace(
         needle,
         needle + "\n\n  if (iplm == 2) return fatebridge_aa96_native_emb(J, pobj);",
@@ -121,8 +105,6 @@ def build(
     needle = "static void embofs_mosh(double tjd, double *xemb) \n{"
     if patched.count(needle) != 1:
         raise ValueError("Unexpected pinned Moshier lunar offset")
-    else:
-        pass
     patched = patched.replace(needle, needle + profile["lunar_replacement_c"])
     (source / "swemplan-aa1996.c").write_text(patched)
     observed = {name: _sha(source / name) for name in expected}
@@ -130,15 +112,11 @@ def build(
         raise ValueError(
             "Build sources differ from the validated AA1996 calculation graph"
         )
-    else:
-        pass
     graph_sha = hashlib.sha256(
         json.dumps(observed, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
     if graph_sha != profile["calculation_source_sha256"]:
         raise ValueError("AA1996 calculation graph identity differs")
-    else:
-        pass
     marker = f"""#include "swephexp.h"
 const char *fatebridge_aa1996_model_id(void) {{ return "{MODEL_ID}"; }}
 const char *fatebridge_aa1996_profile_sha256(void) {{ return "{profile_sha}"; }}
@@ -153,14 +131,10 @@ int fatebridge_aa1996_solar(double tt, double *out, char *error) {{
         compiler = (
             str(apple) if system == "Darwin" and apple.is_file() else shutil.which("cc")
         )
-    else:
-        pass
     if not compiler:
         raise ValueError(
             "A C compiler is required to build the optional AA1996 library"
         )
-    else:
-        pass
     library = output / (
         "aa1996-solar.dylib" if system == "Darwin" else "aa1996-solar.so"
     )
@@ -210,8 +184,6 @@ int fatebridge_aa1996_solar(double tt, double *out, char *error) {{
     ]
     if system == "Linux":
         command += ["-lm", "-ldl"]
-    else:
-        pass
     with (output / "build-console.txt").open("x") as log:
         result = subprocess.run(command, stdout=log, stderr=log)
     build_record = dict(
@@ -226,8 +198,6 @@ int fatebridge_aa1996_solar(double tt, double *out, char *error) {{
         raise RuntimeError(
             "AA1996 compilation failed; original sources and log retained"
         )
-    else:
-        pass
     probe = ctypes.CDLL(str(library))
     for name, expected_value in [
         ("fatebridge_aa1996_model_id", MODEL_ID),
@@ -237,8 +207,6 @@ int fatebridge_aa1996_solar(double tt, double *out, char *error) {{
         method.restype = ctypes.c_char_p
         if method().decode("ascii") != expected_value:
             raise ValueError("Built AA1996 model marker mismatch")
-        else:
-            pass
     manifest: dict[str, int | str] = dict(
         model_id=MODEL_ID,
         version=profile["version"],
@@ -280,5 +248,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-else:
-    pass

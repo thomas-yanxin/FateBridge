@@ -36,14 +36,10 @@ def key_day_origin(
     origin_ordinal = winter_clock.ordinal - SEXAGENARY_INDEX[winter_ganzhi]
     if origin_ordinal < 1:
         raise ValueError("冬至前甲子超出可表达日历范围")
-    else:
-        pass
     origin = NominalClockLabel(origin_ordinal, 0)
     count = target_clock.ordinal - origin_ordinal + 1
     if count < 1:
         raise ValueError("日计日期早于冬至前甲子")
-    else:
-        pass
     return {
         "source": KEY_SOURCE,
         "winter_clock": winter_clock.isoformat(),
@@ -70,8 +66,6 @@ def key_day_numeric_board(
     core = cyclic_core(count, yin=yin, shiji_profile=shiji_profile)
     if ruler != BRANCHES[(count - 1) % 12]:
         raise ValueError("从甲子起计的积日与所给日支不一致")
-    else:
-        pass
     core.update(
         ruler_branch=ruler,
         ruler_label="日支",
@@ -107,8 +101,6 @@ def key_day_numeric_board(
                 "source": KEY_SOURCE,
             },
         ]
-    else:
-        pass
     return board
 
 
@@ -215,8 +207,6 @@ def build_key_day_board(
     )
     if reference:
         board["calendar_rules"]["historical_date_reference"] = reference
-    else:
-        pass
     board["calendar_summary"] = calendar_summary(board)
     board["winter_origin_selection"] = winter_origin_selection(
         origin,

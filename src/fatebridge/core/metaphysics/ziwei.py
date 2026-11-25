@@ -115,8 +115,6 @@ def _resolve_wuxing_ju(ming_stem: str, ming_branch: str) -> ZiweiBureau:
     element = nayin[-1] if nayin and nayin != "未知纳音" else ""
     if element not in WUXING_JU_NUMBER_BY_ELEMENT:
         raise ValueError(f"命宫干支无法确定五行局：{ming_stem}{ming_branch}")
-    else:
-        pass
     number = WUXING_JU_NUMBER_BY_ELEMENT[element]
     return {
         "number": number,
@@ -138,8 +136,6 @@ def _apply_sihua_to_palaces(
                     for label in palace["stars"]
                 ]
                 break
-            else:
-                pass
     return ordered_sihua_mapping(sihua)
 
 
@@ -243,8 +239,6 @@ def build_ziwei_chart(
             # 所选安大限诀从命前/后一宫起，首限为父母/兄弟。
             # 命宫仍为本命宫，不能因运限起点改变而搬移星曜。
             period_index = (period_index - 1) % 12
-        else:
-            pass
         period_start = start_age + period_index * 10
         palace: dict[str, Any] = {
             "name": palace_name,
@@ -556,14 +550,10 @@ def build_ziwei_rules(
     if year_stem:
         if year_stem not in rules:
             raise ValueError("紫微四化年干必须为甲乙丙丁戊己庚辛壬癸之一")
-        else:
-            pass
         focused = {
             "year_stem": year_stem,
             "sihua": ordered_sihua_mapping(rules[year_stem]),
         }
-    else:
-        pass
     return {
         "requested_year_stem": year_stem,
         "rule_catalogue": catalogue,

@@ -41,8 +41,6 @@ def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str,
     elements = {int(k): v["element"] for k, v in rule_data("annual_stars").items()}
     if review.activities:
         rules.append(provenance("workstation_activity_authored_v1"))
-    else:
-        pass
     for activity in review.activities:
         path = (
             f"environmental_context.workstation_review.activities.{activity.object_id}"
@@ -74,38 +72,26 @@ def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str,
                         "confirm_actual_activity",
                     )
                 )
-            else:
-                pass
             counts["unknown" if unknown else "confirmed_unsupported"] += 1
             findings.append(record)
             missing.extend(record["missing_inputs"])
             continue
-        else:
-            pass
         record["selected_star_role"] = "facing"
         record["reference_finding"] = "authored_wakeful_role"
         placement = placements.get(activity.object_id)
         location = placement.location_direction if placement else None
         if activity.observation_basis == "image_observed":
             record["missing_inputs"].append(path + ".observation_basis")
-        else:
-            pass
         if location is None:
             record["missing_inputs"].append(
                 f"placements.{activity.object_id}.location_direction"
             )
-        else:
-            pass
         if not charts:
             record["missing_inputs"].append(
                 "workstation_review.computed_xuankong_natal"
             )
-        else:
-            pass
         if len(charts) > 1:
             record["missing_inputs"].append("xuankong_natal.unambiguous_bearing")
-        else:
-            pass
         record.update(
             status=(
                 "candidate_only"
@@ -130,8 +116,6 @@ def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str,
             palace = chart["palaces"].get(location) if location else None
             if palace is None:
                 continue
-            else:
-                pass
             number = palace["facing_star_number"]
             mountain = palace["mountain_star_number"]
             pair = dict(
@@ -193,8 +177,6 @@ def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str,
     constraints = {c.object_id: c for c in req.layout_constraints}
     if review.entry_barriers:
         rules.append(provenance("afsi_entry_barrier_v1"))
-    else:
-        pass
     for relation in review.entry_barriers:
         path = f"environmental_context.workstation_review.entry_barriers.{relation.relation_id}"
         line = relation.entry_line_through_user
@@ -226,8 +208,6 @@ def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str,
         for key in ("entry_line_through_user", "barrier_between_entry_and_user"):
             if key == "barrier_between_entry_and_user" and len(relevant_facts) == 1:
                 continue
-            else:
-                pass
             fact = getattr(relation, key)
             if fact.value is None or fact.observation_basis == "image_observed":
                 record["missing_inputs"].append(path + "." + key)
@@ -238,8 +218,6 @@ def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str,
                         "confirm_entry_barrier_relationship",
                     )
                 )
-            else:
-                pass
         if relation.observation_basis == "image_observed":
             record["missing_inputs"].append(path + ".observation_basis")
             pending.append(
@@ -249,8 +227,6 @@ def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str,
                     "confirm_barrier_identity",
                 )
             )
-        else:
-            pass
         counts["unknown" if uncertain else "supported"] += 1
         if line.value is not False:
             constraint = constraints.get(
@@ -294,8 +270,6 @@ def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str,
                         "optional_action",
                     )
                 )
-            else:
-                pass
             if (
                 between.value is not True
                 or between.observation_basis == "image_observed"
@@ -308,8 +282,6 @@ def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str,
                         "optional_action",
                     )
                 )
-            else:
-                pass
             for key in execution:
                 fact = getattr(relation, key)
                 if (
@@ -325,8 +297,6 @@ def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str,
                             "optional_action",
                         )
                     )
-                else:
-                    pass
             action = dict(
                 action_id=f"entry-barrier:{relation.relation_id}",
                 object_id=relation.barrier_id,
@@ -368,8 +338,6 @@ def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str,
             record["action_options"].append(action)
             actions.append(action)
             pending.extend(action["pending_confirmations"])
-        else:
-            pass
         findings.append(record)
         missing.extend(record["missing_inputs"])
     for record in findings:

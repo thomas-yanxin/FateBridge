@@ -323,8 +323,6 @@ def calculate_ziwei_rules(
 ) -> dict[str, Any]:
     if year_stem is not None and year_stem not in set(GAN):
         raise ValueError("year_stem 必须是单个天干")
-    else:
-        pass
     payload = build_ziwei_rules(
         year_stem,
         rule_profile=rule_profile,
@@ -464,18 +462,12 @@ def calculate_liureng_runyear(
     analysis_civil = localize_datetime(seed.input_datetime, seed.timezone)
     if utc_ordering_key(analysis_civil) < utc_ordering_key(birth_moment):
         raise ValueError("行年分析日期不能早于出生日期")
-    else:
-        pass
     birth_lunar = get_lunar_context(birth_moment, timezone_name=birth_zone)
     if birth_lunar is None:
         raise ValueError("行年需要出生日期的农历年")
-    else:
-        pass
     birth_lunar_year = birth_lunar.get("year")
     if not isinstance(birth_lunar_year, int):
         raise ValueError("行年需要出生日期的农历年")
-    else:
-        pass
     seed.calendar_context["ren_calendar_policy"] = require_ren_calendar(
         seed, analysis_utc_offset=analysis_utc_offset
     )
@@ -587,8 +579,6 @@ def calculate_qimen_analysis(
                 "evidence_paths": ["qimen.calendar_policy.civil_clock_resolution"],
             }
         )
-    else:
-        pass
     snapshot_text = build_qimen_snapshot_text(seed=seed, qimen=qimen)
     snapshot_export = _build_snapshot_export(
         technique="qimen",

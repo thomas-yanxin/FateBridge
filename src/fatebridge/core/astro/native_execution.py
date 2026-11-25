@@ -100,8 +100,6 @@ class AuxiliaryInputs:
             if path is None:
                 rows.append([index, None, None])
                 continue
-            else:
-                pass
             try:
                 digest = hashlib.sha256()
                 with path.open("rb") as source:
@@ -119,8 +117,6 @@ class AuxiliaryInputs:
     def check(self) -> None:
         if self.snapshot() != self.initial:
             raise EphemerisSourceError("auxiliary_changed_during")
-        else:
-            pass
 
     def evidence(self) -> dict[str, Any]:
         return {
@@ -150,8 +146,6 @@ def context_for_entry(entry: str) -> dict[str, str]:
             "lifetime": "one_human_design_cycle_request_validation",
             "scope": "Request-only birth/reference TT ordering in a fresh native process. The calculation revalidates in its separate whole-operation context. Auxiliary candidate identities do not prove atomic reads, table validity or physical accuracy.",
         }
-    else:
-        pass
     if entry == "fatebridge.services.human_design.calculate_human_design":
         from fatebridge.core.human_design.human_design_context import (
             CONTEXT_LIFETIME,
@@ -159,8 +153,6 @@ def context_for_entry(entry: str) -> dict[str, str]:
         )
 
         return {"lifetime": CONTEXT_LIFETIME, "scope": CONTEXT_SCOPE}
-    else:
-        pass
     return {}
 
 
@@ -186,8 +178,6 @@ def message_bytes(message: dict[str, Any]) -> bytes:
     )
     if len(payload) > _MAX_MESSAGE:
         raise NativeExecutionError("Native calculation message exceeds limit")
-    else:
-        pass
     return payload
 
 
@@ -218,20 +208,14 @@ def _receive(process: subprocess.Popen[bytes], deadline: float) -> dict[str, Any
         ) from payload
     elif not payload:
         raise NativeExecutionError("Private native calculation exited without a result")
-    else:
-        pass
     if len(payload) > _MAX_MESSAGE:
         raise NativeExecutionError("Native calculation message exceeds limit")
-    else:
-        pass
     try:
         message = json.loads(payload)
     except ValueError as error:
         raise NativeExecutionError("Invalid native calculation response") from error
     if not isinstance(message, dict):
         raise NativeExecutionError("Invalid native calculation response")
-    else:
-        pass
     return message
 
 
@@ -252,13 +236,9 @@ def calculate(
 
     if entry not in _ENTRIES:
         raise NativeExecutionError("Unsupported private calculation entry")
-    else:
-        pass
     session = current_source_session()
     if session is None:
         raise NativeExecutionError("Private calculation requires a source session")
-    else:
-        pass
     options = dict(kwargs)
     auxiliary_path = effective_ephemeris_search_path()
     auxiliary = AuxiliaryInputs(auxiliary_path)
@@ -277,8 +257,6 @@ def calculate(
     }
     if current_policy() is not None:
         request["physical_ephemeris_policy"] = policy_mode()
-    else:
-        pass
     payload = message_bytes(request)
     worker = Path(__file__).with_name("_native_worker.py")
     deadline = time.monotonic() + _TIMEOUT
@@ -298,26 +276,18 @@ def calculate(
                 session.check()
                 if response.get("kind") == "ready":
                     continue
-                else:
-                    pass
                 if response.get("kind") == "sample":
                     if observer is None:
                         raise NativeExecutionError("Unexpected native sample callback")
-                    else:
-                        pass
                     observer(*decode(response["args"]))
                     session.check()
                     process.stdin.write(message_bytes({"kind": "continue"}))
                     process.stdin.flush()
                     continue
-                else:
-                    pass
                 if response.get("kind") != "result":
                     raise NativeExecutionError(
                         "Invalid native calculation response kind"
                     )
-                else:
-                    pass
                 auxiliary.check()
                 merge_clock_reads(response.get("clock_reads", []))
                 if "error" in response:
@@ -326,34 +296,20 @@ def calculate(
                         policy = current_policy()
                         if policy is not None:
                             policy.failure = policy.failure or error["reason"]
-                        else:
-                            pass
                         raise EphemerisSourceError(error["reason"])
-                    else:
-                        pass
                     if error["type"] == "jyotish":
                         if error.get("reason") not in JyotishCalculationError.MESSAGES:
                             raise NativeExecutionError(
                                 "Invalid Jyotish integrity reason"
                             )
-                        else:
-                            pass
                         raise JyotishCalculationError(error["reason"])
-                    else:
-                        pass
                     if error["type"] == "value":
                         raise ValueError(error["message"])
-                    else:
-                        pass
                     if error["type"] == "import":
                         raise ModuleNotFoundError(
                             "Private native calculation dependency unavailable"
                         )
-                    else:
-                        pass
                     raise NativeExecutionError("Private native calculation failed")
-                else:
-                    pass
                 merge_worker_policy(response.get("physical_ephemeris_policy"))
                 result = decode_result(response["value"])
                 process.stdin.close()
@@ -362,14 +318,10 @@ def calculate(
                     raise NativeExecutionError(
                         "Private native calculation did not finish cleanly"
                     )
-                else:
-                    pass
                 return result
         finally:
             # Also runs on callback exceptions and cancellation. Reap exactly
             # this owned child; never leave private input in a long-lived pool.
             if process.poll() is None:
                 process.kill()
-            else:
-                pass
             process.wait()

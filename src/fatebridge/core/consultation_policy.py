@@ -55,21 +55,13 @@ def restricted_intent_path(data: Mapping[str, object]) -> str | None:
         return "category"
     elif isinstance(topic, str) and _normalize(topic) in BLOCKED_ELECTION_TOPICS:
         return "topic_id"
-    else:
-        pass
     for field_name, submitted_value in data.items():
         if field_name in _INTENT_FIELDS and isinstance(submitted_value, str):
             normalized_intent = _normalize(submitted_value)
             if any(pattern.search(normalized_intent) for pattern in _PATTERNS):
                 return field_name
-            else:
-                pass
         elif isinstance(submitted_value, Mapping):
             nested_path = restricted_intent_path(submitted_value)
             if nested_path:
                 return f"{field_name}.{nested_path}"
-            else:
-                pass
-        else:
-            pass
     return None

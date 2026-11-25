@@ -32,8 +32,6 @@ def key_hour_origin(
     origin_ordinal = winter_ordinal - SEXAGENARY_INDEX[winter_ganzhi]
     if origin_ordinal < 2:
         raise ValueError("冬至前甲子锚点超出可表达日期")
-    else:
-        pass
     origin_day = NominalClockLabel(origin_ordinal, 0)
     origin_clock = origin_day.shifted(timedelta(hours=-1))
     target_slot = double_hour_slot(target_clock)
@@ -41,8 +39,6 @@ def key_hour_origin(
     branch_index = target_slot % 12
     if day_number < 1:
         raise ValueError("时计所求日期早于冬至前甲子锚点")
-    else:
-        pass
     accumulation = (day_number - 1) * 12 + branch_index + 1
     effective_day = NominalClockLabel(target_slot // 12, 0)
     return {

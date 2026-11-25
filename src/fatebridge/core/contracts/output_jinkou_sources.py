@@ -41,13 +41,9 @@ def _source_fields_match(actual: Any, expected: Any) -> None:
         for key, value in actual.items():
             if key not in expected:
                 raise ValueError("旺衰来源不能添加未登记的认证")
-            else:
-                pass
             _source_fields_match(value, expected[key])
     elif type(actual) is not type(expected) or actual != expected:
         raise ValueError("旺衰来源、原页或异文与已登记原书不一致")
-    else:
-        pass
 
 
 class JinkouStrengthSource(PartialOutput):

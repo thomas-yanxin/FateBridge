@@ -84,8 +84,6 @@ def build_heluo_result(
     normalized_gender = normalize_gender(gender)
     if not isinstance(gender, str) or normalized_gender not in {"男", "女"}:
         raise ValueError("河洛相荡、寄宫和元堂需要明确gender为男或女，不能默认性别。")
-    else:
-        pass
     longitude, longitude_source = resolve_numerology_longitude(
         lon, gps_lon, use_true_solar_time
     )
@@ -110,8 +108,6 @@ def build_heluo_result(
     confirmed_offset = normalize_numerology_utc_offset(birth_utc_offset)
     if confirmed_offset is not None:
         input_normalized["birth_utc_offset"] = confirmed_offset
-    else:
-        pass
     seed_time = numerology_seed_time(
         birth_date,
         birth_clock.normalized_clock,
@@ -187,8 +183,6 @@ def build_heluo_result(
     timing_text = selected_timing_snapshot(timing)
     if timing_text:
         snapshot_text += "\n\n" + timing_text
-    else:
-        pass
     analysis_context = _build_metaphysics_analysis_context(seed)
     analysis_context["longitude"] = longitude
     clock = numerology_birth_clock(

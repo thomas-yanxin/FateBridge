@@ -47,10 +47,6 @@ class LiurenOrderedPatterns(PartialOutput):
         ):
             if value["complete_classical_conformance"] is not False:
                 raise ValueError("局部传序识别只允许布尔false，不认证完整原典")
-            else:
-                pass
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -63,8 +59,6 @@ class LiurenOrderedPatterns(PartialOutput):
             expected.pop("matched_ids")
             for row in expected["evaluations"]:
                 row.pop("matched")
-        else:
-            pass
         compare_present_branches(actual, expected)
         return self
 
@@ -79,8 +73,6 @@ def require_complete_ordered_patterns(board: dict[str, Any]) -> None:
     value = board.get("transmission_relations", {}).get("named_structures")
     if value != expected:
         raise ValueError("完整传序课体依据缺项或与本课初中末传不一致")
-    else:
-        pass
     traces = [
         t
         for t in board.get("rule_trace", [])
@@ -88,5 +80,3 @@ def require_complete_ordered_patterns(board: dict[str, Any]) -> None:
     ]
     if traces != [ordered_patterns_trace(expected)]:
         raise ValueError("传序课体轨迹缺项、重复或与本课依据不一致")
-    else:
-        pass

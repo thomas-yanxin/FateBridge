@@ -29,8 +29,6 @@ SCOPE = "axis_host_guest_operations_only_not_timeliness_fortune_or_site_eligibil
 def _check(value: bool) -> None:
     if not value:
         raise FengshuiCalculationError("natal_host_guest_inconsistent")
-    else:
-        pass
 
 
 class HostGuestClause(TypedDict):
@@ -122,8 +120,6 @@ def _direction(chart: dict[str, Any], axis: str) -> str:
 def _raw_number(chart: dict[str, Any], direction: str, role: str) -> int:
     if role == "earth":
         return _facts()["fixed_earth_numbers"][direction]
-    else:
-        pass
     number = _number(chart[role + "_chart"][direction])
     _check(chart["palaces"][direction][role + "_star_number"] == number)
     return number
@@ -154,8 +150,6 @@ def _comparison(chart: dict[str, Any], axis: str, label: str) -> dict[str, Any]:
             "status": "not_applicable_lower_chart_corpus",
             "matched": None,
         }
-    else:
-        pass
     row = _literal(chart)
     labels = row["labels"]["山" if axis == "sitting" else "向"]
     return {
@@ -259,13 +253,9 @@ def validate(
     value = interpretation.get("host_guest_analysis")
     if expected_selected is False:
         _check(value is None)
-    else:
-        pass
     if value is None:
         _check(expected_selected is not True)
         return counts
-    else:
-        pass
     try:
         data = _facts()
         expected_provenance = provenance()
@@ -294,8 +284,6 @@ def validate(
                     for source_id in registered["source_ids"]
                 ],
             }
-        else:
-            pass
         _check(_same(reported_provenance, expected_provenance))
         _check(value["scope"] == SCOPE)
         _check(value["evaluation_timeliness_applied"] is False)

@@ -29,40 +29,26 @@ def _profile() -> tuple[dict[str, Any], str]:
     )
     if hashlib.sha256(content).hexdigest() != _PROFILE_SHA256:
         raise ValueError("Frozen HKO solar-date profile content changed")
-    else:
-        pass
     raw: dict[str, Any] = json.loads(content)
     if raw["id"] != "meihua_hko_solar_dates_v1" or raw["version"] != "1.0.0":
         raise ValueError("Unknown Mei Hua solar-date reference profile")
-    else:
-        pass
     if raw["source_scope"]["comparison_offset"] != "+08:00":
         raise ValueError("The reference uses fixed UTC+08 date labels")
-    else:
-        pass
     if set(raw["years"]) != {str(y) for y in range(1901, 2101)}:
         raise ValueError("Retain all200 published HKO years")
-    else:
-        pass
     for year, entry in raw["years"].items():
         if set(entry["terms"]) != _TERMS:
             raise ValueError("Retain all24 published solar-term dates per year")
-        else:
-            pass
         if any(
             date.fromisoformat(value).year != int(year)
             for value in entry["terms"].values()
         ):
             raise ValueError("Published solar dates must retain their source year")
-        else:
-            pass
     named = {(e["year"], e["term"]) for e in raw["publisher_named_events"]}
     if named != {(2021, "冬至"), (2051, "春分"), (2083, "立春"), (2084, "春分")}:
         raise ValueError(
             "Retain the four named solar events without adding moon episodes"
         )
-    else:
-        pass
     return raw, hashlib.sha256(content).hexdigest()
 
 
@@ -106,14 +92,10 @@ def compare_solar_term_date(term: Any, *, fact_path: str) -> dict[str, Any]:
     }
     if actual is None:
         return result
-    else:
-        pass
     try:
         moment = parse_solar_reference_datetime(actual)
         if moment.utcoffset() is None:
             return result
-        else:
-            pass
         at_reference = moment.astimezone(_REFERENCE_OFFSET)
     except (ValueError, OverflowError):
         return result
@@ -125,14 +107,10 @@ def compare_solar_term_date(term: Any, *, fact_path: str) -> dict[str, Any]:
     if entry is None:
         result["comparison_status"] = "outside_published_year_range"
         return result
-    else:
-        pass
     published = entry["terms"].get(result["event_name"])
     if published is None:
         result["comparison_status"] = "term_not_in_reference"
         return result
-    else:
-        pass
     difference = (at_reference.date() - date.fromisoformat(published)).days
     result.update(
         published_date=published,
@@ -230,8 +208,6 @@ def solar_reference_notice(reference: Mapping[str, Any]) -> str | None:
             "返回的同年同名节气记录含不同交节时刻；当前资料不足以确定一个一致的"
             "月令时间依据，须复核相关时刻来源。"
         )
-    else:
-        pass
     parts = []
     seen = set()
     for event in reference["events"]:
@@ -249,8 +225,6 @@ def solar_reference_notice(reference: Mapping[str, Any]) -> str | None:
                 f"{event['event_name']}计算日期{event['computed_date']}，"
                 f"香港天文台固定年表标为{event['published_date']}。"
             )
-        else:
-            pass
     named = list(
         dict.fromkeys(
             e["published_date"][:4] + "年" + e["event_name"]
@@ -262,12 +236,8 @@ def solar_reference_notice(reference: Mapping[str, Any]) -> str | None:
         parts.append(
             "香港天文台固定说明点名" + "、".join(named) + "为接近午夜的日期复核案例。"
         )
-    else:
-        pass
     if not parts:
         return None
-    else:
-        pass
     return (
         "节气日期对照（固定UTC+08）："
         + "".join(parts)

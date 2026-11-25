@@ -23,8 +23,6 @@ def pack_native_positions(rows: list[dict[str, Any]]) -> list[list[float | int]]
         "SouthNode",
     }:
         raise ValueError("Incomplete or duplicate activation body set")
-    else:
-        pass
     return [[by_body[b][k] for k in SCALARS] for b in DIRECT_BODIES]
 
 
@@ -40,12 +38,8 @@ def decode_native_positions(
         "strict_jpl",
     }:
         raise ValueError("Invalid native position policy")
-    else:
-        pass
     if not isinstance(native, list) or len(native) != len(DIRECT_BODIES):
         raise ValueError("Incomplete native positions")
-    else:
-        pass
     rows = []
     for body, values in zip(DIRECT_BODIES, native):
         if (
@@ -55,21 +49,15 @@ def decode_native_positions(
             or not 0 <= values[0] < 360
         ):
             raise ValueError("Invalid native position scalars")
-        else:
-            pass
         model = position_flag_model(values[2])
         if require_swiss_files and model != "swieph":
             raise ValueError("Native positions violate Swiss policy")
-        else:
-            pass
         if (
             body in BODY_IDS
             and physical_backend_policy == "strict_jpl"
             and model != "jpl"
         ):
             raise ValueError("Native positions violate strict JPL policy")
-        else:
-            pass
         rows.append(
             {
                 "body": body,

@@ -20,8 +20,6 @@ def solar_time_receipt(
     """Bind the decomposed correction to its physical input and solar label."""
     if civil_instant.utcoffset() is None:
         raise ValueError("太阳时修正依据须保留带时区的原民用实际时刻")
-    else:
-        pass
     local = ZonedCalendar(
         utc_calendar(civil_instant), parse_timezone_name(timezone_name)
     ).require_datetime()
@@ -48,8 +46,6 @@ def solar_time_receipt(
         )
     ) or not (abs(parts - total) < 1e-9 and abs(actual_delta - total * 60) < 2e-6):
         raise ValueError("太阳时分项、总修正与实际钟表标签不一致；不能生成不实依据")
-    else:
-        pass
     hour, minute, second, microsecond = corrected_label.time_parts
     seconds = hour * 3600 + minute * 60 + second + microsecond / 1e6
     hour_distance = (seconds - 3600) % 7200
@@ -80,12 +76,8 @@ def solar_time_receipt(
 def solar_time_evidence_lines(evidence: dict[str, Any]) -> list[str]:
     if not evidence.get("applied"):
         return []
-    else:
-        pass
     if evidence.get("status") != "captured_at_seed_calculation":
         return ["真太阳时修正：本种子未提供分项算法依据，不能从总修正量补写均时差方法"]
-    else:
-        pass
     return [
         f"真太阳时修正：经度差{evidence['longitude_correction_minutes']:.6f}分＋均时差{evidence['equation_of_time_minutes']:.6f}分－夏令时{evidence['daylight_saving_minutes']:.6f}分＝总修正{evidence['total_correction_minutes']:.6f}分；均时差方法{evidence['equation_of_time_method']}，UTC近似UT1，未认证亚秒精度",
         f"原实际时刻{evidence['civil_input_instant_utc']}，太阳钟表标签{evidence['apparent_solar_label']}；标签供日时取用，不移动原交节时刻",

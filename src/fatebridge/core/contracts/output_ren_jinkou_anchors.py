@@ -34,8 +34,6 @@ from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 def _jinkou(board: Any, pillars: Any, liuren: Any) -> None:
     if board is None:
         return
-    else:
-        pass
 
     day = _day(pillars)
     day_stem = _stem(_get(pillars, "day", "stem"))
@@ -52,27 +50,17 @@ def _jinkou(board: Any, pillars: Any, liuren: Any) -> None:
     ):
         if expected is not None:
             _same(board, "branch_stars." + field, expected)
-        else:
-            pass
     if day_stem is not None:
         _same(board, "stem_relations.day_stem", day_stem)
         _same(board, "definition_evidence.day_stem", day_stem)
-    else:
-        pass
     if hour is not None:
         _same(board, "definition_evidence.hour_branch", hour)
-    else:
-        pass
     if chosen is not None:
         _same(board, "definition_evidence.selected_is_diurnal", chosen)
-    else:
-        pass
     if day is not None:
         _same(board, "calendar_policy.effective_day_ganzhi", day)
         _same(overview, "xun_head", xun_head_for_ganzhi(day))
         _same(overview, "kongwang", kongwang_for_ganzhi(day))
-    else:
-        pass
     if day_branch is not None:
         for name in (
             "qi_evidence.day_branch",
@@ -80,33 +68,21 @@ def _jinkou(board: Any, pillars: Any, liuren: Any) -> None:
             "relations.calendar.day_branch",
         ):
             _same(board, name, day_branch)
-    else:
-        pass
     if month is not None:
         _same(board, "qi_evidence.month_building_branch", month)
         _same(board, "combinations.month_branch", month)
-    else:
-        pass
     if year is not None:
         _same(board, "relations.calendar.year_branch", year)
-    else:
-        pass
     general = _branch(_get(overview, "month_general", "branch"))
     attached_general = _branch(_get(liuren, "month_general", "branch"))
     if attached_general is not None:
         _same(overview, "month_general.branch", attached_general)
         general = attached_general
-    else:
-        pass
     rows = _get(board, "rows")
     if rows is None:
         return
-    else:
-        pass
     if len(rows) != 4:
         raise ValueError("金口诀四位数组须保留四个位置")
-    else:
-        pass
     by_role = dict(zip(POSITIONS, rows))
     contents = {}
     for label, row in by_role.items():
@@ -114,13 +90,9 @@ def _jinkou(board: Any, pillars: Any, liuren: Any) -> None:
         value = _get(row, "content")
         if value is None:
             continue
-        else:
-            pass
         sequence = HEAVENLY_STEMS if label == "人元" else EARTHLY_BRANCHES
         if value not in sequence:
             raise ValueError("金口诀人元须为干，神将地分须为支")
-        else:
-            pass
         contents[label] = value
         phase = (
             stem_element_text(value) if label == "人元" else branch_element_text(value)
@@ -135,8 +107,6 @@ def _jinkou(board: Any, pillars: Any, liuren: Any) -> None:
                 "month_break",
                 label != "人元" and value == SIX_CLASH_BRANCHES[month],
             )
-        else:
-            pass
         if day is not None:
             empty_phase = {"甲子": "水", "甲午": "水", "甲寅": "金", "甲申": "金"}.get(
                 xun_head_for_ganzhi(day)
@@ -147,26 +117,16 @@ def _jinkou(board: Any, pillars: Any, liuren: Any) -> None:
                 label != "人元" and value in kongwang_for_ganzhi(day)[:2],
             )
             _same(row, "si_da_kong", phase == empty_phase)
-        else:
-            pass
         if day_stem is not None and label in ("贵神", "将神"):
             _same(row, "dun_stem", wuzidun_stem(day_stem, value))
-        else:
-            pass
     ground = _branch(_get(overview, "di_fen"))
     if contents.get("地分") is not None:
         _same(overview, "di_fen", contents["地分"])
         ground = contents["地分"]
-    else:
-        pass
     if day_stem is not None and ground is not None:
         _same(by_role["人元"], "content", wuzidun_stem(day_stem, ground))
-    else:
-        pass
     if ground is not None:
         _same(overview, "guishen.earth_branch", ground)
-    else:
-        pass
     if (
         day_stem is not None
         and ground is not None
@@ -179,14 +139,10 @@ def _jinkou(board: Any, pillars: Any, liuren: Any) -> None:
         _same(overview, "guishen.name", god_name)
         _same(overview, "guishen.start_branch", start)
         _same(overview, "guishen.direction", "逆" if start in "巳午未申酉戌" else "顺")
-    else:
-        pass
     god_name = _get(by_role["贵神"], "shenjiang")
     if god_name is not None:
         if god_name not in GUISHEN_IDENTITIES:
             raise ValueError("金口诀贵神须为所选本的十二贵神")
-        else:
-            pass
         intrinsic = GUISHEN_IDENTITIES[god_name]
         _same(by_role["贵神"], "content", intrinsic[1])
         _same(by_role["贵神"], "intrinsic_ganzhi", intrinsic)
@@ -194,8 +150,6 @@ def _jinkou(board: Any, pillars: Any, liuren: Any) -> None:
         _same(overview, "guishen.branch", intrinsic[1])
         _same(overview, "guishen.intrinsic_ganzhi", intrinsic)
         _same(board, "stem_relations.guishen_intrinsic_ganzhi", intrinsic)
-    else:
-        pass
     if general is not None and ground is not None and hour is not None:
         located = EARTHLY_BRANCHES[
             (
@@ -209,8 +163,6 @@ def _jinkou(board: Any, pillars: Any, liuren: Any) -> None:
         _same(by_role["将神"], "shenjiang", YUE_JIANG_NAMES[located])
         _same(overview, "yuejiang.branch", located)
         _same(overview, "yuejiang.name", YUE_JIANG_NAMES[located])
-    else:
-        pass
     if len(contents) == 4:
         inputs = [
             dict(
@@ -230,5 +182,3 @@ def _jinkou(board: Any, pillars: Any, liuren: Any) -> None:
         _same(board, "use_evidence.polarity_position", use)
         for label, row in by_role.items():
             _same(row, "is_use", label == use)
-    else:
-        pass

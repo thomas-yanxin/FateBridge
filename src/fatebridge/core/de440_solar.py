@@ -102,14 +102,10 @@ def _coefficient_data() -> bytes:
         metadata = folder.joinpath(ATLAS_BASENAME + ".json").read_bytes()
         if hashlib.sha256(metadata).hexdigest() != ATLAS_MANIFEST_SHA256:
             raise ValueError("DE440 source record atlas identity changed")
-        else:
-            pass
         manifest: _AtlasManifest = json.loads(metadata)
         packed = folder.joinpath(manifest["file"]).read_bytes()
         if hashlib.sha256(packed).hexdigest() != manifest["compressed_sha256"]:
             raise ValueError("DE440 source record archive changed")
-        else:
-            pass
         data = unpack_records(
             packed,
             [
@@ -119,8 +115,6 @@ def _coefficient_data() -> bytes:
         )
         if hashlib.sha256(data).hexdigest() != manifest["uncompressed_sha256"]:
             raise ValueError("DE440 source coefficient words changed")
-        else:
-            pass
     except (OSError, ValueError, EOFError, zlib.error) as error:
         raise EphemerisSourceError("solar_de440_invalid") from error
     return data
@@ -143,14 +137,10 @@ def _profile(profile_id: str = MODEL_ID) -> _Profile:
         metadata = folder.joinpath(basename + ".json").read_bytes()
         if hashlib.sha256(metadata).hexdigest() != _MANIFEST_SHA256[profile_id]:
             raise ValueError("DE440 selected profile identity changed")
-        else:
-            pass
         manifest: SolarManifest = json.loads(metadata)
         tdb_raw = folder.joinpath("geocentric-tdb-v1.json").read_bytes()
         if hashlib.sha256(tdb_raw).hexdigest() != TDB_SHA256:
             raise ValueError("Geocentric TDB source terms changed")
-        else:
-            pass
         tdb: TDBParameters = json.loads(tdb_raw)
     except (OSError, ValueError, KeyError) as error:
         raise EphemerisSourceError("solar_de440_invalid") from error
@@ -173,8 +163,6 @@ def geocentric_tdb_minus_tt(jd_tt: float, *, profile_id: str = MODEL_ID) -> floa
     """Full geocentric ERFA Fairhead model, seconds; no observer terms."""
     if not math.isfinite(jd_tt):
         raise ValueError("TT epoch must be finite")
-    else:
-        pass
     return geocentric_tdb_minus_tt_relative(jd_tt - 2451545.0, profile_id=profile_id)
 
 
@@ -184,8 +172,6 @@ def geocentric_tdb_minus_tt_relative(
     """Same Fairhead series with its relative epoch supplied directly."""
     if not math.isfinite(days_from_j2000):
         raise ValueError("TT relative epoch must be finite")
-    else:
-        pass
     rows = _selected_profile(profile_id).tdb["fairhead_terms"]
     return fairhead_seconds(days_from_j2000, rows)
 
@@ -206,8 +192,6 @@ def state(
         and not math.isfinite(tdb_days_from_j2000)
     ):
         raise ValueError("TDB epoch must be finite")
-    else:
-        pass
     p = _selected_profile(profile_id)
     s = next(
         (s for s in p.manifest["segments"] if (s["center"], s["target"]) == pair),
@@ -215,8 +199,6 @@ def state(
     )
     if s is None:
         raise ValueError("Unsupported DE440 solar body pair")
-    else:
-        pass
     initial, span = s["initial_seconds_from_j2000_tdb"], s["interval_seconds"]
     # Select the original record from the supplied epoch before rounding.
     # A rounded seconds sum can cross a source edge before local evaluation.
@@ -228,12 +210,8 @@ def state(
     if index == s["record_count"] and offset == 0:
         index -= 1
         offset += span_exact
-    else:
-        pass
     if not 0 <= index < s["record_count"]:
         raise EphemerisSourceError("solar_de440_range")
-    else:
-        pass
     size = s["record_size_doubles"]
     record = struct.unpack_from(
         "<" + "d" * size, p.data, s["offset_bytes"] + index * size * 8
@@ -241,8 +219,6 @@ def state(
     midpoint = initial + (index + 0.5) * span
     if record[0] != midpoint or record[1] != span / 2:
         raise EphemerisSourceError("solar_de440_invalid")
-    else:
-        pass
     x = 2 * offset / span_exact - 1
     count = (size - 2) // 3
     positions, velocities = [], []
@@ -255,8 +231,6 @@ def state(
         velocities.append(velocity)
     if not all(math.isfinite(v) for v in positions + velocities):
         raise EphemerisSourceError("solar_de440_invalid")
-    else:
-        pass
     return (positions[0], positions[1], positions[2]), (
         velocities[0],
         velocities[1],
@@ -275,8 +249,6 @@ def solar_longitude_parts(
     """Geocentric apparent Sun at an explicit two-part TT point."""
     if not all(math.isfinite(value) for value in (day, fraction)):
         raise ValueError("TT epoch parts must be finite")
-    else:
-        pass
     relative = Fraction(day) - 2451545 + Fraction(fraction)
     correction = geocentric_tdb_minus_tt_relative(relative, profile_id=profile_id)
     # Keep the received and emitted epochs exact until the source record owns them.
@@ -395,8 +367,6 @@ def longitude_crossing_tt(
 ) -> dict[str, Any]:
     if not all(math.isfinite(x) for x in (target, low, high)) or low >= high:
         raise ValueError("DE440 crossing requires a finite increasing TT bracket")
-    else:
-        pass
 
     def residual(epoch: float) -> float:
         return math.remainder(
@@ -406,15 +376,11 @@ def longitude_crossing_tt(
     flo, fhi = residual(low), residual(high)
     if not flo < 0 <= fhi or fhi - flo >= 90:
         raise ValueError("DE440 TT bracket does not contain a forward crossing")
-    else:
-        pass
     iterations = 0
     for _ in range(40):
         middle = (low + high) / 2
         if middle == low or middle == high:
             break
-        else:
-            pass
         if residual(middle) < 0:
             low = middle
         else:
@@ -436,8 +402,6 @@ def longitude_crossing_tt_parts(
     """Explicit two-part alternative; scalar/default callers stay unchanged."""
     if not all(math.isfinite(v) for v in (target, low, high)) or low >= high:
         raise ValueError("DE440 crossing requires a finite increasing TT bracket")
-    else:
-        pass
     base = float(math.floor(low))
     a, b = low - base, high - base
 
@@ -449,15 +413,11 @@ def longitude_crossing_tt_parts(
     flo, fhi = residual(a), residual(b)
     if not flo < 0 <= fhi or fhi - flo >= 90:
         raise ValueError("DE440 TT bracket does not contain a forward crossing")
-    else:
-        pass
     iterations = 0
     for _ in range(48):
         middle = (a + b) / 2
         if middle in (a, b):
             break
-        else:
-            pass
         if residual(middle) < 0:
             a = middle
         else:

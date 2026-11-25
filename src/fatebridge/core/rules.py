@@ -103,8 +103,6 @@ class BaZiRules:
                             "name": f"{s1}{s2}相合",
                         }
                     )
-                else:
-                    pass
 
             # Clashes (Chong)
             for c1, c2 in STEM_FOUR_CLASHES:
@@ -116,8 +114,6 @@ class BaZiRules:
                             "name": f"{s1}{s2}相冲",
                         }
                     )
-                else:
-                    pass
 
             # Control (Ke) - General Elemental Control
             e1 = STEM_ELEMENTS[s1][0]
@@ -136,10 +132,6 @@ class BaZiRules:
                     patterns["controls"].append(
                         {"stems": [s2, s1], "pillars": [p2, p1], "name": f"{s2}克{s1}"}
                     )
-                else:
-                    pass
-            else:
-                pass
 
         return patterns
 
@@ -151,8 +143,6 @@ class BaZiRules:
             if item and item not in seen:
                 seen.add(item)
                 result.append(item)
-            else:
-                pass
         return result
 
     @staticmethod
@@ -160,8 +150,6 @@ class BaZiRules:
         for element_enum in Element:
             if element_enum.value == element_value:
                 return element_enum
-            else:
-                pass
         return None
 
     @staticmethod
@@ -169,8 +157,6 @@ class BaZiRules:
         for element_enum, generated in GENERATION_CYCLE.items():
             if generated == target:
                 return element_enum
-            else:
-                pass
         return None
 
     @staticmethod
@@ -178,8 +164,6 @@ class BaZiRules:
         for element_enum, destroyed in DESTRUCTION_CYCLE.items():
             if destroyed == target:
                 return element_enum
-            else:
-                pass
         return None
 
     @staticmethod
@@ -187,26 +171,16 @@ class BaZiRules:
         day_element = STEM_ELEMENTS[day_stem][0]
         if ten_god in {TenGod.COMPARE.value, TenGod.ROB_WEALTH.value}:
             return day_element.value
-        else:
-            pass
         if ten_god in {TenGod.FOOD_GOD.value, TenGod.HURT_OFFICER.value}:
             return GENERATION_CYCLE[day_element].value
-        else:
-            pass
         if ten_god in {TenGod.POSITIVE_WEALTH.value, TenGod.PARTIAL_WEALTH.value}:
             return DESTRUCTION_CYCLE[day_element].value
-        else:
-            pass
         if ten_god in {TenGod.POSITIVE_OFFICER.value, TenGod.SEVEN_KILLER.value}:
             destroying = BaZiRules._get_destroying_element(day_element)
             return destroying.value if destroying else None
-        else:
-            pass
         if ten_god in {TenGod.POSITIVE_SEAL.value, TenGod.PARTIAL_SEAL.value}:
             generating = BaZiRules._get_generating_element(day_element)
             return generating.value if generating else None
-        else:
-            pass
         return None
 
     @staticmethod
@@ -217,8 +191,6 @@ class BaZiRules:
             element_enum = BaZiRules._get_element_enum_by_value(element_value)
             if element_enum is None:
                 continue
-            else:
-                pass
 
             if element_enum == day_element:
                 ten_gods.extend([TenGod.COMPARE.value, TenGod.ROB_WEALTH.value])
@@ -234,8 +206,6 @@ class BaZiRules:
                 )
             elif GENERATION_CYCLE[element_enum] == day_element:
                 ten_gods.extend([TenGod.PARTIAL_SEAL.value, TenGod.POSITIVE_SEAL.value])
-            else:
-                pass
 
         return BaZiRules._ordered_unique(ten_gods)
 
@@ -258,8 +228,6 @@ class BaZiRules:
             main_hidden = hidden[0]
             main_god = get_ten_god(day_stem, main_hidden).value
             significant.add(main_god)
-        else:
-            pass
 
         return significant
 
@@ -310,8 +278,6 @@ class BaZiRules:
                     ],
                 }
             )
-        else:
-            pass
 
         if TenGod.SEVEN_KILLER.value in sig_gods and (
             TenGod.POSITIVE_SEAL.value in sig_gods
@@ -335,8 +301,6 @@ class BaZiRules:
                     ],
                 }
             )
-        else:
-            pass
 
         if TenGod.SEVEN_KILLER.value in sig_gods and TenGod.FOOD_GOD.value in sig_gods:
             candidates.append(
@@ -355,8 +319,6 @@ class BaZiRules:
                     ],
                 }
             )
-        else:
-            pass
 
         if TenGod.HURT_OFFICER.value in sig_gods and (
             TenGod.POSITIVE_SEAL.value in sig_gods
@@ -379,8 +341,6 @@ class BaZiRules:
                     ],
                 }
             )
-        else:
-            pass
 
         if (
             TenGod.HURT_OFFICER.value in sig_gods
@@ -404,8 +364,6 @@ class BaZiRules:
                     ],
                 }
             )
-        else:
-            pass
 
         for candidate in candidates:
             candidate["formation_status"] = "candidate_only"
@@ -419,36 +377,22 @@ class BaZiRules:
     ) -> str:
         if not result_element_value:
             return "主要体现为气机扰动，需要结合被触动的五行再看。"
-        else:
-            pass
 
         day_element = BaZiRules._get_element_enum_by_value(day_element_value)
         result_element = BaZiRules._get_element_enum_by_value(result_element_value)
         if day_element is None or result_element is None:
             return "对日主影响需要结合五行关系进一步判断。"
-        else:
-            pass
 
         if day_element == result_element:
             return f"{result_element_value}与日主同气，助身增势。"
-        else:
-            pass
         if GENERATION_CYCLE[result_element] == day_element:
             return f"{result_element_value}生日主，对日主有补益作用。"
-        else:
-            pass
         if GENERATION_CYCLE[day_element] == result_element:
             return f"日主之气流向{result_element_value}，更偏向泄秀或输出。"
-        else:
-            pass
         if DESTRUCTION_CYCLE[result_element] == day_element:
             return f"{result_element_value}克日主，带来约束与压力。"
-        else:
-            pass
         if DESTRUCTION_CYCLE[day_element] == result_element:
             return f"日主可制{result_element_value}，更利于驾驭资源或对象。"
-        else:
-            pass
         return "与日主关系中性，需要结合全局判断。"
 
     @staticmethod
@@ -465,27 +409,17 @@ class BaZiRules:
         if result_element_value:
             if result_element_value in useful_elements:
                 return f"{result_element_value}属于{structure_label}可用之气，对格局流通有支持。"
-            else:
-                pass
             if result_element_value in avoid_elements:
                 return f"{result_element_value}属于{structure_label}需回避之气，对格局流通有干扰。"
-            else:
-                pass
             return (
                 f"{result_element_value}对{structure_label}影响中性，需结合全局衡量。"
             )
-        else:
-            pass
 
         affected = set(affected_elements or [])
         if useful_elements & affected:
             return f"事件触动了{structure_label}的可用五行，格局稳定性需要重点观察。"
-        else:
-            pass
         if avoid_elements & affected:
             return f"事件触动了{structure_label}的忌避五行，既可能化解也可能放大张力。"
-        else:
-            pass
         return f"事件对{structure_label}形成扰动，偏向张力型影响。"
 
     @staticmethod
@@ -534,8 +468,6 @@ class BaZiRules:
             decision_basis.append(
                 f"月令本气为{selected_month['original_main_qi']['ten_god']}，当前有限规则所选为{selected_month['ten_god']}；是否变格、兼格仍待裁定，不以透干即抹去本气。"
             )
-        else:
-            pass
 
         resolution = resolve_useful_elements(
             pillars, element_analysis, recognized_structures
@@ -550,8 +482,6 @@ class BaZiRules:
             decision_basis.append(
                 "任注顺局从儿的月柱食伤、分布与财星前提已见；从儿不以身弱为必要条件。成气、藏印官杀及承接救应未判，普通扶抑喜忌列为条件参考。"
             )
-        else:
-            pass
         useful_elements = resolution["useful_elements"]
         avoid_elements = resolution["avoid_elements"]
         useful_ten_gods = BaZiRules._derive_ten_gods_from_elements(
@@ -604,8 +534,6 @@ class BaZiRules:
                 decision_basis.append(
                     f"{event['label']}：{event['impact_on_structure']}"
                 )
-            else:
-                pass
 
         structure_profile["decision_basis"] = BaZiRules._ordered_unique(decision_basis)
         return structure_profile

@@ -188,8 +188,6 @@ def native_source_facts(
     for name in _SOURCE_GODS:
         if name not in god_sign_indices:
             unavailable["@" + name] = "No selected source god position supplied"
-        else:
-            pass
     for source_season in "春夏秋冬":
         booleans[source_season] = season == source_season
 
@@ -224,8 +222,6 @@ def native_source_facts(
                 forward_gap = (palace_indices[following] - palace_indices[name]) % 12
                 strings[name + "后"] = previous if backward_gap < 2 else "无"
                 strings[name + "前"] = following if forward_gap < 2 else "无"
-        else:
-            pass
 
         for number in range(1, 7):
             booleans["__sp" + str(number)] = False
@@ -243,8 +239,6 @@ def native_source_facts(
                     upper += 1
                 else:
                     break
-            else:
-                pass
             lower += 1
         if lower == upper:
             booleans["__sp5" if around_sun else "__sp4"] = True
@@ -257,12 +251,6 @@ def native_source_facts(
                     booleans["__sp2"] = True
                 elif last == "月":
                     booleans["__sp3"] = True
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
 
         lower = ordered.index("日")
         while ordered[(lower - 1) % 11] in "日月" + five:
@@ -292,8 +280,6 @@ def native_source_facts(
             unavailable["$" + name + "后"] = (
                 "Complete eleven-body coordinates and palaces required"
             )
-    else:
-        pass
 
     provenance = {
         "provider_id": NATIVE_FACTS_POLICY_ID,
@@ -320,8 +306,6 @@ def native_source_facts(
                 strings.pop(name, None)
             elif key[0] == "?":
                 booleans.pop(name, None)
-            else:
-                pass
             unavailable.pop(key, None)
         for prefix, names in (
             ("@", supplied.palaces),
@@ -342,8 +326,6 @@ def native_source_facts(
             day_season="Native solar day/night; source-provider month season or explicit unknown",
             mansions="Selected source-provider mansion facts or explicit unknown; no RA substitution",
         )
-    else:
-        pass
     return MoiraSourceFacts(
         palaces=palaces,
         mansions=mansions,

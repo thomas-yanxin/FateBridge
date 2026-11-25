@@ -92,8 +92,6 @@ def _compact_bazhai(result: ServiceResult) -> ServiceResult:
         compact_layer["house_candidates"] = [
             _compact_bazhai_chart(chart) for chart in layer["house_candidates"]
         ]
-    else:
-        pass
     return {
         **result,
         "rulesets": _compact_rulesets(result),
@@ -209,8 +207,6 @@ def _compact_xuankong(result: ServiceResult) -> ServiceResult:
                 for candidate in city_gate["candidates"]
             ],
         }
-    else:
-        pass
     if "interpretation" in layer:
         interpretation_fields = {
             "status",
@@ -224,8 +220,6 @@ def _compact_xuankong(result: ServiceResult) -> ServiceResult:
             for key, value in layer["interpretation"].items()
             if key in interpretation_fields
         }
-    else:
-        pass
     return {
         **result,
         "rulesets": _compact_rulesets(result),
@@ -245,8 +239,6 @@ def _compact_assessment(result: ServiceResult) -> ServiceResult:
     layout = result.get("layout_analysis")
     if layout is None:
         return result
-    else:
-        pass
     coverage = result["coverage"]
     progress = layout["analysis_progress"]
     compact_layers: dict[str, ServiceResult] = {}
@@ -256,8 +248,6 @@ def _compact_assessment(result: ServiceResult) -> ServiceResult:
             trimmed["candidates"] = _compact_candidate_ids(
                 trimmed.get("candidates", [])
             )
-        else:
-            pass
         compact_layers[name] = trimmed
     return {
         **result,

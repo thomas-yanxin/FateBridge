@@ -94,8 +94,6 @@ class JinkouCourse(PartialOutput):
 
         if not (info.context and info.context.get("full_result")):
             validate_strength_evidence(self.model_dump(exclude_unset=True))
-        else:
-            pass
         return self
 
     @model_validator(mode="after")
@@ -109,28 +107,18 @@ class JinkouCourse(PartialOutput):
         for trace in self.rule_trace or []:
             if trace.rule_id != "jinkou.jingben_relations" or trace.result is None:
                 continue
-            else:
-                pass
             block = trace.result.get("si_jue")
             if not isinstance(block, dict) or "natal" not in block:
                 continue
-            else:
-                pass
             traced = JinkouJue.model_validate(block).natal
             if traced is None:
                 raise ValueError("将命大绝规则轨迹不可伪造为空")
-            else:
-                pass
             nodes.append(traced)
             if primary is not None:
                 a = primary.model_dump(exclude_unset=True)
                 b = traced.model_dump(exclude_unset=True)
                 if any(a[k] != b[k] for k in a.keys() & b.keys()):
                     raise ValueError("将命大绝正文与同次规则轨迹不一致")
-                else:
-                    pass
-            else:
-                pass
         row = next((r for r in self.rows or [] if r.label == "将神"), None)
         if row is not None and row.content is not None:
             for natal in nodes:
@@ -139,10 +127,6 @@ class JinkouCourse(PartialOutput):
                     and natal.left_branch != row.content
                 ):
                     raise ValueError("将命大绝须使用同次四位的将神支")
-                else:
-                    pass
-        else:
-            pass
         return self
 
     @model_validator(mode="after")
@@ -153,33 +137,21 @@ class JinkouCourse(PartialOutput):
             or self.overview is None
         ):
             return self
-        else:
-            pass
         if self.stem_relations is None or self.stem_relations.day_stem is None:
             return self
-        else:
-            pass
         if self.overview.is_diurnal is None:
             return self
-        else:
-            pass
         actual = self.definition_evidence
         if actual.hour_branch is None:
             return self
-        else:
-            pass
         # Only rebuild when all four raw row anchors are available. Projection
         # validation must not fabricate omitted data.
         rows = [r.model_dump(exclude_unset=True) for r in self.rows]
         needed = ("label", "content", "element")
         if len(rows) != 4 or any(any(k not in r for k in needed) for r in rows):
             return self
-        else:
-            pass
         if not rows[1].get("intrinsic_ganzhi"):
             return self
-        else:
-            pass
 
         expected = definition_evidence(
             day_stem=self.stem_relations.day_stem,
@@ -196,8 +168,6 @@ class JinkouCourse(PartialOutput):
     def stems_agree_with_four_positions(self) -> "JinkouCourse":
         if self.stem_relations is None or self.rows is None:
             return self
-        else:
-            pass
         by_label = {row.label: row for row in self.rows if row.label is not None}
         for label, node in (
             ("贵神", self.stem_relations.god),
@@ -206,8 +176,6 @@ class JinkouCourse(PartialOutput):
             row = by_label.get(label)
             if row is None or node is None:
                 continue
-            else:
-                pass
             for node_field, row_field in (
                 ("branch", "content"),
                 ("name", "shenjiang"),
@@ -219,8 +187,6 @@ class JinkouCourse(PartialOutput):
                 a, b = getattr(node, node_field), getattr(row, row_field)
                 if a is not None and b is not None and a != b:
                     raise ValueError("遁干证据与原四位的同次事实不一致")
-                else:
-                    pass
         god = by_label.get("贵神")
         intrinsic = self.stem_relations.guishen_intrinsic_ganzhi
         if (
@@ -230,6 +196,4 @@ class JinkouCourse(PartialOutput):
             and god.intrinsic_ganzhi != intrinsic
         ):
             raise ValueError("贵神固有干支与遁干证据不一致")
-        else:
-            pass
         return self

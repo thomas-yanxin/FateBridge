@@ -36,15 +36,11 @@ def require_recorded_instant(birth: AstroBirthInfo) -> None:
     )
     if physical.utcoffset() is None or recorded.utcoffset() is None:
         raise ValueError("印占的记录钟时与物理时刻必须带时区。")
-    else:
-        pass
     if utc_calendar(physical) != utc_calendar(recorded):
         raise ValueError(
             "印占须保留记录钟时所指的物理时刻；不能把真太阳钟标签重新当作民用出生时间。"
             "构建 AstroBirthInfo 时使用 preserve_instant=true。"
         )
-    else:
-        pass
 
 
 def clock_context(
@@ -122,8 +118,6 @@ def require_clock_policy(birth: AstroBirthInfo, ephemeris_policy: str) -> None:
         raise ValueError(
             "Strict Jyotish requires the LAT birth clock to be resolved under require_data_files as well"
         )
-    else:
-        pass
 
 
 def check_clock_sources(
@@ -133,8 +127,6 @@ def check_clock_sources(
     conversion = birth.clock_conversion
     if conversion is None:
         return None
-    else:
-        pass
     from fatebridge.core.astro.birth_clock import resolve_solar_birth_clock
 
     session = current_source_session()
@@ -155,8 +147,6 @@ def check_clock_sources(
             != birth.require_utc_datetime
         ):
             raise EphemerisSourceError("birth_clock_source_mismatch")
-        else:
-            pass
         moment, replay = resolve_solar_birth_clock(
             wall, birth.longitude, basis, ephemeris_policy=ephemeris_policy
         )
@@ -164,13 +154,9 @@ def check_clock_sources(
         # The original solver's JD roundtrip tolerance is not widened here.
         if abs(difference) > 0.0002:
             raise EphemerisSourceError("birth_clock_source_mismatch")
-        else:
-            pass
         original_library = conversion.get("swisseph_version")
         if original_library and original_library != replay["swisseph_version"]:
             raise EphemerisSourceError("birth_clock_source_mismatch")
-        else:
-            pass
         cohort = SunSourceCohort()
         original = conversion.get("solar_source_comparison", {}).get(
             "physical_ephemeris_sources", []
@@ -178,15 +164,11 @@ def check_clock_sources(
         original_models = set(conversion.get("solar_ephemeris_models_observed", []))
         if not original_models and conversion.get("solar_ephemeris_model"):
             original_models.add(conversion["solar_ephemeris_model"])
-        else:
-            pass
         if basis == "local_apparent_solar":
             if original_models and original_models != set(
                 replay["solar_ephemeris_models_observed"]
             ):
                 raise EphemerisSourceError("birth_clock_source_mismatch")
-            else:
-                pass
             try:
                 for source in [
                     *original,
@@ -195,8 +177,6 @@ def check_clock_sources(
                     cohort.add(source)
             except EphemerisSourceError as error:
                 raise EphemerisSourceError("birth_clock_source_mismatch") from error
-        else:
-            pass
         session.memo[key] = {
             "cohort": cohort,
             "difference": difference,
@@ -206,8 +186,6 @@ def check_clock_sources(
             "original_library_known": bool(original_library),
             "original_models": sorted(original_models),
         }
-    else:
-        pass
     checked = session.memo[key]
     is_apparent = conversion["input_clock_basis"] == "local_apparent_solar"
     cohort = checked["cohort"]
@@ -216,8 +194,6 @@ def check_clock_sources(
             cohort.add(sun_source(native, native["by_factor"]["equatorial_Sun"]))
         except EphemerisSourceError as error:
             raise EphemerisSourceError("birth_clock_source_mismatch") from error
-    else:
-        pass
     return {
         "rule_id": "jyotish.birth_clock_source_coherence.v1",
         "status": (
@@ -265,8 +241,6 @@ def birth_grid(
         for index in range(1, count):
             if 2 * index == count:
                 continue
-            else:
-                pass
             offset = -span + 2.0 * span * index / count
             shifts[offset] = timedelta(seconds=offset)
         offsets = sorted(shifts)
@@ -278,8 +252,6 @@ def birth_grid(
             offsets.index(0.0),
             {},
         )
-    else:
-        pass
 
     assert birth.native_epoch is not None  # The solar input resolver owns it.
     wall = datetime.fromisoformat(conversion["input_wall_datetime"])
@@ -304,8 +276,6 @@ def birth_grid(
     low, center, high = lower.tt.days, nominal.tt.days, upper.tt.days
     if not low <= center <= high:
         raise ValueError("Converted solar interval must contain its nominal instant")
-    else:
-        pass
     duration = high - low
     count = max(1, math.ceil(duration / Fraction(30, 86400)))
     samples = {low: lower, high: upper, center: nominal}
@@ -315,8 +285,6 @@ def birth_grid(
             samples[point] = RecordedBirthSample(
                 PhysicalEpoch.from_tt(TTInstant(point))
             )
-        else:
-            pass
     ordered = sorted(samples)
     return BirthTimeGrid(
         tuple((float((point - center) * 86400), samples[point]) for point in ordered),

@@ -56,8 +56,6 @@ class TimingEffectsAnalysis:
                     ),
                 },
             }
-        else:
-            pass
         month_stem = birth_pillars["month"][0]
         month_branch = birth_pillars["month"][1]
 
@@ -105,16 +103,12 @@ class TimingEffectsAnalysis:
                 "message": f"尚未起运，约在{start_info['start_age_precise']}岁起运",
                 "timing_context": context,
             }
-        else:
-            pass
         if period_index >= len(sequence):
             return {
                 "status": "beyond_calculation",
                 "message": "超出计算范围",
                 "timing_context": context,
             }
-        else:
-            pass
 
         current_dayun = sequence[period_index]
         years_in_period = (
@@ -177,10 +171,6 @@ class TimingEffectsAnalysis:
             liunian_kwargs["moment"] = moment
             if timezone_name is not None:
                 liunian_kwargs["timezone_name"] = timezone_name
-            else:
-                pass
-        else:
-            pass
         liunian_info = TimingAnalysis.calculate_liunian(target_year, **liunian_kwargs)
 
         # 分析流年对命局的影响
@@ -220,8 +210,6 @@ class TimingEffectsAnalysis:
                 timezone_name=timezone_name,
                 target_date=target_date,
             )
-        else:
-            pass
 
         detailed_analysis = TimingAnalysis.analyze_liuyue_detailed(
             birth_pillars,
@@ -267,8 +255,6 @@ class TimingEffectsAnalysis:
             liuri_info = TimingAnalysis.calculate_liuri(
                 target_date, timezone_name=timezone_name
             )
-        else:
-            pass
         detailed_analysis = TimingAnalysis.analyze_liuri_detailed(
             birth_pillars,
             target_date,
@@ -309,8 +295,6 @@ class TimingEffectsAnalysis:
             liushi_info = TimingAnalysis.calculate_liushi(
                 target_datetime, timezone_name=timezone_name
             )
-        else:
-            pass
         detailed_analysis = TimingAnalysis.analyze_liushi_detailed(
             birth_pillars,
             target_datetime,
@@ -377,8 +361,6 @@ class TimingEffectsAnalysis:
                     or datetime(target_year, target_month, target_day),
                     timezone_name=timezone_name,
                 )
-            else:
-                pass
             result["liunian_analysis"] = liunian_analysis
 
             liuyue_branch = liuyue_analysis["liuyue_info"]["branch"]
@@ -388,8 +370,6 @@ class TimingEffectsAnalysis:
                 liuyue_branch, liunian_branch, "流月", "流年"
             )
             result["combination_effects"]["liuyue_liunian"] = combination_analysis
-        else:
-            pass
 
         # 大运组合分析需要性别+出生日期等额外输入，本入口未提供这些参数，
         # 故不在此层伪造。需要大运联动时由上层 analyze_dayun_effects 负责。
@@ -415,8 +395,6 @@ class TimingEffectsAnalysis:
                     "effect": "支冲关系成立，喜忌需结合原局",
                 }
             )
-        else:
-            pass
 
         if check_branch_combination(branch1, branch2):
             relations.append(
@@ -426,8 +404,6 @@ class TimingEffectsAnalysis:
                     "effect": "六合关系成立，合化与喜忌尚未判定",
                 }
             )
-        else:
-            pass
 
         if not relations:
             relations.append(
@@ -437,8 +413,6 @@ class TimingEffectsAnalysis:
                     "effect": "本二元检查未命中六冲或六合；不代表无其他关系",
                 }
             )
-        else:
-            pass
 
         return {
             "branch1": branch1,
@@ -472,8 +446,6 @@ class TimingEffectsAnalysis:
                 summary_parts.append(
                     f"与{combo_key.replace('_', '、')}组合{combo_data['overall_effect']}"
                 )
-            else:
-                pass
 
         return "，".join(summary_parts) + "。"
 
@@ -492,8 +464,6 @@ class TimingEffectsAnalysis:
         if "dayun_info" in dayun_analysis:
             dayun_pillar = dayun_analysis["dayun_info"]["pillar"]
             summary_parts.append(f"大运{dayun_pillar}")
-        else:
-            pass
 
         liunian_pillar = liunian_analysis["liunian_info"]["pillar"]
         liuyue_pillar = liuyue_analysis["liuyue_info"]["pillar"]
@@ -506,8 +476,6 @@ class TimingEffectsAnalysis:
         if liushi_analysis and "liushi_info" in liushi_analysis:
             liushi_pillar = liushi_analysis["liushi_info"]["pillar"]
             summary_parts.append(f"流时{liushi_pillar}")
-        else:
-            pass
 
         overall_effect = combined_effects["overall_effect"]
 

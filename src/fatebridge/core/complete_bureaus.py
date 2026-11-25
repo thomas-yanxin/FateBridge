@@ -33,8 +33,6 @@ def complete_bureau_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
                 "这不裁定全局成格或有效通关。"
             )
             continue
-        else:
-            pass
         if (
             event.get("kind") not in {"三合", "三会"}
             or len(positions) <= 3
@@ -42,8 +40,6 @@ def complete_bureau_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
             or not all(p in branches for p in positions)
         ):
             continue
-        else:
-            pass
         seats = "、".join(labels.get(p, p) + branches[p] for p in positions)
         result.append(
             f"完整{event['kind']}{event['target']}局：{seats}；"

@@ -46,12 +46,8 @@ def expected_facts(board: dict[str, Any]) -> dict[str, Any]:
     rows = board.get("rows")
     if not isinstance(rows, list) or len(rows) != 4:
         return {}
-    else:
-        pass
     if [r.get("label") for r in rows] != list(POSITIONS):
         return {}
-    else:
-        pass
     canonical = []
     for index, row in enumerate(rows):
         phase = row.get("element")
@@ -65,15 +61,9 @@ def expected_facts(board: dict[str, Any]) -> dict[str, Any]:
                 raise ValueError("旺衰输入须为人元干及其余三位的地支") from exc
             if "element" in row and phase != anchored:
                 raise ValueError("旺衰须使用四位实际干支的五行")
-            else:
-                pass
             phase = anchored
-        else:
-            pass
         if phase is None:
             return {}
-        else:
-            pass
         canonical.append(dict(row, element=phase))
     strength = internal_strength(canonical)
     result = {"internal_strength": strength}
@@ -89,8 +79,6 @@ def expected_facts(board: dict[str, Any]) -> dict[str, Any]:
         result["use_evidence"] = use_evidence(
             canonical, strength, polarity_position=position
         )
-    else:
-        pass
     qi = board.get("qi_evidence")
     if (
         isinstance(qi, dict)
@@ -103,8 +91,6 @@ def expected_facts(board: dict[str, Any]) -> dict[str, Any]:
             month_branch=qi["month_building_branch"],
             day_branch=qi["day_branch"],
         )
-    else:
-        pass
     return result
 
 
@@ -120,24 +106,16 @@ def validate_seasonal_evidence(board: dict[str, Any]) -> None:
     ]
     if not months:
         return
-    else:
-        pass
     month = months[0]
     basis = seasonal_power_basis(month)
     if any(other != month for other in months):
         raise ValueError("同课四季旺衰的月建依据不一致")
-    else:
-        pass
     overview = board.get("overview")
     if isinstance(overview, dict) and overview.get("power_basis") is not None:
         compare_present(overview["power_basis"], basis)
-    else:
-        pass
     rows = board.get("rows")
     if not isinstance(rows, list):
         return
-    else:
-        pass
     for index, row in enumerate(rows):
         phase = row.get("element")
         content = row.get("content")
@@ -151,20 +129,12 @@ def validate_seasonal_evidence(board: dict[str, Any]) -> None:
                 raise ValueError("四季旺衰须使用四位实际干支") from exc
             if phase is not None:
                 compare_present(phase, anchored)
-            else:
-                pass
             phase = anchored
-        else:
-            pass
         if phase is None:
             continue
-        else:
-            pass
         power = seasonal_power(month, phase)
         if row.get("seasonal_power") is not None:
             compare_present(row["seasonal_power"], power)
-        else:
-            pass
 
 
 def validate_strength_evidence(
@@ -175,34 +145,22 @@ def validate_strength_evidence(
     validate_seasonal_evidence(board)
     if expected is None:
         expected = expected_facts(board)
-    else:
-        pass
     strength = expected.get("internal_strength")
     if strength is not None:
         for row in board["rows"]:
             if "internal_power" in row:
                 compare_present(row["internal_power"], strength["powers"][row["label"]])
-            else:
-                pass
-    else:
-        pass
     for key, value in expected.items():
         if key in board:
             compare_present(board[key], value, key)
-        else:
-            pass
     for key, rule_id in TRACES.items():
         traces = [
             t for t in board.get("rule_trace") or [] if t.get("rule_id") == rule_id
         ]
         if len(traces) > 1:
             raise ValueError("金口诀同一旺衰或取用规则轨迹不可重复")
-        else:
-            pass
         if key in expected and traces and "result" in traces[0]:
             compare_present(traces[0]["result"], expected[key], key)
-        else:
-            pass
 
 
 def require_present(actual: Any, expected: Any) -> None:
@@ -210,15 +168,11 @@ def require_present(actual: Any, expected: Any) -> None:
     if isinstance(expected, dict):
         if not isinstance(actual, dict) or set(expected) - set(actual):
             raise ValueError("完整金口诀缺少旺衰或用位依据字段")
-        else:
-            pass
         for key, value in expected.items():
             require_present(actual[key], value)
     elif isinstance(expected, list):
         if not isinstance(actual, list) or len(actual) != len(expected):
             raise ValueError("完整金口诀缺少旺衰或用位依据条目")
-        else:
-            pass
         for a, b in zip(actual, expected):
             require_present(a, b)
     elif expected is not None and actual is None:
@@ -227,16 +181,12 @@ def require_present(actual: Any, expected: Any) -> None:
         not isinstance(actual, str) or not actual.strip()
     ):
         raise ValueError("完整金口诀不可将旺衰或取用说明置空")
-    else:
-        pass
 
 
 def require_complete_strength_evidence(board: dict[str, Any]) -> None:
     rows = board.get("rows")
     if not isinstance(rows, list) or len(rows) != 4:
         raise ValueError("完整金口诀须保留四位旺衰的输入依据")
-    else:
-        pass
     for position, row in zip(POSITIONS, rows):
         if (
             not isinstance(row, dict)
@@ -245,19 +195,13 @@ def require_complete_strength_evidence(board: dict[str, Any]) -> None:
             or any(row[k] is None for k in ROW_FIELDS if k != "internal_power")
         ):
             raise ValueError("完整金口诀须保留四位旺衰的输入依据")
-        else:
-            pass
     expected = expected_facts(board)
     if set(expected) != set(TRACES):
         raise ValueError("完整金口诀须保留月建日辰与阴阳用位依据")
-    else:
-        pass
     basis = seasonal_power_basis(expected["qi_evidence"]["month_building_branch"])
     overview = board.get("overview")
     if not isinstance(overview, dict) or overview.get("power_basis") != basis:
         raise ValueError("完整金口诀须保留与实际月建一致的四季旺衰说明")
-    else:
-        pass
     for key, value in expected.items():
         require_present(board.get(key), value)
         traces = [
@@ -265,8 +209,6 @@ def require_complete_strength_evidence(board: dict[str, Any]) -> None:
         ]
         if len(traces) != 1:
             raise ValueError("完整金口诀须保留唯一的旺衰与用位规则轨迹")
-        else:
-            pass
         require_present(traces[0].get("result"), value)
         if key == "internal_strength":
             source = value["source_evidence"]
@@ -277,8 +219,4 @@ def require_complete_strength_evidence(board: dict[str, Any]) -> None:
                 or traces[0].get("source_section") != source["source_section"]
             ):
                 raise ValueError("完整旺衰须保留相同且真实的原书来源与异文")
-            else:
-                pass
-        else:
-            pass
     validate_strength_evidence(board, expected=expected)

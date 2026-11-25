@@ -15,17 +15,11 @@ def _numeral(value: str) -> int:
     digits = {c: i for i, c in enumerate("一二三四五六七八九", 1)}
     if value == "十":
         return 10
-    else:
-        pass
     if value in digits:
         return digits[value]
-    else:
-        pass
     tens, separator, ones = value.partition("十")
     if not separator:
         raise ValueError("未识别的原句日号")
-    else:
-        pass
     return (digits[tens] if tens else 1) * 10 + (digits[ones] if ones else 0)
 
 
@@ -34,16 +28,12 @@ def validate_selected_claims(data: dict[str, Any]) -> None:
     sources = {row["id"]: row for row in data["sources"]}
     if len(sources) != len(data["sources"]) or set(sources) != {"T1796", "T2216"}:
         raise ValueError("定日分时来源必须完整唯一")
-    else:
-        pass
     quotes: dict[tuple[str, str], str] = {}
     for source in sources.values():
         for row in source["selected_quotations"]:
             key = source["id"], row["id"]
             if key in quotes:
                 raise ValueError("定日分时选段重复")
-            else:
-                pass
             quotes[key] = row["literal"]
     required = {
         ("T1796", "phase_condition"),
@@ -54,8 +44,6 @@ def validate_selected_claims(data: dict[str, Any]) -> None:
     }
     if set(quotes) != required:
         raise ValueError("定日分时选段不完整")
-    else:
-        pass
     phase = data["phase_day_distinction"]
     condition = phase["conditional_source_case"]
     text = quotes[condition["source_id"], condition["quote_id"]]
@@ -82,8 +70,6 @@ def validate_selected_claims(data: dict[str, Any]) -> None:
         or phase["phase_reference"]["quarter_source_name"] != quarter_name[1]
     ):
         raise ValueError("定日月相控制未绑定所选原句")
-    else:
-        pass
     comment = phase["commentarial_case"]
     text = quotes[comment["source_id"], comment["quote_id"]]
     case = re.search(
@@ -100,8 +86,6 @@ def validate_selected_claims(data: dict[str, Any]) -> None:
         != case[3].replace("黒", "黑")
     ):
         raise ValueError("注疏条件日号未绑定所选原句")
-    else:
-        pass
     morning = data["morning_reference"]
     text = quotes[morning["source_id"], morning["quote_id"]]
     if any(
@@ -109,8 +93,6 @@ def validate_selected_claims(data: dict[str, Any]) -> None:
         for key in ("morning_gloss_literal", "character_distinction_literal")
     ):
         raise ValueError("晨辰说明未绑定所选原句")
-    else:
-        pass
     time = data["time_wording_reference"]
     if time["T1796_literal"] not in quotes["T1796", "time_wording"] or any(
         literal not in quotes["T2216", "thirty_time_debate"]
@@ -120,15 +102,11 @@ def validate_selected_claims(data: dict[str, Any]) -> None:
         ]
     ):
         raise ValueError("三十时争议未绑定所选原句")
-    else:
-        pass
 
 
 def phase_clock_reference(day: int) -> dict[str, Any]:
     if type(day) is not int or not 1 <= day <= 30:
         raise ValueError("历日命名只支持1..30整数日号")
-    else:
-        pass
     loaded = load_source(SOURCE)
     reference = loaded.data
     validate_selected_claims(reference)

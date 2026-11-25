@@ -71,8 +71,6 @@ def classify_profile_solar_arc(personality_longitude: float) -> dict[str, Any]:
         or not math.isfinite(personality_longitude)
     ):
         raise ValueError("Profile partition needs a finite numeric longitude")
-    else:
-        pass
     p = Fraction(personality_longitude) % 360
     d = (p - 88) % 360
     p_row, d_row = _rational_activation(p), _rational_activation(d)
@@ -101,8 +99,6 @@ def profile_partition_report(chart: dict[str, Any]) -> dict[str, Any]:
         ]
         if len(selected) != 2 or {a["body"] for _, a in selected} != {"Sun", "Earth"}:
             raise ValueError("Incomplete Sun/Earth role basis")
-        else:
-            pass
         by_body = {a["body"]: a for _, a in selected}
         if (
             any(
@@ -112,8 +108,6 @@ def profile_partition_report(chart: dict[str, Any]) -> dict[str, Any]:
             or by_body["Sun"]["line"] != by_body["Earth"]["line"]
         ):
             raise ValueError("Inconsistent Sun/Earth role lines")
-        else:
-            pass
         rows[side] = by_body["Sun"]
         for i, a in selected:
             for key in ("body", "longitude", "gate", "line"):
@@ -121,15 +115,11 @@ def profile_partition_report(chart: dict[str, Any]) -> dict[str, Any]:
     profile = f"{rows['personality']['line']}/{rows['design']['line']}"
     if chart["profile"] != profile or profile not in FOUNDATION | TRANSITION:
         raise ValueError("Actual paired profile mismatch")
-    else:
-        pass
     ideal = classify_profile_solar_arc(rows["personality"]["longitude"])
     for row in rows.values():
         classified = longitude_activation(row["longitude"])
         if any(row[k] != classified[k] for k in ("gate", "line")):
             raise ValueError("Solar role line differs from actual longitude")
-        else:
-            pass
     p, d = (Fraction(rows[s]["longitude"]) % 360 for s in ("personality", "design"))
     residual = (p - d - 88 + 180) % 360 - 180
     agrees = profile == ideal["ideal_profile"]

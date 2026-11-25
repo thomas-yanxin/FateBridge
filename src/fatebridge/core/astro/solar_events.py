@@ -80,17 +80,11 @@ def _cartesian_state(jd_tt: float, body: int, flags: int) -> tuple[CartesianStat
         or returned & ~SOURCE_MASK != flags & ~SOURCE_MASK
     ):
         raise EphemerisSourceError("coordinate_contract_changed")
-    else:
-        pass
     if len(coordinates) < 6:
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     x, y, z, vx, vy, vz = (float(v) for v in coordinates[:6])
     if not all(math.isfinite(v) for v in (x, y, z, vx, vy, vz)):
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     return CartesianState((x, y, z), (vx, vy, vz)), returned & SOURCE_MASK
 
 
@@ -117,12 +111,8 @@ def solar_observation(
     module = runtime.swe
     if module is None:
         raise ModuleNotFoundError("Swiss Ephemeris is required for solar events")
-    else:
-        pass
     if source is not None and ephemeris_flags is not None:
         raise ValueError("Choose a solar source or native flags, not both")
-    else:
-        pass
     with runtime.preserve_ephemeris_path():
         epoch = (
             resolve_tt_from_ut1(julian_day_ut1)
@@ -149,8 +139,6 @@ def solar_observation(
                     actual_source = returned & SOURCE_MASK
                     if actual_source not in (1, 2, 4):
                         raise EphemerisSourceError("coordinate_contract_changed")
-                    else:
-                        pass
                     attitude = earth_attitude(
                         module, julian_day_ut1, julian_day_tt=epoch
                     )
@@ -204,8 +192,6 @@ def solar_observation(
                     )
                     if natural_source != actual_source or earth_source != actual_source:
                         raise EphemerisSourceError("coordinate_model_changed")
-                    else:
-                        pass
                     distance = math.hypot(*natural_sun.position)
                     solar_distance = math.hypot(
                         *(
@@ -220,8 +206,6 @@ def solar_observation(
                     bm2 = 1 - dot(beta, beta)
                     if distance == 0 or solar_distance == 0 or bm2 <= 0:
                         raise EphemerisSourceError("coordinate_values_unavailable")
-                    else:
-                        pass
                     apparent = erfa.ab(
                         tuple(v / distance for v in natural_sun.position),
                         beta,
@@ -251,8 +235,6 @@ def solar_observation(
                         attitude.reduction.ecliptic_to_target,
                         (math.cos(angle), math.sin(angle), 0.0),
                     )
-                else:
-                    pass
                 actual_source = None
                 actual_model = selected.value
         except module.Error as error:
@@ -301,8 +283,6 @@ def solar_crossings_in_window(
     module = runtime.swe
     if module is None:
         raise ModuleNotFoundError("Swiss Ephemeris is required for solar events")
-    else:
-        pass
     if (
         not math.isfinite(start_ut1)
         or not math.isfinite(end_ut1)
@@ -311,12 +291,8 @@ def solar_crossings_in_window(
         raise ValueError(
             "Solar event window must have finite, increasing UT1 endpoints"
         )
-    else:
-        pass
     if source is not None and ephemeris_flags is not None:
         raise ValueError("Choose a solar source or native flags, not both")
-    else:
-        pass
     with runtime.preserve_ephemeris_path():
         fixed_source = (
             select_solar_source(
@@ -360,8 +336,6 @@ def solar_crossings_in_window(
                     observed_source = identity
                 elif identity != observed_source:
                     raise EphemerisSourceError("coordinate_model_changed")
-                else:
-                    pass
                 if (
                     ephemeris_policy == "require_data_files"
                     and sample.ephemeris_model
@@ -370,11 +344,7 @@ def solar_crossings_in_window(
                     raise ValueError(
                         "require_data_files requires file-backed solar ephemerides"
                     )
-                else:
-                    pass
                 observations[ut1] = sample
-            else:
-                pass
             return math.sin(
                 math.radians(observations[ut1].altitude_degrees)
             ) - math.sin(math.radians(horizon))
@@ -426,15 +396,11 @@ def solar_crossings_in_window(
             upper, high_value = right
             if lower >= upper or not sign_change(low_value, high_value):
                 return
-            else:
-                pass
             for remaining in range(steps - 1, -1, -1):
                 middle = lower + (upper - lower) / 2
                 if middle in (lower, upper):
                     record_crossing(lower, upper, low_value < 0)
                     return
-                else:
-                    pass
                 current = value(middle)
                 if current == 0:
                     # Partition the known bracket at the zero. Its own direction
@@ -443,12 +409,8 @@ def solar_crossings_in_window(
                     refine_crossing((lower, low_value), before, remaining)
                     if sign_change(before[1], after[1]):
                         record_crossing(middle, middle, after[1] > 0)
-                    else:
-                        pass
                     refine_crossing(after, (upper, high_value), remaining)
                     return
-                else:
-                    pass
                 if (current < 0) == (low_value < 0):
                     lower, low_value = middle, current
                 else:
@@ -474,21 +436,13 @@ def solar_crossings_in_window(
             if sample[1] != 0:
                 if previous is not None:
                     refine_crossing(previous, sample)
-                else:
-                    pass
                 previous = sample
                 continue
-            else:
-                pass
             before, after = zero_neighbors(point)
             if previous is not None:
                 refine_crossing(previous, before)
-            else:
-                pass
             if sign_change(before[1], after[1]):
                 record_crossing(point, point, after[1] > 0)
-            else:
-                pass
             # A neighbor beyond the search window may classify the zero but
             # cannot start another event bracket in this window.
             previous = after if after[0] <= end_ut1 else None

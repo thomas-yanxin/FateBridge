@@ -78,8 +78,6 @@ class SourceCandidatePath(PartialOutput):
             "requires_identity_adjudication",
         ) and any(c.status == "not_matched" for c in self.observed_conditions or []):
             raise ValueError("可观察前提未满足时不能冒称已进入纯力量裁定")
-        else:
-            pass
         return self
 
 

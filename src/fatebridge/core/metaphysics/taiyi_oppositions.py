@@ -39,8 +39,6 @@ def annotation_notes() -> dict[int, dict[str, Any]]:
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != DATA_SHA256:
         raise ValueError("主方对宫原注数据指纹不符")
-    else:
-        pass
     data = json.loads(raw)
     return {row["ju"]: row for row in data["records"]}
 
@@ -125,8 +123,6 @@ def opposition_assessment(core: dict[str, Any]) -> dict[str, Any]:
                 ],
                 "scope": "所选阳循环局注的同相位对照；不是该古例的原年原时历法重建，也不是名称统一验收。",
             }
-        else:
-            pass
         entries.append(entry)
     return {
         "ruleset": {
@@ -190,16 +186,12 @@ def oppositions_text(assessment: dict[str, Any]) -> str:
     for row in assessment["entries"]:
         if row["field"] not in {"main_general", "main_vice_general"}:
             continue
-        else:
-            pass
         if row["is_opposite"] is True:
             lines.append(
                 f"{row['subject']}{row['palace']}与太乙{row['taiyi_palace']}正对；主方局注格/对异称并存，未统一名目。"
             )
         elif row["is_opposite"] is None:
             lines.append(f"{row['subject']}在中五，无环向，不制造对宫。")
-        else:
-            pass
         comparison = row.get("source_comparison")
         if comparison:
             lines.append(
@@ -209,7 +201,5 @@ def oppositions_text(assessment: dict[str, Any]) -> str:
                 lines.append(
                     f"原注另称{extra['source_name']}；向太乙之外迫几何一致{extra['matches_selected_taiyi_reference']}。{extra['scope']}"
                 )
-        else:
-            pass
     lines.append(SCOPE)
     return "\n".join(lines)

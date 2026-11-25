@@ -55,8 +55,6 @@ def _normalize_canping_method(value: Any) -> str:
     text = f"{value if value is not None else ''}".strip().lower()
     if text not in {"gu", "ming"}:
         raise ValueError("method 仅支持 gu（原典日支）或 ming（月支变法）。")
-    else:
-        pass
     return text
 
 
@@ -80,20 +78,14 @@ def build_canping_result(
     normalized_gender = normalize_gender(gender)
     if not isinstance(gender, str) or normalized_gender not in {"男", "女"}:
         raise ValueError("参评男女条文与配运方向需要明确gender为男或女，不能默认性别。")
-    else:
-        pass
     if dayun_method not in {APPENDIX, CONTINUOUS, LEGACY}:
         raise ValueError(
             "dayun_method仅支持bazi_appendix_v1、bazi_continuous_v1、legacy_minggong_v1。"
         )
-    else:
-        pass
     if dayun_method == LEGACY and analysis_datetime is not None:
         raise ValueError(
             "legacy命宫顺排没有已核实的日期映射，不支持analysis_datetime。"
         )
-    else:
-        pass
     normalized_method = _normalize_canping_method(method)
     longitude, longitude_source = resolve_numerology_longitude(
         lon, gps_lon, use_true_solar_time
@@ -118,8 +110,6 @@ def build_canping_result(
     confirmed_offset = normalize_numerology_utc_offset(birth_utc_offset)
     if confirmed_offset is not None:
         input_normalized["birth_utc_offset"] = confirmed_offset
-    else:
-        pass
     seed_time = numerology_seed_time(
         birth_date,
         birth_clock.normalized_clock,
@@ -238,8 +228,6 @@ def build_canping_result(
             timing["solar_year_context"]["policy_id"],
             series["year_boundaries"],
         )
-    else:
-        pass
     snapshot_text += "\n\n" + pillar_link_snapshot(pillar_links)
     four_pillars = create_pillar_dict(seed.pillars)
 

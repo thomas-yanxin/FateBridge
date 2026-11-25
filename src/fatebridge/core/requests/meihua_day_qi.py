@@ -23,6 +23,4 @@ class MeihuaDayQiContext(_DeferredModel):
     def nonblank_label(self) -> "MeihuaDayQiContext":
         if not self.label.strip():
             raise ValueError("日气资料label不能仅为空白")
-        else:
-            pass
         return self

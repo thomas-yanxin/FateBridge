@@ -226,8 +226,6 @@ def liuren_annotation_note(day_ganzhi: str, gan_upper: str) -> Dict[str, Any] | 
     record = notes.get((day_ganzhi, gan_upper))
     if record is None:
         return None
-    else:
-        pass
     annotation, page, kind, explanation = record
     return {
         "annotation": annotation,

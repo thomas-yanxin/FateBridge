@@ -11,8 +11,6 @@ def root_qualification_snapshot_lines(assessment: Mapping[str, Any]) -> list[str
     decision = assessment.get("structural_decision")
     if not rows or not decision:
         return []
-    else:
-        pass
     positions = {"year": "年支", "month": "月支", "day": "日支", "hour": "时支"}
     rules = {
         "weighted_balance": "有效五行扶身与减身份额",
@@ -31,8 +29,6 @@ def root_qualification_snapshot_lines(assessment: Mapping[str, Any]) -> list[str
     for row in rows:
         if row["qualification_basis"] == "not_anchored_kind":
             continue
-        else:
-            pass
         fraction = row["retention_fraction"]
         retention = f"{fraction:.1%}" if fraction is not None else "未有实际根量"
         inclusion = "计入" if row["qualified_for_structural_rule"] else "未计入"

@@ -26,13 +26,9 @@ def ephemeris_search_directories(
     """
     if not search_path:
         return ()
-    else:
-        pass
     separators = r"[;:]+" if os.pathsep == ":" else r";+"
     if not search_path.endswith(os.sep):
         search_path += os.sep
-    else:
-        pass
     line = re.split(r"[\r\n]", search_path, maxsplit=1)[0]
     # note (swi_fopen): A native 20-field buffer leaves its final field unsplit.
     directories = re.split(separators, line, maxsplit=19)
@@ -47,8 +43,4 @@ def ephemeris_search_directories(
             if prefix_bytes + filename_bytes >= SWISS_PATH_BUFFER_BYTES:
                 directories = directories[:index]
                 break
-            else:
-                pass
-    else:
-        pass
     return tuple(Path(directory or ".") for directory in directories)

@@ -28,12 +28,8 @@ def traditional_detail_view(
     omitted = set(_STANDARD_FIELDS)
     if detail == "compact":
         omitted.update(_COMPACT_FIELDS)
-    else:
-        pass
     if not keep_lunar_meihua:
         omitted.add(("lunar_calendar", "meihua"))
-    else:
-        pass
 
     def shape(value: JsonValue, parent: str) -> JsonValue:
         if isinstance(value, dict):
@@ -43,12 +39,8 @@ def traditional_detail_view(
                 if key in requested
                 or (("", key) not in omitted and (parent, key) not in omitted)
             }
-        else:
-            pass
         if isinstance(value, list):
             return [shape(child, parent) for child in value]
-        else:
-            pass
         return value
 
     return {

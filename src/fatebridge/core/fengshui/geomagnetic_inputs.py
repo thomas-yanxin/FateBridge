@@ -60,27 +60,19 @@ class GeomagneticReference(_DeferredModel):
             isinstance(value, date) and not isinstance(value, datetime)
         ):
             return value
-        else:
-            pass
         if isinstance(value, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
             return value
-        else:
-            pass
         raise ValueError("model_date须为明确的YYYY-MM-DD日期，不能以时间戳或时刻代替")
 
     @model_validator(mode="after")
     def exactly_one_time(self) -> "GeomagneticReference":
         if (self.model_date is None) == (self.decimal_year is None):
             raise ValueError("model_date和decimal_year须且只能提供一项")
-        else:
-            pass
         return self
 
     def year_value(self) -> float:
         if self.decimal_year is not None:
             return self.decimal_year
-        else:
-            pass
         assert self.model_date is not None
         year = self.model_date.year
         return (

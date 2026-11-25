@@ -38,7 +38,7 @@
 
 ## 原刊行限率与单位
 
-本次重新取得[国图藏《钦定古今图书集成》第3150册原扫描](https://commons.wikimedia.org/wiki/File:NLC892-411999021002-92845_欽定古今圖書集成_第3150冊.pdf)，完整PDF为24732787字节，SHA-256为`2766952041ab8a829dedcc0404a24dd7c22d0b31d3f549cb66752d42d58c315c`，与原冻结PDF相同。蔣廷錫、陳夢雷等辑，清雍正四年（1726）内府铜活字本，国图善本书号12072；Commons扫描保留水印，资料署名及PD-scan说明见[原来源回执](../tests/fixtures/guolao-ruler-calendar-v1/reference.json)。PDF第35页左叶“定行限度法”明确百秒为一分、百分为一度。
+本次重新取得[国图藏《钦定古今图书集成》第3150册原扫描](https://commons.wikimedia.org/wiki/File:NLC892-411999021002-92845_欽定古今圖書集成_第3150冊.pdf)，完整PDF为24732787字节，与参考资料中的原版一致。蔣廷錫、陳夢雷等辑，清雍正四年（1726）内府铜活字本，国图善本书号12072；Commons扫描保留水印，资料署名及PD-scan说明见[原来源回执](../tests/fixtures/guolao-ruler-calendar-v1/reference.json)。PDF第35页左叶“定行限度法”明确百秒为一分、百分为一度。
 
 计都修复阶段再次查看同一扫描的七条行限率，保留福德／妻妾“二度七十二分七秒”、疾厄“四度二十八分五十秒”、奴仆／男女／田宅“六度六十分六秒”。年度率与月日尺格的三组矛盾确实在原页，不能拿总长除法改掉原字。该阶段是已知读法后的同源复核，未做全210格新复读；后续完整复读及其限制见下节。
 
@@ -142,7 +142,7 @@ SWIEPH原文件与JPL既存18记录切片均在计算前冻结，切片不等于
 
 ## 前推历日期标签与干支桥接（R129）
 
-`calendar_label_noon_jdn` 与 `calendar_label_from_noon_jdn` 的完整公元 1 至 9999 年整数域，分别与 Swiss Ephemeris 2.10.03 作者库的 `swe_julday`、`swe_revjul` 对照。前推格里历正向和反向各 **3,652,059/3,652,059**，前推儒略历各 **3,652,134/3,652,134**。作者库的全部反算小时均为 12。USNO 五个原刊例继续相符，八个越界或不支持的口径均拒绝。 [Swiss 作者源码](https://github.com/aloistr/swisseph/blob/175e1fcb3108bcd5c0d146c803f51dcf23508012/swedate.c)
+`calendar_label_noon_jdn` 与 `calendar_label_from_noon_jdn` 的完整公元 1 至 9999 年整数域，分别与 Swiss Ephemeris 2.10.03 作者库的 `swe_julday`、`swe_revjul` 对照。前推格里历正向和反向各 **3,652,059/3,652,059**，前推儒略历各 **3,652,134/3,652,134**。作者库的全部反算小时均为 12。USNO 五个原刊例继续相符，八个越界或不支持的口径均拒绝。 [Swiss 作者源码](https://github.com/aloistr/swisseph)
 
 既有 2016 年 10 月 9 日甲子锚点保持固定。另读香港天文台 2016 年 11 月日历，30 个干支刊值全部相符。原 10 月同刊 31 值和 USNO 五刊例沿用原范围。 [香港天文台原刊](https://www.hko.gov.hk/en/gts/astron2016/files/2016cal11.pdf)
 

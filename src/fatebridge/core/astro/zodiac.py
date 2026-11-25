@@ -41,8 +41,6 @@ def native_lahiri_positions(
     """Native zodiac coordinates/speeds; physical states remain for horizon."""
     if runtime.swe is None:
         raise ValueError("原生Lahiri黄道转换需要Swiss Ephemeris")
-    else:
-        pass
     operation = "calc" if julian_day_tt is not None else "calc_ut"
     # Native states and their motion/source-window corrections share this
     # actual SDK epoch, rather than a frame evaluated at an unrounded point.
@@ -119,10 +117,6 @@ def native_lahiri_positions(
                     motion_metadata.setdefault("lunar_source_windows", {})[
                         "lahiri"
                     ] = policy
-                else:
-                    pass
-            else:
-                pass
             result[planet].update(
                 corrected_longitude_motion(
                     planet,
@@ -137,8 +131,6 @@ def native_lahiri_positions(
             )
         if source_trace is None:
             trace.finish()
-        else:
-            pass
     return result
 
 
@@ -153,8 +145,6 @@ def native_lahiri_houses(
     """Native sidereal cusps/angles and separately labelled true/mean offsets."""
     if runtime.swe is None:
         raise ValueError("原生Lahiri宫头计算需要Swiss Ephemeris")
-    else:
-        pass
     operation = "get_ayanamsa_ex" if julian_day_tt is not None else "get_ayanamsa_ex_ut"
     instant = (
         TTInstant.from_value(julian_day_tt).as_float()
@@ -190,8 +180,6 @@ def native_lahiri_houses(
         )
         if flags < 0 or mean_flags < 0:
             raise ValueError("Lahiri偏移计算失败")
-        else:
-            pass
         definition = native_ecliptic_horizon_angle_definition(
             julian_day_ut1=julian_day_ut1,
             julian_day_tt=julian_day_tt,

@@ -32,8 +32,6 @@ def _load_source() -> dict[str, Any]:
         or len({tuple(p["lines"]) for p in anchors}) != len(anchors)
     ):
         raise ValueError("河洛纳甲来源表身份、纯卦覆盖或条目索引冲突。")
-    else:
-        pass
     for p in anchors:
         if (
             len(p["lines"]) != 6
@@ -51,8 +49,6 @@ def _load_source() -> dict[str, Any]:
             )
         ):
             raise ValueError("河洛纳甲原页条目须有六个明确位置、页码与有效干支。")
-        else:
-            pass
     for p in pure:
         anchor = next((a for a in anchors if a["gua"] == p["gua"]), None)
         if (
@@ -64,8 +60,6 @@ def _load_source() -> dict[str, Any]:
             != {k: p[k] for k in ("gua", "page", "lines", "direct", "borrowed")}
         ):
             raise ValueError("河洛纯卦基础表与同一原页六项读数不一致。")
-        else:
-            pass
     # All constituent slots must also agree with the separately read composite
     # entries. This is source consistency, not 64 individually read entries.
     by_bits = {tuple(p["bits"]): p for p in pure}
@@ -81,8 +75,6 @@ def _load_source() -> dict[str, Any]:
                 raise ValueError(
                     "河洛所核复卦条目与纯卦内外位置读数冲突，不能自动取舍。"
                 )
-            else:
-                pass
     data["loaded_sha256"] = sha256(raw).hexdigest()
     return data
 
@@ -140,14 +132,10 @@ def annotate_positions(
         or any(type(e["pos"]) is not int for e in entries)
     ):
         raise ValueError("河洛纳甲取证须有六个明确爻位及其实际计算结果。")
-    else:
-        pass
     by_bits = {tuple(p["bits"]): p for p in data["pure_tables"]}
     anchor = next((a for a in data["hexagram_entries"] if a["lines"] == lines), None)
     if anchor is not None and anchor["gua"] != gua:
         raise NumerologySourceError("hexagram_mismatch")
-    else:
-        pass
     result = deepcopy(entries)
     for e in result:
         pos = e["pos"]
@@ -158,8 +146,6 @@ def annotate_positions(
             or e.get("borrowed") != component["borrowed"][pos - 1]
         ):
             raise NumerologySourceError("runtime_assignment_conflict")
-        else:
-            pass
         witness = anchor or component
         e["source"] = {
             "basis": "hexagram_entry" if anchor else "pure_trigram_rule",
@@ -182,8 +168,6 @@ def najia_snapshot(assessments: list[dict[str, Any]]) -> str:
             lines.append(
                 f"{phase}·{row['gua']}：出生年{row['year_ganzhi']}未命中本阶段六爻正纳／借用。"
             )
-        else:
-            pass
         for match in row["matches"]:
             entry = row["lines"][match["pos"] - 1]
             source = entry["source"]
@@ -200,6 +184,4 @@ def najia_snapshot(assessments: list[dict[str, Any]]) -> str:
             lines.append(
                 f"{phase}·{row['gua']}：两印本原文列举末两支顺序与计算爻序不同，成员相同；列举是否按爻位仍未决，不据此换位或称该卦逐爻已核。"
             )
-        else:
-            pass
     return "\n".join(lines)

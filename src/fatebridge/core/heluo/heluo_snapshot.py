@@ -25,8 +25,6 @@ def yao_text(gua_name: str, pos: int) -> dict[str, Any] | None:
     g = _tiaowen().get(gua_name)
     if not g or not g.get("yao", {}).get(str(pos)):
         return None
-    else:
-        pass
     return collated_line(gua_name, pos, g["yao"][str(pos)])
 
 
@@ -37,12 +35,8 @@ def yao_name(lines: list[int], pos: int) -> str:
     yang = lines[pos - 1] == 1
     if pos == 1:
         return f"初{'九' if yang else '六'}"
-    else:
-        pass
     if pos == 6:
         return f"上{'九' if yang else '六'}"
-    else:
-        pass
     return f"{'九' if yang else '六'}{LINE_POSITION_LABELS[pos - 1]}"
 
 
@@ -51,8 +45,6 @@ def build_snapshot_text(
 ) -> str:
     if not chart:
         return ""
-    else:
-        pass
     lines: list[str] = []
     lines.append("[起命]")
     lines.append(
@@ -76,8 +68,6 @@ def build_snapshot_text(
                 poem_text_snapshot(text),
                 *text_reading_notes_snapshot(text),
             ]
-        else:
-            pass
     if jg:
         lines.append("")
         lines.append("[命运篇]")
@@ -106,8 +96,6 @@ def build_snapshot_text(
         lines.append(
             f"元堂：位序阴阳{'匹配' if jg['yuanTang']['position_polarity_match'] else '未匹配'}　先天元堂与应爻阴阳{'相异' if jg['yuanTang']['youYing'] else '相同'}（非十体有援总判）　用爻与所用阴阳令{relation}（非原典当位或综合顺逆时）"
         )
-    else:
-        pass
     if dy and dy.get("all"):
         lines.append("")
         lines.append("[大限·岁运]")
@@ -115,28 +103,16 @@ def build_snapshot_text(
             lines.append(
                 f"{s['ageStart']}-{s['ageEnd']}岁 {s['gua']} {yao_name(s['lines'], s['pos'])}（{'阳9' if s['yang'] else '阴6'}）"
             )
-    else:
-        pass
     if jg and jg.get("najia"):
         lines.extend(["", najia_snapshot(jg["najia"])])
-    else:
-        pass
     if jg and jg.get("seasonal_numbers"):
         lines.extend(["", seasonal_snapshot(jg["seasonal_numbers"])])
-    else:
-        pass
     if jg and jg.get("deTi"):
         lines.extend(["", body_snapshot(jg["deTi"])])
-    else:
-        pass
     if jg and jg.get("qi_phases"):
         lines.extend(["", phase_qi_snapshot(jg["qi_phases"])])
-    else:
-        pass
     if jg and jg.get("line_conditions"):
         lines.extend(["", line_snapshot(jg["line_conditions"])])
-    else:
-        pass
     if jg and jg.get("month_affinity"):
         lines.extend(
             [
@@ -166,8 +142,6 @@ def build_snapshot_text(
                 lines.append(f"{label}PDF第{witness['source_pdf_page']}页：{reading}。")
             if row["source_months_agree"] is False:
                 lines.append("两处月号不同；当前计算按所选方法，未裁定哪处讹误。")
-            else:
-                pass
             for window in row["additional_windows"]:
                 match = (
                     (
@@ -199,19 +173,13 @@ def build_snapshot_text(
                 lines.append(
                     f"{phase_label}·另列「{clause['literal']}」：月号{'匹配' if clause['month_label_match'] else '不匹配'}，{najia_text}；及字连接范围待核，整条条件未定，PDF第{clause['source_pdf_page']}页。"
                 )
-            else:
-                pass
             if row["opposed_month_conditions"]:
                 lines.append(
                     "此月同时进入原文及时与失时两段，保留冲突，未裁定优先规则。"
                 )
-            else:
-                pass
         lines.append(
             "以上按四柱月支解释月号；原典月界仍待核定，不据此裁定综合得时或葉否。"
         )
-    else:
-        pass
     lines.extend(["", "[所用爻辞与校勘]"])
     for phase, label, text in (("xian", "先天", xt), ("hou", "后天", ht)):
         if text:
@@ -224,17 +192,11 @@ def build_snapshot_text(
             lines.append(
                 f"{label}·{chart[phase]['name']}·{yao_name(chart[phase]['lines'], chart[phase]['yuan'])}：{text['yaoci']}（{status}）"
             )
-        else:
-            pass
     lines.append(
         "爻辞、注文与诗歌分别标注来源；旧吉凶摘要标签未获底本条件认证，葉与不葉及岁运分支不自动选取。"
     )
     if chart.get("yuantang_derivation"):
         lines.extend(["", yuantang_snapshot(chart["yuantang_derivation"])])
-    else:
-        pass
     if jg and jg.get("body_structure"):
         lines.extend(["", structure_snapshot(jg["body_structure"])])
-    else:
-        pass
     return "\n".join(lines)

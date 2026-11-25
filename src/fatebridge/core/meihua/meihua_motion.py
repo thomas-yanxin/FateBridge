@@ -20,8 +20,6 @@ def _profile() -> dict[str, Any]:
     )
     if profile["id"] != "meihua_motion_nlc1925_v1" or profile["version"] != "1.1.0":
         raise ValueError("Unknown selected Meihua motion profile")
-    else:
-        pass
     return profile
 
 
@@ -40,8 +38,6 @@ def _reading(
 ) -> dict[str, Any]:
     if [r["role"] for r in stages] != list(ROLES):
         raise ValueError("Motion requires all four actual auxiliary roles")
-    else:
-        pass
     profile = _profile()
     rules = {r["id"]: r for r in profile["rules"]}
     orientation_source = profile["orientation_reference"]
@@ -172,16 +168,10 @@ def _reading(
             observer_activity
         ]
         summary += f"所报占者活动为{activity_label}，所选原句作“{observer_rule['quote']}”，仅保留相对迟速。"
-    else:
-        pass
     if any(r["motion"] is not None for r in rows):
         summary += "外应动静按逐条所报事实保留，不从水土或器物类别推定；动而吉／凶的速应句尚缺外应吉凶综合判断，问吉事或问不吉之事不能替代。"
         if any(r["motion"] == "stationary" for r in rows):
             summary += "所报不动对应原句“吉凶之未见”，不据此断无事发生或取消本次起卦。"
-        else:
-            pass
-    else:
-        pass
     if any(row["orientation"] is not None for row in rows):
         summary += "外应向背按卷二《向背》逐项列出相向而来、相背而去的条文条件；外物资格与动静速应的跨篇合参未定。"
     if summary:
@@ -190,8 +180,6 @@ def _reading(
             + summary
             + "三项未综合为日期、持续时间或现实结局。"
         )
-    else:
-        pass
     motion_profile = motion_ruleset()
     orientation_reference = motion_profile.pop("orientation_reference")
     return {
@@ -226,16 +214,10 @@ def apply_motion_context(
     interpretation["motion_context"] = None
     if observer_activity not in {None, "seated", "walking", "standing"}:
         raise ValueError("Unknown reported observer activity")
-    else:
-        pass
     if interpretation["interpretation_topic"] == "weather":
         if observer_activity is not None:
             raise ValueError("Selected human motion clauses do not apply to weather")
-        else:
-            pass
         return
-    else:
-        pass
     layer = _reading(
         cast["stage_relations"],
         interpretation.get("external_omens"),
@@ -263,9 +245,5 @@ def apply_motion_context(
                 else "卦序数口径"
             )
             suffix += label + "动静另核：" + row["summary"]
-        else:
-            pass
     if suffix:
         interpretation["comprehensive_judgement"] += suffix
-    else:
-        pass

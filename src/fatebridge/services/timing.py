@@ -159,8 +159,6 @@ def calculate_comprehensive_timing(
             dayun_section["element_effects"] = serialize_element_effects(
                 dayun_analysis["element_effects"]
             )
-        else:
-            pass
         result["dayun_analysis"] = dayun_section
     else:
         result["dayun_analysis"] = {
@@ -181,8 +179,6 @@ def calculate_comprehensive_timing(
         liunian_section["element_effects"] = serialize_element_effects(
             liunian_analysis["element_effects"]
         )
-    else:
-        pass
     result["liunian_analysis"] = liunian_section
 
     liuyue_analysis = timing_result["liuyue_analysis"]
@@ -223,8 +219,6 @@ def calculate_comprehensive_timing(
             analysis_moment=analysis_date if analysis_age is None else None,
             analysis_age=analysis_age,
         )
-    else:
-        pass
 
     result["comprehensive_summary"] = timing_result["comprehensive_summary"]
     result["snapshot_text"] = _build_comprehensive_timing_snapshot_text(
@@ -258,8 +252,6 @@ def calculate_comprehensive_timing(
     timeline = context.get("timeline") if isinstance(context, dict) else None
     if isinstance(timeline, dict):
         timeline.pop("periods", None)
-    else:
-        pass
     result["dayun_analysis"]["first_view"] = first_view
     return with_analysis_reference(
         result,
@@ -297,8 +289,6 @@ def calculate_dayun_analysis(
     )
     if analysis_age is not None and any(part is not None for part in date_parts):
         raise ValueError("analysis_age年龄参考不能与analysis_*分析日期同时使用")
-    else:
-        pass
     analysis_moment = None
     analysis_reference: AnalysisClockReference = age_only_reference()
     if analysis_age is None:
@@ -316,8 +306,6 @@ def calculate_dayun_analysis(
         analysis_age = calculate_analysis_age(
             normalized_birth_time.input_datetime, analysis_moment
         )
-    else:
-        pass
 
     dayun_result = TimingEffectsAnalysis.analyze_dayun_effects(
         birth_context.birth_pillars,
@@ -391,8 +379,6 @@ def calculate_dayun_analysis(
             analysis_moment=analysis_moment,
             analysis_age=analysis_age if analysis_moment is None else None,
         )
-    else:
-        pass
 
     snapshot_text = _build_dayun_snapshot_text(
         person_name=person.name,
@@ -435,8 +421,6 @@ def calculate_jieqi_timeline_analysis(
 
     if target_year is None:
         target_year = current_local_datetime(normalized_birth_time.timezone).year
-    else:
-        pass
 
     jieqi_timeline = enrich_jieqi_timeline(
         birth_context,
@@ -454,8 +438,6 @@ def calculate_jieqi_timeline_analysis(
             f"{target_year}年共生成{len(jieqi_timeline)}个节气节点，"
             f"其中{unavailable}个区间没有可重放的当地整分。"
         )
-    else:
-        pass
     snapshot_text = _build_jieqi_timeline_snapshot_text(
         person_name=person.name,
         birth_datetime=normalized_birth_time.input_datetime,

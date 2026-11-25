@@ -38,8 +38,6 @@ class CanpingInterval(PartialOutput):
             )
         ):
             raise ValueError("精确配运区间缺少完整数值端点或显示标签。")
-        else:
-            pass
         for evidence, label in (
             (self.start_point, self.start_at),
             (self.end_point, self.end_at),
@@ -48,16 +46,10 @@ class CanpingInterval(PartialOutput):
             if point is not None and label is not None:
                 if point.as_calendar() != ZonedCalendar.from_isoformat(label).utc:
                     raise ValueError("配运数值端点与显示标签不一致。")
-                else:
-                    pass
-            else:
-                pass
         start = self.start_point.known_day() if self.start_point is not None else None
         end = self.end_point.known_day() if self.end_point is not None else None
         if start is not None and end is not None and start >= end:
             raise ValueError("配运数值区间须为正长度半开区间。")
-        else:
-            pass
         return self
 
 
@@ -98,17 +90,11 @@ class CanpingSolarBoundary(PartialOutput):
             )
         ):
             raise ValueError("完整立春主点收据缺少年份、选择或实际模型身份。")
-        else:
-            pass
         if self.instant_utc is not None:
             at = ZonedCalendar.from_isoformat(self.instant_utc).utc
             civil = self.record.display_with_offset if self.record is not None else None
             if civil is not None and at != ZonedCalendar.from_isoformat(civil).utc:
                 raise ValueError("民用立春与UTC边界不一致。")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -140,15 +126,9 @@ class CanpingSolarContext(PartialOutput):
         if self.horizon_years is not None:
             if not 1 <= self.horizon_years <= 120:
                 raise ValueError("年序范围须为1至120。")
-            else:
-                pass
             if (
                 self.boundary_count is not None
                 and self.boundary_count != self.horizon_years + 1
             ):
                 raise ValueError("年序边界不能截短。")
-            else:
-                pass
-        else:
-            pass
         return self

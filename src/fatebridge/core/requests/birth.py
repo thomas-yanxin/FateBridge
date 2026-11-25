@@ -91,8 +91,6 @@ class BaziClockRequest(FateBridgeRequest):
                 "birth_second需要显式提供birth_minute；不能替未知分钟填0",
                 {"path": "birth_minute", "required_with": "birth_second"},
             )
-        else:
-            pass
         return self
 
 

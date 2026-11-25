@@ -17,16 +17,10 @@ def calendar_method_reference(
     """Classify the printed lunar year; an era name cannot select the method."""
     if type(year) is not int or type(month) is not int or type(leap) is not bool:
         raise ValueError("历法期别须使用已算定的阴历年、月与明确闰标志")
-    else:
-        pass
     if not 1 <= month <= 12:
         raise ValueError("月份须为1至12")
-    else:
-        pass
     if not 1685 <= year <= 1872:
         return None
-    else:
-        pass
     source = load_source(SOURCE)
     data = source.data
     periods = [
@@ -36,8 +30,6 @@ def calendar_method_reference(
     ]
     if len(periods) != 1:
         raise ValueError("具名历法期别缺失或重叠，不能猜测历法")
-    else:
-        pass
     period = deepcopy(periods[0])
     research = None
     if period["id"] in {"horeki", "corrected_horeki"}:
@@ -54,8 +46,6 @@ def calendar_method_reference(
             "author_rule_applied_to_primary": False,
             "decimal_strings_are_modern_clock_times": False,
         }
-    else:
-        pass
     reform = None
     if (year, month, leap) == (1872, 12, False):
         reform = {
@@ -63,8 +53,6 @@ def calendar_method_reference(
             "source": deepcopy(data["sources"]["ndl_sizes"]),
             "nominal_size_does_not_extend_covered_calendar": True,
         }
-    else:
-        pass
     return {
         "source_bundle_sha256": source.sha256,
         "calendar_period": period,
@@ -103,13 +91,9 @@ def reading_lines(reference: dict[str, Any]) -> list[str]:
             "第3表另一月名列是规则闰月的翌月，不能当作替换闰月。"
             "原颁历、作者天象计算及宿曜补配先后仍未由此认证。"
         )
-    else:
-        pass
     if reference["reform_month_length_reference"] is not None:
         lines.append(
             "NDL大小表把1872年十二月列为大月，当前历史参考因明治改历仅覆盖该月两天；"
             "原定月大小与实际覆盖天数分开，保留30／2差别，不补出已停用的旧历日期。"
         )
-    else:
-        pass
     return lines

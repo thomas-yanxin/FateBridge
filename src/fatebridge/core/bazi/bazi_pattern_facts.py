@@ -132,20 +132,12 @@ class PillarPairRelationships(TypedDict):
 def _element_relation(left: Element, right: Element) -> ElementRelation:
     if left == right:
         return "same_element"
-    else:
-        pass
     if GENERATION_CYCLE[left] == right:
         return "generates"
-    else:
-        pass
     if GENERATION_CYCLE[right] == left:
         return "generated_by"
-    else:
-        pass
     if DESTRUCTION_CYCLE[left] == right:
         return "controls"
-    else:
-        pass
     return "controlled_by"
 
 
@@ -308,14 +300,10 @@ def check_hidden_patterns(pillars: Pillars) -> HiddenPatterns:
                                 "candidate_element": element,
                             }
                         )
-                    else:
-                        pass
         if stem_pairs:
             result["hidden_stem_combinations"].append(
                 {"pillars": [left, right], "branches": [a, b], "stem_pairs": stem_pairs}
             )
-        else:
-            pass
 
         # The source's five lu-position pairs are narrower than all hidden pairs.
         for ba, bb, sa, sb in (
@@ -334,8 +322,6 @@ def check_hidden_patterns(pillars: Pillars) -> HiddenPatterns:
                         "source_ref": "sanming_siku_branch_relations",
                     }
                 )
-            else:
-                pass
 
         group_tables: tuple[tuple[Literal["三合", "三会"], Mapping[str, str]], ...] = (
             ("三合", BRANCH_TRIPLE_COMBINATIONS),
@@ -360,8 +346,6 @@ def check_hidden_patterns(pillars: Pillars) -> HiddenPatterns:
                             "formation_status": "not_adjudicated",
                         }
                     )
-                else:
-                    pass
 
     day, hour = "".join(pillars["day"]), "".join(pillars["hour"])
     arch_rules: tuple[tuple[Literal["拱禄", "拱贵"], str, str, str], ...] = (
@@ -392,8 +376,6 @@ def check_hidden_patterns(pillars: Pillars) -> HiddenPatterns:
                     "source_ref": "sanming_siku_arch",
                 }
             )
-        else:
-            pass
     return result
 
 
@@ -446,13 +428,9 @@ def analyze_special_patterns(
         required = "day"
     elif day in ("癸巳", "丁酉"):
         required = "night"
-    else:
-        pass
     clock: Literal["day", "night"] | None = None
     if birth_hour is not None:
         clock = "day" if 6 <= birth_hour < 18 else "night"
-    else:
-        pass
     stems = [pillars[name][0] for name in ORDER]
     branches = [pillars[name][1] for name in ORDER]
     result: SpecialPatterns = {

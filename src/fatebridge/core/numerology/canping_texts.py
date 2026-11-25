@@ -44,8 +44,6 @@ def _pin_reviewed_content(data: dict[str, Any], expected: str, reason: str) -> N
         ).hexdigest()
         if digest != expected:
             raise ValueError("参评所载原文或来源身份与已核修订不符。")
-        else:
-            pass
     except (TypeError, ValueError) as exc:
         raise NumerologySourceError(reason) from exc
 
@@ -57,8 +55,6 @@ def _loaded(path: Path) -> dict[str, Any]:
         data = json.loads(raw)
         if not isinstance(data, dict):
             raise ValueError("参评来源须为结构化对象。")
-        else:
-            pass
     except (OSError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_canping_text_source") from exc
     return {"data": data, "sha256": sha256(raw).hexdigest()}
@@ -79,13 +75,9 @@ def _collation() -> dict[str, Any]:
         and _VERIFIED_COLLATION[1] == TEXT_CONTENT_SHA256
     ):
         return data
-    else:
-        pass
     additional = data.get("additional_rereading_witnesses", [])
     if not isinstance(additional, list):
         raise ValueError("参评复读见证须分别登记，不能覆盖先前见证。")
-    else:
-        pass
     witnesses = (
         [data["rereading_witness"]] if data.get("rereading_witness") else []
     ) + additional
@@ -96,8 +88,6 @@ def _collation() -> dict[str, Any]:
         for w in witnesses
     ) or len({w["fixture_id"] for w in witnesses}) != len(witnesses):
         raise ValueError("参评复读见证身份缺失或重复。")
-    else:
-        pass
     rereading_pages = {
         w["fixture_id"]: {p["pdf_page"] for p in w["pages"]} for w in witnesses
     }
@@ -106,8 +96,6 @@ def _collation() -> dict[str, Any]:
         set(e["cells"]) - KINDS.keys() for e in data["entries"]
     ):
         raise ValueError("参评校勘索引重复或栏目无效。")
-    else:
-        pass
     entries_by_key = dict(zip(keys, data["entries"]))
     number_observations = data.get("number_reading_witness", {}).get("headers", [])
     observed_keys = [
@@ -115,8 +103,6 @@ def _collation() -> dict[str, Any]:
     ]
     if len(observed_keys) != len(set(observed_keys)) or set(observed_keys) - set(keys):
         raise ValueError("参评编号原图证据重复或缺少对应条目。")
-    else:
-        pass
     for observed in number_observations:
         entry = entries_by_key[(observed["element"], observed["provisional_number"])]
         if (
@@ -130,8 +116,6 @@ def _collation() -> dict[str, Any]:
             raise ValueError(
                 "参评编号疑读原图仍有未定字，不得撤销编号疑读或提升任何一栏。"
             )
-        else:
-            pass
     for entry in data["entries"]:
         uncertain = entry.get("reading_uncertainties", {})
         revisions = entry.get("reading_revisions", {})
@@ -149,8 +133,6 @@ def _collation() -> dict[str, Any]:
             for r in revisions.values()
         ):
             raise ValueError("参评复读修订须保留原疑读、对应原页和复读见证。")
-        else:
-            pass
         number_uncertain = entry.get("number_reading_uncertainties")
         if number_uncertain is not None and (
             not isinstance(number_uncertain, list)
@@ -159,8 +141,6 @@ def _collation() -> dict[str, Any]:
             or set(entry["cells"]) - uncertain.keys()
         ):
             raise ValueError("参评编号疑读须说明原因，并将该行所有已录栏目保留未定。")
-        else:
-            pass
         if set(uncertain) - entry["cells"].keys() or any(
             not isinstance(notes, list)
             or not notes
@@ -168,15 +148,11 @@ def _collation() -> dict[str, Any]:
             for notes in uncertain.values()
         ):
             raise ValueError("参评疑读须对应具体栏目并说明原因。")
-        else:
-            pass
         if any(
             "□" in text and kind not in uncertain
             for kind, text in entry["cells"].items()
         ):
             raise ValueError("参评编辑方框必须明确标为疑读，不能冒充原页圈空。")
-        else:
-            pass
     _pin_reviewed_content(data, TEXT_CONTENT_SHA256, "invalid_canping_text_collation")
     _VERIFIED_COLLATION = (data, TEXT_CONTENT_SHA256)
     return data
@@ -284,21 +260,15 @@ def _witness_corpus() -> dict[str, Any]:
         and _VERIFIED_WITNESS[1] == WITNESS_CONTENT_SHA256
     ):
         return data
-    else:
-        pass
     keys = [(e["element"], e["number"], e["kind"]) for e in data["entries"]]
     unmatched = data.get("unmatched_observations", [])
     if not isinstance(unmatched, list):
         raise ValueError("参评未匹配原页观察须逐格登记。")
-    else:
-        pass
     unmatched_keys = [(e["element"], e["number"], e["kind"]) for e in unmatched]
     if len(unmatched_keys) != len(set(unmatched_keys)) or set(keys) & set(
         unmatched_keys
     ):
         raise ValueError("参评未匹配观察不可重复或冒充已绑定对读格。")
-    else:
-        pass
     for e in data["entries"] + unmatched:
         if (
             e["element"] not in {"水", "火", "木", "金", "土"}
@@ -310,8 +280,6 @@ def _witness_corpus() -> dict[str, Any]:
             or e["body_pdf_page"] not in e["pdf_pages"]
         ):
             raise ValueError("参评对读须对应明确五行、编号、栏目与原页。")
-        else:
-            pass
         notes = e.get("reading_uncertainties")
         if ("□" in e["text"] and not notes) or (
             notes
@@ -321,8 +289,6 @@ def _witness_corpus() -> dict[str, Any]:
             )
         ):
             raise ValueError("参评对读编辑方框须明确标为疑读。")
-        else:
-            pass
         occurrence = e.get("source_occurrence_id")
         header_page = e.get("header_pdf_page")
         if (occurrence is not None or header_page is not None) and (
@@ -332,8 +298,6 @@ def _witness_corpus() -> dict[str, Any]:
             or header_page not in e["pdf_pages"]
         ):
             raise ValueError("参评原页条目身份须绑定实际编号所在页。")
-        else:
-            pass
     grouped: dict[tuple[str, int, str], list[dict[str, Any]]] = {}
     for key, entry in zip(keys, data["entries"]):
         grouped.setdefault(key, []).append(entry)
@@ -344,10 +308,6 @@ def _witness_corpus() -> dict[str, Any]:
                 occurrences
             ) != len(set(occurrences)):
                 raise ValueError("参评对读格重复；同号原页须有不同的条目身份。")
-            else:
-                pass
-        else:
-            pass
     if any(
         e.get("matching_status")
         != "unmatched_observation_not_assigned_to_a_computed_key"
@@ -357,8 +317,6 @@ def _witness_corpus() -> dict[str, Any]:
         for e in unmatched
     ):
         raise ValueError("参评未匹配观察须保留实际编号、原页及未绑定原因。")
-    else:
-        pass
     _pin_reviewed_content(
         data, WITNESS_CONTENT_SHA256, "invalid_canping_witness_collation"
     )
@@ -504,12 +462,8 @@ def lookup_record(element: str, number: int, kind: Optional[str]) -> dict[str, A
         or type(number) is not int
     ):
         raise ValueError("参评选条须为明确五行及整数编号。")
-    else:
-        pass
     if kind is not None and (not isinstance(kind, str) or kind not in KINDS):
         raise ValueError("参评栏目仅支持male、female、luck或未选性别的None。")
-    else:
-        pass
     source = _verified_source()
     row = _loaded(INHERITED_PATH)["data"]["parts"][element].get(str(number))
     entry = next(
@@ -532,8 +486,6 @@ def lookup_record(element: str, number: int, kind: Optional[str]) -> dict[str, A
         row = _loaded(INHERITED_PATH)["data"]["parts"][element].get(
             str(entry["inherited_wrong_number"])
         )
-    else:
-        pass
     selection: dict[str, Any] = {
         "element": element,
         "number": number,
@@ -550,13 +502,9 @@ def lookup_record(element: str, number: int, kind: Optional[str]) -> dict[str, A
             corrected_number=retired["number"],
         )
         return {"text": "", "selection": selection}
-    else:
-        pass
     if kind is None:
         selection["cell_status"] = "not_selected_missing_gender"
         return {"text": "", "selection": selection}
-    else:
-        pass
     if entry and kind in entry["cells"]:
         text = entry["cells"][kind]
         uncertain = entry.get("reading_uncertainties", {}).get(kind)
@@ -581,10 +529,6 @@ def lookup_record(element: str, number: int, kind: Optional[str]) -> dict[str, A
             selection["reading_uncertainties"] = list(uncertain)
             if "□" in text:
                 selection["editorial_unknown_marker"] = "□"
-            else:
-                pass
-        else:
-            pass
         if entry.get("number_reading_uncertainties"):
             selection["number_reading_uncertainties"] = list(
                 entry["number_reading_uncertainties"]
@@ -617,35 +561,21 @@ def lookup_record(element: str, number: int, kind: Optional[str]) -> dict[str, A
                         )
                     )
                 )
-            else:
-                pass
-        else:
-            pass
         if entry.get("reading_notes"):
             selection["reading_notes"] = entry["reading_notes"][:]
-        else:
-            pass
         if kind in entry.get("reading_revisions", {}):
             selection["reading_revision"] = entry["reading_revisions"][kind]
-        else:
-            pass
         old_text = (row or {}).get(kind, "")
         if old_text != text or "inherited_wrong_number" in entry:
             selection["inherited_text"] = old_text
-        else:
-            pass
         if "inherited_wrong_number" in entry:
             selection["inherited_number"] = entry["inherited_wrong_number"]
-        else:
-            pass
     else:
         text = (row or {}).get(kind) or ""
         if not row:
             selection["cell_status"] = "row_absent_in_local_corpus"
         elif not text_available(text):
             selection["cell_status"] = "inherited_blank_or_placeholder_unverified"
-        else:
-            pass
     note = next(
         (n for n in source["unapplied_notes"] if n["printed_number"] == number), None
     )
@@ -654,15 +584,11 @@ def lookup_record(element: str, number: int, kind: Optional[str]) -> dict[str, A
             k: note[k]
             for k in ("printed_number", "pdf_page", "status", "applied_to_lookup")
         }
-    else:
-        pass
     comparisons = _comparisons(
         element, number, kind, text, selection["cell_status"], (row or {}).get(kind, "")
     )
     if comparisons:
         selection["witnesses"] = comparisons
-    else:
-        pass
     return {"text": text, "selection": deepcopy(selection)}
 
 
@@ -710,10 +636,6 @@ def selection_snapshot(verses: dict[str, Any]) -> str:
                 state = "编号遮损，暂按继承键定位，号文归属未定；此格不计已确定校勘"
                 if row.get("editorial_unknown_marker"):
                     state += "；正文□为编辑方框而非原页圈空"
-                else:
-                    pass
-            else:
-                pass
             page = (
                 f"，PDF第{row['source_pdf_page']}页"
                 if row.get("source_pdf_page")
@@ -724,8 +646,6 @@ def selection_snapshot(verses: dict[str, Any]) -> str:
             )
             if row.get("reading_revision"):
                 lines.append("同馆藏原图复读，旧疑读另存；同一审阅者复读仍待独立复核。")
-            else:
-                pass
             if row.get("number_reading_evidence"):
                 body_state = {
                     "source_body_visually_read": "正文可读",
@@ -736,16 +656,12 @@ def selection_snapshot(verses: dict[str, Any]) -> str:
                 lines.append(
                     f"暂定继承键行的{body_state}；原图编号仍未定，整格不计入已确定数。"
                 )
-            else:
-                pass
             if any(
                 w.get("number_occurrence_ambiguous") for w in row.get("witnesses", [])
             ):
                 lines.append(
                     "同一文明書局本同号有多处正文，按原页并列；号文归属未裁定，不据第一条替换主选文。"
                 )
-            else:
-                pass
             for witness in row.get("witnesses", []):
                 pages = "、".join(str(p) for p in witness["pdf_pages"])
                 relation = {
@@ -758,12 +674,8 @@ def selection_snapshot(verses: dict[str, Any]) -> str:
                 lines.append(
                     f"文明書局本对读（单次目读，PDF第{pages}页）：{witness['text']}〔{relation}；未替换本次主选文〕"
                 )
-        else:
-            pass
     if verses.get("pair_resolution", {}).get("same_number"):
         lines.append("顺逆同号，指向同一行，不是两条独立依据。")
-    else:
-        pass
     lines.append(
         "○为原页圈空，□为编辑目读未定，均不补字；疑读不计入已确定校勘，不作确定解读。"
     )

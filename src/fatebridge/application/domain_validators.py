@@ -70,8 +70,6 @@ def validate_ren_output(
             raise
         except (ValueError, TypeError, KeyError, OverflowError) as exc:
             raise OutputContractError("完整六壬金口诀结果与本次请求不符") from exc
-    else:
-        pass
 
 
 def validate_suzhan_clock(
@@ -95,8 +93,6 @@ def validate_meihua_clock(
 ) -> None:
     if request is None:
         return
-    else:
-        pass
 
     assert isinstance(request, MeihuaAnalysisRequest)
     try:
@@ -161,12 +157,8 @@ def validate_chart_variant_roots(
     assert variants is not None
     if variant not in variants:
         raise OutputContractError("聚合星盘输出包含未支持的盘型")
-    else:
-        pass
     if any(result.get(field) in (None, {}) for field in variants[variant]):
         raise OutputContractError("完整聚合星盘缺少所选盘型的必需业务事实")
-    else:
-        pass
 
 
 def validate_astro_chart_variant(
@@ -189,8 +181,6 @@ def validate_astro_chart_variant(
         return
     if actual_variant != expected_variant:
         raise OutputContractError("星盘输出盘型与本次请求不符")
-    else:
-        pass
 
 
 def resolve_bazi_analysis_time_defaults(
@@ -199,8 +189,6 @@ def resolve_bazi_analysis_time_defaults(
     reference = result.get("analysis_reference")
     if isinstance(reference, dict):
         return list(reference["defaulted_from_clock"])
-    else:
-        pass
     return current
 
 

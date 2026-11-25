@@ -97,11 +97,7 @@ class EngineeringForceComposition(PartialOutput):
                     raise ValueError("身印精确回执须为有限分数") from error
                 if value < 0 or (field == "body_within_support_exact" and value > 1):
                     raise ValueError("身印精确回执范围不符")
-                else:
-                    pass
                 values[field] = value
-            else:
-                pass
         if "body_energy_exact" in values and "seal_energy_exact" in values:
             body, seal = values["body_energy_exact"], values["seal_energy_exact"]
             expected = (
@@ -114,22 +110,14 @@ class EngineeringForceComposition(PartialOutput):
                 and self.body_seal_energy_relation != expected
             ):
                 raise ValueError("身印比较与精确分量不符")
-            else:
-                pass
             if (
                 body + seal
                 and "body_within_support_exact" in values
                 and values["body_within_support_exact"] != body / (body + seal)
             ):
                 raise ValueError("身印精确占比与分量不符")
-            else:
-                pass
             if not body + seal and "body_within_support_exact" in values:
                 raise ValueError("身印工程总量为零时占比未定义，不能伪造0/0的值")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -176,8 +164,6 @@ class ClassicalForceAdjudication(PartialOutput):
             )
         ):
             raise ValueError("原典力量未裁定时不能交付强弱、身印关系或普通扶抑适用结论")
-        else:
-            pass
         return self
 
 
@@ -216,8 +202,6 @@ class ClassicalForceComponents(PartialOutput):
         provenance = self.energy_provenance
         if provenance is None:
             return self
-        else:
-            pass
         composition = self.engineering_composition
         if (
             composition is not None
@@ -226,8 +210,6 @@ class ClassicalForceComponents(PartialOutput):
             and composition.strength_method_id != provenance.strength_method_id
         ):
             raise ValueError("身印能量来源与计算方法须为同次回执")
-        else:
-            pass
         for role in ROLES:
             front = (
                 getattr(provenance.fronts, role)
@@ -239,16 +221,12 @@ class ClassicalForceComponents(PartialOutput):
             )
             if front is None or component is None:
                 continue
-            else:
-                pass
             if (
                 front.element is not None
                 and component.element is not None
                 and front.element != component.element
             ):
                 raise ValueError("分项能量五行须忠于对应身印等角色")
-            else:
-                pass
             if (
                 front.total_energy_unrounded is not None
                 and component.engineering_energy_unrounded is not None
@@ -257,8 +235,6 @@ class ClassicalForceComponents(PartialOutput):
                 )
             ):
                 raise ValueError("归因总量须忠于对应同次未舍入分量")
-            else:
-                pass
             if component.remaining_hidden_roots is not None:
                 bind_part(
                     front,
@@ -268,8 +244,6 @@ class ClassicalForceComponents(PartialOutput):
                         for r in component.remaining_hidden_roots
                     ],
                 )
-            else:
-                pass
         return self
 
     @model_validator(mode="after")
@@ -277,22 +251,16 @@ class ClassicalForceComponents(PartialOutput):
         components, composition = self.components, self.engineering_composition
         if components is None or composition is None:
             return self
-        else:
-            pass
         fields = {
             "unrounded_same_assessment": "engineering_energy_unrounded",
         }
         key = fields.get(composition.ratio_basis or "")
         if key is None or components.body is None or components.seal is None:
             return self
-        else:
-            pass
         body = getattr(components.body, key)
         seal = getattr(components.seal, key)
         if body is None or seal is None:
             return self
-        else:
-            pass
         expected_relation = (
             "body_greater"
             if body > seal
@@ -303,8 +271,6 @@ class ClassicalForceComponents(PartialOutput):
             and composition.float_body_seal_energy_relation != expected_relation
         ):
             raise ValueError("浮点身印比较必须忠于同次已给分量")
-        else:
-            pass
         # Exact arithmetic can legitimately disagree at a float boundary.
         # Only a declared FLOAT comparison is compared with these floats.
         if (
@@ -313,18 +279,10 @@ class ClassicalForceComponents(PartialOutput):
             and composition.body_seal_energy_relation != expected_relation
         ):
             raise ValueError("同基准身印比较与已给分量不符")
-        else:
-            pass
         share = composition.body_within_support_share
         if share is not None:
             if not body + seal:
                 raise ValueError("身印工程总量为零时浮点占比未定义")
-            else:
-                pass
             if share != body / (body + seal):
                 raise ValueError("身印浮点占比必须忠于同次已给未舍入或旧展示分量")
-            else:
-                pass
-        else:
-            pass
         return self

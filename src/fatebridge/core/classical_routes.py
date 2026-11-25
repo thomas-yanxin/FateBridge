@@ -152,8 +152,6 @@ def build_classical_routes(
         for a, b in product(left, right):
             if ref(a) == ref(b):
                 continue
-            else:
-                pass
             ea, eb = STEM_ELEMENTS[a["stem"]][0], STEM_ELEMENTS[b["stem"]][0]
             if relation == "生":
                 observed = GENERATION_CYCLE[ea] == eb
@@ -166,8 +164,6 @@ def build_classical_routes(
                 )
             if not observed:
                 continue
-            else:
-                pass
             distance = abs(ORDER.index(a["pillar"]) - ORDER.index(b["pillar"]))
             competitors = []
             if relation == "合":
@@ -182,8 +178,6 @@ def build_classical_routes(
                         or frozenset((pillars[name][0], b["stem"])) in COMBINATIONS
                     )
                 ]
-            else:
-                pass
             edges.append(
                 {
                     "from_star": ref(a),
@@ -236,8 +230,6 @@ def build_classical_routes(
     for wealth, seal in product(stars(WEALTH), stars(SEAL)):
         if wealth["location"] != "天干" or seal["location"] != "天干":
             continue
-        else:
-            pass
         lo, hi = sorted((ORDER.index(wealth["pillar"]), ORDER.index(seal["pillar"])))
         positions.append(
             {
@@ -253,8 +245,6 @@ def build_classical_routes(
     for output, wealth in product(stars(("食神", "伤官")), stars(WEALTH)):
         if output["location"] != "天干" or wealth["location"] != "天干":
             continue
-        else:
-            pass
         for root_name in ORDER:
             left = [r for r in output["roots"] if r["pillar"] == root_name]
             right = [r for r in wealth["roots"] if r["pillar"] == root_name]
@@ -271,8 +261,6 @@ def build_classical_routes(
                         "effect_status": "shared_branch_root_not_equal_force",
                     }
                 )
-            else:
-                pass
     hurt_month = match_month_uses(resolution, ("伤官",))
     metal_water_context: bool | None = False
     if STEM_ELEMENTS[pillars["day"][0]][0].value == "金":
@@ -285,8 +273,6 @@ def build_classical_routes(
                 else False
             )
         )
-    else:
-        pass
     return {
         "method_id": "ziping_position_routes_v1",
         "life_stage_profile_id": STAGE_PROFILE_ID,

@@ -59,8 +59,6 @@ def primary_diagram_evidence(chart: dict[str, Any]) -> dict[str, Any]:
 def primary_diagram_reading(record: dict[str, Any]) -> str:
     if not record["observations"]:
         raise ValueError("No inspected source diagram matches this quartet and angle")
-    else:
-        pass
     parts = []
     for row in record["observations"]:
         a, b, c, d = row["gates"]

@@ -30,8 +30,6 @@ SECTOR_SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書
 def key_hour_gate_cycle(accumulation: int, yin: bool) -> dict[str, Any]:
     if type(accumulation) is not int or accumulation < 1 or type(yin) is not bool:
         raise ValueError("金钥匙四门须完整正整数积时及明确阴阳遁")
-    else:
-        pass
     phase = (accumulation - 1) % 120
     index, in_gate = divmod(phase, 30)
     doors = tuple("杜死伤景") if yin else tuple("开生惊休")
@@ -51,8 +49,6 @@ def key_hour_gate_cycle(accumulation: int, yin: bool) -> dict[str, Any]:
 def gate_cycle(accumulation: int) -> dict[str, Any]:
     if type(accumulation) is not int or accumulation < 1:
         raise ValueError("太乙八门积数必须是正整数")
-    else:
-        pass
     phase = (accumulation - 1) % 240
     index, in_gate = divmod(phase, 30)
     return {
@@ -83,8 +79,6 @@ def gate_frame(
     """Rotate gates in the physical order 乾坎艮震巽離坤兌, never 1..9."""
     if type(anchor) is not int or anchor not in PALACES or duty_gate not in DOORS:
         raise ValueError("太乙门盘需要实际宫位和已知直门")
-    else:
-        pass
     if anchor == 5:
         return {
             "status": "not_assessed",
@@ -94,8 +88,6 @@ def gate_frame(
             "anchor_source_value": 5,
             "reason": "中五无八方环位，不自动寄坤布门。",
         }
-    else:
-        pass
     start = PALACE_ORDER.index(anchor)
     door_start = DOORS.index(duty_gate)
     rows = [
@@ -130,8 +122,6 @@ def check_three_gates(
             "conditions_satisfied": None,
             "frame_source_path": path,
         }
-    else:
-        pass
     checks = []
     rows = frame["rows"]
     for entity in entities:

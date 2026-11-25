@@ -18,8 +18,6 @@ def utc_instant(moment: datetime) -> datetime:
     """Never compare same-zone wall labels when an actual instant is intended."""
     if moment.utcoffset() is None:
         raise ValueError("实际时刻比较必须带时区，不能默认服务器时区")
-    else:
-        pass
     return moment.astimezone(timezone.utc)
 
 
@@ -44,8 +42,6 @@ def resolve_civil_clock(
     """
     if wall.utcoffset() is not None:
         raise ValueError("本地钟表字段须为无时区标签，实际时刻另外明确偏移")
-    else:
-        pass
     if recorded_offset is not None:
         if explicit_offset is None:
             explicit_offset = recorded_offset
@@ -70,20 +66,12 @@ def resolve_civil_clock(
                     [{"path": offset_field, "code": "conflicting_utc_offset"}],
                     status_code=400,
                 )
-            else:
-                pass
             return requested
-        else:
-            pass
-    else:
-        pass
     zone_info = parse_timezone_name(zone, issue_path=timezone_field)
     local = wall.replace(tzinfo=zone_info)
     if explicit_offset is None:
         validate_local_clock(local)
         return local
-    else:
-        pass
     match = (
         _OFFSET.fullmatch(explicit_offset.strip())
         if type(explicit_offset) is str
@@ -95,8 +83,6 @@ def resolve_civil_clock(
             [{"path": offset_field, "code": "invalid_utc_offset"}],
             status_code=400,
         )
-    else:
-        pass
     sign, hour, minute, second = match.groups()
     h, m, s = int(hour), int(minute), int(second or 0)
     if h >= 24 or m >= 60 or s >= 60:
@@ -105,8 +91,6 @@ def resolve_civil_clock(
             [{"path": offset_field, "code": "invalid_utc_offset"}],
             status_code=400,
         )
-    else:
-        pass
     expected = timedelta(hours=h, minutes=m, seconds=s) * (1 if sign == "+" else -1)
     candidates = local.replace(fold=0), local.replace(fold=1)
     for candidate in candidates:
@@ -115,8 +99,6 @@ def resolve_civil_clock(
             # and keep fold=0 for an ordinary label with equal offsets.
             validate_local_clock(candidate, allow_ambiguous=True)
             return candidate
-        else:
-            pass
     defined = next(
         (
             candidate

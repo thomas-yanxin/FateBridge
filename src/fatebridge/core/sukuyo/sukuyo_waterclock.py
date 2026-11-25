@@ -20,17 +20,11 @@ def _number(text: str) -> int:
     digits = {c: n for n, c in enumerate("一二三四五六七八九", 1)}
     if text == "兩":
         return 2
-    else:
-        pass
     if text in digits:
         return digits[text]
-    else:
-        pass
     tens, sep, ones = text.partition("十")
     if sep:
         return (digits[tens] if tens else 1) * 10 + (digits[ones] if ones else 0)
-    else:
-        pass
     raise ValueError("未识别的漏刻原文数词")
 
 
@@ -38,16 +32,12 @@ def _extract(pattern: str, text: str) -> int:
     match = re.search(pattern, text)
     if match is None:
         raise ValueError("漏刻数值缺少所选原文支持")
-    else:
-        pass
     return _number(match[1])
 
 
 def _equal(value: Any, expected: Any) -> None:
     if type(value) is not type(expected) or value != expected:
         raise ValueError("漏刻控制与所选原文、单位或来源层不一致")
-    else:
-        pass
 
 
 def validate_source_controls(data: dict[str, Any]) -> None:
@@ -114,23 +104,15 @@ def validate_source_controls(data: dict[str, Any]) -> None:
     ):
         if nalanda[key] not in quotes["nalanda"]:
             raise ValueError("计碗与报时信号未绑定原文")
-        else:
-            pass
     for key in ("condition_literal", "shortening_literal", "lengthening_literal"):
         if source["calibration"][key] not in quotes["calibration"]:
             raise ValueError("季节校准原句不完整")
-        else:
-            pass
     for key in ("literal", "quoted_rule_literal"):
         if source["local_noon"][key] not in quotes["local_context"]:
             raise ValueError("当地日中说明不在所选原段")
-        else:
-            pass
     for row in source["retained_unadjudicated_literals"]:
         if row["literal"] not in "".join(quotes.values()):
             raise ValueError("未定字句不在所选原段")
-        else:
-            pass
     for value in [
         nalanda["special_signal_hits_are_bowl_sinkings"],
         source["mahbodhi_kusinagara"]["whole_day_night_sinkings_established"],
@@ -176,8 +158,6 @@ def validate_source_controls(data: dict[str, Any]) -> None:
     )
     if later["conjectural_marker"] != "歟" or "正著時歟" not in later["main_literal"]:
         raise ValueError("不可丢失原文疑问标记")
-    else:
-        pass
     _equal(comparison["counts_equal"], False)
     _equal(comparison["editorial_or_witness_cause_resolved"], False)
 
@@ -206,8 +186,6 @@ def nalanda_group_count(completed_sinkings: int) -> dict[str, Any]:
         raise ValueError(
             f"声明的一周期累计计碗须为0..{limit}整数；不接受布尔、钟时或自动取模"
         )
-    else:
-        pass
     row = _counter_row(completed_sinkings, n["sinkings_per_named_part"])
     fraction = row["elapsed_named_parts"]
     return {

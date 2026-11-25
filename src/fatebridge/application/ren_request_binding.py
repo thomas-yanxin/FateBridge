@@ -32,8 +32,6 @@ def _get(value: Any, path: str) -> Any:
     for part in path.split("."):
         if not isinstance(value, dict) or part not in value:
             return MISSING
-        else:
-            pass
         value = value[part]
     return value
 
@@ -42,8 +40,6 @@ def _same(value: Any, path: str, expected: Any) -> None:
     actual = _get(value, path)
     if actual is MISSING or not same_value(actual, expected):
         raise ValueError("完整六壬结果的" + path + "与本次请求不符")
-    else:
-        pass
 
 
 def _mapping(actual: Any, expected: dict[str, Any], prefix: str = "") -> None:
@@ -59,8 +55,6 @@ def _gender(holder: Any, path: str, expected: str | None) -> None:
     actual = _get(holder, path)
     if actual is MISSING or normalize_gender(actual) != normalize_gender(expected):
         raise ValueError("完整六壬结果的性别来源与本次请求不符")
-    else:
-        pass
 
 
 def require_request_binding(
@@ -69,8 +63,6 @@ def require_request_binding(
     """Check request facts against the same run's recorded operands."""
     if key not in TOOLS:
         return
-    else:
-        pass
     # note (catalog): These engine helpers load only when validating a Ren result.
     from fatebridge.core.local_techniques.chart import (
         _normalize_date_text,
@@ -151,8 +143,6 @@ def require_request_binding(
             )
         ):
             raise ValueError("显式真太阳时请求需要经度")
-        else:
-            pass
         applied_solar = request.use_true_solar_time and longitude is not None
         ren_result = result
         profile = request.guiren_profile
@@ -181,8 +171,6 @@ def require_request_binding(
     if offset is None:
         if clock is not None:
             raise ValueError("不能把未指定的起课UTC偏移改称显式选择")
-        else:
-            pass
     else:
         _mapping(
             clock,
@@ -249,8 +237,6 @@ def require_request_binding(
                 _mapping(child, policy, "calendar_policy.")
                 _mapping(child, diurnal, "overview.diurnal_evidence.")
                 _gender(child, "overview.gender", gender)
-            else:
-                pass
     elif key == "liureng_runyear":
         assert isinstance(request, LiuRengRunyearRequest)
         person = _build_person(
@@ -281,8 +267,6 @@ def require_request_binding(
             < utc_calendar(birth).julian_day_exact()
         ):
             raise ValueError("成功行年结果不能绑定到出生前的分析瞬间")
-        else:
-            pass
         _gender(result, "runyear.gender", person.gender)
         analysis_civil = localize_datetime(civil, zone)
         years = result["runyear"]["age_calendar"]
@@ -295,8 +279,6 @@ def require_request_binding(
             or age < 1
         ):
             raise ValueError("行年农历年份与同次民用年份范围不符")
-        else:
-            pass
         _mapping(
             result["runyear"],
             dict(
@@ -307,5 +289,3 @@ def require_request_binding(
                 ),
             ),
         )
-    else:
-        pass

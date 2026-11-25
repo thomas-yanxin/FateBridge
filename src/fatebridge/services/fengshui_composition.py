@@ -48,12 +48,8 @@ def _collect_sources(result: dict[str, Any]) -> None:
     def visit(value: JsonValue, *, registry_record: bool = False) -> JsonValue:
         if isinstance(value, list):
             return [visit(row) for row in value]
-        else:
-            pass
         if not isinstance(value, dict):
             return value
-        else:
-            pass
         shaped = {name: visit(child) for name, child in value.items()}
         if "ruleset_id" in value and "sources" in value:
             sources = value["sources"]
@@ -62,8 +58,6 @@ def _collect_sources(result: dict[str, Any]) -> None:
             shaped.pop("sources")
             if not registry_record and sources == registered_sources.get(ruleset_id):
                 return shaped
-            else:
-                pass
             citations: dict[str, JsonValue] = {}
             for source in sources:
                 assert isinstance(source, dict)
@@ -77,10 +71,6 @@ def _collect_sources(result: dict[str, Any]) -> None:
                 }
             if citations:
                 shaped["source_citations"] = citations
-            else:
-                pass
-        else:
-            pass
         return shaped
 
     result["rulesets"] = [
@@ -89,8 +79,6 @@ def _collect_sources(result: dict[str, Any]) -> None:
     for name, value in result.items():
         if name != "rulesets":
             result[name] = visit(value)
-        else:
-            pass
     result["source_catalog"] = catalog
 
 
@@ -167,8 +155,6 @@ def compose_fengshui_result(
                     "enumeration_complete"
                 ),
             }
-        else:
-            pass
         # Top-level status retains the raw-chart contract. Requested layout
         # readiness is separate and must survive a coverage-only projection.
         result["coverage"].update(
@@ -202,14 +188,10 @@ def compose_fengshui_result(
                 }
                 for r in extra_rules
             )
-        else:
-            pass
         if not layers:
             result["status"] = layout["status"]
             result["summary"] = f"layout: {layout['status']}"
             result["coverage"]["missing_inputs"] = layout["missing_inputs"]
-        else:
-            pass
         for branch in (
             "interior_analysis",
             "material_analysis",
@@ -217,8 +199,6 @@ def compose_fengshui_result(
             "workstation_layout_analysis",
         ):
             result["rule_trace"].extend(layout.get(branch, {}).get("rule_trace", []))
-    else:
-        pass
     source_comparison = layers.get("xuankong_natal", {}).get("source_comparison")
     if source_comparison is not None:
         record = source_comparison["ruleset"]
@@ -230,8 +210,6 @@ def compose_fengshui_result(
                 for key in ("method", "ruleset_id", "version", "source_ids", "scope")
             }
         )
-    else:
-        pass
     interpretation = layers.get("xuankong_natal", {}).get("interpretation")
     if interpretation is not None:
         provenance_record = interpretation_provenance()
@@ -251,8 +229,6 @@ def compose_fengshui_result(
                     )
                 }
             )
-        else:
-            pass
         if interpretation.get("host_guest_analysis") is not None:
             host_guest = interpretation["host_guest_analysis"]
             result["rulesets"].append(host_guest["ruleset"])
@@ -262,16 +238,12 @@ def compose_fengshui_result(
                 "relation_count": 8 * len(host_guest["candidates"]),
                 "scope": host_guest["scope"],
             }
-        else:
-            pass
         if interpretation.get("fixed_lingzheng_analysis") is not None:
             record = interpretation["fixed_lingzheng_analysis"]["ruleset"]
             result["rulesets"].append(record)
             result["rule_trace"].extend(
                 interpretation["fixed_lingzheng_analysis"]["rule_trace"]
             )
-        else:
-            pass
         result["rule_trace"].append(
             {
                 key: provenance_record[key]
@@ -289,8 +261,6 @@ def compose_fengshui_result(
                 else "complete"
             ),
         )
-    else:
-        pass
     city_gate = layers.get("xuankong_natal", {}).get("city_gate_analysis")
     if city_gate is not None:
         result["summary"] += f"；city_gate: {city_gate['status']}（独立参考运）"
@@ -314,8 +284,6 @@ def compose_fengshui_result(
                 else "complete"
             ),
         )
-    else:
-        pass
     geomagnetic = layers.get("directions", {}).get("geomagnetic_reference")
     if geomagnetic is not None:
         record = geomagnetic_provenance()
@@ -326,12 +294,8 @@ def compose_fengshui_result(
                 for key in ("method", "ruleset_id", "version", "source_ids", "scope")
             }
         )
-    else:
-        pass
     if scene_scope is not None:
         result["coverage"]["scene_scope"] = scene_scope
-    else:
-        pass
     if method_selection is not None and method_reference is not None:
         result["method_policy"] = method_selection
         result["method_details"] = method_reference
@@ -351,16 +315,12 @@ def compose_fengshui_result(
                 for key in ("method", "ruleset_id", "version", "source_ids", "scope")
             }
         )
-    else:
-        pass
     context = (layout or {}).get("environmental_context")
     if context is not None:
         result["coverage"].update(
             environmental_context_status=context["status"],
             environmental_context_missing_inputs=context["missing_inputs"],
         )
-    else:
-        pass
     _collect_sources(result)
     snapshot_sections = sections(result)
     result["snapshot_text"] = render_snapshot_lines(snapshot_sections)
@@ -371,6 +331,4 @@ def compose_fengshui_result(
     )
     if include_calculation_reading:
         result["calculation_reading"] = build_natal_reading(result)
-    else:
-        pass
     return result

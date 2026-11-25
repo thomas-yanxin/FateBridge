@@ -13,23 +13,15 @@ SIX_YAO_NAMES = ["初爻", "二爻", "三爻", "四爻", "五爻", "上爻"]
 def normalize_cast_lines(lines: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
     if lines and len(lines) != 6:
         raise ValueError("六爻 lines 必须恰为 6 条，按初爻至上爻排列")
-    else:
-        pass
     normalized: list[dict[str, Any]] = []
     for item in lines or []:
         if not isinstance(item, dict):
             raise ValueError("六爻 lines 每条必须是爻线对象")
-        else:
-            pass
         value = item.get("value")
         if type(value) is not int or value not in (0, 1):
             raise ValueError("六爻 value 必须为 0 或 1")
-        else:
-            pass
         if type(item.get("change", False)) is not bool:
             raise ValueError("六爻 change 必须为布尔值")
-        else:
-            pass
         normalized.append(
             {
                 "value": value,
@@ -44,12 +36,8 @@ def normalize_cast_lines(lines: list[dict[str, Any]] | None) -> list[dict[str, A
 def validate_hexagram_code(code: str | None) -> str:
     if code is None:
         return ""
-    else:
-        pass
     if not isinstance(code, str) or len(code) != 6 or set(code) - {"0", "1"}:
         raise ValueError("六爻卦码必须是 6 位 0/1 字符串，不接受被忽略的其他字符。")
-    else:
-        pass
     return code
 
 
@@ -76,8 +64,6 @@ def changed_hexagram_code(lines: list[dict[str, Any]]) -> str:
         value = int(line.get("value", 0))
         if line.get("change"):
             value = 1 - value
-        else:
-            pass
         chars.append(str(value))
     return "".join(chars) or "000000"
 
@@ -89,8 +75,6 @@ def cast_lines_from_codes(
     changed = current if changed_code is None else validate_hexagram_code(changed_code)
     if len(current) != 6 or len(changed) != 6:
         raise ValueError("六爻卦码必须是 6 位 0/1 字符串。")
-    else:
-        pass
 
     normalized: list[dict[str, Any]] = []
     for index, (current_bit, changed_bit) in enumerate(zip(current, changed)):
@@ -144,8 +128,6 @@ def coin_cast(coin_sums: list[int]) -> CoinCast:
     """Convert six toss sums in bottom-up order and retain each reported sum."""
     if len(coin_sums) != 6:
         raise ValueError("摇钱起卦需要 6 掷（初爻→上爻）。")
-    else:
-        pass
     lines: list[dict[str, Any]] = []
     tosses: list[CoinToss] = []
     for index, coin_sum in enumerate(coin_sums):
@@ -154,8 +136,6 @@ def coin_cast(coin_sums: list[int]) -> CoinCast:
             raise ValueError(
                 "摇钱起卦每掷之和必须为 6/7/8/9（三枚铜钱，字面=2、背面=3）。"
             )
-        else:
-            pass
         lines.append(
             {
                 "value": meaning["value"],

@@ -29,8 +29,6 @@ TABLE_PROFILES = ("gujin37_siku", "yuanshi55_digital")
 def _number(value: str) -> F:
     if not isinstance(value, str) or not re.fullmatch(r"[0-9]+(?:\.[0-9]+)?", value):
         raise ValueError("源常数须为十进制字符串，不混入浮点、补字或取整")
-    else:
-        pass
     return F(value)
 
 
@@ -74,16 +72,10 @@ class SourceSolarFold:
     def fold(self, accumulation_du: F, *, origin_reference: str) -> dict[str, Any]:
         if not isinstance(accumulation_du, F):
             raise TypeError("积度须为明确原历古度Fraction，不接收浮点、布尔或现代JD")
-        else:
-            pass
         if not isinstance(origin_reference, str) or not origin_reference.strip():
             raise ValueError("须明确提供冬至加时起点依据，不推定积度原点")
-        else:
-            pass
         if not 0 <= accumulation_du <= 2 * self.half_year:
             raise ValueError("只接收所声明源周期内非负积度，不补前一年或自动取年余")
-        else:
-            pass
         reductions = accumulation_du // self.half_year
         remainder = accumulation_du - reductions * self.half_year
         initial = remainder <= self.threshold
@@ -115,19 +107,13 @@ class SourceSolarFold:
     ) -> dict[str, Any]:
         if table_profile not in TABLE_PROFILES:
             raise ValueError("须明确选择既有半夜分表，不把大都表改名为七政算表")
-        else:
-            pass
         if basis != "dadu_source_table" or solar_side not in ("inside", "outside"):
             raise ValueError("须明确大都表基准及太阳内外，不根据日期或折叠分支猜测")
-        else:
-            pass
         if (
             hashlib.sha256(NIGHT_DATA.read_bytes()).hexdigest()
             != self.night_data_sha256
         ):
             raise ValueError("半夜分表输入已改变，不能沿用同一折叠比较版本")
-        else:
-            pass
         folded = self.fold(accumulation_du, origin_reference=origin_reference)
         table = load_table(table_profile)
         local = F(folded["folded_table_argument_du_exact"])
@@ -172,14 +158,10 @@ class SourceSolarFold:
 def load_source_fold(profile: str) -> SourceSolarFold:
     if profile not in PROFILES:
         raise ValueError("须明确选择文献折叠版本，不按闭合或现代误差自动择优")
-    else:
-        pass
     blob = DATA.read_bytes()
     raw = json.loads(blob)
     if raw.get("schema") != "named_source_solar_fold_v1":
         raise ValueError("未核对的原历太阳折叠数据")
-    else:
-        pass
     half_year, year_quarter, half_circle, celestial_quarter = (
         _number(raw[name])
         for name in (
@@ -196,8 +178,6 @@ def load_source_fold(profile: str) -> SourceSolarFold:
         or not 0 < celestial_quarter < half_year
     ):
         raise ValueError("所声明半周与象限源常数不符，不改阈值或归一化")
-    else:
-        pass
     explicit = profile == PROFILES[0]
     return SourceSolarFold(
         profile,

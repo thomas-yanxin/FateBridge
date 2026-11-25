@@ -66,13 +66,9 @@ def evaluate_event_paths(
             "unavailable_reason", "Native event history unavailable"
         )
         return result
-    else:
-        pass
     if querent == quesited:
         result["status"] = "same_body_insufficient"
         return result
-    else:
-        pass
     result["status"] = "computed_conditions"
     events = history["events"]
     # A tangent, overlap with the question epoch, or a continuous exact interval
@@ -105,8 +101,6 @@ def evaluate_event_paths(
         )
         if any(r["receives"] != central["receives"] for r in endpoints):
             central = {**central, "receives": None}
-        else:
-            pass
         return {
             "julian_day_tt": event["julian_day_tt"],
             "root_bracket_tt": event["root_bracket_tt"],
@@ -224,10 +218,6 @@ def evaluate_event_paths(
                             "scope": "Prograde applicant turns retrograde before first principal contact in this window; recipient has no observed reversal before it. Not an assertion about all later contacts.",
                         }
                     )
-                else:
-                    pass
-            else:
-                pass
         if future and future["aspect"] == "conjunction":
             for third in LIGHT_WEIGHT_ORDER:
                 speed = states[third]["speed"]
@@ -237,13 +227,9 @@ def evaluate_event_paths(
                     or speed <= states[applicant]["speed"]
                 ):
                     continue
-                else:
-                    pass
                 for a in intervention:
                     if not event_involves(a, third, applicant):
                         continue
-                    else:
-                        pass
                     for b in intervention:
                         if (
                             event_involves(b, third, recipient)
@@ -271,12 +257,6 @@ def evaluate_event_paths(
                                     "scope": "Selected p111 prograde overtaking pattern: same body/ray type reaches applicant then recipient before their conjunction. Other prohibition variants remain unverified.",
                                 }
                             )
-                        else:
-                            pass
-        else:
-            pass
-    else:
-        pass
     add(
         "direct",
         [querent, quesited],
@@ -333,8 +313,6 @@ def evaluate_event_paths(
     for carrier in LIGHT_WEIGHT_ORDER:
         if carrier in {querent, quesited}:
             continue
-        else:
-            pass
         latest, latest_order = ordered_contact(
             events, unresolved_intervals, carrier, past=True
         )
@@ -350,23 +328,15 @@ def evaluate_event_paths(
             )
             if last is None or following is None or latest is None or earliest is None:
                 continue
-            else:
-                pass
             if (
                 last["root_bracket_tt"][1] < latest["root_bracket_tt"][0]
                 or earliest["root_bracket_tt"][1] < following["root_bracket_tt"][0]
             ):
                 continue
-            else:
-                pass
             if latest is not last or latest_order is None:
                 last_order = None
-            else:
-                pass
             if earliest is not following or earliest_order is None:
                 following_order = None
-            else:
-                pass
             speed = states[carrier]["speed"]
             lighter = LIGHT_WEIGHT_ORDER.index(carrier) > max(
                 LIGHT_WEIGHT_ORDER.index(p) for p in (source, target)
@@ -459,14 +429,10 @@ def evaluate_event_paths(
             collector
         ) >= min(LIGHT_WEIGHT_ORDER.index(p) for p in (querent, quesited)):
             continue
-        else:
-            pass
         a, order_a = ordered_contact(events, unresolved_intervals, querent, collector)
         b, order_b = ordered_contact(events, unresolved_intervals, quesited, collector)
         if a is None or b is None:
             continue
-        else:
-            pass
         receipts = [receipt(querent, collector, a), receipt(quesited, collector, b)]
         add(
             "collection",

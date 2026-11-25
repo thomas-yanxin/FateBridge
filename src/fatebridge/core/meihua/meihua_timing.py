@@ -33,8 +33,6 @@ def _profile() -> dict[str, Any]:
         or len(profile["scales"]) != 3
     ):
         raise ValueError("Unknown selected post-heaven timing profile")
-    else:
-        pass
     return profile
 
 
@@ -51,29 +49,21 @@ def build_postheaven_count_reference(
     """Use the actual original total and declared observer, never line remainder."""
     if observer_activity is None:
         return None
-    else:
-        pass
     profile = _profile()
     scale = next(
         (r for r in profile["scales"] if r["activity"] == observer_activity), None
     )
     if scale is None:
         raise ValueError("No selected numeric scale for this observer activity")
-    else:
-        pass
     seed = cast["seed"]
     if seed.get("casting_method") not in profile["accepted_casting_methods"]:
         return None
-    else:
-        pass
     numbers = {name: number for number, name in BAGUA_BY_NUMBER.items()}
     upper = numbers[cast["base_hexagram"]["upper"]["name"]]
     lower = numbers[cast["base_hexagram"]["lower"]["name"]]
     branch = seed.get("hour_branch")
     if branch not in EARTHLY_BRANCHES:
         raise ValueError("Post-heaven timing requires the original hour branch")
-    else:
-        pass
     hour = EARTHLY_BRANCHES.index(branch) + 1
     total = upper + lower + hour
     expected = {
@@ -86,15 +76,11 @@ def build_postheaven_count_reference(
     }
     if any(type(seed.get(k)) is not int or seed[k] != v for k, v in expected.items()):
         raise ValueError("Timing must bind this observed cast's unreduced total")
-    else:
-        pass
     if (
         seed["parameters"].get("hour_branch") != branch
         or seed["parameters"].get("method") != seed["casting_method"]
     ):
         raise ValueError("Timing method and hour must bind the actual parameters")
-    else:
-        pass
     nominal = Fraction(total) * Fraction(scale["numerator"], scale["denominator"])
     activity_label = {"walking": "行", "seated": "坐", "standing": "立"}[
         observer_activity
@@ -168,19 +154,13 @@ def apply_postheaven_count_reference(
     """Append only an eligible declared observer's source count; preserve all old text."""
     if interpretation["interpretation_topic"] == "weather":
         return
-    else:
-        pass
     motion = interpretation.get("motion_context")
     if motion is None:
         return
-    else:
-        pass
     observer = motion["observer"]
     declaration = observer["declaration"]
     if declaration is None:
         return
-    else:
-        pass
     result = build_postheaven_count_reference(
         cast,
         observer_activity=observer["activity"],
@@ -188,12 +168,8 @@ def apply_postheaven_count_reference(
     )
     if result is None:
         return
-    else:
-        pass
     if cast.get("counting_variants") or interpretation.get("casting_readings"):
         raise ValueError("Selected observed methods must not borrow a count variant")
-    else:
-        pass
     motion["postheaven_count_reference"] = result
     motion["summary"] += result["summary"]
     interpretation["comprehensive_judgement"] += result["summary"]

@@ -10,9 +10,9 @@ from fatebridge.core.contracts.output_chinese import Jinkou, JinkouYearFate
 from fatebridge.core.metaphysics.jinkou_year_fate import ordinal_year_fate
 from fatebridge.core.requests.metaphysics import JinkouAnalysisRequest
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
-from scripts.ren.audit_jinkou_year_fate import course_cases, references
 from tests.support.output_facts import canonical_json
 from tests.support.transports import AS_OF, SPECS, rest, surface_calls
+from validation.jinkou_year_fate_reference import course_cases, references
 
 REF, _RAW, _ERRATA = references()
 COURSE, CASES = course_cases()

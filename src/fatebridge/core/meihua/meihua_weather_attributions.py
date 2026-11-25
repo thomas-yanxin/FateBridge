@@ -32,8 +32,6 @@ def build_weather_attributions(
     """
     if season not in {None, "spring", "summer", "autumn", "winter"}:
         raise ValueError("Weather attribution season must be explicit or unknown")
-    else:
-        pass
     if (
         len(slots) != 6
         or any(
@@ -45,8 +43,6 @@ def build_weather_attributions(
         or len({row["path"] for row in slots}) != 6
     ):
         raise ValueError("Weather attributions require all six actual unique positions")
-    else:
-        pass
     profile = weather_attribution_profile()
     clauses = profile["clauses"]
     terms = []
@@ -105,8 +101,6 @@ def build_weather_attributions(
                 + clauses[key]["quote"]
                 + "”"
             )
-        else:
-            pass
     seasonal_text = {
         "pending_context": "季节未知，所列季令条件待确认",
         "season_matched": "已报季节与所列季令句相符",
@@ -125,8 +119,6 @@ def build_weather_attributions(
                 + "："
                 + seasonal_text[relevant[0]["seasonal_check"]["status"]]
             )
-        else:
-            pass
     summary = (
         "所选文明书局本天时类象补充："
         + ("；".join(groups) or "本次未见本层所列卦名，不补列这些类象")

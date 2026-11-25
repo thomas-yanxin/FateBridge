@@ -26,8 +26,6 @@ def sitting_support(
                 "regions": [],
             }
         ]
-    else:
-        pass
     center = Fraction(degrees) % 360
     lower, upper = center - Fraction(radius), center + Fraction(radius)
     found: dict[str, dict[str, Any]] = {}
@@ -36,8 +34,6 @@ def sitting_support(
         end = min(upper, index * 45 + Fraction(45, 2))
         if start > end:
             continue
-        else:
-            pass
         direction = directions[(index + 4) % 8]
         candidate = found.setdefault(
             direction,

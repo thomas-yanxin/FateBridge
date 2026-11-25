@@ -4,8 +4,6 @@ import sys
 
 if sys.platform == "win32":
     raise ImportError("private_files_posix requires POSIX")
-else:
-    pass
 
 import fcntl
 import os

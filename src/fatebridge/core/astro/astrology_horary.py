@@ -141,8 +141,6 @@ def _planet_state(subject: Any, planet: str) -> dict[str, Any]:
     speed = None if raw_speed is None else float(raw_speed)
     if speed is not None and not math.isfinite(speed):
         raise ValueError("Horary longitude speed must be finite or unknown")
-    else:
-        pass
     occupied = house_number(getattr(point, "house", None))
     return {
         "occupied_house": occupied,
@@ -192,8 +190,6 @@ def _degree_aspect_candidate(
         orb = abs(separation - Fraction(angle))
         if orb > Fraction(orb_limit):
             continue
-        else:
-            pass
         return {
             "aspect": key,
             "aspect_label": label,
@@ -216,8 +212,6 @@ def _applying_aspect(
     candidate = _degree_aspect_candidate(state_a, state_b, orb_profile=orb_profile)
     if candidate is None:
         return None
-    else:
-        pass
     phase = _aspect_phase(
         state_a["longitude"],
         state_a["speed"],
@@ -260,8 +254,6 @@ def _moon_void_of_course(
             "contacts": [],
             "unavailable_reason": "Native lunar-event evidence was not supplied",
         }
-    else:
-        pass
     for contact in physical_motion["contacts"]:
         contact["other_label"] = others[contact["other"]]["planet_label"]
         exact_orb = abs(
@@ -286,38 +278,26 @@ def _moon_void_of_course(
 def _extract_source_models(source: object) -> dict[str, str]:
     if not isinstance(source, Mapping):
         return {}
-    else:
-        pass
     by_factor = source.get("by_factor")
     if not isinstance(by_factor, Mapping):
         return {}
-    else:
-        pass
     models: dict[str, str] = {}
     for body, row in by_factor.items():
         if isinstance(row, Mapping) and row.get("model"):
             models[str(body)] = str(row["model"])
-        else:
-            pass
     return models
 
 
 def _extract_file_contexts(source: object) -> FileContext:
     if not isinstance(source, Mapping):
         return ()
-    else:
-        pass
     files = source.get("files")
     if not isinstance(files, list | tuple):
         return ()
-    else:
-        pass
     contexts: list[tuple[str, float, float, int]] = []
     for row in files:
         if not isinstance(row, Mapping) or not row.get("filename"):
             continue
-        else:
-            pass
         start = row.get("start_julian_day_tt", row.get("start_julian_day_tdb", 0.0))
         end = row.get("end_julian_day_tt", row.get("end_julian_day_tdb", 0.0))
         contexts.append(
@@ -351,8 +331,6 @@ def _horary_ephemeris_source_identity(
         earth_rotation_model = str(earth_rotation["method"])
     elif basis.get("time_scale"):
         earth_rotation_model = str(basis["time_scale"])
-    else:
-        pass
 
     zodiac = getattr(subject, "zodiac_type", None)
     frame = (
@@ -373,16 +351,12 @@ def _horary_ephemeris_source_identity(
         )
     elif event_history.get("status") == "unavailable":
         event_summary = "unavailable"
-    else:
-        pass
 
     consistent: bool | None = None
     if chart_models and event_models:
         consistent = {p: chart_models.get(p) for p in TRADITIONAL_PLANETS} == {
             p: event_models.get(p) for p in TRADITIONAL_PLANETS
         }
-    else:
-        pass
 
     return build_ephemeris_source_identity(
         planetary_models,
@@ -423,8 +397,6 @@ def build_horary_payload(
     """
     if category not in HOUSE_BY_CATEGORY:
         raise ValueError("不支持的卜卦类别；生死与临床判断不开放")
-    else:
-        pass
     selected_orbs = orb_receipt(orb_profile)  # Validate before any event search.
     phase = partial(_applying_aspect, orb_profile=orb_profile)
     quesited_house = HOUSE_BY_CATEGORY[category]
@@ -617,8 +589,6 @@ def build_horary_payload(
         _qualify_unresolved_reference(
             payload, subject, radicality_context=radicality_context
         )
-    else:
-        pass
     return payload
 
 
@@ -660,8 +630,6 @@ def _qualify_unresolved_reference(
                     getattr(subject, "zodiac_type", None),
                 ),
             )
-        else:
-            pass
         states[name] = state
     physical = payload["fortitudes"]["physical_inputs"]
     payload["planets"] = states
@@ -703,8 +671,6 @@ def _qualify_unresolved_reference(
     if not dependent_houses and payload["quesited_house"] != 1:
         ruler = RULER_BY_SIGN[_house_sign(subject, payload["quesited_house"])]
         independent_quesited = {"house": payload["quesited_house"], **states[ruler]}
-    else:
-        pass
     payload["significators"] = {
         "querent": None,
         "quesited": independent_quesited,

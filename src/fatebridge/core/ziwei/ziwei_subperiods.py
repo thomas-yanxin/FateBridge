@@ -45,28 +45,20 @@ def decade_half(
             or "gender_required_for_direction",
         )
         return result
-    else:
-        pass
     if scope.get("status") == "not_started":
         result.update(
             status="not_started", unresolved_reason="formal_decade_not_started"
         )
         return result
-    else:
-        pass
     candidates = [p for p in palaces if p["ganzhi"][1] == scope.get("branch")]
     if scope.get("status") != "computed" or len(candidates) != 1:
         return result
-    else:
-        pass
     try:
         lo, hi = (int(v) for v in candidates[0]["daxian"].split("~"))
     except (ValueError, TypeError, AttributeError, KeyError):
         return result
     if lo < 1 or hi - lo != 9 or not lo <= nominal_age <= hi:
         return result
-    else:
-        pass
     upper = nominal_age - lo < 5
     result.update(
         status="computed_given_selected_age_convention",

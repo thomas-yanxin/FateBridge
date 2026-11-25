@@ -29,16 +29,12 @@ def observed_windows() -> Optional[Tuple[tuple, ...]]:
     getter = getattr(runtime.swe, "get_current_file_data", None)
     if not callable(getter):
         return None
-    else:
-        pass
     values = tuple(tuple(getter(slot)) for slot in (0, 1))
     if any(
         not name or not math.isfinite(start) or not math.isfinite(end) or start >= end
         for name, start, end, _ in values
     ):
         return None
-    else:
-        pass
     return values
 
 
@@ -82,19 +78,13 @@ class CenterWindowProbe:
         )
         if configured_ephemeris_path() != self.selected:
             raise EphemerisSourceError("physical_configuration_changed")
-        else:
-            pass
         if runtime.ephemeris_model_from_retflag(returned) != "swieph":
             raise EphemerisSourceError("model_changed")
-        else:
-            pass
         require_spherical_coordinates(
             values, returned, native=runtime.swe, sidereal=self.sidereal
         )
         if len(values) != 6 or not all(math.isfinite(x) for x in values):
             raise EphemerisSourceError("coordinate_values_unavailable")
-        else:
-            pass
         return tuple(float(value) for value in values)
 
     def _replay_center_files(self) -> None:
@@ -103,8 +93,6 @@ class CenterWindowProbe:
         runtime.swe.set_ephe_path(self.selected or "")
         if self.sidereal:
             runtime.ephemeris_call("set_sid_mode", runtime.swe.SIDM_LAHIRI, 0, 0)
-        else:
-            pass
         anchor = self.epoch
         tried = set()
         for _ in range(5):
@@ -114,44 +102,30 @@ class CenterWindowProbe:
             actual = observed_windows()
             if actual == self.windows:
                 return
-            else:
-                pass
             if actual is None:
                 break
-            else:
-                pass
             candidates = []
             for observed, wanted in zip(actual, self.windows):
                 if observed == wanted:
                     continue
-                else:
-                    pass
                 # An anchor outside an unwanted fit's range, but inside the
                 # intersection of all wanted fits, forces a source transition.
                 # Midpoints depend only on file headers, never on residuals.
                 if self.lower < observed[1]:
                     candidates.append((self.lower + min(self.upper, observed[1])) / 2)
-                else:
-                    pass
                 if self.upper > observed[2]:
                     candidates.append((max(self.lower, observed[2]) + self.upper) / 2)
-                else:
-                    pass
             candidates = [
                 x for x in candidates if self.lower < x < self.upper and x not in tried
             ]
             if not candidates:
                 break
-            else:
-                pass
             anchor = min(candidates, key=lambda x: (abs(x - self.epoch), x))
         raise EphemerisSourceError("position_motion_not_converged")
 
     def _probe(self, delta: float) -> Dict[str, Any]:
         if delta in self.cache:
             return self.cache[delta]
-        else:
-            pass
         at = self.epoch + delta
         pad = 64 * math.ulp(at)
         result: Dict[str, Any] = {"cell": None}
@@ -159,8 +133,6 @@ class CenterWindowProbe:
             result["reason"] = "outside_interior_center_file_window"
             self.cache[delta] = result
             return result
-        else:
-            pass
         self._replay_center_files()
         raw = self._raw(at)
         context = self.trace.observe(
@@ -170,16 +142,10 @@ class CenterWindowProbe:
             result["reason"] = "center_file_context_changed"
             self.cache[delta] = result
             return result
-        else:
-            pass
         if delta == 0:
             if tuple(raw) != self.center:
                 raise EphemerisSourceError("position_motion_not_converged")
-            else:
-                pass
             self.center_verified = True
-        else:
-            pass
         value = float(raw[0])
         local_contexts: Dict[str, Any] = {}
         if self.planet != "Sun":
@@ -206,8 +172,6 @@ class CenterWindowProbe:
                 result["reason"] = "solar_interpolation_boundary_ambiguous"
                 self.cache[delta] = result
                 return result
-            else:
-                pass
             cell = f"center_files_solar_cell_{geometry['cell']}"
         else:
             cell = "center_files_solar_direction"
@@ -228,8 +192,6 @@ class CenterWindowProbe:
         value = self._probe(delta)
         if value.get("cell") is None:
             raise EphemerisSourceError("position_motion_not_converged")
-        else:
-            pass
         return float(value["value"])
 
     def receipt(self) -> Dict[str, Any]:

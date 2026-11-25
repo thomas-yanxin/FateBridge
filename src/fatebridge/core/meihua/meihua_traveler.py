@@ -40,8 +40,6 @@ def _profile() -> dict[str, Any]:
         or profile["selection_policy"]["target_role"] != "use"
     ):
         raise ValueError("Unknown or incomplete selected traveler profile")
-    else:
-        pass
     return profile
 
 
@@ -60,8 +58,6 @@ def traveler_qualifications(
     """Evaluate directed atoms against initial use; never rename the original body."""
     if [r["role"] for r in stages] != list(ROLES):
         raise ValueError("Traveler frame requires all four actual stage roles")
-    else:
-        pass
     profile = _profile()
     target = cast["use_trigram"]
     initial = stages[0]
@@ -71,8 +67,6 @@ def traveler_qualifications(
         fact_prefix + ".use_trigram",
     ):
         raise ValueError("Traveler target must be this candidate's original use")
-    else:
-        pass
     control = build_internal_countercontrol(stages, fact_prefix=fact_prefix)
     nodes = control["nodes"]
     incoming = {
@@ -115,12 +109,8 @@ def traveler_qualifications(
             fact_prefix + ".use_trigram",
         ):
             raise ValueError("Traveler strength must belong to this candidate's use")
-        else:
-            pass
         strength = row["strength"]
         strength_path = f"{strength_prefix}.trigrams.{index}.strength"
-    else:
-        pass
     weak = True if strength == "衰" else False if strength == "旺" else None
     controlled = bool(controllers)
     # Three-valued conjunction; 原文未定 is unknown, not the opposite of 衰.

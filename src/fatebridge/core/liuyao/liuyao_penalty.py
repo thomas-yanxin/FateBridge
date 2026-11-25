@@ -39,8 +39,6 @@ def penalty_context(
                 actors.append(
                     dict(location=location, branch=b, presence_condition_match=True)
                 )
-            else:
-                pass
         if own_changed in ("寅", "申"):
             actors.append(
                 dict(
@@ -50,8 +48,6 @@ def penalty_context(
                     presence_condition_match=True,
                 )
             )
-        else:
-            pass
         for row, c in zip(lines or [], conditions or []):
             p, b = row["position"], row["branch"]
             if (p != position or subject_kind == "hidden") and b in ("寅", "申"):
@@ -69,8 +65,6 @@ def penalty_context(
                     )
                 else:
                     actors.append(actor)
-            else:
-                pass
             changed = row.get("changed_branch")
             if changed in ("寅", "申") and (p != position or own_changed is None):
                 ignored.append(
@@ -86,10 +80,6 @@ def penalty_context(
                         ),
                     )
                 )
-            else:
-                pass
-    else:
-        pass
     values = []
     for b in ("寅", "申"):
         matches = [a["presence_condition_match"] for a in actors if a["branch"] == b]
@@ -179,16 +169,12 @@ def penalty_explanation(context: dict[str, Any]) -> str | None:
     presence = context["condition_match"]
     if presence is False:
         return None
-    else:
-        pass
     if presence is None:
         return (
             "申爻活动资格待审，寅日长生生扶不能先行确认；刑的总作用未裁定"
             if context["day_yin_growth_applicable"]
             else "三支活动资格待审，寅生扶不能先行确认；刑的总作用未裁定"
         )
-    else:
-        pass
     if context["day_yin_growth_applicable"]:
         text = "巳寅申三支条件已核，寅日不按长生或同一日生扶计入；刑的总作用未裁定"
         if any(
@@ -196,9 +182,5 @@ def penalty_explanation(context: dict[str, Any]) -> str | None:
             for a in context["actors"]
         ):
             text += "；本位变寅亦不计为回头生扶，其他独立生扶仍保留"
-        else:
-            pass
         return text
-    else:
-        pass
     return "巳寅申三支条件已核，所列寅月、动寅及本位变寅不计为寅生扶；刑的总作用未裁定，其他独立生扶仍保留"

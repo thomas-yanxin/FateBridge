@@ -64,8 +64,6 @@ def seasonal_metadata() -> dict[str, Any]:
 def empty_condition(power: str, xun_kong: bool) -> str | None:
     if power not in ("旺", "相", "休", "囚", "死") or type(xun_kong) is not bool:
         raise ValueError("本空季节条件需要有效五态与布尔本空")
-    else:
-        pass
     return ("半空条件" if power in ("旺", "相") else "真空条件") if xun_kong else None
 
 
@@ -83,8 +81,6 @@ def seasonal_evidence(
         or month_branch not in MONTH_PARTITION
     ):
         raise ValueError("六壬季节条件需要有效日干支与月建支")
-    else:
-        pass
     if (
         not isinstance(sky_by_earth, dict)
         or set(sky_by_earth) != set(BRANCHES)
@@ -95,8 +91,6 @@ def seasonal_evidence(
         or set(sky_by_earth.values()) != set(BRANCHES)
     ):
         raise ValueError("六壬季节条件需要完整天地盘")
-    else:
-        pass
     if (
         len(
             {
@@ -107,8 +101,6 @@ def seasonal_evidence(
         != 1
     ):
         raise ValueError("六壬季节条件的天地盘须一致转动")
-    else:
-        pass
     if (
         not isinstance(god_by_sky, dict)
         or set(god_by_sky) != set(BRANCHES)
@@ -118,8 +110,6 @@ def seasonal_evidence(
         or set(god_by_sky.values()) != set(GOD_ELEMENTS)
     ):
         raise ValueError("六壬季节条件需要完整十二天将")
-    else:
-        pass
     partition = MONTH_PARTITION[month_branch]
     powers = POWERS[partition]
     empty = list(kongwang_for_ganzhi(day_ganzhi)[:2])

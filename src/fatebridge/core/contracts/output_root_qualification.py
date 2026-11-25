@@ -31,8 +31,6 @@ class RootQualification(PartialOutput):
         if self.qualification_basis == "source_heavy_root":
             if self.source_weight_class not in (None, "heavy"):
                 raise ValueError("原典重根资格必须保留重根分类")
-            else:
-                pass
             if self.kind is not None and self.kind not in {
                 "lu_root",
                 "yang_blade_root",
@@ -40,19 +38,11 @@ class RootQualification(PartialOutput):
                 "prosperity_root",
             }:
                 raise ValueError("轻根或无根参考不能冒充原典重根")
-            else:
-                pass
-        else:
-            pass
         if self.qualified_for_structural_rule is True:
             if self.matching_hidden_stems == [] or self.initial_hidden_mass == 0:
                 raise ValueError("健全根资格不能由无实际藏干的长生参考产生")
-            else:
-                pass
             if self.qualification_basis == "not_anchored_kind":
                 raise ValueError("非锚定根类不能冒充健全根")
-            else:
-                pass
             if (
                 self.initial_hidden_mass is not None
                 and self.remaining_hidden_mass is not None
@@ -61,10 +51,6 @@ class RootQualification(PartialOutput):
                 < self.initial_hidden_mass * self.minimum_retention_policy
             ):
                 raise ValueError("健全根资格不能绕过已声明的保留门槛")
-            else:
-                pass
-        else:
-            pass
         if (
             self.initial_hidden_mass is not None
             and self.initial_hidden_mass > 0
@@ -74,6 +60,4 @@ class RootQualification(PartialOutput):
             != self.remaining_hidden_mass / self.initial_hidden_mass
         ):
             raise ValueError("保留比例必须忠于未舍入的实际根量")
-        else:
-            pass
         return self

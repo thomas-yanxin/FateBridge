@@ -31,13 +31,9 @@ def _units(bundle: dict[str, Any]) -> tuple[int, int, int]:
     ]
     if any(type(v) is not int or v <= 0 for v in values):
         raise ValueError("具注历所选单位须为正整数")
-    else:
-        pass
     hours, koku, fun = values
     if units["id"] != MODEL or (hours, koku, fun) != (12, 50, 6):
         raise ValueError("单位不符合所选NAOJ2019五十刻模型")
-    else:
-        pass
     return hours, koku, fun
 
 
@@ -45,14 +41,10 @@ def _quantity(text: str, fun_per_koku: int) -> Fraction:
     """Read a quantity, including the table's noncanonical sum 3刻7分."""
     if not isinstance(text, str):
         raise ValueError("刻分量须为明确字符串")
-    else:
-        pass
     text = "".join(text.split())
     match = re.fullmatch(r"(?:(\d+)刻)?(?:(\d+)分(半)?)?", text)
     if not match or not any(match.groups()):
         raise ValueError("刻分量须明确单位；不把裸半或半刻改读为半分")
-    else:
-        pass
     koku, fun, half = match.groups()
     return Fraction(int(koku or 0) * fun_per_koku + int(fun or 0)) + (
         Fraction(1, 2) if half else 0
@@ -63,8 +55,6 @@ def _clock(text: str, bundle: dict[str, Any]) -> dict[str, Any]:
     hours, koku_per_day, fun_per_koku = _units(bundle)
     if not isinstance(text, str):
         raise ValueError("辰刻时点须为明确字符串")
-    else:
-        pass
     normalized = "".join(text.split())
     match = re.fullmatch(
         r"([" + BRANCHES + r"])(時正|初(?:\d+分(?:半)?)?|\d+刻(?:\d+分(?:半)?)?)",
@@ -72,8 +62,6 @@ def _clock(text: str, bundle: dict[str, Any]) -> dict[str, Any]:
     )
     if not match:
         raise ValueError("辰刻时点须明确初、刻分或時正；不猜裸半的单位")
-    else:
-        pass
     branch, tail = match.groups()
     per_day = koku_per_day * fun_per_koku
     per_hour = Fraction(per_day, hours)
@@ -85,12 +73,8 @@ def _clock(text: str, bundle: dict[str, Any]) -> dict[str, Any]:
         fun_match = re.search(r"(\d+)分", quantity)
         if fun_match and int(fun_match[1]) >= fun_per_koku:
             raise ValueError("时点的分栏须小于六；表中和数另按量计算")
-        else:
-            pass
         if offset > per_hour:
             raise ValueError("时点超过一辰刻；四刻一分是下一辰刻边界")
-        else:
-            pass
     boundary = offset == per_hour
     return {
         "literal": text,
@@ -113,8 +97,6 @@ def decode_clock(text: str, *, model: str) -> dict[str, Any]:
     """Decode only an explicitly selected model, never infer it from a date."""
     if model != MODEL:
         raise ValueError("必须明确选择所选NAOJ2019五十刻模型")
-    else:
-        pass
     source = load_source(SOURCE)
     return {
         **_clock(text, source.data),
@@ -126,8 +108,6 @@ def decode_clock(text: str, *, model: str) -> dict[str, Any]:
 def quantity_fun(text: str, *, model: str) -> dict[str, int]:
     if model != MODEL:
         raise ValueError("必须明确选择所选NAOJ2019五十刻模型")
-    else:
-        pass
     bundle = load_source(SOURCE).data
     return _ratio(_quantity(text, _units(bundle)[2]))
 
@@ -137,14 +117,10 @@ def seasonal_ordinal(label: str) -> int:
     bundle = load_source(SOURCE).data
     if not isinstance(label, str):
         raise ValueError("须提供平气节气日标签，不能用民用日期替代")
-    else:
-        pass
     match = re.fullmatch(r"(.+?)(\d+)日", label)
     names: list[str] = bundle["seasonal_axis"]["term_order_from_winter_solstice"]
     if not match or match[1] not in names or not 1 <= int(match[2]) <= 15:
         raise ValueError("平气标签须为所选二十四气及一至十五日")
-    else:
-        pass
     return names.index(match[1]) * 15 + int(match[2])
 
 
@@ -165,16 +141,12 @@ def _assess(bundle: dict[str, Any], *, include_all_rows: bool) -> dict[str, Any]
             != group["nominal_seasonal_ordinal"]
         ):
             errors.append(["seasonal_ordinal", group["id"]])
-        else:
-            pass
         gap = (
             groups[(index + 1) % len(groups)]["nominal_seasonal_ordinal"]
             - group["nominal_seasonal_ordinal"]
         ) % 360
         if gap != group["printed_interval_to_next"]:
             errors.append(["nominal_interval", group["id"]])
-        else:
-            pass
         for number, reading in enumerate(group["readings"]):
             sunrise, sunset = [
                 _clock(reading[key], bundle) for key in ["sunrise", "sunset"]
@@ -190,14 +162,10 @@ def _assess(bundle: dict[str, Any], *, include_all_rows: bool) -> dict[str, Any]
             printed = reading["printed_sum"]
             if printed is not None and total != _quantity(printed, fun):
                 errors.append(["printed_sum", group["id"], number])
-            else:
-                pass
             residual = total - expected
             residuals[str(residual)] += 1
             if residual:
                 exceptional_groups.add(group["id"])
-            else:
-                pass
             rows.append(
                 {
                     "group_id": group["id"],
@@ -230,8 +198,6 @@ def _assess(bundle: dict[str, Any], *, include_all_rows: bool) -> dict[str, Any]
     }
     if include_all_rows:
         result["all_readings"] = rows
-    else:
-        pass
     return result
 
 

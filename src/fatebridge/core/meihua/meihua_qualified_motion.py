@@ -33,8 +33,6 @@ def _profile() -> dict[str, Any]:
         or any("多" not in r["qualified_predicate"] for r in result["rows"])
     ):
         raise ValueError("Unknown or incomplete qualified chapter-motion reading")
-    else:
-        pass
     return result
 
 
@@ -44,15 +42,11 @@ def build_qualified_motion(
     """Select a singular original role; full source/outcome predicates stay open."""
     if topic not in _ROLE:
         raise ValueError("Select travel or traveler for the qualified chapter reading")
-    else:
-        pass
     profile = _profile()
     role = _ROLE[topic]
     name = cast[role + "_trigram"]["name"]
     if name not in _NAMES:
         raise ValueError("Qualified chapter reading requires a known original trigram")
-    else:
-        pass
     path = fact_prefix + "." + role + "_trigram.name"
     clauses = [
         {
@@ -72,8 +66,6 @@ def build_qualified_motion(
     matches = [row for row in clauses if row["category_matches"]]
     if len(clauses) != 2 or len(matches) > 1:
         raise ValueError("Qualified chapter categories must be disjoint")
-    else:
-        pass
     label = "初体" if role == "body" else "初用"
     values = {"role_label": label, "trigram": name}
     if matches:
@@ -81,8 +73,6 @@ def build_qualified_motion(
             quote=matches[0]["quote"],
             qualified_predicate=matches[0]["qualified_predicate"],
         )
-    else:
-        pass
     summary = profile["summary_templates"][
         "matched" if matches else "not_matched"
     ].format(**values)

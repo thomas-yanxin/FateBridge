@@ -43,54 +43,34 @@ def is_ascendant_resolved(source: object) -> bool:
     """Return whether a chart, subject, reference, or angle_definition resolves ASC."""
     if source is None:
         return True
-    else:
-        pass
     if isinstance(source, Mapping):
         if "geometric_ascendant_resolved" in source:
             return source.get("geometric_ascendant_resolved") is not False
-        else:
-            pass
         if source.get("status") in _UNRESOLVED_ASCENDANT_STATUSES:
             return False
-        else:
-            pass
         for key in ("angle_definition", "calculation_basis", "chart_profile"):
             nested = source.get(key)
             if isinstance(nested, Mapping) and not is_ascendant_resolved(nested):
                 return False
-            else:
-                pass
         angles = source.get("angles")
         if isinstance(angles, Mapping):
             asc = angles.get("ascendant")
             if isinstance(asc, Mapping) and not is_ascendant_resolved(asc):
                 return False
-            else:
-                pass
-        else:
-            pass
         ascendant = source.get("ascendant")
         if isinstance(ascendant, Mapping) and not is_ascendant_resolved(ascendant):
             return False
-        else:
-            pass
         if (
             ("absolute_degree" in source or "longitude" in source)
             and source.get("absolute_degree") is None
             and source.get("longitude") is None
         ):
             return False
-        else:
-            pass
         return True
-    else:
-        pass
     for attr in ("calculation_basis", "chart_profile", "angle_definition"):
         nested = getattr(source, attr, None)
         if isinstance(nested, Mapping) and not is_ascendant_resolved(nested):
             return False
-        else:
-            pass
     return True
 
 
@@ -107,8 +87,6 @@ def ecliptic_horizon_angle_definition(
     """
     if not all(math.isfinite(v) for v in (latitude, armc, obliquity)):
         raise ValueError("Angle conditioning requires finite geometry inputs")
-    else:
-        pass
     phi, theta, eps = map(math.radians, (latitude, armc, obliquity))
     a = math.cos(phi) * math.cos(theta)
     b = math.fsum(
@@ -117,8 +95,6 @@ def ecliptic_horizon_angle_definition(
     r = math.hypot(a, b)
     if r > INTERSECTION_CONDITION_THRESHOLD:
         return None
-    else:
-        pass
     resolved = r > INTERSECTION_RESOLUTION_GUARD
     return {
         "status": (
@@ -195,12 +171,8 @@ def native_ecliptic_horizon_angle_definition(
         > INTERSECTION_CONDITION_THRESHOLD
     ):
         return None
-    else:
-        pass
     if runtime.swe is None:
         raise ValueError("Native angle conditioning requires Swiss Ephemeris")
-    else:
-        pass
     if observed:
         equator = physical_equator(
             runtime.swe, julian_day_ut1, julian_day_tt=julian_day_tt
@@ -212,10 +184,6 @@ def native_ecliptic_horizon_angle_definition(
             INTERSECTION_CONDITION_THRESHOLD
         ):
             return None
-        else:
-            pass
-    else:
-        pass
     attitude = earth_attitude(runtime.swe, julian_day_ut1, julian_day_tt=julian_day_tt)
     definition = ecliptic_horizon_angle_definition(
         latitude=latitude,
@@ -228,8 +196,6 @@ def native_ecliptic_horizon_angle_definition(
             geographic_latitude=geographic_latitude,
             rotation_axis_latitude=latitude,
         )
-    else:
-        pass
     return definition
 
 
@@ -239,8 +205,6 @@ def geographic_pole_angle_definition(
     """Exact poles only; do not classify nearby, well-defined latitudes as poles."""
     if abs(latitude) != 90.0:
         return None
-    else:
-        pass
     result: dict[str, object] = {
         "status": "geographic_pole_meridian_convention",
         "ascendant_definition": "eastern_ecliptic_horizon_intersection_relative_to_supplied_meridian",
@@ -280,8 +244,4 @@ def geographic_pole_angle_definition(
                     "本记录只说明地理坐标约定，实际高度与交点按所选地平模型读取。"
                 ),
             )
-        else:
-            pass
-    else:
-        pass
     return result

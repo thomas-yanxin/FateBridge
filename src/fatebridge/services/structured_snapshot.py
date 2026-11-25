@@ -77,8 +77,6 @@ def field_label(field_name: str) -> str:
 def render_scalar(value: JsonValue) -> str:
     if isinstance(value, bool):
         return "是" if value else "否"
-    else:
-        pass
     return f"{value}"
 
 
@@ -100,8 +98,6 @@ def flatten_snapshot_value(
         if depth >= MAX_SNAPSHOT_DEPTH:
             lines.append(f"{indentation}（{len(value)} 项，略）")
             return lines
-        else:
-            pass
         for field_name, field_value in value.items():
             label = field_label(field_name)
             if isinstance(field_value, (dict, list)) and not is_empty_snapshot_value(
@@ -111,14 +107,10 @@ def flatten_snapshot_value(
                 lines.extend(flatten_snapshot_value(field_value, indent + 1, depth + 1))
             elif not isinstance(field_value, (dict, list)):
                 lines.append(f"{indentation}{label}：{render_scalar(field_value)}")
-            else:
-                pass
     elif isinstance(value, list):
         if depth >= MAX_SNAPSHOT_DEPTH:
             lines.append(f"{indentation}（{len(value)} 条，略）")
             return lines
-        else:
-            pass
         for entry in value[:MAX_SNAPSHOT_LIST_ENTRIES]:
             if isinstance(entry, dict):
                 inline = "，".join(
@@ -137,14 +129,10 @@ def flatten_snapshot_value(
                         lines.extend(
                             flatten_snapshot_value(field_value, indent + 2, depth + 1)
                         )
-                    else:
-                        pass
             else:
                 lines.append(f"{indentation}- {render_scalar(entry)}")
         if len(value) > MAX_SNAPSHOT_LIST_ENTRIES:
             lines.append(f"{indentation}…（共 {len(value)} 条，余略）")
-        else:
-            pass
     else:
         lines.append(f"{indentation}{render_scalar(value)}")
     return lines
@@ -166,19 +154,13 @@ def build_structured_snapshot_sections(
     overview: list[str] = []
     if title:
         overview.append(f"类型：{title}")
-    else:
-        pass
     detail_sections: list[SnapshotSectionLines] = []
     for field_name, value in public_payload(data).items():
         if field_name in skip:
             continue
-        else:
-            pass
         if isinstance(value, (dict, list)):
             if is_empty_snapshot_value(value):
                 continue
-            else:
-                pass
             detail_sections.append(
                 SnapshotSectionLines(
                     field_label(field_name), flatten_snapshot_value(value)
@@ -190,8 +172,6 @@ def build_structured_snapshot_sections(
     sections: list[SnapshotSectionLines] = []
     if overview:
         sections.append(SnapshotSectionLines("概要", overview))
-    else:
-        pass
     sections.extend(detail_sections)
     return sections
 

@@ -24,15 +24,11 @@ def seibunkan_reference(
     ).encode()
     if hashlib.sha256(canonical).hexdigest() != FACTS_SHA256:
         raise ValueError("近代注释对照的原字、归属或未定范围改变，须重新核验")
-    else:
-        pass
     if any(
         meanings.get(key) != value
         for key, value in data["calendar_meanings_binding"].items()
     ) or any(taisho.get(key) != value for key, value in data["taisho_binding"].items()):
         raise ValueError("近代注释对照与本次桧尾原文及句义绑定不一致，须重新核验")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 

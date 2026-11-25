@@ -27,8 +27,6 @@ _RAW = (
 ).read_bytes()
 if hashlib.sha256(_RAW).hexdigest() != COEFFICIENT_SHA256:
     raise RuntimeError("Nutation coefficients differ from the pinned native source")
-else:
-    pass
 _DATA: NutationParameters = json.loads(_RAW)
 SOURCE_URL = _DATA["source_url"]
 _TERMS = tuple(tuple(map(float, row)) for row in _DATA["terms"])

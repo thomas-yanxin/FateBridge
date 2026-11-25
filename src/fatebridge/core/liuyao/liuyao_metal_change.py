@@ -34,8 +34,6 @@ def own_si_context(
 ) -> dict[str, Any] | None:
     if not (row["change"] and row["element"] == "金" and row["changed_branch"] == "巳"):
         return None
-    else:
-        pass
     p, day = row["position"], day_ganzhi[1]
     path = f"liuyao_evidence.conditional_analysis.growth_conditions.lines.{p-1}.own_changed_si"
     roots = []
@@ -45,8 +43,6 @@ def own_si_context(
             location == "month" and monthly["monthly_supported"] is not True
         ):
             continue
-        else:
-            pass
         root_path = None
         if assessment is not None:
             supports = assessment["lines"][p - 1]["strength"]["supports"]
@@ -56,8 +52,6 @@ def own_si_context(
                 if a["location"] == location and a["branch"] == branch
             )
             root_path = f"liuyao_evidence.conditional_analysis.classical_assessment.lines.{p-1}.strength.supports.{index}"
-        else:
-            pass
         roots.append(
             dict(
                 location=location,
@@ -77,8 +71,6 @@ def own_si_context(
             profile=PROFILE,
             scope="只核实际化巳金爻以外的独立动土生扶，不用该金爻或巳信用自证。",
         )
-    else:
-        pass
     support = True if roots or moving and moving["condition_match"] is True else None
     facts = branch_facts("巳", month, day, xunkong(day_ganzhi))
     void_pending = facts["is_xunkong"] and not facts["is_day_clash"]
@@ -137,8 +129,6 @@ def back_control_condition(
         or element_relation(ELEMENTS[row["changed_branch"]], row["element"]) != "克爻"
     ):
         return False
-    else:
-        pass
     context = condition.get(INTERNAL_KEY)
     return (
         cast(bool | None, context["qualified_back_control_condition"])
@@ -150,6 +140,4 @@ def back_control_condition(
 def outgoing_blocker(condition: dict[str, Any]) -> bool | None:
     if not condition.get("outgoing_obstructions"):
         return False
-    else:
-        pass
     return None if own_si_pending(condition) else True

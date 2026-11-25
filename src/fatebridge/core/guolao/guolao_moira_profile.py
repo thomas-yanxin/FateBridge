@@ -70,8 +70,6 @@ class _Parser:
                     end += 1
                 if end == cursor:
                     raise ValueError(f"Unsupported Moira catalogue token: {char}")
-                else:
-                    pass
                 self.tokens.append(source[cursor:end])
                 cursor = end
         self.position = 0
@@ -80,8 +78,6 @@ class _Parser:
         expression = self._binary(0)
         if self.position != len(self.tokens):
             raise ValueError("Trailing Moira catalogue expression")
-        else:
-            pass
         return expression
 
     def _binary(self, minimum: int) -> Expression:
@@ -92,8 +88,6 @@ class _Parser:
             priority = precedence.get(operator, -1)
             if priority < minimum:
                 break
-            else:
-                pass
             self.position += 1
             left = Binary(operator, left, self._binary(priority + 1))
         return left
@@ -105,43 +99,27 @@ class _Parser:
             index = self._binary(0)
             self._consume("]")
             expression = Index(expression, index)
-        else:
-            pass
         return expression
 
     def _unary(self) -> Expression:
         if self.position >= len(self.tokens):
             raise ValueError("Incomplete Moira catalogue expression")
-        else:
-            pass
         token = self.tokens[self.position]
         self.position += 1
         if token == "!":
             return Negation(self._unary())
-        else:
-            pass
         if token == "@":
             return Lookup("@", self._unary())
-        else:
-            pass
         if token == "%":
             return Lookup("%", self._unary())
-        else:
-            pass
         if token == "$":
             return Lookup("$", self._unary())
-        else:
-            pass
         if token == "?":
             return Lookup("?", self._unary())
-        else:
-            pass
         if token == "(":
             expression = self._binary(0)
             self._consume(")")
             return expression
-        else:
-            pass
         if token == "{":
             parts: list[Expression] = []
             while (
@@ -150,19 +128,13 @@ class _Parser:
                 parts.append(self._postfix())
             self._consume("}")
             return Name(tuple(parts))
-        else:
-            pass
         if token in "}&|=+-)[],":
             raise ValueError(f"Unexpected Moira catalogue token: {token}")
-        else:
-            pass
         return Atom(token)
 
     def _consume(self, expected: str) -> None:
         if self.position >= len(self.tokens) or self.tokens[self.position] != expected:
             raise ValueError(f"Expected Moira catalogue token: {expected}")
-        else:
-            pass
         self.position += 1
 
 
@@ -220,8 +192,6 @@ def _java_hashtable_order(keys: Sequence[str]) -> tuple[str, ...]:
         slot = (hash_code & 0x7FFFFFFF) % len(buckets)
         if any(existing == key for _, existing in buckets[slot]):
             continue
-        else:
-            pass
         if count >= threshold:
             old_buckets = buckets
             buckets = [[] for _ in range(2 * len(old_buckets) + 1)]
@@ -231,8 +201,6 @@ def _java_hashtable_order(keys: Sequence[str]) -> tuple[str, ...]:
                     new_slot = (old_hash & 0x7FFFFFFF) % len(buckets)
                     buckets[new_slot].insert(0, (old_hash, old_key))
             slot = (hash_code & 0x7FFFFFFF) % len(buckets)
-        else:
-            pass
         buckets[slot].insert(0, (hash_code, key))
         count += 1
     return tuple(key for bucket in reversed(buckets) for _, key in bucket)
@@ -243,8 +211,6 @@ def load_source_profile(path: Path) -> CompiledProfile:
     document: object = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(document, dict):
         raise ValueError("Moira source profile must be an object")
-    else:
-        pass
     source: dict[str, object] = {
         key: value for key, value in document.items() if isinstance(key, str)
     }
@@ -259,8 +225,6 @@ def load_source_profile(path: Path) -> CompiledProfile:
         value = source.get(key)
         if not isinstance(value, str):
             raise ValueError(f"Moira source profile requires string {key}")
-        else:
-            pass
         identity[key] = value
     sequences: dict[str, tuple[str, ...]] = {}
     for key in ("full_zodiac", "full_stellar_signs", "primitive_booleans"):
@@ -269,20 +233,14 @@ def load_source_profile(path: Path) -> CompiledProfile:
             isinstance(item, str) for item in value
         ):
             raise ValueError(f"Moira source profile requires string list {key}")
-        else:
-            pass
         sequences[key] = tuple(item for item in value if isinstance(item, str))
     string_data = source.get("source_strings")
     if not isinstance(string_data, dict):
         raise ValueError("Moira source profile requires source_strings")
-    else:
-        pass
     strings: list[tuple[str, str | tuple[str, ...]]] = []
     for key, value in string_data.items():
         if not isinstance(key, str):
             raise ValueError("Moira source string key must be a string")
-        else:
-            pass
         if isinstance(value, str):
             strings.append((key, value))
         elif isinstance(value, list) and all(isinstance(item, str) for item in value):
@@ -296,20 +254,14 @@ def load_source_profile(path: Path) -> CompiledProfile:
     declarations = source.get("declarations")
     if not isinstance(declarations, list):
         raise ValueError("Moira source profile requires declarations")
-    else:
-        pass
     rules: dict[str, CompiledRule] = {}
     aliases: list[SourceAlias] = []
     for declaration in declarations:
         if not isinstance(declaration, dict):
             raise ValueError("Moira source declaration must be an object")
-        else:
-            pass
         line, text = declaration.get("line"), declaration.get("text")
         if type(line) is not int or not isinstance(text, str):
             raise ValueError("Moira source declaration requires line and text")
-        else:
-            pass
         header, expression = "".join(text.split()).split(":", 1)
         alias = header.startswith("=")
         never = header.startswith(("+&", "-&"))
@@ -324,8 +276,6 @@ def load_source_profile(path: Path) -> CompiledProfile:
                 parts[2] if len(parts) > 2 else 0,
             )
             expression = expression[end + 1 :]
-        else:
-            pass
         expansions = [(name, expression)]
         if "{" in name:
             start, end = name.index("{"), name.index("}")
@@ -340,16 +290,12 @@ def load_source_profile(path: Path) -> CompiledProfile:
                         expression.replace("{}", operand),
                     )
                 )
-        else:
-            pass
         for expanded_name, expanded_expression in expansions:
             expanded_name = expanded_name.lower()
             if alias:
                 target = expanded_expression.replace("{", "").replace("}", "")
                 aliases.append(SourceAlias(expanded_name, target, line))
                 continue
-            else:
-                pass
             condition, *reject_texts = expanded_expression.split("~")
             rules[expanded_name] = CompiledRule(
                 expanded_name,
@@ -373,10 +319,6 @@ def load_source_profile(path: Path) -> CompiledProfile:
                 target = tail[: tail.index("}")]
                 if target in rules:
                     rejects.append(Name((Atom(target),)))
-                else:
-                    pass
-            else:
-                pass
             remaining = remaining[:start]
         rules[key] = CompiledRule(
             rule.rule_id,

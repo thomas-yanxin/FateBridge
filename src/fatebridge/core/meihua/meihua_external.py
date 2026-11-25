@@ -28,8 +28,6 @@ def _profile() -> dict[str, Any]:
         or profile["version"] != "1.0.0"
     ):
         raise ValueError("Unknown selected external manifestation profile")
-    else:
-        pass
     return profile
 
 
@@ -53,8 +51,6 @@ def _reading(
         if category is None:
 
             category = additional_manifestation(kind)
-        else:
-            pass
         raw = relationship_by_role(body["element"], category["element"])
         rule = next(
             (
@@ -139,8 +135,6 @@ def apply_external_omens(
     interpretation["external_omens"] = None
     if observations is None:
         return
-    else:
-        pass
     selected = _reading(
         cast["body_trigram"],
         observations,
@@ -162,8 +156,6 @@ def apply_external_omens(
     interpretation["comprehensive_judgement"] += suffix
     if interpretation.get("traditional_judgement"):
         interpretation["traditional_judgement"] += selected["summary"]
-    else:
-        pass
     interpretation["evidence_scope"][
         "external_omens"
     ] = "caller_reported_selected_manifestation_pairs"

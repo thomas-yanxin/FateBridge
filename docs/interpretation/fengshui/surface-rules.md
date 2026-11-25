@@ -17,7 +17,7 @@
 
 [WOFS的办公室作者指引](https://www.wofs.com/7-quick-tips-career-success/)支持书桌避开已确认直走道、裸露横梁正下方和朝向使用者的家具尖角。版本记录于 [`layout-supplements-v1.json`](../../../src/fatebridge/data/fengshui/layout-supplements-v1.json) 的 F4；这三项是可选观察，未提供时不推断，不把灯带当横梁或屏幕框当实体尖角，不外推到床/灶。其有线电话接线方向、硬性左右高低、物件数量和健康/财富断语未采用。
 
-AFSI《The Principles of Feng Shui》本次重新获取的PDF散列与原记录相同：6ab5135060df281fd6a6e376e0516e660c185dd2af2f146a5f850df64cc3b024。印刷页104/PDF页121反对机械套用左右青龙白虎决定建筑入口，不能据此推出桌面手机必须左、右屏必须低。保留分歧，不将搜索结果中的左右规则合为共识。
+AFSI《The Principles of Feng Shui》依据留存的 PDF 版本。印刷页104/PDF页121反对机械套用左右青龙白虎决定建筑入口，不能据此推出桌面手机必须左、右屏必须低。保留分歧，不将搜索结果中的左右规则合为共识。
 
 ## 合同
 

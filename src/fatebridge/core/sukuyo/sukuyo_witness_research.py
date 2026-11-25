@@ -28,8 +28,6 @@ def validate_bundle(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("所选影像研究事实、来源或接受状态改变，须重新核验")
-    else:
-        pass
 
 
 def research_reference(taisho: dict[str, Any]) -> dict[str, Any]:
@@ -38,8 +36,6 @@ def research_reference(taisho: dict[str, Any]) -> dict[str, Any]:
     validate_bundle(data)
     if any(taisho.get(key) != value for key, value in data["taisho_binding"].items()):
         raise ValueError("所选影像研究参考与本次大正原文不一致，须重新核验")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 
@@ -52,15 +48,11 @@ def native_followup_reference(previous: dict[str, Any]) -> dict[str, Any]:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != NATIVE_FACTS_SHA256:
         raise ValueError("原尺寸后续研究事实或接受状态改变，须重新核验")
-    else:
-        pass
     if (
         previous.get("source_bundle_sha256") != data["previous_research_source_sha256"]
         or previous.get("id") != data["previous_research_id"]
     ):
         raise ValueError("原尺寸后续研究与此前冻结参考不一致，须重新核验")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 
@@ -98,15 +90,11 @@ def native_completion_reference(previous: dict[str, Any]) -> dict[str, Any]:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != COMPLETION_FACTS_SHA256:
         raise ValueError("原尺寸完成记录事实或接受状态改变，须重新核验")
-    else:
-        pass
     if (
         previous.get("source_bundle_sha256") != data["previous_followup_source_sha256"]
         or previous.get("id") != data["previous_followup_id"]
     ):
         raise ValueError("原尺寸完成记录与此前后续参考不一致，须重新核验")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 

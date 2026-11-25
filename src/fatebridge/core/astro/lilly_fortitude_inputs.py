@@ -46,18 +46,12 @@ def collect_fortitude_inputs(subject: Any) -> dict[str, Any]:
     }
     if at is None or runtime.swe is None:
         return result
-    else:
-        pass
     if not math.isfinite(at):
         raise ValueError("Fortitude epoch must be finite")
-    else:
-        pass
     zodiac = getattr(subject, "zodiac_type", None)
     if zodiac not in {"Tropic", "Tropical", "Sidereal"}:
         result["reason"] = "unknown_zodiac_frame"
         return result
-    else:
-        pass
     sidereal = zodiac == "Sidereal"
     selected = configured_ephemeris_path()
     trace = PhysicalEphemerisTrace()
@@ -82,18 +76,12 @@ def collect_fortitude_inputs(subject: Any) -> dict[str, Any]:
             assert_physical_configuration(selected)
             if sampled is None:
                 break
-            else:
-                pass
             state, model = sampled
             expected_model = (expected.get(planet) or {}).get("model")
             if expected_model is not None and model != expected_model:
                 raise EphemerisSourceError("model_changed")
-            else:
-                pass
             if planet in models and models[planet] != model:
                 raise EphemerisSourceError("model_changed")
-            else:
-                pass
             models[planet] = model
             # Same epoch-dependent display offset used by NativeSubject.
             offset_angle = (
@@ -107,8 +95,6 @@ def collect_fortitude_inputs(subject: Any) -> dict[str, Any]:
                 if nominal is not None:
                     if not math.isfinite(nominal):
                         raise EphemerisSourceError("coordinate_values_unavailable")
-                    else:
-                        pass
                     discrepancy = abs(
                         (points[-1] - Fraction(nominal) + 180) % 360 - 180
                     )
@@ -120,21 +106,13 @@ def collect_fortitude_inputs(subject: Any) -> dict[str, Any]:
                     )
                     if discrepancy > coordinate_allowance:
                         raise EphemerisSourceError("coordinate_contract_changed")
-                    else:
-                        pass
                     nominal_check = (
                         "agrees_with_supplied_coordinate_within_arithmetic_allowance"
                     )
-                else:
-                    pass
-            else:
-                pass
         point = getattr(subject, planet.lower(), None)
         speed = getattr(point, "speed", None)
         if speed is not None and not math.isfinite(speed):
             raise EphemerisSourceError("coordinate_motion_unavailable")
-        else:
-            pass
         direction = (
             None
             if speed is None
@@ -163,11 +141,7 @@ def collect_fortitude_inputs(subject: Any) -> dict[str, Any]:
     if north is not None:
         if not math.isfinite(north):
             raise EphemerisSourceError("coordinate_values_unavailable")
-        else:
-            pass
         result["north_node_longitude"] = north % 360
-    else:
-        pass
     positions, profile = apparent_positions(at, sidereal=sidereal)
     assert_physical_configuration(selected)
     if (
@@ -176,8 +150,6 @@ def collect_fortitude_inputs(subject: Any) -> dict[str, Any]:
         and profile.get("earth_ephemeris_model") not in set(models.values())
     ):
         raise EphemerisSourceError("model_changed")
-    else:
-        pass
     result["star_longitudes"] = {
         p: positions[p]["longitude"]
         for p in ("Regulus", "Spica", "Algol")

@@ -97,7 +97,7 @@ uv run --locked --extra dev fatebridge liuyao \
 
 ## 影印校勘、三合及飞伏
 
-底本为中国国家图书馆藏《增删卜易》文明书局 1925 年秦慎安校勘本，394 页，完整 PDF 原始字节冻结在 scan bundle（本地数据：`../tests/fixtures/liuyao_scan_v3/`），SHA-256 为 `caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa`。只声明 collation.json（本地数据：`../tests/fixtures/liuyao_scan_v3/collation.json`） 列明段落的人工目读核对，不把 OCR 或资料保存当作全书校勘。
+底本为中国国家图书馆藏《增删卜易》文明书局 1925 年秦慎安校勘本，394 页，完整 PDF 原始字节冻结在 scan bundle（本地数据：`../tests/fixtures/liuyao_scan_v3/`）。只声明 collation.json（本地数据：`../tests/fixtures/liuyao_scan_v3/collation.json`） 列明段落的人工目读核对，不把 OCR 或资料保存当作全书校勘。
 
 | 影印页 | 核实内容与实现 |
 | --- | --- |
@@ -418,7 +418,7 @@ uv run --locked --extra dev fatebridge liuyao --subject-file docs/examples/liuya
 
 2026-11-14 完整审读 `core/local_techniques/sixyao.py` 的18个函数，无局部具名定义。原清单1组10项展开为18组126项职责：宫序、世应、纳支、六亲、六神、三钱及阴阳变换与输入边界、历法委派、调用编排、来源投影、快照显示分别标明。126是审查分辨率，不是126种算法；600行左右的快照函数主要消费条件层结果，本轮没有把那些显示分支当成新的判断算法。
 
-独立参考实际运行原版 [ichingpy 0.1.11 固定提交](https://github.com/JinyangWang27/ichingpy/tree/4eb8c0f7ba49fcd14d062be04a1bec8ba7554139)。它逐次变换求世应，FateBridge 使用八宫掩码；双方五行六亲、经卦纳支及六神仍需按来源单独核实，不能仅凭实现不同就认定独立权威。先在仓库外独立环境导出全部4⁶种钱数输入，再运行本项目公开装卦函数比较；Python、依赖版本、实际源码字节及完整期望值见[冻结参考及复现方式](../tests/data/liuyao_chart_v1/README.md)。该项目是独立软件对照，不据此授予“最先进权威算法”的地位。
+独立参考实际运行原版 [ichingpy 0.1.11 固定提交](https://github.com/JinyangWang27/ichingpy)。它逐次变换求世应，FateBridge 使用八宫掩码；双方五行六亲、经卦纳支及六神仍需按来源单独核实，不能仅凭实现不同就认定独立权威。先在仓库外独立环境导出全部4⁶种钱数输入，再运行本项目公开装卦函数比较；Python、依赖版本、实际源码字节及完整期望值见[冻结参考及复现方式](../tests/data/liuyao_chart_v1/README.md)。该项目是独立软件对照，不据此授予“最先进权威算法”的地位。
 
 | 所选验收域 | 本轮实际结果 | 信用范围 |
 | --- | --- | --- |

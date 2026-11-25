@@ -46,8 +46,6 @@ def deliver_response(
         if should_project_compact_fields and spec is not None:
             if spec.compact_view is not None:
                 payload = spec.compact_view(payload)
-            else:
-                pass
             fields = compact_fields(spec)
             if (
                 fields is not None
@@ -55,22 +53,14 @@ def deliver_response(
                 and "snapshot_text" in payload
             ):
                 fields = [*fields, "snapshot_text"]
-            else:
-                pass
             strict_fields = False
-        else:
-            pass
         payload = project_fields(payload, fields, strict_fields=strict_fields)
         if should_project_compact_fields and fields:
             payload.pop("projection_warnings", None)
-        else:
-            pass
         if detail in ("compact", "standard"):
             requested = {part for path in fields or () for part in path.split(".")}
             if spec is not None and spec.detail_view is not None:
                 payload = spec.detail_view(payload, detail, requested)
-            else:
-                pass
             metadata = payload.get("run_metadata")
             if detail == "compact" and "run_metadata" not in requested and metadata:
                 assert isinstance(metadata, dict)
@@ -82,12 +72,6 @@ def deliver_response(
                         if name in COMPACT_RUN_METADATA_FIELDS
                     },
                 }
-            else:
-                pass
-        else:
-            pass
-    else:
-        pass
     should_keep_snapshot = include_snapshot_text
     if should_keep_snapshot is None:
         should_keep_snapshot = (
@@ -95,17 +79,11 @@ def deliver_response(
             or (detail == "audit" and spec is not None and spec.optional_snapshot)
             or (detail != "compact" and (spec is None or spec.include_snapshot_text))
         )
-    else:
-        pass
     if not should_keep_snapshot and "snapshot_text" in payload:
         payload = payload.copy()
         payload.pop("snapshot_text")
-    else:
-        pass
     if failed:
         return payload
-    else:
-        pass
     return bound_public_response(
         payload, response_char_limit, compact=compact, selected_fields=fields
     )

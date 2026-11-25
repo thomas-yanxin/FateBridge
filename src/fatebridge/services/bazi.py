@@ -266,8 +266,6 @@ def _resolve_analysis_date(
         and analysis_day is not None
     ):
         return datetime(analysis_year, analysis_month, analysis_day)
-    else:
-        pass
     now = (
         current_local_datetime(timezone_name)
         if timezone_name is not None
@@ -280,8 +278,6 @@ def _resolve_analysis_date(
         value is not None for value in (analysis_year, analysis_month, analysis_day)
     ):
         return datetime(year, month, day)
-    else:
-        pass
     # Clamp the day to the resolved month so a partial date (e.g. only
     # analysis_day=31) combined with the current month never raises a
     # clock-dependent "day is out of range" error.
@@ -358,8 +354,6 @@ def _build_three_origins(
     shen_position = month_order + shen_hour_order
     if shen_position > 12:
         shen_position -= 12
-    else:
-        pass
     shen_branch = MONTH_HOUR_ORDER[shen_position - 1]
     shen_stem = _palace_stem(year_stem, shen_position)
 
@@ -386,8 +380,6 @@ def _find_group_target(
     for group, target in mappings:
         if source_branch in group:
             return target
-        else:
-            pass
     return None
 
 
@@ -399,8 +391,6 @@ def _collect_branch_hits(
     for key, branch in positions.items():
         if branch in target_branches:
             hits.append(f"{PILLAR_LABELS[key]}{branch}")
-        else:
-            pass
     return hits
 
 
@@ -415,14 +405,10 @@ def _collect_stem_or_branch_hits(
         for key, stem in stem_positions.items():
             if stem == target:
                 hits.append(f"{PILLAR_LABELS[key]}{stem}")
-            else:
-                pass
     else:
         for key, branch in branch_positions.items():
             if branch == target:
                 hits.append(f"{PILLAR_LABELS[key]}{branch}")
-            else:
-                pass
     return hits
 
 
@@ -733,8 +719,6 @@ def _build_snapshot_text(
         birth_context_lines.append(
             f"当下节气：{acc_solar_term}，后续节气：{acc_next_term}"
         )
-    else:
-        pass
     sections = [
         (
             "起盘信息",
@@ -820,8 +804,6 @@ def _build_snapshot_text(
         blocks.append(f"[{title}]")
         if body:
             blocks.append(body)
-        else:
-            pass
         blocks.append("")
     return "\n".join(blocks).strip()
 
@@ -913,8 +895,6 @@ def calculate_bazi_birth(
         result["snapshot_export"] = parse_export_content(
             technique="bazi", content=snapshot_text, selected_sections=selected_sections
         )
-    else:
-        pass
     return result
 
 
@@ -930,15 +910,11 @@ def _parse_pillar_str(
     """Only absent overrides default; explicit invalid pillars are rejected."""
     if pillar_str is None:
         return None
-    else:
-        pass
     if not isinstance(pillar_str, str) or pillar_str not in SEXAGENARY_INDEX:
         raise ParameterError(
             "覆盖柱必须为六十甲子中的完整两字干支",
             [{"path": field_name, "code": "invalid_sexagenary_pillar"}],
         )
-    else:
-        pass
     return (pillar_str[0], pillar_str[1])
 
 
@@ -1009,8 +985,6 @@ def _derive_current_pillars(
             else dayun_result["status"]
         )
         context["limitations"] = [dayun_result["message"]]
-    else:
-        pass
     return (
         _parse_pillar_str(dayun_pillar_str),
         _parse_pillar_str(liunian_pillar_str),
@@ -1061,12 +1035,8 @@ def _run_bazi_dimension_analysis(
             }
             if dayun is None:
                 dayun = auto_dayun
-            else:
-                pass
             if liunian is None:
                 liunian = auto_liunian
-            else:
-                pass
             timing_context["dayun_pillar"] = "".join(dayun) if dayun else None
             timing_context["liunian_pillar"] = "".join(liunian) if liunian else None
             if timing_context["overridden"]["dayun_pillar"]:
@@ -1119,8 +1089,6 @@ def _run_bazi_dimension_analysis(
         result = {"analysis_type": analysis_type, f"{topic}_analysis": analysis}
         if not render_snapshot:
             return result
-        else:
-            pass
         snapshot_text = render_structured_snapshot_text(
             {
                 "four_pillars": {

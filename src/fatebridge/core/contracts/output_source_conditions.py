@@ -25,8 +25,6 @@ class RelativeSourceTiming(PartialOutput):
     def exact_integer_fact(cls, value: object) -> object:
         if value is not None and type(value) is not int:
             raise ValueError("原文相对天数必须保留JSON整数类型")
-        else:
-            pass
         return value
 
     @field_validator(
@@ -36,8 +34,6 @@ class RelativeSourceTiming(PartialOutput):
     def exact_boolean_facts(cls, value: object) -> object:
         if value is not None and type(value) is not bool:
             raise ValueError("相对时序不能以数值冒充是否已推算出生瞬间或司令")
-        else:
-            pass
         return value
 
 
@@ -50,8 +46,6 @@ class SourcePageAnchor(PartialOutput):
     def exact_page(cls, value: object) -> object:
         if value is not None and type(value) is not int:
             raise ValueError("原页页码必须保留JSON整数类型")
-        else:
-            pass
         return value
 
 
@@ -107,8 +101,6 @@ class SourceConditionReview(PartialOutput):
     def exact_credit(cls, value: object) -> object:
         if value is not None and type(value) is not int:
             raise ValueError("校读信用必须为整数0，不可借布尔值改变证据类型")
-        else:
-            pass
         return value
 
     @field_validator("strength_annotation_assigned_or_regraded", mode="before")
@@ -116,8 +108,6 @@ class SourceConditionReview(PartialOutput):
     def exact_boolean_fact(cls, value: object) -> object:
         if value is not None and type(value) is not bool:
             raise ValueError("校读不重判等级的事实必须保留JSON布尔类型")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -127,6 +117,4 @@ class SourceConditionReview(PartialOutput):
             validate_known_review(
                 self.model_dump(exclude_unset=True, exclude_none=True)
             )
-        else:
-            pass
         return self

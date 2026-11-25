@@ -108,8 +108,6 @@ def triplicity_rulers(sign: str, chart_sect: str) -> dict[str, str | None]:
     """
     if chart_sect not in {"day", "night"}:
         raise ValueError("Triplicity requires an explicit day or night condition")
-    else:
-        pass
     element = ELEMENT_BY_SIGN[sign]
     return {
         "primary": "Mars" if element == "Water" else _TRIANGLES[element][chart_sect],
@@ -162,8 +160,6 @@ def build_ptolemy_layer(
     }
     if not tropical:
         return result
-    else:
-        pass
     result["orientality_policy"] = orientality_policy()
     if ascendant is not None and "Sun" in longitudes and "Moon" in longitudes:
         fortune = fortune_longitude(ascendant, longitudes["Sun"], longitudes["Moon"])
@@ -174,13 +170,9 @@ def build_ptolemy_layer(
             "degree_in_sign": fortune % 30,
             "source_url": FORTUNE_SOURCE_URL,
         }
-    else:
-        pass
     for planet in EXALTATION_SIGNS:
         if planet not in longitudes:
             continue
-        else:
-            pass
         longitude = normalize_angle(longitudes[planet])
         sign = SIGNS[int(longitude // 30)]
         triangle = triplicity_rulers(sign, chart_sect)

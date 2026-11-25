@@ -25,16 +25,12 @@ def validate_matanga_data(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("摩登伽计时链、见证映射、原字或未定控制改变，须重新核验")
-    else:
-        pass
 
 
 def matanga_time_reference() -> dict[str, Any]:
     loaded = load_source(SOURCE)
     if loaded.sha256 != DATA_SHA256:
         raise ValueError("摩登伽计时资料身份改变，须重新冻结来源")
-    else:
-        pass
     data = loaded.data
     validate_matanga_data(data)
     products = {}
@@ -50,8 +46,6 @@ def matanga_time_reference() -> dict[str, Any]:
     match = re.search(r"於(十九)年凡有(七)閏。(五)年(再)閏", literal)
     if match is None:
         raise ValueError("闰数条件比较没有所选原句支持")
-    else:
-        pass
     numbers = {"十九": 19, "七": 7, "五": 5, "再": 2}
     first = Fraction(numbers[match[2]], numbers[match[1]])
     second = Fraction(numbers[match[4]], numbers[match[3]])
@@ -59,8 +53,6 @@ def matanga_time_reference() -> dict[str, Any]:
     first_count, second_count = first * common, second * common
     if first_count.denominator != 1 or second_count.denominator != 1:
         raise ValueError("所选共同周期没有整数条件计数")
-    else:
-        pass
     return {
         **data,
         "source_bundle_sha256": loaded.sha256,

@@ -59,25 +59,15 @@ def activation_longitude_fraction(activation: Dict[str, Any]) -> Fraction:
     if activation.get("derived_from") is not None:
         if activation["derived_from"] not in {"Sun", "NorthNode"}:
             raise ValueError("人类图对点来源必须为 Sun 或 NorthNode")
-        else:
-            pass
         source = activation["derivation_source_longitude"]
         if not math.isfinite(source):
             raise ValueError("人类图对点来源黄经必须为有限数值")
-        else:
-            pass
         return (Fraction(source) + 180) % 360
-    else:
-        pass
     if "derivation_source_longitude" in activation:
         raise ValueError("人类图对点来源数值必须同时标明 derived_from")
-    else:
-        pass
     longitude = activation["longitude"]
     if not math.isfinite(longitude):
         raise ValueError("人类图黄经必须为有限数值")
-    else:
-        pass
     return Fraction(longitude) % 360
 
 
@@ -123,17 +113,11 @@ def planetary_positions(
     """Use actual Swiss return flags; refuse failure or coarse orbital fallback."""
     if runtime.swe is None:
         raise RuntimeError("人类图需要 Swiss Ephemeris，未启用近似轨道回退")
-    else:
-        pass
     if node_mode not in {"true", "mean"}:
         raise ValueError("node_mode 必须为 true 或 mean")
-    else:
-        pass
     time = ephemeris_time(moment)
     if time.jd_tt is None:
         raise RuntimeError("人类图需要可用的 TT 星历时刻")
-    else:
-        pass
     return {
         "positions": positions_at_tt(
             time.jd_tt,
@@ -159,8 +143,6 @@ def design_epoch(
         raise ValueError(
             "设计根落在 UTC 调整区间，datetime 无法唯一表示；应使用 chart_at 的 TT 与标签状态"
         )
-    else:
-        pass
     return solved["datetime"], solved["solver"]
 
 
@@ -176,8 +158,6 @@ def chart_at(
 ) -> Dict[str, Any]:
     if birth.utcoffset() is None:
         raise ValueError("出生瞬间必须带时区")
-    else:
-        pass
     birth = birth.astimezone(timezone.utc)
     solved = solve_design_epoch(birth, require_swiss_files=require_swiss_files)
     personality = planetary_positions(
@@ -210,8 +190,6 @@ def chart_at_tt(
     """TT instants, including leap-second births, avoid rounding via datetime."""
     if not math.isfinite(birth_jd_tt):
         raise ValueError("出生 TT 必须为有限数值")
-    else:
-        pass
     context = epoch_context_at_tt(birth_jd_tt, method="continuous_TT_interval_sample")
     solved = solve_design_epoch_tt(
         birth_jd_tt, require_swiss_files=require_swiss_files, backend=backend
@@ -270,8 +248,6 @@ def _assemble_chart(
         batch_id = position_batch_id(data["positions"])
         if batch_id is not None:
             batch_refs[side] = batch_id
-        else:
-            pass
         sides[side] = [
             {
                 "body": body,
@@ -291,8 +267,6 @@ def _assemble_chart(
     profile = f"{suns['personality']['line']}/{suns['design']['line']}"
     if profile not in VALID_PROFILES:
         raise RuntimeError("太阳弧与人生角色不一致，拒绝输出无效 Profile")
-    else:
-        pass
     solver: dict[str, Any] = {
         **solved["solver"],
         "numerical_precision": {

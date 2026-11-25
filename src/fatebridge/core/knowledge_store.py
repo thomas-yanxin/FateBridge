@@ -190,32 +190,20 @@ def load_knowledge_bundles() -> dict[str, KnowledgeBundle]:
             raise ValueError("Invalid BaZi knowledge supplement") from error
         if supplement["schema_version"] != 1:
             raise ValueError("Invalid BaZi knowledge supplement")
-        else:
-            pass
         supplement_id = supplement["id"]
         if supplement_id in supplement_ids:
             raise ValueError("Knowledge supplements cannot repeat component IDs")
-        else:
-            pass
         supplement_ids.add(supplement_id)
         categories = supplement["categories"]
         for category, entries in categories.items():
             if not category:
                 raise ValueError("Knowledge supplement needs named categories")
-            else:
-                pass
             if category in base:
                 raise ValueError("Knowledge supplement cannot replace a base category")
-            else:
-                pass
             if not entries:
                 raise ValueError("Knowledge supplement needs nonempty entry mappings")
-            else:
-                pass
             if old_keys.intersection(entries):
                 raise ValueError("Knowledge supplement cannot shadow existing keys")
-            else:
-                pass
             base[category] = entries
             old_keys.update(entries)
         supplements.append(
@@ -254,16 +242,12 @@ def _domain_index(domain: str) -> dict[str, Any]:
                 ].items()
             ],
         }
-    else:
-        pass
     domain_index = load_knowledge_index().get("domains")
     assert isinstance(domain_index, list)
     for domain_record in domain_index:
         assert isinstance(domain_record, dict)
         if domain_record.get("domain") == domain:
             return deepcopy(domain_record)
-        else:
-            pass
     return {}
 
 
@@ -298,8 +282,6 @@ def _knowledge_provenance(
             "reference_only": True,
             "personal_applicability_assessed": False,
         }
-    else:
-        pass
     index = load_knowledge_index()
     provenance: KnowledgeProvenance = {
         "source_domain": "xingque_hover_docs",
@@ -327,8 +309,6 @@ def _knowledge_provenance(
     if supplements:
         provenance["supplements"] = deepcopy(supplements)
         provenance["coverage_scope"] = "original_index_plus_declared_supplements"
-    else:
-        pass
     return provenance
 
 
@@ -336,17 +316,11 @@ def _normalize_house_key(key: str) -> str:
     text = (key or "").strip()
     if not text:
         return ""
-    else:
-        pass
     match = re.search(r"(\d+)", text)
     if match:
         number = int(match.group(1))
         if 1 <= number <= 12:
             return f"House{number}"
-        else:
-            pass
-    else:
-        pass
     normalized = (
         text.replace("第", "").replace("宫", "").replace("房", "").strip().lower()
     )
@@ -361,12 +335,8 @@ def _normalize_astro_key(category: str, key: str) -> str:
     text = (key or "").strip()
     if category == "house":
         return _normalize_house_key(text)
-    else:
-        pass
     if category == "aspect":
         return text
-    else:
-        pass
     reverse_labels = {label: name for name, label in ASTRO_LABELS.items()}
     return reverse_labels.get(text, text)
 
@@ -375,20 +345,12 @@ def _normalize_qimen_key(category: str, key: str) -> str:
     text = (key or "").strip()
     if category == "stem":
         return text[:1]
-    else:
-        pass
     if category == "door":
         return text if text.endswith("门") else f"{text}门"
-    else:
-        pass
     if category == "star":
         return QIMEN_STAR_ALIASES.get(text, text)
-    else:
-        pass
     if category == "god":
         return QIMEN_GOD_ALIASES.get(text, text)
-    else:
-        pass
     return text
 
 
@@ -403,13 +365,9 @@ def _tips_to_rendered_text(title: str, tips: list[str]) -> str:
         tip_text = tip.strip()
         if not tip_text:
             continue
-        else:
-            pass
         if tip_text == "==":
             lines.append("")
             continue
-        else:
-            pass
         lines.append(f"- {tip_text}")
     return "\n".join(lines).strip()
 
@@ -428,8 +386,6 @@ def _build_liureng_house_entry(
             code="knowledge.liureng.unknown_jiang",
             details={"jiang_name": jiang_name},
         )
-    else:
-        pass
     tian = _normalize_liureng_branch(tian_branch)
     di = _normalize_liureng_branch(di_branch)
     if not tian or not di:
@@ -438,8 +394,6 @@ def _build_liureng_house_entry(
             code="knowledge.liureng.invalid_branch",
             details={"tian_branch": tian_branch, "di_branch": di_branch},
         )
-    else:
-        pass
     shen_entries = bundle.get("shen_entries", {})
     tian_entry = shen_entries.get(tian, {"title": f"{tian}神", "tips": []})
     di_entry = shen_entries.get(di, {"title": f"{di}神", "tips": []})
@@ -494,8 +448,6 @@ def build_knowledge_registry(domain: str | None = None) -> dict[str, Any]:
                 code="knowledge.unknown_domain",
                 details={"domain": name},
             )
-        else:
-            pass
         if name != "liureng":
             categories = [
                 {
@@ -544,8 +496,6 @@ def build_knowledge_registry(domain: str | None = None) -> dict[str, Any]:
             "provenance": _knowledge_provenance(domain=domain),
             "domains": result_domains,
         }
-    else:
-        pass
     return {
         "source": "xingque_hover_docs",
         "bundle_version": index.get("bundle_version"),
@@ -571,8 +521,6 @@ def _autoresolve_bare_category(
             code=f"knowledge.{domain}.category_required",
             details={"domain": domain},
         )
-    else:
-        pass
     candidate_categories: list[str] = []
     for category, entries in categories.items():
         if domain == "astro":
@@ -583,8 +531,6 @@ def _autoresolve_bare_category(
             normalized_key = lookup_key
         if normalized_key in entries:
             candidate_categories.append(category)
-        else:
-            pass
     if len(candidate_categories) == 1:
         return candidate_categories[0]
     elif not candidate_categories:
@@ -620,22 +566,16 @@ def read_knowledge_entry(
             code="knowledge.unknown_domain",
             details={"domain": domain},
         )
-    else:
-        pass
     if not category and key:
         category = _autoresolve_bare_category(
             domain, bundles[domain].get("categories", {}), key
         )
-    else:
-        pass
     if domain in RULE_REFERENCE_DOMAINS:
         bundle = bundles[domain]
         categories = bundle.get("categories", {})
         is_aspect = domain == "astro" and category == "aspect"
         if is_aspect and payload.get("aspect_degree") is not None:
             key = str(payload["aspect_degree"])
-        else:
-            pass
         normalizer = _normalize_astro_key if domain == "astro" else _normalize_qimen_key
         normalized_key = normalizer(category, key)
         entry = categories.get(category, {}).get(normalized_key)
@@ -649,8 +589,6 @@ def read_knowledge_entry(
                     "normalized_key": normalized_key,
                 },
             )
-        else:
-            pass
         query: dict[str, str | None] = {"key": normalized_key}
         title = entry["title"]
         tips = list(entry["tips"])
@@ -663,10 +601,6 @@ def read_knowledge_entry(
                 second = ASTRO_LABELS.get(object_b, object_b)
                 title = f"{first} - {second}：{title}"
                 tips.insert(0, f"对象：{first} 与 {second}")
-            else:
-                pass
-        else:
-            pass
         return {
             "domain": domain,
             "category": category,
@@ -682,8 +616,6 @@ def read_knowledge_entry(
             ),
             "citation": entry["citation"],
         }
-    else:
-        pass
 
     if domain == "liureng":
         bundle = bundles["liureng"]
@@ -696,8 +628,6 @@ def read_knowledge_entry(
                     code="knowledge.liureng.unknown_key",
                     details={"category": category, "key": key},
                 )
-            else:
-                pass
             tips = list(entry.get("tips", []))
             return {
                 "domain": domain,
@@ -717,8 +647,6 @@ def read_knowledge_entry(
                 ),
                 "citation": f"Xingque hover knowledge · {domain}/{category}/{normalized_key}",
             }
-        else:
-            pass
         if category == "house":
             return _build_liureng_house_entry(
                 bundle,
@@ -726,15 +654,11 @@ def read_knowledge_entry(
                 tian_branch=f"{payload.get('tian_branch') or ''}".strip(),
                 di_branch=f"{payload.get('di_branch') or ''}".strip(),
             )
-        else:
-            pass
         raise ToolValidationError(
             f"Unknown 六壬 knowledge category: {category}",
             code="knowledge.liureng.unknown_category",
             details={"category": category},
         )
-    else:
-        pass
 
     if domain == "bazi":
         bundle = bundles["bazi"]
@@ -747,8 +671,6 @@ def read_knowledge_entry(
                 code="knowledge.bazi.unknown_key",
                 details={"category": category, "key": key},
             )
-        else:
-            pass
         tips = list(entry.get("tips", []))
         provenance = _knowledge_provenance(domain=domain, category=category, key=key)
         curation = entry.get("curation")
@@ -785,8 +707,6 @@ def read_knowledge_entry(
                 else f"FateBridge旧资料待逐条核对 · {domain}/{category}/{key}；未据此认证指定原典或现实效力。"
             ),
         }
-    else:
-        pass
 
     raise ToolValidationError(
         f"Unknown knowledge domain: {domain}",

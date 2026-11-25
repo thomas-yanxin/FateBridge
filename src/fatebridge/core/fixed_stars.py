@@ -36,8 +36,6 @@ def catalogue() -> tuple[dict[str, Any], bytes]:
         raise ValueError(
             "Western fixed-star catalogue does not match its source receipt"
         )
-    else:
-        pass
     return source, catalogue_bytes
 
 
@@ -51,8 +49,6 @@ def apparent_positions(
     """Native geocentric apparent ecliptic coordinates at TT, in one frame."""
     if not math.isfinite(julian_day_tt):
         raise ValueError("Fixed-star TT Julian day must be finite")
-    else:
-        pass
     source, catalogue_bytes = catalogue()
     profile: dict[str, Any] = {
         "model_id": MODEL_ID,
@@ -82,8 +78,6 @@ def apparent_positions(
             "恒星层未计算：缺少原生星历引擎；空列表不表示没有恒星合相。"
         )
         return {}, profile
-    else:
-        pass
     swe = runtime.swe
     profile["swisseph_version"] = swe.version
     positions: dict[str, dict[str, Any]] = {}
@@ -91,8 +85,6 @@ def apparent_positions(
         with fixed_star_catalogue(swe, catalogue_bytes):
             if sidereal:
                 swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
-            else:
-                pass
             flag = swe.FLG_SWIEPH | (swe.FLG_SIDEREAL if sidereal else 0)
             # fixstar2 can echo SWIEPH even when its observer Earth used
             # Moshier. Probe the same selected path explicitly, retaining
@@ -102,26 +94,18 @@ def apparent_positions(
             )
             if earth_flags < 0:
                 raise ValueError("Invalid Earth state for apparent star positions")
-            else:
-                pass
             for row in source["stars"]:
                 coordinates, returned_name, flags = runtime.ephemeris_call(
                     "fixstar2", row["catalogue_key"], julian_day_tt, flag
                 )
                 if flags < 0 or not all(math.isfinite(v) for v in coordinates):
                     raise ValueError("Nonfinite or invalid native fixed-star position")
-                else:
-                    pass
                 if sidereal and not flags & swe.FLG_SIDEREAL:
                     raise ValueError(
                         "Native fixed-star position did not retain Lahiri frame"
                     )
-                else:
-                    pass
                 if returned_name.split(",")[0] != row["catalogue_key"]:
                     raise ValueError("Native fixed-star catalogue identity mismatch")
-                else:
-                    pass
                 positions[row["name"]] = {
                     "longitude": normalize_angle(float(coordinates[0])),
                     "latitude": float(coordinates[1]),
@@ -161,8 +145,6 @@ def conjunction_hits(
     """Classify before rounding; the next float outside a limit is outside."""
     if not math.isfinite(orb) or not 0 <= orb <= 180:
         raise ValueError("Fixed-star orb must be finite and between 0 and 180 degrees")
-    else:
-        pass
     # Reduce the supplied doubles exactly before testing the limit. Near the
     # 0/360 wrap, two float subtractions can round an outside value onto 1°.
     for value in points.values():
@@ -178,8 +160,6 @@ def conjunction_hits(
             raise ValueError(
                 "Traditional star labels disagree with the named source attribution"
             )
-        else:
-            pass
         longitude = normalize_angle(star["longitude"])
         star_angle = Fraction(star["longitude"]) % 360
         for point, point_angle in point_angles.items():
@@ -202,8 +182,6 @@ def conjunction_hits(
                         "catalogue_identifier": star["identifier"],
                     }
                 )
-            else:
-                pass
     hits.sort(key=lambda row: (row["orb"], row["star"], row["point"]))
     return hits
 
@@ -219,14 +197,10 @@ def build_layer(
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if not math.isfinite(julian_day_ut1):
         raise ValueError("Fixed-star UT1 Julian day must be finite")
-    else:
-        pass
     # Validate arguments even when the physical layer will be unavailable.
     conjunction_hits(points, {}, labels, orb=orb)
     if julian_day_tt is None and runtime.swe is not None:
         julian_day_tt = tt_from_ut1(julian_day_ut1)
-    else:
-        pass
     if julian_day_tt is None:
         profile = {
             "model_id": MODEL_ID,
@@ -236,8 +210,6 @@ def build_layer(
             "note_zh": "恒星层未计算：缺少TT时间基准；空列表不表示没有恒星合相。",
         }
         return [], profile
-    else:
-        pass
     positions, profile = apparent_positions(julian_day_tt, sidereal=sidereal)
     profile["orb_limit"] = orb
     return conjunction_hits(points, positions, labels, orb=orb), profile

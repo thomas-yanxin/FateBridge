@@ -79,12 +79,8 @@ def classify_triple_members(group: str, branches: Iterable[str]) -> TripleMember
     present = set(group).intersection(branches)
     if len(present) == 3:
         return "complete"
-    else:
-        pass
     if len(present) == 2:
         return "peak_pair" if TRIPLE_COMBINATION_PEAK[group] in present else "arch_pair"
-    else:
-        pass
     return "insufficient"
 
 
@@ -102,8 +98,6 @@ def check_harmony_patterns(pillars: Pillars) -> HarmonyPatterns:
                 "formation_status": "not_adjudicated",
             }
             (full if membership == "complete" else halves).append(fact)
-        else:
-            pass
     return {
         "method_id": "bazi_branch_harmony_facts_v1",
         "rulesets": [SOURCE.copy()],
@@ -129,8 +123,6 @@ def check_clash_patterns(pillars: Pillars) -> ClashPatterns:
         present = [branch for branch in group if branch in branches]
         if len(present) < 2:
             continue
-        else:
-            pass
         full = len(group) == len(present) == 3
         punishments.append(
             {
@@ -166,8 +158,6 @@ def check_clash_patterns(pillars: Pillars) -> ClashPatterns:
                     "effect_status": "not_adjudicated",
                 }
             )
-        else:
-            pass
     return {
         "method_id": "bazi_branch_clash_facts_v1",
         "rulesets": [SOURCE.copy()],

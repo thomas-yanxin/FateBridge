@@ -33,8 +33,6 @@ class JinkouNatalAbsolute(PartialOutput):
     def declared_natal_branch_controls_knownness(self) -> "JinkouNatalAbsolute":
         if "right_branch" not in self.model_fields_set:
             return self
-        else:
-            pass
         provided = self.right_branch is not None
         allowed_sources = (
             {"explicit_natal_branch", "explicit_birth_year_ganzhi"}
@@ -46,8 +44,6 @@ class JinkouNatalAbsolute(PartialOutput):
             and self.input_source not in allowed_sources
         ):
             raise ValueError("本命年支的明确来源与已知状态不一致")
-        else:
-            pass
         source = self.input_source or (
             "explicit_natal_branch" if provided else "not_provided"
         )
@@ -57,18 +53,12 @@ class JinkouNatalAbsolute(PartialOutput):
         }
         if not provided:
             known.update(matched=None, element=None)
-        else:
-            pass
         if self.left_branch is not None:
 
             known.update(
                 natal_absolute(self.left_branch, self.right_branch, input_source=source)
             )
-        else:
-            pass
         actual = self.model_dump(exclude_unset=True)
         if any(actual[k] != value for k, value in known.items() if k in actual):
             raise ValueError("将命大绝与本命支、京本配对或未知状态不一致")
-        else:
-            pass
         return self

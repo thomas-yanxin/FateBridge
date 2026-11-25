@@ -34,21 +34,15 @@ def later_reading_reference(
         if key != "source_bundle_sha256"
     ):
         raise ValueError("善通寺后续校读与既有来源身份不一致，须重新核验")
-    else:
-        pass
     if set(data["acceptance_flags"]) != ACCEPTANCE_FLAGS or any(
         value is not False for value in data["acceptance_flags"].values()
     ):
         raise ValueError("所选工作校读不能自动提升原典或历法验收状态")
-    else:
-        pass
     if any(
         row["accepted_literal"] is not None
         for row in data["unresolved_calendar_readings"]
     ):
         raise ValueError("后续未决字不能未经复核提升为统一定字")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 

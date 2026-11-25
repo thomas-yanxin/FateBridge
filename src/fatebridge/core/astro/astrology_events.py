@@ -65,16 +65,12 @@ def _require_swe() -> None:
         raise EphemerisUnavailableError(
             "swisseph (pyswisseph) is required for ingress / return solving"
         )
-    else:
-        pass
 
 
 def _julian_day(moment: datetime | UTCCalendar) -> float:
     times = ephemeris_time(moment)
     if times.jd_tt is None:
         raise EphemerisUnavailableError("Swiss Ephemeris is required for TT events")
-    else:
-        pass
     return times.jd_tt
 
 
@@ -142,8 +138,6 @@ def build_ephemeris_source_identity(
         summary = physical_ephemeris_summary(planetary_models)
         if summary == "none":
             summary = next(iter(planetary_models.values()))
-        else:
-            pass
     else:
         summary = "synthetic_subject"
 
@@ -153,8 +147,6 @@ def build_ephemeris_source_identity(
     for filename, start, end, edition in file_contexts:
         if not filename:
             continue
-        else:
-            pass
         basename = Path(filename).name
         file_key = (basename, start, end, edition)
         if file_key not in seen_files:
@@ -167,12 +159,8 @@ def build_ephemeris_source_identity(
                     "de_number": edition,
                 }
             )
-        else:
-            pass
         if edition > 0:
             de_editions.add(edition)
-        else:
-            pass
 
     reference_points: dict[str, object] = {
         "body_centers": body_centers,
@@ -183,8 +171,6 @@ def build_ephemeris_source_identity(
     }
     if reference_point_kind is not None:
         reference_points["reference_point_kind"] = reference_point_kind
-    else:
-        pass
 
     backend_payload: dict[str, object] = {
         "summary": summary,
@@ -196,14 +182,10 @@ def build_ephemeris_source_identity(
     }
     if event_search_backend is not None:
         backend_payload["event_search_backend"] = event_search_backend
-    else:
-        pass
     if consistent_with_chart_ephemeris is not None:
         backend_payload["consistent_with_chart_ephemeris"] = (
             consistent_with_chart_ephemeris
         )
-    else:
-        pass
 
     return {
         "schema_version": "fatebridge_ephemeris_source_identity_v1",
@@ -263,8 +245,6 @@ class LongitudeCrossing:
     def require_utc_datetime(self) -> datetime:
         if self.utc_datetime is None:
             raise ValueError("Solved event has no Python-representable UTC datetime")
-        else:
-            pass
         return self.utc_datetime
 
 
@@ -288,16 +268,12 @@ def _planet_motion(
 ) -> MotionSample:
     if not math.isfinite(jd):
         raise ValueError("Julian day TT must be finite")
-    else:
-        pass
     with lock_ephemeris_configuration():
         _require_swe()
         flags = swe.FLG_SWIEPH | swe.FLG_SPEED
         if sidereal:
             ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
             flags |= swe.FLG_SIDEREAL
-        else:
-            pass
         try:
             result, returned = ephemeris_call("calc", jd, planet_id, flags)
         except native_ephemeris_errors() as exc:
@@ -307,8 +283,6 @@ def _planet_motion(
                 raise EphemerisUnavailableError(
                     f"Ephemeris data file '{missing_match.group(1)}' unavailable for body {planet_id}"
                 ) from exc
-            else:
-                pass
             safe_message = raw_message.split(" in PATH ")[0]
             raise EphemerisUnavailableError(
                 f"Swiss Ephemeris failed for body {planet_id}: {safe_message}"
@@ -331,8 +305,6 @@ def _planet_motion(
             raise EphemerisUnavailableError(
                 f"Astronomical event ephemeris returned unexpected coordinate flags ({returned}) for body {planet_id}"
             )
-        else:
-            pass
         contexts: list[tuple[str, float, float, int]] = []
         if planet_id != swe.MEAN_NODE and (
             returned & (swe.FLG_SWIEPH | swe.FLG_JPLEPH)
@@ -346,8 +318,6 @@ def _planet_motion(
             for slot in slots:
                 filename, start, end, edition = swe.get_current_file_data(slot)
                 contexts.append((str(filename), float(start), float(end), int(edition)))
-        else:
-            pass
     return float(result[0] % 360.0), float(result[3]), int(returned), tuple(contexts)
 
 
@@ -398,8 +368,6 @@ def _longitude_crossings(
             value = _planet_motion(at, planet_id, sidereal=sidereal)
             if value[2:] != current[2:]:
                 raise EphemerisSourceError("model_changed")
-            else:
-                pass
             return value
 
         knots = [(previous_jd, previous[0])]
@@ -408,8 +376,6 @@ def _longitude_crossings(
         ):
             if previous[2:] != current[2:]:
                 raise EphemerisSourceError("model_changed")
-            else:
-                pass
             if previous[1] == 0.0:
                 turn = previous_jd
             elif current[1] == 0.0:
@@ -420,14 +386,10 @@ def _longitude_crossings(
                     mid = (low + high) / 2
                     if mid in (low, high):
                         break
-                    else:
-                        pass
                     sample = same_source(mid)
                     if sample[1] == 0:
                         low = high = mid
                         break
-                    else:
-                        pass
                     if (sample[1] < 0) == (previous[1] < 0):
                         low = mid
                     else:
@@ -436,8 +398,6 @@ def _longitude_crossings(
             split_jds: set[float] = set()
             if previous_jd < turn < jd:
                 split_jds.add(turn)
-            else:
-                pass
             # Native speed only identifies a candidate cell. A grazing target
             # can be reached at a different, even single, representable TT point.
             a, b = previous_jd, jd
@@ -475,8 +435,6 @@ def _longitude_crossings(
                 split_jds.add(extremum)
             for split_jd in sorted(split_jds):
                 knots.append((split_jd, same_source(split_jd)[0]))
-        else:
-            pass
         knots.append((jd, current[0]))
         cells = list(zip(knots, knots[1:]))
         if reverse:
@@ -489,8 +447,6 @@ def _longitude_crossings(
             ) and abs(right_diff - left_diff) < 90.0:
                 if previous[2:] != current[2:]:
                     raise EphemerisSourceError("model_changed")
-                else:
-                    pass
                 source_id = _body_source_identity(
                     planet_id, current[2], current[3], sidereal=sidereal
                 )
@@ -500,14 +456,10 @@ def _longitude_crossings(
                     high = low
                 elif right_diff == 0:
                     low = high
-                else:
-                    pass
                 for _ in range(64):
                     mid = (low + high) / 2.0
                     if mid in (low, high):
                         break
-                    else:
-                        pass
                     mid_negative = (
                         _wrapped_diff(
                             same_source(mid)[0],
@@ -643,8 +595,6 @@ def resolve_cardinal_ingress(year: int, term: str) -> LongitudeCrossing:
         raise EphemerisUnavailableError(
             f"could not resolve {term} ingress for year {year}"
         )
-    else:
-        pass
     return crossing
 
 
@@ -675,12 +625,8 @@ def resolve_planet_returns(
     _require_swe()
     if not math.isfinite(period_days) or period_days <= 0.0:
         raise ValueError("period_days must be finite and positive")
-    else:
-        pass
     if past < 0 or future < 0:
         raise ValueError("past and future return counts must be non-negative")
-    else:
-        pass
     reference_jd = _julian_day(reference_utc)
     reference = Fraction(reference_jd)
     expected_source = (

@@ -77,8 +77,6 @@ def parse_timezone_name(timezone_name: str, *, issue_path: str | None = None) ->
     except _InvalidTimezoneError:
         if issue_path is None:
             raise
-        else:
-            pass
         raise ParameterError(
             invalid_timezone_message(timezone_name, field=issue_path),
             [{"path": issue_path, "code": "invalid_timezone"}],
@@ -96,15 +94,11 @@ def timezone_transition_candidates(
     """
     if lower.utcoffset() != timedelta(0) or upper.utcoffset() != timedelta(0):
         raise ValueError("Clock transition bounds require UTC instants")
-    else:
-        pass
     points = timezone_transition_calendar_candidates(
         zone, utc_calendar(lower), utc_calendar(upper)
     )
     if points is None:
         return None
-    else:
-        pass
     instants: list[datetime] = []
     for point in points:
         instant = point.as_datetime()
@@ -119,19 +113,13 @@ def timezone_transition_calendar_candidates(
     """Index the loaded zone on the integer UTC calendar, including auxiliary years."""
     if not isinstance(zone, ZoneInfo):
         return None
-    else:
-        pass
     zone_name = zone.key
     if zone_name is None or zone_name not in pytz._all_timezones_unchecked:
         return None
-    else:
-        pass
     parsed = _parse_timezone_name_cached(zone_name)
     index = parsed.transitions
     if parsed.zone is not zone or index is None:
         return None
-    else:
-        pass
     return index.between(lower, upper)
 
 
@@ -149,8 +137,6 @@ def format_local_time_or_utc(
             sep=sep, timespec=timespec
         )
         return utc_label.removesuffix("+00:00") + "Z"
-    else:
-        pass
     return moment.isoformat(sep=sep, timespec=timespec)
 
 
@@ -159,14 +145,10 @@ def _require_defined_local_clock(
 ) -> None:
     if not is_unspecified_local_time(moment):
         return
-    else:
-        pass
     if clock_label is None:
         raise PydanticCustomError(
             "unresolved_timezone_offset", UNRESOLVED_OFFSET_MESSAGE
         )
-    else:
-        pass
     raise ParameterError(
         f"unresolved local time：时区规则未定义{clock_label}的当地 UTC 偏移。",
         [{"path": "request", "code": "unresolved_timezone_offset"}],
@@ -177,15 +159,11 @@ def require_defined_gap_offsets(moment: datetime, *, clock_label: str) -> None:
     """Require two defined TZif types before displacing a generated wall label."""
     if not isinstance(moment.tzinfo, ZoneInfo):
         return
-    else:
-        pass
     before, after = moment.replace(fold=0), moment.replace(fold=1)
     old, new = before.utcoffset(), after.utcoffset()
     if old is not None and new is not None and new > old:
         _require_defined_local_clock(before, clock_label)
         _require_defined_local_clock(after, clock_label)
-    else:
-        pass
 
 
 def validate_local_clock(
@@ -205,8 +183,6 @@ def validate_local_clock(
         before, after = first.utcoffset(), second.utcoffset()
         if before is None or after is None:
             raise ValueError("Local clock validation requires an aware datetime")
-        else:
-            pass
         exists = after <= before
         ambiguous = after < before
         if not exists or (ambiguous and not allow_ambiguous):
@@ -214,8 +190,6 @@ def validate_local_clock(
             # Only two defined local types can establish a civil clock change.
             _require_defined_local_clock(first, clock_label)
             _require_defined_local_clock(second, clock_label)
-        else:
-            pass
     else:
         exists = tz.datetime_exists(moment)
         ambiguous = tz.datetime_ambiguous(moment)
@@ -226,8 +200,6 @@ def validate_local_clock(
             f"nonexistent local time：{label}处于时区偏移变动造成的跳时区间；请提供有效钟时。",
             moment,
         )
-    else:
-        pass
     _require_defined_local_clock(moment, clock_label)
     if ambiguous and not allow_ambiguous:
         raise LocalClockError(
@@ -235,8 +207,6 @@ def validate_local_clock(
             f"ambiguous local time：{label}处于时区偏移变动造成的重复区间；请用明确 UTC 偏移消除歧义。",
             moment,
         )
-    else:
-        pass
 
 
 def timezone_rules_metadata(timezone_name: str) -> dict[str, str]:
@@ -252,8 +222,6 @@ def timezone_rules_metadata(timezone_name: str) -> dict[str, str]:
             "tzif_sha256": parsed.tzif_sha256,
             "future_policy": "extrapolate_pinned_rules_subject_to_legal_changes",
         }
-    else:
-        pass
     fixed = {"provider": "datetime.timezone", "database": "explicit_fixed_offset"}
     if parsed.decimal_hour_rounded:
         fixed.update(
@@ -261,8 +229,6 @@ def timezone_rules_metadata(timezone_name: str) -> dict[str, str]:
             offset_resolution_seconds="0.000001",
             rounding_error_bound_seconds="0.0000005",
         )
-    else:
-        pass
     return fixed
 
 
@@ -272,12 +238,8 @@ def _parse_timezone_name_cached(value: str) -> _ParsedTimezone:
         # GMT is a known zero offset, with its own declared abbreviation.
         # Retain that label without depending on a named-zone resource.
         return _ParsedTimezone(timezone(timedelta(0), "GMT"))
-    else:
-        pass
     if value.upper() in {"UTC", "Z"}:
         return _ParsedTimezone(timezone.utc)
-    else:
-        pass
     match = _SECOND_OFFSET.fullmatch(value) or _OFFSET.fullmatch(value)
     if match:
         parts = match.groups()
@@ -291,8 +253,6 @@ def _parse_timezone_name_cached(value: str) -> _ParsedTimezone:
             or (hours == 15 and (minutes or last_seconds))
         ):
             raise _InvalidTimezoneError(invalid_timezone_message(value))
-        else:
-            pass
         seconds = (hours * 3600 + minutes * 60 + last_seconds) * (
             -1 if sign == "-" else 1
         )
@@ -302,8 +262,6 @@ def _parse_timezone_name_cached(value: str) -> _ParsedTimezone:
             else timezone(timedelta(seconds=seconds))
         )
         return _ParsedTimezone(fixed_zone)
-    else:
-        pass
     if _HOURS.fullmatch(value):
         # Preserve Unicode-digit and arbitrary decimal input scope. Compute
         # exactly before the final, explicitly reported microsecond step.
@@ -316,8 +274,6 @@ def _parse_timezone_name_cached(value: str) -> _ParsedTimezone:
         offset_hours = Decimal(normalized)
         if offset_hours.copy_abs() > Decimal(15):
             raise _InvalidTimezoneError(invalid_timezone_message(value))
-        else:
-            pass
         with localcontext() as context:
             # The ten-digit multiplier remains exact for long inputs. Do not
             # inherit a caller's decimal precision or exponent limits.
@@ -330,13 +286,9 @@ def _parse_timezone_name_cached(value: str) -> _ParsedTimezone:
             timezone(timedelta(microseconds=int(rounded))),
             decimal_hour_rounded=microseconds != rounded,
         )
-    else:
-        pass
     # Never let dateutil normalize malformed offsets (e.g. UTC+08:90).
     if value.upper().startswith(("UTC", "GMT", "+", "-")):
         raise _InvalidTimezoneError(invalid_timezone_message(value))
-    else:
-        pass
     # pytz's public lists filter out unreadable files lazily. That would label
     # a missing installed rule file as bad user input on the first cold lookup.
     # Its generated declaration list distinguishes unknown names from damaged
@@ -344,8 +296,6 @@ def _parse_timezone_name_cached(value: str) -> _ParsedTimezone:
     # pytz distributes the IANA Factory entry outside its declaration list.
     if value != "Factory" and value not in pytz._all_timezones_unchecked:
         raise _InvalidTimezoneError(invalid_timezone_message(value))
-    else:
-        pass
     # Read the locked dependency's IANA TZif with the standard-library reader.
     # dateutil.tzfile truncates its transition table to the 32-bit interval:
     # pre-1901 dates can retain LMT and post-2037 dates lose future DST rules.
@@ -362,8 +312,6 @@ def _parse_timezone_name_cached(value: str) -> _ParsedTimezone:
         raise PydanticCustomError(
             "unresolved_timezone_offset", UNRESOLVED_OFFSET_MESSAGE
         )
-    else:
-        pass
     return _ParsedTimezone(
         zone,
         hashlib.sha256(data).hexdigest(),

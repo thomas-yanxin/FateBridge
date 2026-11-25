@@ -36,13 +36,9 @@ def main() -> None:
     line = sys.stdin.buffer.readline(execution._MAX_MESSAGE + 1)
     if len(line) > execution._MAX_MESSAGE or not line.endswith(b"\n"):
         raise execution.NativeExecutionError("Invalid private calculation request")
-    else:
-        pass
     request = json.loads(line)
     if request["entry"] not in execution._ENTRIES:
         raise execution.NativeExecutionError("Unsupported private calculation entry")
-    else:
-        pass
     acknowledgements: Queue[bytes] = Queue(maxsize=1)
 
     def watch_parent() -> None:
@@ -53,12 +49,8 @@ def main() -> None:
                 # request pipe after receiving the final result. Never carry
                 # on a long grid after the sole result recipient disappears.
                 os._exit(0)
-            else:
-                pass
             if len(acknowledgement) > execution._MAX_MESSAGE:
                 os._exit(1)
-            else:
-                pass
             acknowledgements.put(acknowledgement)
 
     owner = Thread(target=watch_parent, name="fatebridge-native-owner", daemon=True)
@@ -80,8 +72,6 @@ def main() -> None:
             auxiliary = execution.AuxiliaryInputs(request["auxiliary_path"])
             if auxiliary.initial != request["auxiliary_fingerprints"]:
                 raise EphemerisSourceError("auxiliary_changed_during")
-            else:
-                pass
             execution._AUXILIARY_EVIDENCE = {
                 **auxiliary.evidence(),
                 **execution.context_for_entry(request["entry"]),
@@ -107,12 +97,8 @@ def main() -> None:
                         raise execution.NativeExecutionError(
                             "Invalid sample acknowledgement"
                         )
-                    else:
-                        pass
 
                 options["_sample_observer"] = observe
-            else:
-                pass
             module, name = request["entry"].rsplit(".", 1)
             function = getattr(importlib.import_module(module), name)
             send({"kind": "ready"})
@@ -133,8 +119,6 @@ def main() -> None:
             }
             if policy is not None:
                 response["physical_ephemeris_policy"] = policy.receipt()
-            else:
-                pass
         except EphemerisSourceError as error:
             response = {
                 "kind": "result",
@@ -167,5 +151,3 @@ if __name__ == "__main__":
     # note (native IPC): Isolated execution must resolve the package beside this entry.
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
     main()
-else:
-    pass

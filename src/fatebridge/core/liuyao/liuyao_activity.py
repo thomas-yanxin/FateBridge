@@ -18,8 +18,6 @@ def activity_candidate(row: dict[str, Any], condition: dict[str, Any]) -> bool:
 def activity_condition(row: dict[str, Any], condition: dict[str, Any]) -> bool | None:
     if row["change"]:
         return True
-    else:
-        pass
     return cast(
         bool | None,
         condition.get("activity_condition_match", activity_candidate(row, condition)),

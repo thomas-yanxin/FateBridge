@@ -25,8 +25,6 @@ def _profile() -> dict[str, Any]:
         or value["version"] != "1.0.0"
     ):
         raise ValueError("Unknown selected obstruction-day profile")
-    else:
-        pass
     return value
 
 
@@ -42,23 +40,15 @@ def build_obstruction_timing(
     """Use each candidate's raw relations; retain countercontrol separately."""
     if [r["role"] for r in stages] != list(ROLES):
         raise ValueError("Obstruction timing requires four actual stage roles")
-    else:
-        pass
     if matter_scenario not in {None, "favorable_matter", "unfavorable_matter"}:
         raise ValueError("Unknown declared source matter scenario")
-    else:
-        pass
     profile = _profile()
     first = stages[0]
     if profile["body_elements"].get(first["body"]) != first["body_element"]:
         raise ValueError("Original body trigram and element disagree")
-    else:
-        pass
     qualifications = control["qualifications"]
     if [r["role"] for r in qualifications] != list(ROLES):
         raise ValueError("Countercontrol roles must remain bound to this candidate")
-    else:
-        pass
     for index, row in enumerate(stages):
         if (
             row["body"],
@@ -78,16 +68,12 @@ def build_obstruction_timing(
             raise ValueError(
                 "Timing must use this candidate's actual body and relations"
             )
-        else:
-            pass
         qualification = qualifications[index]
         if (
             qualification["original_relation_to_body"],
             qualification["target_fact_path"],
         ) != (row["relation"], row["fact_path"]):
             raise ValueError("Timing and countercontrol facts must remain bound")
-        else:
-            pass
     generation = [r["role"] for r in stages if r["relation"] == "用生体"]
     attackers = [r for r in stages if r["relation"] == "用克体"]
     structural = bool(generation and attackers)
@@ -102,8 +88,6 @@ def build_obstruction_timing(
     for index, row in enumerate(stages):
         if row["relation"] != "用克体":
             continue
-        else:
-            pass
         name = row["trigram"]
         days = profile["trigram_numbers"][name]
         basis = (
@@ -154,8 +138,6 @@ def build_obstruction_timing(
             + counts
             + "。这是条件化原文日数；同卦重复角色不累加，多卦日数不合并，既有制约与旺衰仍须另核。未据此确定净延迟、起算日、完成日期或现实成败。"
         )
-    else:
-        pass
     return {
         "ruleset_id": profile["id"],
         "version": profile["version"],

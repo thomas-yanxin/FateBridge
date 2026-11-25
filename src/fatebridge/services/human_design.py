@@ -102,8 +102,6 @@ def calculate_human_design(
                 source_observer=observer,
                 design_source_observer=design_observer,
             )
-        else:
-            pass
         return chart_at(
             clock.utc_anchor,
             mode,
@@ -129,8 +127,6 @@ def calculate_human_design(
             future_leap_seconds_assumed_unchanged=False,
         )
         chart["design_solver"]["civil_elapsed_days"] = None
-    else:
-        pass
     cycles = (
         calculate_cycle_context(
             chart,
@@ -167,8 +163,6 @@ def calculate_human_design(
             node_mode,
             require_swiss_files=require_swiss_files,
         )
-    else:
-        pass
     comparison_reports: dict[str, dict[str, Any]] = {}
     if compare_apparent_models:
         alternative = natal_chart("mean" if node_mode == "true" else "true")
@@ -205,26 +199,16 @@ def calculate_human_design(
                 )
                 * 86400,
             )
-        else:
-            pass
-    else:
-        pass
     if (
         configured_ephemeris_path() != selected_path
         or configured_jpl_file() != selected_jpl
     ):
         raise EphemerisSourceError("physical_configuration_changed")
-    else:
-        pass
     if birth_sources is not None:
         # Keep original source files pinned through the comparison passes.
         birth_sources.trace.finish()
-    else:
-        pass
     if design_sources is not None:
         design_sources.trace.finish()
-    else:
-        pass
     chart["time_sensitivity"] = sensitivity
     chart.update(comparison_reports)
     return {

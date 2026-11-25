@@ -105,8 +105,6 @@ def _extract_path(payload: dict[str, Any], path: tuple[str, ...]) -> dict[str, A
         current = current[key]
     if not isinstance(current, dict):
         raise TypeError(f"Expected dict payload at {'.'.join(path)}")
-    else:
-        pass
     return current
 
 
@@ -138,20 +136,12 @@ def _build_aspect_summary(
     }
     if "sign_changes" in payload:
         summary["sign_changes"] = payload["sign_changes"]
-    else:
-        pass
     if "exact_hits" in payload:
         summary["exact_hits"] = payload["exact_hits"]
-    else:
-        pass
     if "current_window" in payload:
         summary["current_window"] = payload["current_window"]
-    else:
-        pass
     if len(summary) == 2:
         summary["note"] = "离线独立工具未额外生成单独相位表，请结合星盘信息阅读。"
-    else:
-        pass
     return summary
 
 
@@ -179,8 +169,6 @@ def _build_sections(
                 format_snapshot_json(_build_aspect_summary(label, result, payload)),
             ),
         ]
-    else:
-        pass
 
     if section_kind == "transit":
         return [
@@ -208,8 +196,6 @@ def _build_sections(
                 ),
             ),
         ]
-    else:
-        pass
 
     if section_kind == "pd":
         return [
@@ -250,8 +236,6 @@ def _build_sections(
                 ),
             ),
         ]
-    else:
-        pass
 
     if section_kind == "pdchart":
         return [
@@ -292,8 +276,6 @@ def _build_sections(
                 ),
             ),
         ]
-    else:
-        pass
 
     if section_kind == "zr":
         return [
@@ -309,8 +291,6 @@ def _build_sections(
             ),
             ("基于X点推运", format_snapshot_json(payload)),
         ]
-    else:
-        pass
 
     if section_kind == "firdaria":
         return [
@@ -318,8 +298,6 @@ def _build_sections(
             ("星盘信息", format_snapshot_json(natal_reference)),
             ("法达星限表格", format_snapshot_json(payload)),
         ]
-    else:
-        pass
 
     if section_kind == "decennials":
         display_reference = dict(natal_reference)
@@ -358,8 +336,6 @@ def _build_sections(
             ),
             ("基于X起运", format_snapshot_json(payload, compact=True)),
         ]
-    else:
-        pass
 
     raise ValueError(f"Unsupported section kind: {section_kind}")
 
@@ -379,8 +355,6 @@ def calculate_timing_tool(
         )
         if "error" in result:
             return result
-        else:
-            pass
 
         payload = _extract_path(result, spec["path"])
         response = {
@@ -395,8 +369,6 @@ def calculate_timing_tool(
         }
         if not render_snapshot:
             return response
-        else:
-            pass
         sections = _build_sections(
             section_kind=spec["section_kind"],
             label=spec["label"],

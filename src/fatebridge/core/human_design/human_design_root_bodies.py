@@ -87,8 +87,6 @@ def derive_root_body_assessment(
         or chosen not in expected_times
     ):
         raise ValueError("Missing or invented root endpoint evaluation")
-    else:
-        pass
     decoded = []
     for epoch, tt in zip(evaluations, expected_times):
         expected_role = "activation" if tt == chosen else ROLE
@@ -99,8 +97,6 @@ def derive_root_body_assessment(
             or epoch["source_role"] != expected_role
         ):
             raise ValueError("Root endpoint detached from its native scalar witness")
-        else:
-            pass
         rows = decode_native_positions(
             epoch["native_positions"],
             node_mode,
@@ -111,8 +107,6 @@ def derive_root_body_assessment(
             raise ValueError(
                 "Selected root endpoint differs from original design activations"
             )
-        else:
-            pass
         decoded.append(rows)
     first, last = decoded[0], decoded[-1]
     changes = [
@@ -143,8 +137,6 @@ def derive_root_body_assessment(
                     "actual_activation": {k: actual[k] for k in LEVELS},
                 }
             )
-        else:
-            pass
     return {
         "method_id": METHOD,
         "node_mode": node_mode,

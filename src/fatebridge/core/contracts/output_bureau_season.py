@@ -33,23 +33,15 @@ class BureauSeasonObservation(PartialOutput):
             and self.criteria_differ is not None
         ):
             raise ValueError("门槛未提供时不能虚构相同或不同")
-        else:
-            pass
         if self.positions is not None:
             if len(self.positions) < 3 or len(set(self.positions)) != len(
                 self.positions
             ):
                 raise ValueError("完整三会须保留至少三个不同实体柱位")
-            else:
-                pass
             if self.month_is_member is not None and self.month_is_member != (
                 "month" in self.positions
             ):
                 raise ValueError("月支是否参与须忠于实际柱位")
-            else:
-                pass
-        else:
-            pass
         if (
             self.criteria_differ is not None
             and self.supplied_season_support_flag is not None
@@ -59,10 +51,6 @@ class BureauSeasonObservation(PartialOutput):
                 self.supplied_season_support_flag != self.month_in_target_branch_group
             ):
                 raise ValueError("两种季节条件不得混写成同一个布尔值")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -96,40 +84,26 @@ class BureauSeasonReference(PartialOutput):
             )
             if self.combination_gate_basis != expected:
                 raise ValueError("未知旺衰方法不能冒用已核对的相位门槛")
-            else:
-                pass
-        else:
-            pass
         if self.month_branch is not None:
             if self.month_branch not in BRANCH_ELEMENTS:
                 raise ValueError("月支不合法")
-            else:
-                pass
             if (
                 self.principal_branch_element is not None
                 and self.principal_branch_element
                 != BRANCH_ELEMENTS[self.month_branch][0].value
             ):
                 raise ValueError("月支本气须忠于原月支")
-            else:
-                pass
             if (
                 self.branch_seasonal_group is not None
                 and self.month_branch not in self.branch_seasonal_group
             ):
                 raise ValueError("季支归组须包含实际月支")
-            else:
-                pass
-        else:
-            pass
         if (
             self.branch_seasonal_group is not None
             and self.branch_group_element is not None
             and self.branch_group_element != GROUPS[self.branch_seasonal_group]
         ):
             raise ValueError("土本气不能替换三会季支归组的目标五行")
-        else:
-            pass
         for row in self.combination_observations or []:
             if (
                 self.branch_group_element is not None
@@ -140,10 +114,6 @@ class BureauSeasonReference(PartialOutput):
                     self.branch_group_element == row.target_element
                 ):
                     raise ValueError("实际目标与月支归组不同须保留")
-                else:
-                    pass
-            else:
-                pass
             if (
                 self.calculated_phases is not None
                 and row.target_element is not None
@@ -154,10 +124,6 @@ class BureauSeasonReference(PartialOutput):
                     != row.calculated_target_phase
                 ):
                     raise ValueError("目标季相须引用同次已提供值")
-                else:
-                    pass
-            else:
-                pass
             if (
                 self.combination_gate_basis == "supplied_phase_equals_wang"
                 and row.calculated_target_phase is not None
@@ -167,8 +133,4 @@ class BureauSeasonReference(PartialOutput):
                     row.calculated_target_phase == "旺"
                 ):
                     raise ValueError("现行门槛须忠于同次旺相判定，不能伪写为季支归组")
-                else:
-                    pass
-            else:
-                pass
         return self

@@ -25,20 +25,14 @@ def project_fields(
     """
     if fields is None:
         return result
-    else:
-        pass
     fields = list(fields)
     if not fields:
         return result
-    else:
-        pass
     issues = projection_issues(
         result if validate_against is None else validate_against, fields
     )
     if issues and strict_fields:
         raise ParameterError("输出字段投影无效", [{**issue} for issue in issues])
-    else:
-        pass
     tree = build_selection_tree(fields)
     tree["run_metadata"] = True
     projected: dict[str, JsonValue] = {
@@ -48,8 +42,6 @@ def project_fields(
     }
     if issues:
         projected["projection_warnings"] = [{**issue} for issue in issues]
-    else:
-        pass
     return projected
 
 
@@ -83,18 +75,12 @@ def projection_issues(
                 if not isinstance(value, dict):
                     code = "non_object_projection_path"
                     break
-                else:
-                    pass
                 if part not in value:
                     code = "unknown_projection_path"
                     break
-                else:
-                    pass
                 value = value[part]
         if code:
             issues.append({"path": path, "code": code})
-        else:
-            pass
     return issues
 
 
@@ -107,18 +93,12 @@ def build_selection_tree(fields: Iterable[str]) -> SelectionTree:
             if i == len(parts) - 1:
                 node[part] = True
                 break
-            else:
-                pass
             child = node.get(part)
             if child is True:
                 break
-            else:
-                pass
             if child is None:
                 child = {}
                 node[part] = child
-            else:
-                pass
             node = child
     return root
 
@@ -126,8 +106,6 @@ def build_selection_tree(fields: Iterable[str]) -> SelectionTree:
 def apply_selection(value: JsonValue, node: Literal[True] | SelectionTree) -> JsonValue:
     if node is True or not isinstance(value, dict):
         return value
-    else:
-        pass
     return {
         name: apply_selection(value[name], child)
         for name, child in node.items()

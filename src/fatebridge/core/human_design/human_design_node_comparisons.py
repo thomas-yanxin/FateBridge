@@ -50,8 +50,6 @@ def reconstruct_node_reference(
 ) -> dict[str, Any]:
     if node_mode not in {"true", "mean"} or set(witness) != set(SIDES):
         raise ValueError("Invalid node reference convention or sides")
-    else:
-        pass
     reference = {**selected, "activations": {}}
     for side in SIDES:
         row = witness[side]
@@ -65,15 +63,11 @@ def reconstruct_node_reference(
             or not 0 <= row["longitude"] < 360
         ):
             raise ValueError("Node reference is malformed or detached from selected TT")
-        else:
-            pass
         native = position_flag_model(row["return_flags"])
         if (required_model is not None and native != required_model) or (
             require_swiss_files and native != "swieph"
         ):
             raise ValueError("Node reference flag violates the requested source")
-        else:
-            pass
         provenance = {
             "longitude_speed": row["longitude_speed"],
             "return_flags": row["return_flags"],
@@ -116,8 +110,6 @@ def node_convention_report(
 ) -> dict[str, Any]:
     if node_mode not in {"true", "mean"}:
         raise ValueError("Invalid selected node mode")
-    else:
-        pass
     return {
         "selected": node_mode,
         "alternative": "mean" if node_mode == "true" else "true",

@@ -153,8 +153,10 @@ uv run --locked --extra dev python -m pytest -q tests/meihua/test_meihua_calenda
 
 新增审计入口要求事先保存参考文件的SHA-256，完整比较1900—2100年全部4,824个节气；缺项、重复ID、重复JSON键、非有限TT值及指纹变化均拒绝。退出码0仅表示对所给参考满足固定的1秒TT差值门槛，退出码1保留所有超限项。文件指纹和参考自报来源不能单独认证其独立性。
 
+先将资料清单中该参考文件的校验值设为 `MEIHUA_REFERENCE_SHA256`。
+
 ```bash
-uv run --locked --extra dev python -m scripts.meihua.audit_meihua_solar_seconds --reference tests/fixtures/meihua_solar_seconds_v1/reference-2000a.json --expected-sha256 45dd2ab73b54e5d3a4cdbd6b00501180d0f1eb291a8264b9c473dca914ba0e37 --output audit-solar-seconds.json
+uv run --locked --extra dev python -m scripts.meihua.audit_meihua_solar_seconds --reference tests/fixtures/meihua_solar_seconds_v1/reference-2000a.json --expected-sha256 "$MEIHUA_REFERENCE_SHA256" --output audit-solar-seconds.json
 ```
 
 固定副本的DE440输出与独立IAU 2006/2000A实现比较，4,824项最大相差约0.0631秒，均在原门槛内；原审计中原版 Swiss Moshier、空外部星历目录的对照有494项超限，最大约2.094秒。两份实现共享DE440动力学来源，不能由软件相符推导绝对民用钟时精度。TT、UT1、UTC以及历史／未来换算条件分别保留，原有7处香港天文台日标签分歧仍未消除。

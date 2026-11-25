@@ -84,14 +84,10 @@ def geometric_candidates(branches: Mapping[str, str]) -> list[dict[str, Any]]:
             seats = [p for p in ORDER if branches[p] in group]
             if {branches[p] for p in seats} == set(group):
                 add(kind, BUREAU_ELEMENT[bureau].value, seats)
-            else:
-                pass
     for pair in combinations(ORDER, 2):
         target = BRANCH_COMBINATION_ELEMENT.get(frozenset(branches[p] for p in pair))
         if target is not None:
             add("六合", target.value, pair)
-        else:
-            pass
     for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
         for pair in combinations(ORDER, 2):
             if (
@@ -99,8 +95,6 @@ def geometric_candidates(branches: Mapping[str, str]) -> list[dict[str, Any]]:
                 == "peak_pair"
             ):
                 add("半合", BUREAU_ELEMENT[bureau].value, pair)
-            else:
-                pass
     return specs
 
 
@@ -196,8 +190,6 @@ def build_branch_combination_candidates(
                 decision = "suppressed_before_half_evaluation"
             else:
                 decision = "unclassified_unrecorded"
-        else:
-            pass
         matching_statuses = (
             [events[index].get("status") for index in matching]
             if events is not None

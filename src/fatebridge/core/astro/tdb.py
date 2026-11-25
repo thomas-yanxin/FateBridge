@@ -38,8 +38,6 @@ def _parameters() -> Parameters:
     )
     if hashlib.sha256(raw).hexdigest() != COEFFICIENT_SHA256:
         raise RuntimeError("Geocentric TDB parameters differ from the declared source")
-    else:
-        pass
     data: Parameters = json.loads(raw)
     return data
 
@@ -88,14 +86,10 @@ def geocentric_tdb_state(
     """Geocentric TDB-TT and its TT derivative, without loading any orbits."""
     if not math.isfinite(days_from_j2000):
         raise ValueError("TT relative epoch must be finite")
-    else:
-        pass
     rows = _parameters()["fairhead_terms"]
     if not need_rate:
         t = float(Fraction(days_from_j2000) / 365250)
         return TimeOffset(_fairhead_seconds(t, rows), 0.0)
-    else:
-        pass
     return fairhead_state(days_from_j2000, rows)
 
 

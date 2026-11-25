@@ -104,8 +104,6 @@ _HOUSE_OFFSET = {
 def _sign_zi(sign_idx: int) -> str:
     if sign_idx < 0:
         return ""
-    else:
-        pass
     return _SIGN_ZI[(sign_idx + 12) % 12]
 
 
@@ -166,20 +164,12 @@ class _Resolver:
     def __call__(self, name: str) -> int:
         if name in _HOUSE_OFFSET:
             return _offset_palace_index(self._life, _HOUSE_OFFSET[name])
-        else:
-            pass
         if name == "身":
             return self._self
-        else:
-            pass
         if name in self._gods and self._gods[name] >= 0:
             return self._gods[name]
-        else:
-            pass
         if name in self._planets:
             return self._planets[name]
-        else:
-            pass
         try:
             return _SIGN_ZI.index(name)
         except ValueError:
@@ -191,14 +181,10 @@ def _lost_rulership(signof: _Resolver, subject: str) -> bool:
     sign_idx = signof(subject)
     if sign_idx < 0:
         return False
-    else:
-        pass
     ruler_cn = _RULER_BY_SIGN_IDX[sign_idx]
     ruler_sign = signof(ruler_cn)
     if ruler_sign < 0:
         return False
-    else:
-        pass
     ruler_of_ruler = _RULER_BY_SIGN_IDX[ruler_sign]
     return ruler_of_ruler == _OVERCOMING.get(ruler_cn)
 
@@ -206,27 +192,17 @@ def _lost_rulership(signof: _Resolver, subject: str) -> bool:
 def _indices(value: object, label: str, allowed: set[str]) -> dict[str, int]:
     if value is None:
         return {}
-    else:
-        pass
     if not isinstance(value, dict):
         raise TypeError(f"{label}须为具名宫位索引映射")
-    else:
-        pass
     for key, index in value.items():
         if key not in allowed:
             raise ValueError(
                 f"{label}包含未声明的对象{key}，不能跨行星和神煞角色补位置"
             )
-        else:
-            pass
         if type(index) is not int:
             raise TypeError(f"{label}.{key}须为整数索引，不能以布尔、浮点或空值冒充")
-        else:
-            pass
         if not -1 <= index < 12:
             raise ValueError(f"{label}.{key}须为0至11；未知仅可显式用-1或省略")
-        else:
-            pass
     return dict(value)
 
 
@@ -256,8 +232,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
         life_sign_idx = facts["life_sign_idx"]
         if type(life_sign_idx) is not int or not 0 <= life_sign_idx < 12:
             raise ValueError("显式命宫索引须为0至11的整数")
-        else:
-            pass
     else:
         life_sign_idx = -1
     self_sign_idx = planet_signidx.get("月", -1)
@@ -266,8 +240,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
     for name, value in [("is_day", is_day), ("is_winter", is_winter)]:
         if value is not None and type(value) is not bool:
             raise TypeError(f"{name}须为明确布尔或未提供，不能以数值代替条件")
-        else:
-            pass
 
     signof = _Resolver(planet_signidx, life_sign_idx, self_sign_idx, god_signidx)
 
@@ -301,10 +273,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
                     "disease_lord_palace_index": signof(disease_ruler_cn),
                 },
             )
-        else:
-            pass
-    else:
-        pass
 
     # Moira1.50Final: the winter-night 寒月单行 rule rejects 孤月独明.
     # Select the effective seasonal rule, rather than emitting both verdicts.
@@ -359,10 +327,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
                 },
                 source=MOIRA_MOON_RULES_SOURCE,
             )
-        else:
-            pass
-    else:
-        pass
 
     # 日月拱官（喜）：日月分拱官禄。
     if (
@@ -381,8 +345,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
             rule_id="moira_sun_moon_four_palaces_from_career_v2",
             inputs={"sun_index": sun, "moon_index": moon, "career_index": guan},
         )
-    else:
-        pass
 
     # 金水相涵（喜）：金水同宫，且不以冬令破格。
     if _same(venus, mercury) and is_winter is False:
@@ -399,8 +361,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
                 "is_winter": is_winter,
             },
         )
-    else:
-        pass
 
     # 日月拱贵人（喜）：分别按昼夜取已计算的天贵／玉贵。
     noble = signof("天贵" if is_day else "玉贵") if isinstance(is_day, bool) else -1
@@ -426,8 +386,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
                 "moon_index": moon,
             },
         )
-    else:
-        pass
 
     # 命登岁驾（兼容喜格）：只比较命宫与岁驾的离散宫位，不计算命度。
     if _same(life_sign_idx, signof("岁驾")):
@@ -440,8 +398,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
             rule_id="moira_life_and_suijia_same_palace_v2",
             inputs={"life_palace_index": life_sign_idx, "suijia_index": signof("岁驾")},
         )
-    else:
-        pass
 
     # 日月失所（忌）：日居西北、月居东南。
     if sun >= 0 and moon >= 0:
@@ -462,10 +418,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
                     "moon_branch": moon_zi,
                 },
             )
-        else:
-            pass
-    else:
-        pass
 
     # 官福失垣（忌）：官禄、福德主失垣。
     if _lost_rulership(signof, "官") and _lost_rulership(signof, "福"):
@@ -481,8 +433,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
                 "fortune": _rulership_inputs(signof, "福"),
             },
         )
-    else:
-        pass
 
     # 孛犯太阳（忌）：孛与太阳同宫。
     if _same(dark_moon, sun):
@@ -495,8 +445,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
             rule_id="moira_apogee_sun_same_palace_v2",
             inputs={"sun_index": sun, "apogee_index": dark_moon},
         )
-    else:
-        pass
 
     # 罗犯太阳（忌）：罗与太阳同宫。
     if _same(north_node, sun):
@@ -509,8 +457,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
             rule_id="moira_node_sun_same_palace_v2",
             inputs={"sun_index": sun, "node_index": north_node},
         )
-    else:
-        pass
 
     # 孛罗交战（忌）：罗孛同宫。
     if _same(north_node, dark_moon):
@@ -523,8 +469,6 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
             rule_id="moira_node_apogee_same_palace_v2",
             inputs={"node_index": north_node, "apogee_index": dark_moon},
         )
-    else:
-        pass
 
     patterns.sort(key=lambda pattern: pattern["level"] != "good")
     return patterns
@@ -548,6 +492,4 @@ def build_section_text(patterns: list[dict[str, Any]]) -> str:
     ]
     if other:
         lines.append(f"察看：{fmt(other)}")
-    else:
-        pass
     return "\n".join(lines)

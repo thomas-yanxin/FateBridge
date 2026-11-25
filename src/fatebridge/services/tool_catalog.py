@@ -62,14 +62,10 @@ def _western_ephemeris_execution_wrapper(
             result = run()
         if policy is not None and "error" not in result:
             return {**result, "ephemeris_data_policy": policy.receipt()}
-        else:
-            pass
         return result
     except EphemerisSourceError as error:
         if mode == "auto":
             raise
-        else:
-            pass
         return handle_calculation_error(error, spec.operation_label_zh)
 
 
@@ -79,8 +75,6 @@ def _with_western_data_files_view(
     def build(views: EvidenceViews | None) -> EvidenceViews | None:
         if previous is not None:
             views = previous(views)
-        else:
-            pass
         views = views or {}
         views["data_files"] = {
             "fields": ["ephemeris_data_policy"],
@@ -120,8 +114,6 @@ def _enrich_builtin_spec(spec: ToolSpec) -> ToolSpec:
     )
     if not updated.methods:
         updated = replace(updated, methods=register_methods(updated))
-    else:
-        pass
     return updated
 
 

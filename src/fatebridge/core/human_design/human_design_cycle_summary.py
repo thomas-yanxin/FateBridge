@@ -62,14 +62,10 @@ def compact_cycle_summary(rich: dict[str, Any]) -> dict[str, Any]:
                 # the explicit normal default.
                 if key in event and _same(event[key], value):
                     event.pop(key)
-                else:
-                    pass
             evidence = event.pop("motion_evidence")
             if evidence is None:
                 event["segment_phase_trend"] = None
                 continue
-            else:
-                pass
             default = mapping[event["motion"]]
             trend = evidence["search_segment_phase_trend"]
             if (
@@ -81,12 +77,8 @@ def compact_cycle_summary(rich: dict[str, Any]) -> dict[str, Any]:
                 is not (trend == default)
             ):
                 raise ValueError("Inconsistent cycle motion evidence")
-            else:
-                pass
             if trend != default:
                 event["segment_phase_trend"] = trend
-            else:
-                pass
     result["summary_format"] = FORMAT
     result["contact_defaults"] = deepcopy(CONTACT_DEFAULTS)
     result["motion_evidence_defaults"] = deepcopy(MOTION_DEFAULTS)
@@ -124,21 +116,15 @@ def cycle_contact_facts(summary: dict[str, Any]) -> list[dict[str, Any]]:
     compact = summary.get("summary_format") == FORMAT
     if summary.get("summary_format") not in (None, FORMAT):
         raise ValueError("Unknown cycle summary format")
-    else:
-        pass
     if not compact and any(
         key in summary for key in ("contact_defaults", "motion_evidence_defaults")
     ):
         raise ValueError("Cycle defaults lack their format declaration")
-    else:
-        pass
     if compact and (
         not _same(summary.get("contact_defaults"), CONTACT_DEFAULTS)
         or not _same(summary.get("motion_evidence_defaults"), MOTION_DEFAULTS)
     ):
         raise ValueError("Missing or altered cycle summary defaults")
-    else:
-        pass
     mapping = MOTION_DEFAULTS["segment_phase_trend_from_motion"]
     assert isinstance(mapping, dict)
     result = []
@@ -148,24 +134,16 @@ def cycle_contact_facts(summary: dict[str, Any]) -> list[dict[str, Any]]:
             complete = {**CONTACT_DEFAULTS, **event} if compact else event
             if any(key not in complete for key in CONTACT_KEYS):
                 raise ValueError("Incomplete cycle contact facts")
-            else:
-                pass
             if type(complete["future_leap_seconds_assumed_unchanged"]) is not bool:
                 raise ValueError("Invalid future leap-second status")
-            else:
-                pass
             facts = {key: deepcopy(complete[key]) for key in CONTACT_KEYS}
             if compact:
                 if set(event) - {*CONTACT_KEYS, "segment_phase_trend"}:
                     raise ValueError("Unknown compact contact fields")
-                else:
-                    pass
                 default = mapping[facts["motion"]]
                 trend = event.get("segment_phase_trend", default)
                 if trend is not None and trend not in mapping.values():
                     raise ValueError("Unknown cycle segment trend")
-                else:
-                    pass
                 evidence = (
                     None
                     if trend is None

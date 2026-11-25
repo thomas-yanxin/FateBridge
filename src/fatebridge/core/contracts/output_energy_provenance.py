@@ -25,12 +25,8 @@ class EnergyPart(PartialOutput):
             and self.energy_unrounded is not None
         ):
             raise ValueError("不完整账本不能宣称已知完整分项能量")
-        else:
-            pass
         if self.refs is not None and len(self.refs) != len(set(self.refs)):
             raise ValueError("同一账本条目不能重复归因")
-        else:
-            pass
         return self
 
 
@@ -55,8 +51,6 @@ class EnergyFront(PartialOutput):
             p is not None and p.status in {"partial", "not_supplied"} for p in parts
         ):
             raise ValueError("完整归因不能含未给或不完整分项")
-        else:
-            pass
         values = [p.energy_unrounded if p is not None else None for p in parts]
         attributed = (
             sum(v for v in values if v is not None)
@@ -69,32 +63,20 @@ class EnergyFront(PartialOutput):
             and not close(attributed, self.attributed_energy_unrounded)
         ):
             raise ValueError("归因总量必须等于三个未舍入分项之和")
-        else:
-            pass
         if attributed is None:
             attributed = self.attributed_energy_unrounded
-        else:
-            pass
         if attributed is not None and self.total_energy_unrounded is not None:
             residual = self.total_energy_unrounded - attributed
             if self.residual is not None and not close(residual, self.residual):
                 raise ValueError("归因残差不能掩盖分项与总量差额")
-            else:
-                pass
             if self.status == "complete" and not close(residual, 0.0):
                 raise ValueError("完整能量归因须在原定精度内闭合")
-            else:
-                pass
-        else:
-            pass
         if (
             self.status == "complete"
             and self.residual is not None
             and not close(self.residual, 0.0)
         ):
             raise ValueError("非零残差不能宣称完整归因")
-        else:
-            pass
         return self
 
 
@@ -122,8 +104,6 @@ class SyntheticContribution(PartialOutput):
             and self.energy != round(self.energy_unrounded, 6)
         ):
             raise ValueError("合成贡献展示值须忠于同次未舍入值")
-        else:
-            pass
         return self
 
 
@@ -143,20 +123,14 @@ class EnergyProvenance(PartialOutput):
             front = getattr(self.fronts, role) if self.fronts is not None else None
             if front is None:
                 continue
-            else:
-                pass
             if (
                 self.day_element is not None
                 and front.element is not None
                 and role_elements(self.day_element)[role] != front.element
             ):
                 raise ValueError("五行归因角色须忠于日主五行")
-            else:
-                pass
             if self.status == "complete" and front.status in {"partial", "not_closed"}:
                 raise ValueError("整体完整归因不能隐藏未闭合分量")
-            else:
-                pass
             bind_part(
                 front,
                 "synthetic_branch",
@@ -177,27 +151,17 @@ def bind_part(front: EnergyFront, kind: str, rows: Any) -> None:
     part = getattr(front, kind)
     if part is None or front.element is None or not isinstance(rows, list):
         return
-    else:
-        pass
     expected = ledger_parts(rows, kind)[front.element]
     if expected["status"] != "complete":
         return
-    else:
-        pass
     if part.status is not None and part.status != "complete":
         raise ValueError("归因账本状态须忠于同次完整账本")
-    else:
-        pass
     if part.energy_unrounded is not None and not close(
         part.energy_unrounded, expected["energy_unrounded"]
     ):
         raise ValueError("分项归因必须忠于同次未舍入账本")
-    else:
-        pass
     if part.refs is not None and part.refs != expected["refs"]:
         raise ValueError("分项引用不能漏记、重复或混入其他能量来源")
-    else:
-        pass
 
 
 def bind_assessment(
@@ -212,8 +176,6 @@ def bind_assessment(
     ]
     if methods and any(m != methods[0] for m in methods):
         raise ValueError("能量归因不能混用不同旺衰计算方法")
-    else:
-        pass
     raw = assessment.get("combination_contributions")
     if isinstance(raw, list) and provenance.synthetic_contributions is not None:
         copied = [
@@ -221,17 +183,11 @@ def bind_assessment(
         ]
         if len(raw) != len(copied):
             raise ValueError("合成账本不能漏记同次条目")
-        else:
-            pass
         for original, copy in zip(raw, copied):
             if isinstance(original, dict) and any(
                 k in original and original[k] != v for k, v in copy.items()
             ):
                 raise ValueError("合成账本须忠于同次原始条目")
-            else:
-                pass
-    else:
-        pass
     stem = assessment.get("stem_energy_accounting")
     stem = stem if isinstance(stem, dict) else {}
     totals = assessment.get("effective_elements_unrounded")
@@ -243,16 +199,12 @@ def bind_assessment(
         and day != provenance.day_element
     ):
         raise ValueError("能量归因日主五行不能混用另一回执")
-    else:
-        pass
     for role in ROLES:
         front = (
             getattr(provenance.fronts, role) if provenance.fronts is not None else None
         )
         if front is None:
             continue
-        else:
-            pass
         for kind, rows in zip(
             PARTS, (assessment.get("hidden_stem_ledger"), raw, stem.get("ledger"))
         ):
@@ -265,5 +217,3 @@ def bind_assessment(
             and not close(total, front.total_energy_unrounded)
         ):
             raise ValueError("归因总量必须忠于同次未舍入五行总量")
-        else:
-            pass

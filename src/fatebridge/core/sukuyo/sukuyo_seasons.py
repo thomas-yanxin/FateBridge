@@ -16,13 +16,9 @@ def seasonal_reference(rizang: dict[str, Any]) -> dict[str, Any]:
     data = loaded.data
     if data["source_files"]["T13n0397.xml"]["sha256"] != rizang["source_sha256"]:
         raise ValueError("季节昼夜对照与日藏具名版本不一致，须重新核验")
-    else:
-        pass
     t1299 = load_source(DATA_DIR / "sukuyo_t1299_days.json").data
     if data["source_files"]["T21n1299.xml"]["sha256"] != t1299["source_sha256"]:
         raise ValueError("季节昼夜对照与T1299具名版本不一致，须重新核验")
-    else:
-        pass
     comparative = load_source(DATA_DIR / "sukuyo_comparative_time_units.json").data
     witnesses = [r for r in comparative["witnesses"] if r["id"] == "T25n1509"]
     if (
@@ -31,8 +27,6 @@ def seasonal_reference(rizang: dict[str, Any]) -> dict[str, Any]:
         != witnesses[0]["source_sha256"]
     ):
         raise ValueError("季节昼夜对照与大智度论具名版本不一致，须重新核验")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 

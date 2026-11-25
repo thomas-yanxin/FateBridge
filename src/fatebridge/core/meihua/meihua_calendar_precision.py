@@ -19,12 +19,8 @@ def _profile() -> dict[str, Any]:
     )
     if raw["id"] != "meihua_calendar_precision_v1" or raw["version"] != "1.0.0":
         raise ValueError("Unknown Mei Hua calendar-precision profile")
-    else:
-        pass
     if len(raw["events"]) != 3:
         raise ValueError("Retain all three named HKO new-moon uncertainties")
-    else:
-        pass
     for event in raw["events"]:
         start = date.fromisoformat(event["published_new_moon_date"])
         end = date.fromisoformat(event["published_next_month_start"])
@@ -35,8 +31,6 @@ def _profile() -> dict[str, Any]:
             or event["alternate_calendar_computed"] is not False
         ):
             raise ValueError("Inconsistent published-month review scope")
-        else:
-            pass
     return raw
 
 

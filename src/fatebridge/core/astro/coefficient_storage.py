@@ -19,8 +19,6 @@ class RecordBlock(NamedTuple):
 def pack_records(data: bytes, blocks: Sequence[RecordBlock]) -> bytes:
     if len(data) != sum(count * size for count, size in blocks):
         raise ValueError("Coefficient bytes do not match the record layout")
-    else:
-        pass
     channels = bytearray()
     offset = 0
     for count, size in blocks:
@@ -35,8 +33,6 @@ def unpack_records(packed: bytes, blocks: Sequence[RecordBlock]) -> bytes:
     channels = gzip.decompress(packed)
     if len(channels) != sum(count * size for count, size in blocks):
         raise ValueError("Coefficient bytes do not match the record layout")
-    else:
-        pass
     data = bytearray(len(channels))
     offset = 0
     for count, size in blocks:

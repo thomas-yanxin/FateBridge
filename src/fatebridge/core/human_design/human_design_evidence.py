@@ -554,8 +554,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                 [NODE_SOURCE],
             )
         )
-    else:
-        pass
     interval_statements = []
     if "time_sensitivity" in chart:
         summary = chart["time_sensitivity"]["summary"]
@@ -567,8 +565,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                 [],
             )
         )
-    else:
-        pass
     return (
         (
             [
@@ -768,8 +764,6 @@ def design_time_reading(chart: Dict[str, Any]) -> str:
     lattice = precision["local_solar_lattice"]
     if lattice["observed_decreasing_step_indices"]:
         body_text += "所检查的相邻TT太阳函数存在低位数值反向；这不是物理逆行，不能认证唯一数值根。"
-    else:
-        pass
     family = precision["local_root_family"]
     if family is not None:
         body_text += (
@@ -781,8 +775,6 @@ def design_time_reading(chart: Dict[str, Any]) -> str:
             )
             + "主盘采用已观测正到负括区及零点中的最小残差选根；这些数值候选不是物理误差区间或多个真实时刻。"
         )
-    else:
-        pass
     return (
         f"设计时刻从本次已观测的正到负太阳括区及零点中选择绝对精确残差最小者，同残差取较早TT；所选括区宽度{solver['bracket_width_seconds']:.9f}秒。"
         + status
@@ -796,8 +788,6 @@ def design_time_reading(chart: Dict[str, Any]) -> str:
 def variable_reading(variables: Dict[str, Any]) -> str:
     if variables["status"] != "computed":
         return "四组日地／交点的Tone缺失或对点不一致，本次不生成Variable编码；未确定的箭头不可自行补齐。"
-    else:
-        pass
     return (
         f"本次Variable编码为 {variables['code']}。P为人格、D为设计，每组先日地后交点；L、R对应Tone的1至3与4至6。"
         "这只汇总所选时刻和后端的四箭头，不等于现实认知、学习能力、饮食或健康评估；不同样本的箭头不能拼接。"
@@ -808,8 +798,6 @@ def circuitry_reading(graph: Dict[str, Any]) -> str:
     summary = graph["circuitry"]
     if not summary["defined_channel_count"]:
         return "本次没有完整定义通道，故没有固定通道回路可解读；已激活的单门仍保留，不能据此说缺少能力或人生主题。"
-    else:
-        pass
     parts = [
         f"{','.join(row['channel_ids'])}：{row['meaning']}"
         for row in summary["circuits"]

@@ -60,22 +60,14 @@ def _root(a: float, b: float, function: PlanetaryEventResidual) -> TtRootBracket
     fa, fb = function(a), function(b)
     if fa == 0:
         return a, a
-    else:
-        pass
     if fb == 0:
         return b, b
-    else:
-        pass
     if (fa < 0) == (fb < 0):
         raise ValueError("Event root is not bracketed")
-    else:
-        pass
     for step in range(80):
         mid = (a + b) / 2
         if mid in (a, b):
             return a, b
-        else:
-            pass
         # Safeguarded secant accelerates smooth planetary crossings from ~53 to ~8 evals
         # while bisecting every 3rd step guarantees adjacent-double convergence.
         cand = mid
@@ -87,17 +79,9 @@ def _root(a: float, b: float, function: PlanetaryEventResidual) -> TtRootBracket
                 sec = a - dfa * (b - a) / denom
                 if a < sec < b:
                     cand = sec
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         fm = function(cand)
         if fm == 0:
             return cand, cand
-        else:
-            pass
         if (fm < 0) == (fa < 0):
             a, fa = cand, fm
         else:
@@ -123,26 +107,18 @@ def solve_planetary_events(
         or len(bodies) < 2
     ):
         raise ValueError("Invalid finite planetary-event search window")
-    else:
-        pass
     left, end = start_tt - past_days, start_tt + future_days
     beginning = left
     if left == end or left >= start_tt and past_days > 0:
         raise ValueError("Unrepresentable event window")
-    else:
-        pass
 
     @lru_cache(maxsize=None)
     def sample(planet: str, at: float) -> SampledPlanetMotion:
         value = sampler(planet, at)
         if not all(math.isfinite(value[k]) for k in ("longitude", "speed")):
             raise ValueError("Event sampler must supply finite longitude and speed")
-        else:
-            pass
         if abs(value["speed"]) > 30:
             raise ValueError("Event sampler exceeds declared daily-motion guard")
-        else:
-            pass
         return {**value, "longitude": normalize_angle(value["longitude"])}
 
     events: list[dict[str, Any]] = []
@@ -157,17 +133,11 @@ def solve_planetary_events(
         for previous in reversed(events):
             if previous["kind"] != kind or previous["bodies"] != list(actors):
                 continue
-            else:
-                pass
             if previous.get("ray_degrees") != facts.get("ray_degrees"):
                 continue
-            else:
-                pass
             old = previous["root_bracket_tt"]
             if old[0] <= bracket[1] and bracket[0] <= old[1]:
                 return
-            else:
-                pass
         events.append(
             {
                 "kind": kind,
@@ -194,16 +164,10 @@ def solve_planetary_events(
             vx, vy = rate(x), rate(y)
             if vx == vy == 0:
                 continue
-            else:
-                pass
             if vx * vy < 0 or vy == 0:
                 bracket = _root(x, y, rate)
                 if not roots or roots[-1][1] < bracket[0]:
                     roots.append(bracket)
-                else:
-                    pass
-            else:
-                pass
         return roots
 
     def crossings(
@@ -223,8 +187,6 @@ def solve_planetary_events(
             last = first + _step(value, longitude(y))
             if abs(last - first) >= 90:
                 raise ValueError("Unwrapped event increment exceeds scan guard")
-            else:
-                pass
             if first == last:
                 if first % 360 in rays and rate(x) == rate(y) == 0:
                     unresolved.append(
@@ -234,19 +196,13 @@ def solve_planetary_events(
                             "interval_tt": [x, y],
                         }
                     )
-                else:
-                    pass
                 continue
-            else:
-                pass
             low, high = sorted((first, last))
             for turn in range(int(low // 360) - 1, int(high // 360) + 2):
                 for ray in rays:
                     target = Fraction(turn * 360 + ray)
                     if not (first < target <= last or last <= target < first):
                         continue
-                    else:
-                        pass
 
                     def residual(at: float) -> Fraction:
                         return first + _step(value, longitude(at)) - target
@@ -255,8 +211,6 @@ def solve_planetary_events(
                     topology = "crossing"
                     if any(r[0] <= bracket[1] and bracket[0] <= r[1] for r in turns):
                         topology = "relative_station_contact_unresolved"
-                    else:
-                        pass
                     add(
                         kind,
                         actors,
@@ -271,8 +225,6 @@ def solve_planetary_events(
         right = min(end, left + step_days)
         if right == left:
             raise ValueError("Unrepresentable event scan step")
-        else:
-            pass
         for planet in bodies:
 
             def rate(t: float, p: str = planet) -> float:
@@ -286,8 +238,6 @@ def solve_planetary_events(
                 after = rate(min(end, bracket[1] + step_days / 16))
                 if before * after < 0:
                     add("station", (planet,), bracket, direction=1 if after > 0 else -1)
-                else:
-                    pass
             crossings(
                 left,
                 right,
@@ -372,18 +322,12 @@ def native_planetary_events(subject: Any) -> dict[str, Any]:
         except EphemerisSourceError as error:
             if error.reason == "position_motion_not_converged":
                 failed_sample.update(planet=planet, julian_day_tt=at)
-            else:
-                pass
             raise
         if result is None:
             raise ValueError("Physical planetary-event ephemeris unavailable")
-        else:
-            pass
         state, model = result
         if planet in models and models[planet] != model:
             raise EphemerisSourceError("model_changed")
-        else:
-            pass
         models[planet] = model
         speed_offset = offset(at + 0.5) - offset(at - 0.5) if sidereal else 0.0
         values = {
@@ -405,8 +349,6 @@ def native_planetary_events(subject: Any) -> dict[str, Any]:
             source_key = "longitude_speed_" + key
             if source_key in state:
                 values["speed_" + key] = state[source_key]
-            else:
-                pass
         seen_longitudes[(planet, at)] = values["longitude"]
         return values
 
@@ -417,8 +359,6 @@ def native_planetary_events(subject: Any) -> dict[str, Any]:
         cached = seen_longitudes.get((planet, at))
         if cached is not None:
             return cached
-        else:
-            pass
         assert_physical_configuration(selected)
         try:
             result = _swisseph_planet_state(
@@ -432,18 +372,12 @@ def native_planetary_events(subject: Any) -> dict[str, Any]:
         except EphemerisSourceError as error:
             if error.reason == "position_motion_not_converged":
                 failed_sample.update(planet=planet, julian_day_tt=at)
-            else:
-                pass
             raise
         if result is None:
             raise ValueError("Physical planetary-event ephemeris unavailable")
-        else:
-            pass
         state, model = result
         if planet in models and models[planet] != model:
             raise EphemerisSourceError("model_changed")
-        else:
-            pass
         models[planet] = model
         return normalize_angle(state["longitude"] - offset(at))
 
@@ -458,13 +392,9 @@ def native_planetary_events(subject: Any) -> dict[str, Any]:
             raise ValueError(
                 "Native question zodiac frame is unavailable or unsupported"
             )
-        else:
-            pass
         at = question_tt
         if at is None:
             raise ValueError("Native question TT is unavailable")
-        else:
-            pass
         for planet in BODIES:
             question_states[planet] = sample(planet, at)
         result = solve_planetary_events(at, sample)
@@ -500,8 +430,6 @@ def native_planetary_events(subject: Any) -> dict[str, Any]:
     except EphemerisSourceError as error:
         if error.reason != "position_motion_not_converged":
             raise
-        else:
-            pass
         return {
             "status": "unavailable",
             "method_id": "native_tt_seven_planet_event_history_v1",
@@ -536,9 +464,5 @@ def _sample_longitude(
         value = fast(planet, at)
         if not math.isfinite(value):
             raise ValueError("Event sampler must supply finite longitude and speed")
-        else:
-            pass
         return normalize_angle(value)
-    else:
-        pass
     return sample(planet, at)["longitude"]

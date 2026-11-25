@@ -25,8 +25,6 @@ CALIBRATION_SOURCE = SOURCE.with_name("sukuyo_t30107_calibration.json")
 def _nonnegative_count(value: int, name: str) -> None:
     if type(value) is not int or value < 0:
         raise ValueError(f"{name}须为明确的非负整数积算，不接受民用日期猜配")
-    else:
-        pass
 
 
 def _fraction_record(value: Fraction) -> dict[str, int | str]:
@@ -58,8 +56,6 @@ def classical_source_year_count(named_year_number: int) -> dict[str, Any]:
     _nonnegative_count(named_year_number, "named_year_number")
     if not 1 <= named_year_number <= 9999:
         raise ValueError("具名年份仅接受1..9999的纪年标签，不外推历元前日期")
-    else:
-        pass
     source = load_source(PRINTED_CHAPTER_SOURCE)
     rule = source.data["year_count_rule"]
     delta = named_year_number - rule["anchor_year_number"]
@@ -107,8 +103,6 @@ def classical_calibration_precision() -> dict[str, Any]:
         or mean_record["elapsed_years"] != rule["elapsed_years"]
     ):
         raise ValueError("Selected calibration nominal day/year counts changed")
-    else:
-        pass
     mean_value = mean_record["mean_accumulated_days"]
     mean = Fraction(mean_value["numerator"], mean_value["denominator"])
     drift = _selected_decimal_interval(rule["printed_drift_days"])
@@ -285,8 +279,6 @@ def classical_solar_recalculation(elapsed_years: int) -> dict[str, Any]:
 def civil_weekday(calendar_date: str, calendar_timezone: str) -> dict[str, Any]:
     if calendar_timezone not in {"UTC+08:00", "UTC+09:00"}:
         raise ValueError("宿曜七曜须明确已支持的UTC+08或UTC+09宿主历日")
-    else:
-        pass
     weekday = (date.fromisoformat(calendar_date).weekday() + 1) % 7
     return {
         "index_sunday_zero": weekday,
@@ -317,12 +309,8 @@ def classical_weekday_arithmetic(
     ):
         if type(value) is not int or value < 0:
             raise ValueError(f"{name}须为已核定的非负整数积算，不接受民用日期猜配")
-        else:
-            pass
     if elapsed_months > 12 or elapsed_days > 30:
         raise ValueError("入年月数须为0..12，入月日数须为0..30的明确积算")
-    else:
-        pass
     source = load_source(SOURCE)
     constants = source.data["general_formula"]["constants"]
     regular_months = elapsed_years * constants["months_per_year"]
@@ -346,8 +334,6 @@ def classical_weekday_arithmetic(
     accumulated_days = nominal_days - omitted_days
     if accumulated_days < 0:
         raise ValueError("所选原式积日为负，未裁定历元前的余数及计数规则")
-    else:
-        pass
     weekday_remainder = accumulated_days % 7
     sexagenary_remainder = accumulated_days % 60
     cycle_index = (40 + accumulated_days - 1) % 60  # 甲辰 counts as one.

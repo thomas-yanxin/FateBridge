@@ -46,8 +46,6 @@ def qualify_kyoto_reference(
     data = loaded.data
     if _digest(data) != FACTS_SHA256:
         raise ValueError("京都字层事实或读录阶段改变，须重新核验")
-    else:
-        pass
     expected = data["expected_legacy"]
     if (
         expected["source_bundle_sha256"] != legacy_source_sha256
@@ -64,14 +62,10 @@ def qualify_kyoto_reference(
         )
     ):
         raise ValueError("京都分层跟进与既有来源或校记身份不一致，须重新核验")
-    else:
-        pass
     if set(data["acceptance_flags"]) != ACCEPTANCE_FLAGS or any(
         value is not False for value in data["acceptance_flags"].values()
     ):
         raise ValueError("工作字层读录不能自动提升原典或历法验收状态")
-    else:
-        pass
     overwrite = data["middle_black_overwrite_and_side_writing"]
     if (
         any(row["accepted_literal"] is not None for row in data["unresolved_readings"])
@@ -95,8 +89,6 @@ def qualify_kyoto_reference(
         )
     ):
         raise ValueError("京都未决字层不能未经复核提升为统一定字")
-    else:
-        pass
     originals = {row["id"]: row for row in primary["observations"]}
     mapped = data["mapped_legacy_observations"]
     if (
@@ -110,8 +102,6 @@ def qualify_kyoto_reference(
         )
     ):
         raise ValueError("京都字位跟进不能省略或改写既有片段")
-    else:
-        pass
     controls = [row for row in primary["observations"] if "month" in row]
     followup_controls = data["clear_date_example_positions"]
     if len(controls) != len(followup_controls) or {
@@ -121,13 +111,9 @@ def qualify_kyoto_reference(
         for row in followup_controls
     }:
         raise ValueError("京都改数字位不能代换三个日期例题")
-    else:
-        pass
     width, height = primary["image_dimensions"]
     if data["image_dimensions"] != [width, height]:
         raise ValueError("京都字位坐标与原图尺寸不一致")
-    else:
-        pass
 
     def box(row: dict[str, Any]) -> list[int]:
         value = row["region_xyxy"]
@@ -138,15 +124,11 @@ def qualify_kyoto_reference(
             or not 0 <= value[1] < value[3] <= height
         ):
             raise ValueError("京都字位坐标超出原图或没有面积")
-        else:
-            pass
         return [int(part) for part in value]
 
     box(overwrite)
     if overwrite["image_sha256"] != primary["image_sha256"]:
         raise ValueError("京都中部覆写字位与原图身份不一致")
-    else:
-        pass
     for record in overwrite["source_working_records"]:
         box(record)
         if not any(
@@ -155,8 +137,6 @@ def qualify_kyoto_reference(
             for source in data["source_readings"]
         ):
             raise ValueError("京都中部覆写工作读未绑定既有首读")
-        else:
-            pass
     for corrected in data["corrected_number_positions"]:
         left = box(corrected)
         for control in followup_controls:
@@ -165,8 +145,6 @@ def qualify_kyoto_reference(
                 left[1], right[1]
             ) < min(left[3], right[3]):
                 raise ValueError("京都叠改数字的字位不能混同日期例题")
-            else:
-                pass
     qualification = data["span_scope_qualification"]
     if (
         qualification["legacy_scope"] != span["scope"]
@@ -175,8 +153,6 @@ def qualify_kyoto_reference(
         or qualification["candidate_character_count"] != span["character_count"]
     ):
         raise ValueError("京都分层说明不能改写原十六字候选")
-    else:
-        pass
     followup = {**data, "source_bundle_sha256": loaded.sha256}
     return (
         {**deepcopy(primary), "later_layered_reading": followup},

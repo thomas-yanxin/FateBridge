@@ -77,8 +77,6 @@ def calculate_western_timing_analysis(
     )
     if firdaria_year_basis == "calendar_anniversary":
         validate_calendar_firdaria_inputs(birth_info, analysis_datetime)
-    else:
-        pass
     return build_western_timing_payload(
         birth_info,
         analysis_datetime=analysis_datetime,
@@ -153,8 +151,6 @@ def calculate_western_timing_module_analysis(
     )
     if technique == "firdaria" and firdaria_year_basis == "calendar_anniversary":
         validate_calendar_firdaria_inputs(birth_info, analysis_datetime)
-    else:
-        pass
     return build_western_timing_module_payload(
         birth_info,
         technique=technique,

@@ -28,21 +28,15 @@ def compare(actual: Any, expected: Any, *, complete: bool = False) -> None:
             complete and expected.keys() - actual.keys()
         ):
             raise ValueError("完整破支事实缺少原文或同课依据")
-        else:
-            pass
         for key in actual.keys() & expected.keys():
             compare(actual[key], expected[key], complete=complete)
     elif isinstance(expected, list):
         if not isinstance(actual, list) or len(actual) != len(expected):
             raise ValueError("破支事实须保留所列完整队列")
-        else:
-            pass
         for a, b in zip(actual, expected):
             compare(a, b, complete=complete)
     elif type(actual) is not type(expected) or actual != expected:
         raise ValueError("破支事实与所选原文或本课本支不一致")
-    else:
-        pass
 
 
 class JinkouBreakPair(PartialOutput):
@@ -67,8 +61,6 @@ class JinkouBreakPair(PartialOutput):
             compare(
                 value, dict(left_position=POSITIONS[i], right_position=POSITIONS[j])
             )
-        else:
-            pass
         if self.left_branch is not None and self.right_branch is not None:
             compare(value, pair_facts(self.left_branch, self.right_branch))
         elif any(
@@ -76,10 +68,6 @@ class JinkouBreakPair(PartialOutput):
         ):
             if self.source_pair_present is not None:
                 raise ValueError("明确未知的本支不能判定破支配对")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -118,8 +106,6 @@ class JinkouBranchBreaks(PartialOutput):
                     for identifier, i, j in CONTEXTS
                 ],
             )
-        else:
-            pass
         return self
 
 
@@ -137,41 +123,23 @@ def align_branch_breaks(value: Any, *, complete: bool = False) -> None:
         }
         if all(by_role.get(p) is not None for p in POSITIONS):
             expected = branch_breaks(*(cast(str, by_role[p]) for p in POSITIONS))
-        else:
-            pass
-    else:
-        pass
     block = board.get("branch_breaks")
     traces = [t for t in board.get("rule_trace") or [] if t.get("rule_id") == RULE]
     if len(traces) > 1:
         raise ValueError("破支事实的规则轨迹不可重复")
-    else:
-        pass
     for trace in traces:
         if trace.get("result") is not None:
             JinkouBranchBreaks.model_validate(trace["result"])
-        else:
-            pass
     if complete:
         if expected is None or block is None or len(traces) != 1:
             raise ValueError("完整金口诀须保留三组破支事实及唯一同课轨迹")
-        else:
-            pass
         compare(block, expected, complete=True)
         compare(traces[0], branch_breaks_trace(expected), complete=True)
     else:
         if expected is not None:
             if block is not None:
                 compare(block, expected)
-            else:
-                pass
             if traces and "result" in traces[0]:
                 compare(traces[0]["result"], expected)
-            else:
-                pass
-        else:
-            pass
         if block is not None and traces and "result" in traces[0]:
             compare(traces[0]["result"], block)
-        else:
-            pass

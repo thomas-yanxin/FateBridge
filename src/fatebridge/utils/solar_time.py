@@ -76,22 +76,14 @@ class NormalizedBirthTime:
         # 的输出结构不变，避免给既有消费者凭空多一个 null 字段。
         if self.resolution_advisory is not None:
             summary["resolution_advisory"] = self.resolution_advisory
-        else:
-            pass
         if self.equation_of_time_method is not None:
             summary["equation_of_time_method"] = self.equation_of_time_method
             summary["equation_of_time_time_scale"] = "UTC_as_UT1"
-        else:
-            pass
         if self.solar_time_strategy is not None:
             summary["solar_time_strategy"] = self.solar_time_strategy
-        else:
-            pass
         if include_timezone_resolution:
             summary["timezone_source"] = self.timezone_source
             summary["timezone_resolved_place"] = self.timezone_resolved_place
-        else:
-            pass
         return summary
 
 
@@ -110,15 +102,11 @@ def calculate_equation_of_time_minutes(
     if isinstance(target_datetime, datetime):
         if target_datetime.utcoffset() is None:
             raise ValueError("均时差计算需要带时区的真实时刻")
-        else:
-            pass
         instant = utc_calendar(target_datetime)
     else:
         instant = target_datetime
     if runtime.swe is None:
         raise ModuleNotFoundError("真太阳时均时差计算需要 Swiss Ephemeris")
-    else:
-        pass
     if julian_day_ut1 is None:
         year, month, day = instant.date_parts
         instant_hour, instant_minute, instant_second, instant_microsecond = (
@@ -140,8 +128,6 @@ def calculate_equation_of_time_minutes(
     else:
         if not math.isfinite(julian_day_ut1):
             raise ValueError("Equation-of-time UT1 Julian day must be finite")
-        else:
-            pass
         julian_day = julian_day_ut1
     return float(runtime.ephemeris_call("time_equ", julian_day)) * 1440
 
@@ -166,8 +152,6 @@ def calculate_solar_time_adjustment(
     utc_offset = aware_datetime.utcoffset()
     if utc_offset is None:
         raise ValueError(_invalid_timezone_message(timezone_name))
-    else:
-        pass
 
     daylight_saving = aware_datetime.dst() or timedelta(0)
     standard_offset = utc_offset - daylight_saving
@@ -230,12 +214,8 @@ def rebase_birth_clock(
     )
     if not template.applied:
         return replace(template, input_datetime=civil, corrected_datetime=civil)
-    else:
-        pass
     if template.longitude is None or template.solar_time_strategy is None:
         raise ValueError("已生效的出生钟校正缺少经度或策略，不能推定派生时刻口径")
-    else:
-        pass
     adjustment = calculate_solar_time_adjustment(
         civil,
         template.timezone,
@@ -291,8 +271,6 @@ def normalize_birth_time(
     if longitude is None and inferred_place.longitude is not None:
         longitude = inferred_place.longitude
         longitude_source = inferred_place.source
-    else:
-        pass
 
     # When no timezone is explicitly supplied but a longitude is known, assume the
     # given wall-clock time is local standard time at the zone nearest that
@@ -302,8 +280,6 @@ def normalize_birth_time(
         zone_hours = max(-12, min(14, int(round(longitude / 15.0))))
         timezone_name = f"{'+' if zone_hours >= 0 else '-'}{abs(zone_hours):02d}:00"
         timezone_source = "longitude_standard_meridian_assumption"
-    else:
-        pass
 
     resolved_clock = resolve_civil_clock(
         input_datetime,
@@ -315,8 +291,6 @@ def normalize_birth_time(
     )
     if birth_utc_offset is not None or person.birth_utc_offset is not None:
         input_datetime = resolved_clock
-    else:
-        pass
 
     if not person.use_true_solar_time:
         return NormalizedBirthTime(
@@ -335,8 +309,6 @@ def normalize_birth_time(
             timezone_source=timezone_source,
             timezone_resolved_place=timezone_resolved_place,
         )
-    else:
-        pass
 
     if longitude is None:
         place = person.birth_place
@@ -359,8 +331,6 @@ def normalize_birth_time(
                 ],
                 status_code=400,
             )
-        else:
-            pass
         # 真太阳时是「默认开」而非显式要求，且无经度可解 → 降级为钟表时间，并透明
         # 提示精度损失（与省级 fallback 的 advisory 同一模式），而不是让默认路径报错。
         return NormalizedBirthTime(
@@ -383,8 +353,6 @@ def normalize_birth_time(
                 "钟表（标准时区）时间计算；补出生地或经度即可启用真太阳时（经度东正）。"
             ),
         )
-    else:
-        pass
 
     adjustment = calculate_solar_time_adjustment(
         input_datetime,
@@ -412,8 +380,6 @@ def normalize_birth_time(
             f"（{resolved_place}）经度 {longitude:.2f}° 做真太阳时校正，"
             "未确认实际出生点经度，误差界未量化；如需细分时辰请改传 birth_longitude。"
         )
-    else:
-        pass
 
     return NormalizedBirthTime(
         input_datetime=input_datetime,

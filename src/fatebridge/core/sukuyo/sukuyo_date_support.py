@@ -49,8 +49,6 @@ def input_timezone_context(zone_text: str) -> dict[str, str]:
             offset.days * 86400 + offset.seconds
         ) * _SECOND_MICROSECONDS + offset.microseconds
         rules["effective_offset_microseconds"] = str(ticks)
-    else:
-        pass
     return rules
 
 
@@ -58,8 +56,6 @@ def input_timezone_reading(context: dict[str, Any]) -> str:
     rules = context.get("input_timezone_rules") or {}
     if rules.get("decimal_hour_rounding") != "nearest_microsecond_ties_even":
         return ""
-    else:
-        pass
     represented = ""
     if "effective_offset_microseconds" in rules:
         ticks = int(rules["effective_offset_microseconds"])
@@ -71,8 +67,6 @@ def input_timezone_reading(context: dict[str, Any]) -> str:
             f"本次表示后的固定偏移为UTC{'-' if ticks < 0 else '+'}"
             f"{hours:02}:{minutes:02}:{seconds:02}{suffix}。"
         )
-    else:
-        pass
     return (
         "输入的小数小时偏移按最近微秒表示，恰在中点时取偶数；"
         f"声明的最大表示舍入误差为{rules['rounding_error_bound_seconds']}秒。"
@@ -99,8 +93,6 @@ def support_interval_duration_reading(interval: dict[str, Any]) -> str:
         ) * _SECOND_MICROSECONDS + elapsed.microseconds
     if ticks <= 0:
         raise ValueError("历日支持区间须有正长度")
-    else:
-        pass
     seconds, fraction = divmod(ticks, _SECOND_MICROSECONDS)
     number = f"{seconds}.{fraction:06d}" if fraction else str(seconds)
     return f"该区间长{number}秒，长度不是出生概率。"
@@ -110,13 +102,9 @@ def support_completeness_reading(context: dict[str, Any]) -> str:
     """Describe the actual date and mansion coverage without certifying history."""
     if not context.get("calendar_candidates"):
         return ""
-    else:
-        pass
     support = context.get("date_support") or {}
     if support.get("complete_under_loaded_timezone_rules") is not True:
         return "本次未确认当地日期原像已完整覆盖，不能将所列分支称为穷尽。"
-    else:
-        pass
     text = (
         f"在本次加载的{context['input_timezone']}时区规则和固定{context['calendar_timezone']}参考日界下，"
         + (
@@ -144,12 +132,8 @@ def support_completeness_reading(context: dict[str, Any]) -> str:
             "微秒epoch端点用十进制整数字符串保存，读取时按整数处理；"
             "古代大数可能超过JavaScript安全整数范围，转成普通Number可能合并一微秒区间的两个端点。"
         )
-    else:
-        pass
     if support.get("integer_transport") is not None:
         text += integer_transport_reading(support["integer_transport"])
-    else:
-        pass
     return (
         text
         + "这种完整性不穷尽所有古代时制，也不认证历史地方钟时或出生概率。"
@@ -178,12 +162,8 @@ def _wall_second_support(
         after = late.utcoffset()
         if before is None or after is None:
             raise ValueError("具名时区未提供本地钟时偏移")
-        else:
-            pass
         if after > before:
             continue
-        else:
-            pass
         folds = (
             ((early, before), (late, after)) if after < before else ((early, before),)
         )
@@ -197,11 +177,7 @@ def _wall_second_support(
             raise PydanticCustomError(
                 "unresolved_timezone_offset", UNRESOLVED_OFFSET_MESSAGE
             )
-        else:
-            pass
         raise ValueError("所给当地日期在该时区不存在，不能据此排宿；请核对原始日期。")
-    else:
-        pass
     intervals = []
     opened = previous = None
     previous_date = None
@@ -212,12 +188,8 @@ def _wall_second_support(
             if opened is not None:
                 assert previous is not None
                 intervals.append((previous_date, opened, previous + 1))
-            else:
-                pass
             opened = instant
             previous_date = target
-        else:
-            pass
         previous = instant
     assert opened is not None and previous is not None
     intervals.append((previous_date, opened, previous + 1))
@@ -242,8 +214,6 @@ def _fixed_offset_support(
     """
     if civil >= date(9999, 12, 30):
         raise ValueError("当地日期超出可枚举的民用日期范围。")
-    else:
-        pass
     offset = zone.utcoffset(None)
     assert offset is not None
     offset_us = (
@@ -283,8 +253,6 @@ def _fixed_offset_support(
                 start_utc_epoch_seconds=(opened - epoch_us) // _SECOND_MICROSECONDS,
                 end_utc_epoch_seconds=(finish - epoch_us) // _SECOND_MICROSECONDS,
             )
-        else:
-            pass
         intervals.append(row)
         opened = finish
     return {
@@ -332,10 +300,6 @@ def _support(date_text: str, zone_text: str, calendar_offset_hours: int = 8) -> 
                 civil, zone, calendar_offset_hours
             )
             return boundary_intervals, seconds_found, tuple(metadata.items())
-        else:
-            pass
-    else:
-        pass
     anchor = datetime.combine(civil, datetime.min.time(), tzinfo=timezone.utc)
     try:
         start = anchor - timedelta(days=1)
@@ -367,31 +331,19 @@ def _support(date_text: str, zone_text: str, calendar_offset_hours: int = 8) -> 
                     .isoformat()
                 )
                 seconds_found += 1
-        else:
-            pass
         if target != previous_date:
             if opened is not None:
                 intervals.append((previous_date, opened, instant))
-            else:
-                pass
             opened = instant if target is not None else None
             previous_date = target
-        else:
-            pass
     if opened is not None:
         intervals.append((previous_date, opened, end))
-    else:
-        pass
     if not intervals:
         if has_unspecified_support:
             raise PydanticCustomError(
                 "unresolved_timezone_offset", UNRESOLVED_OFFSET_MESSAGE
             )
-        else:
-            pass
         raise ValueError("所给当地日期在该时区不存在，不能据此排宿；请核对原始日期。")
-    else:
-        pass
     return tuple(intervals), seconds_found, tuple(metadata.items())
 
 
@@ -400,8 +352,6 @@ def local_date_support(
 ) -> dict[str, Any]:
     if type(calendar_offset_hours) is not int or calendar_offset_hours not in (8, 9):
         raise ValueError("宿曜参考历日只支持固定UTC+08或UTC+09")
-    else:
-        pass
     civil = date.fromisoformat(date_text)
     zone = parse_timezone_name(zone_text)
     if isinstance(zone, timezone):
@@ -411,11 +361,7 @@ def local_date_support(
         diagnostic = integer_transport_diagnostic(result["utc_support_intervals"])
         if diagnostic is not None:
             result["integer_transport"] = diagnostic
-        else:
-            pass
         return result
-    else:
-        pass
     intervals, seconds_found, metadata = _support(
         date_text, zone_text, calendar_offset_hours
     )
@@ -462,8 +408,6 @@ def local_date_support(
         result["scope"] = (
             "遍历当地日期的完整UTC原像，按显式固定UTC+09日本旧历参考日期分段；不是历史日本地方时、实际出生时刻或概率。使用同份TZif整数秒规则，未来法定规则可能变更。"
         )
-    else:
-        pass
     if isinstance(intervals[0][1], int):
         result["method_id"] = "complete_local_wall_second_fold_preimage_v1"
         result["calendar_reference_timezone"] = f"UTC+{calendar_offset_hours:02}:00"
@@ -473,6 +417,4 @@ def local_date_support(
             "未猜生时或以午夜偏移替换全天规则。UTC端点必要时用天文年编号0，不开放年0出生输入；"
             "这是加载时区规则的前推参考，不是古代地方钟时、平明或桧尾半日重建，也不把POSIX秒数当含闰秒的物理时长。"
         )
-    else:
-        pass
     return result

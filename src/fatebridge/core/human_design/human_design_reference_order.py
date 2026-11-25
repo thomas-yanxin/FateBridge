@@ -32,15 +32,11 @@ def validate_reference_precision(value: str) -> None:
     # these before parsing, including fractional UTC offsets and comma syntax.
     if re.search(r"[.,]\d{7,}", value):
         raise ValueError("cycle_reference_datetime 的小数秒最多6位，不静默截断")
-    else:
-        pass
 
 
 def civil_jd(moment: datetime) -> Fraction:
     if moment.utcoffset() is None:
         raise ValueError("An aware civil clock is required")
-    else:
-        pass
     utc = moment.astimezone(timezone.utc)
     micros = ((utc.hour * 60 + utc.minute) * 60 + utc.second) * 1_000_000
     return Fraction(2 * utc.toordinal() + 3442849, 2) + Fraction(
@@ -62,24 +58,18 @@ def _source(name: str) -> tuple[dict[str, Any], dict[str, str]]:
 def _finite(value: Any) -> float:
     if type(value) is not float or not math.isfinite(value):
         raise ValueError("Ordering witness requires finite binary64 epochs")
-    else:
-        pass
     return value
 
 
 def _close(a: Fraction, b: float) -> None:
     if abs(a - Fraction(_finite(b))) * 86400 > TOLERANCE_SECONDS:
         raise ValueError("Ordering axis is detached from the physical epoch")
-    else:
-        pass
 
 
 @runtime.preserve_ephemeris_path()
 def _historical_native(moment: datetime) -> dict[str, Any]:
     if runtime.swe is None:
         raise ModuleNotFoundError("Swiss Ephemeris required for historical UT1")
-    else:
-        pass
     runtime.swe.set_ephe_path(configured_ephemeris_path() or "")
     args = [
         moment.year,
@@ -121,8 +111,6 @@ def _axis(
         )
         if moment.utcoffset() != timedelta(0):
             raise ValueError("Ordering clock must be normalized UTC")
-        else:
-            pass
         if leap:
             clock = ConfirmedLeapSecond.from_utc_anchor(moment)
             _, source = _source("western-leap-seconds")
@@ -170,8 +158,6 @@ def _axis(
                 "delta_t_days",
             }:
                 raise ValueError("Missing historical UT1 ordering observation")
-            else:
-                pass
             if (
                 observed["utc_to_jd_arguments"]
                 != [
@@ -187,8 +173,6 @@ def _axis(
                 or observed["delta_t_flag"] != -1
             ):
                 raise ValueError("Wrong historical native ordering path")
-            else:
-                pass
             delta = Fraction(_finite(observed["delta_t_days"]))
             ut1 = _finite(observed["jd_ut1"])
             if (
@@ -196,8 +180,6 @@ def _axis(
                 or ut1 + float(delta) != physical_tt
             ):
                 raise ValueError("Historical ordering native epoch mismatch")
-            else:
-                pass
             _close(civil_jd(moment), ut1)
             exact = civil_jd(moment) + delta
             proof["source"] = {
@@ -226,8 +208,6 @@ def reference_ordering(
     def native(key: str) -> dict[str, Any] | None:
         if replay_proof is None:
             return None
-        else:
-            pass
         return cast(
             dict[str, Any] | None, replay_proof[key]["source"].get("native_observation")
         )

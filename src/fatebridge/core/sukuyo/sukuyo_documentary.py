@@ -26,8 +26,6 @@ def with_text_layers(rule: dict[str, Any]) -> dict[str, Any]:
             deepcopy(source.data["passages"][identifier]) for identifier in identifiers
         ]
         result["source_layer_bundle_sha256"] = source.sha256
-    else:
-        pass
     return result
 
 
@@ -40,8 +38,6 @@ def japanese_calendar_comparison(
     """Compare membership in this body clause, never infer an unlisted taboo."""
     if type(day) is not int or not 1 <= day <= 30:
         raise ValueError("文献对照入月日须为1至30的整数")
-    else:
-        pass
     source = load_source(JAPANESE)
     result = deepcopy(source.data)
     listed = day in result["selected_body_day_sequence"]["lunar_days"]
@@ -85,24 +81,16 @@ def text_placement_label(rule: dict[str, Any]) -> str:
     passages = rule.get("source_passages", [])
     if not passages:
         return ""
-    else:
-        pass
     if rule["layer"] == "travel_direction":
         if rule.get("auspicious_time_cannot_release"):
             return "主文列禁行方向，‘纵吉时亦不可行’在行内注"
-        else:
-            pass
         label = "主文列宫名，取宿及行向说明在行内注"
         if (
             rule.get("direction_binding_basis")
             == "following_已上_clause_for_paired_rows"
         ):
             return label + "；连属的‘已上’段一并保留"
-        else:
-            pass
         return label
-    else:
-        pass
     return "所选条文在主文，未混入行内注"
 
 

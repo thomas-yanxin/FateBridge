@@ -60,8 +60,6 @@ def _build_knowledge_registry_snapshot_text(
     ]
     if registry.get("bundle_version") is not None:
         overview_lines.append(f"Bundle 版本：{registry['bundle_version']}")
-    else:
-        pass
 
     sections: list[tuple[str, list[str]]] = [("目录概览", overview_lines)]
     for domain_record in domains:
@@ -86,8 +84,6 @@ def _build_knowledge_registry_snapshot_text(
                     f"键列表：{'完整' if category.get('keys_complete') else '样例，非全部键'}；"
                     f"查询格式：{category.get('key_format')}；个人适用性未评估。"
                 )
-            else:
-                pass
         sections.append((domain_record.get("domain", "未知"), category_lines))
 
     source_lines = [
@@ -95,16 +91,10 @@ def _build_knowledge_registry_snapshot_text(
     ]
     if provenance.get("bundle_version") is not None:
         source_lines.append(f"Bundle 版本：{provenance['bundle_version']}")
-    else:
-        pass
     if provenance.get("upstream_source_marker"):
         source_lines.append(f"上游标记：{provenance['upstream_source_marker']}")
-    else:
-        pass
     if provenance.get("build_timestamp"):
         source_lines.append(f"构建时间：{provenance['build_timestamp']}")
-    else:
-        pass
     sections.append(("来源", source_lines))
     return render_snapshot_lines(sections)
 
@@ -119,21 +109,15 @@ def _build_knowledge_snapshot_text(entry: dict[str, Any]) -> str:
     ]
     if entry.get("title"):
         query_lines.append(f"标题：{entry['title']}")
-    else:
-        pass
     for field, label in _QUERY_LABELS.items():
         value = query_normalized.get(field)
         if value in {None, ""}:
             continue
-        else:
-            pass
         query_lines.append(f"{label}：{value}")
 
     body_lines: list[str] = []
     if entry.get("title"):
         body_lines.append(f"标题：{entry['title']}")
-    else:
-        pass
     tips = entry.get("tips")
     if isinstance(tips, list) and tips:
         for tip in tips:
@@ -144,8 +128,6 @@ def _build_knowledge_snapshot_text(entry: dict[str, Any]) -> str:
             text = f"{line}".strip()
             if text:
                 body_lines.append(text)
-            else:
-                pass
 
     source_lines = [
         f"来源：{entry.get('source', '未提供')}",
@@ -153,17 +135,11 @@ def _build_knowledge_snapshot_text(entry: dict[str, Any]) -> str:
     ]
     if entry.get("bundle_version") is not None:
         source_lines.append(f"Bundle 版本：{entry['bundle_version']}")
-    else:
-        pass
     if provenance.get("upstream_source_marker"):
         source_lines.append(f"上游标记：{provenance['upstream_source_marker']}")
-    else:
-        pass
     if provenance.get("build_timestamp"):
         label = "上游包构建时间" if provenance.get("entry_curation") else "构建时间"
         source_lines.append(f"{label}：{provenance['build_timestamp']}")
-    else:
-        pass
 
     curation = provenance.get("entry_curation")
     if isinstance(curation, dict):
@@ -184,8 +160,6 @@ def _build_knowledge_snapshot_text(entry: dict[str, Any]) -> str:
         for reference in curation.get("implementation_refs") or []:
             source_lines.append(f"实现：{reference.get('source_path')}")
             source_lines.append(f"实现说明范围：{reference.get('support_scope')}")
-    else:
-        pass
 
     if provenance.get("reference_policy_id") == "numerology_source_reference_v1":
         source_lines.append(f"参考范围：{provenance.get('scope')}")
@@ -197,10 +171,6 @@ def _build_knowledge_snapshot_text(entry: dict[str, Any]) -> str:
             )
             if record.get("source_url"):
                 source_lines.append(f"来源网址：{record['source_url']}")
-            else:
-                pass
-    else:
-        pass
 
     if provenance.get("reference_policy_id") == "human_design_line_reference_v1":
         source_lines.append(f"参考范围：{provenance.get('scope')}")
@@ -210,10 +180,6 @@ def _build_knowledge_snapshot_text(entry: dict[str, Any]) -> str:
             )
             if record.get("source_url"):
                 source_lines.append(f"来源网址：{record['source_url']}")
-            else:
-                pass
-    else:
-        pass
 
     return render_snapshot_lines(
         [
@@ -267,8 +233,6 @@ def calculate_knowledge_registry(
             registry = build_knowledge_registry(domain=domain)
         if not render_snapshot:
             return registry
-        else:
-            pass
         snapshot_text = _build_knowledge_registry_snapshot_text(registry, domain=domain)
         snapshot_export = build_snapshot_export(
             technique="knowledge_registry",
@@ -329,8 +293,6 @@ def calculate_knowledge_read(
                     code="knowledge.human_design.irrelevant_fields",
                     details={"fields": irrelevant_fields},
                 )
-            else:
-                pass
             entry = human_design_knowledge.read_reference(category=category, key=key)
         elif lookup_domain in DOMAINS:
             entry = read_reference(domain=lookup_domain, category=category, key=key)
@@ -338,8 +300,6 @@ def calculate_knowledge_read(
             entry = read_knowledge_entry(payload)
         if not render_snapshot:
             return entry
-        else:
-            pass
         snapshot_text = _build_knowledge_snapshot_text(entry)
         snapshot_export = build_snapshot_export(
             technique="knowledge",

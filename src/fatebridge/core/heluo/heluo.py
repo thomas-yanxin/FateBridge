@@ -214,17 +214,11 @@ def _reduce_tian(t: int) -> int:
     v = t
     if v > 25:
         v -= 25
-    else:
-        pass
     if v == 25:
         return 5
-    else:
-        pass
     if v >= 10:
         u = v % 10
         return v // 10 if u == 0 else u
-    else:
-        pass
     return v
 
 
@@ -232,17 +226,11 @@ def _reduce_di(d: int) -> int:
     v = d
     if v > 30:
         v -= 30
-    else:
-        pass
     if v == 30:
         return 3
-    else:
-        pass
     if v >= 10:
         u = v % 10
         return v // 10 if u == 0 else u
-    else:
-        pass
     return v
 
 
@@ -251,13 +239,9 @@ def _wu_ji_gong(minguo_year: int, yang_gan: bool, is_male: bool) -> str:
     phase = ((minguo_year + 1911 - 1504) % 180) // 60
     if phase == 0:  # 上元
         return "艮" if is_male else "坤"
-    else:
-        pass
     if phase == 1:  # 中元
         ay = (yang_gan and is_male) or (not yang_gan and not is_male)  # 阳男 or 阴女
         return "艮" if ay else "坤"
-    else:
-        pass
     return "離" if is_male else "兌"  # 下元
 
 
@@ -277,24 +261,16 @@ def transform_houtian(
     """翻元堂爻 → 后天卦（三至尊卦「变而不易」特例）。"""
     if type(yang_ling) is not bool:
         raise ValueError("阴阳令须为布尔值，不能以字符串或数字代替。")
-    else:
-        pass
     if type(yuan) is not int or not 1 <= yuan <= 6:
         raise ValueError("元堂须为1至6的整数爻位。")
-    else:
-        pass
     if (
         not isinstance(xian_lines, list)
         or len(xian_lines) != 6
         or any(type(v) is not int or v not in (0, 1) for v in xian_lines)
     ):
         raise ValueError("后天换卦须输入自初至上的六个0/1整数。")
-    else:
-        pass
     if lines_to_gua(xian_lines)["name"] != xian_name:
         raise ValueError("先天卦名必须与六爻一致，不能据不一致的卦名选择特例。")
-    else:
-        pass
     flipped = _flip_line(xian_lines, yuan)  # ① 元堂爻 阴阳互变
     if xian_name in ZHI_ZUN:
         bu_yi = (yuan == 5 and not yang_ling) or (
@@ -306,10 +282,6 @@ def transform_houtian(
                 "lines": flipped,
                 "yuan": yuan,
             }
-        else:
-            pass
-    else:
-        pass
     hou_lines = _swap_trigrams(flipped)  # ② 移外卦入内、内卦出外
     hou_yuan = yuan - 3 if yuan > 3 else yuan + 3  # 元堂随上下卦互换而易位
     return {
@@ -331,8 +303,6 @@ def four_pillar_number_totals(four_pillars: Dict[str, str]) -> Dict[str, Any]:
         for k in ("year", "month", "day", "hour")
     ):
         raise ValueError("形式取数仍需要四个有效六十甲子。")
-    else:
-        pass
     tian = di = 0
     for key in ("year", "month", "day", "hour"):
         gz = four_pillars[key]
@@ -365,34 +335,22 @@ def calculate(
     """起命：天地数→卦→元堂→先天/后天。"""
     if not isinstance(gender, str) or normalize_gender(gender) not in {"男", "女"}:
         raise ValueError("河洛相荡、寄宫和元堂需要明确gender为男或女，不能默认性别。")
-    else:
-        pass
     if month_yang_ling is not None and type(month_yang_ling) is not bool:
         raise ValueError("阴阳令须为布尔值或None，不能以字符串或数字代替。")
-    else:
-        pass
     gender = normalize_gender(gender)
     cycle = [GAN[i % 10] + ZHI[i % 12] for i in range(60)]
     if type(birth_year) is not int or not 1 <= birth_year <= 9999:
         raise ValueError("出生公历年须为1至9999的整数。")
-    else:
-        pass
     if any(four_pillars.get(k) not in cycle for k in ("year", "month", "day", "hour")):
         raise ValueError("四柱必须是有效的六十甲子。")
-    else:
-        pass
     if hour_zhi != four_pillars["hour"][1] or month_zhi != four_pillars["month"][1]:
         raise ValueError("月支、时支必须与四柱一致。")
-    else:
-        pass
     require_pillar_links(four_pillars)
     if four_pillars["year"] not in (
         cycle[(birth_year - 4) % 60],
         cycle[(birth_year - 5) % 60],
     ):
         raise ValueError("出生年与年柱不一致；仅允许公历当年或立春前上一干支年。")
-    else:
-        pass
     year_g = four_pillars["year"][0]
     year_z = four_pillars["year"][1]
     totals = four_pillar_number_totals(four_pillars)
@@ -402,8 +360,6 @@ def calculate(
     cycle_year = birth_year
     if cycle[(birth_year - 5) % 60] == four_pillars["year"]:
         cycle_year -= 1
-    else:
-        pass
     minguo = cycle_year - 1911
     yang_gan = GAN.index(year_g) % 2 == 0  # 甲丙戊庚壬=阳
     t_num = _reduce_tian(tian)
@@ -453,8 +409,6 @@ def calculate(
             f"阴令：{xian_name}{alternatives[0]['xian_yuan']}爻→{alternatives[0]['hou_name']}{alternatives[0]['hou_yuan']}爻；"
             f"阳令：{xian_name}{alternatives[1]['xian_yuan']}爻→{alternatives[1]['hou_name']}{alternatives[1]['hou_yuan']}爻。"
         )
-    else:
-        pass
     selected_index = int(yang_ling is True)
     selected = alternatives[selected_index]
     yuan = selected["xian_yuan"]
@@ -539,8 +493,6 @@ def hexagram_najia(lines: List[int]) -> List[Dict[str, Any]]:
     """
     if len(lines) != 6 or any(type(v) is not int or v not in (0, 1) for v in lines):
         raise ValueError("纳甲须输入自初至上的六个0/1整数。")
-    else:
-        pass
     gua = lines_to_gua(lines)
     result = []
     for pos in range(1, 7):
@@ -550,8 +502,6 @@ def hexagram_najia(lines: List[int]) -> List[Dict[str, Any]]:
         if trigram in {"乾", "坤"}:
             paired_stem = {"甲": "壬", "壬": "甲", "乙": "癸", "癸": "乙"}
             borrowed = [paired_stem[direct[0]] + direct[1]]
-        else:
-            pass
         result.append(
             {"pos": pos, "trigram": trigram, "direct": direct, "borrowed": borrowed}
         )
@@ -627,8 +577,6 @@ def judge(
         )
     ):
         raise ValueError("显式化工／反化工候选须为八卦名列表，不能静默退回月支近似。")
-    else:
-        pass
     hg_list = list(
         hg_override["hg"] if hg_override is not None else MONTH_HG.get(month_zhi, [])
     )
@@ -649,12 +597,8 @@ def judge(
         for entry in entries:
             if four_pillars["year"] == entry["direct"]:
                 matches.append({"pos": entry["pos"], "kind": "direct"})
-            else:
-                pass
             if four_pillars["year"] in entry["borrowed"]:
                 matches.append({"pos": entry["pos"], "kind": "borrowed"})
-            else:
-                pass
         najia.append(
             {
                 "phase": phase,

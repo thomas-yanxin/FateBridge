@@ -111,8 +111,6 @@ def calculate(signs: Mapping[str, int]) -> dict[str, Any]:
         raise ValueError(
             "Aiyar tables require exactly seven planets and Ascendant, integer signs0..11"
         )
-    else:
-        pass
     positions = dict(signs)
     # Inverse membership from each absolute sign; independent reference instead
     # shifts the literal positive-house list forward into initially empty rows.

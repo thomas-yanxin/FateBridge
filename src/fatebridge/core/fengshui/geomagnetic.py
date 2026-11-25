@@ -124,8 +124,6 @@ def geomagnetic_reference(
     if bearing_degrees is not None and unavailable is None:
         if north_reference not in ("magnetic", "true"):
             raise ValueError("换算方位必须明确原始north_reference")
-        else:
-            pass
         target = "magnetic" if north_reference == "true" else "true"
         # Partition the exact sum of the supplied heading and delivered D.
         # Rounding that sum first can move it onto a different sector edge.
@@ -144,8 +142,6 @@ def geomagnetic_reference(
             },
             classification_basis="supplied_heading_and_delivered_declination_before_display_rounding",
         )
-    else:
-        pass
     return {
         "calculation_status": "complete",
         # Full source records live once in the public envelope's rulesets.

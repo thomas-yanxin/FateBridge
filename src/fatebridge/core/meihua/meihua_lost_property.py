@@ -31,8 +31,6 @@ def _profile() -> dict[str, Any]:
         or profile["location_selection_policy"]["scope"] != "changed_use_trigram"
     ):
         raise ValueError("Unknown or incomplete selected lost-property profile")
-    else:
-        pass
     return profile
 
 
@@ -55,8 +53,6 @@ def lost_property_qualifications(
     trigram = cast["changed_hexagram"][position]["name"]
     if changed_use["fact_path"] != path or changed_use["trigram"] != trigram:
         raise ValueError("Lost-property location must use this candidate's changed use")
-    else:
-        pass
     rule = next(row for row in profile["location_rules"] if row["trigram"] == trigram)
     return {
         "ruleset_id": profile["id"],

@@ -72,14 +72,10 @@ def comparison_report(chart: dict[str, Any]) -> dict[str, Any]:
     for fix in line_fixings(chart["activations"]):
         if (fix["gate"], fix["line"]) != (58, 5):
             continue
-        else:
-            pass
         if (fix["exaltation_planet"], fix["detriment_planet"]) != ("Moon", "Sun"):
             raise ValueError(
                 "Selected58.5 catalogue changed; review historical comparison"
             )
-        else:
-            pass
         original = fix["fixing_planets"]
         # Move only Sun donors. Keep each actual side/index/relation, including
         # harmonic and opposite-side donors, and never introduce node donors.

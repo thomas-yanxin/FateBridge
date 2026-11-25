@@ -42,8 +42,6 @@ def build_combinations(
     for index, palace in enumerate(board["palaces"]):
         if palace["trigram"] == "中":
             continue
-        else:
-            pass
         path = f"qimen.palaces.{index}"
         local = [p for p in existing_patterns if p["palace"] == palace["name"]]
 
@@ -97,8 +95,6 @@ def build_combinations(
                 result[-1]["evidence_paths"].extend(
                     ["qimen.xun_head", "qimen.rule_trace.0.outputs"]
                 )
-            else:
-                pass
 
         for sky in palace["heaven_stems"]:
             for earth in palace["earth_stems"]:
@@ -171,8 +167,6 @@ def build_combinations(
                             conflicts=list(dict.fromkeys(p["name"] for p in local)),
                             identity_binding=binding,
                         )
-                    else:
-                        pass
                 if earth in DE_SHI.get(sky, set()):
                     conflict = ADVERSE_PAIRS.get((sky, earth))
                     same_leader = leader["star_gong"] == palace["trigram"]
@@ -187,8 +181,6 @@ def build_combinations(
                         conflicts=[conflict] if conflict else [],
                         same_leader_required=bool(conflict),
                     )
-                else:
-                    pass
                 if sky == "丙" and earth == "丁" and palace["door"] == "生门":
                     blockers = [
                         p["name"]
@@ -209,8 +201,6 @@ def build_combinations(
                         observed=not blockers,
                         blockers=blockers,
                     )
-                else:
-                    pass
                 if sky == "乙" and earth == "己" and palace["door"] == "开门":
                     append(
                         "earth_dun",
@@ -221,8 +211,6 @@ def build_combinations(
                         condition="开门、天盘乙、地盘己同宫；仍须合看全局",
                         observed=True,
                     )
-                else:
-                    pass
             if sky == "丁" and palace["door"] == "休门" and palace["god"] == "太阴":
                 append(
                     "human_dun",
@@ -233,8 +221,6 @@ def build_combinations(
                     condition="休门、天盘丁、太阴同宫；不以此推断现实和合",
                     observed=True,
                 )
-            else:
-                pass
             if sky == "丙" and palace["door"] == "生门" and palace["god"] == "九天":
                 append(
                     "spirit_dun",
@@ -245,8 +231,6 @@ def build_combinations(
                     condition="生门、天盘丙、九天同宫；仅记录原典组合",
                     observed=True,
                 )
-            else:
-                pass
         if palace["trigram"] == leader["door_gong"] and "丁" in palace["earth_stems"]:
             append(
                 "jade_maiden_gate",
@@ -261,6 +245,4 @@ def build_combinations(
                 condition="本时值使门落地盘丁所在宫，不是天盘丁或任意门逢丁",
                 observed=True,
             )
-        else:
-            pass
     return result

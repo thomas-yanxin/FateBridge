@@ -28,12 +28,8 @@ POLICIES = ("explicit_only", "inherit_column_heading")
 def _integer(value: int, maximum: int, label: str) -> None:
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{label}须为明确整数，不接收浮点、布尔或隐式现代度数")
-    else:
-        pass
     if not 0 <= value <= maximum:
         raise ValueError(f"{label}越过此源表范围，不能进位或取模来修正")
-    else:
-        pass
 
 
 @dataclass(frozen=True)
@@ -46,18 +42,12 @@ class FractionalTerm:
         if self.status == "literal":
             if self.value is None or not isinstance(self.text, str) or not self.text:
                 raise ValueError("明确分抄须同时保留整数释读及原字记录")
-            else:
-                pass
             _integer(self.value, 99, "分抄数")
         elif self.status in {"not_printed", "unresolved"}:
             if self.value is not None:
                 raise ValueError("未印单位或未释数字不能暗补成零或其他数")
-            else:
-                pass
             if self.status == "not_printed" and self.text is not None:
                 raise ValueError("未印单位不能附造原字")
-            else:
-                pass
         else:
             raise ValueError("分抄须明确标为已读、单位未印或数字未释")
 
@@ -85,37 +75,23 @@ class PassageCell:
             or len(self.branch) != 1
         ):
             raise ValueError("须为本图四历之一及单个明确辰支")
-        else:
-            pass
         if self.mansion not in MANSIONS:
             raise ValueError("须保留列头明确宿名")
-        else:
-            pass
         if self.printed_calendar_label != CALENDAR_LABELS[self.calendar]:
             raise ValueError("历名标注与所选源行不符，不能换名混历")
-        else:
-            pass
         if self.second_unit not in {"抄", "秒"}:
             raise ValueError("须保留本格明确的小单位，不能跨影像换字")
-        else:
-            pass
         _integer(self.heading_degree, 40, "列头整度")
         if self.printed_degree is not None:
             _integer(self.printed_degree, 40, "格内重印整度")
-        else:
-            pass
         if not isinstance(self.minute, FractionalTerm) or not isinstance(
             self.second, FractionalTerm
         ):
             raise TypeError("分抄须用具名源字组件")
-        else:
-            pass
 
     def resolve(self, *, whole_degree_policy: str) -> dict[str, Any]:
         if whole_degree_policy not in POLICIES:
             raise ValueError("须明确选择只用格内整度或承接列头，不能猜整度")
-        else:
-            pass
         inherited = (
             self.printed_degree is None
             and whole_degree_policy == "inherit_column_heading"
@@ -142,8 +118,6 @@ class PassageCell:
                 + Fraction(self.minute.value or 0, 100)
                 + Fraction(self.second.value or 0, 10000)
             )
-        else:
-            pass
         old_example = self.calendar == "shoushi" and (
             (self.branch, self.mansion, degree) in {("卯", "氐", 2), ("申", "毕", 7)}
         )
@@ -197,14 +171,10 @@ class PassageRegistry:
         object.__setattr__(self, "cells", tuple(self.cells))
         if any(not isinstance(cell, PassageCell) for cell in self.cells):
             raise TypeError("各格须为已冻结的具名源字组件")
-        else:
-            pass
         expected = {(calendar, branch) for calendar in CALENDARS for branch in BRANCHES}
         actual = {(cell.calendar, cell.branch) for cell in self.cells}
         if len(self.cells) != 48 or actual != expected:
             raise ValueError("本图须逐一具备四历十二宫48格，不能重排补齐或混历")
-        else:
-            pass
 
     def entry(
         self, calendar: str, branch: str, *, whole_degree_policy: str
@@ -216,8 +186,6 @@ class PassageRegistry:
         ]
         if len(matches) != 1:
             raise ValueError("须明确给本图历名和辰支；不能以年份或其他版本代替")
-        else:
-            pass
         result = matches[0].resolve(whole_degree_policy=whole_degree_policy)
         result.update(
             {
@@ -301,8 +269,6 @@ def load_registry() -> PassageRegistry:
     headings = {h["branch"]: h for h in data["headers"]}
     if len(data["headers"]) != 12 or set(headings) != set(BRANCHES):
         raise ValueError("列头须具备十二个不同辰支")
-    else:
-        pass
     cells = tuple(
         PassageCell(
             calendar=row["key"],
@@ -344,24 +310,16 @@ def compare_nijl_shoushi(*, whole_degree_policy: str) -> dict[str, Any]:
     """
     if whole_degree_policy not in POLICIES:
         raise ValueError("两份见证须使用同一个明确整度政策作比较")
-    else:
-        pass
     blob = NIJL_DATA.read_bytes()
     data = json.loads(blob)
     headings = {h["branch"]: h for h in data["headers"]}
     if len(data["headers"]) != 12 or set(headings) != set(BRANCHES):
         raise ValueError("新见证的列头须自行具备十二个不同辰支")
-    else:
-        pass
     if data["calendar"] != "shoushi" or data["printed_calendar_label"] != "授時":
         raise ValueError("新见证只核本行授时，不能换名扩成其他三历")
-    else:
-        pass
     branches = [cell["branch"] for cell in data["cells"]]
     if len(branches) != 12 or set(branches) != set(BRANCHES):
         raise ValueError("新见证须逐一保存授时十二格，不补齐或删除难格")
-    else:
-        pass
     original = load_registry()
     entries = []
     for cell in data["cells"]:

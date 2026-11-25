@@ -24,8 +24,6 @@ def assemble_catalog(plugins: Sequence[DomainPlugin]) -> list[ToolSpec]:
         for spec in plugin.specs:
             if spec.key in seen_keys:
                 raise ValueError(f"Duplicate key {spec.key} in domain {plugin.name}")
-            else:
-                pass
             seen_keys.add(spec.key)
             catalog.append(spec)
     return catalog

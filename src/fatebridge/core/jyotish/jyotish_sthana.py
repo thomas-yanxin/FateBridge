@@ -115,15 +115,11 @@ DREKKANA_PROFILES: dict[str, dict[str, Any]] = {
 def drekkana(longitude: float, planet: str, profile_id: str) -> dict[str, Any]:
     if profile_id not in DREKKANA_PROFILES:
         raise ValueError("drekkana_profile 必须为 santhanam_27_6 或 raman_36。")
-    else:
-        pass
     profile = DREKKANA_PROFILES[profile_id]
     if planet not in PEAKS:
         raise ValueError(
             "Drekkana strength is registered for the seven physical grahas only"
         )
-    else:
-        pass
     n, d = longitude_ratio(longitude)
     decanate = n % (30 * d) // (10 * d)
     preferred = next(i for i, group in enumerate(profile["groups"]) if planet in group)
@@ -145,8 +141,6 @@ def saptavargaja(
 ) -> dict[str, Any]:
     if profile_id not in PROFILES:
         raise ValueError("saptavargaja_profile 必须为 santhanam_27 或 raman_30。")
-    else:
-        pass
     profile = PROFILES[profile_id]
     signs = {p: varga_sign(longitudes[p], 1) for p in PEAKS}
     rows = []
@@ -200,12 +194,8 @@ def resolve_sthana(
 ) -> SthanaResolution:
     if profile_id not in PROFILES:
         raise ValueError("saptavargaja_profile 必须为 santhanam_27 或 raman_30。")
-    else:
-        pass
     if drekkana_profile not in DREKKANA_PROFILES:
         raise ValueError("drekkana_profile 必须为 santhanam_27_6 或 raman_36。")
-    else:
-        pass
     ascendant_sign = varga_sign(ascendant, 1)
     summary: dict[str, dict[str, float]] = {}
     totals: dict[str, Fraction] = {}

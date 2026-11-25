@@ -27,21 +27,15 @@ def strict_reference_equal(actual: Any, expected: Any) -> bool:
     """Compare the JSON value and its types; bool is never a nominal integer."""
     if type(actual) is not type(expected):
         return False
-    else:
-        pass
     if isinstance(expected, dict):
         return actual.keys() == expected.keys() and all(
             strict_reference_equal(actual[key], value)
             for key, value in expected.items()
         )
-    else:
-        pass
     if isinstance(expected, list):
         return len(actual) == len(expected) and all(
             strict_reference_equal(left, right) for left, right in zip(actual, expected)
         )
-    else:
-        pass
     return isinstance(expected, (str, int, bool, type(None))) and actual == expected
 
 
@@ -60,8 +54,6 @@ def pointer_count_scope(
     data = loaded.data
     if _digest(data) != FACTS_SHA256:
         raise ValueError("校记定位口径或关联诊断改变，须重新核验")
-    else:
-        pass
     expected = data["expected_legacy"]
     if (
         expected["raw_source_sha256"] != legacy_source_sha256
@@ -69,8 +61,6 @@ def pointer_count_scope(
         or expected["source_data_id"] != legacy["id"]
     ):
         raise ValueError("校记定位口径与原有来源身份不一致")
-    else:
-        pass
     policy = data["counting_policy"]
     if (
         policy["locating_attributes"] != ["target", "from", "to"]
@@ -81,12 +71,8 @@ def pointer_count_scope(
         or any(value is not False for value in data["interpretation_flags"].values())
     ):
         raise ValueError("定位指针核对不能提升为全部关联或古代历法验收")
-    else:
-        pass
     if set(data["sources"]) != {"T1509", "T2122"}:
         raise ValueError("校记定位口径必须保留两部已登记来源")
-    else:
-        pass
     for work, source in data["sources"].items():
         original = legacy["sources"][work]
         if (
@@ -97,8 +83,6 @@ def pointer_count_scope(
             )
         ):
             raise ValueError("校记定位范围不能替换原计数或源文")
-        else:
-            pass
         integer_keys = [
             "all_back_note_app_records",
             "records_with_own_local_locating_tokens",
@@ -114,8 +98,6 @@ def pointer_count_scope(
             for value in source["own_tokens_by_attribute"].values()
         ):
             raise ValueError("校记记录数和token数必须是整数，不能以布尔值代替")
-        else:
-            pass
         counts = original["apparatus_counts"]
         if (
             source["all_back_note_app_records"]
@@ -130,8 +112,6 @@ def pointer_count_scope(
             or set(source["own_tokens_by_attribute"]) != {"target", "from", "to"}
         ):
             raise ValueError("校记定位计数口径与原始记录不一致")
-        else:
-            pass
     reuse = data["sources"]["T1509"]["selected_reuse"]
     if (
         reuse["own_range_matches_exact_xml_ids"] is not True
@@ -139,8 +119,6 @@ def pointer_count_scope(
         or reuse["corresp"] != "#0409025"
     ):
         raise ValueError("编号式校记复用不能冒充同名xml:id已解析")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 

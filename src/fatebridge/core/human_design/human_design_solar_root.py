@@ -81,14 +81,10 @@ def solve_solar_root(birth_tt: float, sun: SolarLongitude) -> SolarRoot:
             longitude_degrees = sun(jd_tt)
             if not math.isfinite(longitude_degrees) or not 0 <= longitude_degrees < 360:
                 raise RuntimeError("太阳求根函数未返回有效黄经")
-            else:
-                pass
             evaluations[jd_tt] = SolarEvaluation(
                 longitude_degrees=longitude_degrees,
                 residual_degrees=solar_residual(birth_sun_degrees, longitude_degrees),
             )
-        else:
-            pass
         return evaluations[jd_tt]
 
     lower_jd_tt, upper_jd_tt = birth_tt - 110, birth_tt - 70
@@ -98,15 +94,11 @@ def solve_solar_root(birth_tt: float, sun: SolarLongitude) -> SolarRoot:
         > evaluate(upper_jd_tt).residual_degrees
     ):
         raise RuntimeError("设计时刻的太阳黄经未能括定 88 度根")
-    else:
-        pass
     iterations = 0
     while math.nextafter(lower_jd_tt, math.inf) < upper_jd_tt:
         midpoint_jd_tt = lower_jd_tt + (upper_jd_tt - lower_jd_tt) / 2
         if midpoint_jd_tt in (lower_jd_tt, upper_jd_tt):
             break
-        else:
-            pass
         residual_degrees = evaluate(midpoint_jd_tt).residual_degrees
         iterations += 1
         if residual_degrees == 0:

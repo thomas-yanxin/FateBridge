@@ -40,12 +40,8 @@ def birth_clock_input_receipt(
     supplied = ["year", "month", "day", "hour"]
     if "birth_minute" in person.model_fields_set:
         supplied.append("minute")
-    else:
-        pass
     if person.birth_second is not None:
         supplied.append("second")
-    else:
-        pass
     omitted = [part for part in ("minute", "second") if part not in supplied]
     civil = normalized.input_datetime
     zone = parse_timezone_name(normalized.timezone)
@@ -83,8 +79,6 @@ def birth_clock_input_receipt(
         receipt["offset_selection_scope"] = (
             "偏移只按已解析时区的规则校验并选择实际时刻；不认证出生记录、推断时区或未来规则。"
         )
-    else:
-        pass
     return receipt
 
 
@@ -110,6 +104,4 @@ def birth_clock_snapshot_lines(receipt: BirthClockReceipt) -> list[str]:
             f"fold={receipt['civil_fold']}；实际UTC：{receipt['civil_instant_utc']}。"
             "原时区规则用于后续交运；偏移选择不认证出生记录。"
         )
-    else:
-        pass
     return lines

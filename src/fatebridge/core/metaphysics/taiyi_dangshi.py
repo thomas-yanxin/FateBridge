@@ -24,8 +24,6 @@ def _catalog() -> dict[str, Any]:
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != CATALOG_SHA256:
         raise ValueError("太乙当时法贵人来源目录指纹不符")
-    else:
-        pass
     result: dict[str, Any] = json.loads(raw)
     return result
 
@@ -53,8 +51,6 @@ def noble_source_assessment(
     }
     if day_stem not in tuple("甲乙丙丁戊己庚辛壬癸"):
         return {**result, "reason": "实际日干未提供或无效，不猜贵人本位。"}
-    else:
-        pass
     traces = [
         (i, t.get("result"))
         for i, t in enumerate(liureng.get("rule_trace", []))
@@ -63,13 +59,9 @@ def noble_source_assessment(
     meta = liureng.get("meta") or {}
     if len(traces) != 1:
         return {**result, "reason": "缺少唯一的同盘贵人起点算路，不能借地盘位置反推。"}
-    else:
-        pass
     index, trace = traces[0]
     if not isinstance(trace, dict):
         return {**result, "reason": "缺少唯一的同盘贵人起点算路，不能借地盘位置反推。"}
-    else:
-        pass
     start, is_day = trace.get("start_branch"), trace.get("is_diurnal")
     if (
         start not in tuple("子丑寅卯辰巳午未申酉戌亥")
@@ -80,8 +72,6 @@ def noble_source_assessment(
         or meta["is_diurnal"] != is_day
     ):
         return {**result, "reason": "同盘贵人算路与配置／昼夜回执不完整或不一致。"}
-    else:
-        pass
     comparisons = []
     for table in catalog["tables"]:
         row = next(r for r in table["rows"] if r["stem"] == day_stem)
@@ -118,8 +108,6 @@ def noble_source_assessment(
 def noble_source_text(assessment: dict[str, Any]) -> str:
     if assessment["status"] != "compared_noble_start_only":
         return f"贵人来源未评估：{assessment['reason']}"
-    else:
-        pass
     lines = [
         f"六壬实际配置{assessment['actual_profile']}；日干{assessment['day_stem']}；"
         f"所选{'昼' if assessment['is_diurnal'] else '夜'}贵起于{assessment['actual_start_branch']}。",
@@ -135,6 +123,4 @@ def noble_source_text(assessment: dict[str, Any]) -> str:
         lines.append(
             "本次太乙非时计；这里只对照贵人表，不把跨时间层对应当作当时法验收。"
         )
-    else:
-        pass
     return "\n".join(lines)

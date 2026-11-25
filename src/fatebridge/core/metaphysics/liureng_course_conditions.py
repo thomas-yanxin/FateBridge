@@ -69,12 +69,8 @@ SCOPE = (
 def course_conditions(day_ganzhi: str, transmissions: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(day_ganzhi, str) or day_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("课体条件需要有效占日干支")
-    else:
-        pass
     if not isinstance(transmissions, dict):
         raise ValueError("课体条件需要实际三传")
-    else:
-        pass
     rows: list[dict[str, Any]] = []
     for position in ("initial", "middle", "final"):
         r = transmissions.get(position)
@@ -85,8 +81,6 @@ def course_conditions(day_ganzhi: str, transmissions: dict[str, Any]) -> dict[st
             or r.get("god") not in GUI_REN_SEQUENCE
         ):
             raise ValueError("课体条件需要三传支神、承座及天将")
-        else:
-            pass
         rows.append(r)
     branches = [r["branch"] for r in rows]
     initial = rows[0]

@@ -51,8 +51,6 @@ class PartialOutput(BaseModel):
             schema["required"] = [
                 name for name in schema["required"] if not is_integrity_field(name)
             ]
-        else:
-            pass
         return schema
 
     @model_validator(mode="after")
@@ -60,37 +58,25 @@ class PartialOutput(BaseModel):
         """Complete execution and projected public reads share one field contract."""
         if not info.context or not info.context.get("full_result"):
             return self
-        else:
-            pass
         for name, field in type(self).model_fields.items():
             metadata = field.json_schema_extra
             if not isinstance(metadata, dict):
                 continue
-            else:
-                pass
             requirement = metadata.get("x-fatebridge-full-result")
             if requirement and (
                 name not in self.model_fields_set
                 or (requirement == "non_null" and getattr(self, name) is None)
             ):
                 raise ValueError(f"完整结果缺少必要事实：{name}")
-            else:
-                pass
             identity_field = metadata.get("x-fatebridge-full-result-unique-by")
             value = getattr(self, name)
             if isinstance(identity_field, str) and value is not None:
                 identities = [getattr(row, identity_field) for row in value]
                 if len(identities) != len(set(identities)):
                     raise ValueError(f"完整结果集合身份重复：{name}")
-                else:
-                    pass
                 required = metadata.get("x-fatebridge-full-result-identities", [])
                 if not isinstance(required, list) or any(
                     item not in identities for item in required
                 ):
                     raise ValueError(f"完整结果缺少必要集合成员：{name}")
-                else:
-                    pass
-            else:
-                pass
         return self

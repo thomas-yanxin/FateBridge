@@ -30,8 +30,6 @@ def _profile() -> dict[str, Any]:
         or profile["version"] != "1.0.0"
     ):
         raise ValueError("Unknown selected Meihua strength-reading profile")
-    else:
-        pass
     return profile
 
 
@@ -42,12 +40,8 @@ def seasonal_reading_ruleset() -> dict[str, Any]:
 def _preference_status(actual: str | None, expected: str | None) -> str:
     if expected is None:
         return "not_applicable"
-    else:
-        pass
     if actual not in {"旺", "衰"}:
         return "unknown_strength"
-    else:
-        pass
     return "matches" if actual == expected else "does_not_match"
 
 
@@ -62,13 +56,9 @@ def build_seasonal_qualification(
     """Use computed labels as supplied; 原文未定 never becomes neutral or weak."""
     if [r["role"] for r in stages] != list(ROLES):
         raise ValueError("Strength reading requires the four actual stage roles")
-    else:
-        pass
     nodes = control["nodes"]
     if [n["role"] for n in nodes] != ["body", *ROLES]:
         raise ValueError("Strength reading requires the same internal role occurrences")
-    else:
-        pass
     if (nodes[0]["trigram"], nodes[0]["element"]) != (
         stages[0]["body"],
         stages[0]["body_element"],
@@ -80,25 +70,17 @@ def build_seasonal_qualification(
         raise ValueError(
             "Strength and control contexts must belong to the same actual cast"
         )
-    else:
-        pass
     strengths = {}
     if seasonal is not None:
         if [r["role"] for r in seasonal["trigrams"]] != ["body", *ROLES]:
             raise ValueError("Strength labels must cover each actual role once")
-        else:
-            pass
         for index, (n, row) in enumerate(zip(nodes, seasonal["trigrams"], strict=True)):
             if (n["trigram"], n["element"]) != (row["trigram"], row["element"]):
                 raise ValueError("Strength label belongs to another cast")
-            else:
-                pass
             strengths[n["role"]] = (
                 row["strength"],
                 f"{strength_prefix}.trigrams.{index}.strength",
             )
-    else:
-        pass
     rules = {r["id"]: r for r in _profile()["rules"]}
     role_rows = []
     for index, n in enumerate(nodes):
@@ -161,8 +143,6 @@ def build_seasonal_qualification(
     for rule in _profile()["rules"]:
         if rule["kind"] != "joint_condition":
             continue
-        else:
-            pass
         related = [
             n
             for n in role_rows[1:]
@@ -201,8 +181,6 @@ def build_seasonal_qualification(
     for row in conditions:
         if row["status"] != "matched":
             continue
-        else:
-            pass
         labels = "、".join(
             LABELS[r] + next(n["trigram"] for n in role_rows if n["role"] == r)
             for r in row["related_roles"]
@@ -225,8 +203,6 @@ def build_seasonal_qualification(
             if seasonal is not None
             else "未给已确认节月，相关旺衰联合条件待核定。"
         )
-    else:
-        pass
     preferred = [r for r in preferences[1:] if r["status"] == "matches"]
     if preferred:
         labels = "、".join(
@@ -236,12 +212,8 @@ def build_seasonal_qualification(
             for r in preferred
         )
         parts.append(labels + "的所列偏好。")
-    else:
-        pass
     if not parts:
         parts.append("当前所列三条旺衰联合条件未触发；不据此给出整体吉凶。")
-    else:
-        pass
     parts.append(
         "这些为分别记录的条款与偏好，须与生克受制并看，未合成为净吉凶、应期或现实成败。"
     )

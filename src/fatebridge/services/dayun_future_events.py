@@ -47,13 +47,9 @@ def collect_future_dayun_gap_events(
     """Retain calculated inverse brackets; never certify continuous coverage."""
     if analysis_moment is None:
         return [], [], {"status": "not_applicable_explicit_age"}, ()
-    else:
-        pass
     zone = parse_timezone_name(template.timezone)
     if isinstance(zone, timezone):
         return [], [], {"status": "fixed_offset"}, ()
-    else:
-        pass
     analysis = utc_calendar(localize_datetime(analysis_moment, template.timezone))
     try:
         utc_day = date(*analysis.date_parts)
@@ -84,8 +80,6 @@ def collect_future_dayun_gap_events(
     }
     if not gaps and not folds:
         return [], [], scan, ()
-    else:
-        pass
     events: list[BirthEventRecord] = []
     unresolved: list[UnresolvedBirthEvent] = []
     seen = set()
@@ -100,8 +94,6 @@ def collect_future_dayun_gap_events(
                 }
             )
             continue
-        else:
-            pass
         for gap in changes:
             fold = gap.offset_after_seconds < gap.offset_before_seconds
             change_name = "fold" if fold else "gap"
@@ -113,14 +105,10 @@ def collect_future_dayun_gap_events(
                     bracket = cell.inverse(target)
                     if bracket is None:
                         continue
-                    else:
-                        pass
                     lower, upper = bracket
                     key = (lower, upper, gap.instant_utc, index, target)
                     if key in seen:
                         continue
-                    else:
-                        pass
                     seen.add(key)
                     events.append(
                         {

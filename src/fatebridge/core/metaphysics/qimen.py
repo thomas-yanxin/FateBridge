@@ -152,8 +152,6 @@ def _qimen_effective_ganzhi(seed: MetaphysicsSeed) -> tuple[str, str]:
     hour, _, _, _ = seed.clock.time_parts
     if hour != 23:
         return ganzhi_text(seed.pillars["day"]), ganzhi_text(seed.pillars["hour"])
-    else:
-        pass
 
     day_pillar = BaZiCalendar.calculate_day_pillar(
         *resolve_bazi_effective_date(
@@ -180,8 +178,6 @@ def _qimen_resolve_zhirun_meta(
     hour, _, _, _ = seed.clock.time_parts
     if hour == 23:
         target_day_number += 1
-    else:
-        pass
     target_key = qimen_day_key(target_day_number)
     # The annual map already covers previous Daxue through next Lichun.
     # Corrected-clock or late-Zi rollover can cross a year without changing
@@ -190,14 +186,10 @@ def _qimen_resolve_zhirun_meta(
     yinyangdun_map = _qimen_build_yinyangdun_map(context_year, seed.timezone)
     if target_key not in yinyangdun_map:
         raise ValueError("无法确定置闰局，不以月份、日支或时支凑局数")
-    else:
-        pass
     resolved_term, resolved_day_ganzhi = yinyangdun_map[target_key]
     effective_day_ganzhi, _ = _qimen_effective_ganzhi(seed)
     if resolved_day_ganzhi != effective_day_ganzhi:
         raise ValueError("置闰历表与有效日柱不一致，不能继续起局")
-    else:
-        pass
     ju_day_ganzhi = resolved_day_ganzhi
     yuan = _qimen_find_yuan(ju_day_ganzhi)
     ju_number = _qimen_ju_number_for_term(
@@ -236,8 +228,6 @@ def _qimen_ju_number_for_term(
     table = QIMEN_JU_BY_TERM.get(current_term)
     if not table:
         raise ValueError(f"未知奇门定局节气：{current_term!r}")
-    else:
-        pass
     yuan_index = {"上元": 0, "中元": 1, "下元": 2}[yuan]
     return table[yuan_index]
 
@@ -245,12 +235,8 @@ def _qimen_ju_number_for_term(
 def _qimen_build_ju_text(dun_type: str, ju_number: int, yuan: str) -> str:
     if dun_type not in {"阳遁", "阴遁"} or yuan not in {"上元", "中元", "下元"}:
         raise ValueError("未知奇门遁型或三元")
-    else:
-        pass
     if type(ju_number) is not int or not 1 <= ju_number <= 9:
         raise ValueError("奇门局数必须是1至9的整数")
-    else:
-        pass
     index = ju_number - 1
     return f"{dun_type}{QIMEN_CN_NUMBERS[index]}局{yuan}"
 
@@ -274,8 +260,6 @@ def build_qimen_board(
         yuan = _qimen_find_yuan(day_ganzhi)
         if current_term not in QIMEN_JU_BY_TERM:
             raise ValueError("无法确定拆补局的实际节气")
-        else:
-            pass
         ju_meta = {
             "current_term": current_term,
             "yuan": yuan,
@@ -310,13 +294,9 @@ def build_qimen_board(
     zhishi_palace = palace_map[leaders["door_gong"]]
     if zhifu_star not in [zhifu_palace["star"], *zhifu_palace["hosted_stars"]]:
         raise ValueError("值符身份与九星盘不一致")
-    else:
-        pass
     zhishi_door = zhishi_palace["door"]
     if zhishi_door != QIMEN_DOOR_DISPLAY[leaders["door"]]:
         raise ValueError("值使身份与八门盘不一致")
-    else:
-        pass
     assert zhishi_door is not None
     zhishi_door_code = leaders["door"]
 

@@ -45,8 +45,6 @@ def validate_bundle(data: dict[str, Any]) -> None:
         or [r["row_number"] for r in rows] != list(range(1, 328))
     ):
         raise ValueError("大衍所选327行数值与原始源预期的绑定已改变")
-    else:
-        pass
     if (
         data["units"]["day_units"] != 3040
         or data["source_reference"]["version_literal"] != "2022/12/27版"
@@ -67,8 +65,6 @@ def validate_bundle(data: dict[str, Any]) -> None:
         is not False
     ):
         raise ValueError("大衍所选单位、版本或未知条件不得改为统一进朔法")
-    else:
-        pass
 
 
 @dataclass(frozen=True)
@@ -93,8 +89,6 @@ def _table(path: Path) -> _Table:
     )
     if len(set(keys)) != len(keys):
         raise ValueError("大衍具名行的普通月与闰月键不得重复或合并")
-    else:
-        pass
     return _Table(
         keys,
         tuple(json.dumps(r, ensure_ascii=False) for r in ordered),
@@ -187,8 +181,6 @@ def scope_lines(scope: dict[str, Any], selected: dict[str, Any] | None) -> list[
             "selected_original_witness_comparison为空；当前研究选行仍按实际字段交付，"
             "不将别月甲午／丙午校订或条件月首用于本月，也不外推闰月补配或统一进朔公式。"
         )
-    else:
-        pass
     return lines
 
 
@@ -209,15 +201,11 @@ def month_comparison(
         or not 0 <= host_month_start_index < 60
     ):
         raise ValueError("具名月首比较须使用明确月键及0至59的月首干支序号")
-    else:
-        pass
     table = _table(SOURCE)
     key = (year, month, leap)
     index = bisect_left(table.keys, key)
     if index == len(table.keys) or table.keys[index] != key:
         return None
-    else:
-        pass
     row = json.loads(table.row_json[index])
     literal = row["author_proposed_decision_literal"]
     shift = None if literal == "-" else int(literal.startswith("進"))
@@ -325,6 +313,4 @@ def comparison_lines(result: dict[str, Any]) -> list[str]:
     )
     if witness is not None:
         parts.extend(witness_lines(witness))
-    else:
-        pass
     return parts

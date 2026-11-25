@@ -20,8 +20,6 @@ def _solar_extremum(
     for _ in range(96):
         if left == right or left == lower or right == upper:
             break
-        else:
-            pass
         if left_value < right_value:
             upper, right, right_value = right, left, left_value
             left = upper - ratio * (upper - lower)
@@ -47,15 +45,11 @@ def _chebyshev_derivative(coefficients: list[float]) -> list[float]:
     degree = len(coefficients) - 1
     if degree == 0:
         return [0.0]
-    else:
-        pass
     derivative = [0.0] * degree
     for index in range(degree - 1, -1, -1):
         derivative[index] = 2 * (index + 1) * coefficients[index + 1]
         if index + 2 < degree:
             derivative[index] += derivative[index + 2]
-        else:
-            pass
     derivative[0] /= 2
     return derivative
 
@@ -68,8 +62,6 @@ def _chebyshev_roots(coefficients: list[float]) -> list[float]:
     """
     if len(coefficients) == 1:
         return []
-    else:
-        pass
     stationary = _chebyshev_roots(_chebyshev_derivative(coefficients))
     nodes = [-1.0, *stationary, 1.0]
     values = [_chebyshev_value(coefficients, point) for point in nodes]
@@ -79,20 +71,14 @@ def _chebyshev_roots(coefficients: list[float]) -> list[float]:
     ):
         if not (low_value < 0 < high_value or high_value < 0 < low_value):
             continue
-        else:
-            pass
         for _ in range(64):
             middle = lower + (upper - lower) / 2
             if middle == lower or middle == upper:
                 break
-            else:
-                pass
             score = _chebyshev_value(coefficients, middle)
             if score == 0:
                 lower = upper = middle
                 break
-            else:
-                pass
             if (score < 0) == (low_value < 0):
                 lower, low_value = middle, score
             else:
@@ -124,13 +110,9 @@ def solar_altitude_nodes(
             words.append(math.nextafter(words[-1], upper))
             if words[-1] == upper:
                 break
-            else:
-                pass
         if words[-1] == upper:
             nodes.update(words)
             continue
-        else:
-            pass
         middle = lower + (upper - lower) / 2
         radius = (upper - lower) / 2
 
@@ -178,17 +160,11 @@ def solar_altitude_nodes(
             8 * tail + uncertainty
         ):
             continue
-        else:
-            pass
         if tail > uncertainty:
             if depth == 20 or middle in (lower, upper):
                 raise RuntimeError("Solar altitude interpolation did not converge")
-            else:
-                pass
             pending.extend(((lower, middle, depth + 1), (middle, upper, depth + 1)))
             continue
-        else:
-            pass
         while len(coefficients) > 1 and abs(coefficients[-1]) <= uncertainty:
             coefficients.pop()
         derivative = _chebyshev_derivative(coefficients)
@@ -208,6 +184,4 @@ def solar_altitude_nodes(
                         maximum=before > 0,
                     )
                 )
-            else:
-                pass
     return sorted(nodes)

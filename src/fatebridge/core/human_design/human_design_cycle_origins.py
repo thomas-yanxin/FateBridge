@@ -98,8 +98,6 @@ def comparison_rows(
         r["body"] for r in alternative
     ] != list(BODIES):
         raise ValueError("Cycle origin comparison requires all three ordered bodies")
-    else:
-        pass
     for selected, assumed in zip(primary, alternative, strict=True):
         a, b = _endpoints(selected, reference), _endpoints(assumed, reference)
         shifts = {}
@@ -142,8 +140,6 @@ def origin_reading(rows: list[dict[str, Any]], *, has_reference: bool) -> str:
             if has_reference:
                 text += "参考位置保持未评估，"
             text += "不由零个已观察候选推断没有交会。"
-        else:
-            pass
     return (
         text
         + "天王星出生原点有公开明文；设计假设不是同等原典依据。土星／凯龙原点及全部首末触优先仍未裁定，不据此分配第六线阶段或预测事件。"
@@ -235,8 +231,6 @@ def calculate_origin_comparison(
         "Uranus",
     }:
         raise EphemerisSourceError("design_origin_source_mismatch")
-    else:
-        pass
     traces: dict[str, dict[float, list[float | int]]] = {b: {} for b in BODIES}
     indices: dict[str, dict[float, int]] = {b: {} for b in BODIES}
     failures: dict[str, dict[float, str]] = {b: {} for b in BODIES}
@@ -251,8 +245,6 @@ def calculate_origin_comparison(
             activation["return_flags"],
         ]:
             raise EphemerisSourceError("design_origin_source_mismatch")
-        else:
-            pass
         traces[body][origin] = list(seed)
         indices[body][origin] = origin_sources.indices[body]
     readers = {

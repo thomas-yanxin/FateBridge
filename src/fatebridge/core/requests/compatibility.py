@@ -185,6 +185,4 @@ class SukuyoCompatibilityRequest(_DeferredModel):
             for p in (self.person1_calendar_day_part, self.person2_calendar_day_part)
         ):
             raise ValueError("原典日序半日只适用于明确选择的Hinoo研究档案")
-        else:
-            pass
         return self

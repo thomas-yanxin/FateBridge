@@ -31,22 +31,14 @@ def historical_solar_resolution(
         BASE_SOFTWARE_YEARS[0] <= year <= BASE_SOFTWARE_YEARS[1]
     ):
         return None
-    else:
-        pass
     mode = solar_model_policy()
     if mode == "aa1996":
         return _aa1996_resolution(year, term_name, timezone_name)
-    else:
-        pass
     if mode not in {"auto", "de440"}:
         return None
-    else:
-        pass
     jpl_file = configured_jpl_file()
     if mode == "auto" and jpl_file is not None:
         return None
-    else:
-        pass
     source_key = de440_solar.cache_key(MODEL_ID)
     index = almanac.SOLAR_TERM_NAMES.index(term_name)
     month = index // 2 + 1
@@ -72,8 +64,6 @@ def historical_solar_resolution(
         raise EphemerisSourceError("solar_configuration_changed") from error
     if current_configuration != (mode, jpl_file, source_key):
         raise EphemerisSourceError("solar_configuration_changed")
-    else:
-        pass
     return {
         "moment": moment.isoformat(),
         "civil_point": point.to_record(),
@@ -126,8 +116,6 @@ def _aa1996_resolution(year: int, term_name: str, timezone_name: str) -> dict[st
     details = provenance["solar_model_details"]
     if details["qualified_solar_term_years"] != list(SOFTWARE_YEARS):
         raise EphemerisSourceError("solar_aa1996_range")
-    else:
-        pass
     try:
         unchanged = solar_model_policy() == "aa1996" and (
             solar_term_cache_context(almanac.swe) == context
@@ -136,8 +124,6 @@ def _aa1996_resolution(year: int, term_name: str, timezone_name: str) -> dict[st
         raise EphemerisSourceError("solar_configuration_changed") from error
     if not unchanged:
         raise EphemerisSourceError("solar_configuration_changed")
-    else:
-        pass
     return {
         "moment": ZonedCalendar(moment, parse_timezone_name(timezone_name)).isoformat(),
         "civil_point": provenance["resolved_civil_point"].to_record(),

@@ -51,8 +51,6 @@ def enrich_india_chart(
             }
         )
         return
-    else:
-        pass
     india = build_india(
         birth,
         node_mode=node_mode,
@@ -122,8 +120,6 @@ def calculate_vimshottari(
 ) -> dict[str, Any]:
     if hsys not in {None, 0} or zodiacal not in {None, 1}:
         raise ValueError("Vimshottari 使用 Lahiri 恒星黄道与整宫制。")
-    else:
-        pass
     # The solar option is a display label. It cannot change the ephemeris epoch
     # or enter a different mean-model window by moving to a neighbouring date.
     birth_kwargs["preserve_instant"] = True
@@ -136,8 +132,6 @@ def calculate_vimshottari(
         # Build the recorded instant without the generic UTC-as-UT1 display.
         # Noncivil conflicting options still reach the builder's validation.
         birth_kwargs["use_true_solar_time"] = False
-    else:
-        pass
     birth = build_astro_birth_info(**birth_kwargs)
     birth, _ = normalize_solar_display(
         birth, ephemeris_policy, requested=display_requested
@@ -170,8 +164,6 @@ def calculate_vimshottari(
             "分析钟时的当地 UTC 偏移未指定。请提供有效的分析时区或已核实的 UTC 偏移。",
             [{"path": "analysis_timezone", "code": "unresolved_timezone_offset"}],
         ).as_result()
-    else:
-        pass
     validate_clock(analysis, "分析钟时")
     grid = DashaGrid(analysis, year_basis, divisions, dasha_depth)
     india = build_india(
@@ -210,8 +202,6 @@ def calculate_vimshottari(
         current_lords.update(
             row["lord"] for row in result["subdivisions"]["current_levels"]
         )
-    else:
-        pass
     result["natal_ruler_context"] = [
         {
             "reference": "nominal_birth_instant_only",
@@ -278,8 +268,6 @@ def calculate_vimshottari(
             f"按名义生时，目标时刻运主链为{chain}；按{year_basis}递归细分，"
             "给定生时误差另见完整运主链候选；细分边界不代表现实事件精度。"
         )
-    else:
-        pass
     output["snapshot_text"] = render_structured_snapshot_text(
         output, title="印占 Vimshottari 分期"
     )

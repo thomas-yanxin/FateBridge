@@ -22,8 +22,6 @@ HOUR_BRANCH_TOMBS = {
 def build_hour_branch_tomb(hour_ganzhi: str, *, source: str) -> dict[str, Any]:
     if hour_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("时干支入墓检查需要有效的六十甲子时柱")
-    else:
-        pass
     definition = HOUR_BRANCH_TOMBS.get(hour_ganzhi)
     return {
         "rule_id": "hour_branch_tomb",

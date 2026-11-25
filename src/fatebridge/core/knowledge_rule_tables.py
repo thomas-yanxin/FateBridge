@@ -106,8 +106,6 @@ def astro_rule_cards(labels: dict[str, str]) -> dict[str, dict[str, KnowledgeCar
             )
         if lot_id == "fortune":
             descriptions.append("托勒密 III.10 单列上升点 + 月亮 − 太阳，夜盘同式。")
-        else:
-            pass
         lots[key] = {
             "title": definition["cn"],
             "tips": descriptions,

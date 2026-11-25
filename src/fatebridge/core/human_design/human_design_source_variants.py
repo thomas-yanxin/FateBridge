@@ -38,23 +38,17 @@ def printed_lines() -> dict[int, list[dict[str, Any]]]:
         (gate, line) for gate in range(1, 65) for line in range(1, 7)
     }:
         raise ValueError("Incomplete source line arcs")
-    else:
-        pass
     if (
         reference["printed_source"]["pdf_sha256"]
         != depth_reference()["source"]["pdf_sha256"]
     ):
         raise ValueError("Different original source edition")
-    else:
-        pass
     for row in rows:
         if any(
             type(row[k]) is not int or not 0 <= row[k] < 1296000
             for k in ("start_arcseconds", "end_arcseconds")
         ):
             raise ValueError("Invalid exact printed arc")
-        else:
-            pass
     return {
         g: sorted((r for r in rows if r["gate"] == g), key=lambda r: r["line"])
         for g in range(1, 65)
@@ -185,8 +179,6 @@ def line_variant_impact(chart: dict[str, Any]) -> dict[str, Any]:
                         "source_pdf_page_one_based": row[0]["pdf_page_one_based"],
                     }
                 )
-            else:
-                pass
     changes = []
     pairs = []
     candidate_profile = None
@@ -207,8 +199,6 @@ def line_variant_impact(chart: dict[str, Any]) -> dict[str, Any]:
             by_body = {r["body"]: r for r in conditional.get(side, [])}
             if not {"Sun", "Earth"} <= by_body.keys():
                 continue
-            else:
-                pass
             sun, earth = by_body["Sun"]["line"], by_body["Earth"]["line"]
             pairs.append(
                 {
@@ -220,10 +210,6 @@ def line_variant_impact(chart: dict[str, Any]) -> dict[str, Any]:
             )
         if len(pairs) == 2 and all(r["same_line"] for r in pairs):
             candidate_profile = "/".join(str(r["printed_sun_line"]) for r in pairs)
-        else:
-            pass
-    else:
-        pass
     paired = len(pairs) == 2 and all(r["same_line"] for r in pairs)
     return {
         "status": (
@@ -272,8 +258,6 @@ def discrepancy_reading(impacts: dict[str, Any], names: dict[str, Any]) -> str:
             == "inconsistent_printed_sun_earth_lines"
         ):
             text += "照搬印刷线界会使同侧日地不同线，不能据此生成一个有效的替代角色或完整解释。"
-        else:
-            pass
         text += "条件性线固定差异见同次source_consistency.activation_impacts；未生成替代Color/Tone/Base。"
     else:
         text += "当前激活未落入该印刷分歧区间，不能据此宣称原典整体一致。"

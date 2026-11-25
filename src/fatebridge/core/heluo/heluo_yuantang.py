@@ -23,20 +23,12 @@ def resolve_half_year(
     """A sexagenary month pillar spans its Jie boundaries, not a solstice."""
     if month_zhi not in YANG_HOURS + YIN_HOURS:
         raise ValueError("月支须为十二地支。")
-    else:
-        pass
     if explicit is not None:
         if type(explicit) is not bool:
             raise ValueError("阴阳令须为布尔值，不能以字符串或数字代替。")
-        else:
-            pass
         return explicit, "explicit_half_year"
-    else:
-        pass
     if month_zhi in {"子", "午"}:
         return None, "boundary_month_unresolved"
-    else:
-        pass
     return month_zhi in "丑寅卯辰巳", "month_branch_half_year"
 
 
@@ -49,18 +41,12 @@ def placement(
         or any(type(b) is not int or b not in (0, 1) for b in lines)
     ):
         raise ValueError("元堂须输入自初至上的六个0/1整数。")
-    else:
-        pass
     if hour_zhi not in YANG_HOURS + YIN_HOURS:
         raise ValueError("元堂时支须为十二地支。")
-    else:
-        pass
     if type(is_male) is not bool or (
         yang_ling is not None and type(yang_ling) is not bool
     ):
         raise ValueError("元堂性别标志及阴阳令不得隐式强转。")
-    else:
-        pass
     yang_hour = hour_zhi in YANG_HOURS
     hours = YANG_HOURS if yang_hour else YIN_HOURS
     matching = [p for p, bit in enumerate(lines, 1) if bit == int(yang_hour)]
@@ -72,8 +58,6 @@ def placement(
         needs_half = (qian and not is_male) or (not qian and is_male)
         if needs_half and yang_ling is None:
             raise ValueError("纯乾女命或纯坤男命的元堂须明确至点阴阳令。")
-        else:
-            pass
         reverse = (qian and not is_male and yang_ling is True) or (
             not qian and is_male and yang_ling is False
         )

@@ -25,8 +25,6 @@ _DIGITS = "一二三四五六七八九"
 def _integer_text(value: int) -> str:
     if value < 10:
         return _DIGITS[value - 1]
-    else:
-        pass
     tens, ones = divmod(value, 10)
     return (
         ("" if tens == 1 else _DIGITS[tens - 1])
@@ -47,39 +45,25 @@ class MarkerReading:
     def __post_init__(self) -> None:
         if self.palace not in BRANCHES or len(self.palace) != 1:
             raise ValueError("附字须有单个明确宫支")
-        else:
-            pass
         if isinstance(self.column, bool) or not isinstance(self.column, int):
             raise TypeError("附字位置须为明确整数列号")
-        else:
-            pass
         if not 1 <= self.column <= 30 or self.mansion not in MANSIONS:
             raise ValueError("附字须对应本图1至30列的具名宿标")
-        else:
-            pass
         if self.kind == "integer":
             if isinstance(self.integer_value, bool) or not isinstance(
                 self.integer_value, int
             ):
                 raise TypeError("整数释读须明确给出整数，不能借浮点或默认零补字")
-            else:
-                pass
             if not 1 <= self.integer_value <= 30 or self.text != _integer_text(
                 self.integer_value
             ):
                 raise ValueError("规范汉字与数值释读不符；不能借相邻格改字")
-            else:
-                pass
         elif self.kind == "initial":
             if self.text != "初" or self.integer_value is not None:
                 raise ValueError("初字须保留为初，不赋数值零")
-            else:
-                pass
         elif self.kind == "not_visible":
             if self.text is not None or self.integer_value is not None:
                 raise ValueError("未见附字不等于零、初或推定整数")
-            else:
-                pass
         else:
             raise ValueError("须明确选择整数、初字或本图未见附字")
 
@@ -105,25 +89,15 @@ class GridCell:
     def __post_init__(self) -> None:
         if not isinstance(self.initial_marker, bool):
             raise TypeError("初标须明确为布尔值，不以数值冒充")
-        else:
-            pass
         if self.mansion_marker is not None and self.mansion_marker not in MANSIONS:
             raise ValueError("宿名标须为具名28宿之一，不要求所有标名都有外圈")
-        else:
-            pass
         if self.numeral_value is not None:
             if isinstance(self.numeral_value, bool) or not isinstance(
                 self.numeral_value, int
             ):
                 raise TypeError("普通格数字只接收明确整数释读")
-            else:
-                pass
             if not 1 <= self.numeral_value <= 30:
                 raise ValueError("本图普通格数字释读范围为1至30，不接收浮点古度")
-            else:
-                pass
-        else:
-            pass
         if (
             int(self.mansion_marker is not None)
             + int(self.numeral_value is not None)
@@ -131,8 +105,6 @@ class GridCell:
             != 1
         ):
             raise ValueError("每格须且仅须一种已释类别；不猜宿标附字或缺失格")
-        else:
-            pass
 
 
 @dataclass(frozen=True)
@@ -153,18 +125,12 @@ class LifeDegreeGrid:
         rows = tuple(tuple(row) for row in self.rows)
         if len(rows) != 12 or any(len(row) != 30 for row in rows):
             raise ValueError("本图须有明确的12行30列；不按相邻格生成缺格")
-        else:
-            pass
         if any(not isinstance(cell, GridCell) for row in rows for cell in row):
             raise TypeError("每格须为明确释读的GridCell")
-        else:
-            pass
         object.__setattr__(self, "rows", rows)
         readings = tuple(self.marker_readings)
         if any(not isinstance(r, MarkerReading) for r in readings):
             raise TypeError("附字须为明确的MarkerReading")
-        else:
-            pass
         if (readings and not (self.marker_profile_id and self.marker_data_sha256)) or (
             not readings
             and (
@@ -175,8 +141,6 @@ class LifeDegreeGrid:
             raise ValueError(
                 "具名附字资料及其指纹须与完整读法一起提供，不能空表冒充同版本"
             )
-        else:
-            pass
         if readings:
             expected = {
                 (p, c, cell.mansion_marker)
@@ -189,10 +153,6 @@ class LifeDegreeGrid:
                 raise ValueError(
                     "附字须逐一对应本图全部宿名标，不重排、补位或跨版本拼接"
                 )
-            else:
-                pass
-        else:
-            pass
         object.__setattr__(self, "marker_readings", readings)
 
     def _marker(self, palace: str, column: int) -> MarkerReading | None:
@@ -208,16 +168,10 @@ class LifeDegreeGrid:
     def cell(self, palace: str, column: int) -> dict[str, Any]:
         if palace not in BRANCHES or len(palace) != 1:
             raise ValueError("须明确给出单个宫支，不从现代经度推定")
-        else:
-            pass
         if isinstance(column, bool) or not isinstance(column, int):
             raise TypeError("原图列号须为1至30的整数，不接收现代角度或小数")
-        else:
-            pass
         if not 1 <= column <= 30:
             raise ValueError("本图列号须为1至30，不取模、不自动换叶或挪一列")
-        else:
-            pass
         cell = self.rows[BRANCHES.index(palace)][column - 1]
         reading = self._marker(palace, column)
         return {
@@ -288,8 +242,6 @@ class LifeDegreeGrid:
         """
         if attached_text is not None and not isinstance(attached_text, str):
             raise TypeError("须给原图规范汉字附字，或明确None表示所见空白")
-        else:
-            pass
         candidates = [
             r
             for r in self.marker_readings
@@ -297,13 +249,9 @@ class LifeDegreeGrid:
         ]
         if len(candidates) != 1:
             raise ValueError("指定宫支/宿标在已录附字中不唯一或不存在，不从普通格猜宿")
-        else:
-            pass
         reading = candidates[0]
         if reading.text != attached_text:
             raise ValueError("附字与本图释读不符，不按邻格、全宿度或目标算例改数")
-        else:
-            pass
         result = self.compare(
             source_palace=source_palace,
             target_palace=target_palace,
@@ -339,12 +287,8 @@ class LifeDegreeGrid:
                             "label_or_column_corrected": False,
                         }
                     )
-                else:
-                    pass
                 if left.numeral_value is None or right.numeral_value is None:
                     continue
-                else:
-                    pass
                 if right.numeral_value != left.numeral_value - 1:
                     restarts.append(
                         {
@@ -357,8 +301,6 @@ class LifeDegreeGrid:
                             "label_or_column_corrected": False,
                         }
                     )
-                else:
-                    pass
         return {
             "source_id": self.source_id,
             "source_url": self.source_url,
@@ -412,12 +354,8 @@ def load_grid() -> LifeDegreeGrid:
         or markers["source_image_sha256"] != data["source_image_sha256"]
     ):
         raise ValueError("附字文件与具名矩阵/原图指纹不一致，拒绝跨版本合表")
-    else:
-        pass
     if "".join(row["palace"] for row in data["rows"]) != BRANCHES:
         raise ValueError("源图行支顺序须明确，不自动排序或补行")
-    else:
-        pass
     rows = tuple(
         tuple(GridCell(**cell) for cell in row["cells"]) for row in data["rows"]
     )

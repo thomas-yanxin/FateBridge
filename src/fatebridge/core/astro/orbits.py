@@ -134,11 +134,7 @@ class ApproximateEphemeris:
                 self.uncomputed_motion_reasons[planet] = (
                     "piecewise_mean_node_correction_has_no_unique_derivative_at_knot"
                 )
-            else:
-                pass
             return state
-        else:
-            pass
         motion = self.observer.apparent_state(
             planet, self.tt.days - 2451545, offset_days
         )
@@ -165,8 +161,6 @@ class ApproximateEphemeris:
                 "solar_deflection_has_no_unique_local_TT_derivative_at_profile_or_limiter_corner"
             )
             return state
-        else:
-            pass
         display_d = madd(mm(rotation_d, matrix), mm(rotation, matrix_d))
         mean_d = tuple(
             a + b
@@ -202,24 +196,16 @@ class ApproximateEphemeris:
             )
             dependencies["JPL DE441 bounded source"] = PLANETARY_SOURCE_VERSION
             dependencies["geocentric ERFA TDB-TT coefficients"] = "2.0.1"
-        else:
-            pass
         if any(name not in {"Sun", "Moon"} for name in physical):
             additional.extend([DEFLECTION_SOURCE_URL, DEFLECTION_FORMULA_URL])
-        else:
-            pass
         if "North Node" in planets:
             additional.append(MEAN_NODE_SOURCE_URL)
             dependencies["Swiss numerical mean-node parameters"] = (
                 MEAN_NODE_SOURCE_VERSION
             )
-        else:
-            pass
         if self.tt_source != "chart_tt":
             dependencies["astronomy-engine"] = LIBRARY_VERSION
             additional.append(SOURCE_URL)
-        else:
-            pass
         return {
             "approximate_planets": list(planets),
             "time_argument": "TT",

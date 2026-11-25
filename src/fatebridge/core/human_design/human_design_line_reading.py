@@ -50,8 +50,6 @@ def _condition(source: dict, chart: dict, fixing: dict) -> dict:
         or sorted(requested) not in [sorted((a, b)) for a, b, _ in CHANNELS]
     ):
         return result
-    else:
-        pass
     endpoints = set(requested)
     witnesses = [
         {"path": f"bodygraph.channels.{i}", "value": deepcopy(c)}
@@ -72,8 +70,6 @@ def _condition(source: dict, chart: dict, fixing: dict) -> dict:
     complete = {r["gate"] for r in gates} == endpoints
     if bool(witnesses) != complete:
         raise ValueError("Channel and same-run activation witnesses disagree")
-    else:
-        pass
     result.update(
         calculation_condition_satisfied=complete,
         evaluation_status="evaluated_natal_graph_predicate",
@@ -94,16 +90,12 @@ def _compose(
         len(chart["activations"][s]) != 13 for s in ("personality", "design")
     ):
         raise ValueError("Complete26-activation inventory required")
-    else:
-        pass
     rows = []
     for i, fixing in enumerate(fixings):
         key = f"{fixing['gate']}.{fixing['line']}"
         reference = references[key]["reference_details"]["record"]
         if key != reference["key"] or fixing["fixing_state"] not in EMPHASIS:
             raise ValueError("Wrong line reference or unknown fixing state")
-        else:
-            pass
         meaning = reference["editorial_paraphrase"]
         conditions = reference.get("source_conditions")
         bound = (
@@ -123,8 +115,6 @@ def _compose(
                     raise ValueError(
                         "Source pole and editorial text inventory disagree"
                     )
-                else:
-                    pass
                 text += "局部待复核转述：" + "".join(
                     POLES[p] + "为" + meaning[p] for p in available
                 )
@@ -187,15 +177,11 @@ def _compose(
                 ],
                 source_polarity_wording_policy="enumerated_source_poles_no_invented_opposite_v1",
             )
-        else:
-            pass
     expected_paths = [
         f"activations.{s}.{i}" for s in ("personality", "design") for i in range(13)
     ]
     if [r["activation_path"] for r in rows] != expected_paths:
         raise ValueError("Original activation traversal changed or a row was omitted")
-    else:
-        pass
     curated = sum(r["editorial_paraphrase"] is not None for r in rows)
     return {
         "activation_scope": "selected_nominal_personality_and_design",

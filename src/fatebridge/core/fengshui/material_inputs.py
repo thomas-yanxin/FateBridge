@@ -70,8 +70,6 @@ class MaterialShapeFact(_DeferredModel):
     def nonblank(cls, value: str) -> str:
         if not value.strip():
             raise ValueError("材质器形事实的ID与依据不能为空白")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -80,17 +78,11 @@ class MaterialShapeFact(_DeferredModel):
             raise ValueError(
                 "材质器形事实至少提供一种实际属性；未知用unknown，不以目标代替观察"
             )
-        else:
-            pass
         if self.plant_alive is not None and self.material != "living_plant":
             raise ValueError("plant_alive只用于明确的living_plant")
-        else:
-            pass
         if self.application is not None:
             if self.element_use is None:
                 raise ValueError("材料施用条件须有明确 element_use 问题")
-            else:
-                pass
             allowed = {
                 "water_clean": "water",
                 "water_moving": "water",
@@ -103,16 +95,12 @@ class MaterialShapeFact(_DeferredModel):
                     and self.material != material
                 ):
                     raise ValueError("施用观察须与独立确认的实际材质一致")
-                else:
-                    pass
             if (
                 self.application.proportionate_to_space is not None
                 and self.material
                 not in {"metal", "water", "stone", "ceramic", "living_plant"}
             ):
                 raise ValueError("尺度条件仅用于已登记的实际代表物材质")
-            else:
-                pass
             healthy = self.application.plant_healthy
             if (
                 healthy
@@ -122,8 +110,4 @@ class MaterialShapeFact(_DeferredModel):
                 and self.observation_basis != "image_observed"
             ):
                 raise ValueError("已确认死亡植物不能同时确认健康存活")
-            else:
-                pass
-        else:
-            pass
         return self

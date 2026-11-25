@@ -120,8 +120,6 @@ def build_stem_context(
     for index, palace in enumerate(board["palaces"]):
         if palace["trigram"] == "中":
             continue
-        else:
-            pass
         for rule_id, name, sky, earth, matched, section, pages, aliases in [
             (
                 "hidden_day_stem",
@@ -160,8 +158,6 @@ def build_stem_context(
         ]:
             if not matched:
                 continue
-            else:
-                pass
             is_hour = rule_id == "hour_stem_block"
             identity = context["hour"] if is_hour else day_context
             result.append(

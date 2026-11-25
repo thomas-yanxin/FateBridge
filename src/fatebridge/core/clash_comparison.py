@@ -18,8 +18,6 @@ def build_clash_comparison(
     for event in events:
         if event.get("kind") != "六冲":
             continue
-        else:
-            pass
         positions = list(event["positions"])
         row: dict[str, Any] = {
             "positions": positions,
@@ -67,8 +65,6 @@ def clash_comparison_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
     receipt = assessment.get("clash_comparison")
     if not receipt or not receipt.get("events"):
         return []
-    else:
-        pass
     labels = {"year": "年支", "month": "月支", "day": "日支", "hour": "时支"}
     lines = []
     for row in receipt["events"]:

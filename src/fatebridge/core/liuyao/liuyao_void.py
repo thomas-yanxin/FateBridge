@@ -83,8 +83,6 @@ def build_void_conditions(
                 day_generate["matched"], day, penalty
             )
             day_generate["qualification_source_path"] = penalty["source_path"]
-        else:
-            pass
         positive = [
             rule(
                 "supported", "旺不为空；仅使用同次明确有根生扶裁定", a["is_supported"]

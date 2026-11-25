@@ -360,10 +360,6 @@ class FengshuiOutput(ProjectedOutput):
             )
             if set(self.coverage.implemented_layers or []) - actual:
                 raise ValueError("完整风水结果缺少已声明计算的图层")
-            else:
-                pass
-        else:
-            pass
         return self
 
 

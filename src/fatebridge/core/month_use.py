@@ -164,14 +164,10 @@ def build_month_use_resolution(
         ]
         if month == "辰" and day in _CHEN_REN_CLAIMS:
             revelations.append(("壬", _CHEN_REN_CLAIMS[day]))
-        else:
-            pass
         for stem, store_claim in revelations:
             positions = [p for p in ("year", "month", "hour") if pillars[p][0] == stem]
             if not positions:
                 continue
-            else:
-                pass
             god = get_ten_god(day, stem).value
             kind: MonthUseKind
             if store_claim is None:
@@ -212,8 +208,6 @@ def build_month_use_resolution(
         for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
             if month not in group or not set(group).issubset(actual):
                 continue
-            else:
-                pass
             element = bureau[0]
             possible = list(
                 dict.fromkeys(
@@ -314,15 +308,11 @@ def match_month_uses(
             and not include_original_reference
         ):
             continue
-        else:
-            pass
         possible = set(witness["possible_ten_gods"])
         if possible.issubset(allowed):
             matched.append(witness["id"])
         elif possible.intersection(allowed):
             pending.append(witness["id"])
-        else:
-            pass
     return {
         "status": (
             "matched"

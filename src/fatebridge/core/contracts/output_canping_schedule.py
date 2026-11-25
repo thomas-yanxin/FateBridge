@@ -21,8 +21,6 @@ from fatebridge.core.numerology.canping_schedule_basis import (
 def _exact_false(value: object) -> Literal[False]:
     if value is not False:
         raise ValueError("未完成的原典／效验状态不能提升或以0代替false。")
-    else:
-        pass
     return value
 
 
@@ -56,8 +54,6 @@ class CanpingReadingCitation(PartialOutput):
     def coherent_citation(self) -> "CanpingReadingCitation":
         if self.source_id is None:
             return self
-        else:
-            pass
 
         data = source_readings()
         pages = sorted(
@@ -65,8 +61,6 @@ class CanpingReadingCitation(PartialOutput):
         )
         if self.pdf_pages is not None and self.pdf_pages != pages:
             raise ValueError("阅读引文的PDF页码不能跨书替换。")
-        else:
-            pass
         possible_roles = [
             next(
                 c["roles"]
@@ -77,8 +71,6 @@ class CanpingReadingCitation(PartialOutput):
         ]
         if self.roles is not None and self.roles not in possible_roles:
             raise ValueError("阅读引文角色未登记。")
-        else:
-            pass
         return self
 
 
@@ -105,10 +97,6 @@ class CanpingReadingContext(PartialOutput):
                 )
                 if self.date_mapping_statement != expected:
                     raise ValueError("阅读日期条件与所选方法及钟制不符。")
-                else:
-                    pass
-            else:
-                pass
             if self.source_citations is not None:
                 expected_by_source = {
                     c["source_id"]: c for c in reading_source_citations(self.profile_id)
@@ -117,24 +105,12 @@ class CanpingReadingContext(PartialOutput):
                     if c.source_id is not None and c.roles is not None:
                         if c.roles != expected_by_source[c.source_id]["roles"]:
                             raise ValueError("阅读引文角色与所选方法不符。")
-                        else:
-                            pass
-                    else:
-                        pass
-            else:
-                pass
-        else:
-            pass
         if self.source_citations is not None:
             ids = [
                 c.source_id for c in self.source_citations if c.source_id is not None
             ]
             if len(ids) != len(set(ids)):
                 raise ValueError("阅读引文不能重复来源。")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -160,22 +136,16 @@ class CanpingScheduleClause(PartialOutput):
     def coherent_source_excerpt(self) -> "CanpingScheduleClause":
         if self.id is None:
             return self
-        else:
-            pass
 
         entry = next(
             (x for x in source_readings()["clauses"] if x["id"] == self.id), None
         )
         if entry is None:
             raise ValueError("未登记的配运原句。")
-        else:
-            pass
         for key in ("source_id", "pdf_page", "printed_page", "locator", "text", "kind"):
             value = getattr(self, key)
             if value is not None and value != entry[key]:
                 raise ValueError("配运原句及其出处不能互换或改写。")
-            else:
-                pass
         return self
 
 
@@ -221,8 +191,6 @@ class CanpingScheduleBasis(PartialOutput):
             value = getattr(self, field)
             if value is not None and value != expected:
                 raise ValueError("配运来源身份与所选版本不一致。")
-            else:
-                pass
         if self.summary is not None:
             possible = (
                 [SUMMARIES[self.profile_id]]
@@ -231,25 +199,15 @@ class CanpingScheduleBasis(PartialOutput):
             )
             if self.summary not in possible:
                 raise ValueError("配运摘要与实际方法或已核范围不一致。")
-            else:
-                pass
-        else:
-            pass
         if self.sources is not None:
             for source_id, source in self.sources.items():
                 expected_source = data["sources"].get(source_id)
                 if expected_source is None:
                     raise ValueError("未登记的配运书目来源。")
-                else:
-                    pass
                 for key, expected in expected_source.items():
                     value = getattr(source, key)
                     if key in source.model_fields_set and value != expected:
                         raise ValueError("配运书名、版本或书影身份不能互换。")
-                    else:
-                        pass
-        else:
-            pass
         if self.timezone_rules is not None:
             expected_policy = clock_policy_for_rules(self.timezone_rules)
             if (
@@ -258,28 +216,18 @@ class CanpingScheduleBasis(PartialOutput):
                 and self.future_clock_policy != expected_policy
             ):
                 raise ValueError("未来钟面政策与本次时区规则不一致。")
-            else:
-                pass
-        else:
-            pass
         if self.reading_context is not None:
             for field in ("profile_id", "future_clock_policy", "timezone_spec"):
                 outer = getattr(self, field)
                 inner = getattr(self.reading_context, field)
                 if outer is not None and inner is not None and outer != inner:
                     raise ValueError("阅读上下文与同次配运回执不符。")
-                else:
-                    pass
-        else:
-            pass
 
         if (
             self.source_content_sha256 is not None
             and self.source_content_sha256 != CONTENT_SHA256
         ):
             raise ValueError("配运原句的内容身份不符。")
-        else:
-            pass
         if self.profile_id is not None:
             if (
                 self.has_actual_date_mapping is not None
@@ -287,35 +235,19 @@ class CanpingScheduleBasis(PartialOutput):
                 != (self.profile_id != "legacy_minggong_v1")
             ):
                 raise ValueError("旧命宫排法没有已核实际日期映射。")
-            else:
-                pass
             if (
                 self.applied_clause_ids is not None
                 and self.applied_clause_ids != APPLIED[self.profile_id]
             ):
                 raise ValueError("实际采用的配运规则与所选方法不一致。")
-            else:
-                pass
             if self.clauses is not None:
                 for c in self.clauses:
                     if c.id is not None and c.role is not None:
                         entry = next(x for x in data["clauses"] if x["id"] == c.id)
                         if c.role != clause_role(self.profile_id, entry):
                             raise ValueError("配运原句的本次角色与实际方法不一致。")
-                        else:
-                            pass
-                    else:
-                        pass
-            else:
-                pass
-        else:
-            pass
         if self.clauses is not None:
             ids = [c.id for c in self.clauses if c.id is not None]
             if len(ids) != len(set(ids)):
                 raise ValueError("配运原句不能重复计数。")
-            else:
-                pass
-        else:
-            pass
         return self

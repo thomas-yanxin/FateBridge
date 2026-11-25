@@ -79,24 +79,16 @@ def require_meihua_clock_binding(
     }
     if receipt.keys() != expected.keys() | {"statement"}:
         raise ValueError("梅花钟时输入记录的版本或字段范围不符")
-    else:
-        pass
     for name, value in expected.items():
         if type(receipt[name]) is not type(value) or receipt[name] != value:
             raise ValueError("梅花钟时输入记录与本次请求不符：" + name)
-        else:
-            pass
     if any(type(v) is not int for v in receipt["calculation_defaults"].values()):
         raise ValueError("计算补位必须为整数00")
-    else:
-        pass
     nominal = parse_meihua_clock_label(clock["local_datetime"])
     values = [getattr(request, "analysis_" + n) for n in COMPONENTS]
     wanted = [v if v is not None else 0 for v in values]
     if [getattr(nominal, n) for n in COMPONENTS] != wanted:
         raise ValueError("梅花名义钟时与本次请求的计算分量不符")
-    else:
-        pass
     if (
         result["calendar_context"]["lunar_calendar"]["meihua"]["calendar_policy"][
             "civil_clock_resolution"
@@ -104,8 +96,6 @@ def require_meihua_clock_binding(
         != clock
     ):
         raise ValueError("梅花钟时输入记录与时间轨迹不符")
-    else:
-        pass
     scope = result["interpretation"]["evidence_scope"]["clock_input"]
     if (
         scope["path"]
@@ -116,39 +106,27 @@ def require_meihua_clock_binding(
         or scope["observed_precision_certified"] is not False
     ):
         raise ValueError("梅花解释的钟时依据与输入记录不符")
-    else:
-        pass
     require_meihua_instant_binding(result, request)
 
 
 def _same_clock_record(actual: JsonValue, expected: JsonValue, path: str) -> None:
     if type(actual) is not type(expected):
         raise ValueError("梅花钟时记录类型不符：" + path)
-    else:
-        pass
     if isinstance(expected, dict) and isinstance(actual, dict):
         if set(actual) != set(expected):
             raise ValueError("梅花钟时记录字段不符：" + path)
-        else:
-            pass
         for key, value in expected.items():
             _same_clock_record(actual[key], value, path + "." + key)
     elif actual != expected:
         raise ValueError("梅花钟时记录与请求不符：" + path)
-    else:
-        pass
 
 
 def _clock_datetime(value: JsonValue, path: str, *, aware: bool) -> datetime:
     if type(value) is not str:
         raise ValueError("梅花时刻须为字符串：" + path)
-    else:
-        pass
     parsed = parse_meihua_clock_label(value)
     if (parsed.utcoffset() is not None) is not aware:
         raise ValueError("梅花时刻的时区信息不符：" + path)
-    else:
-        pass
     return parsed
 
 
@@ -160,31 +138,23 @@ def _local_clock_matches(value: JsonValue, expected: datetime, path: str) -> Non
         or utc_instant(actual) != utc_instant(expected)
     ):
         raise ValueError("梅花本地钟时或实际时刻与请求不符：" + path)
-    else:
-        pass
 
 
 def _utc_clock_matches(value: JsonValue, expected: datetime, path: str) -> None:
     actual = _clock_datetime(value, path, aware=True)
     if actual.utcoffset() != timedelta(0) or utc_instant(actual) != expected:
         raise ValueError("梅花UTC时刻与请求不符：" + path)
-    else:
-        pass
 
 
 def _elapsed_matches(actual: JsonValue, expected: float, path: str) -> None:
     # note (clock): Boolean values cannot serve as elapsed clock measurements.
     if type(actual) not in {int, float} or actual != expected:
         raise ValueError("梅花UTC钟面间隔不符：" + path)
-    else:
-        pass
 
 
 def _solar_term_day(record: dict[str, JsonValue], path: str) -> Fraction:
     if "civil_point" not in record:
         raise ValueError("梅花节气缺少精确民用主点：" + path)
-    else:
-        pass
     display = record.get("datetime_utc") or record["datetime_with_offset"]
     calendar = utc_calendar(_clock_datetime(display, path, aware=True))
     evidence = CivilPointEvidence.model_validate(
@@ -193,8 +163,6 @@ def _solar_term_day(record: dict[str, JsonValue], path: str) -> Fraction:
     point = evidence.known_point()
     if point is None or point.as_calendar() != calendar:
         raise ValueError("梅花节气主点与民用显示不一致：" + path)
-    else:
-        pass
     return point.day
 
 
@@ -218,8 +186,6 @@ def require_meihua_instant_binding(
     resolved_offset = local.utcoffset()
     if resolved_offset is None:
         raise ValueError("梅花请求没有有效UTC偏移")
-    else:
-        pass
     offset_label = format_utc_offset(resolved_offset)
     supplied = supplied_clock_components(request)
     minute_known, second_known = "minute" in supplied, "second" in supplied
@@ -272,8 +238,6 @@ def require_meihua_instant_binding(
             "input_precision_certifies_accuracy": False,
             "original_text_uniquely_prescribes_seconds": False,
         }
-    else:
-        pass
     _same_clock_record(
         {k: v for k, v in clock.items() if k != "input_components"},
         expected_clock,
@@ -287,8 +251,6 @@ def require_meihua_instant_binding(
     ]:
         if _clock_datetime(value, path, aware=False) != wall:
             raise ValueError("梅花民用钟面与请求不符：" + path)
-        else:
-            pass
     for label, context in [
         ("analysis_context", analysis_context),
         ("calendar_context", calendar_context),
@@ -310,8 +272,6 @@ def require_meihua_instant_binding(
         ]
         if len(traces) != 1:
             raise ValueError("梅花钟时轨迹缺失或重复")
-        else:
-            pass
         _same_clock_record(traces[0]["result"], clock, "rule_trace.result")
         _same_clock_record(
             traces[0]["inputs"],
@@ -331,8 +291,6 @@ def require_meihua_instant_binding(
     after = _solar_term_day(month["next_term"], "month.next_term")
     if not before <= actual_day < after:
         raise ValueError("梅花实际时刻不在所列节月区间")
-    else:
-        pass
     elapsed = actual_day - before
     remaining = after - actual_day
     _elapsed_matches(
@@ -359,8 +317,6 @@ def require_meihua_instant_binding(
     next_day = _solar_term_day(upcoming, "next_solar_term")
     if not previous_day <= actual_day < next_day:
         raise ValueError("梅花实际时刻不在所列相邻节气区间")
-    else:
-        pass
     _same_clock_record(
         analysis_context["current_jieqi"],
         previous["name"],

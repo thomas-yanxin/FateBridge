@@ -35,8 +35,6 @@ def _profile() -> dict[str, Any]:
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != _PROFILE_SHA256:
         raise ValueError("Selected volume-five table source bytes changed")
-    else:
-        pass
     profile: dict[str, Any] = json.loads(raw)
     if (
         profile["id"] != "meihua_volume5_four_state_nlc1925_v1"
@@ -45,18 +43,12 @@ def _profile() -> dict[str, Any]:
         or profile["columns"] != ["春", "夏", "秋", "冬", "四季之月"]
     ):
         raise ValueError("Unknown selected volume-five table layout")
-    else:
-        pass
     for i, column in enumerate(profile["columns"]):
         values = [row[i] for row in profile["rows"].values()]
         if len(set(values)) != 4 or not set(values) < _ELEMENTS:
             raise ValueError("Selected volume-five table is not four distinct cells")
-        else:
-            pass
         if _ELEMENTS - set(values) != {profile["unlisted_elements_by_column"][column]}:
             raise ValueError("Selected volume-five table absence was rebound")
-        else:
-            pass
     return profile
 
 
@@ -73,8 +65,6 @@ def build_volume5_strength_comparison(
         row["element"] not in _ELEMENTS for row in roles
     ):
         raise ValueError("Volume-five comparison requires five actual body/use roles")
-    else:
-        pass
     profile = _profile()
     column = None
     month = None
@@ -84,8 +74,6 @@ def build_volume5_strength_comparison(
             for row in roles
         ):
             raise ValueError("A missing month cannot carry supplied strength labels")
-        else:
-            pass
     else:
         month = seasonal["month_branch"]
         if (
@@ -93,13 +81,9 @@ def build_volume5_strength_comparison(
             or month not in profile["declared_month_branch_columns"]
         ):
             raise ValueError("Volume-five comparison requires a declared month branch")
-        else:
-            pass
         column = profile["declared_month_branch_columns"][month]
         if _SEASON_COLUMNS.get(seasonal["season"]) != column:
             raise ValueError("Month and existing seasonal source context disagree")
-        else:
-            pass
         given = seasonal["trigrams"]
         if len(given) != len(roles) or any(
             any(
@@ -111,8 +95,6 @@ def build_volume5_strength_comparison(
             raise ValueError(
                 "Volume-five comparison and primary labels belong to different casts"
             )
-        else:
-            pass
     index = profile["columns"].index(column) if column is not None else None
     compared = []
     for row in roles:

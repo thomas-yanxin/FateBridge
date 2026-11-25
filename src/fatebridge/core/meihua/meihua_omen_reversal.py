@@ -27,8 +27,6 @@ def _profile() -> dict[str, Any]:
     )
     if value["id"] != "meihua_omen_reversal_nlc1925_v1" or value["version"] != "1.0.0":
         raise ValueError("Unknown selected omen-reversal profile")
-    else:
-        pass
     return value
 
 
@@ -37,8 +35,6 @@ def additional_manifestation(kind: str) -> dict[str, Any]:
     profile = _profile()
     if kind not in profile["manifestations"]:
         raise ValueError("Unknown external manifestation category")
-    else:
-        pass
     return {
         **deepcopy(profile["manifestations"][kind]),
         "mapping_ruleset_id": profile["id"],
@@ -55,21 +51,15 @@ def _reading(
     profile = _profile()
     if profile["body_elements"].get(body["name"]) != body["element"]:
         raise ValueError("Original body trigram and element disagree")
-    else:
-        pass
     records = []
     summaries = []
     observations = external["reported_observations"]
     if len(observations) != len(external["observations"]):
         raise ValueError("External observations and computed rows must remain bound")
-    else:
-        pass
     for index, observation in enumerate(observations):
         kind = observation["manifestation"]
         if kind not in profile["cases"]:
             continue
-        else:
-            pass
         computed = external["observations"][index]
         actual = relationship_by_role(body["element"], "金")
         if (
@@ -84,8 +74,6 @@ def _reading(
             raise ValueError(
                 "Omen qualification must use this candidate's actual body and relation"
             )
-        else:
-            pass
         rule = profile["cases"][kind]
         matched = body["name"] in rule["qualified_bodies"]
         qualified = rule["qualified_symbol"] if matched else None
@@ -131,8 +119,6 @@ def _reading(
             )
     if not records:
         return None
-    else:
-        pass
     return {
         "ruleset_id": profile["id"],
         "version": profile["version"],
@@ -156,15 +142,11 @@ def apply_omen_reversal(cast: dict[str, Any], interpretation: dict[str, Any]) ->
     external = interpretation.get("external_omens")
     if external is None:
         return
-    else:
-        pass
     if not any(
         o["manifestation"] in NEW_MANIFESTATIONS
         for o in external["reported_observations"]
     ):
         return
-    else:
-        pass
     layer = _reading(
         cast["body_trigram"],
         external,
@@ -173,8 +155,6 @@ def apply_omen_reversal(cast: dict[str, Any], interpretation: dict[str, Any]) ->
     )
     if layer is None:
         return
-    else:
-        pass
     external["body_relative_symbols"] = layer
     external["summary"] += layer["summary"]
     suffix = layer["summary"]
@@ -190,8 +170,6 @@ def apply_omen_reversal(cast: dict[str, Any], interpretation: dict[str, Any]) ->
             raise ValueError(
                 "Each actual candidate must retain the same declared categories"
             )
-        else:
-            pass
         own["body_relative_symbols"] = candidate
         own["summary"] += candidate["summary"]
         suffix += (
@@ -202,5 +180,3 @@ def apply_omen_reversal(cast: dict[str, Any], interpretation: dict[str, Any]) ->
     interpretation["comprehensive_judgement"] += suffix
     if interpretation.get("traditional_judgement"):
         interpretation["traditional_judgement"] += layer["summary"]
-    else:
-        pass

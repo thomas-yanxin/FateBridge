@@ -58,24 +58,16 @@ def clause_role(profile: str, clause: dict[str, Any]) -> str:
     """The role belongs to this profile, not just to the book containing it."""
     if clause["id"] in APPLIED[profile]:
         return "applied_rule"
-    else:
-        pass
     if clause["source_id"] == "sanming_nlc":
         return (
             "supplementary_ziping_background"
             if profile != LEGACY
             else "comparison_not_applied"
         )
-    else:
-        pass
     if profile == LEGACY:
         return "comparison_not_applied"
-    else:
-        pass
     if clause["kind"] in {"attribution", "method_distinction"}:
         return "source_context"
-    else:
-        pass
     return "comparison_not_applied"
 
 
@@ -84,16 +76,10 @@ def clock_policy_for_rules(rules: dict[str, Any]) -> str | None:
     database = rules.get("database")
     if database is None:
         return None
-    else:
-        pass
     if database == "explicit_fixed_offset":
         return "explicit_fixed_offset_assumption; no_regional_future_rules"
-    else:
-        pass
     if database == "pytz":
         return "pinned_regional_rules; subject_to_future_legislation"
-    else:
-        pass
     raise ValueError("参评时区规则提供方未登记。")
 
 
@@ -113,8 +99,6 @@ def _collation() -> dict[str, Any]:
         ).hexdigest()
         if digest != CONTENT_SHA256:
             raise ValueError("配运原句或来源身份与所核读法不符。")
-        else:
-            pass
     except (OSError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_canping_schedule_collation") from exc
     data["_file_sha256"] = sha256(raw).hexdigest()
@@ -130,8 +114,6 @@ def reading_source_citations(profile: str) -> list[dict[str, Any]]:
     """Record the examined pages and actual roles for each source ID."""
     if profile not in APPLIED:
         raise ValueError("未登记的参评配运方法。")
-    else:
-        pass
     data = _collation()
     result = []
     for source_id in data["sources"]:
@@ -152,19 +134,13 @@ def date_mapping_statement(
     """Qualify mapped dates without inventing dates for the legacy profile."""
     if profile not in APPLIED:
         raise ValueError("未登记的参评配运方法。")
-    else:
-        pass
     if profile == LEGACY:
         return (
             "本次旧命宫方案仅有年龄标签，没有已核的实际起止日期；"
             "出生钟制记录不构成运期日期映射。"
         )
-    else:
-        pass
     if not isinstance(timezone_spec, str) or not timezone_spec.strip():
         raise ValueError("日期条件需要同次实际时区记录。")
-    else:
-        pass
     if (
         future_clock_policy
         == "explicit_fixed_offset_assumption; no_regional_future_rules"
@@ -173,15 +149,11 @@ def date_mapping_statement(
             f"本次日期按显式固定偏移{timezone_spec}映射，仅在该固定偏移假设下成立；"
             "不表示当地未来法定时间已确认。"
         )
-    else:
-        pass
     if future_clock_policy == "pinned_regional_rules; subject_to_future_legislation":
         return (
             f"本次日期按封存的{timezone_spec}地区规则映射；涉及未来的落点受将来立法影响，"
             "不是已确认的未来当地法定时刻。"
         )
-    else:
-        pass
     raise ValueError("日期条件缺少已登记的同次钟制政策。")
 
 
@@ -209,8 +181,6 @@ def build_schedule_basis(profile: str, timing: dict, clock: dict) -> dict[str, A
     """
     if profile not in APPLIED or timing.get("profile_id") != profile:
         raise NumerologySourceError("runtime_canping_schedule_profile_conflict")
-    else:
-        pass
     data = _collation()
     clauses = []
     for original in data["clauses"]:
@@ -234,8 +204,6 @@ def build_schedule_basis(profile: str, timing: dict, clock: dict) -> dict[str, A
         ) from exc
     if clock_policy is None:
         raise NumerologySourceError("runtime_canping_schedule_binding_conflict")
-    else:
-        pass
     return {
         "policy_id": POLICY_ID,
         "profile_id": profile,
@@ -277,6 +245,4 @@ def schedule_basis_snapshot(basis: dict) -> str:
                 f"出处：《{source['title']}》；{source['edition']}；"
                 f"PDF第{pages}页；本次角色：{roles}。书影：{source['url']}"
             )
-    else:
-        pass
     return "\n".join(lines)

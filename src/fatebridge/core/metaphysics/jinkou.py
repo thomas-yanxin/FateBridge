@@ -66,8 +66,6 @@ def _jinkou_pick_use_position(rows: List[Dict[str, Any]]) -> Tuple[str, str, str
         minority = "阳" if count == 1 else "阴"
         label = next(row["label"] for row in rows if row["polarity"] == minority)
         return label, f"{pattern}，取少数{minority}位{label}为用。", pattern
-    else:
-        pass
     label = "贵神" if count == 4 else "将神"
     return label, f"{pattern}，依阴阳次第五用取{label}。", pattern
 
@@ -112,8 +110,6 @@ def _motion_evidence(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                     ],
                 }
             )
-        else:
-            pass
     return result
 
 
@@ -131,8 +127,6 @@ def build_jinkou_board(
     hour_branch = seed.pillars["hour"][1]
     if di_fen is not None and di_fen not in EARTHLY_BRANCHES:
         raise ValueError("di_fen 必须是一个十二地支")
-    else:
-        pass
     di_fen_branch = hour_branch if di_fen is None else di_fen
     diurnal = resolve_diurnal(hour_branch, is_diurnal_override)
     guiren_start, guishen_map = _build_guishen_mapping(
@@ -278,8 +272,6 @@ def build_jinkou_board(
     }
     if runyear:
         overview["runyear"] = runyear
-    else:
-        pass
     return {
         "overview": overview,
         "calendar_policy": dict(

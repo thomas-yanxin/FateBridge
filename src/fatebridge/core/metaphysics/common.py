@@ -136,8 +136,6 @@ class MetaphysicsSeed:
         display = self.input_datetime
         if not self.input_offset_visible:
             display = display.replace(tzinfo=None)
-        else:
-            pass
         return display.isoformat(sep=sep, timespec=timespec)
 
     def clock_isoformat(
@@ -145,8 +143,6 @@ class MetaphysicsSeed:
     ) -> str:
         if not self.applied_true_solar:
             return self.input_isoformat(sep=sep, timespec=timespec)
-        else:
-            pass
         return self.clock.isoformat(sep=sep, timespec=timespec)
 
 
@@ -163,8 +159,6 @@ def require_lunar_month_day(
         support = seed.calendar_context.get("lunar_calendar_support") or {}
         reason = support.get("reason") or "离线农历换算不可用"
         raise ValueError(f"{technique}需要农历月日，无法起盘：{reason}")
-    else:
-        pass
     return lunar, int(lunar["month"]), int(lunar["day"])
 
 
@@ -174,16 +168,10 @@ def rotate_sequence(
     ordered = list(values)
     if not ordered:
         return []
-    else:
-        pass
     if reverse:
         ordered = list(reversed(ordered))
-    else:
-        pass
     if start_value not in ordered:
         return ordered
-    else:
-        pass
     start_index = ordered.index(start_value)
     return ordered[start_index:] + ordered[:start_index]
 
@@ -249,17 +237,11 @@ def chinese_numeral(value: int) -> str:
     mapping = "零一二三四五六七八九"
     if value < 10:
         return mapping[value]
-    else:
-        pass
     if value < 20:
         suffix = "" if value == 10 else mapping[value % 10]
         return f"十{suffix}"
-    else:
-        pass
     tens = value // 10
     ones = value % 10
     if ones == 0:
         return f"{mapping[tens]}十"
-    else:
-        pass
     return f"{mapping[tens]}十{mapping[ones]}"

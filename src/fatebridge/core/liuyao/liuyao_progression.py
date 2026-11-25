@@ -88,8 +88,6 @@ def build_progress_conditions(
     pairs = dict(PROFILE["advance_pairs"])
     if not line["change"] or not (pairs.get(old) == new or pairs.get(new) == old):
         raise ValueError("Progression requires an actual moving original/changed pair")
-    else:
-        pass
     pair = "进神" if pairs.get(old) == new else "退神"
     original_supported = strength["is_supported"]
     original_weak = strength["is_weak"]
@@ -104,8 +102,6 @@ def build_progress_conditions(
     ):
         original_supported, original_weak = False, True
         original_basis = "unassisted_seasonal_branch_only"
-    else:
-        pass
     transformed = changed_calendar_strength(
         new, month, day_ganzhi, changed_monthly, stages
     )

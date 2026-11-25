@@ -36,8 +36,6 @@ def _midpoint_house_cusps(
 ) -> list[float]:
     if len(left_cusps) != 12 or len(right_cusps) != 12:
         return []
-    else:
-        pass
     return [
         unique_midpoint(left_cusps[index], right_cusps[index]) for index in range(12)
     ]
@@ -55,8 +53,6 @@ def _relative_house_layout(
         code = house_system_info.get("swisseph_code")
         if code is None:
             code = {"whole_sign": b"W", "equal": b"E"}[house_system_info["key"]]
-        else:
-            pass
         try:
             return native_lahiri_houses(
                 julian_day_ut1=times.ut1,
@@ -72,8 +68,6 @@ def _relative_house_layout(
             raise ValueError(
                 f"原生Lahiri {house_system_info['key']}宫头计算失败，不能冒用热带宫头"
             ) from error
-    else:
-        pass
     ayanamsha = (
         _ayanamsha(times.jd_ut1, julian_day_tt=times.tt)
         if zodiacal_info["sidereal"]
@@ -98,8 +92,6 @@ def _relative_house_layout(
         if ayanamsha is not None:
             ascendant = normalize_angle(ascendant - ayanamsha)
             midheaven = normalize_angle(midheaven - ayanamsha)
-        else:
-            pass
         house_cusps = [
             item["cusp_longitude"]
             for item in _build_houses(
@@ -125,12 +117,6 @@ def _relative_house_layout(
                     precision["corrected_cusps"] = list(range(1, 13))
                     convention["native_cusps_and_projection_retained"] = False
                     convention["note_zh"] += " 宫头已从复核后的ASC重新建立。"
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         return {
             "ascendant": ascendant,
             "midheaven": midheaven,
@@ -145,8 +131,6 @@ def _relative_house_layout(
                 else {}
             ),
         }
-    else:
-        pass
 
     try:
         with runtime.preserve_ephemeris_path():
@@ -194,8 +178,6 @@ def _relative_house_layout(
         ascendant = normalize_angle(ascendant - ayanamsha)
         midheaven = normalize_angle(midheaven - ayanamsha)
         house_cusps = [normalize_angle(item - ayanamsha) for item in house_cusps]
-    else:
-        pass
 
     return {
         "ascendant": ascendant,

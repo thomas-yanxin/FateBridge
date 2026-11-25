@@ -71,37 +71,19 @@ def _normalize_relative_mode(value: int | str | None) -> RelativeModeSelection:
             normalized = RELATIVE_MODE_NUMERIC_MAP.get(numeric_value)
             if normalized is not None:
                 resolution = "numeric_string"
-            else:
-                pass
-        else:
-            pass
         if normalized is None:
             normalized = RELATIVE_MODE_EXACT_ALIASES.get(stripped)
             if normalized is not None:
                 resolution = "exact_alias"
-            else:
-                pass
-        else:
-            pass
         lowered = stripped.lower()
         if normalized is None:
             normalized = RELATIVE_MODE_FALLBACK_ALIASES.get(stripped)
             if normalized is not None:
                 resolution = "fallback_alias"
-            else:
-                pass
-        else:
-            pass
         if normalized is None:
             normalized = RELATIVE_MODE_FALLBACK_ALIASES.get(lowered)
             if normalized is not None:
                 resolution = "fallback_alias_casefold"
-            else:
-                pass
-        else:
-            pass
-    else:
-        pass
 
     if normalized is None:
         if mode_selector not in (None, "", 0, "0"):
@@ -109,12 +91,8 @@ def _normalize_relative_mode(value: int | str | None) -> RelativeModeSelection:
                 "relative_mode 无效，请使用 Compare、Synastry、Composite，"
                 "或使用 0/1/2 数值别名。"
             )
-        else:
-            pass
         normalized = "compare"
         resolution = "default_compare_fallback"
-    else:
-        pass
 
     return RelativeModeSelection(
         selector=mode_selector, resolution=resolution, mode=normalized
@@ -205,15 +183,11 @@ def build_relative_payload(
     normalized_mode = mode_selection.mode
     if davison_variant not in DAVISON_VARIANTS:
         raise ValueError("davison_variant必须为uncorrected、corrected或spherical")
-    else:
-        pass
     if (
         normalized_mode not in {"timespace", "marks"}
         and davison_variant != "uncorrected"
     ):
         raise ValueError("davison_variant仅适用于TimeSpace和Marks，不能静默忽略")
-    else:
-        pass
     marks_charts: dict[str, dict[str, Any]] = {}
     if normalized_mode == "composite":
         primary_chart = _composite_chart(
@@ -350,18 +324,12 @@ def build_relative_payload(
     }
     if normalized_mode == "marks":
         relationship_profile["primary_chart_role"] = "inner"
-    else:
-        pass
     if normalized_mode in {"timespace", "marks"}:
         relationship_profile["davison_variant"] = davison_variant
-    else:
-        pass
     if primary_chart:
         relationship_profile["derivation_policy"] = primary_chart_profile[
             "derivation_policy"
         ]
-    else:
-        pass
     relationship_profile["relative_midpoint_policy"] = (
         "unrounded shorter-arc points; exact diametric pairs retain both undecided candidates"
     )

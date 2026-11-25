@@ -22,8 +22,6 @@ def build_equatorial_mansions(birth: AstroBirthInfo) -> dict[str, Any]:
         raise ModuleNotFoundError(
             "天文不等宽宿度需要Swiss Ephemeris；不静默降级为等分示意。"
         )
-    else:
-        pass
     # This projection needs geocentric RA only. Do not evaluate observer
     # geometry or derivative epochs, or invent a site for unused house facts.
     raw = positions(
@@ -76,8 +74,6 @@ def apply_equatorial_mansions(chart: dict[str, Any], astronomy: dict[str, Any]) 
         if point["id"] not in by_name:
             point["su28_unavailable_reason"] = "outside_seven_physical_luminaries_scope"
             continue
-        else:
-            pass
         body = by_name[point["id"]]
         mansion = body["mansion"]
         point.update(

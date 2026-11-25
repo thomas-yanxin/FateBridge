@@ -28,12 +28,8 @@ def conjunction(*values: bool | None) -> bool | None:
     """A known blocker is decisive; missing evidence is never a positive."""
     if not values or any(v is not None and type(v) is not bool for v in values):
         raise ValueError("条件合取需要非空的布尔或未知值")
-    else:
-        pass
     if any(v is False for v in values):
         return False
-    else:
-        pass
     return None if any(v is None for v in values) else True
 
 
@@ -66,8 +62,6 @@ def _unassessed_same_camp(core: dict[str, Any]) -> list[dict[str, Any]]:
                     "reason": "同阵两将数齐；是否属于卷三关及卷四相关尚未裁定，不把未列关当作无关。",
                 }
             )
-        else:
-            pass
     return pending
 
 

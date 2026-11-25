@@ -31,13 +31,9 @@ def _longitude_tt(
     )
     if state is None:
         raise ValueError("Return search ephemeris failed")
-    else:
-        pass
     longitude = state[0]["longitude"]
     if sidereal:
         longitude -= native_lahiri_ayanamsha(julian_day_tt=julian_day_tt)
-    else:
-        pass
     return longitude % 360
 
 
@@ -58,8 +54,6 @@ def governing_return_tt(
     """
     if body_id not in {swe.SUN, swe.MOON}:
         raise ValueError("This return solver supports Sun and Moon only")
-    else:
-        pass
     lookback, step = (370.0, 10.0) if body_id == swe.SUN else (32.0, 1.0)
     left = analysis_tt - lookback
     previous = _signed_offset(
@@ -73,28 +67,20 @@ def governing_return_tt(
         )
         if previous <= 0 <= current and current - previous < 180:
             bracket = (left, right)
-        else:
-            pass
         left, previous = right, current
     if previous == 0:
         # A locally nonmonotone native longitude can make refinement discard
         # the exact zero already observed at the analysis point.
         return analysis_tt
-    else:
-        pass
     if bracket is None:
         raise ValueError(
             "No governing return was bracketed before the analysis instant"
         )
-    else:
-        pass
     low, high = bracket
     for _ in range(64):
         middle = (low + high) / 2
         if middle in {low, high}:
             break
-        else:
-            pass
         value = _signed_offset(
             _longitude_tt(body_id, middle, sidereal=sidereal), target_longitude
         )
@@ -126,8 +112,6 @@ def build_return_payload(
     times = ephemeris_time(calendar)
     if times.jd_tt is None:
         raise ModuleNotFoundError("Swiss Ephemeris is required for planetary returns")
-    else:
-        pass
     payload: dict[str, Any] = {}
     for key, planet, body_id in [
         ("solar_return", "sun", swe.SUN),
@@ -135,8 +119,6 @@ def build_return_payload(
     ]:
         if key not in (include or ["solar_return", "lunar_return"]):
             continue
-        else:
-            pass
         target = float(getattr(natal_subject, planet).abs_pos)
         sidereal = natal_subject.zodiac_type == "Sidereal"
         solved = governing_return_tt(body_id, target, times.jd_tt, sidereal=sidereal)

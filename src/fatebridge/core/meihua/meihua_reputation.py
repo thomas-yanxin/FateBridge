@@ -27,8 +27,6 @@ def _profile() -> dict[str, Any]:
         or set(profile["fangdao_classes"]) != set("乾坤震巽坎离艮兑")
     ):
         raise ValueError("Unknown or incomplete selected reputation supplement")
-    else:
-        pass
     return profile
 
 
@@ -67,14 +65,10 @@ def _reading(
     profile = _profile()
     if [r["role"] for r in stages] != list(ROLES):
         raise ValueError("Reputation supplement requires four actual auxiliary roles")
-    else:
-        pass
     body = cast["body_trigram"]["name"]
     qualifications = control["qualifications"]
     if [r["role"] for r in qualifications] != list(ROLES):
         raise ValueError("Reputation countercontrol must retain this candidate's roles")
-    else:
-        pass
     strengths = {
         r["role"]: (i, r)
         for i, r in enumerate(seasonal["trigrams"] if seasonal else [])
@@ -88,16 +82,12 @@ def _reading(
     for i, row in enumerate(stages):
         if row["body"] != body or not row["fact_path"].startswith(fact_prefix + "."):
             raise ValueError("Reputation facts must use this candidate's original body")
-        else:
-            pass
         qualification = qualifications[i]
         if (
             qualification["target_fact_path"],
             qualification["original_relation_to_body"],
         ) != (row["fact_path"], row["relation"]):
             raise ValueError("Reputation and countercontrol facts must remain bound")
-        else:
-            pass
         strength = strengths.get(row["role"])
         roles.append(
             {
@@ -126,8 +116,6 @@ def _reading(
         value is not None and type(value) is not bool for value in [office, appointment]
     ):
         raise ValueError("Reputation declarations must be booleans or unknown")
-    else:
-        pass
     office_applies = (
         False if not attackers or office is False else True if office is True else None
     )
@@ -149,8 +137,6 @@ def _reading(
     path = f"{fact_prefix}.changed_hexagram.{position}"
     if (stages[-1]["trigram"], stages[-1]["fact_path"]) != (changed, path):
         raise ValueError("Reputation direction must use this candidate's changed use")
-    else:
-        pass
     direction = deepcopy(profile["fangdao_classes"][changed])
     no_attacker = {
         "source_rule": _source_rule("without_attacker"),
@@ -214,8 +200,6 @@ def _reading(
         summary += f"所报求职任，按明示变用经卦读法取{changed}，所选方道栏作“{direction['quote']}”。"
         if direction["source_direction_conflict"]:
             summary += "同本地理另记東南、固定转录方道亦作東南，差异未裁定。"
-        else:
-            pass
         summary += "这只是所选文字类象，未核实际任所或地理原点。"
     elif appointment is False:
         summary += "所报非求原文职任，未将求名泛化为任所判断。"
@@ -277,11 +261,7 @@ def apply_reputation_supplement(
             raise ValueError(
                 "Reputation context requires interpretation_topic=reputation"
             )
-        else:
-            pass
         return
-    else:
-        pass
     selected = _reading(
         cast,
         cast["stage_relations"],

@@ -54,25 +54,17 @@ def source_kinematics(
         or body not in {*GROUPS, "Earth", "Moon"}
     ):
         raise EphemerisSourceError("jpl_kinematics_invalid")
-    else:
-        pass
     info = jpl_header(path)
     try:
         with path.open("rb") as source:
             before = _signature(os.fstat(source.fileno()))
             if before != _signature(path.stat()):
                 raise EphemerisSourceError("changed_during")
-            else:
-                pass
             if before[2] != info["bytes"]:
                 raise EphemerisSourceError("changed_during")
-            else:
-                pass
             raw_header = source.read(RECORD_BYTES)
             if len(raw_header) != RECORD_BYTES:
                 raise EphemerisSourceError("jpl_kinematics_invalid")
-            else:
-                pass
             orders = [
                 o
                 for o in ("<", ">")
@@ -80,8 +72,6 @@ def source_kinematics(
             ]
             if len(orders) != 1:
                 raise EphemerisSourceError("jpl_kinematics_invalid")
-            else:
-                pass
             order = orders[0]
             begin, end, step = struct.unpack_from(order + "3d", raw_header, 2652)
             au, emrat = struct.unpack_from(order + "2d", raw_header, 2680)
@@ -90,8 +80,6 @@ def source_kinematics(
                 info["end_julian_day_tdb"],
             ) or not begin <= epoch <= end:
                 raise EphemerisSourceError("jpl_kinematics_outside_source")
-            else:
-                pass
             # Wide subtraction can discard an epoch ULP before a record edge.
             # Select with the exact stored binary64 words, before any rounding.
             index = min(
@@ -102,16 +90,12 @@ def source_kinematics(
             raw = source.read(RECORD_BYTES)
             if step != 32 or au != 149597870.7 or not 81 < emrat < 82:
                 raise EphemerisSourceError("jpl_kinematics_invalid")
-            else:
-                pass
             if (
                 len(raw) != RECORD_BYTES
                 or before != _signature(os.fstat(source.fileno()))
                 or before != _signature(path.stat())
             ):
                 raise EphemerisSourceError("changed_during")
-            else:
-                pass
     except OSError as error:
         raise EphemerisSourceError("unavailable_during") from error
     values = struct.unpack(order + "1018d", raw)
@@ -120,8 +104,6 @@ def source_kinematics(
         begin + (index + 1) * step,
     ):
         raise EphemerisSourceError("jpl_kinematics_invalid")
-    else:
-        pass
     cells: dict[str, Any] = {}
 
     def group(
@@ -137,16 +119,12 @@ def source_kinematics(
             and offset + 3 * count * parts - 1 <= 1018
         ):
             raise EphemerisSourceError("jpl_kinematics_invalid")
-        else:
-            pass
         width = step / parts
         subcell = min(
             int((Fraction(epoch) - Fraction(values[0])) // Fraction(width)), parts - 1
         )
         if not 0 <= subcell < parts or not values[0] <= epoch <= values[1]:
             raise EphemerisSourceError("jpl_kinematics_outside_source")
-        else:
-            pass
         low = values[0] + subcell * width
         x = 2 * (Fraction(epoch) - Fraction(low)) / Fraction(width) - 1
         axes = []
@@ -172,8 +150,6 @@ def source_kinematics(
         resolved = tuple(e.minus(m, 1 + emrat) for e, m in zip(emb, moon))
         if body == "Moon":
             resolved = tuple(e.plus(m) for e, m in zip(resolved, moon))
-        else:
-            pass
     else:
         resolved = group(GROUPS[body])
     vectors = [axis.rounded() for axis in resolved]
@@ -213,8 +189,6 @@ def checked_fixed_acceleration(
         or not all(math.isfinite(v) for v in (*raw, *native))
     ):
         raise EphemerisSourceError("jpl_kinematics_invalid")
-    else:
-        pass
 
     def dot(a: Sequence[float], b: Sequence[float]) -> float:
         return math.fsum(x * y for x, y in zip(a, b))
@@ -223,16 +197,12 @@ def checked_fixed_acceleration(
         size, speed = math.hypot(*p), math.hypot(*v)
         if size <= 0 or speed <= 0:
             raise EphemerisSourceError("jpl_kinematics_frame_mismatch")
-        else:
-            pass
         a = tuple(x / size for x in p)
         radial = dot(a, v)
         normal = tuple(x - radial * y for x, y in zip(v, a))
         radius = math.hypot(*normal)
         if radius / speed < 0.5:
             raise EphemerisSourceError("jpl_kinematics_frame_mismatch")
-        else:
-            pass
         b = tuple(x / radius for x in normal)
         return (
             a,
@@ -259,8 +229,6 @@ def checked_fixed_acceleration(
     ]
     if max(errors) > FRAME_LINE:
         raise EphemerisSourceError("jpl_kinematics_frame_mismatch")
-    else:
-        pass
     return rotate(raw[6:9]), {
         "method_id": "checked_two_vector_fixed_rotation_v1",
         "matrix": [list(row) for row in matrix],

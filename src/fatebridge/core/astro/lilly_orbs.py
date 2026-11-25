@@ -39,8 +39,6 @@ _FULL_ORBS = {
 def full_orbs(profile: str = DEFAULT_ORB_PROFILE) -> dict[str, float]:
     if profile not in _FULL_ORBS:
         raise ValueError("Unknown Lilly orb_profile; select a printed p107 column")
-    else:
-        pass
     return dict(_FULL_ORBS[profile])
 
 

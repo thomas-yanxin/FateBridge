@@ -66,12 +66,8 @@ def build_period_board(
     profile = DEFAULT_MONTH_PROFILE if mode == "month" else "jinjing_hour_solstice_v1"
     if is_key_hour:
         profile = KEY_HOUR_PROFILE
-    else:
-        pass
     if is_key_month:
         profile = KEY_MONTH_PROFILE
-    else:
-        pass
     board["solar_anchors"] = {
         "boundary": term.as_dict(),
         **(
@@ -118,8 +114,6 @@ def build_period_board(
             reference = month_calendar_reference(instant.date(), origin)
             if reference:
                 origin["calendar_reference"] = reference
-            else:
-                pass
             calendar.update(
                 input_calendar="proleptic_gregorian",
                 month_profile=KEY_MONTH_PROFILE,
@@ -183,10 +177,6 @@ def build_period_board(
             )
             if historical_reference:
                 calendar["historical_date_reference"] = historical_reference
-            else:
-                pass
-        else:
-            pass
     board.update(
         {
             "style_label": f"太乙金镜式经·{label}",
@@ -254,8 +244,6 @@ def build_period_board(
                 "课式壬子元第四缺完整局数；全盘断语及年度十神不因数值重放而认证。",
             ],
         )
-    else:
-        pass
     if is_key_hour:
         board["accumulation_label"] = f"时计冬至前甲子积时：{frame['accumulation']}"
         board["style_label"] = "太乙金钥匙续集·时计现代日期适配"
@@ -278,16 +266,12 @@ def build_period_board(
                 "空间七类与卷四三项五将层分别援用已注明的金镜来源，不当作金钥匙全套断语。",
             ],
         )
-    else:
-        pass
     if is_key_hour:
         board["winter_origin_selection"] = winter_origin_selection(
             frame["hour_origin"],
             board["solar_anchors"]["winter_origin"],
             hour_clock_basis,
         )
-    else:
-        pass
     board["long_cycles"] = {
         "status": "not_computed_for_selected_mode",
         "selected_mode": mode,

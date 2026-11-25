@@ -101,15 +101,11 @@ class _ToolValidationFeedback(Middleware):
             cause = exc if isinstance(exc, ValidationError) else exc.__cause__
             if not isinstance(cause, ValidationError):
                 raise
-            else:
-                pass
             result = validation_error_result(cause)
             if context.message.name == "run_calculation":
                 result = correlate_error(
                     result, safe_correlation(context.message.arguments or {})
                 )
-            else:
-                pass
             return _render_protocol_error(result, context.message.name)
 
 
@@ -191,8 +187,6 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
         spec = exposed_by_name.get(tool)
         if spec is None:
             return _unknown_tool_result(tool, "run_calculation")
-        else:
-            pass
         controls = {
             "as_of": as_of,
             "trace_id": trace_id,
@@ -211,8 +205,6 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
             )
             if result_is_error(result):
                 return _render_protocol_error(result, spec.operation_label_zh)
-            else:
-                pass
             payload = deliver_response(
                 result,
                 spec=spec,
@@ -296,8 +288,6 @@ def create_mcp_app(families: str | None = None) -> FastMCP:
     exposed = select_mcp_specs(CATALOG, family=families)
     if not exposed:
         raise ValueError("未找到所选分类的公开工具")
-    else:
-        pass
     server = FastMCP(
         name="fatebridge",
         instructions=_MCP_INSTRUCTIONS,
@@ -329,5 +319,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-else:
-    pass

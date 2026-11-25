@@ -32,8 +32,6 @@ def _profile() -> dict[str, Any]:
         or value["version"] != "1.0.0"
     ):
         raise ValueError("Unknown selected time-unit branch profile")
-    else:
-        pass
     if (
         set(value["unit_branch_atoms"]) != set("乾坤震巽坎离艮兑")
         or value["chapter_selectors"] != qi_day_atom_ruleset()["chapter_selectors"]
@@ -41,13 +39,9 @@ def _profile() -> dict[str, Any]:
         raise ValueError(
             "Time-unit atoms must retain the selected original chapter roles"
         )
-    else:
-        pass
     for row in value["unit_branch_atoms"].values():
         if set(row["unit_branches"]) != set(UNITS):
             raise ValueError("Each source atom requires all four separate units")
-        else:
-            pass
         for branches in row["unit_branches"].values():
             if (
                 not branches
@@ -57,8 +51,6 @@ def _profile() -> dict[str, Any]:
                 raise ValueError(
                     "Source time units require explicit named branch labels"
                 )
-            else:
-                pass
     return value
 
 
@@ -77,8 +69,6 @@ def _label(
 ) -> dict[str, Any]:
     if branch not in EARTHLY_BRANCHES:
         raise ValueError("A known time-unit label must be an actual input branch")
-    else:
-        pass
     return {
         "id": identifier,
         "branch": branch,
@@ -125,14 +115,10 @@ def _input_labels(
                 absolute_lunar_year=policy.get("lunar_year"),
             )
         )
-    else:
-        pass
     hour = seed.get("hour_branch")
     if hour is not None:
         if parameters and parameters.get("hour_branch") != hour:
             raise ValueError("Time-unit hour must remain the original declared hour")
-        else:
-            pass
         result["hour"].append(
             _label(
                 "original_hour",
@@ -142,8 +128,6 @@ def _input_labels(
                 origin="original_computed_or_declared_hour_not_recast",
             )
         )
-    else:
-        pass
     seasonal = (
         cast.get("seasonal_strength")
         if fact_prefix == "meihua"
@@ -152,15 +136,11 @@ def _input_labels(
     parent_seasonal = original.get("seasonal_strength")
     if (seasonal is None) != (parent_seasonal is None):
         raise ValueError("Each candidate must retain the same original month input")
-    else:
-        pass
     if seasonal is not None and (
         parent_seasonal is None
         or seasonal["month_branch"] != parent_seasonal["month_branch"]
     ):
         raise ValueError("Each candidate must retain the same original month input")
-    else:
-        pass
     if seasonal is not None:
         prefix = (
             fact_prefix + ".seasonal_strength"
@@ -178,13 +158,9 @@ def _input_labels(
                 uniquely_selected_for_source_timing=False,
             )
         )
-    else:
-        pass
     if month is not None:
         if type(month) is not int or not 1 <= month <= 12:
             raise ValueError("Nominal month label requires an existing month number")
-        else:
-            pass
         result["month"].append(
             _label(
                 "nominal_lunar_month",
@@ -204,8 +180,6 @@ def _input_labels(
                 mapping_source=deepcopy(_profile()["nominal_month_label_source"]),
             )
         )
-    else:
-        pass
     day = layer.get("day_qi")
     if day is not None:
         calendars = day["calendar_candidates"]
@@ -216,26 +190,18 @@ def _input_labels(
             raise ValueError(
                 "Time-unit day labels require the original selected candidate"
             )
-        else:
-            pass
         for i, row in enumerate(calendars):
             if [r["role"] for r in row["roles"]] != list(roles):
                 raise ValueError("Input day must retain each candidate's actual roles")
-            else:
-                pass
             for r in row["roles"]:
                 if (r["trigram"], r["fact_path"]) != (
                     roles[r["role"]]["trigram"],
                     roles[r["role"]]["fact_path"],
                 ):
                     raise ValueError("Time-unit day cannot borrow another cast's body")
-                else:
-                    pass
             c = row["calendar"]
             if c["ganzhi"] is not None and c["ganzhi"][1] != c["day_branch"]:
                 raise ValueError("Input day branch and its ganzhi label disagree")
-            else:
-                pass
             result["day"].append(
                 _label(
                     c["id"],
@@ -250,8 +216,6 @@ def _input_labels(
                     changes_other_units=False,
                 )
             )
-    else:
-        pass
     return result
 
 
@@ -402,8 +366,6 @@ def apply_qi_branch_timing_references(
     topic = interpretation["interpretation_topic"]
     if topic not in {"wealth", "reputation"}:
         return
-    else:
-        pass
     main = _reading(
         cast,
         cast,

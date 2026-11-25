@@ -69,8 +69,6 @@ class ContextFact(_DeferredModel):
     def nonblank_evidence(cls, value: str) -> str:
         if not value.strip():
             raise ValueError("环境事实依据不能为空白")
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -79,15 +77,9 @@ class ContextFact(_DeferredModel):
             value = getattr(self, name)
             if isinstance(value, str) and not value.strip():
                 raise ValueError(f"{name} 不能为空白")
-            else:
-                pass
             if name.endswith("_ids") and isinstance(value, list):
                 if any(not item.strip() for item in value):
                     raise ValueError(f"{name} 不能含空白 ID")
-                else:
-                    pass
-            else:
-                pass
         return self
 
 
@@ -103,8 +95,6 @@ class OrientationConfirmation(ContextFact):
     def reference_for_confirmed_direction(self) -> "OrientationConfirmation":
         if self.direction_confirmed and self.north_reference is None:
             raise ValueError("确认方位须说明 north_reference，不能由命盘推定方位")
-        else:
-            pass
         return self
 
     def ready_for_sectors(self) -> bool:
@@ -143,23 +133,15 @@ class HouseholdMember(ContextFact):
     def coherent_roles(self) -> "HouseholdMember":
         if len(set(self.family_roles)) != len(self.family_roles):
             raise ValueError("family_roles 不可重复")
-        else:
-            pass
         ranks = set(self.family_roles) - {"parent"}
         if len(ranks) > 1:
             raise ValueError("同一家庭不能同时提供多个子女排行")
-        else:
-            pass
         if self.spouse_subject_id == self.subject_id:
             raise ValueError("配偶不能是本人")
-        else:
-            pass
         if self.follow_spouse_rank and (
             self.gender_role != "female" or self.spouse_subject_id is None
         ):
             raise ValueError("妻随夫排行须明确女性角色及 spouse_subject_id")
-        else:
-            pass
         return self
 
 
@@ -206,33 +188,21 @@ class FloorSpace(ContextFact):
     def scoped_floor(self) -> "FloorSpace":
         if self.space_kind == "courtyard" and self.level != 1:
             raise ValueError("本次专家口径将院落归属于第一层，courtyard.level 必须为1")
-        else:
-            pass
         if len(set(self.subject_ids)) != len(self.subject_ids):
             raise ValueError("楼层 subject_ids 不可重复")
-        else:
-            pass
         if len(set(self.object_ids)) != len(self.object_ids):
             raise ValueError("楼层 object_ids 不可重复")
-        else:
-            pass
         if self.usage_confirmed != (self.usage_evidence is not None):
             raise ValueError("完整使用范围确认与 usage_evidence 必须成对")
-        else:
-            pass
         if (self.suitability != "not_assessed") != (
             self.suitability_evidence is not None
         ):
             raise ValueError("楼层适宜性确认与 suitability_evidence 必须成对")
-        else:
-            pass
         if (
             self.suitability_evidence is not None
             and not self.suitability_evidence.strip()
         ):
             raise ValueError("楼层适宜性依据不能为空白")
-        else:
-            pass
         return self
 
     def ready_for_sectors(self) -> bool:
@@ -256,16 +226,10 @@ class FloorInfluence(ContextFact):
     def scoped_influence(self) -> "FloorInfluence":
         if len(set(self.shared_floor_ids)) != len(self.shared_floor_ids):
             raise ValueError("shared_floor_ids 不可重复")
-        else:
-            pass
         if self.extent == "shared_confirmed" and not self.shared_floor_ids:
             raise ValueError("共同影响须明确 shared_floor_ids")
-        else:
-            pass
         if self.extent != "shared_confirmed" and self.shared_floor_ids:
             raise ValueError("只有共同影响能指定 shared_floor_ids")
-        else:
-            pass
         return self
 
 
@@ -317,8 +281,6 @@ class EnvironmentalObservation(ContextFact):
         }
         if self.feature not in categories[self.category]:
             raise ValueError("feature 与 category 不一致")
-        else:
-            pass
         return self
 
 
@@ -336,42 +298,26 @@ class EnvironmentalObject(ContextFact):
     def kind_and_purpose(self) -> "EnvironmentalObject":
         if not self.label.strip():
             raise ValueError("环境对象 label 不能为空白")
-        else:
-            pass
         if self.purpose == "door" and self.kind != "opening":
             raise ValueError("门对象的 kind 须为 opening")
-        else:
-            pass
         if self.purpose in {"bed", "desk", "stove"} and self.kind != "furniture":
             raise ValueError("门床桌灶用途须与环境对象 kind 一致")
-        else:
-            pass
         if self.role in {"main_entry_door", "bathroom_door"} and self.kind != "opening":
             raise ValueError("主门/厕门角色必须为opening")
-        else:
-            pass
         if self.role in {"bed", "desk", "stove"} and self.kind != "furniture":
             raise ValueError("床桌灶角色必须为furniture")
-        else:
-            pass
         if self.role in {"bed", "desk", "stove"} and self.purpose not in (
             None,
             self.role,
         ):
             raise ValueError("明确角色与purpose不得矛盾")
-        else:
-            pass
         if (
             self.role in {"exposed_beam", "pipe", "toilet_wall", "pillar_corner"}
             and self.kind != "material_object"
         ):
             raise ValueError("梁、管、厕墙部件须以material_object明确记录")
-        else:
-            pass
         if self.role in {"mirror", "sharp_corner"} and self.kind == "room":
             raise ValueError("镜面/尖角源必须记录实际物件，不能把整个房间当部件")
-        else:
-            pass
         return self
 
 
@@ -420,8 +366,6 @@ class EnvironmentalContext(_DeferredModel):
             raise ValueError(
                 "环境上下文至少提供方向核对、家庭成员、楼层或具体观察；对象定义本身不是完成审查"
             )
-        else:
-            pass
         for values, attr in (
             (self.household_members, "subject_id"),
             (self.floors, "floor_id"),
@@ -434,33 +378,23 @@ class EnvironmentalContext(_DeferredModel):
             ids = [getattr(item, attr) for item in values]
             if len(ids) != len(set(ids)):
                 raise ValueError(f"{attr} 不可重复")
-            else:
-                pass
         attributes = set()
         for fact in self.material_facts:
             for name in ("material", "shape", "colour", "application"):
                 if getattr(fact, name) is None:
                     continue
-                else:
-                    pass
                 key = (fact.object_id, name)
                 if key in attributes:
                     raise ValueError(
                         "同一物件属性须独立且只确认一次，不能重复或相互覆盖"
                     )
-                else:
-                    pass
                 attributes.add(key)
         uses: dict[str, str] = {}
         for fact in self.material_facts:
             if fact.element_use is not None:
                 if fact.object_id in uses and uses[fact.object_id] != fact.element_use:
                     raise ValueError("同一物件本次代表物用途问题不得相互矛盾")
-                else:
-                    pass
                 uses[fact.object_id] = fact.element_use
-            else:
-                pass
         members = {m.subject_id: m for m in self.household_members}
         floors = {f.floor_id: f for f in self.floors}
         spouse_references = [
@@ -470,62 +404,40 @@ class EnvironmentalContext(_DeferredModel):
         ]
         if len(spouse_references) != len(set(spouse_references)):
             raise ValueError("同一成员不能同时被多个成员引用为配偶")
-        else:
-            pass
         for member in self.household_members:
             spouse_id = member.spouse_subject_id
             if spouse_id is None:
                 continue
-            else:
-                pass
             if spouse_id not in members:
                 raise ValueError(f"未知配偶 subject_id: {spouse_id}")
-            else:
-                pass
             spouse = members[spouse_id]
             if spouse.generation != member.generation:
                 raise ValueError("同一家庭的配偶须使用相同辈分")
-            else:
-                pass
             if spouse.spouse_subject_id not in (None, member.subject_id):
                 raise ValueError("配偶引用不一致")
-            else:
-                pass
             if member.follow_spouse_rank and (
                 spouse.gender_role != "male"
                 or not set(spouse.family_roles) - {"parent"}
             ):
                 raise ValueError("妻随夫排行须已确认丈夫的男性角色与子女排行")
-            else:
-                pass
         for influence in self.floor_influences:
             for floor_id in [influence.source_floor_id, *influence.shared_floor_ids]:
                 if floor_id not in floors:
                     raise ValueError(f"未知影响楼层 floor_id: {floor_id}")
-                else:
-                    pass
         for obs in self.observations:
             if obs.floor_id is not None and obs.floor_id not in floors:
                 raise ValueError(f"未知观察楼层 floor_id: {obs.floor_id}")
-            else:
-                pass
             if (
                 obs.floor_id is not None
                 and obs.object_id not in floors[obs.floor_id].object_ids
             ):
                 raise ValueError("观察对象须列入对应楼层 object_ids")
-            else:
-                pass
         interior_levels = [f.level for f in self.floors if f.space_kind == "interior"]
         if len(interior_levels) != len(set(interior_levels)):
             raise ValueError("同一层 interior 只能提供一次；院落独立记录为第一层")
-        else:
-            pass
         object_floor_ids = [obj for floor in self.floors for obj in floor.object_ids]
         if len(object_floor_ids) != len(set(object_floor_ids)):
             raise ValueError("同一对象不能同时位于不同楼层")
-        else:
-            pass
         return self
 
     def validate_references(
@@ -551,42 +463,28 @@ class EnvironmentalContext(_DeferredModel):
                 expected_kind = "opening" if existing_purpose == "door" else "furniture"
                 if obj.kind != expected_kind:
                     raise ValueError(f"环境对象与已有类型不一致: {obj.object_id}")
-                else:
-                    pass
-            else:
-                pass
             if (
                 existing_purpose is not None
                 and obj.purpose is not None
                 and existing_purpose != obj.purpose
             ):
                 raise ValueError(f"环境对象与已有用途不一致: {obj.object_id}")
-            else:
-                pass
             if (
                 existing_purpose is not None
                 and obj.role in {"bed", "desk", "stove"}
                 and obj.role != existing_purpose
             ):
                 raise ValueError(f"环境角色与已有用途不一致: {obj.object_id}")
-            else:
-                pass
         for floor in self.floors:
             for subject_id in floor.subject_ids:
                 if subject_id not in subjects:
                     raise ValueError(f"未知楼层使用人 subject_id: {subject_id}")
-                else:
-                    pass
             for object_id in floor.object_ids:
                 if object_id not in objects:
                     raise ValueError(f"未知楼层对象 object_id: {object_id}")
-                else:
-                    pass
         for observation in self.observations:
             if observation.object_id not in objects:
                 raise ValueError(f"未知环境观察对象 object_id: {observation.object_id}")
-            else:
-                pass
         roles = {key: set(values) for key, values in (known_object_roles or {}).items()}
         for object_id, purpose in (known_object_purposes or {}).items():
             roles.setdefault(object_id, set()).add(purpose)
@@ -596,8 +494,6 @@ class EnvironmentalContext(_DeferredModel):
             )
             if obj.role == "pillar_corner":
                 roles[obj.object_id].add("sharp_corner")
-            else:
-                pass
         validate_relation_references(
             self.interior_relations,
             roles,
@@ -613,5 +509,3 @@ class EnvironmentalContext(_DeferredModel):
         for fact in self.material_facts:
             if fact.object_id not in objects:
                 raise ValueError(f"未知材质器形对象 object_id: {fact.object_id}")
-            else:
-                pass

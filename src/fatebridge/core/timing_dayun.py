@@ -97,13 +97,9 @@ def dayun_wall_year_preimages(
     """Invert decade year addition, retaining both leap-day preimages."""
     if boundary_wall.tzinfo is not None:
         raise ValueError("大运年份逆像需要未附民用时区的钟面标签")
-    else:
-        pass
     year = boundary_wall.year - year_offset
     if not 1 <= year <= 9999:
         return ()
-    else:
-        pass
     try:
         targets = [boundary_wall.replace(year=year)]
     except ValueError:
@@ -115,8 +111,6 @@ def dayun_wall_year_preimages(
         and isleap(year)
     ):
         targets.append(boundary_wall.replace(year=year, day=29))
-    else:
-        pass
     return tuple(targets)
 
 
@@ -135,12 +129,8 @@ def resolve_dayun_calendar_boundary(
         roundtrip = localize_datetime(later, timezone_name)
         if roundtrip.replace(tzinfo=None) != wall or instant < birth_point:
             raise ValueError("首运边界不能早于已确认的出生时刻")
-        else:
-            pass
         validate_local_clock(roundtrip, allow_ambiguous=True, clock_label="交运边界")
         return roundtrip, True
-    else:
-        pass
     validate_local_clock(resolved, allow_ambiguous=True, clock_label="交运边界")
     return resolved, False
 
@@ -185,8 +175,6 @@ def dayun_is_forward(gender: str | None, year_stem: str) -> bool:
         raise ValueError(
             "大运方向需要明确性别（男/女）；请提供 gender，或显式传入 dayun_pillar。"
         )
-    else:
-        pass
     return canonical_gender == "男" if is_yang_year else canonical_gender == "女"
 
 

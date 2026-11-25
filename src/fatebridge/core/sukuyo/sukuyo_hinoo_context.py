@@ -24,20 +24,14 @@ def context_reference(
     ).encode()
     if hashlib.sha256(canonical).hexdigest() != FACTS_SHA256:
         raise ValueError("桧尾相邻语境、读录阶段或未定范围改变，须重新核验")
-    else:
-        pass
     if (
         previous.get("id") != data["previous_completion_id"]
         or previous.get("source_bundle_sha256")
         != data["previous_completion_bundle_sha256"]
     ):
         raise ValueError("桧尾相邻语境与此前原尺寸记录不一致，须重新核验")
-    else:
-        pass
     if any(taisho.get(key) != value for key, value in data["taisho_binding"].items()):
         raise ValueError("桧尾相邻语境与所用大正原文或校记不一致，须重新核验")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 

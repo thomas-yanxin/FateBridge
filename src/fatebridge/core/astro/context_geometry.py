@@ -59,16 +59,10 @@ def build_context_geometry(
         "lahiri_sidereal_ecliptic_of_date",
     }:
         raise ValueError("Motion rates require their explicit display reference frame")
-    else:
-        pass
     if fortune_method not in FORTUNE_METHODS:
         raise ValueError("fortune_method必须为sect_reversing或ptolemy_iii10")
-    else:
-        pass
     if chart_sect not in {"day", "night"}:
         raise ValueError("天象福点需要核心引擎的明确昼夜条件")
-    else:
-        pass
     longitudes = {
         name: normalize_angle(
             zodiac_longitudes[name]
@@ -83,8 +77,6 @@ def build_context_geometry(
             angle_fraction(longitudes["North Node"]) + 180
         ) % 360
         longitudes["South Node"] = combine_longitudes(longitudes["North Node"], 180.0)
-    else:
-        pass
     markers = {name.lower(): lon for name, lon in longitudes.items()}
     if ascendant_resolved:
         markers["asc"] = ascendant
@@ -120,16 +112,12 @@ def build_context_geometry(
     if fortune is not None:
         partition_longitudes["Pars Fortuna"] = fortune
         longitudes["Pars Fortuna"] = longitude_float(fortune)
-    else:
-        pass
     projected_positions: dict[str, HouseCoordinate] = {}
     if houses_resolved and house_projection is not None:
         for name, lon in longitudes.items():
             if house_coordinates is not None and name in house_coordinates:
                 projected_positions[name] = house_coordinates[name]
                 continue
-            else:
-                pass
             exact_tropical_longitude = None
             if name in states:
                 tropical_longitude = states[name]["longitude"]
@@ -145,8 +133,6 @@ def build_context_geometry(
             projected_positions[name] = house_projection.coordinate(
                 tropical_longitude, exact_longitude=exact_tropical_longitude
             )
-    else:
-        pass
     houses = _build_houses(
         ascendant,
         house_system,
@@ -234,14 +220,10 @@ def build_context_geometry(
     }
     if house_projection is not None:
         result["house_position_projection"] = house_projection.metadata()
-    else:
-        pass
     if planetary_models is not None:
         result["ephemeris_reference_points"] = ephemeris_reference_points(
             planetary_models, [name for name in longitudes if name not in states]
         )
-    else:
-        pass
     if motion_rates is not None:
         uncomputed = [
             obj["id"]
@@ -259,6 +241,4 @@ def build_context_geometry(
             "source_sections": "3.3.3, 3.4, 12.2",
             "scope": "Instantaneous sky longitude motion only; does not alter dice conditions or establish event timing, observational accuracy or divination validity.",
         }
-    else:
-        pass
     return result

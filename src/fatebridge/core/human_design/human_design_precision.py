@@ -43,8 +43,6 @@ def node_backend_base(chart: dict[str, Any], node_mode: str) -> dict[str, Any]:
     """
     if node_mode not in {"true", "mean"}:
         raise ValueError("node_mode 必须为 true 或 mean")
-    else:
-        pass
     report: dict[str, Any] = {
         "method_id": "human_design_observed_node_backend_comparison_v1",
         "node_mode": node_mode,
@@ -75,16 +73,12 @@ def compare_node_backends(chart: dict[str, Any], node_mode: str) -> dict[str, An
             "reference_backend": None,
             "mechanical_comparison": None,
         }
-    else:
-        pass
     if runtime.swe is None:
         return {
             **report,
             "status": "reference_unavailable",
             "mechanical_comparison": None,
         }
-    else:
-        pass
     if configured_jpl_file() is not None:
         return {
             **report,
@@ -93,8 +87,6 @@ def compare_node_backends(chart: dict[str, Any], node_mode: str) -> dict[str, An
             "unavailable_reason": "jpl_mixed_request",
             "mechanical_comparison": None,
         }
-    else:
-        pass
     alternate = {**chart, "activations": {}}
     for side in SIDES:
         jd_tt = chart["time_scales"][side]["jd_tt"]
@@ -125,8 +117,6 @@ def compare_node_backends(chart: dict[str, Any], node_mode: str) -> dict[str, An
                 "mechanical_comparison": None,
                 "unavailable_side": side,
             }
-        else:
-            pass
         observe_native_source("NorthNode", jd_tt, flags, role="node_reference")
         alternate["activations"][side] = []
         for selected in chart["activations"][side]:
@@ -134,8 +124,6 @@ def compare_node_backends(chart: dict[str, Any], node_mode: str) -> dict[str, An
             if body not in {"NorthNode", "SouthNode"}:
                 alternate["activations"][side].append(selected)
                 continue
-            else:
-                pass
             source_longitude = float(coordinates[0]) % 360
             activation = (
                 opposite_activation(source_longitude)
@@ -152,8 +140,6 @@ def compare_node_backends(chart: dict[str, Any], node_mode: str) -> dict[str, An
             }
             if body == "SouthNode":
                 reference["derived_from"] = "NorthNode"
-            else:
-                pass
             alternate["activations"][side].append(reference)
     return node_backend_report(chart, alternate, node_mode)
 
@@ -171,8 +157,6 @@ def node_backend_report(
             body = selected["body"]
             if body not in {"NorthNode", "SouthNode"}:
                 continue
-            else:
-                pass
             flags = reference["return_flags"]
             longitude = reference["longitude"]
             rows.append(

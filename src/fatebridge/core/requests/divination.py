@@ -201,20 +201,14 @@ class SixYaoRequest(_DeferredModel):
     def complete_lines(self) -> "SixYaoRequest":
         if self.lines and len(self.lines) != 6:
             raise ValueError("六爻 lines 必须恰为 6 条，按初爻至上爻排列")
-        else:
-            pass
         if self.focus_kind in ("month", "day") and self.focus_line is not None:
             raise ValueError("日月取用不能同时指定爻位")
-        else:
-            pass
         if (
             self.focus_kind in ("visible", "changed", "hidden")
             and self.focus_line is None
             and self.focus_kinship is None
         ):
             raise ValueError("指定爻类取用还须提供focus_line或focus_kinship")
-        else:
-            pass
         if (
             self.timing_days
             and self.focus_line is None
@@ -222,8 +216,6 @@ class SixYaoRequest(_DeferredModel):
             and self.focus_kind is None
         ):
             raise ValueError("展开日级候选需要先明确focus_line或focus_kinship")
-        else:
-            pass
         return self
 
 
@@ -350,8 +342,6 @@ class SuZhanRequest(AstroHouseValidatorMixin, _DeferredModel):
             and self.calendar_profile != "hinoo_t1299_host27"
         ):
             raise ValueError("原典日序半日只适用于明确选择的Hinoo研究档案")
-        else:
-            pass
         validate_activity_details(self.activity, self.activity_details)
         return self
 
@@ -414,8 +404,6 @@ class CanpingRequest(_DeferredModel):
         gender = normalize_gender(value)
         if gender not in {"男", "女"}:
             raise ValueError("参评男女条文及配运需要明确男/女，不能默认性别。")
-        else:
-            pass
         return gender
 
     @field_validator("time", mode="before")
@@ -442,10 +430,6 @@ class CanpingRequest(_DeferredModel):
             at = parse_civil_iso_clock(value.replace("Z", "+00:00"))
             if not isinstance(at, UTCCalendar):
                 raise ValueError("analysis_datetime须为带时区的ISO时刻。")
-            else:
-                pass
-        else:
-            pass
         return value
 
     @model_validator(mode="after")
@@ -457,8 +441,6 @@ class CanpingRequest(_DeferredModel):
             and self.analysis_datetime is not None
         ):
             raise ValueError("legacy方法没有已核实的日期映射，不能查询精确时刻。")
-        else:
-            pass
         return self
 
 
@@ -531,8 +513,6 @@ class HeluoRequest(_DeferredModel):
         gender = normalize_gender(value)
         if gender not in {"男", "女"}:
             raise ValueError("河洛相荡、寄宫和元堂需要明确男/女，不能默认性别。")
-        else:
-            pass
         return gender
 
     @field_validator("time", mode="before")
@@ -557,12 +537,8 @@ class HeluoRequest(_DeferredModel):
         resolve_numerology_longitude(self.lon, self.gps_lon, self.use_true_solar_time)
         if self.month_index is not None and self.analysis_year is None:
             raise ValueError("month_index需要analysis_year年标签。")
-        else:
-            pass
         if self.day_index is not None and self.month_index is None:
             raise ValueError("day_index需要month_index月序号。")
-        else:
-            pass
         return self
 
 
@@ -630,15 +606,11 @@ class OtherBuRequest(AstroHouseValidatorMixin, _DeferredModel):
 
         if value is None:
             return None
-        else:
-            pass
         parsed = parse_geo_coordinate(
             value, axis="latitude" if info.field_name == "gps_lat" else "longitude"
         )
         if parsed is None:
             raise ValueError("GPS坐标不可为空白")
-        else:
-            pass
         return parsed
 
     @field_validator("sign")

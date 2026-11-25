@@ -43,16 +43,10 @@ def parse_section_title_line(line: str | None) -> str:
     text = f"{line or ''}".strip()
     if not text:
         return ""
-    else:
-        pass
     if text.startswith("[") and text.endswith("]") and len(text) > 2:
         return normalize_section_title(text[1:-1])
-    else:
-        pass
     if text.startswith("【") and text.endswith("】") and len(text) > 2:
         return normalize_section_title(text[1:-1])
-    else:
-        pass
     return ""
 
 
@@ -67,8 +61,6 @@ def split_content_sections(content: str) -> list[ContentSection]:
         if not current_title and not "".join(current_lines).strip():
             current_lines = []
             return
-        else:
-            pass
         sections.append(
             {
                 "raw_title": current_title,
@@ -84,19 +76,13 @@ def split_content_sections(content: str) -> list[ContentSection]:
         if raw_title:
             if current_lines:
                 push_current()
-            else:
-                pass
             current_title = raw_title
             current_lines = [line]
             continue
-        else:
-            pass
         current_lines.append(line)
 
     if current_lines:
         push_current()
-    else:
-        pass
     return sections
 
 
@@ -117,8 +103,6 @@ def parse_export_content(
     technique_info = get_technique_info(technique)
     if technique_info is None:
         raise ValueError(f"Unknown AI export technique: {technique}")
-    else:
-        pass
 
     raw_text = f"{content or ''}".strip()
     sections = split_content_sections(raw_text)
@@ -157,8 +141,6 @@ def parse_export_content(
         )
         if normalized_title and normalized_title in forbidden:
             should_include_section = False
-        else:
-            pass
         filtered_sections.append(
             {
                 "index": index,
@@ -179,8 +161,6 @@ def parse_export_content(
             for section in filtered_sections
             if normalize_section_title(section["title"]) not in forbidden
         )
-    else:
-        pass
 
     normalized_detected = {normalize_section_title(title) for title in detected_titles}
     unknown_detected = [
@@ -203,8 +183,6 @@ def parse_export_content(
         settings_used["planetInfo"][technique] = normalize_planet_info_setting(
             planet_info
         )
-    else:
-        pass
     if (
         technique_info["supports_astro_meaning"]
         or technique_info["supports_hover_meaning"]
@@ -212,8 +190,6 @@ def parse_export_content(
         settings_used["astroMeaning"][technique] = normalize_astro_meaning_setting(
             astro_meaning
         )
-    else:
-        pass
 
     return {
         "technique": technique_info,

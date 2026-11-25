@@ -49,8 +49,6 @@ def register_discovery_resources(
         """Full shared contract for one exposed tool; hidden tools stay hidden."""
         if tool not in allowed_tool_names:
             raise ValueError("工具未在当前 MCP 配置中公开")
-        else:
-            pass
         return render_catalog(tool=tool, detail="full")
 
     @app.resource("fatebridge://tools/{tool}/input", mime_type="application/json")
@@ -59,8 +57,6 @@ def register_discovery_resources(
         spec = resolve_spec(catalog, tool)
         if spec is None or spec.tool_name not in allowed_tool_names:
             raise ValueError("工具未在当前 MCP 配置中公开")
-        else:
-            pass
         return json.dumps(
             {
                 "detail": "input",

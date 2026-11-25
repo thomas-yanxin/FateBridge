@@ -29,8 +29,6 @@ def _source(path: Path) -> tuple[str, dict[tuple[int, int, bool], tuple[str, ...
     ).encode()
     if hashlib.sha256(canonical).hexdigest() != CANONICAL_SHA256:
         raise ValueError("NAOJ公开校订目录已改变，须重新核验完整来源与月键")
-    else:
-        pass
     header = {
         "ruleset_id": data["id"],
         "source_bundle_sha256": loaded.sha256,
@@ -120,8 +118,6 @@ def adjustment_lines(reference: dict[str, Any]) -> list[str]:
                 "此条改的是月名或闰标记，没有在这一条另印月首西历；不从相邻条目补造该条月首。"
             )
             continue
-        else:
-            pass
         before, after = row["before_start"], row["after_start"]
 
         def describe(value: dict[str, Any]) -> str:

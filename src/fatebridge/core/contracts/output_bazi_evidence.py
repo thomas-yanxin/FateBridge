@@ -99,8 +99,6 @@ class StrengthContext(PartialOutput):
         index = self.engineering_index
         if index is None:
             return self
-        else:
-            pass
         if (
             self.method_id is not None
             and index.method_id is not None
@@ -111,8 +109,6 @@ class StrengthContext(PartialOutput):
             and self.strength_level != index.strength_level
         ):
             raise ValueError("工程索引与同次旺衰政策结果不符")
-        else:
-            pass
         if (
             self.threshold_arithmetic is not None
             and self.threshold_arithmetic.numerical_label is not None
@@ -121,8 +117,6 @@ class StrengthContext(PartialOutput):
             != index.numerical_strength_level
         ):
             raise ValueError("工程索引数值档与同次精确账本不符")
-        else:
-            pass
         return self
 
     @model_validator(mode="after")
@@ -136,8 +130,6 @@ class StrengthContext(PartialOutput):
             != self.requires_special_structure_review
         ):
             raise ValueError("特殊结构复核标记与同次精确回执不符")
-        else:
-            pass
         return self
 
 
@@ -331,15 +323,11 @@ class BaziEvidenceChain(PartialOutput):
                     else {}
                 ),
             )
-        else:
-            pass
         inventory = (
             relations.branch_combination_candidates if relations is not None else None
         )
         if inventory is None:
             return self
-        else:
-            pass
         if (
             self.strength_context is not None
             and self.strength_context.method_id is not None
@@ -347,8 +335,6 @@ class BaziEvidenceChain(PartialOutput):
             and self.strength_context.method_id != inventory.strength_method_id
         ):
             raise ValueError("通关候选与旺衰上下文须来自同次计算方法")
-        else:
-            pass
         if (
             self.classical_passage is not None
             and inventory.branches_by_position is not None
@@ -366,10 +352,6 @@ class BaziEvidenceChain(PartialOutput):
                     and inventory.known_branches().get(str(pillar)) != node.branch
                 ):
                     raise ValueError("通关候选不能混入另一四柱的物理藏支")
-                else:
-                    pass
-        else:
-            pass
         return self
 
     @model_validator(mode="after")
@@ -382,8 +364,6 @@ class BaziEvidenceChain(PartialOutput):
             and self.bureau_season_reference.month_branch is not None
         ):
             months.append(self.bureau_season_reference.month_branch)
-        else:
-            pass
         if self.classical_passage is not None:
             for node in self.classical_passage.nodes or []:
                 pillar, plane = (
@@ -393,15 +373,9 @@ class BaziEvidenceChain(PartialOutput):
                 )
                 if pillar == "month" and plane == "hidden" and node.branch is not None:
                     months.append(node.branch)
-                else:
-                    pass
-        else:
-            pass
         coherent_months(months)
         if months and self.month_command is not None:
             self.month_command.check_month(months[0])
-        else:
-            pass
         return self
 
     @model_validator(mode="after")
@@ -409,8 +383,6 @@ class BaziEvidenceChain(PartialOutput):
         context, force = self.strength_context, self.force_components
         if context is None or force is None:
             return self
-        else:
-            pass
         left, right = context.classical_adjudication, force.classical_adjudication
         if left is not None and right is not None:
             for name in left.model_fields_set & right.model_fields_set:
@@ -418,16 +390,10 @@ class BaziEvidenceChain(PartialOutput):
                     raise ValueError(
                         "原典力量裁定须来自同次日主结果，不得在证据层另行改判"
                     )
-                else:
-                    pass
-        else:
-            pass
         if force.energy_provenance is not None:
             bind_assessment(
                 force.energy_provenance, context.model_dump(exclude_unset=True)
             )
-        else:
-            pass
         composition = force.engineering_composition
         if composition is not None:
             if (
@@ -436,23 +402,15 @@ class BaziEvidenceChain(PartialOutput):
                 and context.method_id != composition.strength_method_id
             ):
                 raise ValueError("身印分量与旺衰上下文不能混用不同计算方法")
-            else:
-                pass
             if (
                 context.strength_level is not None
                 and composition.strength_level is not None
                 and context.strength_level != composition.strength_level
             ):
                 raise ValueError("同次身印分量与旺衰上下文等级不符")
-            else:
-                pass
-        else:
-            pass
         receipt = context.threshold_arithmetic
         if receipt is None or receipt.day_element is None:
             return self
-        else:
-            pass
         body = receipt.day_element
         seal = next(
             e.value for e, child in GENERATION_CYCLE.items() if child.value == body
@@ -475,8 +433,6 @@ class BaziEvidenceChain(PartialOutput):
                 and component.element != element
             ):
                 raise ValueError("身印五行角色必须忠于同次日主五行")
-            else:
-                pass
             energy = (
                 getattr(composition, exact_field) if composition is not None else None
             )
@@ -487,8 +443,6 @@ class BaziEvidenceChain(PartialOutput):
                 and Fraction(energy) != Fraction(recorded)
             ):
                 raise ValueError("身印精确分量必须沿用同次旺衰回执，不能拼接其他结果")
-            else:
-                pass
         return self
 
 
@@ -550,8 +504,6 @@ class EvidenceStructureProfile(PartialOutput):
             self.useful_elements or self.avoid_elements or self.neutral_elements
         ):
             raise ValueError("来源喜忌未裁定时，工程参考不能回填已选喜忌或中性结论")
-        else:
-            pass
         return self
 
     dominant_structure: MonthStructureReference | None = None

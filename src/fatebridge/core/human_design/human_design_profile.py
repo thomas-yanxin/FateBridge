@@ -51,16 +51,12 @@ def profile_evidence(chart: dict[str, Any]) -> dict[str, Any]:
             pair = [(i, a) for i, a in enumerate(rows) if a["body"] in {"Sun", "Earth"}]
             if len(pair) != 2 or {a["body"] for _, a in pair} != {"Sun", "Earth"}:
                 return {**base, "status": "incomplete_paired_line_basis"}
-            else:
-                pass
             values = [a["line"] for _, a in pair]
             if (
                 any(type(v) is not int or not 1 <= v <= 6 for v in values)
                 or values[0] != values[1]
             ):
                 return {**base, "status": "inconsistent_paired_line_basis"}
-            else:
-                pass
             line = values[0]
             sides.append(
                 {
@@ -85,16 +81,12 @@ def profile_evidence(chart: dict[str, Any]) -> dict[str, Any]:
     match = next((r for r in reference["profiles"] if r["profile"] == expected), None)
     if match is None or chart.get("profile") != expected:
         return {**base, "status": "inconsistent_profile_combination"}
-    else:
-        pass
     angle = match["angle"]
     if (
         "incarnation_cross" in chart
         and chart["incarnation_cross"].get("angle") != angle
     ):
         return {**base, "status": "inconsistent_profile_cross_angle"}
-    else:
-        pass
     sixth = [r["side"] for r in sides if r["line"] == 6]
     return {
         **base,
@@ -136,8 +128,6 @@ def profile_evidence(chart: dict[str, Any]) -> dict[str, Any]:
 def profile_brief(evidence: dict[str, Any]) -> str:
     if evidence["status"] != "computed":
         return "本次人格/设计日地线号或角度依据不完整或不一致，不能补造角色主题。"
-    else:
-        pass
     p, d = evidence["lines"]
     return (
         f"人生角色 {evidence['profile']}：人格侧第 {p['line']} 线为 {p['archetype']}，"
@@ -149,8 +139,6 @@ def profile_reading(evidence: dict[str, Any]) -> str:
     brief = profile_brief(evidence)
     if evidence["status"] != "computed":
         return brief
-    else:
-        pass
     p, d = evidence["lines"]
     trigrams = {"lower": "下卦", "upper": "上卦"}
     result = (
@@ -161,10 +149,6 @@ def profile_reading(evidence: dict[str, Any]) -> str:
         result += "4与6均属上卦，整体仍为右角，不能改标左角。"
     elif evidence["profile"] == "4/1":
         result += "4/1单独归并列结构；Fixed Fate为原有类别名，不表示现实结局不可改变。"
-    else:
-        pass
     if evidence["sixth_line_process"]["applicable"]:
         result += "含第六线的传统三阶段说明；本命角色证据不分配现阶段或改变角色数字。可选周期交会另见cycle_summary，出生起点及多次交会取舍未由原始资料裁定。"
-    else:
-        pass
     return result

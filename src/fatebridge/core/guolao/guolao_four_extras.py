@@ -40,20 +40,14 @@ def _tables() -> tuple[dict[str, Any], str]:
             or Fraction(table["printed_days_per_du"]) <= 0
         ):
             raise ValueError(f"{key}刊表须完整、严格递增并闭合刊载周积，禁止补格归一化")
-        else:
-            pass
         step = 1 if table["direction"] == "forward" else -1
         if table["direction"] not in {"forward", "reverse"} or any(
             MANSIONS[(MANSIONS.index(name) + step) % 28] != names[(i + 1) % 28]
             for i, name in enumerate(names)
         ):
             raise ValueError(f"{key}刊表宿序与顺逆方向不符")
-        else:
-            pass
         if table["entry_kind"] != ("initial_degree" if step == 1 else "final_degree"):
             raise ValueError(f"{key}顺行初度与逆行末度不得互换")
-        else:
-            pass
     offsets = source["factors"]
     node_period = Fraction(source["tables"]["nodes"]["period_days"])
     half = Fraction(source["half_node_period_days"])
@@ -64,8 +58,6 @@ def _tables() -> tuple[dict[str, Any], str]:
         != half
     ):
         raise ValueError("罗计刊载半周积与两至后策不符，不能套现代180度修补")
-    else:
-        pass
     return source, hashlib.sha256(blob).hexdigest()
 
 
@@ -81,19 +73,11 @@ def four_extras_source_days(
     """
     if not isinstance(zhongji_days, Fraction):
         raise TypeError("中积须为明确的Fraction原历日数，不接收现代JD浮点值")
-    else:
-        pass
     if winter_cycle_days is not None:
         if not isinstance(winter_cycle_days, Fraction):
             raise TypeError("冬至分须为Fraction原历60日周期数")
-        else:
-            pass
         if not 0 <= winter_cycle_days < 60:
             raise ValueError("冬至分须在原历60日周期的[0,60)内")
-        else:
-            pass
-    else:
-        pass
     source, digest = _tables()
     factors = {}
     for key, info in source["factors"].items():
@@ -128,11 +112,7 @@ def four_extras_source_days(
                 or purple.interval_end_days != end
             ):
                 raise ValueError("紫气新旧刊表不一致，不以改边界消除差异")
-            else:
-                pass
             degree = str(purple.degree_in_mansion_du)
-        else:
-            pass
         factors[key] = {
             "name": info["name"],
             "phase_origin": table["phase_origin"],

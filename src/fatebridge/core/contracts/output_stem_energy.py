@@ -29,25 +29,17 @@ class StemEnergyRow(PartialOutput):
         if self.physical_stem is not None:
             if self.physical_stem not in STEM_ELEMENTS:
                 raise ValueError("天干原字不合法")
-            else:
-                pass
             if (
                 self.physical_element is not None
                 and self.physical_element != STEM_ELEMENTS[self.physical_stem][0].value
             ):
                 raise ValueError("原字五行必须忠于原柱")
-            else:
-                pass
-        else:
-            pass
         if (
             self.available_budget is not None
             and self.binding_multiplier is not None
             and self.available_budget != self.binding_multiplier
         ):
             raise ValueError("可用天干预算必须忠于合绊乘数")
-        else:
-            pass
         if all(
             v is not None
             for v in (
@@ -70,10 +62,6 @@ class StemEnergyRow(PartialOutput):
                 abs_tol=1e-12,
             ):
                 raise ValueError("天干计力必须使用未舍入的预算、激活与季相")
-            else:
-                pass
-        else:
-            pass
         return self
 
 
@@ -92,8 +80,6 @@ class StemEnergyAccounting(PartialOutput):
             positions = [r.pillar for r in self.ledger if r.pillar is not None]
             if len(positions) != len(set(positions)):
                 raise ValueError("每个原柱天干只能计一次")
-            else:
-                pass
             for row in self.ledger:
                 if (
                     self.conversion_policy is not None
@@ -102,8 +88,4 @@ class StemEnergyAccounting(PartialOutput):
                     and row.physical_element != row.effective_element
                 ):
                     raise ValueError("未启用成化政策不能宣称已转换作用元素")
-                else:
-                    pass
-        else:
-            pass
         return self

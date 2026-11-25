@@ -48,8 +48,6 @@ def calculate_election(
         with use_ut1_source(ut1_source):
             if topic_id not in TOPIC_MASTER:
                 raise ValueError("未知的择日主题；请使用公开 topic_id 枚举")
-            else:
-                pass
             house_system = normalize_house_system(house_system)
             candidate_local, calendar_conversion, hour_origin_conversion = (
                 event_wall_datetime(
@@ -144,8 +142,6 @@ def calculate_election(
                     ),
                 ]
                 result["snapshot_text"] = _render_snapshot_text(sections)
-            else:
-                pass
             return result
     except Exception as exc:
         return handle_calculation_error(exc, label)

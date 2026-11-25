@@ -43,13 +43,9 @@ def _precision_geometry(
     geographic_latitude = latitude
     if not isinstance(runtime.swe, ModuleType):
         return None
-    else:
-        pass
     observed = active_ut1.get() is not None
     if not observed and abs(latitude) == 90:
         return None
-    else:
-        pass
     if not all(
         math.isfinite(v)
         for v in (
@@ -63,8 +59,6 @@ def _precision_geometry(
         )
     ):
         raise EphemerisSourceError("horizon_direction_model_unavailable")
-    else:
-        pass
     if observed:
         equator = physical_equator(
             runtime.swe, julian_day_ut1, julian_day_tt=julian_day_tt
@@ -74,10 +68,6 @@ def _precision_geometry(
         ).equatorial_site()
         if abs(latitude) == 90:
             return None
-        else:
-            pass
-    else:
-        pass
     gap = abs((common[0] - common[1] + 180) % 360 - 180)
     # A native intersection may be snapped to a cardinal longitude even when
     # its reported ASC is far from MC/IC. |A| also screens for a small horizon
@@ -86,8 +76,6 @@ def _precision_geometry(
     a = math.cos(phi) * math.cos(theta)
     if min(gap, 180 - gap) > 1.0 and abs(a) > SELECTOR_WORK_GATE:
         return None
-    else:
-        pass
     try:
         attitude = earth_attitude(
             runtime.swe, julian_day_ut1, julian_day_tt=julian_day_tt
@@ -100,8 +88,6 @@ def _precision_geometry(
             and error.reason != "earth_attitude_model_unavailable"
         ):
             raise
-        else:
-            pass
         raise EphemerisSourceError("horizon_direction_model_unavailable") from error
     phi, theta, e = map(math.radians, (latitude, common[2], eps))
     a = math.cos(phi) * math.cos(theta)
@@ -117,12 +103,8 @@ def _precision_geometry(
     # resolvable intersection that needs higher precision.
     if norm <= INTERSECTION_RESOLUTION_GUARD:
         return None
-    else:
-        pass
     if norm > SELECTOR_WORK_GATE and abs(selector) > SELECTOR_WORK_GATE:
         return None
-    else:
-        pass
     try:
         model = horizon_geometry(latitude, float(common[2]), eps)
     except Exception as error:
@@ -196,8 +178,6 @@ def _canonical_house_axes(
                 else "tropical"
             ),
         )
-    else:
-        pass
     public = (corrected, float(physical[1]), *native_angles[2:])
     separation = abs((native_angles[1] - public[1] + 180) % 360 - 180)
     ascendant_separation = abs((native_angles[0] - public[0] + 180) % 360 - 180)
@@ -205,8 +185,6 @@ def _canonical_house_axes(
     # accuracy threshold. Always retain the common physical-axis calculation.
     if separation <= 90 and ascendant_separation <= 90 and precision is None:
         return public, None, model, physical
-    else:
-        pass
     exchanged = "／".join(
         name
         for name, distance in (("ASC", ascendant_separation), ("MC", separation))
@@ -249,8 +227,6 @@ def _canonical_house_axes(
             }[precision[1]["ascendant_action"]]
             + "交点方向对时地输入高度敏感，此处核对的是声明的角度模型。"
         )
-    else:
-        pass
     return public, receipt, model, physical
 
 
@@ -299,8 +275,6 @@ def canonical_house_geometry(
     cusps = tuple(native_cusps)
     if model is None or receipt is None:
         return cusps, public, receipt
-    else:
-        pass
     changed = []
     phases = model.regiomontanus_phases if house_code == b"R" else model.campanus_phases
     if house_code in (b"R", b"C"):
@@ -310,8 +284,6 @@ def canonical_house_geometry(
             values.append(corrected)
             if action != "native_coordinate_retained":
                 changed.append(index + 1)
-            else:
-                pass
         cusps = tuple(values)
     elif house_code == b"W":
         cusps = tuple(
@@ -349,12 +321,8 @@ def canonical_house_geometry(
             values[index] = corrected
             if action != "native_coordinate_retained":
                 changed.append(index + 1)
-            else:
-                pass
         cusps = tuple(values)
         receipt["source_section"] = "6.2.1; swehouse.c CalcH ASC/DSC identities"
-    else:
-        pass
     receipt["eastern_direction_precision"]["corrected_cusps"] = changed
     receipt["eastern_direction_precision"]["native_cusps"] = list(native_cusps)
     receipt["eastern_direction_precision"]["delivered_cusps"] = list(cusps)
@@ -376,6 +344,4 @@ def canonical_house_geometry(
         receipt[
             "note_zh"
         ] += " 本次相应宫头端点已一并修正；原生落宫投影的声明政策另列。"
-    else:
-        pass
     return cusps, public, receipt

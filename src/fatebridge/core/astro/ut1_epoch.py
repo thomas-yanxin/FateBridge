@@ -16,16 +16,12 @@ class UT1Instant:
     def __post_init__(self) -> None:
         if not isinstance(self.days, Fraction):
             raise TypeError("UT1Instant requires an exact Fraction of UT1 days")
-        else:
-            pass
 
     @classmethod
     def from_float(cls, jd_ut1: float) -> UT1Instant:
         """Preserve the supplied IEEE point without inferring a prior clock."""
         if isinstance(jd_ut1, bool) or not math.isfinite(jd_ut1):
             raise ValueError("UT1 point must be finite and numeric")
-        else:
-            pass
         return cls(Fraction(jd_ut1))
 
     @classmethod

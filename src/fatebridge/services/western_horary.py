@@ -52,8 +52,6 @@ def calculate_horary(
         with use_ut1_source(ut1_source):
             if category not in HOUSE_BY_CATEGORY:
                 raise ValueError("未知的卜卦类别；请使用公开 category 枚举")
-            else:
-                pass
             full_orbs(orb_profile)
             house_system = normalize_house_system(house_system)
             question_local, calendar_conversion, hour_origin_conversion = (
@@ -154,8 +152,6 @@ def calculate_horary(
                     ),
                 ]
                 result["snapshot_text"] = _render_snapshot_text(sections)
-            else:
-                pass
             return result
     except Exception as exc:
         return handle_calculation_error(exc, label)

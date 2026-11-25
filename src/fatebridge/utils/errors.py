@@ -71,8 +71,6 @@ class NumerologySourceError(DomainSourceError, RuntimeError):
     def __init__(self, reason: str) -> None:
         if reason not in self.MESSAGES:
             raise RuntimeError("Unknown numerology source consistency reason")
-        else:
-            pass
         self.reason = reason
         super().__init__(self.MESSAGES[reason])
 
@@ -103,8 +101,6 @@ class FengshuiCalculationError(DomainSourceError, RuntimeError):
     def __init__(self, reason: str) -> None:
         if reason not in self.MESSAGES:
             raise ValueError("Unknown Feng Shui calculation consistency reason")
-        else:
-            pass
         self.reason = reason
         super().__init__(self.MESSAGES[reason])
 
@@ -146,8 +142,6 @@ class JyotishCalculationError(DomainSourceError, RuntimeError):
     def __init__(self, reason: str) -> None:
         if reason not in self.MESSAGES:
             raise ValueError("Unknown Jyotish calculation consistency reason")
-        else:
-            pass
         self.reason = reason
         super().__init__(self.MESSAGES[reason])
 
@@ -266,8 +260,6 @@ class EphemerisSourceError(DomainSourceError, ValueError):
     def __init__(self, reason: str) -> None:
         if reason not in self.MESSAGES:
             raise ValueError("Unknown physical-ephemeris consistency reason")
-        else:
-            pass
         self.reason = reason
         super().__init__(self.MESSAGES[reason])
 
@@ -333,10 +325,6 @@ def validation_issues_result(entries: Sequence[ErrorDetails]) -> dict[str, Any]:
             cause = (item.get("ctx") or {}).get("error")
             if isinstance(cause, EphemerisSourceError):
                 return cause.as_result()
-            else:
-                pass
-    else:
-        pass
     issues: list[dict[str, object]] = []
     is_restricted = False
     message = "请求参数无效"
@@ -356,8 +344,6 @@ def validation_issues_result(entries: Sequence[ErrorDetails]) -> dict[str, Any]:
                 for issue in cause.issues
             )
             continue
-        else:
-            pass
         constraints: dict[str, object] = {
             key: context[key]
             for key in (
@@ -375,8 +361,6 @@ def validation_issues_result(entries: Sequence[ErrorDetails]) -> dict[str, Any]:
         }
         if field := context.get("path"):
             path = f"{path}.{field}" if path else field
-        else:
-            pass
         issue_message = item["msg"]
         if code == "consultation_restricted":
             is_restricted = True
@@ -385,16 +369,10 @@ def validation_issues_result(entries: Sequence[ErrorDetails]) -> dict[str, Any]:
             path = "request"
             if loc:
                 constraints["position"] = loc[0]
-            else:
-                pass
             if cause:
                 issue_message = f"{issue_message}: {cause}"
-            else:
-                pass
         elif code == "value_error" and isinstance(cause, ValueError):
             issue_message = str(cause) or issue_message
-        else:
-            pass
         if message == "请求参数无效" and code in {
             "unsupported_house_system",
             "invalid_house_system",
@@ -402,8 +380,6 @@ def validation_issues_result(entries: Sequence[ErrorDetails]) -> dict[str, Any]:
             "unresolved_timezone_offset",
         }:
             message = issue_message
-        else:
-            pass
         issue: dict[str, object] = {
             "path": path or "request",
             "code": code,
@@ -411,8 +387,6 @@ def validation_issues_result(entries: Sequence[ErrorDetails]) -> dict[str, Any]:
         }
         if constraints:
             issue["constraints"] = constraints
-        else:
-            pass
         issues.append(issue)
     return {
         "error": "此请求超出允许的咨询范围" if is_restricted else message,
@@ -429,17 +403,11 @@ def handle_calculation_error(error: Exception, operation: str) -> dict[str, Any]
     """Return caller diagnostics and log only exception identity and stack locations."""
     if isinstance(error, ValidationError):
         return validation_error_result(error)
-    else:
-        pass
     if isinstance(error, ParameterError):
         return error.as_result()
-    else:
-        pass
     if isinstance(error, DomainSourceError):
         logger.error(f"{operation} failed ({type(error).__name__}: {error.reason})")
         return error.as_result()
-    else:
-        pass
 
     if (
         isinstance(error, PydanticCustomError)
@@ -452,8 +420,6 @@ def handle_calculation_error(error: Exception, operation: str) -> dict[str, Any]
             "retryable": False,
             "issues": [{"path": "request", "code": error.type}],
         }
-    else:
-        pass
 
     if isinstance(error, ValueError):
         return {
@@ -462,8 +428,6 @@ def handle_calculation_error(error: Exception, operation: str) -> dict[str, Any]
             "status_code": 400,
             "retryable": False,
         }
-    else:
-        pass
 
     cause = error.__cause__ or error
     frames = " -> ".join(

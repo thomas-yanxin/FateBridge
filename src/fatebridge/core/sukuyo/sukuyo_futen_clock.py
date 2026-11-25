@@ -29,8 +29,6 @@ def _models(bundle: dict[str, Any]) -> dict[str, dict[str, Any]]:
     models = {row["id"]: row for row in rows}
     if len(rows) != 2 or set(models) != {FUTEN, SENMYO}:
         raise ValueError("符天研究的两种时制必须完整唯一")
-    else:
-        pass
     for name, day, koku in [(FUTEN, 10000, 100), (SENMYO, 8400, 84)]:
         row = models[name]
         if (
@@ -43,24 +41,18 @@ def _models(bundle: dict[str, Any]) -> dict[str, dict[str, Any]]:
             or row["day_origin_literal"] != "子半"
         ):
             raise ValueError("符天研究时制单位或起点与所选解释不一致")
-        else:
-            pass
     return models
 
 
 def _clock(literal: str, model: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(literal, str):
         raise ValueError("历史时点须为明确字符串")
-    else:
-        pass
     text = "".join(literal.split())
     match = re.fullmatch(
         r"([" + BRANCHES + r"])(時正|初刻(?:\d+分)?|\d+刻(?:\d+分)?)", text
     )
     if not match:
         raise ValueError("须明确辰、刻分或時正，不推测裸数字、半或单位")
-    else:
-        pass
     branch, tail = match.groups()
     day, koku = model["day_units"], model["koku_units"]
     per_branch = Fraction(day, model["double_hours_per_day"])
@@ -73,13 +65,9 @@ def _clock(literal: str, model: dict[str, Any]) -> dict[str, Any]:
         minute = int(parts[2] or 0)
         if minute >= koku:
             raise ValueError("时点的分栏超出所选一刻单位")
-        else:
-            pass
         offset = Fraction(count * koku + minute)
         if offset > per_branch:
             raise ValueError("时点超出所选一辰时")
-        else:
-            pass
     # The selected study starts the day at 子半. 子初 is in the preceding
     # nominal day; do not silently wrap it and lose the day shift.
     absolute = Fraction((2 * BRANCHES.index(branch) - 1) * day, 24) + offset
@@ -103,8 +91,6 @@ def decode_clock(literal: str, *, model: str) -> dict[str, Any]:
     models = _models(loaded.data)
     if model not in models:
         raise ValueError("须明确选择符天研究所列的时制模型")
-    else:
-        pass
     return {
         **_clock(literal, models[model]),
         "source_bundle_sha256": loaded.sha256,
@@ -118,8 +104,6 @@ def futen_clock_reference() -> dict[str, Any]:
     readings = bundle["selected_1240_readings"]
     if [row["id"] for row in readings] != ["start", "middle", "end"]:
         raise ValueError("符天研究所选三个时点须完整且按原顺序")
-    else:
-        pass
     comparisons = []
     values: dict[str, list[Fraction]] = {FUTEN: [], SENMYO: []}
     for row in readings:

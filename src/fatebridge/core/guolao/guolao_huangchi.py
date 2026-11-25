@@ -34,8 +34,6 @@ class RateRow:
             self.second_rate, Fraction
         ):
             raise TypeError("当前行未提供两项明确古度率，不能补造或派生")
-        else:
-            pass
         return self.first_rate, self.second_rate
 
 
@@ -52,41 +50,27 @@ class HuangChiTable:
         object.__setattr__(self, "rows", tuple(self.rows))
         if len(self.rows) != 93:
             raise ValueError("黄赤道率须保留初至表尾93个锚点，不补齐缺行")
-        else:
-            pass
         for i, row in enumerate(self.rows):
             if not isinstance(row.first, Fraction) or not isinstance(
                 row.second, Fraction
             ):
                 raise TypeError("原历积度和度率须以Fraction明确表示古度")
-            else:
-                pass
             if i < 92:
                 first_rate, second_rate = row.rates()
                 if first_rate <= 0 or second_rate <= 0:
                     raise ValueError("源表度率须为正；不以零或负率补算")
-                else:
-                    pass
-            else:
-                pass
             if i and (
                 row.first <= self.rows[i - 1].first
                 or row.second <= self.rows[i - 1].second
             ):
                 raise ValueError("源表积度须严格递增，不能排序来消除倒序")
-            else:
-                pass
         if self.rows[0].first != 0 or self.rows[0].second != 0:
             raise ValueError("原历本地积度起点须为初")
-        else:
-            pass
         if (
             self.rows[-1].first_rate is not None
             or self.rows[-1].second_rate is not None
         ):
             raise ValueError("表尾无后继度率，不能补造")
-        else:
-            pass
 
     def residuals(self) -> list[dict[str, Any]]:
         findings = []
@@ -102,8 +86,6 @@ class HuangChiTable:
                         "second_residual_du_exact": str(second),
                     }
                 )
-            else:
-                pass
         return findings
 
     def audit(self) -> dict[str, Any]:
@@ -143,15 +125,11 @@ class HuangChiTable:
         """Local accumulation from a named 至/分 point, never mansion degree."""
         if not isinstance(degree_du, Fraction):
             raise TypeError("须以Fraction提供原历本地积度，不接收现代黄经或宿内度")
-        else:
-            pass
         if origin not in {"solstice", "equinox"} or direction not in {
             "equatorial_to_ecliptic",
             "ecliptic_to_equatorial",
         }:
             raise ValueError("须明确至后/分后及黄赤道转换方向")
-        else:
-            pass
         use_second = (origin == "solstice") == (direction == "equatorial_to_ecliptic")
         source = tuple(row.second if use_second else row.first for row in self.rows)
         target = tuple(row.first if use_second else row.second for row in self.rows)
@@ -159,8 +137,6 @@ class HuangChiTable:
             raise ValueError(
                 "输入越过所选原表本地积度范围；不填满理论象限、不取模或外推"
             )
-        else:
-            pass
         index = min(bisect_right(source, degree_du) - 1, 91)
         row = self.rows[index]
         first_rate, second_rate = row.rates()
@@ -199,8 +175,6 @@ def load_table(profile: str) -> HuangChiTable:
     entries = json.loads(raw)["profiles"]
     if profile not in entries:
         raise ValueError("须明确选择nlc166或wikisource，不能自动拼合版本")
-    else:
-        pass
     entry = entries[profile]
     values = entry["rows"]
     rows = tuple(
@@ -234,13 +208,9 @@ def project_reference_mansions(
     eq = SHOUSHI_EQUATORIAL_1281
     if winter_mansion not in MANSIONS or not isinstance(winter_degree_du, Fraction):
         raise ValueError("须明确给定固定赤道宿表中的冬至宿名和Fraction古度")
-    else:
-        pass
     i = MANSIONS.index(winter_mansion)
     if not 0 <= winter_degree_du < eq.widths_du[i]:
         raise ValueError("冬至宿内度须首含尾不含，不能按现代黄经取模")
-    else:
-        pass
     table = load_table(profile)
     origin = sum(eq.widths_du[:i], Fraction()) + winter_degree_du
     quadrant = eq.circle_du / 4
@@ -281,8 +251,6 @@ def project_reference_mansions(
         if width is not None:
             scaled = width * 100 + Fraction(1, 2)
             rounded = Fraction(scaled.numerator // scaled.denominator, 100)
-        else:
-            pass
         printed = NLC166_MANSIONS.widths_du[index]
         widths.append(
             {

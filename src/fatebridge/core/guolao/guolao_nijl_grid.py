@@ -31,8 +31,6 @@ def _data() -> dict[str, Any]:
     raw = DATA.read_bytes()
     if hashlib.sha256(raw).hexdigest() != DATA_SHA256:
         raise ValueError("NIJL源表转写指纹变化，不能静默改字或套用旧校勘")
-    else:
-        pass
     result: dict[str, Any] = json.loads(raw)
     if (
         result["source_id"] != SOURCE_ID
@@ -40,8 +38,6 @@ def _data() -> dict[str, Any]:
         or "".join(row["palace"] for row in result["rows"]) != BRANCHES
     ):
         raise ValueError("NIJL表须保持具名原图及原行顺序，不能跨扫描拼表")
-    else:
-        pass
     return result
 
 
@@ -116,8 +112,6 @@ def compare_ma591() -> dict[str, Any]:
     for key, expected in data["comparison_base"].items():
         if getattr(base, key) != expected:
             raise ValueError("MA591比较基准已变化，不能套用NIJL旧校勘绑定")
-        else:
-            pass
     cells = []
     for palace in BRANCHES:
         for column in range(1, 31):
@@ -158,16 +152,10 @@ def _literal_integer(cell: dict[str, Any]) -> int | None:
     if value is None:
         attached = cell["marker_reading"]
         value = attached["integer_value"] if attached else None
-    else:
-        pass
     if value is None:
         return None
-    else:
-        pass
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError("原格数值须为明确整数标签，不隐式换算浮点或真假值")
-    else:
-        pass
     return value
 
 
@@ -182,16 +170,12 @@ def compare_intro_examples() -> dict[str, Any]:
     raw = EXAMPLES.read_bytes()
     if hashlib.sha256(raw).hexdigest() != data["intro_example_data_sha256"]:
         raise ValueError("原例资料指纹变化，不能删例或套用旧表位置")
-    else:
-        pass
     reference = json.loads(raw)
     examples = [
         item for item in reference["cases"] if item["id"] in data["intro_example_ids"]
     ]
     if [item["id"] for item in examples] != data["intro_example_ids"]:
         raise ValueError("须齐全保留本见证的两条入门原例")
-    else:
-        pass
     source = next(
         item
         for item in reference["sources"]

@@ -36,32 +36,20 @@ def three_shadow_elapsed(
     """Elapsed source days from A's midnight; modes must be declared."""
     if len(days) != 3 or any(type(v) is not int for v in days):
         raise TypeError("三个观测日须为明确整数序号")
-    else:
-        pass
     if len(shadows) != 3 or any(not isinstance(v, F) for v in shadows):
         raise TypeError("三个同单位影长须为精确Fraction")
-    else:
-        pass
     if not days[0] < days[1] < days[2] or any(v <= 0 for v in shadows):
         raise ValueError("观测日须递增且影长为正，不排序或替换原观测")
-    else:
-        pass
     if mode not in MODES or noon_basis != NOON_BASIS:
         raise ValueError("须明确具名三日法和从中天到夜半的半日约定")
-    else:
-        pass
     a, b, c = shadows
     m = days[2] - days[0]
     if mode == MODES[0]:
         if days[2] - days[1] != 1:
             raise ValueError("前1后2型要求后两次观测相邻，不把间隔偷换为一日")
-        else:
-            pass
         slope = c - b
         if slope == 0:
             raise ValueError("相邻观测影差为零，不能插算或猜测节气")
-        else:
-            pass
         ratio = (a - c) / slope
         equal_shadow_day = F(m) + ratio
         bracketed = m - 1 <= equal_shadow_day <= m
@@ -69,13 +57,9 @@ def three_shadow_elapsed(
     else:
         if days[1] - days[0] != 1:
             raise ValueError("前2后1型要求前两次观测相邻，不把间隔偷换为一日")
-        else:
-            pass
         slope = b - a
         if slope == 0:
             raise ValueError("相邻观测影差为零，不能插算或猜测节气")
-        else:
-            pass
         ratio = (c - a) / slope
         equal_shadow_day = ratio
         bracketed = 0 <= equal_shadow_day <= 1
@@ -106,20 +90,12 @@ def source_clock_bin(
     """
     if clock_policy != CLOCK_POLICY:
         raise ValueError("须声明百刻与二十四半时的区间约定")
-    else:
-        pass
     if branch not in bridge.BRANCHES or len(branch) != 1 or half not in ("初", "正"):
         raise ValueError("须明确地支及初正")
-    else:
-        pass
     if type(ke) is not int:
         raise TypeError("刊刻编号须为整数")
-    else:
-        pass
     if not 0 <= ke <= 3:
         raise ValueError("仅复原初初至三刻的完整刻区间，四刻小刻尚未裁定")
-    else:
-        pass
     half_index = 2 * bridge.BRANCHES.index(branch) - (half == "初")
     start = F(half_index, 24) + F(ke, 100)
     end = start + F(1, 100)
@@ -159,12 +135,8 @@ class GnomonEpoch:
     def triad(self, season: str, case_id: int) -> dict[str, Any]:
         if season not in SEASONS:
             raise ValueError("未支持的具名二至，不能换样本以凑合结果")
-        else:
-            pass
         if type(case_id) is not int:
             raise TypeError("刊表算例编号须为整数")
-        else:
-            pass
         matches = [
             v
             for v in self.source["triads"]
@@ -172,14 +144,10 @@ class GnomonEpoch:
         ]
         if len(matches) != 1:
             raise ValueError("未找到唯一具名三日组，不补观测或挑近似组")
-        else:
-            pass
         published_row = matches[0]
         row = dict(published_row)
         if self.reading is not None and season == "winter1279" and case_id == 25:
             row["A"] = str(self.reading["declared_A"])
-        else:
-            pass
         observations = [self.observations[int(row[k])] for k in ("A", "B", "C")]
         labels = [
             list(map(int, v["printed_calendar_date"].split("-"))) for v in observations
@@ -229,15 +197,11 @@ class GnomonEpoch:
                 "observed_after_first_domain_comparison": True,
                 "primary_witness": self.reading["primary_witness"],
             }
-        else:
-            pass
         return result
 
     def season_mean(self, season: str) -> dict[str, Any]:
         if season not in SEASONS:
             raise ValueError("未支持的具名二至")
-        else:
-            pass
         rows = [
             self.triad(season, int(v["case_id"]))
             for v in self.source["triads"]
@@ -294,8 +258,6 @@ class GnomonEpoch:
 def load_gnomon_epoch(profile: str) -> GnomonEpoch:
     if profile not in PROFILES:
         raise ValueError("须选择具名三日法资料，不能匿名替换观测")
-    else:
-        pass
     blob = DATA.read_bytes()
     source = json.loads(blob)
     policy = source["method_policy"]
@@ -319,8 +281,6 @@ def load_gnomon_epoch(profile: str) -> GnomonEpoch:
         or source["physical_epoch_calibrated"] is not False
     ):
         raise ValueError("具名来源、日界或完整样本数改变，不改常数或删组以凑合结果")
-    else:
-        pass
     fingerprint = hashlib.sha256(blob).hexdigest()
     reading = None
     reading_fingerprint = None
@@ -340,8 +300,4 @@ def load_gnomon_epoch(profile: str) -> GnomonEpoch:
             or reading["physical_epoch_calibrated"] is not False
         ):
             raise ValueError("原页校读声明与固定来源不一致，不静默改刊值")
-        else:
-            pass
-    else:
-        pass
     return GnomonEpoch(source, fingerprint, profile, reading, reading_fingerprint)

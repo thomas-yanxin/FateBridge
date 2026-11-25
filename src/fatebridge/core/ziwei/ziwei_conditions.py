@@ -68,8 +68,6 @@ def structural_condition_evidence(
                 raise ValueError(
                     "Unknown compiled Ming geometry: " + clause["geometry"]
                 )
-        else:
-            pass
         branch_match = not clause["branches"] or ming_branch in clause["branches"]
         stem_match = not clause["year_stems"] or year_stem in clause["year_stems"]
         # Known false premises remain false even if another premise is unknown.
@@ -85,8 +83,6 @@ def structural_condition_evidence(
                 occurrences[name][0]["natal_branch"] == branch
                 for name, branch in example["positions"].items()
             )
-        else:
-            pass
         records.append(
             dict(
                 id=clause["id"],

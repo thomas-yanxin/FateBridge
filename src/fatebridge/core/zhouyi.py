@@ -69,8 +69,6 @@ def classical_hexagram(code: str) -> ClassicalHexagram:
                 "edition_status": corpus["edition_status"],
                 **deepcopy(chapter),
             }
-        else:
-            pass
     raise ValueError("周易卦码必须为初爻至上爻的六位 0/1 字符串")
 
 

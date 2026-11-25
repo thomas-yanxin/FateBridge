@@ -19,8 +19,6 @@ def validate_bundle(data: dict[str, Any]) -> None:
     ).encode()
     if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
         raise ValueError("桧尾馆藏候选、目录记录及未取得状态改变，须重新核验")
-    else:
-        pass
 
 
 def catalogue_reference(publisher_witness_note: str) -> dict[str, Any]:
@@ -33,8 +31,6 @@ def catalogue_reference(publisher_witness_note: str) -> dict[str, Any]:
         != data["facts"]["existing_sat_note_not_new_discovery"]["literal"]
     ):
         raise ValueError("桧尾目录候选与本次大正书目注不一致，不能继承旧候选")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 

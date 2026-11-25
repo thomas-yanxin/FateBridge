@@ -37,8 +37,6 @@ class EphemerisSourceSession:
             or configured_jpl_file() != self.jpl
         ):
             raise EphemerisSourceError("physical_configuration_changed")
-        else:
-            pass
 
 
 _SESSION: ContextVar[EphemerisSourceSession | None] = ContextVar(
@@ -60,8 +58,6 @@ def source_session(
         yield active
         active.check()
         return
-    else:
-        pass
     with (
         runtime.preserve_ephemeris_path()
         if restore_native_path

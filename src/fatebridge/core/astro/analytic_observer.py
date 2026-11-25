@@ -38,8 +38,6 @@ class AnalyticObserver:
         key = (body, tt_days, offset_days)
         if key not in self._sources:
             self._sources[key] = mean_j2000_state(body, tt_days, offset_days)
-        else:
-            pass
         return self._sources[key]
 
     def apparent_state(
@@ -91,14 +89,10 @@ class AnalyticObserver:
                 CartesianState(target, (tx, ty, tz)),
                 CartesianState(emitting_sun.position, (ux, uy, uz)),
             )
-        else:
-            pass
         beta = tuple(v / LIGHT_SPEED_AU_PER_DAY for v in earth.velocity)
         if motion.velocity is None:
             x, y, z = aberration_position(motion.position, beta)
             return CartesianMotion((x, y, z), None)
-        else:
-            pass
         apparent, position_change = aberration_position_jvp(
             motion.position, motion.velocity, beta
         )
@@ -119,8 +113,6 @@ class AnalyticObserver:
         """Compute only apparent position, skipping unused velocity/acceleration derivatives."""
         if planet not in {"Sun", "Moon"}:
             return self.apparent_state(planet, tt_days, offset_days).position
-        else:
-            pass
         earth = mean_j2000_state("Earth", tt_days, offset_days, derivatives=1)
 
         def sample(delay: float) -> tuple[tuple[float, ...], None]:

@@ -32,8 +32,6 @@ def _manuscript_reference(
         != cited["capture_sha256"]
     ):
         raise ValueError("护摩抄本对照与所用T2216来源不一致，须重新核验")
-    else:
-        pass
     rows = manuscript["monthly_day_observations"]
     if (
         len(rows) != 12
@@ -46,8 +44,6 @@ def _manuscript_reference(
         )
     ):
         raise ValueError("护摩抄本十二月日必须完整唯一且为合法整数")
-    else:
-        pass
     quoted = {
         row["month"]: row["day"]
         for row in reference["monthly_pushya_reference"]["literal_days"]
@@ -97,8 +93,6 @@ def commentarial_boundary_reference() -> dict[str, Any]:
         )
     ):
         raise ValueError("注疏所引十二月日必须完整唯一且为合法整数")
-    else:
-        pass
     comparisons = []
     for row in literal:
         calculation = fullmoon_calculation(row["month"], row["day"], SU27_ORDER)

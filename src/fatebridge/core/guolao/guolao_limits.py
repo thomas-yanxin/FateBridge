@@ -21,8 +21,6 @@ SCALE_CELLS = 30
 def _exact(value: Fraction, label: str) -> Fraction:
     if not isinstance(value, Fraction):
         raise TypeError(f"{label}须以Fraction提供原尺数值，不能混入浮点或现代日期")
-    else:
-        pass
     return value
 
 
@@ -38,16 +36,10 @@ class LimitScale:
         _exact(self.years, "宫限年数")
         if self.years <= 0 or not self.palaces:
             raise ValueError("原尺须有宫限名及正的年数")
-        else:
-            pass
         if self.printed_rate is not None:
             _exact(self.printed_rate, "刊载速率")
             if self.printed_rate <= 0:
                 raise ValueError("刊载速率须为正")
-            else:
-                pass
-        else:
-            pass
 
     @property
     def degrees_per_year(self) -> Fraction:
@@ -62,16 +54,12 @@ class LimitScale:
         value = _exact(scale_degrees, "行限尺度")
         if not 0 <= value <= SCALE_CELLS:
             raise ValueError("局部行限尺只接收0至30；不能按周天取模或猜下一限")
-        else:
-            pass
         return value * self.years_per_degree
 
     def position(self, elapsed_source_years: Fraction) -> dict[str, Any]:
         value = _exact(elapsed_source_years, "已入本限的原尺年数")
         if not 0 <= value <= self.years:
             raise ValueError("年数须在所选宫限内；不自动推定起限岁数或接续其他宫")
-        else:
-            pass
         degrees = value * self.degrees_per_year
         complete = value == self.years
         return {
@@ -102,12 +90,8 @@ class LimitScale:
         """Zero-based source-year interval [start,end) of a printed 1..30 cell."""
         if isinstance(cell, bool) or not isinstance(cell, int):
             raise TypeError("行限表格号须为1至30的整数")
-        else:
-            pass
         if not 1 <= cell <= SCALE_CELLS:
             raise ValueError("行限表格号须为1至30")
-        else:
-            pass
         return (cell - 1) * self.years_per_degree, cell * self.years_per_degree
 
 
@@ -143,8 +127,6 @@ def limit_scale(palace: str) -> LimitScale:
     for scale in LIMIT_SCALES:
         if palace in scale.palaces:
             return scale
-        else:
-            pass
     raise ValueError("须选择已校读的十一宫限；命宫起限规则尚未复原，不能补默认值")
 
 

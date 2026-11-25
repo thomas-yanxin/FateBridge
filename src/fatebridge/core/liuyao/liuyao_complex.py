@@ -112,8 +112,6 @@ def build_three_harmony(
                             "branch": m["branch"],
                         }
                     )
-                else:
-                    pass
             for location, branch in (("month", month), ("day", day)):
                 if stages[m["element"]].get(branch) == "墓":
                     obstructions.append(
@@ -126,8 +124,6 @@ def build_three_harmony(
                             "actor_branch": branch,
                         }
                     )
-                else:
-                    pass
         count = sum(
             active[m["position"]] for m in members if m["location"] == "visible"
         )
@@ -150,8 +146,6 @@ def build_three_harmony(
         ]
         if missing and completions:
             status = "day_month_completion_candidate"
-        else:
-            pass
         structural_status = status
         pending_activity = sorted(
             {
@@ -171,8 +165,6 @@ def build_three_harmony(
         )
         if pending_activity:
             status = "formation_requires_activity_resolution"
-        else:
-            pass
         candidates.append(
             {
                 "candidate_id": group
@@ -213,8 +205,6 @@ def build_three_harmony(
                 append(
                     group, element, "base_three_branches", [member(r) for r in triple]
                 )
-            else:
-                pass
         for pair in combinations(lines, 2):
             branches = {r["branch"] for r in pair}
             if (
@@ -223,8 +213,6 @@ def build_three_harmony(
                 or not all(active[r["position"]] for r in pair)
             ):
                 continue
-            else:
-                pass
             missing = sorted(set(group) - branches)
             if not any(r["branch"] in missing for r in lines):
                 append(
@@ -234,25 +222,17 @@ def build_three_harmony(
                     [member(r) for r in pair],
                     missing,
                 )
-            else:
-                pass
         for left, right, label in ((0, 2, "inner_changed"), (3, 5, "outer_changed")):
             endpoints = [lines[left], lines[right]]
             if not all(r["change"] for r in endpoints):
                 continue
-            else:
-                pass
             for transformed in endpoints:
                 members = [*(member(r) for r in endpoints), member(transformed, True)]
                 if {m["branch"] for m in members} == set(group):
                     append(group, element, label, members)
-                else:
-                    pass
     for candidate in candidates:
         if candidate["pattern"] != "two_base_branches_waiting":
             continue
-        else:
-            pass
         anchors = {m["position"] for m in candidate["members"]}
         completion_paths = [
             p
@@ -274,8 +254,6 @@ def build_three_harmony(
                 )
                 else "changed_completion_requires_fill_or_review"
             )
-        else:
-            pass
     relations = [
         {
             "source_id": outer["candidate_id"],
@@ -373,20 +351,12 @@ def build_hidden_conditions(
                                 )
                             )
                         )
-                    else:
-                        pass
-                else:
-                    pass
                 found.append(row)
-            else:
-                pass
         return found
 
     def actor_match(actors: list[dict[str, Any]]) -> bool | None:
         if any(a.get("effect_status", "conditional") == "conditional" for a in actors):
             return True
-        else:
-            pass
         if any(
             a.get("effect_status")
             in (
@@ -397,8 +367,6 @@ def build_hidden_conditions(
             for a in actors
         ):
             return None
-        else:
-            pass
         return False
 
     results = []
@@ -407,8 +375,6 @@ def build_hidden_conditions(
         fly = lines[h["position"] - 1]["branch"]
         if h.get("flying_branch", fly) != fly:
             raise ValueError("伏神记录的飞神与本卦同位原爻不一致")
-        else:
-            pass
         monthly, flying_monthly = strength(branch, month), strength(fly, month)
         generated = actors(branch, "generates")
         flying_struck = actors(fly, "strikes")
@@ -431,20 +397,12 @@ def build_hidden_conditions(
         weak_flying = []
         if fly_facts["is_xunkong"]:
             weak_flying.append("旬空")
-        else:
-            pass
         if fly_facts["is_month_clash"]:
             weak_flying.append("月破")
-        else:
-            pass
         if not flying_monthly["monthly_supported"]:
             weak_flying.append("月令休囚层")
-        else:
-            pass
         if any(stages[ELEMENTS[fly]].get(b) in ("墓", "绝") for b in (month, day)):
             weak_flying.append("日月墓绝位关系")
-        else:
-            pass
 
         def condition(
             rule: str,

@@ -24,12 +24,8 @@ def calendar_clause_meanings(taisho: dict[str, Any]) -> dict[str, Any]:
     ).encode()
     if hashlib.sha256(canonical).hexdigest() != FACTS_SHA256:
         raise ValueError("桧尾句义、出处或解释范围改变，须重新核验")
-    else:
-        pass
     if any(taisho.get(key) != value for key, value in data["primary_binding"].items()):
         raise ValueError("桧尾句义与本次原文或校记不一致，须重新核验")
-    else:
-        pass
     return {**data, "source_bundle_sha256": loaded.sha256}
 
 

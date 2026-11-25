@@ -33,8 +33,6 @@ def example_input(spec: ToolSpec) -> dict[str, JsonValue] | None:
         return None
     elif isinstance(source, str):
         source = bundle["subjects"][source]
-    else:
-        pass
     inputs = {
         field: deepcopy(value)
         for field, value in source.items()

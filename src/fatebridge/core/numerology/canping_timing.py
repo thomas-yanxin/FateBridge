@@ -79,8 +79,6 @@ class ResolvedAnnualSeries:
 def _utc(moment: datetime) -> UTCCalendar:
     if moment.tzinfo is None or moment.utcoffset() is None:
         raise ValueError("配运和查询必须使用带时区的时刻。")
-    else:
-        pass
     return utc_calendar(moment)
 
 
@@ -117,13 +115,9 @@ def luck_timeline(
 ) -> dict[str, Any]:
     if method not in {APPENDIX, CONTINUOUS}:
         raise ValueError("日期配运方法必须为bazi_appendix_v1或bazi_continuous_v1。")
-    else:
-        pass
     _utc(birth)
     if gender not in {"男", "女"}:
         raise ValueError("参评配运方向需要明确gender为男或女，不能默认性别。")
-    else:
-        pass
     birth = localize_datetime(birth, zone)
     if method == CONTINUOUS:
         timeline = TimingAnalysis.calculate_dayun_timeline(
@@ -131,8 +125,6 @@ def luck_timeline(
         )
         timeline["profile_id"] = method
         return timeline
-    else:
-        pass
     resolution = TimingAnalysis.resolve_dayun_start(birth, gender, zone)
     term = resolution.target_term
     if not term.has_defined_local_clock:
@@ -145,8 +137,6 @@ def luck_timeline(
                 }
             ],
         )
-    else:
-        pass
     start_details = resolution.to_details()
     reference = term.calendar
     offset = appendix_age(birth, reference)
@@ -208,8 +198,6 @@ def _active_segment(
 ) -> dict[str, object]:
     if period is None:
         return {"status": "not_started"}
-    else:
-        pass
     numbers = compute_number(taisui, period["branch"], element)
     return {
         "status": "active",
@@ -227,8 +215,6 @@ def resolve_annual_series(
     """Retain Lichun/period points through clipping, splitting and selection."""
     if type(horizon) is not int or not 1 <= horizon <= 120:
         raise ValueError("年序范围须为1至120；不是寿命估计。")
-    else:
-        pass
     birth_year = get_bazi_year(birth, zone)
     birth_label = ZonedCalendar.from_datetime(birth)
     birth_point = CivilPoint(birth_label.utc.julian_day_exact())
@@ -248,8 +234,6 @@ def resolve_annual_series(
     ]
     if environment != (solar_model_policy(), configured_jpl_file()):
         raise EphemerisSourceError("solar_configuration_changed")
-    else:
-        pass
     # Dayun boundaries are defined by the named civil birthday mapping. Its
     # labels own these points; solar boundaries above retain their solved point.
     resolved = []
@@ -281,12 +265,8 @@ def resolve_annual_series(
         for a, a_label, b, b_label, _ in resolved:
             if start.day < a.day < end.day:
                 cuts[a.day] = (a, a_label)
-            else:
-                pass
             if start.day < b.day < end.day:
                 cuts[b.day] = (b, b_label)
-            else:
-                pass
         ordered = [cuts[key] for key in sorted(cuts)]
         ganzhi = _year_ganzhi(year)
         segments = []
@@ -297,8 +277,6 @@ def resolve_annual_series(
             )
             if period is None and a.day >= resolved[0][0].day:
                 raise ValueError("配运时间轴未覆盖请求年序；不能沿用最后一运。")
-            else:
-                pass
             interval = ResolvedCanpingInterval(
                 a,
                 b,
@@ -340,8 +318,6 @@ def resolve_annual_series(
                     }
                 }
             )
-        else:
-            pass
         rows.append(row)
     receipts = [boundary.to_record() for boundary in boundaries]
     record: dict[str, object] = {
@@ -399,14 +375,10 @@ def build_canping_timing(
         query = parse_civil_iso_clock(analysis_datetime.replace("Z", "+00:00"))
         if not isinstance(query, UTCCalendar):
             raise ValueError("analysis_datetime须为带时区的ISO时刻。")
-        else:
-            pass
         query_clock = ZonedCalendar(query, parse_timezone_name(zone))
         query_day = query_clock.utc.julian_day_exact()
         if query_day < utc_calendar(birth).julian_day_exact():
             raise ValueError("查询时刻不能早于出生时刻。")
-        else:
-            pass
         match = next(
             (
                 interval
@@ -417,8 +389,6 @@ def build_canping_timing(
         )
         if match is None:
             raise ValueError("查询时刻超出本次年序范围；不外推。")
-        else:
-            pass
         selected = match.to_record()
         selected.update(
             {
@@ -429,8 +399,6 @@ def build_canping_timing(
                 "year_end_boundary": match.year_end_boundary.to_record(),
             }
         )
-    else:
-        pass
     details = {k: deepcopy(v) for k, v in timeline.items() if k != "periods"}
     details.update(
         {

@@ -72,8 +72,6 @@ def explicit_ruleset(*, casting_method: str | None = None) -> dict[str, Any]:
                 "statement": "只查已报五种物象及八方，保留来、往、所在关系，不从描述取象或自动反方；物卦与方位按先天卦序相加，加原时支数一次取爻。",
             }
         )
-    else:
-        pass
     return result
 
 
@@ -134,15 +132,11 @@ def cast_explicit_meihua(
         total = upper + lower
         if parameters["cun"] is not None:
             ignored["cun"] = parameters["cun"]
-        else:
-            pass
     elif method == "length_chi_cun":
         upper, lower = parameters["chi"], parameters["cun"]
         total = upper + lower + hour
         if parameters["fen"] is not None:
             ignored["fen"] = parameters["fen"]
-        else:
-            pass
     elif method in {"text_tones", "text_strokes"}:
         counts = parameters["tones" if method == "text_tones" else "strokes"]
         split = len(counts) // 2
@@ -176,16 +170,10 @@ def cast_explicit_meihua(
     }
     if "hour_branch" in parameters:
         seed["hour_branch"] = parameters["hour_branch"]
-    else:
-        pass
     if observation_basis is not None:
         seed["observation_basis"] = observation_basis
-    else:
-        pass
     if method == "text_tones":
         seed["text_tone_basis"] = build_text_tone_basis(parameters)
-    else:
-        pass
     if method == "text_count":
         facsimile = parameters["text_basis"] == "nlc1925_selected_span"
         seed["text_count_basis"] = {
@@ -203,14 +191,10 @@ def cast_explicit_meihua(
             "software_count_guard": 1_000_000,
             "line_sum_convention_uniquely_classical": False,
         }
-    else:
-        pass
     if method != "existing":
         seed.update(
             {"raw_upper_number": upper, "raw_lower_number": lower, "line_sum": total}
         )
-    else:
-        pass
     if alternate is not None:
         seed.update(
             {
@@ -223,8 +207,6 @@ def cast_explicit_meihua(
                 ),
             }
         )
-    else:
-        pass
     formulas = {
         "lunar_time_added_count": "upper_raw=year_branch_number+lunar_month+lunar_day+added_count; lower_raw=upper_raw+original_hour_number; line_sum=lower_raw; reduce trigrams modulo 8 and line modulo 6, zero maps to 8/6; do not add hour again",
         "object_count": "upper=count; lower=hour_number; line_sum=(raw count or reduced upper trigram number)+original hour_number; hour added once, never reduced to lower trigram number",
@@ -301,8 +283,6 @@ def cast_explicit_meihua(
                     ),
                 }
             )
-    else:
-        pass
     return {
         "method": "meihua_" + method,
         "seed": seed,

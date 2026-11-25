@@ -94,13 +94,9 @@ def nayin_element(year_gz: str) -> str:
     cycle = {_GANS[i % 10] + BRANCHES[i % 12] for i in range(60)}
     if not isinstance(year_gz, str) or year_gz not in cycle:
         return ""
-    else:
-        pass
     nayin = get_nayin(year_gz[0], year_gz[1])
     if not nayin or nayin == "未知纳音":
         return ""
-    else:
-        pass
     return nayin[-1]
 
 
@@ -112,12 +108,8 @@ def _branch_of(ganzhi_or_branch: str) -> str:
     text = ganzhi_or_branch or ""
     if len(text) >= 2 and text[1] in BRANCH_NUM:
         return text[1]
-    else:
-        pass
     if len(text) == 1 and text in BRANCH_NUM:
         return text
-    else:
-        pass
     return ""
 
 
@@ -146,8 +138,6 @@ def compute_number(day_branch: str, hour_branch: str, element: str) -> dict[str,
     """Calculate the forward and reverse Canping lookup numbers."""
     if element not in ELEMENT_ADD:
         raise ValueError("纳音五行必须是水、火、木、金、土。")
-    else:
-        pass
     day_branch_number = BRANCH_NUM[day_branch]
     hour_branch_number = BRANCH_NUM[hour_branch]
     # note (canping): The volume six Metal example counts matching branches through a full cycle including both ends.
@@ -168,8 +158,6 @@ def _verses(element: str, numbers: dict[str, int], kind: str | None) -> dict[str
     def status(text: str) -> str:
         if not text or all(c in "○〇□ \n，。" for c in text):
             return "unavailable_in_local_corpus"
-        else:
-            pass
         return (
             "incomplete_transcription"
             if any(c in text for c in "○〇□")
@@ -189,8 +177,6 @@ def _verses(element: str, numbers: dict[str, int], kind: str | None) -> dict[str
             "not_selected_missing_gender",
         }:
             return str(state)
-        else:
-            pass
         return status(record["text"])
 
     return {
@@ -215,10 +201,6 @@ def _kind_for_gender(gender: str | None) -> Literal["male", "female"] | None:
             return "female"
         elif normalized_gender == "男":
             return "male"
-        else:
-            pass
-    else:
-        pass
     raise ValueError("参评本命选栏需要明确男／女；未提供时可算数，但不能默认性别。")
 
 
@@ -295,8 +277,6 @@ def calculate(
                 **annual_numbers,
                 "verses": _verses(element, annual_numbers, "luck"),
             }
-    else:
-        pass
 
     return {
         "method": method,
@@ -350,20 +330,12 @@ def liunian_series(
         or end_age < start_age
     ):
         raise ValueError("年序年龄范围须为从1起的有序整数。")
-    else:
-        pass
     if type(qiyun_age) is not int or qiyun_age < 0:
         raise ValueError("起运年龄须为明确的非负整数。")
-    else:
-        pass
     if birth_year is not None and (type(birth_year) is not int or birth_year < 0):
         raise ValueError("公历年标签须为正整数；未知用None或0，不能用布尔值代替。")
-    else:
-        pass
     if birth_year and _year_ganzhi(birth_year) != year_gz:
         raise ValueError("流年起始年标签须与出生年柱一致；立春前不能直接用公历出生年。")
-    else:
-        pass
     result = calculate(
         year_gz=year_gz,
         month_branch=month_branch,
@@ -393,8 +365,6 @@ def liunian_series(
         k = (age - qiyun_age) // 10
         if k < 0:
             return None
-        else:
-            pass
         return dayun[k]
 
     rows: list[dict[str, Any]] = []
@@ -412,8 +382,6 @@ def liunian_series(
         if dy is None:
             rows.append({**row, "status": "not_started"})
             continue
-        else:
-            pass
         info = compute_number(taisui, dy["branch"], element)
         row.update(
             {
@@ -445,8 +413,6 @@ def build_snapshot_text(result: dict[str, Any]) -> str:
     """渲染 [起盘]/[本命]/[大运·歲運]/[流年·歲運] 四段中文快照。"""
     if not result:
         return ""
-    else:
-        pass
     lines: list[str] = []
     benming = result.get("benming") or {}
     verses = benming.get("verses") or {}
@@ -464,14 +430,10 @@ def build_snapshot_text(result: dict[str, Any]) -> str:
         lines.append(
             f"配运政策：{result['timing']['profile_id']}（与河洛六九年大限区分）"
         )
-    else:
-        pass
     lines.append("")
     lines.append("[本命]")
     if result.get("kindMain") is None:
         lines.append("未提供计算性别；保留两数，本命未选择男／女栏目。")
-    else:
-        pass
     lines.append(f"顺 {verses.get('numShun')}：{verses.get('textShun')}")
     lines.append(f"逆 {verses.get('numNi')}：{verses.get('textNi')}")
     lines.append("")
@@ -499,8 +461,6 @@ def build_snapshot_text(result: dict[str, Any]) -> str:
                 f"大运{selected['dayun_pillar']}：顺{selected['numShun']} {verses['textShun']} ／ "
                 f"逆{selected['numNi']} {verses['textNi']}"
             )
-    else:
-        pass
     liunian = result.get("liunian")
     if liunian:
         lv = liunian.get("verses") or {}
@@ -511,13 +471,9 @@ def build_snapshot_text(result: dict[str, Any]) -> str:
             f"顺{lv.get('numShun')} {lv.get('textShun')} ／ "
             f"逆{lv.get('numNi')} {lv.get('textNi')}"
         )
-    else:
-        pass
     lines.extend(
         ["", "[参评选条与来源]", selection_snapshot(benming.get("verses") or {})]
     )
     if selected and selected["status"] == "active":
         lines.append("查询当段：" + selection_snapshot(selected["verses"]))
-    else:
-        pass
     return "\n".join(lines)

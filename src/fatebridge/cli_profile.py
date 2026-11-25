@@ -88,8 +88,6 @@ def _resolve_profile_systems(
         elif spec.key not in seen:
             resolved.append((token, spec))
             seen.add(spec.key)
-        else:
-            pass
     return resolved, unknown
 
 
@@ -120,8 +118,6 @@ def run_profile(
     raw: str | None = args.systems
     if raw is None:
         raw = DEFAULT_PROFILE_SYSTEMS
-    else:
-        pass
     tokens = [t.strip() for t in raw.split(",") if t.strip()]
     if not tokens:
         return emit_error(
@@ -132,8 +128,6 @@ def run_profile(
             },
             2,
         )
-    else:
-        pass
     resolved, unknown = _resolve_profile_systems(tokens)
     if unknown:
         return emit_error(
@@ -148,8 +142,6 @@ def run_profile(
             },
             2,
         )
-    else:
-        pass
 
     try:
         validate_subject_fields(subject_data, [spec for _, spec in resolved])
@@ -160,13 +152,9 @@ def run_profile(
     inputs: ServiceResult = {}
     if subject_data:
         inputs.update(subject_data)
-    else:
-        pass
     for fname in PROFILE_PERSON_FIELDS:
         if fname in vars(args):
             inputs[fname] = getattr(args, fname)
-        else:
-            pass
 
     missing = [f for f in PROFILE_REQUIRED_FIELDS if inputs.get(f) is None]
     if missing:
@@ -182,24 +170,16 @@ def run_profile(
             },
             2,
         )
-    else:
-        pass
 
     is_civil_clock = inputs.get("birth_clock_basis", "civil") == "civil"
     if is_civil_clock:
         _unify_birth_instant(inputs)
-    else:
-        pass
 
     root_metadata = attach_run_metadata({}, tool_name="profile")["run_metadata"]
     if options.trace_id is not None:
         root_metadata["trace_id"] = options.trace_id
-    else:
-        pass
     if options.parent_run_id is not None:
         root_metadata["parent_run_id"] = options.parent_run_id
-    else:
-        pass
     with call_clock(options.as_of) as clock:
         as_of = clock.instant.isoformat().replace("+00:00", "Z")
     child_options = ExecutionOptions(
@@ -219,8 +199,6 @@ def run_profile(
         if not is_civil_clock:
             # note (clock basis): Pass solar labels to each request model for validation.
             field_names.add("birth_clock_basis")
-        else:
-            pass
         provided = {k: v for k, v in inputs.items() if k in field_names}
         prefix = f"profile.{token}."
         subpaths = (
@@ -301,8 +279,6 @@ def run_profile(
     }
     if not args.no_metadata:
         output["run_metadata"] = {**root_metadata, "effective_time": {"as_of": as_of}}
-    else:
-        pass
     if requested_fields:
         # Failed legs still validate paths into their error envelope. A declared
         # business root can be unavailable because that leg failed to calculate.
@@ -334,10 +310,6 @@ def run_profile(
                 output.setdefault("profile", {})[token] = leg
             elif token in output.get("profile", {}) and "run_metadata" in leg:
                 output["profile"][token]["run_metadata"] = leg["run_metadata"]
-            else:
-                pass
-    else:
-        pass
     try:
         output = bound_response(
             output,

@@ -29,8 +29,6 @@ def _essential_dignity(planet: str, sign: str) -> dict[str, str] | None:
     """Sign-only major dignity summary; not a full peregrine classification."""
     if planet not in DOMICILE_RULERS:
         return None
-    else:
-        pass
     if sign in DOMICILE_RULERS[planet]:
         dignity = "rulership"
     elif sign == EXALTATION_SIGNS[planet]:
@@ -74,8 +72,6 @@ def _build_houses(
                 }
             )
         return houses
-    else:
-        pass
     if house_system == "whole_sign":
         first_cusp = float(((Fraction(ascendant) % 360) // 30) * 30)
     elif house_system == "equal_mc" and midheaven is not None:
@@ -100,8 +96,6 @@ def _build_houses(
         cusp = float(exact_cusp)
         if int(cusp // 30) != int(exact_cusp // 30):
             cusp = math.nextafter(cusp, -math.inf)
-        else:
-            pass
         sign = _sign_name(cusp)
         houses.append(
             {
@@ -163,8 +157,6 @@ def _build_planet_record(
     }
     if projected_house_position is not None:
         record["ecliptic_house_position"] = projected_house_position
-    else:
-        pass
     if include_sector13:
         record["sector13"] = _sector13_for_longitude(effective_longitude, ascendant)
         record["sector13_evidence"] = {
@@ -174,16 +166,10 @@ def _build_planet_record(
             "rule_id": "fatebridge.equal13.exact_partition.v1",
             "birth_time_uncertainty": "not_assessed",
         }
-    else:
-        pass
     if include_nakshatra:
         record["nakshatra"] = _nakshatra(effective_longitude)
-    else:
-        pass
     if include_su28:
         record["su28"] = _su28(effective_longitude)
-    else:
-        pass
     return record
 
 
@@ -214,16 +200,10 @@ def _summary(
     lines = [f"已生成 {chart_variant} 的 {chart_label}。"]
     if sun is not None:
         lines.append(f"太阳落在 {sun['sign_zh']}，宫位 {sun['house']}。")
-    else:
-        pass
     if moon is not None:
         lines.append(f"月亮落在 {moon['sign_zh']}，宫位 {moon['house']}。")
-    else:
-        pass
     if top_aspect is not None:
         lines.append(
             f"{top_aspect['planet_a']} 与 {top_aspect['planet_b']} 形成 {top_aspect['aspect']}，容许度 {top_aspect['orb']}。"
         )
-    else:
-        pass
     return lines

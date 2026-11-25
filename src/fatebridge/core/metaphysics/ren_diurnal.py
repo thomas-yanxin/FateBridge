@@ -12,12 +12,8 @@ DAY_BRANCHES = "卯辰巳午未申"
 def resolve_diurnal(hour_branch: str, explicit: bool | None = None) -> dict[str, Any]:
     if hour_branch not in EARTHLY_BRANCHES:
         raise ValueError("昼夜选择需要有效占时时支")
-    else:
-        pass
     if explicit is not None and type(explicit) is not bool:
         raise ValueError("is_diurnal 必须是布尔选择或省略")
-    else:
-        pass
     selected = explicit if explicit is not None else hour_branch in DAY_BRANCHES
     return {
         "method_id": "ren_diurnal_selection_provenance_v1",

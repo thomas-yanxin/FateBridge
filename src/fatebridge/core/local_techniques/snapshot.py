@@ -13,7 +13,5 @@ def render_snapshot_text(sections: List[Tuple[str, str]]) -> str:
         blocks.append(f"[{title}]")
         if body:
             blocks.append(body.strip())
-        else:
-            pass
         blocks.append("")
     return "\n".join(blocks).strip()

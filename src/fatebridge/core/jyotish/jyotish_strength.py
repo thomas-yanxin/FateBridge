@@ -73,8 +73,6 @@ def solar_orb_condition(
         raise ValueError(
             "Solar orb criterion requires a registered physical graha and finite coordinates"
         )
-    else:
-        pass
     pn, pd = float(longitude).as_integer_ratio()
     sn, sd = float(sun).as_integer_ratio()
     denominator = pd * sd
@@ -123,12 +121,8 @@ def degree_condition(planet: str, longitude: float) -> dict[str, Any]:
         raise ValueError(
             "Degree conditions are defined only for the seven physical grahas"
         )
-    else:
-        pass
     if not math.isfinite(longitude):
         raise ValueError("Longitude must be finite")
-    else:
-        pass
     n, d = float(longitude).as_integer_ratio()
     n %= 360 * d
     sign, remainder = divmod(n, 30 * d)
@@ -199,18 +193,12 @@ def physical_state(
     }
     if motion_context is not None:
         state["longitude_motion_context"] = motion_context
-    else:
-        pass
     if planet in PEAKS:
         state["degree_condition"] = degree_condition(planet, longitude)
-    else:
-        pass
     if planet not in {"Sun", "Rahu", "Ketu"}:
         condition = solar_orb_condition(planet, longitude, sun, speed)
         state["sun_longitude_separation_degrees"] = condition[
             "sun_longitude_separation_degrees"
         ]
         state["combustion"] = condition
-    else:
-        pass
     return state

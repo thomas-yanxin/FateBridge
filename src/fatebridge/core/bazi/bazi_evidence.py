@@ -119,23 +119,15 @@ def pair_relations(left: str, right: str, pillars: Pillars) -> list[dict[str, An
     ):
         if table.get(a[1]) == b[1]:
             kinds.append(("branch", name))
-        else:
-            pass
     if a[1] == b[1] and a[1] in BRANCH_SELF_PUNISHMENTS:
         kinds.append(("branch", "自刑"))
-    else:
-        pass
     if {a[1], b[1]} == {"子", "卯"}:
         kinds.append(("branch", "子卯刑"))
-    else:
-        pass
     if any(
         (a[0], b[0]) in ((first, second), (second, first))
         for first, second, _ in STEM_COMBINATIONS
     ):
         kinds.append(("stem", "天干五合"))
-    else:
-        pass
     return [
         {
             "kind": kind,
@@ -176,8 +168,6 @@ def group_relations(pillars: Pillars) -> list[dict[str, Any]]:
                         "effect_status": "relation_only",
                     }
                 )
-            else:
-                pass
     return groups
 
 
@@ -199,8 +189,6 @@ def cross_chart_relations(first: Pillars, second: Pillars) -> dict[str, Any]:
         for target, (other_stem, _) in pillars.items():
             if source.split(".")[0] == target.split(".")[0]:
                 continue
-            else:
-                pass
             if DESTRUCTION_CYCLE[source_element] == STEM_ELEMENTS[other_stem][0]:
                 pair_facts.append(
                     {
@@ -212,8 +200,6 @@ def cross_chart_relations(first: Pillars, second: Pillars) -> dict[str, Any]:
                         "effect_status": "relation_only",
                     }
                 )
-            else:
-                pass
     groups = group_relations(pillars)
     for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
         positions = [
@@ -231,8 +217,6 @@ def cross_chart_relations(first: Pillars, second: Pillars) -> dict[str, Any]:
                     "effect_status": "relation_only",
                 }
             )
-        else:
-            pass
     for relation in groups:
         roles = sorted({position.split(".")[0] for position in relation["positions"]})
         relation["source_scope"] = "cross_person" if len(roles) == 2 else roles[0]
@@ -559,8 +543,6 @@ def _structure_checks(
                     "evidence": positions(visible_helpers),
                 }
             )
-        else:
-            pass
         if key == "officer_with_wealth_seal":
             for role, names in (
                 ("wealth", ("正财", "偏财")),
@@ -574,8 +556,6 @@ def _structure_checks(
                         ),
                     }
                 )
-        else:
-            pass
         conditions.extend(
             [
                 {
@@ -688,8 +668,6 @@ def build_topic_evidence(
             if norm_gender in ("male", "female")
             else "unselected_gender_alternatives"
         )
-    else:
-        pass
     temporal = {
         n: p for n, p in (("dayun", dayun), ("liunian", liunian)) if p is not None
     }
@@ -698,8 +676,6 @@ def build_topic_evidence(
         marker_targets.append(
             ("文昌", "day_stem", WEN_CHANG_TARGETS[pillars["day"][0]])
         )
-    else:
-        pass
     if topic in ("marriage", "romance"):
         year_branch = pillars["year"][1]
         marker_targets.extend(
@@ -714,8 +690,6 @@ def build_topic_evidence(
                 target for group, target in PEACH_BLOSSOM_TARGETS if branch in group
             )
             marker_targets.append(("咸池", f"{position}_branch", target))
-    else:
-        pass
     if topic == "marriage":
         day_branch = pillars["day"][1]
         marker_targets.extend(
@@ -724,8 +698,6 @@ def build_topic_evidence(
                 ("寡宿", "day_branch", GUA_SU_TARGETS[day_branch]),
             )
         )
-    else:
-        pass
     markers = [
         {
             "name": name,
@@ -783,8 +755,6 @@ def build_topic_evidence(
         entries = natal["ten_gods"][god]
         if not entries:
             continue
-        else:
-            pass
         first_stars.append(
             {
                 "ten_god": god,
@@ -798,8 +768,6 @@ def build_topic_evidence(
         )
         if len(first_stars) == 2:
             break
-        else:
-            pass
     first_view = {
         "selection_basis": selection,
         "selection_policy": "按专题声明顺序摘录最多两种已见星。",
@@ -833,8 +801,6 @@ def build_topic_evidence(
             observed_elements.add(
                 DESTRUCTION_CYCLE[STEM_ELEMENTS[pillars["day"][0]][0]].value
             )
-        else:
-            pass
         storage_matches = [
             {
                 "pillar": position,
@@ -851,8 +817,6 @@ def build_topic_evidence(
             for position, (_, branch) in pillars.items()
             if branch == target
         ]
-    else:
-        pass
     return {
         "topic": topic,
         "first_view": first_view,

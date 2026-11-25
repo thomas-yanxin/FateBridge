@@ -44,27 +44,17 @@ def projected_wall_image(
     """Enclose calendar-year addition, including the backward leap clip."""
     if low.tzinfo is not None or high.tzinfo is not None or high < low:
         raise ValueError("大运墙钟投影需要顺序明确的无时区标签")
-    else:
-        pass
     points = [low, high]
     for year in range(low.year, high.year + 1):
         projected = year + year_offset
         if not 1 <= projected <= 9999:
             raise ValueError("大运年份投影超出可表示范围")
-        else:
-            pass
         if isleap(year) and not isleap(projected):
             clip = datetime(year, 2, 29)
             if low <= clip <= high:
                 points.append(clip)
                 if low < clip:
                     points.append(clip - MICROSECOND)
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
     shifted = [point + relativedelta(years=year_offset) for point in points]
     return min(shifted), max(shifted)
 
@@ -91,20 +81,14 @@ def forward_gaps_for_wall_image(
     """Find defined forward gap ends in the projected wall clock using its loaded zone."""
     if low.tzinfo is not None or high.tzinfo is not None or high < low:
         raise ValueError("未来跳时扫描需要顺序明确的墙钟范围")
-    else:
-        pass
     start = (low - timedelta(days=1)).replace(tzinfo=timezone.utc)
     end = (high + timedelta(days=1)).replace(tzinfo=timezone.utc)
     if isinstance(zone, timezone):
         return (), start, end
-    else:
-        pass
     # note (clock): Offsets are under 24 hours, so the open scan endpoint cannot hide a relevant gap.
     start = start.replace(microsecond=0)
     if end.microsecond:
         end = end.replace(microsecond=0) + timedelta(seconds=1)
-    else:
-        pass
     gaps = []
     for ordinal in range(start.date().toordinal(), end.date().toordinal() + 1):
         for at, previous, current in _forward_changes_on_utc_day(
@@ -112,8 +96,6 @@ def forward_gaps_for_wall_image(
         ):
             if not start < at <= end:
                 continue
-            else:
-                pass
             upper_wall = at.replace(tzinfo=None) + current
             if low <= upper_wall <= high:
                 gaps.append(
@@ -125,8 +107,6 @@ def forward_gaps_for_wall_image(
                         offset_after_seconds=int(current.total_seconds()),
                     )
                 )
-            else:
-                pass
     return tuple(gaps), start, end
 
 
@@ -138,8 +118,6 @@ def collect_dayun_boundary_clock_events(
     zone = parse_timezone_name(template.timezone)
     if isinstance(zone, timezone):
         return [], [], {"status": "fixed_offset"}
-    else:
-        pass
     events: list[BirthEventRecord] = []
     unresolved: list[UnresolvedBirthEvent] = []
     windows: list[BoundaryClockWindow] = []
@@ -154,8 +132,6 @@ def collect_dayun_boundary_clock_events(
                 )
             )
             continue
-        else:
-            pass
         low_wall, high_wall = cell.wall_range
         for index in range(DEFAULT_DAYUN_PERIODS + 1):
             try:
@@ -194,14 +170,10 @@ def collect_dayun_boundary_clock_events(
                     bracket = cell.inverse(target)
                     if bracket is None:
                         continue
-                    else:
-                        pass
                     lower, upper = bracket
                     key = (lower, upper, gap.instant_utc, index, target)
                     if key in seen:
                         continue
-                    else:
-                        pass
                     seen.add(key)
                     events.append(
                         dict(

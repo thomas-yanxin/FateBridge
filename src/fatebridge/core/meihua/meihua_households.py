@@ -32,23 +32,17 @@ def _profile() -> dict[str, Any]:
         != {(topic, relation) for topic in HOUSEHOLD_TOPICS for relation in _RELATIONS}
     ):
         raise ValueError("Unknown or incomplete selected household profile")
-    else:
-        pass
     for row in profile["rules"]:
         unresolved = row["topic"] == "household" and row["relation"] == "体用比和"
         if row["source_relation_condition"] is not (None if unresolved else True):
             raise ValueError(
                 "Unadjudicated 比利 cannot become an automatic 比和 clause"
             )
-        else:
-            pass
         if unresolved and (
             row["quote"] != "體用比利家宅安穩"
             or row["selection_status"] != "unadjudicated_original_relation_term"
         ):
             raise ValueError("Selected 比利 wording and unresolved status must survive")
-        else:
-            pass
     return profile
 
 
@@ -62,14 +56,10 @@ def household_qualifications(
     """Retain actual same-cast generation roles without inferring a net result."""
     if topic not in HOUSEHOLD_TOPICS:
         raise ValueError("Select the household or dwelling chapter explicitly")
-    else:
-        pass
     profile = _profile()
     stages = meihua_stage_relations(cast, fact_prefix=fact_prefix)
     if [row["role"] for row in stages] != list(ROLES):
         raise ValueError("Household reference requires all four actual auxiliary roles")
-    else:
-        pass
     rule = next(
         row
         for row in profile["rules"]
@@ -109,8 +99,6 @@ def household_qualifications(
             )
             + "原文转引《人事占》，既有互变、受制、旺衰分别保留，未形成完整跨章净结论。"
         )
-    else:
-        pass
     return {
         "ruleset_id": profile["id"],
         "version": profile["version"],

@@ -66,8 +66,6 @@ def three_deception_context(
         raise ValueError(
             "三诈须读取实际外八宫、天盘主寄干、门和所选八神，不猜缺项或套别名"
         )
-    else:
-        pass
     wonders = [s for s in heaven_stems if s in "乙丙丁"]
     good_door = door in GOOD_DOORS
     full = bool(wonders) and good_door and god in DEFINITIONS
@@ -119,16 +117,12 @@ def build_three_deceptions(
     for index, palace in enumerate(board["palaces"]):
         if palace["trigram"] == "中":
             continue
-        else:
-            pass
         context = three_deception_context(
             palace["trigram"], palace["heaven_stems"], palace["door"], palace["god"]
         )
         palace["evidence"]["three_deceptions"] = context
         if not context["matched"]:
             continue
-        else:
-            pass
         path = f"qimen.palaces.{index}"
         local = [p for p in existing if p["palace"] == palace["name"]]
         overlap = [

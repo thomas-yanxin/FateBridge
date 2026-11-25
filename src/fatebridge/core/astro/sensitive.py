@@ -85,14 +85,10 @@ def original_example_reading(
     pairs = {frozenset((a, b)), frozenset((c, d))}
     if pairs != {frozenset(("Mars", "Jupiter")), frozenset(("Zeus", "Midheaven"))}:
         return None
-    else:
-        pass
     point = (values["Mars"] + values["Jupiter"] - values["Zeus"]) % 360
     direct = _delta(point, values["Midheaven"], 360)
     if abs(direct) > axis_orb * 2:
         return None
-    else:
-        pass
     basis = [
         [name, values[name].numerator, values[name].denominator]
         for name in ("Mars", "Jupiter", "Zeus", "Midheaven")

@@ -168,8 +168,6 @@ def calculate_liuyue_analysis(
     liunian_info: dict[str, Any] | None = None
     if liunian_analysis:
         liunian_info = liunian_analysis["liunian_info"]
-    else:
-        pass
     summary = liuyue_result["comprehensive_summary"]
     snapshot_text = _build_liuyue_snapshot_text(
         person_name=person.name,
@@ -238,8 +236,6 @@ def calculate_liuyue_analysis(
             "branch": liunian_info["branch"],
             "element": liunian_info["element"],
         }
-    else:
-        pass
 
     result["summary"] = summary
     return with_analysis_reference(

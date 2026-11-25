@@ -32,21 +32,15 @@ def _cells(source_path: Path) -> tuple[PadaReferenceCell, ...]:
     palaces = load_source(source_path).data["palaces"]
     if [p["ordinal"] for p in palaces] != list(range(1, 13)):
         raise ValueError("原典分足表必须保留师子起算的十二宫序")
-    else:
-        pass
     counts: Counter[str] = Counter()
     cells: list[PadaReferenceCell] = []
     for palace in palaces:
         if sum(s["count"] for s in palace["segments"]) != 9:
             raise ValueError("原典每宫须为九足")
-        else:
-            pass
         for segment in palace["segments"]:
             name, amount = segment["mansion"], segment["count"]
             if name == "牛" or type(amount) is not int or not 1 <= amount <= 4:
                 raise ValueError("原典分足使用不含牛宿的27宿；每段为1..4足")
-            else:
-                pass
             for _ in range(amount):
                 counts[name] += 1
                 cells.append(
@@ -62,24 +56,18 @@ def _cells(source_path: Path) -> tuple[PadaReferenceCell, ...]:
     expected_names = set("星张翼轸角亢氐房心尾箕斗女虚危室壁奎娄胃昴毕觜参井鬼柳")
     if set(counts) != expected_names or any(c != 4 for c in counts.values()):
         raise ValueError("原典分足表必须为27宿每宿四足，共108足")
-    else:
-        pass
     return tuple(cells)
 
 
 def validate_textual_pada(pada: int | None) -> None:
     if pada is not None and (type(pada) is not int or not 1 <= pada <= 4):
         raise ValueError("textual_pada仅为原典查表的1..4整数足序；不猜测实际出生足位")
-    else:
-        pass
 
 
 def reference_cell(mansion: str, pada: int) -> PadaReferenceCell:
     validate_textual_pada(pada)
     if pada is None:
         raise ValueError("单格查询须明确足序")
-    else:
-        pass
     name = normalize_mansion(mansion)
     cell = next(
         (
@@ -91,8 +79,6 @@ def reference_cell(mansion: str, pada: int) -> PadaReferenceCell:
     )
     if cell is None:
         raise ValueError("分足查表只支持原典27宿（牛宫不是牛宿）")
-    else:
-        pass
     return cell.copy()
 
 
@@ -200,7 +186,5 @@ def render_palace_reference(reference: dict[str, Any]) -> str:
         )
     if not reference["candidate_set_complete_within_calendar_profile"]:
         result += "当前历日宿候选未保证穷尽，不能因已列候选同宫而确定宫名。"
-    else:
-        pass
     result += "该查表结果未确定个人本命宫；宫序、太阳/太阴分均为原典表内分类，不是星图House、昼夜生盘或实测月亮黄经。"
     return result

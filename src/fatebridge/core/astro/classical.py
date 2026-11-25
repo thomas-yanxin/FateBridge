@@ -78,16 +78,12 @@ def _luminary_lon_speed(
         return None
     if retflag < 0:
         return None
-    else:
-        pass
     speed = require_longitude_speed(coordinates, retflag, runtime.swe.FLG_SPEED)
     longitude, _, _ = require_spherical_coordinates(
         coordinates, retflag, native=runtime.swe
     )
     if source_trace is not None:
         source_trace.observe(body_id, retflag, julian_day_tt, "tropical_search")
-    else:
-        pass
     return longitude, speed
 
 
@@ -113,8 +109,6 @@ def _prenatal_syzygy(
     """
     if runtime.swe is None:
         return None
-    else:
-        pass
     try:
         source_trace = SyzygySourceTrace()
         birth_point = TTInstant.from_value(
@@ -128,8 +122,6 @@ def _prenatal_syzygy(
             moon = _luminary_lon_speed(at, runtime.swe.MOON, source_trace=source_trace)
             if sun is None or moon is None or moon[1] <= sun[1]:
                 raise ValueError("Unavailable or non-increasing lunar elongation")
-            else:
-                pass
             # Subtract the source doubles exactly before choosing the side.
             return (Fraction(moon[0]) - Fraction(sun[0])) % 360
 
@@ -148,8 +140,6 @@ def _prenatal_syzygy(
                 f_left = offset(left)
                 if f_left < 0 <= f_right and f_right - f_left < 90:
                     break
-                else:
-                    pass
                 right, f_right = left, f_left
             else:
                 return None
@@ -157,8 +147,6 @@ def _prenatal_syzygy(
                 mid = (left + right) / 2
                 if mid in (left, right):
                     break
-                else:
-                    pass
                 if offset(mid) >= 0:
                     right = mid
                 else:
@@ -166,20 +154,14 @@ def _prenatal_syzygy(
             if Fraction(right) >= birth_point.days:
                 search_end = left
                 continue
-            else:
-                pass
             residual = offset(right)
             residual_limit = 1e-6
             if not 0 <= residual < residual_limit:
                 return None
-            else:
-                pass
             body = runtime.swe.MOON if target == 180 else runtime.swe.SUN
             tropical = _luminary_lon_speed(right, body, source_trace=source_trace)
             if tropical is None:
                 return None
-            else:
-                pass
             tropical_longitude = normalize_angle(tropical[0])
             longitude = tropical_longitude
             if sidereal:
@@ -193,8 +175,6 @@ def _prenatal_syzygy(
                     )
                     if flag < 0:
                         return None
-                    else:
-                        pass
                     longitude, _, _ = require_spherical_coordinates(
                         coordinates, flag, native=runtime.swe, sidereal=True
                     )
@@ -202,8 +182,6 @@ def _prenatal_syzygy(
                     # before restoring the path can close or replace caches.
                     source_trace.observe(body, flag, right, "sidereal_display")
                 longitude = normalize_angle(longitude)
-            else:
-                pass
             event_ut1 = ut1_from_tt(right)
             label, moment, leap = utc_from_tt(right)
             return {
@@ -275,12 +253,8 @@ def _resolve_planetary_hour(
     """
     if weekday_clock_basis not in {"civil", "local_mean_solar", "local_apparent_solar"}:
         raise ValueError("Unknown planetary weekday clock basis")
-    else:
-        pass
     if runtime.swe is None:
         return None
-    else:
-        pass
     from fatebridge.core.classical_western import planetary_hour_sequence
 
     query = UT1Instant.from_value(julian_day)
@@ -292,22 +266,14 @@ def _resolve_planetary_hour(
         first, last = rotation_source.ut1_bounds
         if not first <= query.days <= last:
             raise ValueError("Planetary hour is outside the IERS C04 source bounds")
-        else:
-            pass
         # The search uses binary64 UT1. Project each source limit inward so
         # rounding cannot turn a supported interval into an unsupported probe.
         lower, upper = float(first), float(last)
         if lower < first:
             lower = math.nextafter(lower, math.inf)
-        else:
-            pass
         if upper > last:
             upper = math.nextafter(upper, -math.inf)
-        else:
-            pass
         window_start, window_end = max(window_start, lower), min(window_end, upper)
-    else:
-        pass
 
     source = select_solar_source(tt_from_ut1(window_start), tt_from_ut1(window_end))
     events: list[SolarEvent] = []
@@ -316,8 +282,6 @@ def _resolve_planetary_hour(
         right = min(window_end, search_day + day + 1)
         if left >= right:
             continue
-        else:
-            pass
         # Interior seams belong to the next day. A clipped source endpoint
         # has no following window, so it belongs to this last window.
         owns_right = right == window_end < search_end
@@ -338,13 +302,9 @@ def _resolve_planetary_hour(
     opening_rises = [event for event in before if event.rising]
     if not before or not after or not opening_rises:
         return None
-    else:
-        pass
     previous, following = before[-1], after[0]
     if previous.rising == following.rising:
         raise RuntimeError("Solar crossing sequence has consecutive equal directions")
-    else:
-        pass
     opening_rise = opening_rises[-1]
     prev_rise = opening_rise.julian_day_ut1
     is_day = previous.rising
@@ -353,8 +313,6 @@ def _resolve_planetary_hour(
     arc_length = end - start
     if not start <= at < end or arc_length <= 0:
         return None
-    else:
-        pass
     index = (at - start) * 12 // arc_length
     boundaries = [float(start + arc_length * i / 12) for i in range(13)]
 
@@ -370,8 +328,6 @@ def _resolve_planetary_hour(
             opening_label = opening_epoch.utc_label
             if opening_label is None:
                 return None
-            else:
-                pass
         # Arc and hour endpoints are UTC labels. Both an inserted second and
         # an extended Gregorian year can have a label without a datetime.
         endpoint_labels = []
@@ -379,8 +335,6 @@ def _resolve_planetary_hour(
             label, _, _ = utc_from_tt(resolve_tt_from_ut1(point))
             if label is None:
                 return None
-            else:
-                pass
             endpoint_labels.append(label)
         arc_start_utc, arc_end_utc, hour_start_utc, hour_end_utc = endpoint_labels
     except EphemerisSourceError:
@@ -397,8 +351,6 @@ def _resolve_planetary_hour(
         sunrise_label = sunrise_calendar.rule_sample()
         if is_unspecified_local_time(sunrise_label):
             return "opening_sunrise_civil_weekday_undefined"
-        else:
-            pass
     else:
         from fatebridge.core.astro.birth_clock import solar_wall_clock
 
@@ -488,12 +440,8 @@ def _build_classical_layer(
         frame_tt = julian_day_tt
         if frame_tt is None and julian_day is not None:
             frame_tt = fallback_julian_day_tt(julian_day, None)
-        else:
-            pass
         if frame_tt is not None:
             obliquity = analytic_ecliptic_frame(frame_tt).true_obliquity
-        else:
-            pass
     elif julian_day is not None or julian_day_tt is not None:
         try:
             angles, flag = (
@@ -515,14 +463,10 @@ def _build_classical_layer(
             )
             if flag >= 0:
                 obliquity = float(angles[0])
-            else:
-                pass
         except EphemerisSourceError:
             raise
         except runtime.native_ephemeris_errors() as error:
             runtime._log_swe_runtime_failure("ECL_NUT(obliquity)", error)
-    else:
-        pass
     is_day = chart_sect == "day"
     sun = next((item for item in planets if item["id"] == "Sun"), None)
     sun_longitude = sun["longitude"] if sun else None
@@ -569,8 +513,6 @@ def _build_classical_layer(
     for house in houses:
         if houses_resolved and house["house"] == 8:
             lons["eighth"] = float(house["cusp_longitude"])
-        else:
-            pass
 
     lots = build_lots_layer(
         lons, is_day, lot_longitudes=lot_longitudes if ascendant is not None else None
@@ -584,12 +526,8 @@ def _build_classical_layer(
     figuris_points: dict[str, dict[str, Any]] = {}
     if sun:
         figuris_points["Sun"] = sun
-    else:
-        pass
     if moon:
         figuris_points["Moon"] = moon
-    else:
-        pass
     if ascendant is not None:
         figuris_points["Ascendant"] = {
             "sign": asc_sign,
@@ -597,12 +535,8 @@ def _build_classical_layer(
         }
     if fortune:
         figuris_points["fortune"] = fortune
-    else:
-        pass
     if syzygy:
         figuris_points["syzygy"] = syzygy
-    else:
-        pass
 
     return {
         "sect": chart_sect,

@@ -35,8 +35,6 @@ def hinoo_source_lines(source: dict[str, Any]) -> list[str]:
     cached = source.get("cached_primary_excerpt")
     if cached:
         lines.extend(cached["reading_notes"])
-    else:
-        pass
     downloaded = source.get("downloaded_primary_edition")
     if downloaded and source["active_primary_evidence"] == "downloaded_primary_edition":
         lines.append(
@@ -78,33 +76,19 @@ def hinoo_source_lines(source: dict[str, Any]) -> list[str]:
     if critical:
         if meanings := critical.get("calendar_clause_meanings"):
             lines.extend(calendar_clause_meaning_lines(meanings))
-        else:
-            pass
         if natal := critical.get("natal_half_application"):
             lines.extend(natal_scope_lines(natal))
-        else:
-            pass
         if later := critical.get("later_seibunkan_comparison"):
             lines.extend(seibunkan_lines(later))
-        else:
-            pass
         lines.extend(catalogue_lines(critical["witness_catalogue_candidates"]))
         if research := critical.get("image_witness_research"):
             lines.extend(research_lines(research))
-        else:
-            pass
         if native := critical.get("image_witness_native_followup"):
             lines.extend(native_followup_lines(native))
-        else:
-            pass
         if completed := critical.get("image_witness_native_completion"):
             lines.extend(native_completion_lines(completed))
-        else:
-            pass
         if context := critical.get("image_witness_context_followup"):
             lines.extend(context_lines(context))
-        else:
-            pass
         primary = critical["selected_primary"]
         for glyph in primary["unaccepted_glyphs"]:
             if not glyph["accepted_as_a_normalized_variant"]:
@@ -112,16 +96,10 @@ def hinoo_source_lines(source: dict[str, Any]) -> list[str]:
                     f"京都所选末句候选{glyph['candidate_reading']}仍未接纳为规范异文；"
                     f"大正读法{glyph['taisho_reading']}分别保留，不补定墨点或疑字。"
                 )
-            else:
-                pass
         if not primary["independent_human_transcription_accepted"]:
             lines.append("所选归一化工作录未获独立人工验收；红校层未据此合成完整版本。")
-        else:
-            pass
         if layered := primary.get("later_layered_reading"):
             lines.extend(layered_reading_lines(layered))
-        else:
-            pass
         for witness in critical.get("supplemental_witnesses", []):
             lines.append(
                 f"补充直接见证：{witness['holding_institution']}"
@@ -133,8 +111,6 @@ def hinoo_source_lines(source: dict[str, Any]) -> list[str]:
                     "以下善通寺原文为既有首录；后续校读的未决分歧另列，"
                     "不得将旧片段当作已统一定字。"
                 )
-            else:
-                pass
             for row in witness["observations"]:
                 lines.append(f"善通寺所选原文：{row['normalized_transcription']}。")
             for row in witness["selected_example_comparisons"]:
@@ -162,8 +138,6 @@ def hinoo_source_lines(source: dict[str, Any]) -> list[str]:
             )
             if followup := witness.get("later_reading_followup"):
                 lines.extend(later_reading_lines(followup))
-            else:
-                pass
         collation = primary.get("supplemental_model_collation")
         if collation:
             for row in collation["conflicts"]:
@@ -178,16 +152,12 @@ def hinoo_source_lines(source: dict[str, Any]) -> list[str]:
                 "未改配宿数值，三十日婁／室异读及末句分歧照留，"
                 "未以多数或与算法相合裁定，没有据此接纳完整校勘本或改变补配优先。"
             )
-        else:
-            pass
         boundary = critical["day_boundary_reference"]
         lines.append(
             f"T1299所选日界原段{boundary['locator']}明说{boundary['starting_boundary_literal']}"
             f"起曜、至{boundary['next_boundary_literal']}换曜，日夜各{boundary['day_parts']}时；"
             "未据此确定现代钟时、太阳高度或完整日内曜序，也未将桧尾半日等同昼夜分界。"
         )
-    else:
-        pass
     return lines
 
 
@@ -201,8 +171,6 @@ def hinoo_unassigned_month_start_lines(
         or profile.get("short_month_assignment") is not None
     ):
         return []
-    else:
-        pass
     trace = next(
         (
             row
@@ -214,8 +182,6 @@ def hinoo_unassigned_month_start_lines(
     previous = trace["inputs"].get("previous_lunar") if trace else None
     if previous is None:
         return []
-    else:
-        pass
     month_label = "大" if previous["lunar_day"] == 30 else "小"
     month_label += "闰月" if previous["is_leap_month"] else "月"
     return [
@@ -256,16 +222,10 @@ def _hinoo_critical_lines(reference: dict[str, Any]) -> list[str]:
     limits = [f"目录记作{primary['catalogue_copy_description']}"]
     if not primary["copy_date_established"]:
         limits.append("写成日期未定")
-    else:
-        pass
     if not primary["identified_as_taisho_base_or_ko_witness"]:
         limits.append("未识别为大正底本或甲本")
-    else:
-        pass
     if not reference["complete_critical_edition_accepted"]:
         limits.append("尚未完成全本校勘")
-    else:
-        pass
     lines.append("；".join(limits) + "，不据所选例题裁定补配次序或半日钟时。")
     span = reference["apparatus_span_reference"]
     lines.append(
@@ -274,8 +234,6 @@ def _hinoo_critical_lines(reference: dict[str, Any]) -> list[str]:
     )
     if "current_scope_qualification" in span:
         lines.append(span["scope"])
-    else:
-        pass
 
     lines.extend(hinoo_printed_page_lines())
     return lines
@@ -309,8 +267,6 @@ def profile_calculation_lines(selection: dict[str, Any] | None) -> list[str]:
                     f"本月常规初一另按{host['lunar_month']}月{host['lunar_day']}日查得{host['direct_mansion']}，也是后半的来源。"
                     "宿名相同仍分别保留来源；闰月初一若有另一重建路径，继续按下列分支交付。"
                 )
-            else:
-                pass
             if assignment["selected_day_part"]:
                 part = (
                     "前半"
@@ -346,8 +302,6 @@ def profile_calculation_lines(selection: dict[str, Any] | None) -> list[str]:
                         f"前半按{first_calc['lunar_month']}月{first_calc['lunar_day']}日查得{first_calc['direct_mansion']}，"
                         f"后半按{second_calc['lunar_month']}月{second_calc['lunar_day']}日查得{second_calc['direct_mansion']}。"
                     )
-            else:
-                pass
             if (
                 precedence
                 and precedence["adjacent_month_first_half"]
@@ -356,10 +310,6 @@ def profile_calculation_lines(selection: dict[str, Any] | None) -> list[str]:
                 lines.append(
                     "闰月复用与缺日分宿的先后未由原典明确，两个现代重建次序在前半不同；未将重建分支说成原典两条明定算法。"
                 )
-            else:
-                pass
-        else:
-            pass
         if selection.get("hinoo_source"):
 
             lines.append(
@@ -368,11 +318,5 @@ def profile_calculation_lines(selection: dict[str, Any] | None) -> list[str]:
             critical = selection["hinoo_source"].get("critical_calendar_reference")
             if critical:
                 lines.extend(_hinoo_critical_lines(critical))
-            else:
-                pass
             lines.extend(hinoo_source_lines(selection["hinoo_source"]))
-        else:
-            pass
-    else:
-        pass
     return lines

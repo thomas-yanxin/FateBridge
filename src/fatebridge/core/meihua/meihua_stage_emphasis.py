@@ -25,8 +25,6 @@ def _profile() -> dict[str, Any]:
         or profile["version"] != "1.1.0"
     ):
         raise ValueError("Unknown selected Meihua stage emphasis profile")
-    else:
-        pass
     return profile
 
 
@@ -74,8 +72,6 @@ def _reading(
 ) -> dict[str, Any]:
     if [r["role"] for r in stages] != list(ROLES):
         raise ValueError("Stage emphasis requires four actual auxiliary roles")
-    else:
-        pass
     profile = _profile()
     rules = {r["id"]: r for r in profile["rules"]}
     qualifications = {r["role"]: r for r in control["qualifications"]}
@@ -196,18 +192,10 @@ def _reading(
             )
             if clause["unresolved_conditions"]:
                 summary += "互字范围未裁定，所列互角色有生体仍不确认整句适用。"
-            else:
-                pass
-        else:
-            pass
     if not generation:
         summary += "本次所列内卦角色未见用生体，不能单凭这一项断事不成。"
-    else:
-        pass
     if mixed["structural_condition_met"] and matter_scenario != "unfavorable_matter":
         summary += "本次内卦同时见生体与克体，所选原句仍有“事有阻節好中不足”，不能只读生体迟速句。"
-    else:
-        pass
     if matter_scenario is None:
         summary += (
             "既有旺衰与直接制约保留，未综合净作用；未认定问事情境、现实成败或日期。"
@@ -216,8 +204,6 @@ def _reading(
         for clause in scenario_clauses:
             if clause["full_clause_applies"]:
                 summary += f"本次所报情境及所列关系对应原句“{clause['quote']}”；{clause['reading']}。"
-            else:
-                pass
         summary += "既有旺衰与直接制约保留，整句适用仅指所选条文前提核对，未综合净作用或认证现实成败、日期。"
 
     obstruction = build_obstruction_timing(
@@ -290,16 +276,10 @@ def apply_stage_emphasis(
     interpretation["stage_emphasis"] = None
     if matter_scenario not in {None, "favorable_matter", "unfavorable_matter"}:
         raise ValueError("Unknown declared source matter scenario")
-    else:
-        pass
     if interpretation["interpretation_topic"] == "weather":
         if matter_scenario is not None:
             raise ValueError("Weather has no human-matter body/use scenario")
-        else:
-            pass
         return
-    else:
-        pass
     layer = _reading(
         cast["stage_relations"],
         interpretation["internal_countercontrol"],

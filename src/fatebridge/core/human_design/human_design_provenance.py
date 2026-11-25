@@ -19,15 +19,9 @@ def position_flag_model(
     """Require one backend and the declared ecliptic-of-date convention."""
     if type(flags) is not int or flags < 0:
         raise ValueError("Invalid Swiss position flag type or error value")
-    else:
-        pass
     model_bits = flags & 7
     if model_bits not in MODEL_BITS or flags & ~(7 | SPEED_BIT):
         raise ValueError("Swiss flags do not match the declared HD position convention")
-    else:
-        pass
     if require_speed and not flags & SPEED_BIT:
         raise ValueError("Swiss flags do not report the requested position speed")
-    else:
-        pass
     return MODEL_BITS[model_bits]

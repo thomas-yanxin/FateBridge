@@ -29,8 +29,6 @@ def _profile() -> dict[str, Any]:
         is not False
     ):
         raise ValueError("Unknown or incomplete selected dining profile")
-    else:
-        pass
     return profile
 
 
@@ -57,16 +55,12 @@ def dining_qualifications(
         "changed_use",
     ]:
         raise ValueError("Dining needs the original body and all four auxiliary roles")
-    else:
-        pass
     expected_paths = [fact_prefix + ".body_trigram", *[s["fact_path"] for s in stages]]
     expected_names = [cast["body_trigram"]["name"], *[s["trigram"] for s in stages]]
     if [n["fact_path"] for n in nodes] != expected_paths or [
         n["trigram"] for n in nodes
     ] != expected_names:
         raise ValueError("Dining control graph must belong to this candidate")
-    else:
-        pass
     by_role = {n["role"]: n for n in nodes}
     positions = [
         {
@@ -80,8 +74,6 @@ def dining_qualifications(
     ]
     if {n["trigram"] for n in nodes} != {p["trigram"] for p in positions}:
         raise ValueError("Dining five-role and six-position presence disagree")
-    else:
-        pass
     symbols = []
     summary_parts = []
     for rule in profile["symbol_clauses"]:
@@ -114,8 +106,6 @@ def dining_qualifications(
                         ),
                     }
                 )
-            else:
-                pass
         status = (
             "not_present_in_selected_scope"
             if not targets

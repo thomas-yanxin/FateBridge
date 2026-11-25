@@ -52,8 +52,6 @@ def monthly_profection_index(
         start, _ = monthly_profection_segment(year_start, year_end, index)
         if instant >= utc_calendar(start):
             return index
-        else:
-            pass
     return 0
 
 
@@ -106,8 +104,6 @@ def build_annual_profection_payload(
             unavailable_reason="ascendant_required_for_profection_sign_and_lord",
         )
         return payload
-    else:
-        pass
 
     asc_sign = normalize_sign_name(natal_subject.ascendant.sign)
     asc_index = SIGNS.index(asc_sign)
@@ -250,6 +246,4 @@ def build_given_year_payload(
             ascendant_resolved=given_year_asc_resolved,
             unavailable_reason="ascendant_required_for_profection_signs_and_ascendant_hits",
         )
-    else:
-        pass
     return payload

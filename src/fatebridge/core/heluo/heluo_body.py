@@ -30,24 +30,14 @@ def element_relation(body: str, natal: str) -> str:
     """Directed relation; a reverse generating edge is never called support."""
     if body not in GENERATES or natal not in GENERATES:
         raise ValueError("卦体与纳音五行必须明确。")
-    else:
-        pass
     if body == natal:
         return "same_element"
-    else:
-        pass
     if GENERATES[body] == natal:
         return "body_generates_nayin"
-    else:
-        pass
     if GENERATES[natal] == body:
         return "nayin_generates_body"
-    else:
-        pass
     if CONTROLS[body] == natal:
         return "body_controls_nayin"
-    else:
-        pass
     return "nayin_controls_body"
 
 
@@ -63,26 +53,18 @@ def body_evidence(
     """
     if not isinstance(year_ganzhi, str) or len(year_ganzhi) != 2:
         raise ValueError("纳音关系需要完整年干支。")
-    else:
-        pass
     nayin = get_nayin(year_ganzhi[0], year_ganzhi[1])
     if nayin == "未知纳音" or nayin[-1] not in GENERATES:
         raise ValueError("纳音关系需要有效六十甲子年干支。")
-    else:
-        pass
     if set(yuan_trigrams) != {"tian", "di"} or any(
         t not in ELEMENTS for t in yuan_trigrams.values()
     ):
         raise ValueError("纳音关系需要明确的年命天地元气卦。")
-    else:
-        pass
     rows = []
     for phase in ("xian", "hou"):
         trigrams = phases[phase]["trigrams"]
         if len(trigrams) != 4 or any(t not in ELEMENTS for t in trigrams):
             raise ValueError("纳音关系需要本卦实际上下体与两互体。")
-        else:
-            pass
         for (kind, positions), trigram in zip(BODY_POSITIONS, trigrams):
             relation = element_relation(ELEMENTS[trigram], nayin[-1])
             rows.append(

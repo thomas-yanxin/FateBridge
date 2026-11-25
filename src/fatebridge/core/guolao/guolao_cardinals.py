@@ -78,8 +78,6 @@ def gujin43_cardinal_example(*, profile: str) -> dict[str, Any]:
     following = shoushi_winter_sun(319)
     if current["mansion"] != "箕" or following["mansion"] != "箕":
         raise ValueError("具名示例的本、次年冬至须均在箕宿，不套用跨宿差法")
-    else:
-        pass
     equatorial = (
         Fraction(current["degree_in_mansion_du_exact"]),
         Fraction(following["degree_in_mansion_du_exact"]),

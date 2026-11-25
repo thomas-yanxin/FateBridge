@@ -66,8 +66,6 @@ def _palace_by_branch(palaces: list[dict[str, Any]], branch: str) -> dict[str, A
     palace = next((p for p in palaces if p["ganzhi"][1] == branch), None)
     if palace is None:
         raise ValueError(f"未找到地支为 {branch!r} 的宫位")
-    else:
-        pass
     return palace
 
 
@@ -78,13 +76,9 @@ def palace_for_nominal_age(
         lo, hi = (int(x) for x in palace["daxian"].split("~"))
         if lo <= nominal_age <= hi:
             return palace
-        else:
-            pass
     first_age = min(int(p["daxian"].split("~")[0]) for p in palaces)
     if 1 <= nominal_age < first_age:
         raise ValueError("按所选五行局起岁，尚未起正式大限；童限不能替代大限取宫")
-    else:
-        pass
     raise ValueError("目标虚岁超出紫微大限支持范围")
 
 
@@ -92,8 +86,6 @@ def xiaoxian_branch(year_branch: str, nominal_age: int, gender: str) -> str:
     canonical_gender = normalize_gender(gender)
     if canonical_gender not in {"男", "女"}:
         raise ValueError("紫微小限顺逆需要明确性别，不能用未知性别代替女命")
-    else:
-        pass
     start = XIAOXIAN_START_BY_YEAR_BRANCH[year_branch]
     start_branch_index = ZIWEI_BRANCH_SEQUENCE.index(start)
     age_offset = (nominal_age - 1) % 12
@@ -152,8 +144,6 @@ def _link_mutagen_to_natal_stars(
                     "status": "not_located_in_natal_chart",
                 }
             )
-        else:
-            pass
         for palace, star in matches:
             links.append(
                 {
@@ -192,8 +182,6 @@ def _unavailable_gender_scope(
     }
     if first_age is not None:
         record["first_age"] = first_age
-    else:
-        pass
     return record
 
 
@@ -230,16 +218,12 @@ def build_ziwei_horoscope(
     )
     if resolved_day_divide != chart_day_divide:
         raise ValueError("本命与运限晚子分日口径不一致，须按同一口径重建命盘")
-    else:
-        pass
     named_rule = chart.get("ruleset", {}).get("sihua_rule") == "naj_ming_v1"
     named_version = str(chart.get("ruleset", {}).get("version", "")).endswith(
         "+sihua.naj-ming-v1"
     )
     if named_rule != named_version or named_rule != (sihua_source == "naj_ming_v1"):
         raise ValueError("本命四化来源身份不一致，须保留实际所选表的完整规则信息")
-    else:
-        pass
     if (
         named_rule
         and dict(chart["sihua"])
@@ -248,8 +232,6 @@ def build_ziwei_horoscope(
         ]
     ):
         raise ValueError("本命四化与所选明刊来源不一致，须按实际来源重建命盘")
-    else:
-        pass
 
     natal_lunar = chart["lunar_date"]
     age_calendar = nominal_age_calendar(
@@ -445,8 +427,6 @@ def build_ziwei_horoscope(
         for link in scope_record["mutagen_natal_links"]:
             if link["status"] == "matched":
                 link["scope_palace_name"] = roles[link["natal_branch"]]
-            else:
-                pass
 
     table_evidence = sihua_source_comparison(
         sihua_rules_for(ZIWEI_SIHUA_RULES, rule_profile, sihua_source=sihua_source),

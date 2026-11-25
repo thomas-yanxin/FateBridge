@@ -44,8 +44,6 @@ def selected_windows(julian_day_tt: float, retarded_tt: float) -> list[Dict[str,
             or not start <= retarded_tt <= julian_day_tt <= end
         ):
             raise EphemerisSourceError("lunar_source_window_incoherent")
-        else:
-            pass
         windows.append(
             {
                 "slot": slot,
@@ -76,28 +74,20 @@ def prime_lunar_source_window(
     }
     if model != "swieph":
         return {**policy, "status": "not_applied", "reason": "not_compressed_swiss"}
-    else:
-        pass
     if swe is None or (native, binding) != SOURCE_VERSION:
         return {
             **policy,
             "status": "not_applied",
             "reason": "unverified_native_version",
         }
-    else:
-        pass
     if not callable(getattr(swe, "get_current_file_data", None)):
         return {
             **policy,
             "status": "not_applied",
             "reason": "file_window_interface_unavailable",
         }
-    else:
-        pass
     if not math.isfinite(julian_day_tt):
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     owned = coordinate_context_evidence()
     light_path = owned.get("lunar_light_path") if owned is not None else None
     if (
@@ -117,8 +107,6 @@ def prime_lunar_source_window(
             or windows != light_path["selected_windows"]
         ):
             raise EphemerisSourceError("lunar_source_window_incoherent")
-        else:
-            pass
         return {
             **policy,
             "status": "primed",
@@ -133,8 +121,6 @@ def prime_lunar_source_window(
             "source_function": "compressed_ephemeris._lunar_light_path; sweph.c:app_pos_etc_moon",
             "scope": "Reuse the checked owned-native geocentric reception light path, then require apparent recomputation. Source context is observed after owned preselection; auxiliary native states are in that coordinate receipt. No independent re-priming, atomic native read-set or accuracy certification.",
         }
-    else:
-        pass
     selected = configured_ephemeris_path()
     base = (
         swe.FLG_SWIEPH
@@ -162,16 +148,10 @@ def prime_lunar_source_window(
             or bool(returned & swe.FLG_BARYCTR) != barycentric
         ):
             raise EphemerisSourceError("coordinate_contract_changed")
-        else:
-            pass
         if runtime.ephemeris_model_from_retflag(returned) != model:
             raise EphemerisSourceError("model_changed")
-        else:
-            pass
         if len(values) != 6 or not all(math.isfinite(v) for v in values):
             raise EphemerisSourceError("coordinate_values_unavailable")
-        else:
-            pass
         contexts[factor] = trace.observe(factor, model, record_factor=False)
         return tuple(float(v) for v in values)
 
@@ -179,8 +159,6 @@ def prime_lunar_source_window(
     radius = math.hypot(*geometric[:3])
     if radius <= 0:
         raise EphemerisSourceError("coordinate_values_unavailable")
-    else:
-        pass
     delay = radius / LIGHT_SPEED_AU_PER_DAY
     retarded = julian_day_tt - delay
     with preserve_native_dependency_context(
@@ -202,13 +180,9 @@ def finish_lunar_source_window(
 ) -> None:
     if policy["status"] != "primed":
         return
-    else:
-        pass
     after = selected_windows(policy["epoch_jd_tt"], policy["retarded_jd_tt"])
     if after != policy["selected_windows"]:
         raise EphemerisSourceError("lunar_source_window_incoherent")
-    else:
-        pass
     policy["selected_windows_after_recomputation"] = after
     policy["initial_spherical_coordinates"] = list(initial[:3])
     policy["coherent_spherical_coordinates"] = list(refreshed[:3])
@@ -238,16 +212,10 @@ def coherent_lunar_native_state(
         initial, initial_flags = runtime.ephemeris_call(
             operation, epoch, swe.MOON, flags
         )
-    else:
-        pass
     if initial_flags is None:
         raise EphemerisSourceError("coordinate_contract_changed")
-    else:
-        pass
     if runtime.ephemeris_model_from_retflag(initial_flags) != model:
         raise EphemerisSourceError("model_changed")
-    else:
-        pass
     policy = prime_lunar_source_window(julian_day_tt, model, trace)
     coordinates, returned = initial, initial_flags
     if policy["status"] == "primed":
@@ -256,20 +224,12 @@ def coherent_lunar_native_state(
         )
         if runtime.ephemeris_model_from_retflag(returned) != model:
             raise EphemerisSourceError("model_changed")
-        else:
-            pass
         if len(coordinates) != 6 or not all(math.isfinite(v) for v in coordinates):
             raise EphemerisSourceError("coordinate_values_unavailable")
-        else:
-            pass
         finish_lunar_source_window(policy, initial, coordinates)
         if flags & swe.FLG_XYZ:
             policy.pop("initial_spherical_coordinates", None)
             policy.pop("coherent_spherical_coordinates", None)
-        else:
-            pass
-    else:
-        pass
     policy["requested_coordinate_flags"] = flags
     policy["coordinate_kind"] = "cartesian" if flags & swe.FLG_XYZ else "spherical"
     return coordinates, returned, policy

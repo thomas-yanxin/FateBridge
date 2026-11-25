@@ -52,6 +52,4 @@ def resolve_meihua_civil_clock(
     except PydanticCustomError as error:
         if error.type == "unresolved_timezone_offset":
             raise MeihuaUnspecifiedClockError(_UNSPECIFIED_MESSAGE) from error
-        else:
-            pass
         raise

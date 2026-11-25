@@ -32,8 +32,6 @@ class SyzygySourceTrace:
         model = runtime.ephemeris_model_from_retflag(flags)
         if model not in {"swieph", "moshier", "jpl"}:
             raise EphemerisSourceError("coordinate_contract_changed")
-        else:
-            pass
         body = "Sun" if body_id == runtime.swe.SUN else "Moon"
         context = self.physical.observe(body, model)
         self.models.setdefault(body, set()).add(model)
@@ -47,8 +45,6 @@ class SyzygySourceTrace:
                 "minimum_jd_tt": epoch_tt,
                 "maximum_jd_tt": epoch_tt,
             }
-        else:
-            pass
         row = self.contexts[key]
         row["sample_count"] += 1
         row["minimum_jd_tt"] = min(row["minimum_jd_tt"], epoch_tt)

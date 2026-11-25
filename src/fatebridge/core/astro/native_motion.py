@@ -15,16 +15,12 @@ def require_longitude_speed(
 ) -> float:
     if returned_flags < 0 or not returned_flags & speed_flag:
         raise EphemerisSourceError("coordinate_motion_unavailable")
-    else:
-        pass
     try:
         speed = float(coordinates[3])
     except (IndexError, TypeError, ValueError) as error:
         raise EphemerisSourceError("coordinate_motion_unavailable") from error
     if not math.isfinite(speed):
         raise EphemerisSourceError("coordinate_motion_unavailable")
-    else:
-        pass
     return speed
 
 
@@ -60,8 +56,6 @@ def context_motion(
         model = models.get(name)
     if rate is not None and not math.isfinite(rate):
         raise EphemerisSourceError("coordinate_motion_unavailable")
-    else:
-        pass
     result = {
         "longitude_speed": rate,
         "unit": "degree_per_day",
@@ -93,12 +87,6 @@ def context_motion(
                 result["sidereal_origin_correction"] = provenance[
                     "longitude_speed_sidereal_origin_correction"
                 ]
-            else:
-                pass
-        else:
-            pass
-    else:
-        pass
     if (
         provenance is not None
         and "longitude_speed_native" in provenance
@@ -116,32 +104,18 @@ def context_motion(
         origin = provenance.get("longitude_speed_sidereal_origin_wrap_correction")
         if light is not None:
             result["light_time_correction"] = light
-        else:
-            pass
         if spatial is not None:
             result["spatial_aberration_correction"] = spatial
-        else:
-            pass
         if lunar_source is not None:
             result["lunar_source_remainder_correction"] = lunar_source
-        else:
-            pass
         if rotation is not None:
             result["rotation_correction"] = rotation
-        else:
-            pass
         if analytic_frame is not None:
             result["analytic_frame_correction"] = analytic_frame
-        else:
-            pass
         if position is not None:
             result["position_derivative_correction"] = position
-        else:
-            pass
         if origin is not None:
             result["sidereal_origin_wrap_correction"] = origin
-        else:
-            pass
         result["method_id"] = (
             (derivative_policy or {}).get(
                 "method_id", "complete_position_derivative_method_unavailable"
@@ -172,15 +146,9 @@ def context_motion(
             or origin is not None
         ):
             result["basis"] = "native_rate_plus_source_derived_motion_corrections"
-        else:
-            pass
         if analytic_frame is not None:
             result["method_id"] = "fatebridge_lunar_analytic_tropical_frame_v1"
             result["basis"] = (
                 "fixed_reception_source_plus_analytic_tropical_frame_derivative"
             )
-        else:
-            pass
-    else:
-        pass
     return result

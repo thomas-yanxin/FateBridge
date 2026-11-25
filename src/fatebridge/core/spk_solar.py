@@ -37,8 +37,6 @@ def _signature(path: Path) -> tuple[int, ...]:
         stat = path.stat()
         if not path.is_file():
             raise OSError("not a file")
-        else:
-            pass
         return (
             stat.st_dev,
             stat.st_ino,
@@ -86,8 +84,6 @@ class _KernelSun:
                 for group in self.segments.values()
             ):
                 raise ValueError("Required type2 Earth/EMB/Sun segments absent")
-            else:
-                pass
             self.coverage = {
                 f"{a}->{b}": [[float(s.start_jd), float(s.end_jd)] for s in group]
                 for (a, b), group in self.segments.items()
@@ -96,12 +92,8 @@ class _KernelSun:
         except Exception as error:
             if self.kernel is not None:
                 self.kernel.close()
-            else:
-                pass
             if isinstance(error, EphemerisSourceError):
                 raise
-            else:
-                pass
             raise EphemerisSourceError("solar_spk_invalid") from error
         # Eviction must not close a kernel still held by another active root.
         self._finalizer = weakref.finalize(self, self.kernel.close)
@@ -109,8 +101,6 @@ class _KernelSun:
     def check_unchanged(self) -> None:
         if _signature(self.path) != self.signature:
             raise EphemerisSourceError("solar_spk_changed")
-        else:
-            pass
 
     def segment(self, pair: tuple[int, int], tdb2: float) -> Any:
         # SPK priority is the last applicable segment, not simply the last
@@ -120,8 +110,6 @@ class _KernelSun:
         for segment in reversed(self.segments[pair]):
             if segment.start_second <= seconds <= segment.end_second:
                 return segment
-            else:
-                pass
         raise EphemerisSourceError("solar_spk_range")
 
     def longitude(self, jd_tt: float) -> float:
@@ -156,8 +144,6 @@ class _KernelSun:
         value = math.degrees(math.atan2(ecliptic[1], ecliptic[0])) % 360
         if not math.isfinite(value):
             raise EphemerisSourceError("solar_spk_invalid")
-        else:
-            pass
         return value
 
     def receipt(self) -> dict[str, Any]:
@@ -191,8 +177,6 @@ def _selected() -> _KernelSun:
     value = os.environ.get(FILE_ENV, "").strip()
     if not value:
         raise EphemerisSourceError("solar_spk_unavailable")
-    else:
-        pass
     path = Path(value).expanduser().resolve()
     return _load(path, _signature(path))
 
@@ -219,8 +203,6 @@ def solar_longitudes_tt(jd_tts: list[float]) -> dict[str, Any]:
         type(value) in (int, float) and math.isfinite(value) for value in jd_tts
     ):
         raise ValueError("SPK observations require finite numeric TT points")
-    else:
-        pass
     with _LOCK:
         source = _selected()
         selected_key = cache_key()
@@ -229,8 +211,6 @@ def solar_longitudes_tt(jd_tts: list[float]) -> dict[str, Any]:
         source.check_unchanged()
         if before != source.receipt() or selected_key != cache_key():
             raise EphemerisSourceError("solar_configuration_changed")
-        else:
-            pass
         return {"longitudes": values, "model": before}
 
 
@@ -243,8 +223,6 @@ def longitude_crossing_tt(
 ) -> dict[str, Any]:
     if not all(math.isfinite(x) for x in (target, low, high)) or low >= high:
         raise ValueError("SPK crossing requires a finite increasing TT bracket")
-    else:
-        pass
     with _LOCK:
         source = _selected()
 
@@ -256,23 +234,17 @@ def longitude_crossing_tt(
         )
         if expected_source_key is not None and actual_key != expected_source_key:
             raise EphemerisSourceError("solar_configuration_changed")
-        else:
-            pass
 
         def residual(epoch: float) -> float:
             return math.remainder(source.longitude(epoch) - target, 360)
 
         if not residual(low) < 0 <= residual(high):
             raise ValueError("SPK TT bracket does not contain a forward crossing")
-        else:
-            pass
         iterations = 0
         for _ in range(40):
             middle = (low + high) / 2
             if middle == low or middle == high:
                 break
-            else:
-                pass
             if residual(middle) < 0:
                 low = middle
             else:

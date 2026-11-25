@@ -31,15 +31,11 @@ def _profile() -> dict[str, Any]:
         or len(profile["chapter_selectors"]) != 5
     ):
         raise ValueError("Unknown selected qi day-atom profile")
-    else:
-        pass
     for row in profile["literal_day_branch_atoms"].values():
         if not row["day_branches"] or any(
             b not in EARTHLY_BRANCHES for b in row["day_branches"]
         ):
             raise ValueError("Qi day atoms require explicit original branch labels")
-        else:
-            pass
     return profile
 
 
@@ -87,8 +83,6 @@ def chapter_timing_targets(
                             "full_source_context_authenticated": False,
                         }
                     )
-                else:
-                    pass
     elif topic == "reputation":
         q = (
             layer["topic_reading"]["chapter_qualifications"]
@@ -105,8 +99,6 @@ def chapter_timing_targets(
                 raise ValueError(
                     "Qi timing must retain every chapter-selected actual role"
                 )
-            else:
-                pass
             for row in q[collection]:
                 actual = by_role[row["role"]]
                 if (row["trigram"], row["relation"], row["trigram_fact_path"]) != (
@@ -117,8 +109,6 @@ def chapter_timing_targets(
                     raise ValueError(
                         "Qi timing cannot borrow another role's source selector"
                     )
-                else:
-                    pass
                 condition = (
                     True
                     if key == "reputation_completion"
@@ -128,8 +118,6 @@ def chapter_timing_targets(
                     raise ValueError(
                         "Qi timing source context must be boolean or unknown"
                     )
-                else:
-                    pass
                 targets.append(
                     {
                         "selector_id": key,
@@ -155,8 +143,6 @@ def chapter_timing_targets(
             raise ValueError(
                 "Qi body timing cannot borrow another cast's absence condition"
             )
-        else:
-            pass
         if no_attacker["body_time_reference"] is not None:
             targets.append(
                 {
@@ -170,8 +156,6 @@ def chapter_timing_targets(
                     "full_source_context_authenticated": False,
                 }
             )
-        else:
-            pass
     else:
         raise ValueError(
             "Qi day timing selectors require the explicit wealth or reputation chapter"
@@ -191,8 +175,6 @@ def _reading(
     day = layer.get("day_qi")
     if day is None:
         return None
-    else:
-        pass
     profile = _profile()
     by_role, targets = chapter_timing_targets(
         cast,
@@ -208,8 +190,6 @@ def _reading(
             r["role"] for r in candidate["roles"]
         ] != list(by_role):
             raise ValueError("Qi timing requires complete input-day role records")
-        else:
-            pass
         for row in candidate["roles"]:
             actual = by_role[row["role"]]
             if (row["trigram"], row["fact_path"]) != (
@@ -217,8 +197,6 @@ def _reading(
                 actual["fact_path"],
             ):
                 raise ValueError("Qi day roles must remain bound to their own cast")
-            else:
-                pass
         labels.append(
             {
                 **deepcopy(calendar),
@@ -230,8 +208,6 @@ def _reading(
         )
     if not labels or sum(row["selected_input_day_label"] for row in labels) != 1:
         raise ValueError("Qi timing requires the original selected input-day label")
-    else:
-        pass
     selectors = profile["chapter_selectors"]
     rows = []
     for target in targets:
@@ -328,8 +304,6 @@ def apply_qi_day_timing_references(
     topic = interpretation["interpretation_topic"]
     if topic not in {"wealth", "reputation"} or interpretation.get("day_qi") is None:
         return
-    else:
-        pass
     main = _reading(
         cast,
         interpretation,
@@ -340,8 +314,6 @@ def apply_qi_day_timing_references(
     )
     if main is None:
         return
-    else:
-        pass
     interpretation["topic_reading"]["qi_day_timing_reference"] = main
     interpretation["traditional_judgement"] += main["summary"]
     suffix = main["summary"]
@@ -356,8 +328,6 @@ def apply_qi_day_timing_references(
         )
         if item is None:
             raise ValueError("Count candidate lost its own input day labels")
-        else:
-            pass
         row["topic_clause"]["qi_day_timing_reference"] = item
         row["traditional_judgement"] += item["summary"]
         suffix += (

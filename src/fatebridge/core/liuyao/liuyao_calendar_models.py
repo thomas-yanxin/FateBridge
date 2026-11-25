@@ -24,8 +24,6 @@ def month_model_comparison(
     """Report the missing alternate path for an explicitly analytic month."""
     if MODEL_ID not in boundary_models:
         return None
-    else:
-        pass
     return {
         "status": "not_compared_incomplete_native_probes",
         "calculation_month_branch": month_branch,

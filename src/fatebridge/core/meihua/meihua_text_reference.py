@@ -24,8 +24,6 @@ def _profile() -> dict[str, Any]:
         or profile["version"] != "1.0.0"
     ):
         raise ValueError("Unknown Meihua transcription rendering policy")
-    else:
-        pass
     return profile
 
 
@@ -63,8 +61,6 @@ def render_yaoci_text(raw: str) -> dict[str, Any]:
     if unresolved:
         for variant in variants:
             variant["display_start"] = variant["display_end"] = None
-    else:
-        pass
     return {
         "ruleset_id": profile["id"],
         "version": profile["version"],

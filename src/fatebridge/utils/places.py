@@ -100,8 +100,6 @@ def _uk_postal_address_matches(
         ]
         if len(boxes) != 1:
             return None
-        else:
-            pass
         address_end = boxes[0][1]
     else:
         address_end = street[1]
@@ -110,13 +108,9 @@ def _uk_postal_address_matches(
     for span, text in components.items():
         if span[0] < address_end:
             continue
-        else:
-            pass
         match = _UK_POSTCODE.fullmatch(text)
         if match is None:
             continue
-        else:
-            pass
         area = match[1]
         if area is None or area in _GB_POSTCODE_AREAS:
             postal_country = "GB"
@@ -125,16 +119,12 @@ def _uk_postal_address_matches(
         if postal_country is not None:
             postcode = span
             break
-        else:
-            pass
     if street is None:
         if postcode is None or any(
             span != postcode and _UK_POSTCODE.fullmatch(text)
             for span, text in components.items()
         ):
             return None
-        else:
-            pass
         town = next(span for span in reversed(components) if span[1] <= postcode[0])
         named_places = {
             (match.start, match.end) for match in places
@@ -151,16 +141,12 @@ def _uk_postal_address_matches(
             )
         ):
             return None
-        else:
-            pass
         address_end = town[0]
     elif postcode is None and not any(
         context.key == "country:GB" and (context.start, context.end) in components
         for context in contexts
     ):
         return None
-    else:
-        pass
     places = [
         match
         for match in places
@@ -186,8 +172,6 @@ def _uk_postal_address_matches(
                 normalize_birth_place_text(components[postcode]),
             )
         )
-    else:
-        pass
     return places, contexts
 
 
@@ -216,15 +200,11 @@ def _matches(
             alias = normalized[start:end]
             if len(alias) == 1:
                 continue
-            else:
-                pass
             ids, qualifiers = PLACE_ALIAS_INDEX.get(alias), PLACE_CONTEXT_INDEX.get(
                 alias
             )
             if not ids and not qualifiers:
                 continue
-            else:
-                pass
             raw_start, raw_end = positions[start], positions[end - 1] + 1
             # Cased city names need a token edge. Uncased Chinese names may
             # be concatenated, with the resolver checking their hierarchy.
@@ -234,31 +214,23 @@ def _matches(
                 and _is_place_word_char(folded[raw_start - 1])
             ):
                 continue
-            else:
-                pass
             if (
                 raw_end < len(folded)
                 and _is_place_word_char(alias[-1])
                 and _is_place_word_char(folded[raw_end])
             ):
                 continue
-            else:
-                pass
             places.extend(_Match(key, start, end, alias) for key in (ids or ()))
             # Two-letter ISO/state codes are qualifiers only when uppercase in
             # the original input; words such as "in" must not mean India.
             short_code = len(alias) <= 3 and alias.isascii() and alias.isalpha()
             if short_code and (raw_start, raw_end) not in uppercase_code_spans:
                 continue
-            else:
-                pass
             if qualifiers and "," in folded[raw_start:raw_end]:
                 signature = "".join(
                     c for c in folded[raw_start:raw_end] if c.isalnum() or c == ","
                 )
                 qualifiers = PLACE_CONTEXT_COMMAS.get(signature)
-            else:
-                pass
             contexts.extend(
                 _Match(f"{kind}:{key}", start, end, alias)
                 for kind, key in (qualifiers or ())
@@ -273,8 +245,6 @@ def _matches(
     postal = _uk_postal_address_matches(components, places, contexts)
     if postal is not None:
         places, contexts = postal
-    else:
-        pass
     # Discard crossing aliases first: 台南市北区 contains 市北区, but the
     # Shandong name must not suppress the correct 北区 inside that suffix.
     places = [
@@ -306,16 +276,10 @@ def _matches(
             span = (match.start, match.end)
             if span in components:
                 place_fields[span].add(match.key)
-            else:
-                pass
         if not components.keys() <= (
             place_fields.keys() | {(context.start, context.end) for context in contexts}
         ):
             place_fields.clear()
-        else:
-            pass
-    else:
-        pass
     return normalized, places, contexts, place_fields
 
 
@@ -324,8 +288,6 @@ def _ancestors(key: str) -> tuple[str, ...]:
     parent = PLACE_BY_ID[key]["parent"]
     if parent is None:
         return ()
-    else:
-        pass
     return (parent, *_ancestors(parent))
 
 
@@ -345,8 +307,6 @@ def resolve_birth_place_context(birth_place: str | None) -> BirthPlaceResolution
     """Resolve a name/address locally; do not guess among unrelated namesakes."""
     if not birth_place or birth_place == "未提供":
         return _EMPTY
-    else:
-        pass
     return _resolve_birth_place_context_cached(birth_place.strip())
 
 
@@ -390,10 +350,6 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
                 for m in matches
             ):
                 continue
-            else:
-                pass
-        else:
-            pass
         # TW/HK/MO are GeoNames region qualifiers, represented in the China
         # catalog with their proper local civil timezone.
         region = (
@@ -418,10 +374,6 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
                 for span, ids in place_fields.items()
             ):
                 continue
-            else:
-                pass
-        else:
-            pass
         parent_matches = [
             m for m in matches if m.key in ancestors and not match.overlaps(m)
         ]
@@ -442,8 +394,6 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
             jurisdiction_keys.isdisjoint(options) for options in explicit_qualifiers
         ):
             continue
-        else:
-            pass
         if entry["country"] == "CN":
             anchors = [
                 m
@@ -471,10 +421,6 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
                 for m in anchors
             ):
                 continue
-            else:
-                pass
-        else:
-            pass
         # GeoNames numeric admin codes are local to a country and can also
         # appear as house or postal numbers. Keep their positive match signal.
         numeric_admin_match = any(
@@ -496,8 +442,6 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
         ]
         if preferred_matches:
             return _resolve(preferred_matches[0])
-        else:
-            pass
         if exact:
             # Bare prefecture names (南昌/吉林) retain their city meaning; a
             # homonymous county requires 县/区 or a qualifying parent address.
@@ -517,12 +461,6 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
                 ]
                 if cities:
                     scored = cities
-                else:
-                    pass
-            else:
-                pass
-        else:
-            pass
         best = max(s for s, _ in scored)
         winners = {m.key: m for s, m in scored if s == best}
         # Explicit context always wins over the few stable, established aliases
@@ -530,12 +468,6 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
         preferred = PREFERRED_PLACE_ALIASES.get(normalized)
         if preferred in winners:
             return _resolve(winners[preferred])
-        else:
-            pass
         if len(winners) == 1:
             return _resolve(next(iter(winners.values())))
-        else:
-            pass
-    else:
-        pass
     return _EMPTY

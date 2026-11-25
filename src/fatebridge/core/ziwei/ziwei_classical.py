@@ -37,8 +37,6 @@ def symbolic_properties(palaces: List[Dict[str, Any]]) -> Dict[str, Any]:
             for j, star in enumerate(palace["stars_detail"]):
                 if star["name"] != entry["star"]:
                     continue
-                else:
-                    pass
                 records.append(
                     {
                         "star": entry["star"],
