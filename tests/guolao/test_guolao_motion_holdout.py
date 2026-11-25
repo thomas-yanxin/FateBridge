@@ -11,6 +11,7 @@ import pytest
 from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core import guolao
 from fatebridge.core.astro.moshier_motion import METHOD_ID as MOSHIER_MOTION_METHOD_ID
+from fatebridge.core.public_output import same_public_value
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.guolao.audit_guolao_motion import evaluate, load_reference, main
 from tests.fixtures.surface_payloads import astro_payload
@@ -143,10 +144,15 @@ def test_guolao_chart_delivers_the_same_actual_motion_source_on_three_surfaces(
         capsys,
     )
     raw = json.loads(json.dumps(guolao.positions(shared_sources.birth())))
+    (tmp_path / "native.json").write_text(
+        json.dumps(raw, sort_keys=True, indent=2, allow_nan=False), encoding="utf-8"
+    )
     profile = result["guolao"]["profile"]
     assert profile["ephemeris_models"] == [backend]
-    assert profile["longitude_motion"] == raw["longitude_motion"]
-    assert profile["ephemeris_provenance"] == raw["ephemeris_provenance"]
+    assert same_public_value(profile["longitude_motion"], raw["longitude_motion"])
+    assert same_public_value(
+        profile["ephemeris_provenance"], raw["ephemeris_provenance"]
+    )
     bodies = {body["id"]: body for body in result["guolao"]["bodies"]}
     for name, state in raw["states"].items():
         assert bodies[name]["longitude"] == state["longitude"]
