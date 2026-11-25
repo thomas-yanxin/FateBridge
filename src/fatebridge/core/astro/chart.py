@@ -22,6 +22,7 @@ from fatebridge.core.astro.ephemeris import (
     _planet_set,
 )
 from fatebridge.core.astro.ephemeris_files import ephemeris_files_for_years
+from fatebridge.core.astro.event_reference import ASC_INDEPENDENT_HOUSES
 from fatebridge.core.astro.geometry import (
     _nakshatra,
     _sign_name,
@@ -316,9 +317,19 @@ def _build_core_chart_payload(
         house_system_info["key"],
         house_cusps=house_cusps,
     )
+    angle_definition = geographic_pole_angle_definition(
+        birth_info.latitude
+    ) or layout.get("angle_definition")
+    ascendant_resolved = (angle_definition or {}).get(
+        "geometric_ascendant_resolved"
+    ) is not False
+    houses_resolved = (
+        ascendant_resolved
+        or house_system_info["swisseph_code"].decode("ascii") in ASC_INDEPENDENT_HOUSES
+    )
     fixed_stars, fixed_star_profile = _build_fixed_stars(
         planets,
-        effective_ascendant,
+        effective_ascendant if ascendant_resolved else None,
         effective_midheaven,
         julian_day,
         julian_day_tt=times.jd_tt,
@@ -433,6 +444,8 @@ def _build_core_chart_payload(
             julian_day_tt=times.jd_tt,
             sidereal=sidereal,
             chart_sect=chart_sect,
+            ascendant_resolved=ascendant_resolved,
+            houses_resolved=houses_resolved,
         ),
         "classical_patterns": _build_classical_patterns(
             planets, aspects, interpretation_states, chart_sect=chart_sect
@@ -555,12 +568,9 @@ def _build_core_chart_payload(
         {planet: state["longitude"] for planet, state in planet_states.items()},
         chart_sect,
         tropical=not sidereal,
-        ascendant=effective_ascendant,
+        ascendant=effective_ascendant if ascendant_resolved else None,
     )
 
-    angle_definition = geographic_pole_angle_definition(
-        birth_info.latitude
-    ) or layout.get("angle_definition")
     if angle_definition is not None:
         result["chart_profile"]["angle_definition"] = angle_definition
         result["summary"].append(angle_definition["note_zh"])
@@ -578,6 +588,8 @@ def _build_core_chart_payload(
             ayanamsha=ayanamsha,
             chart_sect=chart_sect,
             fortune_method=context_fortune_method,
+            ascendant_resolved=ascendant_resolved,
+            houses_resolved=houses_resolved,
             zodiac_longitudes=(
                 {name: state["longitude"] for name, state in zodiac_states.items()}
                 if zodiac_states is not None
@@ -628,13 +640,17 @@ def _build_core_chart_payload(
         asc_sign = _sign_name(effective_ascendant)
         result["hellenistic"] = {
             "sect": chart_sect,
-            "lot_of_fortune": _fortune_lot(
-                planets, effective_ascendant, chart_sect=chart_sect
+            "lot_of_fortune": (
+                _fortune_lot(planets, effective_ascendant, chart_sect=chart_sect)
+                if ascendant_resolved
+                else None
             ),
-            "ascendant_ruler": RULER_BY_SIGN[asc_sign],
-            "angular_planets": [
-                item["id"] for item in planets if item["house"] in {1, 4, 7, 10}
-            ],
+            "ascendant_ruler": RULER_BY_SIGN[asc_sign] if ascendant_resolved else None,
+            "angular_planets": (
+                [item["id"] for item in planets if item["house"] in {1, 4, 7, 10}]
+                if houses_resolved
+                else None
+            ),
         }
     if chart_variant == "india_chart":
         result["india"] = {

@@ -460,7 +460,10 @@ ALMUTEN_FIGURIS_POINTS = ("Sun", "Moon", "Ascendant", "fortune", "syzygy")
 
 
 def build_almuten_figuris(
-    points: Dict[str, Dict[str, Any]], is_day: bool
+    points: Dict[str, Dict[str, Any]],
+    is_day: bool,
+    *,
+    unknown_points: tuple[str, ...] = (),
 ) -> Dict[str, Any]:
     """Almuten Figuris (命主): the planet ruling the chart's hylegic points.
 
@@ -469,6 +472,8 @@ def build_almuten_figuris(
     supply are passed. Each point contributes the weighted essential-dignity
     tally of :func:`almuten_of`; summing those tallies across every point names
     the chart's overall ruler. Same Chaldean tie-break as the per-degree almuten.
+    Explicit ``unknown_points`` retain per-point scores and known subtotals,
+    without electing a ruler or presenting a subtotal as the complete score.
     """
     totals: Dict[str, int] = {}
     per_point: Dict[str, Any] = {}
@@ -489,6 +494,15 @@ def build_almuten_figuris(
         }
         for planet, weight in result["totals"].items():
             totals[planet] = totals.get(planet, 0) + weight
+    if unknown_points:
+        return {
+            "status": "partial",
+            "unknown_points": list(unknown_points),
+            "winner": None,
+            "totals": None,
+            "known_totals": totals,
+            "points": per_point,
+        }
     return {
         "winner": _almuten_winner(totals),
         "totals": totals,
@@ -1256,6 +1270,25 @@ def build_temperament(
     add_planet("Sun")
     add_planet("Moon")
 
+    unknown_components = [
+        name
+        for name, value in (
+            ("ascendant_sign", asc_sign),
+            ("ascendant_ruler", asc_ruler),
+        )
+        if value is None
+    ]
+    if unknown_components:
+        return {
+            "status": "partial",
+            "unknown_components": unknown_components,
+            "known_tally": tally,
+            "tally": None,
+            "thermal": None,
+            "hygral": None,
+            "humor": None,
+            "cn": None,
+        }
     thermal = "hot" if tally["hot"] >= tally["cold"] else "cold"
     hygral = "moist" if tally["moist"] >= tally["dry"] else "dry"
     humor = _HUMORS[(thermal, hygral)]
@@ -1301,7 +1334,7 @@ def build_planet_classical(
         "orientality": orient,
         "sect_placement": sect_placement(planet, chart_sect, orient),
         "in_halb": in_halb(planet, chart_sect, above, orient),
-        "joy": planetary_joy(planet, house),
+        "joy": planetary_joy(planet, house) if house is not None else None,
         "retrograde": is_retrograde(longitude_speed),
         "out_of_bounds": out_of_bounds(declination, obliquity),
         "dodekatemorion": dodekatemorion(sign, degree_in_sign),

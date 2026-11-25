@@ -902,6 +902,9 @@ class AlmutenPoint(PartialOutput):
 
 
 class AlmutenFiguris(PartialOutput):
+    status: Optional[str] = None
+    unknown_points: Optional[List[str]] = None
+    known_totals: Optional[Dict[str, int]] = None
     points: Optional[Dict[str, AlmutenPoint]] = None
     totals: Optional[Dict[str, int]] = None
     winner: Optional[str] = None
@@ -965,6 +968,9 @@ class Syzygy(PartialOutput):
 
 
 class Temperament(PartialOutput):
+    status: Optional[str] = None
+    unknown_components: Optional[List[str]] = None
+    known_tally: Optional[Dict[str, int]] = None
     cn: Optional[str] = None
     humor: Optional[str] = None
     hygral: Optional[str] = None

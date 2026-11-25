@@ -601,15 +601,12 @@ def _build_variant_note(payload: Dict[str, Any], chart_variant: str) -> Optional
         hellenistic = payload.get("hellenistic", {})
         ascendant_ruler = PLANET_LABELS_ZH.get(
             hellenistic.get("ascendant_ruler", ""),
-            hellenistic.get("ascendant_ruler", "未知"),
+            hellenistic.get("ascendant_ruler") or "未知",
         )
-        angular_planets = (
-            "、".join(
-                PLANET_LABELS_ZH.get(item, item)
-                for item in hellenistic.get("angular_planets", [])
-            )
-            or "无"
-        )
+        angular_planets = "、".join(
+            PLANET_LABELS_ZH.get(item, item)
+            for item in (hellenistic.get("angular_planets") or [])
+        ) or ("未知" if hellenistic.get("angular_planets") is None else "无")
         return (
             f"希腊盘补充信息显示这是{ {'day': '日', 'night': '夜'}.get(hellenistic.get('sect'), '未知') }盘，"
             f"上升主星为{ascendant_ruler}，角宫星体有{angular_planets}。"
@@ -910,6 +907,9 @@ def _build_lots_lines(payload: Dict[str, Any]) -> str:
     """``[阿拉伯点]`` section: each lot's sign/degree + domicile lord and almuten."""
     lots = payload.get("classical", {}).get("lots", {})
     if not lots:
+        definition = payload.get("chart_profile", {}).get("angle_definition") or {}
+        if definition.get("geometric_ascendant_resolved") is False:
+            return "未知（上升无法确定，不能计算依赖上升的派生点）。"
         return "无"
     lines = []
     for lot in lots.values():
@@ -1026,12 +1026,15 @@ def _build_temperament_lines(payload: Dict[str, Any]) -> str:
     temperament = classical.get("temperament")
     if not temperament:
         return "无"
-    tally = temperament.get("tally", {})
-    lines = [
-        f"气质：{temperament.get('cn', '?')}"
-        f"（热{tally.get('hot', 0)}寒{tally.get('cold', 0)} "
-        f"燥{tally.get('dry', 0)}湿{tally.get('moist', 0)}）"
-    ]
+    tally = temperament.get("tally")
+    if tally is None:
+        lines = ["气质：未知（上升及其守护星分量无法确定；已保留日月分量）。"]
+    else:
+        lines = [
+            f"气质：{temperament.get('cn', '?')}"
+            f"（热{tally.get('hot', 0)}寒{tally.get('cold', 0)} "
+            f"燥{tally.get('dry', 0)}湿{tally.get('moist', 0)}）"
+        ]
     dodeka = []
     ninth = []
     for planet in _CLASSICAL_PLANET_ORDER:
@@ -1055,6 +1058,9 @@ def _build_temperament_lines(payload: Dict[str, Any]) -> str:
 def _build_topic_almuten_line(payload: Dict[str, Any]) -> str:
     topic = payload.get("classical", {}).get("topic_almutens", {})
     if not topic:
+        definition = payload.get("chart_profile", {}).get("angle_definition") or {}
+        if definition.get("geometric_ascendant_resolved") is False:
+            return "未知（所选宫制依赖无法确定的上升，不能确定宫主星）。"
         return "无"
     parts = []
     for house in sorted(topic, key=lambda h: int(h)):
@@ -1078,12 +1084,15 @@ def _build_almuten_figuris_line(payload: Dict[str, Any]) -> str:
     classical = payload.get("classical", {})
     figuris = classical.get("almuten_figuris") or {}
     winner = figuris.get("winner")
-    if not winner:
+    if figuris.get("status") == "partial":
+        lines = ["命主：未知（上升与福点无法确定；其余点主仅为局部分量）。"]
+    elif winner:
+        totals = figuris.get("totals", {})
+        lines = [
+            f"命主：{PLANET_LABELS_ZH.get(winner, winner)}（{totals.get(winner, 0)}分）"
+        ]
+    else:
         return "无"
-    totals = figuris.get("totals", {})
-    lines = [
-        f"命主：{PLANET_LABELS_ZH.get(winner, winner)}（{totals.get(winner, 0)}分）"
-    ]
     points = figuris.get("points", {})
     point_parts = []
     for point_id in ("Sun", "Moon", "Ascendant", "fortune", "syzygy"):
@@ -1220,8 +1229,8 @@ def _build_standard_chart_snapshot_sections(
         detail_lines.extend(
             [
                 f"昼夜属性：{hellenistic.get('sect', '未知')}",
-                f"上升主星：{PLANET_LABELS_ZH.get(hellenistic.get('ascendant_ruler', ''), hellenistic.get('ascendant_ruler', '未知'))}",
-                f"角宫星体：{', '.join(PLANET_LABELS_ZH.get(item, item) for item in hellenistic.get('angular_planets', [])) or '无'}",
+                f"上升主星：{PLANET_LABELS_ZH.get(hellenistic.get('ascendant_ruler', ''), hellenistic.get('ascendant_ruler') or '未知')}",
+                f"角宫星体：{', '.join(PLANET_LABELS_ZH.get(item, item) for item in (hellenistic.get('angular_planets') or [])) or ('未知' if hellenistic.get('angular_planets') is None else '无')}",
             ]
         )
 
@@ -1256,6 +1265,8 @@ def _build_standard_chart_snapshot_sections(
             )
 
     greek_lines = ["无"]
+    if chart_variant == "hellen_chart" and hellenistic.get("ascendant_ruler") is None:
+        greek_lines = ["福点：未知（上升无法确定）。"]
     lot_of_fortune = hellenistic.get("lot_of_fortune")
     if isinstance(lot_of_fortune, dict):
         greek_lines = [

@@ -331,6 +331,8 @@ def _build_classical_layer(
     julian_day: Optional[float] = None,
     julian_day_tt: Optional[float] = None,
     sidereal: bool = False,
+    ascendant_resolved: bool = True,
+    houses_resolved: bool = True,
 ) -> Dict[str, Any]:
     """Hellenistic/medieval condition layer — the chart's ``classical`` block.
 
@@ -367,7 +369,7 @@ def _build_classical_layer(
     sun = next((item for item in planets if item["id"] == "Sun"), None)
     sun_longitude = sun["longitude"] if sun else None
     moon = next((item for item in planets if item["id"] == "Moon"), None)
-    asc_sign = _sign_name(ascendant)
+    asc_sign = _sign_name(ascendant) if ascendant_resolved else None
 
     planet_layer: Dict[str, Any] = {}
     placements: Dict[str, str] = {}
@@ -379,7 +381,7 @@ def _build_classical_layer(
             sign=item["sign"],
             degree_in_sign=item["degree_in_sign"],
             longitude=item["longitude"],
-            house=item.get("house"),
+            house=item.get("house") if houses_resolved else None,
             sun_longitude=sun_longitude,
             chart_sect=chart_sect,
             longitude_speed=state.get("longitude_speed"),
@@ -396,13 +398,14 @@ def _build_classical_layer(
             "degree_in_sign": float(house["cusp_longitude"]) % 30.0,
         }
         for house in houses
-        if house.get("sign") is not None
+        if houses_resolved and house.get("sign") is not None
     }
     # Lot longitude markers: the EXACT ascendant (not the whole-sign 1st cusp, so
     # Fortune matches _fortune_lot) + the 8th cusp.
-    lons["asc"] = float(ascendant)
+    if ascendant_resolved:
+        lons["asc"] = float(ascendant)
     for house in houses:
-        if house["house"] == 8:
+        if houses_resolved and house["house"] == 8:
             lons["eighth"] = float(house["cusp_longitude"])
 
     lots = build_lots_layer(lons, is_day)
@@ -417,10 +420,11 @@ def _build_classical_layer(
         figuris_points["Sun"] = sun
     if moon:
         figuris_points["Moon"] = moon
-    figuris_points["Ascendant"] = {
-        "sign": asc_sign,
-        "degree_in_sign": ascendant % 30.0,
-    }
+    if ascendant_resolved:
+        figuris_points["Ascendant"] = {
+            "sign": asc_sign,
+            "degree_in_sign": ascendant % 30.0,
+        }
     if fortune:
         figuris_points["fortune"] = fortune
     if syzygy:
@@ -436,10 +440,14 @@ def _build_classical_layer(
         "topic_almutens": build_topic_almutens(houses_for_almuten, is_day),
         "lots": lots,
         "syzygy": syzygy,
-        "almuten_figuris": build_almuten_figuris(figuris_points, is_day),
+        "almuten_figuris": build_almuten_figuris(
+            figuris_points,
+            is_day,
+            unknown_points=() if ascendant_resolved else ("Ascendant", "fortune"),
+        ),
         "temperament": build_temperament(
             asc_sign,
-            RULER_BY_SIGN.get(asc_sign),
+            RULER_BY_SIGN.get(asc_sign) if asc_sign is not None else None,
             sun["sign"] if sun else None,
             moon["sign"] if moon else None,
         ),
@@ -448,7 +456,7 @@ def _build_classical_layer(
 
 def _build_fixed_stars(
     planets: List[Dict[str, Any]],
-    ascendant: float,
+    ascendant: float | None,
     midheaven: float,
     julian_day: float,
     *,
@@ -463,7 +471,8 @@ def _build_fixed_stars(
     from fatebridge.core.classical_western import build_fixed_star_layer
 
     points = {planet["id"]: planet["longitude"] for planet in planets}
-    points["Ascendant"] = normalize_angle(ascendant)
+    if ascendant is not None:
+        points["Ascendant"] = normalize_angle(ascendant)
     points["Midheaven"] = normalize_angle(midheaven)
     return build_fixed_star_layer(
         points, julian_day, julian_day_tt=julian_day_tt, sidereal=sidereal
