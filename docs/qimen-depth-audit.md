@@ -125,9 +125,9 @@ uv run --locked --extra dev fatebridge qimen \
 
 ## 置闰首尾计日
 
-四库影印《遁甲演义》卷一「超接引例」第 13 页载丙戌年五月初一己卯起芒种上元、初九交芒种、十六甲午重用芒种上元。初一到初九含两端共九日，日期序差为八。现行按该明确实例统一前大雪初始化、芒种重段和当年大雪重段，规则回执为 `2.13.0`。页内也有「超過九日」的文字，按本版算例解释。秦慎安校勘《奇門遁甲統宗》同样给出首尾九日的示例，其夏至锚另属一法。 [两版影印及读法](historical-evidence.md#evidence-20261119-round57-qimen-zhirun-checkpoint-md)
+四库影印《遁甲演义》卷一「超接引例」第 13 页载丙戌年五月初一己卯起芒种上元、初九交芒种、十六甲午重用芒种上元。初一到初九含两端共九日，日期序差为八。现行按该明确实例统一前大雪初始化、芒种重段和当年大雪重段，规则回执为 `2.13.0`。页内也有「超過九日」的文字，按本版算例解释。秦慎安校勘《奇門遁甲統宗》同样给出首尾九日的示例，其夏至锚另属一法。
 
-固定参考以卷四图题、香港天文台历表和独立 DE441 节气根构成。十个局表的逐日节气与日干支从 3,685/4,286 到 4,286/4,286，五组次年重叠从 161/204 到 204/204；两工具实际 REST、MCP、CLI 的定局由 57/75 到 75/75，实际 Schema 相同。早期十二月重叠诊断中的三个差异、原版的九项原典未决和参考排程首版多列冬至的勘误，均有逐项记录。该对照覆盖所选规则和现代历法适配。 [固定给定、原始调用和比较](historical-evidence.md#evidence-20261119-round57-qimen-zhirun-handoff-result-md)
+固定参考以卷四图题、香港天文台历表和独立 DE441 节气根构成。十个局表的逐日节气与日干支从 3,685/4,286 到 4,286/4,286，五组次年重叠从 161/204 到 204/204；两工具实际 REST、MCP、CLI 的定局由 57/75 到 75/75，实际 Schema 相同。早期十二月重叠诊断中的三个差异、原版的九项原典未决和参考排程首版多列冬至的勘误，均有逐项记录。该对照覆盖所选规则和现代历法适配。
 
 为两处卷四数表差异增加独立于排盘引擎的原文内部诊断，见 `validation.qimen_table_integrity`。诊断逐列以印出的旬首宫数为锚，只检验声明的“阳顺一、阴逆一，九宫逐时计数”假设，保留中五原数，不做寄坤替换。卷一影印第7—8页的三条正文示例及相邻数表为语境，不因另存书页而增加独立原例。这个诊断不验证旬首绝对起宫、星数、整个原书的唯一方法或扫描谱系。
 
@@ -343,7 +343,7 @@ uv run --locked --extra dev fatebridge qimen \
 
 ```bash
 uv run --locked --extra dev python -m scripts.qimen.audit_qimen --output /tmp/fatebridge-qimen-current.json
-uv run --locked --extra dev pytest -q tests/qimen/test_qimen_depth.py tests/qimen/test_qimen_accuracy.py tests/qimen/test_qimen_calendar_depth.py tests/qimen/test_qimen_timezone_rules.py tests/qimen/test_qimen_numeric_tables.py tests/qimen/test_qimen_profiles.py tests/qimen/test_qimen_head_patterns.py tests/qimen/test_qimen_stem_context.py tests/qimen/test_qimen_transports.py tests/qimen/test_qimen_combinations.py tests/qimen/test_qimen_claims.py
+uv run --locked --extra dev pytest -q tests/qimen/test_qimen_depth.py tests/qimen/test_qimen_accuracy.py tests/qimen/test_qimen_calendar_depth.py tests/qimen/test_qimen_timezone_rules.py tests/qimen/test_qimen_numeric_tables.py tests/qimen/test_qimen_profiles.py tests/qimen/test_qimen_head_patterns.py tests/qimen/test_qimen_stem_context.py tests/integration/test_full_surface_validation.py tests/qimen/test_qimen_combinations.py tests/qimen/test_qimen_claims.py
 uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 ```
 

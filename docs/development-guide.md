@@ -151,7 +151,7 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 ## 设计约束
 
-编码与审查遵循 [AGENTS.md 的代码简洁与边界原则](../AGENTS.md#代码简洁与边界)，职责和导入方向见[架构说明](architecture.md#分层职责)。领域计算留在 `core` / `analysis`，服务在 `services`，工具由 `services/catalog/` 装配；REST、MCP、CLI 共享执行与输出合同。
+编码与审查遵循 [AGENTS.md 的代码审查原则](../AGENTS.md#代码审查)，职责和导入方向见[架构说明](architecture.md#分层职责)。领域计算留在 `core` / `analysis`，服务在 `services`，工具由 `services/catalog/` 装配；REST、MCP、CLI 共享执行与输出合同。
 
 - 新增结果字段时，说明它由哪些输入和规则得到、调用方如何复核。经典条目由知识工具按需交付。行业映射、现代心理类比和个性化建议由 Agent 结合对话生成。
 - 出生资料复用 `create_person_info`、`normalize_birth_time`、`resolve_birth_place_context`；分析时刻经 `services.timing_clock` 归一化，隐式当前时间读取 `core.execution_context.current_datetime`。
@@ -195,11 +195,11 @@ git diff --check
 
 `docs/contracts/` 的逐工具 JSON 与索引由 `scripts/build_codex_call_contracts.py` 从实际 MCP 输入 Schema 和共享首轮字段生成，不能手改生成文件。根 `AGENTS.md` 不嵌入这些大合同。接口或首轮字段变化后先运行生成器，再用 `--check` 核对。工具发现直接读取中央目录，不再维护独立主题 YAML 或生成的场景清单。
 
-完整执行的必需业务根在 `core/response_models.py` 声明；嵌套必需事实使用 具体字段类型上的 `Annotated` 以及 `FULL_FACT` 或 `PRESENT_FACT` 标记，由完整执行上下文递归核验，规则在完整执行时核对。公开投影允许缺少兄弟字段与合法 null，投影读取不启用完整执行上下文。不能为接收错误输出而放宽声明；相关验证从 `test_complete_output_contracts.py`、`test_algorithm_review_repairs.py` 和对应领域测试开始。
+在 `core/response_models.py` 声明必需业务根，为嵌套必需事实使用具体字段类型上的 `Annotated` 和 `FULL_FACT` 或 `PRESENT_FACT`。常规执行检查必需根和已登记的必需事实；测试设置 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1`，在完整执行上下文递归核验嵌套事实与领域约束。公开投影允许缺少兄弟字段与合法 null，投影读取不启用完整执行上下文。不能为接收错误输出而放宽声明；相关验证从 `test_complete_output_contracts.py`、`test_algorithm_review_repairs.py` 和对应领域测试开始。
 
 ### 最低同步面
 
-接口或能力范围变化至少检查 README、API 参考和算法覆盖矩阵；涉及调用字段时同步生成合同。结构变化更新架构说明，删除支持的入口更新故障排除中的升级说明。非生成源页面的导航或措辞调整通常无需改生成数据；生成器 `--check` 报告源文件散列变化时，重新生成后审查差异。
+接口或能力范围变化至少检查 README、API 参考和算法覆盖矩阵；涉及调用字段时同步生成合同。结构变化更新架构说明，删除支持的入口更新故障排除中的升级说明。只改导航或措辞时直接运行 `--check`。若检查报告生成文件缺失或内容不同，运行生成器并审阅差异。
 
 当前维护文档与具体实现应相互指向；历史审计只作为特定版本证据。一轮修改的测试数量、临时回执与工作区路径写在验收报告中，不作为长期能力承诺。历史报告并入专题时标明日期、模型与范围，保留失败和未决项，并与当前使用步骤分开。
 
@@ -230,8 +230,8 @@ GitHub Release published 入口继续保留，并要求标签严格匹配 `v<包
 
 ```bash
 uv run --locked --extra dev python scripts/sync_github_release.py \
-  --version 0.1.1 --sha fee5e5a4373327e65f3b91e002121d49c18ee49c \
-  --repo thomas-yanxin/FateBridge
+  --version "<已发布版本>" --sha "<已核实的源码提交 SHA>" \
+  --repo "<OWNER/REPOSITORY>"
 ```
 
 ## 提交前检查

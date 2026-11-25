@@ -34,4 +34,4 @@ uv run --locked --extra dev python scripts/evaluate_agent.py --prepare-only \
 
 自动通过仅记为 `mechanical_checks_passed`。人工审阅需逐项核对实际回答是否由模型收到的同 run 回执支持，是否补造事实、重复追问、混淆传统解释与现实建议；准备阶段的参照不代替模型实际读取的证据。源码可复现、机械通过、解释忠实和现实预测分别验收。
 
-比较不同修改时固定 CLI、模型、任务与判据，保留原始失败及未执行案例。声明 `expected_skill` 或 `expected_skill_sets` 的历史任务须使用原版评测器复核。不同模型和宿主分别报告。
+比较不同修改时固定 CLI、模型、任务与判据，保留原始失败及未执行案例。现行运行器拒绝声明 `expected_skill` 或 `expected_skill_sets` 的退役任务。不同模型和宿主分别报告。

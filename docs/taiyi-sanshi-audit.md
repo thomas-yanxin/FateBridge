@@ -39,9 +39,9 @@
 
 现代月、日、时计用已求解节气的保留民用点选锚。月、时计从同一点算 `seconds_from_anchor`，`anchor_utc` 保留供阅读的量化标签。这样，在精确交节位于两个可输入钟时之间时，首个到点的输入会归入新节月或新遁。所选民用或真太阳钟仍负责日界、子初及起算位置。 [保留点实现](../src/fatebridge/core/metaphysics/taiyi_periods.py#L73)
 
-固定参考使用 DE440 求得的保留 TT，以 `TAI−UTC = 37 s` 和 `TT−TAI = 32.184 s` 独立推导名义 UTC 坐标。150 个领域输入覆盖 2026 年十二节、两至及多种盘式。修前有 24 个选锚不符，140 个距锚秒数不符。修后的预定字段全部符合。14 个 2026 年锚点均进入日本国立天文台年历的一分钟门。亚秒部分验的是同一保留 TT 的归属及算术，绝对交节时刻只有分钟级外部对照，所选钟面、古历复原和全盘规则各依原范围。 [固定输入与前后结果](historical-evidence.md#evidence-20261119-round58-taiyi-retained-boundary) · [国立天文台 2026 年历](https://eco.mtk.nao.ac.jp/koyomi/yoko/2026/rekiyou262.html) · [IERS 第 72 号通报](https://datacenter.iers.org/data/16/bulletinc-072.txt)
+固定参考使用 DE440 求得的保留 TT，以 `TAI−UTC = 37 s` 和 `TT−TAI = 32.184 s` 独立推导名义 UTC 坐标。150 个领域输入覆盖 2026 年十二节、两至及多种盘式。修前有 24 个选锚不符，140 个距锚秒数不符。修后的预定字段全部符合。14 个 2026 年锚点均进入日本国立天文台年历的一分钟门。亚秒部分验的是同一保留 TT 的归属及算术，绝对交节时刻只有分钟级外部对照，所选钟面、古历复原和全盘规则各依原范围。 [国立天文台 2026 年历](https://eco.mtk.nao.ac.jp/koyomi/yoko/2026/rekiyou262.html) · [IERS 第 72 号通报](https://datacenter.iers.org/data/16/bulletinc-072.txt)
 
-`taiyi` 和 `sanshiunited` 的固定 14 个请求跨 REST、MCP、CLI 验证。所选字段从 12/42 到 42/42，两个版本的合法请求均为 42/42 符合响应 Schema，同版逐例三端业务一致。两个 2025 年备用锚也分别与日本国立天文台年历相差不到一分钟。首版观察器改写 UTC `Z` 后产生的 14 个 REST 422 保留在记录里，正式对照逐字发送冻结请求。 [独立保存比较](historical-evidence.md#evidence-20261119-round58-taiyi-retained-boundary-independent-saved-review-json) · [国立天文台 2025 年历](https://eco.mtk.nao.ac.jp/koyomi/yoko/2025/rekiyou252.html)
+`taiyi` 和 `sanshiunited` 的固定 14 个请求跨 REST、MCP、CLI 验证。所选字段从 12/42 到 42/42，两个版本的合法请求均为 42/42 符合响应 Schema，同版逐例三端业务一致。两个 2025 年备用锚也分别与日本国立天文台年历相差不到一分钟。首版观察器改写 UTC `Z` 后产生的 14 个 REST 422 保留在记录里，正式对照逐字发送冻结请求。 [国立天文台 2025 年历](https://eco.mtk.nao.ac.jp/koyomi/yoko/2025/rekiyou252.html)
 
 ## 原典与历法来源
 
@@ -67,8 +67,7 @@ uv run --locked --extra dev fatebridge taiyi \
 uv run --locked --extra dev python -m scripts.taiyi.audit_taiyi_classical \
   --include-yin --output /tmp/fatebridge-taiyi-jinjing-source-current.json
 uv run --locked --extra dev pytest -q \
-  tests/taiyi/test_taiyi_accuracy.py tests/taiyi/test_taiyi_transports.py \
-  tests/integration/test_contract_regressions.py
+  tests/taiyi/test_taiyi_accuracy.py tests/taiyi/test_taiyi_transports.py
 ```
 
 审计脚本有未决分歧就返回非零；测试验证审计是否诚实保留这些分歧，所以测试绿色和原典审计失败可以同时成立。测试不得删去失败局或只改分母。

@@ -73,7 +73,7 @@ uv run --locked --extra dev fatebridge firdaria \
 - 比鲁尼《占星术要素指南》列出日夜盘各自的七星顺序，两交点均在七星之后，龙头三年、龙尾二年，无共主。第 395 节给出七等分，从本主星起按降序轮转。 [R. Ramsay Wright 1934 年译本 §§395、438–439](https://www.skyscript.co.uk/pdf/pubs/texts/albiruni/docs/albiruni.pdf) · [数序对照](precision-acceptance.md#firdaria-biruni-round157)
 - Öner Döşer 列出总计 75 年的九段及七等分规则。图 6 把夜盘交点置于火星之后，第 38 页说明到期从原起始发光体重启。 [《Astrological Prediction》节选，第 38–40 页](https://bendykes.com/wp-content/uploads/2016/08/ap-extract.pdf)
 - Steven Birchfield 引述 Abu Maʿshār 的夜盘水星后接交点规则，并讨论通常归于 Bonatti 的另一种理解。仓库历史标签中的 `bonatti` 沿用这一归属。 [《Firdar》，2020 修订，第 2–6 页及附表](https://birchfieldastrology.com/wp-content/uploads/2020/07/firdar_revision-02-2020-07-13.pdf)
-- Bonatti 1550 年巴塞尔印本列出日盘火星后的龙头三年、龙尾二年，随后复归太阳。夜盘从月亮开始，并参照日盘的行星伙伴与圈序。印本未明列夜盘交点接位或满 75 年后的重启主星。 [《De Astronomia Tractatus X》，Pars V，Caput III，印列 813–815](https://www.digitale-sammlungen.de/en/view/bsb10196207?page=447) · [逐行转录与对照](~/.codex/artifacts/fatebridge-audit-20261122-round129/firdaria-bonatti-facsimile/handoff.md)
+- Bonatti 1550 年巴塞尔印本列出日盘火星后的龙头三年、龙尾二年，随后复归太阳。夜盘从月亮开始，并参照日盘的行星伙伴与圈序。印本未明列夜盘交点接位或满 75 年后的重启主星。 [《De Astronomia Tractatus X》，Pars V，Caput III，印列 813–815](https://www.digitale-sammlungen.de/en/view/bsb10196207?page=447)
 - 本项目的工程选择：固定UTC名义日、时区处理、UTC七等分、闰日回退、原始出生锚点、微秒量化、分钟截断及边界归属。这些不冒充来稿已说明或第三方产品已经实现的规则。
 
 Birchfield 三个附表有 16 处水星／金星位置与正文规则及 Döşer 图 7 冲突。产品的 `nodes_after_mars` 有 Döşer 图 6 的明确依据。Bonatti 印本文义允许据日段类推，夜盘次序的历史归属仍有分歧。 [固定参考](../tests/fixtures/firdaria-reference.json)

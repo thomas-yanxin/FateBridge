@@ -34,7 +34,7 @@ The calculation service requires no LLM API key. It serves application developer
 | Human Design | Dual moments separated by 88° solar longitude, gates and lines, channels, type, and authority | [Calculation and acceptance](docs/human-design.md) |
 | Feng Shui | Eight Mansions, basic sand/water rules, annual/monthly stars, historical Xuan Kong charts, layouts, and measured workstations | [Home assessment](docs/fengshui.md) · [Workstations](docs/fengshui-workstation-layout.md) |
 
-The current source exposes **91 business REST routes**. Four MCP tools provide access to **92 capabilities** across **13 families**. The central catalog contains 93 entries, with 92 available through the CLI. All three interfaces share the same domain calculations. See [interface boundaries](docs/api-reference.md#24-三端能力边界) for names and request shapes, and [algorithm status](docs/algorithm-status.md) for method versions, source disagreements, and outstanding acceptance work.
+The current source exposes **93 business REST routes**. Four MCP tools provide access to **93 capabilities** across **14 families**. The central catalog contains 93 entries, with 93 available through the CLI. All three interfaces share the same domain calculations. See [interface boundaries](docs/api-reference.md#24-三端能力边界) for names and request shapes, and [algorithm status](docs/algorithm-status.md) for method versions, source disagreements, and outstanding acceptance work.
 
 ## Quick start
 

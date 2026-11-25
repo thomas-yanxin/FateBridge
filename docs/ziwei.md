@@ -54,7 +54,7 @@
 同一批保存的服务结果与 iztro 2.6.5 发布包另比较，2,422／2,440 项相符。三个晚子时样本各有六项差异，涉及流日、流时的干、四化及本命星位连接。两版对这三例的运限落宫、农历日期和岁序一致。FateBridge 的具名 `iztro_2_5_8` 配置从共享日柱、时柱取干，晚子时按次日取日干；2.6.5 的 `dayDivide=current` 使用当日取干。两个口径按版本保留，原典对流日和流时换日的要求仍待裁定。 [iztro 2.6.5 发布记录](https://github.com/SylarLong/iztro/releases/tag/v2.6.5)
 
 ```bash
-uv run --locked --extra dev python -m pytest -n0 tests/ziwei/test_contract_regressions.py tests/ziwei/test_ziwei_horoscope_crosscheck.py tests/ziwei/test_ziwei_twenty_first_iteration.py
+uv run --locked --extra dev python -m pytest -n0 tests/ziwei/test_ziwei_depth_transports.py tests/ziwei/test_ziwei_horoscope_crosscheck.py tests/ziwei/test_ziwei_twenty_first_iteration.py
 uv run --locked --extra dev python -m scripts.ziwei.audit_ziwei_natal --fixtures tests/data/ziwei_independent/natal_factor_grid_v1 --output /tmp/ziwei-natal-factor-grid-audit.json
 ```
 

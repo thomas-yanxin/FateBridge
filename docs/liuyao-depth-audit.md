@@ -115,9 +115,9 @@ uv run --locked --extra dev fatebridge liuyao \
 
 ### 辰月木余气与旬空并见条件
 
-文明书局本卷一第 39 页（PDF 第 59 页）在辰月条写「木虽不旺还有余气」。`month_strength` 将辰月寅、卯的余气单列，月令档仍为 `休囚`，`monthly_supported` 为 `false`。卷二第 23–24 页（PDF 第 93–94 页）分别列日生扶、有气不动和季令真空。辛亥日旬空中的辰月木静爻同时命中前两条时，FateBridge 保留两条事实，按现行条件政策交付 `conflicting_or_unresolved_conditions` 和 `is_true_void=null`。永久空仍待裁。 [影印底本与逐条核对](historical-evidence.md#evidence-20261119-round58-liuyao-month-residual-qi-handoff-md)
+文明书局本卷一第 39 页（PDF 第 59 页）在辰月条写「木虽不旺还有余气」。`month_strength` 将辰月寅、卯的余气单列，月令档仍为 `休囚`，`monthly_supported` 为 `false`。卷二第 23–24 页（PDF 第 93–94 页）分别列日生扶、有气不动和季令真空。辛亥日旬空中的辰月木静爻同时命中前两条时，FateBridge 保留两条事实，按现行条件政策交付 `conflicting_or_unresolved_conditions` 和 `is_true_void=null`。永久空仍待裁。
 
-八个固定请求的两臂各有 24 次公开调用，REST、MCP、CLI 的完整业务在各臂一致，响应 Schema 前后一致。按影印、独立历法与纳支账本核对，144 个余气槽由 117 个相符到全部相符，141 个可裁静气槽由 123 个相符到全部相符。固定分类及可空真空各由 6/18 到 18/18。季令真空标签、未火、丑水、戌金和真实寅化卯对照通过各自原门。总旺衰、应期和古例终空仍有待裁事项。 [固定判据与前后结果](historical-evidence.md#evidence-20261119-round58-liuyao-month-residual-qi-comparison-json)
+八个固定请求的两臂各有 24 次公开调用，REST、MCP、CLI 的完整业务在各臂一致，响应 Schema 前后一致。按影印、独立历法与纳支账本核对，144 个余气槽由 117 个相符到全部相符，141 个可裁静气槽由 123 个相符到全部相符。固定分类及可空真空各由 6/18 到 18/18。季令真空标签、未火、丑水、戌金和真实寅化卯对照通过各自原门。总旺衰、应期和古例终空仍有待裁事项。
 
 三合候选保留成员来源、爻位、明暗动、缺支、日月补支和空破墓条件。内外动变只检查指定两爻及它们的实际变支，不任意拼接本变。三合与飞伏的文字摘要由同次结构化证据生成；既不从支持条目数量推吉凶，也不将 `formation_conditions_matched` 读作已经有效生克。
 
@@ -130,8 +130,17 @@ uv run --locked --extra dev fatebridge liuyao \
 ```bash
 uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_scan_profile --check
 uv run --locked --extra dev python -m scripts.liuyao.audit_liuyao_calendar --output /tmp/liuyao-calendar-v3.json
-uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_scan_depth.py tests/liuyao/test_liuyao_calendar_audit.py tests/liuyao/test_liuyao_transports.py
+uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_scan_depth.py
 ```
+
+上面三条命令需要预先向维护者取得另备的 `tests/fixtures/liuyao_scan_v3/`（原影印、校勘与冻结案例）。检查当前来源准入和接口可运行：
+
+```bash
+uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_calendar_sources.py \
+  tests/liuyao/test_liuyao_clash_transports.py -k 'not real_limited_de441_kernel'
+```
+
+完整的 `test_real_limited_de441_kernel_against_reused_de440_tt_reference` 另需本地冻结资料 `tests/data/astrodice/tables/de441-j2000.eph`。向维护者取得该受限档案，再移除 `-k` 运行；普通文件模式使用[星历安装指南](ephemeris.md)中的来源。
 
 真实模型运行需用户明确授权独立代理后执行下列入口，完成后还须逐条语义审阅原始回答；预先保存案例文件哈希，保留失败和未恢复错误。
 
@@ -159,7 +168,7 @@ uv run --locked --extra dev python scripts/evaluate_agent.py \
 
 ```bash
 uv run --locked --extra dev python -m scripts.liuyao.build_profile role --check
-uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_transports.py
+uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_clash_transports.py
 ```
 
 ## 有根生扶、三墓及冲开条件
@@ -187,7 +196,7 @@ uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_roles.py tests/li
 
 ```bash
 uv run --locked --extra dev python -m scripts.liuyao.build_profile strength --check
-uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_strength.py tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_transports.py
+uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_strength.py tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_clash_transports.py
 uv run --locked --extra dev python -m scripts.liuyao.audit_liuyao_1900 --output /tmp/liuyao-calendar-1900-v5.json
 ```
 
@@ -211,7 +220,7 @@ uv run --locked --extra dev python -m scripts.liuyao.audit_liuyao_1900 --output 
 
 ```bash
 uv run --locked --extra dev python -m scripts.liuyao.build_profile fanfu --check
-uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_fanfu.py tests/liuyao/test_liuyao_transports.py
+uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_fanfu.py tests/liuyao/test_liuyao_clash_transports.py
 ```
 
 ## 空亡、回头克来源及时间层
@@ -252,7 +261,7 @@ uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_fanfu.py tests/li
 
 ```bash
 uv run --locked --extra dev python -m scripts.liuyao.build_profile void --check
-uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_void.py tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_transports.py
+uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_void.py tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_clash_transports.py
 ```
 
 ## 动静对象、弱动克旺静与受克传递
@@ -271,7 +280,7 @@ REST、原生MCP、CLI、部分字段投影、同次完整缓存和快照分别�
 
 ```bash
 uv run --locked --extra dev python -m scripts.liuyao.build_profile control --check
-uv run --locked --extra dev python -m pytest -q tests/liuyao/test_liuyao_control.py tests/liuyao/test_liuyao_control_transports.py
+uv run --locked --extra dev python -m pytest -q tests/liuyao/test_liuyao_control.py tests/liuyao/test_liuyao_hidden_pending_control.py
 ```
 
 ## 固定资料与复现
@@ -284,7 +293,7 @@ uv run --locked --extra dev python -m pytest -q tests/liuyao/test_liuyao_control
 ```bash
 uv run --locked --extra dev python -m scripts.catalogs.build_zhouyi_corpus --check
 uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_sources --check
-uv run --locked --extra dev python -m pytest -q tests/liuyao/test_liuyao_depth.py tests/liuyao/test_liuyao_conditions.py tests/liuyao/test_liuyao_transports.py
+uv run --locked --extra dev python -m pytest -q tests/liuyao/test_liuyao_depth.py tests/liuyao/test_liuyao_conditions.py tests/liuyao/test_liuyao_clash_transports.py
 uv run --locked --extra dev fatebridge liuyao --subject-file docs/examples/liuyao-need-to-song.json --response-char-limit 0
 ```
 
@@ -304,9 +313,9 @@ uv run --locked --extra dev fatebridge liuyao --subject-file docs/examples/liuya
 
 <a id="moving-clash-residual-qi"></a>
 
-文明书局影印本第 59–60 页列出辰木、未火、丑水的月令余气，第 85 页将「有气」列为明动遇冲不散的依据。明动爻现从同一盘的月令结果读取余气。余气影响冲散这一项，日月克、回头冲克和静日破继续按各自条件判断。未火和丑水在此次修复前已有月令余气，两个案例均可独立复现冲散层遗漏。 [原页及条文裁定](historical-evidence.md#evidence-20261119-round58-liuyao-clash-source-adjudication-source-adjudication-md)
+文明书局影印本第 59–60 页列出辰木、未火、丑水的月令余气，第 85 页将「有气」列为明动遇冲不散的依据。明动爻现从同一盘的月令结果读取余气。余气影响冲散这一项，日月克、回头冲克和静日破继续按各自条件判断。未火和丑水在此次修复前已有月令余气，两个案例均可独立复现冲散层遗漏。
 
-八个固定请求每版在 REST、MCP 和 CLI 各执行一次，三端业务逐值一致。主焦点有气从 9/21 到 21/21，冲散状态从 15/24 到 24/24。四个负控盘的业务结果逐值相同；原弱动仍有未决状态。固定对照覆盖所选条文的局部条件，完整旺衰、弱动全局裁定及现实效验仍待独立验收。 [固定门槛及前后比较](historical-evidence.md#evidence-20261119-round58-liuyao-clash-source-adjudication-handoff-md)
+八个固定请求每版在 REST、MCP 和 CLI 各执行一次，三端业务逐值一致。主焦点有气从 9/21 到 21/21，冲散状态从 15/24 到 24/24。四个负控盘的业务结果逐值相同；原弱动仍有未决状态。固定对照覆盖所选条文的局部条件，完整旺衰、弱动全局裁定及现实效验仍待独立验收。
 
 ## 向外生扶与受生条件
 

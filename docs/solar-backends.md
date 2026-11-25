@@ -51,13 +51,13 @@ export FATEBRIDGE_SOLAR_TERM_MODEL=swiss
 
 新路径复用已有 [`de441_source.py`](../src/fatebridge/core/astro/de441_source.py)、[`AnalyticObserver`](../src/fatebridge/core/astro/analytic_observer.py) 和公共日期框架，同一原始网格上的DE441地月质心、地心月球、EMRAT及质心太阳共同提供接收地球和发射太阳。完整地心Fairhead模型将TT映射到TDB，小光行时偏移保持双部精度；相邻本地TT光锥求解与Lorentz光行差作用于同一条光线。Vondrák长周期岁差、标量黄赤交角、完整Simon77项章动及IAU2006偏置沿用具名原生框架。源码入口为 [`de441_solar.py`](../src/fatebridge/core/de441_solar.py)，没有新拟合、逐年补偿或参考交点运行时依赖。
 
-运行时读取从原始 DE441 网格裁出的有界分块，所选系数按原 binary64 字保留。内部回执区分完整 JPL 文件与包内表示，并分别绑定系数清单、原始准备文件、TDB、日期框架和章动。每块系数都有字节校验，内置回退的 `ephemeris_retflags` 为空。 [原始系数与同源状态对照](precision-acceptance.md#原始de441系数的完整保真与同源状态对照r35)
+运行时读取从原始 DE441 网格裁出的有界分块，所选系数按原 binary64 字保留。内部回执区分完整 JPL 文件与包内表示，并分别绑定系数清单、原始准备文件、TDB、日期框架和章动。每块系数都有字节校验，内置回退的 `ephemeris_retflags` 为空。 [原始系数与同源状态对照](precision-acceptance.md#lossless-de441-round35)
 
 早期整数表示的九个控制点由 CALCEPH 5.0.1 和 Swiss 原生 JPL 读取器对照，内置地球和太阳位置与原文件最大差约 0.48 毫米。两个读取器之间最大差约 0.034 毫米，同几何定义下 Swiss 压缩文件与原记录最大差约 761 米。原始 JPL 参考使用已确认返回 `JPLEPH` 旗标的文件配置。 [Swiss 返回旗标说明](https://www.astro.com/swisseph/swephprg.htm#_Toc112949031)
 
 <a id="de441-fallback-source-selection-round58"></a>
 
-`native` 缓存键使用可能回退的包内来源身份。实际选中 DE441 后，计算再读取并校验所用字节。固定缺失和损坏两臂中，Swiss 文件齐备时恢复两张 2000 年年表的 48 个节气和 6 个河洛三端响应，分别与无故障时逐值相同。实际选用 DE441 时，清单、所用分块和 TDB 注入保留原来源拒绝。固定 72 根继续通过原始 JPL 系数经 CALCEPH、Skyfield 和 ERFA 求根的 1 秒 TT、0.001 角秒两项门槛，最大差分别为 40.233 微秒和 `1.64e-6` 角秒。该样本覆盖显式 `native` 及实际消费的 DE441 路径。 [固定前后对照](historical-evidence.md#evidence-20261119-round58-numerology-source-failures-fixed-comparison-json) · [JPL 原作者说明](https://ssd.jpl.nasa.gov/doc/de440_de441.html)
+`native` 缓存键使用可能回退的包内来源身份。实际选中 DE441 后，计算再读取并校验所用字节。固定缺失和损坏两臂中，Swiss 文件齐备时恢复两张 2000 年年表的 48 个节气和 6 个河洛三端响应，分别与无故障时逐值相同。实际选用 DE441 时，清单、所用分块和 TDB 注入保留原来源拒绝。固定 72 根继续通过原始 JPL 系数经 CALCEPH、Skyfield 和 ERFA 求根的 1 秒 TT、0.001 角秒两项门槛，最大差分别为 40.233 微秒和 `1.64e-6` 角秒。该样本覆盖显式 `native` 及实际消费的 DE441 路径。 [JPL 原作者说明](https://ssd.jpl.nasa.gov/doc/de440_de441.html)
 
 [独立参考包](../tests/data/solar_de441_v1/README.md)包含1684—2304年全部14904项及原1200年小寒。维护的生成器独立安装CALCEPH／Skyfield，按每月15日前后30个TT日括区，实际计算原始JPL光行时、引力偏折、光行差和同定义框架；未导入FateBridge，也未用其根作起点。全部事件及控制点的当前源码／安装包正向视黄经最大差约0.000000396角秒，原0.001角秒线全部符合；实际根与独立CALCEPH／Skyfield最大相差一个TT浮点间隔，约40.233微秒。对原生原始JPL的最大差约1.730毫秒，包含其TT数值参数与TDB来源时标处理差异。这不是全连续域或观测证书。
 
@@ -70,7 +70,6 @@ export FATEBRIDGE_SOLAR_TERM_MODEL=swiss
 2026-11-13，最终源码与锁定依赖的新安装包分别完成全部14905项实际年表求根，TT点、模型及返回标志逐值相同；14914项正向角度（完整原队列、九个控制点和1200补充点）也逐值相同。对同一CALCEPH／Skyfield参考，新路径在全部14905项的绝对TT差不大于原生Moshier；后者仍有1909项超过原1秒线，最大约2.643679秒。旧压缩文件参考下1901项原生失败和旧完整修订的16／21项失败按各自原参考保留。
 
 原96与576项DE440参考继续原值复跑，分别零一秒超差，最大约0.087588／0.089800秒；原生Moshier的12／74项失败分别保留。实际ASGI REST、独立CLI和新stdio MCP共462次调用中，源码／安装包业务字段相同，960条TT诊断符合原一秒线；14个新stdio目录均有92个公开工具，168个子进程核对了28个实际载入模块。空目录配置的24个六壬／金口诀案例没有所比判定字段差异，完整／部分Swiss文件配置下原4个跨模型判定差异均保留。完整文件配置原120条TT逐值保持，部分文件配置的4条1799年冬至依赖改用DE441，实际移动约0.250894秒；没有重写原判定或参考。
-
 
 原生文件交点的`ephemeris_library_version`记录实际运行库。内置DE441不发布原生太阳旗标或SDK版本，该字段为null；实际源、光学方法与日期框架在`solar_model_details`分别声明。具名有界模型仍保留`engine_is_approximate`状态；有限数值通过不自动升级成全域物理认证。已有长期服务进程需重新载入当前代码，独立新stdio通过不能证明既有聊天连接已刷新。
 

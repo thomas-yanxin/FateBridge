@@ -28,11 +28,11 @@
 
 2026-11-18的后续实现将节气的数值比较坐标从微秒显示格点移到保留的精确民用点：`SolarTerm.point`由同一个TT反解取得，不从显示标签重建。`utc_key`继续表示显示格点，独立日历fixture仍只有其原标签精度。相邻窗口、立春岁首、十二节月、农历节气上下文和起运名义日差消费同一保留点；`elapsed_days_between`先作精确分数差，再单次转浮点。下表和后文原始有界队列的数值、失败及日期不据此改写。新增数值传播资料见[保留点控制](../tests/data/retained_civil_points_v1.json)，物理交点精度仍需独立星历／观测判据。
 
-同日[第十一批](algorithm-audit-20261117.md#nominal-event-enclosure-continuation)使出生事件的Jie范围成员、游标和名义carry使用实际typed来源，事件按名义微秒floor／ceil外包，原LiQiu显示零宽点纠正为1微秒包络。原两整秒范围的六次三端完整业务相同，原根、六旧context及全部旧probe事实保持；这不证明实际wall进位阈或连续完备。起运details与wall原浮点操作次序仍保持，理想半偶舍入的±1/240输入微秒偏移和当前float误差继续未解决。
+同日[节令主点与名义包络](#固定参考与结果)使出生事件的Jie范围成员、游标和名义carry使用实际typed来源，事件按名义微秒floor／ceil外包，原LiQiu显示零宽点纠正为1微秒包络。原两整秒范围的六次三端完整业务相同，原根、六旧context及全部旧probe事实保持；这不证明实际wall进位阈或连续完备。起运details与wall原浮点操作次序仍保持，理想半偶舍入的±1/240输入微秒偏移和当前float误差继续未解决。
 
-[第十二批](algorithm-audit-20261117.md#round12-rounding-invariants)再将实际wall偏移改为保留名义跨度乘整系数后单次半偶舍入，details旧float显示不变。固定小暑源的四个微秒出生偏移／wall各1微秒误差消除；原198候选中174来源匹配、24前提不匹配全部保留。精确量化在固定source／方向、民用日期／偏移、整年／月cell内满足相邻输入微秒对应偏移±120微秒，从而支持原逆像的−119／121离散wall斜率；原54固定target的两个假零宽括区间消除，跨cell和连续完整性没有因此通过。合法整秒范围请求的六次三端完整业务相同，不把内部微秒反例称为直接整秒出生误差。
+[起运的数值范围](#固定参考与结果)再将实际wall偏移改为保留名义跨度乘整系数后单次半偶舍入，details旧float显示不变。固定小暑源的四个微秒出生偏移／wall各1微秒误差消除；原198候选中174来源匹配、24前提不匹配全部保留。精确量化在固定source／方向、民用日期／偏移、整年／月cell内满足相邻输入微秒对应偏移±120微秒，从而支持原逆像的−119／121离散wall斜率；原54固定target的两个假零宽括区间消除，跨cell和连续完整性没有因此通过。合法整秒范围请求的六次三端完整业务相同，不把内部微秒反例称为直接整秒出生误差。
 
-[第十三批](algorithm-audit-20261117.md#retained-primary-tt-continuation)补全TT主点在共享时钟、离线星历、框架、几何与worker中的传递，原65536原子时刻的主点全部保留源精确值，旧标量仍全部劣于SOFA两部。两部适配初版的16190项较差没有被主点零误差掩盖；改为最近标量加精确残差后，从同一已保存主点重放的65536项表示误差均更小，没有重调65536时钟队列。此项只裁定固定源算式与表示；原UTC历史端点、调整域、UT1、真实钟时和太阳物理未决均保持，详见[精度分层](precision-acceptance.md#retained-primary-tt)。
+[保留的 TT 主点](precision-acceptance.md#retained-primary-tt)补全TT主点在共享时钟、离线星历、框架、几何与worker中的传递，原65536原子时刻的主点全部保留源精确值，旧标量仍全部劣于SOFA两部。两部适配初版的16190项较差没有被主点零误差掩盖；改为最近标量加精确残差后，从同一已保存主点重放的65536项表示误差均更小，没有重调65536时钟队列。此项只裁定固定源算式与表示；原UTC历史端点、调整域、UT1、真实钟时和太阳物理未决均保持，详见[精度分层](precision-acceptance.md#retained-primary-tt)。
 
 [第十五批](precision-acceptance.md#solar-guolao-primary-tt)继续让太阳钟forward及果老实际目标消费主点，UT1逆解只保原IEEE来源。固定原2024立春root不变，六个限定native／有效标签控制的年／节月成员各2/6→6/6；原生LMT至固定1978目标的TT间隔误差约−3.44181微秒→0。秒60回执保持原载体，不移午夜；普通solar calendar及未执行历史日期hint不因此通过。旧200微秒guard、原SDK模型及下表早期队列的资格均不改写。
 
@@ -256,10 +256,9 @@ R34从R33最终1490生产Python／JSON路径零漂移继续，固定六个无太
 
 原六AFTER各一次，全部完整返回。两原成功控制的完整raw字节分别相同，独立递归类型／float.hex比较0差异，无字段排除。给定BEFORE小寒源操作数，C01实际民用差4天、整1年、余1舍弃，首运0002-01-01、十二运末0122-01-01，符合先封独立整数参考；实际生成120行、121个立春边界，模型均swieph，origin1／pillar-year0及唯一derived year0如实交付。这121个新源事件只能作为AFTER实际准入操作数作区间一致性核对，不冒称旧gold或独立天文根。古代UTC／DeltaT／源物理精度及未知农历仍未由此通过。
 
-金口诀上端的独立来源适用域根因见[本轮来源核对](algorithm-audit-20261117.md#source-eligibility-domain-round34)。连续配运profile共享TimingAnalysis的UTC datetime往返另列未观察义务，本轮不复制算法或宣称它已支持该端点；年9999后的生日、上端默认120年序和其他来源域也未由当前六例证明。
+金口诀上端的独立来源适用域根因见[河洛、参评与六壬的来源端点](#retained-domain-carriers-round34)。连续配运profile共享TimingAnalysis的UTC datetime往返另列未观察义务，本轮不复制算法或宣称它已支持该端点；年9999后的生日、上端默认120年序和其他来源域也未由当前六例证明。
 
 共同运行版本为1490路径canonical SHA256 `f3b8962b35d49d8023327874df2048a6f9340f2d7d3cf0aad7861779d060f54f`，领域六例的52资产及全部37配置se1即时前后无漂移，不是原生原子读集。完整证据在外置`fatebridge-audit-20261118-round34/calendar-domain-discovery/`；R33严格EOT B1、原太阳／物理门槛、奇门九义务和传统异文未改判。
-
 
 <a id="continuous-carrier-round35"></a>
 ## 连续配运的合法下端与比较载体（R35）

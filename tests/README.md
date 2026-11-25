@@ -66,10 +66,10 @@ pytest 使用 `importlib` 导入模式，允许不同领域的同名模块一起
 
 原典字面冲突、数值超差和未裁定结果本身也需要回归：测试通过可能只证明这些失败被诚实保留。不得从当前计算输出重新生成期望值、删反例或把固定来源检查改成跳过。当前算法限制见[算法状态](../docs/algorithm-status.md)，验证方法见[计算与预测验收](../docs/prediction-validation.md)。
 
-人类图冻结参考所记录的五份原生成器保存在 `tests/data/human_design_reference_generators_v1/`，从提交 `008b293447e5c8920a26ed782199e166aab46ae3` 的父提交中逐字恢复，并逐份核对原参考中的 SHA-256。它们只供来源校验及核读，不是在该目录运行的维护入口；现行生成器仍在 `scripts/human_design/`。目录迁移仅改变了维护脚本定位仓库根的层级，不能把现行脚本散列冒充原生成时的散列。原 JSON、计划、观测、失败及门槛均保留；这些 JSON 和星历仍是另备的本地资料，不因此进入自包含 CI。
+人类图冻结参考所记录的五份原生成器保存在 `tests/data/human_design_reference_generators_v1/`，用于核对冻结参考原有的来源清单。它们只供来源校验及核读，不是在该目录运行的维护入口；现行生成器仍在 `scripts/human_design/`。目录迁移仅改变了维护脚本定位仓库根的层级，不能把现行脚本散列冒充原生成时的散列。原 JSON、计划、观测、失败及门槛均保留；这些 JSON 和星历仍是另备的本地资料，不因此进入自包含 CI。
 
 梅花天气研究的机械、农历、节气与条件容量核验共用一个脚本入口；其输出文件保护按四种检查和全部原始故障参数化验证。符号可达性直接运行 `meihua/test_meihua_weather_reachability.py`，保留完整288组取数、1440组解释与午时失败，不再重复启动只写同一报告的专用进程。
 
 公共日期框架的 `astronomy/test_reference_frames.py` 读取独立ERFA／Swiss数值参考。`astronomy/test_de441_solar.py` 对独立原始JPL／CALCEPH／Skyfield的完整14905项检查正向黄经，并对上一修订全部16／21项失败的并集及1200补充交点实际调用年表求根，沿用原门槛。旧Moshier专属算术测试随无调用方实现退役，原失败与来源仍保留；有限通过不是全时域或SOTA认证。
 
-无原生引擎时的同源真黄道、赤道与GAST几何由 [western/test_western_offline_frame.py](western/test_western_offline_frame.py) 读取 [固定来源参考](data/offline_frame_v1.json)，进入自包含CI集合。42项源控制和一个公开昼夜反例只核对所选源框架，不能认证远期物理精度；执行状态见[审计记录](../docs/algorithm-audit-20261117.md)。
+无原生引擎时的同源真黄道、赤道与GAST几何由 [western/test_western_offline_frame.py](western/test_western_offline_frame.py) 读取 [固定来源参考](data/offline_frame_v1.json)，进入自包含CI集合。42项源控制和一个公开昼夜反例只核对所选源框架，不能认证远期物理精度；见[离线框架](../docs/western-astrology.md#输入与天文精度)。

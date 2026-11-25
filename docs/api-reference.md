@@ -103,7 +103,7 @@ REST、MCP 和 CLI 只接受现行名称。升级客户端时，从 `/openapi.js
 
 正午起算的提问或候选钟面无效时，`question_datetime` 或 `candidate_datetime` 指向该组日期与小时标签，错误码为 `invalid_clock_origin_datetime`。
 
-REST OpenAPI、`/api/tools` 和 CLI `describe` 发布中央目录的输入与输出 Schema。MCP 用 `describe_capability(detail="full")` 或 `fatebridge://tools/{tool}` 读取单个工具的完整合同。成功结果在字段投影前校验，输出违规属于 `internal_error`，不归责于请求参数。合同覆盖根字段，以及主限命中与坐标、时主递归子限、寿限时间线、古典与关系盘、紫微星曜、六壬四课三传、奇门宫位、太乙核心盘和地方术数条目，以及九类八字专题、宿曜双向关系、知识覆盖/查询与导出模板/分段/动态设置等稳定嵌套事实。动态星体、卦码和规则键保持开放，但已声明的字典值与列表条目会校验；解释文本和未声明扩展继续允许。业务字段可选且允许 null，以兼容 `fields` 投影、既有可空事实与 CLI 全局 `--no-metadata`；完整执行另核对工具声明的必需根字段及完整事实合同；合法投影不能代替完整结果校验。校验不重序列化响应，因此不补默认值、不删除扩展字段、不改写原数值。OpenAPI 的 `operationId` 使用现行操作名，并在启用 REST 密钥时声明实际鉴权要求。合同回归见 [专业嵌套合同测试](../tests/evaluation/test_agentic_nested_outputs.py) 和 [八字专题、宿曜及知识/导出合同测试](../tests/evaluation/test_agentic_domain_outputs.py)。
+REST OpenAPI、`/api/tools` 和 CLI `describe` 发布中央目录的输入与输出 Schema。MCP 用 `describe_capability(detail="full")` 或 `fatebridge://tools/{tool}` 读取单个工具的完整合同。成功结果在字段投影前核对必需的根字段及工具注册的必需事实。启用 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 后，还会校验完整嵌套模型与领域约束。检测到输出合同违规时返回 `internal_error`。合同覆盖根字段，以及主限命中与坐标、时主递归子限、寿限时间线、古典与关系盘、紫微星曜、六壬四课三传、奇门宫位、太乙核心盘和地方术数条目，以及九类八字专题、宿曜双向关系、知识覆盖/查询与导出模板/分段/动态设置等稳定嵌套事实。动态星体、卦码和规则键保持开放。严格模式核对已声明的字典值与列表条目，允许解释文本和未声明扩展。公开 Schema 允许投影省略字段，并保留各字段声明的可空范围。校验读取原响应，不重新序列化，因此保留原数值和扩展字段。OpenAPI 的 `operationId` 使用现行操作名，并在启用 REST 密钥时声明实际鉴权要求。合同回归见 [专业嵌套合同测试](../tests/evaluation/test_agentic_nested_outputs.py) 和 [八字专题、宿曜及知识/导出合同测试](../tests/evaluation/test_agentic_domain_outputs.py)。
 
 ### 2.2 快照协议
 

@@ -1,6 +1,6 @@
 # 公开工具审查优先级
 
-[细粒度算法与职责清单](algorithm-inventory.md) · [实际调用与未决记录](algorithm-audit-20261117.md)
+[细粒度算法与职责清单](algorithm-inventory.md) · [现行范围与未决项](algorithm-status.md)
 
 本表按主要输出职责为当前 92 个公开工具定级，覆盖 13 个工具族与 65 个共享方法合同。P0 有 4 项，P1 有 27 项，P2 有 54 项，P3 有 7 项。现行接口与迁移说明见[接口名称与升级](api-reference.md#接口名称与升级)。
 
