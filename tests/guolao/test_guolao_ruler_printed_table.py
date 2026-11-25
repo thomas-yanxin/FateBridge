@@ -10,9 +10,11 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import guolao_ruler_printed_table as core
+from fatebridge.core.guolao_clock import METHOD_ID as SOLAR_CLOCK_METHOD
 from fatebridge.core.guolao_ruler_calendar import NominalSourceDate as Date
 from fatebridge.core.guolao_ruler_calendar import ruler_calendar_scale
 from fatebridge.validation.guolao_ruler_printed_table import audit_printed_limit_table
+from tests.support.transports import AS_OF, SPECS, inputs, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-ruler-printed-table-v1"
 REFERENCE_DATA = Path(__file__).parents[1] / "data/guolao/ruler_flint_v1"
@@ -23,6 +25,27 @@ RULER_REFERENCE = json.loads(gzip.decompress(BLOB))
 RULER_INPUTS = json.loads((REFERENCE_DATA / "arithmetic-inputs.json").read_text())
 
 
+def test_portable_reference_inputs_and_complete_literal_edition_are_frozen() -> None:
+    for filename, fingerprint in MANIFEST["files"].items():
+        assert (
+            hashlib.sha256((REFERENCE_DATA / filename).read_bytes()).hexdigest()
+            == fingerprint
+        )
+    source = json.loads(core.DATA.read_bytes())
+    assert hashlib.sha256(core.DATA.read_bytes()).hexdigest() == core.REFERENCE_SHA256
+    assert source["source"]["pdf_sha256"] == MANIFEST["source_pdf"]["sha256"]
+    assert len(source["read_views"]) == 14
+    assert sum(len(row["cells"]) for row in source["rows"]) == 210
+    assert RULER_REFERENCE["production_imported"] is False
+    assert RULER_REFERENCE["total_rows"] == MANIFEST["rational_rows"] == 22635
+    assert len(RULER_REFERENCE["cell_rows"]) == MANIFEST["cell_rows"] == 210
+
+
+@pytest.mark.local_data
+@pytest.mark.skipif(
+    not FIXTURE.exists(),
+    reason="Original scan archive is external; portable FLINT and edition checks run separately",
+)
 def test_complete_literal_reading_and_original_scan_freeze_precede_numeric_comparison():
     ref = json.loads((FIXTURE / "reference.json").read_text())
     frozen = json.loads(
@@ -336,6 +359,87 @@ def test_all_literal_and_formula_endpoints_match_independently_parsed_source(gro
         audit["month_day_full_limit_minus_source_duration_days_exact"]
         == expected["monthday_limit_minus_source_duration_days_exact"]
     )
+
+
+@pytest.mark.parametrize(
+    "solar,target_requested", [(False, True), (True, True), (True, False)]
+)
+def test_public_chart_method_clocks_do_not_claim_a_printed_ruler_date_mapping(
+    surface_calls, solar: bool, target_requested: bool
+) -> None:
+    spec = SPECS["astro_guolao"]
+    payload = {**inputs(spec), "use_true_solar_time": solar}
+    if target_requested:
+        payload["analysis_datetime"] = "2026-10-12T10:00:00+08:00"
+    else:
+        pass
+    fields = [
+        "guolao.profile",
+        "guolao.life_palace",
+        "guolao.timing",
+        "guolao.validation",
+        "guolao.rule_trace",
+    ]
+    for selected_fields in (None, fields):
+        projection = {
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+        }
+        if selected_fields is not None:
+            projection["fields"] = selected_fields
+        else:
+            pass
+        http, protocol, code, local = surface_calls(
+            spec, payload, projection=projection, rest_as_of=AS_OF
+        )
+        assert http.status_code == 200, http.text
+        assert not protocol.is_error, protocol.content
+        assert code == 0, local
+        bodies = [
+            {name: value for name, value in body.items() if name != "run_metadata"}
+            for body in (http.json(), protocol.structured_content, local)
+        ]
+        assert bodies[0] == bodies[1] == bodies[2]
+        chart = bodies[0]["guolao"]
+        life = chart["life_palace"]
+        assert life["longitude"] is life["mansion"] is None
+        assert life["degree_status"] == "unresolved_no_ascendant_substitution"
+        assert life["clock_basis"] == (
+            "apparent_solar_display" if solar else "recorded_civil_clock"
+        )
+        assert chart["validation"]["classical_acceptance_passed"] is False
+        assert chart["validation"]["real_world_prediction_status"] == "not_tested"
+        if solar:
+            clock = chart["profile"]["apparent_solar_clock"]
+            assert clock["method_id"] == SOLAR_CLOCK_METHOD
+            assert life["birth_clock"] == clock["display"]
+            assert life["birth_hour_branch"] == clock["birth_hour_branch"]
+            assert clock["classical_clock_mapping_accepted"] is False
+        else:
+            assert chart["profile"].get("apparent_solar_clock") is None
+        timing = chart["timing"]
+        if target_requested:
+            assert timing["status"] == "research_partial"
+            assert timing["analysis_datetime"] == "2026-10-12T02:00:00+00:00"
+            assert timing["calendar_datetime"] == "2026-10-12T10:00:00+08:00"
+            assert timing["calendar_timezone"] == "Asia/Shanghai"
+            assert len(timing["transit_bodies"]) == 11
+            assert (
+                timing["profile"]["position_basis"]
+                == "geocentric_apparent_target_sky_not_symbolic_direction"
+            )
+            assert timing["small_limit"]["placement_classical_acceptance"] is False
+            assert (
+                timing["small_limit"]["source_id"]
+                == "tohoku_luwei_10020000001141"
+            )
+        else:
+            assert timing == {"status": "not_requested"}
+        assert all(
+            trace["source_id"] != "nlc892_411999021002_92845_3150"
+            for trace in chart["rule_trace"]
+        )
 
 
 @pytest.mark.parametrize("row", RULER_REFERENCE["date_only_stress"])

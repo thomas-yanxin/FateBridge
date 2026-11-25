@@ -39,5 +39,24 @@
 `reference.json.gz` 逐字节相同。测试直接读取冻结结果，无需安装FLINT。
 
 ```bash
-uv run --locked --extra dev python -m pytest -q tests/guolao/test_guolao_ruler_printed_table.py -k "frozen_nominal or independently_parsed or independent_extreme"
+uv run --locked --extra dev python -m pytest -q -n 0 tests/guolao/test_guolao_ruler_printed_table.py -k "frozen_nominal or independently_parsed or independent_extreme"
 ```
+
+## 复验本版与日序
+
+2026-11-25从`c63968b5fe11b59e24a37d8aec4bd2c3d87751ed`的独立检出复验。以本目录的冻结录文和原刊SHA选择`nlc3150_literal210_v1`；不改写七处端点差、疾厄首格之后的30名义日空档或三组年率矛盾。日序从本限一年正月初一的零已过日开始，显式年标按印刷阅读顺序继承，不因月号倒退自动进年；末日的全部子日包含在本格内，下一日为不含端点。这里只能核定这份给定录文的名义映射。
+
+在单独临时目录复制`generate_reference.py`、`arithmetic-inputs.json`和`additional-source-reading-frozen.json`，执行下列命令，其中`$ruler_reference_dir`由调用者设为该目录的绝对路径。生成器拒绝覆盖已有结果；参考重建不增加独立样本数，也没有从生产输出生成预期值。
+
+```bash
+uv run --no-project --with python-flint==0.9.0 python -I "$ruler_reference_dir/generate_reference.py"
+cmp tests/data/guolao/ruler_flint_v1/reference.json.gz "$ruler_reference_dir/reference.json.gz"
+```
+
+实测版本为python-flint 0.9.0／FLINT 3.6.0，重建文件逐字节相同。便携测试检查manifest内四个文件的哈希、生产底本哈希和210格规模，再执行22,635项名义日及子日、210格端点和2项日期压力控制。
+
+远端基线没有提交`tests/fixtures/guolao-ruler-printed-table-v1/`及其引用的24,732,787字节PDF。原扫描及冻结过程的既有完整哈希测试保留为`local_data`，仅在完整档案入口不存在时明确跳过；档案存在但有文件缺失或哈希不符仍失败。该跳过不影响本目录的便携算术验收。另对本机只读原档案的18份附件和PDF复核哈希均相符；旧冻结录文、生产源表与FLINT输入的210格字符串逐项相同。没有取得第二见证或完成独立专家校勘，也不将本机档案加入分发。
+
+同一测试模块通过`tests/support/transports.py`，以固定`as_of=2026-10-12T02:00:00Z`调用公开`astro_guolao_chart`的FastAPI POST、FastMCP工具和CLI，分别核完整响应及严格投影。民用钟、真太阳钟、显式目标时刻与未请求目标时刻分别断言；原尺库没有公开入口，也没有被接入出生排盘。公开小限仍使用其具名底本，研究状态、未定命度／命宿及缺少完整大限仍须保留。三端相等只证明交付一致，不证明名义日到出生年龄或真实历日的转换，也不裁定历史钟制与现实预测。
+
+本轮在共享重测试锁内执行完整分配模块（`-n 0`）：58通过、1跳过，920.55秒；跳过项为外部原扫描档案检查，另有一条Pydantic的`request`别名元数据警告。首轮未设外部档案边界的基线实测为1失败、54通过，失败原因是缺少原扫描回执。全仓Black（3,260文件）、isort、mypy（1,154源文件）、`git diff --check`及调用合同`--check`通过，未复跑公共全量测试。`fatebridge doctor --mcp --family bazi`两次依赖检查通过，但stdio握手均为`TimeoutError`，原因未定；未修改诊断超时。本轮没有真实模型或部署验收。
