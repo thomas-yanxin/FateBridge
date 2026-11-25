@@ -45,6 +45,7 @@ from fatebridge.core.metaphysics.seed import (
 )
 from fatebridge.core.metaphysics.taiyi import build_taiyi_board
 from fatebridge.core.metaphysics.taiyi_clock import civil_clock_resolution
+from fatebridge.core.metaphysics.taiyi_shiji import TaiyiShijiProfile
 from fatebridge.core.metaphysics.ziwei import (
     build_ziwei_chart,
     build_ziwei_horoscope,
@@ -619,6 +620,7 @@ def calculate_taiyi_analysis(
     hour_profile: str | None = None,
     month_profile: str | None = None,
     year_profile: str | None = None,
+    shiji_profile: TaiyiShijiProfile | None = None,
     use_true_solar_time: bool = False,
     true_solar_explicit: bool = True,
     selected_sections: list[str] | None = None,
@@ -643,13 +645,12 @@ def calculate_taiyi_analysis(
         hour_profile=hour_profile,
         month_profile=month_profile,
         year_profile=year_profile,
+        shiji_profile=shiji_profile,
     )
     if analysis_utc_offset is not None:
         resolution = civil_clock_resolution(seed, analysis_utc_offset)
         taiyi["calendar_rules"]["civil_clock_resolution"] = resolution
         taiyi["calendar_summary"]["civil_clock_resolution"] = dict(resolution)
-    else:
-        pass
     taiyi["engine"] = "fatebridge-offline"
     snapshot_text = build_taiyi_snapshot_text(seed=seed, taiyi=taiyi)
     snapshot_export = _build_snapshot_export(

@@ -761,6 +761,7 @@ def calculate_suzhan_analysis(
     calendar_day_part: str | None = None,
     textual_pada: int | None = None,
     calendar_basis: str = "chinese_hko_utc08",
+    chart_requested: bool = False,
 ) -> dict[str, Any]:
     """宿占 / 宿盘分析工具。"""
     return build_suzhan_result(
@@ -786,6 +787,7 @@ def calculate_suzhan_analysis(
         calendar_day_part=calendar_day_part,
         textual_pada=textual_pada,
         calendar_basis=calendar_basis,
+        chart_requested=chart_requested,
     )
 
 

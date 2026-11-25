@@ -1062,39 +1062,30 @@
       "cross_chart_relations.groups"
     ],
     "meihua_analysis": [
-      "analysis_context",
+      "analysis_context.analysis_datetime",
+      "analysis_context.timezone",
+      "analysis_context.civil_utc_offset",
+      "analysis_context.civil_instant_utc",
+      "meihua.calendar_policy.day_boundary",
+      "meihua.calendar_policy.true_solar_time_applied",
+      "meihua.calendar_policy.label_precision.status",
       "meihua.base_hexagram.name",
       "meihua.base_hexagram.binary_code",
       "meihua.base_hexagram.symbol",
+      "meihua.mutual_hexagram.name",
+      "meihua.mutual_hexagram.binary_code",
       "meihua.changed_hexagram.name",
       "meihua.changed_hexagram.binary_code",
       "meihua.changed_hexagram.symbol",
-      "meihua.seed",
+      "meihua.seed.moving_line",
       "meihua.body_trigram.name",
       "meihua.use_trigram.name",
       "meihua.body_use_relation",
       "meihua.stage_relations",
       "meihua.ruleset.id",
-      "meihua.ruleset.sources",
       "meihua.ruleset.version",
-      "meihua.calendar_policy.lunar_year",
-      "meihua.calendar_policy.year_boundary",
-      "meihua.calendar_policy.day_boundary",
-      "meihua.calendar_policy.is_leap_month",
-      "meihua.calendar_policy.leap_month_rule",
-      "meihua.calendar_policy.timezone",
-      "meihua.calendar_policy.date_basis",
-      "meihua.calendar_policy.hour_basis",
-      "meihua.calendar_policy.true_solar_time_applied",
-      "meihua.calendar_policy.minute_role",
-      "meihua.calendar_policy.rule_kind",
-      "meihua.calendar_policy.label_precision.status",
-      "meihua.calendar_policy.label_precision.source_scope",
-      "meihua.calendar_policy.label_precision.exact_astronomical_accuracy_established",
-      "meihua.evidence_scope",
-      "interpretation.topic_reading",
+      "interpretation.interpretation_topic",
       "interpretation.classical_text_reference",
-      "interpretation.evidence_scope",
       "summary"
     ],
     "sixyao": [
@@ -1212,7 +1203,11 @@
     ],
     "fengshui_xuankong_natal": [
       "status",
-      "layers.xuankong_natal",
+      "layers.xuankong_natal.status",
+      "layers.xuankong_natal.period_context",
+      "layers.xuankong_natal.orientation_context",
+      "layers.xuankong_natal.candidates",
+      "layers.xuankong_natal.missing_inputs",
       "coverage",
       "rulesets",
       "source_catalog",
@@ -1472,28 +1467,26 @@
       "source_summary"
     ],
     "meihua_cast": [
-      "input_normalized",
-      "meihua.method",
-      "meihua.seed",
-      "meihua.counting_variants",
-      "meihua.ruleset.id",
-      "meihua.ruleset.sources",
-      "meihua.ruleset.version",
-      "meihua.calendar_policy",
-      "meihua.base_hexagram",
-      "meihua.changed_hexagram",
+      "meihua.seed.casting_method",
+      "meihua.calendar_policy.context_status",
+      "meihua.base_hexagram.name",
+      "meihua.base_hexagram.binary_code",
+      "meihua.base_hexagram.symbol",
+      "meihua.mutual_hexagram.name",
+      "meihua.mutual_hexagram.binary_code",
+      "meihua.changed_hexagram.name",
+      "meihua.changed_hexagram.binary_code",
+      "meihua.changed_hexagram.symbol",
+      "meihua.seed.moving_line",
+      "meihua.body_trigram.name",
+      "meihua.use_trigram.name",
+      "meihua.body_use_relation",
       "meihua.stage_relations",
-      "meihua.seasonal_strength",
-      "meihua.evidence_scope",
-      "interpretation.topic_reading",
+      "meihua.ruleset.id",
+      "meihua.ruleset.version",
+      "interpretation.interpretation_topic",
       "interpretation.classical_text_reference",
-      "interpretation.evidence_scope",
-      "interpretation.weather",
-      "summary",
-      "interpretation.casting_readings",
-      "interpretation.casting_comparison",
-      "interpretation.internal_countercontrol",
-      "interpretation.seasonal_qualification"
+      "summary"
     ],
     "astro_horary": [
       "analysis_context",
@@ -1527,6 +1520,11 @@
     ]
   },
   "call_guidance": {
+    "fengshui_xuankong_natal": {
+      "natal_delivery": "普通宅盘用 evidence_views.natal_candidates，先读 period_context、orientation_context、全部 candidates 和 missing_inputs，并保留 rulesets/rule_trace。缺定运或定向资料时交付已知事实与本次待补项；缺磁向用 house.facing_degrees 配 north_reference=magnetic。边界向逐候选说明，按 candidate_id 关联盘式及依据。候选为数组，投影使用整个 candidates。",
+      "natal_details": "格局读每个 candidates[].structure；需要原典数字对照时首轮用 natal_patterns，保留各候选的比对范围与未裁定项。启用 interpretation 后可读 natal_interpretation；当前评价运与历史宅运独立。若 include_calculation_reading=true（启用解释时默认），追加 calculation_reading。若指定 city_gate，追加 layers.xuankong_natal.city_gate_analysis，独立核对其参考运、状态和缺项。",
+      "natal_projection": "同次需要的视图在首轮合并 fields；result_delivery 只保留当次所选字段，分页沿同一 run 读回。兼容原始路径 layers.xuankong_natal.chart 只有唯一候选才有值；完整导出首次 fields=null。"
+    },
     "jinkou": {
       "month_general_scope": "jinkou.overview.month_general是依中气确定的月将本位；yuejiang是月将加时后落在地分的将神，对应四位将神行。两支可不同，解释分别说明，不将落地分的支称为中气月将本位。快照使用月将本位、将神落地分两个标签。",
       "transmission_progression_scope": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。",
@@ -1637,7 +1635,9 @@
       "interpretation": "先解释已有依据，再给条件式建议；照片候选不升级事实，但不等待全部complete或动作ready才解释。analysis_progress.interpretation_status区分available/conditional/scope_only/insufficient_evidence；follow_up.conclusion_candidates只择会改变当前所问结论的缺项追问，execution_only仅用于落实动作。未实现或无规则直接说明，不反复索取资料；计算定宫与宅运校验保留，边界简述一次。",
       "workstation_review": "工位工作/学习用途用 environmental_context.workstation_review.activities，逐项显式选 workstation_activity_authored_v1 并给实际活动/证据；按 placements.location_direction 读取各候选宅盘向星，位置与朝向分开，不要求外部有水或桌上放水。评价运可用该review.evaluation_period独立确认，不以日期/宅运代替。入口隔挡用 entry_barriers 显式 afsi_entry_barrier_v1，分别登记实际入口/桌/隔挡、两端直线与隔挡介入观察及 operation；执行许可和通行/视野/操作/容纳独立。fields追加layout_analysis.workstation_analysis，rulesets/rule_trace保留。WOFS桌面只作reference_only，不开启固定吉位。",
       "material_application": "material_facts.application显式选afsi_application_conditions_v1；有明确element_use才核相应水体清洁/流动、金属暴露/定性尺度或植物健康，各条件用value/observation_basis/evidence独立证据。target_request_id可引用本轮element_adjustments.request_id，只有实际算出的introduced_element才可绑定；资格、条件、目标绑定、实际位置、剂量和效力分开，不因条件确认返回ready。摆位候选须重核已有application的条件和目标，不能换目标或漏旧属性。",
-      "workstation_measured": "有实际尺寸的人工标注用workstation_layout.scene；+y图纸前方、桌面+x右/+y远沿，米制尺寸/高度/眼高/头顶高分别明确。compass独立提供北基准、角误差、参考中心和chart_binding_confirmed，sector_anchor明确坐者或桌中心；不自动立极。照片/坐标误差保持候选，清单不完整时未列观察仍未知。search提供完整有限位置/角度域，复用layout_constraints搬转许可；实测同一对象不重复提交placements/form_observations/features或旧关系。fields按需追加layout_analysis.workstation_layout_analysis；保留全部search.receipts、拒绝与未显示前沿数量，不把ready或Pareto集合解释为风水总分。BTB与wofs_desktop_compass_v1须逐个明确另选；植物身份、状态及几何分别核对，向星不等于坐向或桌面水体需求。 搜索域可用positions或grid二选一；grid明确原点和步长，默认从房间/桌面生成中心候选。竖直屏幕可在items[].screen实测，检查整面透视遮挡，required_visible明确是否硬约束，不推断眩光。算法完工审查读取research_completion_status/research_coverage；请求complete不代表完整81或24山已完成。"
+      "workstation_measured": "有实际尺寸的人工标注用workstation_layout.scene；+y图纸前方、桌面+x右/+y远沿，米制尺寸/高度/眼高/头顶高分别明确。compass独立提供北基准、角误差、参考中心和chart_binding_confirmed，sector_anchor明确坐者或桌中心；不自动立极。照片/坐标误差保持候选，清单不完整时未列观察仍未知。search提供完整有限位置/角度域，复用layout_constraints搬转许可；实测同一对象不重复提交placements/form_observations/features或旧关系。fields按需追加layout_analysis.workstation_layout_analysis；保留全部search.receipts、拒绝与未显示前沿数量，不把ready或Pareto集合解释为风水总分。BTB与wofs_desktop_compass_v1须逐个明确另选；植物身份、状态及几何分别核对，向星不等于坐向或桌面水体需求。 搜索域可用positions或grid二选一；grid明确原点和步长，默认从房间/桌面生成中心候选。竖直屏幕可在items[].screen实测，检查整面透视遮挡，required_visible明确是否硬约束，不推断眩光。算法完工审查读取research_completion_status/research_coverage；请求complete不代表完整81或24山已完成。",
+      "natal_delivery": "询问玄空宅盘时确认已选 xuankong_natal（可用 methods 显式选中）。通用 first_view 用于已执行布局分析；宅盘首读用 evidence_views.natal_candidates 取历史定运、朝向、全部候选、待补事实和来源。缺磁向用 house.facing_degrees 或 xuankong.house.facing_degrees 配同一 house 的 north_reference=magnetic。逐候选按 candidate_id 关联证据；需要格局及原典数字对照时首轮用 natal_patterns。若传 xuankong.city_gate，追加 layers.xuankong_natal.city_gate_analysis，独立核对其参考运、状态和缺项。",
+      "natal_projection": "同次需要的视图在首轮合并 fields；result_delivery 只保留当次所选字段，分页沿同一 run 读回。兼容原始路径 layers.xuankong_natal.chart 只有唯一候选才有值；完整导出首次 fields=null。"
     },
     "western_timing_analysis": {
       "target_clock": "analysis_hour/minute 是目标钟时，按 birth_timezone；显式0有效。省略分别沿用出生小时/分钟，仅兼容日期级调用。return_timezone转换同一时刻。",
@@ -1646,12 +1646,12 @@
       "evidence": "首次按问题选择evidence_views.stage/annual/short_term/career的fields；事业兼阶段与目标时段用career，结合本命职业配置筛选相关hits。默认与其他视图不强制展开全部方法；fields=null仍表示全量。"
     },
     "ziwei_horoscope": {
-      "projection": "普通摘要显式使用 suggested_fields；strict_fields=true 配合 fields=null 仍是全量，不会自动精简。",
-      "scopes": "scopes数组只能整体投影；按本轮粒度解释所需层，不编造scopes.流年或数字索引路径，不默认读取snapshot_export。",
+      "projection": "普通摘要首次用detail=compact并省略fields，返回六层摘要；完整导出首次用detail=audit、fields=null，超限时用原result_id和run_id调用read_result并按next_offset读齐。",
+      "scopes": "专题需要完整宫位映射和四化连接时，用fields=[\"ziwei_horoscope.scopes\"]、strict_fields=true整体投影，取得六层后按scope取所需项。摘要调用省略每层palace_map及mutagen_natal_links；同次分页仅能补读已选结果。投影路径不使用层名或数字索引。",
       "identity": "analysis_context是目标时刻，birth_context是出生回执；scopes.palace_name/natal_palace_name表示运限命宫所临本命宫。其他本层功能宫读取palace_map.scope_palace_name；mutagen_natal_links分别标记natal_palace_name与scope_palace_name，不混淆为同一功能宫。仅功能名旋宫，未包含全部流曜、飞宫体系或事件结论。",
       "target_clock": "target_minute默认0，target_timezone默认Asia/Shanghai，与出生时区独立；目标时刻采用钟表时间。分钟输入不证明分钟级预测。",
       "rules": "本命和运限使用同一rule_profile/version。iztro_2_5_8 1.1.2保留已起限的软件规则；quanshu_v2_excerpt 1.3.2选择闰月、四化、亮度、长生、旬空双支、部分流年星，并采用邻宫起大限和火铃年支定点读法。source_rules视图核对实际差异，岁首、小限年龄基准、闰月斗君和后续流月日时未据此认证；动态四化复用选表仍是软件约定。",
-      "flowing_stars": "流年软件配置返回禄羊陀三项；摘录配置再返回天德、月德、丧门、吊客、白虎、官府，共九项，保留system_id与两种宫位身份。annual_three_sha只给原文明示三支集合，individual_name_positions=null时不自行给奏书/将军/直符逐一配宫，也不借博士同名星填补。",
+      "flowing_stars": "用flowing_stars视图读取已起大限、流年、流月、流日、流时的魁钺昌曲禄羊陀马鸾喜；流年另有年解，摘录配置另列天德、月德、丧门、吊客、白虎、官府。小限和未起或不可定大限省略流曜字段。flowing_star_basis给本层定位所用干支，流月用有效农历月柱，斗君落宫另见scopes.branch。位置公式按iztro 2.5.8同干支核对，历法或起限口径不同时需分别比较。用scope、system_id、rule_id和两种宫名区分同名星。annual_three_sha只给原文明示三支集合，逐名位置为空。",
       "childhood": "childhood视图单列明文一至六岁童限及实际本命星曜。岁序仍按已披露软件规则；后续岁序未唯一解释时留空，不把本命mutagen当童限四化，也不拿童限证明起大限前替代关系。",
       "time_input": "首轮回执time_input_status标记实际校时状态；time_input视图给出原校时过程、时区来源和地点精度。默认缺经度降级、省级代表点或仅按经度假设时区均按实际条件说明；不能把没有计算的均时差当0，也不把派生秒数当出生资料秒精度。 minute_sensitivity保留秒0；只在所选民用时分和偏移仍有效时比较59.999999秒端点。缺上端点时两项跨界标志为空；跨时辰或排盘日期时首轮上下文有time_input_minute_sensitive=true。不得替换原命盘、猜实际出生秒数、将端点当两份出生事实，或把样本误差当全局精度界。",
       "pre_decade": "大限status=not_started表示按所选五行局起岁尚未开始；宫位、宫干、四化为null，palace_map及mutagen_natal_links为空。六层索引保留但该层未计算，不把童限或其本命星曜当大限／童限四化。其他五层照实际结果解释；岁首仍未获原典认证。",
@@ -1659,7 +1659,7 @@
       "civil_offset": "birth_utc_offset与target_utc_offset分别核对出生和目标命名时区，并选择重复钟时；先后按UTC瞬间比较。偏移选择与nominal_age_basis分别记录，不能把太阳标签当成另一实际瞬间。",
       "limit_subperiods": "明刊运限分段首次按需展开limit_subperiods或limit_subperiod_details的fields；视图名不是参数。大限上/下五年依既有虚岁与实际所临十岁区间，不能用年龄末位取余。它不认证原典岁首或星曜应验几何；natal_star_groups只给原文分类与实际本命星对象，南北斗双属仍无唯一分段，小限半年起止未定，不补公历7月1日或农历七月。原文为福邻句未计算，不能只筛吉星；不变更四化、星位或给出事件断言。详尽首调选完整字段，再沿该run分页；索引run不能读回未请求的明细。",
       "calendar_sources": "calendar核时钟与日期，calendar_sources核date_conversion_provenance：lookups逐个连接实际日期、实施provider与印刷参照，implementation_sources保存所用补表原出处。1900参照TAM全年表，最初30日用PMO补表；1901—2100参照HKO，2100年2月9日后使用HKO补表。实施数据不是独立验证，既有历法数值及混合时钟岁序未借来源标记改写。长结果按首次所选fields沿同run分页取齐。 普通日期的实施者是fatebridge_lunardate_adapter_v1，包含上游库表与本系统已登记修正；逐时钟核applied_year_info_correction，按实际农历年取1933/1954/1978等登记，不按公历年份代选。编码是实施证据，不是新的独立历法观测或置信分。",
-      "nominal_age_basis": "岁序默认birth_civil_timezone：两端实际瞬间均换算到出生民用时区，以该区民用日期查农历年，正月初一00:00换岁。先读nominal_age_calendar核对两端年份、方法、参考区及与legacy_mixed_clock的差值；出生安星仍用原排盘钟，流年/月/日/时仍用目标钟，不混称同一历日。legacy_mixed_clock仅显式回放旧算法，旧春节边界仍可能报错。该修复解决混合时钟岁序的一致性，不认证原典岁首或现实预测。 旧公式比较值不是另一份旧口径成功回执。读取legacy_mixed_clock_age时同时核对legacy_comparison_applied、legacy_comparison_is_separate_run和legacy_ordinal_status：默认比较未应用、未另运行；0值标为would_reject_below_one，显式旧口径会拒算。ordinal_at_least_one只核公式下限，不保证完整旧运行成功，不能把比较值0说成旧回执返回0岁。",
+      "nominal_age_basis": "岁序采用birth_civil_timezone：两端实际瞬间均换算到出生民用时区，再以该区民用日期查农历年，正月初一00:00换岁。nominal_age_calendar给出两端计岁钟。target_civil_lunar_year另指目标原民用时区日期的农历年。day_divide统一作用于出生安星和目标流年/月/日/时：current晚子留当日，forward晚子算次日早子。两种分日均沿出生民用时区计岁。原典岁首未认证。",
       "natal_prerequisites": "问起岁、五行局或本命前置推导时，按natal_prerequisites视图首次请求相应fields；完整JSON仍fields=null。natal_prerequisites直接携带本次运限内部已算本命的lunar_date/year_stem/hour_branch/ming_gong/shen_gong/wuxing_ju及三个原rule_trace，separate_birth_run=false，不是另一次ziwei_birth回执。按实际月时→命身→年干和命宫干支→纳音元素/局数说明连接；源文比较仍以给定农历条件为前提，不认证日期转换、甲人语义或古典岁首。出生排盘钟与nominal_age_calendar参考钟、目标流曜钟可不同，不能用计岁或目标年干覆盖此处本命年干；nayin字符串是实算纳音，原文名目比较未做时不能说该名字已校勘。"
     },
     "firdaria": {
@@ -1917,7 +1917,8 @@
       "postheaven_timing": "端法名义应期数见motion_context.postheaven_count_reference：仅observed_trigrams/observed_categories且占者observer_activity明确时，原上下卦先天序数加原时支数一次，以除六前总数按行1/2、坐2、立1作精确比例。奇数取半保留分数，不取动爻余数，不推定主体活动、时间单位、起算时刻、天数、日期或现实观测窗口。已有卦的起法未知，数起卦和年月日时起卦不借用此式。影印二花皆朝夕与转录二日花皆朝夕、待/特及坐句於字差异保留；二日花不能生成通用两日期限。变通规则未自动裁定，完整先天卦气应期与远期合参未实现；天气旧研究、分母、失败和原365日试验不变。",
       "qi_day_timing": "求名/求财且day_qi已知时，topic_reading.qi_day_timing_reference按原章句实际生体/克体角色核时序明列日支，求名另保留无克体条件未全核时的原体参照；不得用原体或变用替代指定角色。坤辰戌丑未月是月限定，日支原子只取未申年月日時中的未/申；这是明列标签相符，不是五行旺衰或全时序条件。其他数字、季节、五行干支条文未解析，原子不符不等于全条件否定；在任及完整内外无克体前提另列。每个取数候选使用自己的角色与日气，23时保留午夜和子初两个输入日界标签，不挑相符者充作预测。topic/topic_audit同时包含day_qi；不搜索最近日期，不生成实际应期、收支、名成、处分或现实窗口；原天气研究失败与未来365日试验不变。",
       "qi_branch_timing": "求名/求财的topic_reading.qi_branch_timing_reference按原章句实际生体/克体角色分列年、月、日、时的明列支标签；各取数候选读自身topic_clause同名子层。年/时只用原seed，年支不以立春年或子初翌日重算。节月支与名义农历月序对应支分列，后者只是固定月序映射，闰月及完整时序含义未唯一裁定；23时日界备选不改原年支。坤辰戌丑未只另属月，未申见于四单位，月的明列支为辰戌丑未申，其他单位为未申。未知标签不补，分歧不挑相符者、不合并计票；数字、五金、土、季节与完整应期另待核，不推天干谓词，不生成最近日期、现实窗口或成败。topic/topic_audit已带原seed、历法口径、季令、日气及候选；原单独日支层仍保留。",
-      "household_chapters": "显式household为家宅章、dwelling为屋舍章，均读topic/topic_audit已发布父字段。以本候选原体为主、初用为家宅或屋舍；不是风水空间评估、房屋检查或选房迁居许可。家宅影印比利与固定转录比和未裁定，source_relation_condition=null，五行相同不能自动套家宅安稳；屋舍體生用保留冷退/转录衰退，不改原字。家宅生体转引人事章按所列四内卦实际生体角色留路径；未见仅限该范围，不当完整内外无生。full_source_generation_condition和完整跨章净结论保持null；原体、互变、受制及旺衰分别保留，不输出住宅安全、实际失盗、资产结果、日期或概率。"
+      "household_chapters": "显式household为家宅章、dwelling为屋舍章，均读topic/topic_audit已发布父字段。以本候选原体为主、初用为家宅或屋舍；不是风水空间评估、房屋检查或选房迁居许可。家宅影印比利与固定转录比和未裁定，source_relation_condition=null，五行相同不能自动套家宅安稳；屋舍體生用保留冷退/转录衰退，不改原字。家宅生体转引人事章按所列四内卦实际生体角色留路径；未见仅限该范围，不当完整内外无生。full_source_generation_condition和完整跨章净结论保持null；原体、互变、受制及旺衰分别保留，不输出住宅安全、实际失盗、资产结果、日期或概率。",
+      "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），启用strict_fields并关闭快照文本。明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。"
     },
     "human_design": {
       "time_policy": "必须提供出生小时、分钟、时区；未知生时不能套默认；人类图使用民用出生瞬间，不作真太阳时重定时。 完整输出的clock_evidence保留实际时标转换、四步DeltaT迭代与UTC显示见证；当前完整释义验收要求这些见证，并纯回放主盘、整盘后端对照、全部实际生时样本及周期标签。见证不认证原生执行、实测UT1或物理精度；旧回执保留当时版本，不补造转换记录。",
@@ -1978,7 +1979,8 @@
       "postheaven_timing": "端法名义应期数见motion_context.postheaven_count_reference：仅observed_trigrams/observed_categories且占者observer_activity明确时，原上下卦先天序数加原时支数一次，以除六前总数按行1/2、坐2、立1作精确比例。奇数取半保留分数，不取动爻余数，不推定主体活动、时间单位、起算时刻、天数、日期或现实观测窗口。已有卦的起法未知，数起卦和年月日时起卦不借用此式。影印二花皆朝夕与转录二日花皆朝夕、待/特及坐句於字差异保留；二日花不能生成通用两日期限。变通规则未自动裁定，完整先天卦气应期与远期合参未实现；天气旧研究、分母、失败和原365日试验不变。",
       "qi_day_timing": "求名/求财且day_qi已知时，topic_reading.qi_day_timing_reference按原章句实际生体/克体角色核时序明列日支，求名另保留无克体条件未全核时的原体参照；不得用原体或变用替代指定角色。坤辰戌丑未月是月限定，日支原子只取未申年月日時中的未/申；这是明列标签相符，不是五行旺衰或全时序条件。其他数字、季节、五行干支条文未解析，原子不符不等于全条件否定；在任及完整内外无克体前提另列。每个取数候选使用自己的角色与日气，23时保留午夜和子初两个输入日界标签，不挑相符者充作预测。topic/topic_audit同时包含day_qi；不搜索最近日期，不生成实际应期、收支、名成、处分或现实窗口；原天气研究失败与未来365日试验不变。",
       "qi_branch_timing": "求名/求财的topic_reading.qi_branch_timing_reference按原章句实际生体/克体角色分列年、月、日、时的明列支标签；各取数候选读自身topic_clause同名子层。年/时只用原seed，年支不以立春年或子初翌日重算。节月支与名义农历月序对应支分列，后者只是固定月序映射，闰月及完整时序含义未唯一裁定；23时日界备选不改原年支。坤辰戌丑未只另属月，未申见于四单位，月的明列支为辰戌丑未申，其他单位为未申。未知标签不补，分歧不挑相符者、不合并计票；数字、五金、土、季节与完整应期另待核，不推天干谓词，不生成最近日期、现实窗口或成败。topic/topic_audit已带原seed、历法口径、季令、日气及候选；原单独日支层仍保留。",
-      "household_chapters": "显式household为家宅章、dwelling为屋舍章，均读topic/topic_audit已发布父字段。以本候选原体为主、初用为家宅或屋舍；不是风水空间评估、房屋检查或选房迁居许可。家宅影印比利与固定转录比和未裁定，source_relation_condition=null，五行相同不能自动套家宅安稳；屋舍體生用保留冷退/转录衰退，不改原字。家宅生体转引人事章按所列四内卦实际生体角色留路径；未见仅限该范围，不当完整内外无生。full_source_generation_condition和完整跨章净结论保持null；原体、互变、受制及旺衰分别保留，不输出住宅安全、实际失盗、资产结果、日期或概率。"
+      "household_chapters": "显式household为家宅章、dwelling为屋舍章，均读topic/topic_audit已发布父字段。以本候选原体为主、初用为家宅或屋舍；不是风水空间评估、房屋检查或选房迁居许可。家宅影印比利与固定转录比和未裁定，source_relation_condition=null，五行相同不能自动套家宅安稳；屋舍體生用保留冷退/转录衰退，不改原字。家宅生体转引人事章按所列四内卦实际生体角色留路径；未见仅限该范围，不当完整内外无生。full_source_generation_condition和完整跨章净结论保持null；原体、互变、受制及旺衰分别保留，不输出住宅安全、实际失盗、资产结果、日期或概率。",
+      "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），启用strict_fields并关闭快照文本。明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。"
     },
     "astro_horary": {
       "interpretation_boundary": "Read the native events, Lilly conditions, and missing conditions in horary.perfection with the actual moon.motion_basis and rule_profile. Treat instantaneous aspects and same-ruler geometry as candidate facts.",
@@ -2040,6 +2042,43 @@
     }
   },
   "evidence_views": {
+    "fengshui_xuankong_natal": {
+      "natal_candidates": {
+        "fields": [
+          "status",
+          "layers.xuankong_natal.status",
+          "layers.xuankong_natal.period_context",
+          "layers.xuankong_natal.orientation_context",
+          "layers.xuankong_natal.candidates",
+          "layers.xuankong_natal.missing_inputs",
+          "rulesets",
+          "rule_trace"
+        ],
+        "scope": "普通宅盘首读。保留实际定运、定向、全部已算候选及待补输入。边界向逐候选交付；唯一候选可交付单盘。无已算盘时保留已确认的事实和缺项。"
+      },
+      "natal_patterns": {
+        "fields": [
+          "status",
+          "layers.xuankong_natal.status",
+          "layers.xuankong_natal.period_context",
+          "layers.xuankong_natal.orientation_context",
+          "layers.xuankong_natal.candidates",
+          "layers.xuankong_natal.missing_inputs",
+          "layers.xuankong_natal.source_comparison",
+          "rulesets",
+          "rule_trace"
+        ],
+        "scope": "用 candidate_id 关联每盘 structure 与原典数字对照。保留格局适用条件、差异及未裁定范围。缺定运或定向时对照可为 not_computed。"
+      },
+      "natal_interpretation": {
+        "fields": [
+          "layers.xuankong_natal.interpretation",
+          "rulesets",
+          "rule_trace"
+        ],
+        "scope": "仅在传入 interpretation 时使用。逐候选读五行、当令及外局条件，保留未知、待确认与规则未覆盖的解释。"
+      }
+    },
     "heluo": {
       "line_conditions": {
         "purpose": "按实际先后天元堂核二五位、众宗及主本阴元堂阳应爻有援式，保留同阶段应位和阴阳事实；不把通用相应、偶数爻位或未中原句合成十体总评。",
@@ -3307,6 +3346,23 @@
           "current_hexagram",
           "liuyao_evidence.conditional_analysis.void_conditions.focus",
           "liuyao_evidence.conditional_analysis.penalty_conditions.focus"
+        ]
+      },
+      "void_conditions_overview": {
+        "when": "无明确用爻时，查六条明爻和实际伏神的原旬旬空与空／不空条件，核对原文疑义及使用范围。保留问事近远、总旺衰未决的条件，不代选用爻。超出响应预算时，按 result_delivery 读取同一 run 的证据。",
+        "fields": [
+          "current_hexagram",
+          "input_normalized.event_horizon",
+          "lines",
+          "liuyao_evidence.calendar_conventions.month_branch",
+          "liuyao_evidence.calendar_conventions.day_ganzhi",
+          "liuyao_evidence.calendar_conventions.xunkong",
+          "liuyao_evidence.conditional_analysis.void_conditions.lines",
+          "liuyao_evidence.conditional_analysis.void_conditions.hidden",
+          "liuyao_evidence.conditional_analysis.void_conditions.textual_issues",
+          "liuyao_evidence.conditional_analysis.void_conditions.horizon_status",
+          "liuyao_evidence.conditional_analysis.void_conditions.scope",
+          "liuyao_evidence.conditional_analysis.penalty_conditions.lines"
         ]
       }
     },
@@ -6690,6 +6746,39 @@
           "interpretation.seasonal_qualification",
           "interpretation.casting_readings"
         ]
+      },
+      "general": {
+        "purpose": "首轮读取本互变、实际动爻经文及原体用生克。",
+        "when": "interpretation_topic=general（默认）。明确选天时占用weather，明确选人事题篇用topic。",
+        "fields": [
+          "analysis_context.analysis_datetime",
+          "analysis_context.timezone",
+          "analysis_context.civil_utc_offset",
+          "analysis_context.civil_instant_utc",
+          "meihua.calendar_policy.day_boundary",
+          "meihua.calendar_policy.true_solar_time_applied",
+          "meihua.calendar_policy.label_precision.status",
+          "meihua.base_hexagram.name",
+          "meihua.base_hexagram.binary_code",
+          "meihua.base_hexagram.symbol",
+          "meihua.mutual_hexagram.name",
+          "meihua.mutual_hexagram.binary_code",
+          "meihua.changed_hexagram.name",
+          "meihua.changed_hexagram.binary_code",
+          "meihua.changed_hexagram.symbol",
+          "meihua.seed.moving_line",
+          "meihua.body_trigram.name",
+          "meihua.use_trigram.name",
+          "meihua.body_use_relation",
+          "meihua.stage_relations",
+          "meihua.ruleset.id",
+          "meihua.ruleset.version",
+          "interpretation.interpretation_topic",
+          "interpretation.classical_text_reference",
+          "summary"
+        ],
+        "strict_fields": true,
+        "include_snapshot_text": false
       }
     },
     "liureng_gods": {
@@ -7533,7 +7622,7 @@
         ]
       },
       "calendar": {
-        "purpose": "核对钟表／真太阳排盘／UTC+08参考日期及显式偏移；此视图保留既有时钟证据，换算实施来源和印刷日期参照另用calendar_sources。原典时钟、混合年界岁序未认证。",
+        "purpose": "核对民用时刻、真太阳钟、晚子分日后的实际排盘标签及UTC+08参考日期。换算实现与印刷日期参照另读calendar_sources。原典时钟未认证。",
         "fields": [
           "analysis_context",
           "ziwei_birth.ruleset.id",
@@ -7542,7 +7631,11 @@
           "ziwei_birth.calendar_basis.placement_clock",
           "ziwei_birth.calendar_basis.placement_datetime",
           "ziwei_birth.calendar_basis.civil_datetime",
+          "ziwei_birth.calendar_basis.civil_instant_utc",
+          "ziwei_birth.calendar_basis.apparent_solar_datetime",
           "ziwei_birth.calendar_basis.timezone",
+          "ziwei_birth.calendar_basis.day_divide",
+          "ziwei_birth.calendar_basis.late_zi_rollover_applied",
           "ziwei_birth.calendar_basis.date_shift_days",
           "ziwei_birth.calendar_basis.placement_lunar_date",
           "ziwei_birth.calendar_basis.civil_date_lunar_date",
@@ -7559,6 +7652,12 @@
           "ziwei_birth.calendar_rules",
           "ziwei_birth.lunar_date",
           "ziwei_birth.hour_branch"
+        ]
+      },
+      "year_branch_cycles": {
+        "purpose": "按出生排盘农历年支读取岁前与将前十二神的完整地支序列、各自起点及软件来源。与同名本命辅星和博士标记分开。",
+        "fields": [
+          "ziwei_birth.calendar_cycles.year_branch_cycles"
         ]
       },
       "cycle_sources": {
@@ -7608,6 +7707,12 @@
           "ziwei_birth.ming_textual_properties.unresolved_relational_definitions"
         ]
       },
+      "palace_sihua": {
+        "purpose": "按化名和目标星反查十二宫宫干四化，复用所选生年四化表。逐组列出全部发出宫和本命候选星位；星位为空表示未定位，发出宫内有同星落点则记自化。生年与运限标记独立。",
+        "fields": [
+          "ziwei_birth.palace_sihua_relations"
+        ]
+      },
       "sihua_source": {
         "purpose": "核对实际四化表身份、原页比较与是否显式应用；运限的各层实际四化另读同run scopes，运限复用未获原典认证。",
         "fields": [
@@ -7638,6 +7743,13 @@
           "analysis_context",
           "ziwei_birth.ruleset",
           "ziwei_birth.ming_structural_conditions"
+        ]
+      },
+      "named_patterns": {
+        "purpose": "核对选定明刊格表的必要、附加与阻断条件及实际星位。昌曲夹命列独立几何，条文及未决条件定义见 ziwei_rules 的同名证据视图。",
+        "fields": [
+          "ziwei_birth.ruleset",
+          "ziwei_birth.named_patterns"
         ]
       },
       "calendar_sources": {
@@ -8463,9 +8575,54 @@
           "interpretation.seasonal_qualification",
           "interpretation.casting_readings"
         ]
+      },
+      "general": {
+        "purpose": "首轮读取本互变、实际动爻经文及原体用生克。",
+        "when": "interpretation_topic=general（默认）。明确选天时占用weather，明确选人事题篇用topic。",
+        "fields": [
+          "meihua.seed.casting_method",
+          "meihua.calendar_policy.context_status",
+          "meihua.base_hexagram.name",
+          "meihua.base_hexagram.binary_code",
+          "meihua.base_hexagram.symbol",
+          "meihua.mutual_hexagram.name",
+          "meihua.mutual_hexagram.binary_code",
+          "meihua.changed_hexagram.name",
+          "meihua.changed_hexagram.binary_code",
+          "meihua.changed_hexagram.symbol",
+          "meihua.seed.moving_line",
+          "meihua.body_trigram.name",
+          "meihua.use_trigram.name",
+          "meihua.body_use_relation",
+          "meihua.stage_relations",
+          "meihua.ruleset.id",
+          "meihua.ruleset.version",
+          "interpretation.interpretation_topic",
+          "interpretation.classical_text_reference",
+          "summary"
+        ],
+        "strict_fields": true,
+        "include_snapshot_text": false
       }
     },
     "ziwei_horoscope": {
+      "year_branch_cycles": {
+        "purpose": "按目标排盘农历年支读取流年岁前与将前十二神的完整地支序列、各自起点及软件来源。与既有流年附星、运限宫位名称分开。",
+        "fields": [
+          "ziwei_horoscope.annual_cycles"
+        ]
+      },
+      "flowing_stars": {
+        "purpose": "核对各层流曜、实际定位干支、规则来源、两种宫位身份及摘录年度附加星。",
+        "fields": [
+          "analysis_context",
+          "birth_context",
+          "ziwei_horoscope.ruleset",
+          "ziwei_horoscope.scopes"
+        ],
+        "strict_fields": true,
+        "include_snapshot_text": false
+      },
       "source_rules": {
         "purpose": "核对所选大限首宫、给定岁序的小限及正常生月斗君，并区分火铃年支定点读法与软件生时推进；不认证整书、年龄岁首或全部流月日时规则。",
         "fields": [
@@ -8478,7 +8635,7 @@
         ]
       },
       "calendar": {
-        "purpose": "核对原有出生安星、目标流曜、UTC+08参考时钟及岁序公式；同区岁序两端和旧规则差值另读age_calendar，实施来源另读calendar_sources，原典校时未认证。",
+        "purpose": "核对出生与目标的民用时刻、真太阳钟、晚子分日后的实际排盘标签及UTC+08参考日期。同区计岁钟与岁序另读age_calendar，换算实施来源另读calendar_sources。原典校时未认证。",
         "fields": [
           "analysis_context",
           "birth_context",
@@ -8488,7 +8645,11 @@
           "ziwei_horoscope.calendar_basis.birth.placement_clock",
           "ziwei_horoscope.calendar_basis.birth.placement_datetime",
           "ziwei_horoscope.calendar_basis.birth.civil_datetime",
+          "ziwei_horoscope.calendar_basis.birth.civil_instant_utc",
+          "ziwei_horoscope.calendar_basis.birth.apparent_solar_datetime",
           "ziwei_horoscope.calendar_basis.birth.timezone",
+          "ziwei_horoscope.calendar_basis.birth.day_divide",
+          "ziwei_horoscope.calendar_basis.birth.late_zi_rollover_applied",
           "ziwei_horoscope.calendar_basis.birth.date_shift_days",
           "ziwei_horoscope.calendar_basis.birth.placement_lunar_date",
           "ziwei_horoscope.calendar_basis.birth.civil_date_lunar_date",
@@ -8506,7 +8667,11 @@
           "ziwei_horoscope.calendar_basis.target.placement_clock",
           "ziwei_horoscope.calendar_basis.target.placement_datetime",
           "ziwei_horoscope.calendar_basis.target.civil_datetime",
+          "ziwei_horoscope.calendar_basis.target.civil_instant_utc",
+          "ziwei_horoscope.calendar_basis.target.apparent_solar_datetime",
           "ziwei_horoscope.calendar_basis.target.timezone",
+          "ziwei_horoscope.calendar_basis.target.day_divide",
+          "ziwei_horoscope.calendar_basis.target.late_zi_rollover_applied",
           "ziwei_horoscope.calendar_basis.target.date_shift_days",
           "ziwei_horoscope.calendar_basis.target.placement_lunar_date",
           "ziwei_horoscope.calendar_basis.target.civil_date_lunar_date",
@@ -8602,6 +8767,13 @@
           "ziwei_horoscope.ming_limit_subperiods"
         ]
       },
+      "named_pattern_limits": {
+        "purpose": "核对目标农历年、大小限索引与本命禄存天马同宫条件，保留风云际会原文未定处。",
+        "fields": [
+          "ziwei_horoscope.ruleset",
+          "ziwei_horoscope.named_pattern_limit_evidence"
+        ]
+      },
       "calendar_sources": {
         "purpose": "逐个排盘、钟表和UTC+08参考日期核实际库表／补表来源及分别发布的印刷见证；1900年参照TAM，紫台仅是所用一月补表，不把实现输入冒充独立验证或古典校时认证。",
         "fields": [
@@ -8622,7 +8794,7 @@
         ]
       },
       "age_calendar": {
-        "purpose": "核对同区岁序与旧混合时钟差异；出生安星及目标流曜仍各用已声明时钟，未认证原典岁首。",
+        "purpose": "核对出生民用时区内的两端计岁钟、农历年和实际岁序，并与出生排盘年、目标原民用日期的农历年区分。原典岁首未认证。",
         "fields": [
           "ziwei_horoscope.nominal_age",
           "ziwei_horoscope.nominal_age_calendar",
@@ -8901,6 +9073,10 @@
           "rule_catalogue.sihua_source_comparison",
           "focused_rules"
         ]
+      },
+      "named_patterns": {
+        "purpose": "按图号读取选定格表条文、条件角色、采用口径与明刊书影和转录身份。",
+        "fields": ["rule_catalogue.named_patterns"]
       }
     },
     "astro_election": {
@@ -9129,6 +9305,41 @@
           "rule_trace"
         ],
         "scope": "Requires explicit workstation_layout.search. Preserve every finite-search receipt and rejection, frontier IDs and display omissions. Read deferred evidence from the same run; ready only describes geometry and action permissions, not universal auspiciousness."
+      },
+      "natal_candidates": {
+        "fields": [
+          "status",
+          "layers.xuankong_natal.status",
+          "layers.xuankong_natal.period_context",
+          "layers.xuankong_natal.orientation_context",
+          "layers.xuankong_natal.candidates",
+          "layers.xuankong_natal.missing_inputs",
+          "rulesets",
+          "rule_trace"
+        ],
+        "scope": "仅在已选 xuankong_natal 层时使用。按该层状态交付已知定运、定向、全部候选及待补事实；综合状态还可能反映其他已选层。"
+      },
+      "natal_patterns": {
+        "fields": [
+          "status",
+          "layers.xuankong_natal.status",
+          "layers.xuankong_natal.period_context",
+          "layers.xuankong_natal.orientation_context",
+          "layers.xuankong_natal.candidates",
+          "layers.xuankong_natal.missing_inputs",
+          "layers.xuankong_natal.source_comparison",
+          "rulesets",
+          "rule_trace"
+        ],
+        "scope": "仅在已选 xuankong_natal 层时使用。用 candidate_id 关联每盘 structure 与原典数字对照，保留格局适用条件、差异及未裁定范围。缺定运或定向时对照可为 not_computed。"
+      },
+      "natal_interpretation": {
+        "fields": [
+          "layers.xuankong_natal.interpretation",
+          "rulesets",
+          "rule_trace"
+        ],
+        "scope": "需已选 xuankong_natal 层并传入 xuankong.interpretation。逐候选读五行、当令、外局与选定床门的条件，保留未知、待确认与规则未覆盖的解释。"
       }
     }
   }

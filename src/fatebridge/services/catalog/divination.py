@@ -264,7 +264,7 @@ SPECS: list[ToolSpec] = [
         bind=raw_invoke(calculate_suzhan_analysis),
         request_model=SuZhanRequest,
         summary=(
-            "宿占：农历二十七宿、七曜及T1299事项条文；钟时可未知，保留历法候选；星图和天文28宿需已知钟时及完整经纬度，默认采用现代视赤经不等宽研究宿界；"
+            "宿占：按日期计算农历二十七宿、七曜及T1299事项条文；已知钟时可确定宿主历日，缺钟时保留历法候选。星图和天文28宿需提供钟时及完整经纬度，默认采用现代视赤经不等宽研究宿界。"
             "解读已有占星骰面用 interpret_astrology_dice，中式起卦用 liuyao 或 meihua_time_cast。"
         ),
         operation_label_zh="宿占",

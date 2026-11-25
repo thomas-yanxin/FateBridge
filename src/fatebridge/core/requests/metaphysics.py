@@ -10,6 +10,7 @@ from fatebridge.core.metaphysics.jinkou_year_fate import confirmed_natal_branch
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
 from fatebridge.core.metaphysics.taiyi_hour import TaiyiHourProfile
 from fatebridge.core.metaphysics.taiyi_month import TaiyiMonthProfile
+from fatebridge.core.metaphysics.taiyi_shiji import TaiyiShijiProfile
 from fatebridge.core.metaphysics.taiyi_year_calendar import TaiyiYearProfile
 from fatebridge.core.requests.base import _DeferredModel
 from fatebridge.core.requests.birth import FateBridgeRequest
@@ -18,8 +19,13 @@ from fatebridge.core.ziwei.ziwei_rulesets import (
     DEFAULT_ZIWEI_DAY_DIVIDE,
     DEFAULT_ZIWEI_PROFILE,
     ZiweiDayDivide,
+    ZiweiNatalLeapMonthPolicy,
     ZiweiRuleProfile,
     ZiweiSihuaSource,
+)
+from fatebridge.core.ziwei.ziwei_tables import (
+    BRIGHTNESS_SOURCE_DESCRIPTION,
+    ZiweiBrightnessSource,
 )
 
 
@@ -35,9 +41,16 @@ class ZiweiBirthRequest(FateBridgeRequest):
         default=DEFAULT_ZIWEI_PROFILE,
         description="紫微规则：iztro_2_5_8 保留软件口径；quanshu_v2_excerpt 1.3.2 选择闰月、四化、亮度、长生、旬空双支、部分流年星，以及邻宫起大限、火铃年支定点读法；另用sihua_source显式选四化表，非全书认证。",
     )
+    natal_leap_month_policy: ZiweiNatalLeapMonthPolicy | None = Field(
+        default=None,
+        description="本命闰月安星月序：split_at_day_15（初一至十五沿用同名月序，十六日起后移一月）、all_current_month（全月原位）、all_next_month（全月后移）。保留出生农历年、日、闰月标记；闰十二月后移为本年安星月序13。省略按rule_profile：iztro分半，摘录全月后移。",
+    )
     sihua_source: ZiweiSihuaSource = Field(
         default="rule_profile",
         description="四化表：rule_profile沿用基础配置；naj_ming_v1显式取明刊卷三原页（庚日武同相、壬梁紫府武）。只选四化表，不代表整部原典获认证。",
+    )
+    brightness_source: ZiweiBrightnessSource = Field(
+        default="rule_profile", description=BRIGHTNESS_SOURCE_DESCRIPTION
     )
     day_divide: ZiweiDayDivide = Field(
         default=DEFAULT_ZIWEI_DAY_DIVIDE,
@@ -83,9 +96,16 @@ class ZiweiHoroscopeRequest(FateBridgeRequest):
         default=DEFAULT_ZIWEI_PROFILE,
         description="与本命盘共用的版本化紫微规则；quanshu_v2_excerpt 1.3.2 首大限从父母或兄弟起，火铃按年支定点读法；仍是部分摘录配置。",
     )
+    natal_leap_month_policy: ZiweiNatalLeapMonthPolicy | None = Field(
+        default=None,
+        description="出生前置及斗君使用的本命闰月月序：split_at_day_15（初一至十五原位，十六日起后移）、all_current_month（全月原位）、all_next_month（全月后移）。省略按rule_profile；目标流月仍固定按十五日分段。",
+    )
     sihua_source: ZiweiSihuaSource = Field(
         default="rule_profile",
         description="本命与可用运限层共用所选四化表；naj_ming_v1取明刊原页。运限按宫干／时间干复用仍为软件约定，不据此认证古典运限法。",
+    )
+    brightness_source: ZiweiBrightnessSource = Field(
+        default="rule_profile", description=BRIGHTNESS_SOURCE_DESCRIPTION
     )
     day_divide: ZiweiDayDivide = Field(
         default=DEFAULT_ZIWEI_DAY_DIVIDE,
@@ -107,6 +127,9 @@ class ZiweiRulesRequest(_DeferredModel):
     sihua_source: ZiweiSihuaSource = Field(
         default="rule_profile",
         description="要查询的实际四化表；naj_ming_v1为明刊卷三原页，不改变基础安星配置。",
+    )
+    brightness_source: ZiweiBrightnessSource = Field(
+        default="rule_profile", description=BRIGHTNESS_SOURCE_DESCRIPTION
     )
     day_divide: ZiweiDayDivide = Field(
         default=DEFAULT_ZIWEI_DAY_DIVIDE,
@@ -306,6 +329,14 @@ class TaiyiAnalysisRequest(_DeferredModel):
     year_profile: TaiyiYearProfile | None = Field(
         default=None,
         description="仅year：省略或jinjing_year_lunar_civil_v1保留通用现代农历岁首；jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502年闰四月及未决闰五月／六月候选。两者范围外均拒绝。输入仍用推算公历和明确时区；非全部古历、并立王朝异历或原典岁首裁定，不按吉凶择法。",
+    )
+    shiji_profile: TaiyiShijiProfile | None = Field(
+        default=None,
+        description=(
+            "始击来源。默认 jinjing_vol2_rotation_v1 按《金镜》卷二推演。"
+            "jinjing_vol3_table_v1 对阴遁37、43、44局采用卷三表列始击并按卷二重算客算。"
+            "jinjing_vol3_table_literal_v1 对这三局采用卷三表列始击和客算。"
+        ),
     )
     analysis_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="Analysis longitude"

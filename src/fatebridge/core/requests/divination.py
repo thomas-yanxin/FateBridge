@@ -287,16 +287,16 @@ class SuZhanRequest(AstroHouseValidatorMixin, _DeferredModel):
     )
     time: str | None = Field(
         default=None,
-        description="已确认的当地钟时；已知时须同时提供完整经纬度以计算星图。未知时省略或null，保留历法日期／半日候选，不计算星图、宫位或瞬时天文宿位，不补00:00或示例钟时。空字符串无效。",
+        description="已确认的当地钟时，用于按宿主时区定位历日。提供钟时和完整经纬度时计算星图。钟时未知时可省略，保留历法日期或半日候选。空字符串无效。",
     )
     zone: str | None = Field(default="+08:00", description="Timezone spec")
     lat: str | None = Field(
         default=None,
-        description="已知钟时须明确纬度；文本或十进制度，gps_lat优先；未知钟时不用于历法层",
+        description="星图所需纬度，与经度成对提供。接受文本或十进制度，gps_lat优先且0有效。",
     )
     lon: str | None = Field(
         default=None,
-        description="已知钟时须明确经度；文本或十进制度，gps_lon优先；未知钟时不用于历法层",
+        description="星图所需经度，与纬度成对提供。接受文本或十进制度，gps_lon优先且0有效。",
     )
     gps_lat: float | None = Field(default=None, description="GPS latitude")
     gps_lon: float | None = Field(default=None, description="GPS longitude")
@@ -325,6 +325,23 @@ class SuZhanRequest(AstroHouseValidatorMixin, _DeferredModel):
         default=0,
         description="Offline zodiac selector; standard suzhan supports 0=tropical and 1=sidereal(Lahiri-like)",
     )
+
+    @property
+    def chart_requested(self) -> bool:
+        chart_fields = {
+            "szchart",
+            "szshape",
+            "house_start_mode",
+            "hsys",
+            "zodiacal",
+            "mansion_method",
+        }
+        return bool(chart_fields & self.model_fields_set) or (
+            "doubing_su28" in self.model_fields_set and self.doubing_su28
+        )
+
+    def service_inputs(self) -> dict[str, object]:
+        return {**self.model_dump(), "chart_requested": self.chart_requested}
 
     @model_validator(mode="after")
     def day_part_requires_hinoo(self) -> "SuZhanRequest":
@@ -672,7 +689,7 @@ class SanShiUnitedRequest(_DeferredModel):
     )
     taiyi_options: dict[str, Any] = Field(
         default_factory=dict,
-        description="太乙calculation_mode=year/month/day/hour，默认year；仅year可设year_profile=jinjing_year_historical_table_v1选381—385晋历主表，或jinjing_year_qiliang_table_v1选501—505齐梁史历表并保留502年闰标分歧；范围外拒绝，其他两术古历不因而认证；默认年计仍为通用现代农历。仅month可设month_profile=jinjing_month_jie_360_v1（默认金镜）/key_month_tianzheng_jie_v1（金钥匙天地二正，现代节月适配，门数分歧及三门未知保留）；day为金钥匙冬至前甲子积日、所选钟面零时换日，附十精及异数；仅hour可设hour_profile=jinjing_hour_solstice_v1（默认现代至点置一）或key_hour_winter_jiazi_v1（金钥匙完整积时/时支合神/四门，三门主体未决）。仅接受calculation_mode及所选计法对应的year_profile/month_profile/hour_profile；阴阳遁与布盘方向由实际计法和日期决定。日计古历日期仍未复原，不按吉凶择法。",
+        description="太乙calculation_mode=year/month/day/hour，默认year；仅year可设year_profile=jinjing_year_historical_table_v1选381—385晋历主表，或jinjing_year_qiliang_table_v1选501—505齐梁史历表并保留502年闰标分歧；范围外拒绝，其他两术古历不因而认证；默认年计仍为通用现代农历。仅month可设month_profile=jinjing_month_jie_360_v1（默认金镜）/key_month_tianzheng_jie_v1（金钥匙天地二正，现代节月适配，门数分歧及三门未知保留）；day为金钥匙冬至前甲子积日、所选钟面零时换日，附十精及异数；仅hour可设hour_profile=jinjing_hour_solstice_v1（默认现代至点置一）或key_hour_winter_jiazi_v1（金钥匙完整积时/时支合神/四门，三门主体未决）。shiji_profile 可选《金镜》卷二推演、卷三表列始击并重算客算、或卷三表列始击与客算。接受 calculation_mode、shiji_profile 及对应计法的 year_profile、month_profile、hour_profile。阴阳遁与布盘方向由实际计法和日期决定。日计古历日期仍未复原，不按吉凶择法。",
     )
     selected_sections: list[str] = Field(
         default_factory=list,

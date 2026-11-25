@@ -136,6 +136,8 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                         "options",
                         "house_system",
                         "sihua_source",
+                        "brightness_source",
+                        "day_divide",
                         "node_mode",
                         "apparent_model",
                     }

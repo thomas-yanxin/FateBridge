@@ -87,11 +87,24 @@ def _compact_ziwei_horoscope(result: ServiceResult) -> ServiceResult:
     return {
         **result,
         "ziwei_horoscope": {
-            **horoscope,
+            **{
+                key: value for key, value in horoscope.items() if key != "annual_cycles"
+            },
             "scopes": [
                 {key: value for key, value in scope.items() if key in fields}
                 for scope in horoscope["scopes"]
             ],
+        },
+    }
+
+
+def _compact_ziwei_rules(result: ServiceResult) -> ServiceResult:
+    return {
+        **result,
+        "rule_catalogue": {
+            key: value
+            for key, value in result["rule_catalogue"].items()
+            if key != "named_patterns"
         },
     }
 
@@ -107,6 +120,7 @@ SPECS: list[ToolSpec] = [
         cpu_bound=True,
         rest_path="/api/ziwei/birth-chart",
         mcp_name="ziwei_birth_chart",
+        optional_snapshot=True,
     ),
     ToolSpec(
         key="ziwei_horoscope",
@@ -118,6 +132,7 @@ SPECS: list[ToolSpec] = [
         cpu_bound=True,
         rest_path="/api/ziwei/timing",
         mcp_name="ziwei_timing",
+        optional_snapshot=True,
         compact_view=_compact_ziwei_horoscope,
     ),
     ToolSpec(
@@ -132,6 +147,8 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         rest_path="/api/ziwei/rules",
         mcp_name="ziwei_rules",
+        optional_snapshot=True,
+        compact_view=_compact_ziwei_rules,
     ),
     ToolSpec(
         key="liureng_gods",

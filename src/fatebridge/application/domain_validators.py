@@ -30,6 +30,7 @@ from fatebridge.core.requests.divination import (
     CanpingRequest,
     HeluoRequest,
     MeihuaAnalysisRequest,
+    SuZhanRequest,
 )
 from fatebridge.core.requests.reference import (
     KnowledgeReadRequest,
@@ -79,6 +80,7 @@ def validate_suzhan_clock(
     request: BaseModel | None,
     _validated: BaseModel | None,
 ) -> None:
+    assert request is None or isinstance(request, SuZhanRequest)
     try:
         require_clock_input_binding(result, request=request)
     except ValueError as exc:

@@ -152,10 +152,9 @@ def test_zero_gps_coordinates_drive_the_actual_chart_on_every_transport(
 @pytest.mark.parametrize(
     "coordinates",
     [
-        {},
         {"lat": "31n13"},
         {"lon": "121e28"},
-        {"lat": None, "lon": None},
+        {"hsys": 8},
         {"lat": "", "lon": "121e28"},
         {"lat": "31n13", "lon": " "},
         {"gps_lat": 0},
@@ -197,6 +196,26 @@ def test_timed_suzhan_accepts_mixed_explicit_coordinate_sources(
         output["params"]["birthLatitude"] == output["params"]["birthLongitude"] == 0
         for output in outputs
     )
+
+
+@pytest.mark.parametrize("coordinates", [{}, {"lat": None, "lon": None}])
+def test_timed_suzhan_keeps_calendar_clock_without_coordinates(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    coordinates: dict[str, None],
+) -> None:
+    response, code, protocol, outputs = invoke(
+        "suzhan",
+        {"date": "2026-10-20", "time": "12:00", "zone": "UTC", **coordinates},
+        monkeypatch,
+        capsys,
+    )
+    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    for output in outputs:
+        assert output["chart"] is output["astronomy"] is None
+        assert output["params"]["calculationMode"] == "calendar_with_clock"
+        assert output["params"]["birthTimeImputed"] is False
+        assert output["params"]["coordinatesApplied"] is False
 
 
 @pytest.mark.parametrize("unknown_time", [{}, {"time": None, "lat": None, "lon": None}])
