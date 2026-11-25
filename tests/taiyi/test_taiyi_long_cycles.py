@@ -3,6 +3,8 @@
 import hashlib
 import json
 import shutil
+import subprocess
+import sys
 
 import pytest
 from pydantic import ValidationError
@@ -17,6 +19,7 @@ from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from scripts.taiyi.audit_taiyi_long_cycles import CORPUS, audit
 from scripts.taiyi.build_taiyi_long_cycle_reference import TARGET, render
+from tests.support.transports import AS_OF, SPECS, three_surfaces
 
 TABLE = json.loads((CORPUS / "four-spirit-cases.json").read_text())
 WORKED = json.loads((CORPUS / "worked-cases.json").read_text())
@@ -52,6 +55,11 @@ def test_all_raw_failures_remain_in_audit_and_source_collation():
     assert (result["source_rows"], result["source_columns"]) == (60, 12)
     assert (result["checked_fields"], result["matching_fields"]) == (720, 687)
     assert result["classical_acceptance_passed"] is False
+    walking = result["integer_walker"]
+    assert walking["accumulation_range"] == [1, 540]
+    assert walking["checked_marker_pairs"] == walking["matching_marker_pairs"] == 2160
+    assert walking["repeated_table_checked_fields"] == 2160
+    assert walking["repeated_table_matching_fields"] == 2061
     assert all(r["passed"] for r in result["worked_examples"])
     assert {k: v["matching"] for k, v in result["by_star"].items()} == {
         "sishen": 180,
@@ -94,6 +102,144 @@ def test_frozen_audit_rejects_removed_cases_or_changed_primary_sources(
     manifest_path.write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="60|12"):
         audit(copy)
+
+
+@pytest.mark.parametrize(
+    "attempt", ["drop_scan", "drop_worked", "drop_field", "revise_table"]
+)
+def test_audit_uses_selected_corpus_and_preserves_original_denominators(
+    tmp_path, attempt
+):
+    corpus = tmp_path / "corpus"
+    shutil.copytree(CORPUS, corpus)
+    manifest_path = corpus / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    if attempt == "drop_scan":
+        manifest["source_files"] = [
+            entry
+            for entry in manifest["source_files"]
+            if entry["file"] != "cadal06056495-page23.jpg"
+        ]
+    else:
+        path = corpus / (
+            "four-spirit-cases.json"
+            if attempt == "revise_table"
+            else "worked-cases.json"
+        )
+        cases = json.loads(path.read_text())
+        if attempt == "drop_worked":
+            cases.pop()
+        elif attempt == "drop_field":
+            cases[0]["expected"]["wufu"].pop("year_in_palace")
+        else:
+            cases["rows"][0]["expected"]["sishen.upper"] = "2"
+        path.write_text(json.dumps(cases))
+        for entry in manifest["source_files"]:
+            if entry["file"] == path.name:
+                entry["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    manifest_path.write_text(json.dumps(manifest))
+    if attempt == "revise_table":
+        result = audit(corpus)
+        assert result["matching_fields"] == 686
+        assert result["integer_walker"]["repeated_table_matching_fields"] == 2058
+        added = next(
+            entry
+            for entry in result["disagreements"]
+            if entry["field"] == "sishen.upper"
+        )
+        assert added["status"] == "uncollected_table_reading_not_facsimile_confirmed"
+    else:
+        with pytest.raises(ValueError, match="来源记录|9个|24个"):
+            audit(corpus)
+
+
+def test_disputed_cell_spans_retain_the_printed_header_and_raw_readings():
+    locations = json.loads((CORPUS / "page-locations.json").read_text())
+    assert locations["header_order"] == TABLE["columns"]
+    collation = json.loads((CORPUS / "collation.json").read_text())
+    covered = []
+    for span in locations["disputed_row_spans"]:
+        assert (
+            TABLE["rows"][span["first_year_index"] - 1]["ganzhi"]
+            == span["first_ganzhi"]
+        )
+        assert (
+            TABLE["rows"][span["last_year_index"] - 1]["ganzhi"] == span["last_ganzhi"]
+        )
+        for page in (span["row_start_page"], span["last_row_cell_page"]):
+            assert (CORPUS / f"cadal06056495-page{page}.jpg").is_file()
+        for row_index in range(span["first_year_index"], span["last_year_index"] + 1):
+            original = collation["disputed_cells"][row_index - 28]
+            assert original["facsimile_page"] == span["row_start_page"]
+            covered.append(row_index)
+    assert covered == list(range(28, 61))
+    cell_pages = {
+        entry["year_index"]: entry["source_cell_page"]
+        for entry in audit()["disagreements"]
+    }
+    assert cell_pages[30] == 23
+    assert cell_pages[31] == cell_pages[32] == 24
+    assert cell_pages[59] == cell_pages[60] == 31
+
+
+def test_audit_command_really_executes_and_reports_unresolved_acceptance(tmp_path):
+    output = tmp_path / "audit.json"
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "scripts.taiyi.audit_taiyi_long_cycles",
+            "--output",
+            str(output),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 1, completed.stderr
+    report = json.loads(output.read_text())
+    assert (report["checked_fields"], report["matching_fields"]) == (720, 687)
+    assert len(report["disagreements"]) == 33
+
+
+@pytest.mark.parametrize(
+    "year,position,printed,disagrees",
+    [(1950, "9", "9", False), (1951, "绛", "1", True)],
+)
+@pytest.mark.parametrize("fields", [[], ["taiyi.long_cycles"]])
+def test_named_long_cycle_facts_on_three_real_surfaces(
+    year, position, printed, disagrees, fields, tmp_path, monkeypatch, capsys
+):
+    payload = {
+        "analysis_year": year,
+        "analysis_month": 4,
+        "analysis_day": 4,
+        "analysis_hour": 12,
+        "analysis_timezone": "Asia/Shanghai",
+        "calculation_mode": "year",
+        "use_true_solar_time": False,
+    }
+    response = three_surfaces(
+        SPECS["taiyi"], payload, fields, AS_OF, tmp_path, monkeypatch, capsys
+    )
+    cycles = response["taiyi"]["long_cycles"]
+    assert cycles["year"] == year and cycles["time_granularity"] == "year"
+    zhifu = cycles["records"]["zhifu"]
+    assert (
+        zhifu["position"],
+        zhifu["table_position"],
+        zhifu["table_disagreement"],
+    ) == (position, printed, disagrees)
+    assert zhifu["table_yuan"] == "middle"
+    assert zhifu["source_reference"].endswith(".djvu?page=15")
+    assert "33格分歧未裁定" in zhifu["source_edition"]
+    diyi = cycles["records"]["diyi"]
+    assert diyi["accumulation"] == 3361 + year - 724
+    assert diyi["source_method"] == "siku_table_corroborated_by_ming_prose"
+    assert diyi["source_reference"].endswith("#page=74")
+    assert "未替换积年" in diyi["source_edition"]
+    assert cycles["ruleset"]["classical_acceptance_passed"] is False
+    assert cycles["unresolved"]
 
 
 def test_packaged_original_reference_is_generated_without_domain_recalculation():

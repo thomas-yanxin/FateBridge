@@ -1,0 +1,2 @@
+# Preserve the frozen upstream HTML bytes, including its original whitespace.
+vol05.html -whitespace

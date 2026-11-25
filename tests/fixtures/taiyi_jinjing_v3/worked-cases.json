@@ -1,0 +1,129 @@
+[
+  {
+    "id": "five-fu-724",
+    "year": 724,
+    "expected": {
+      "wufu": {
+        "palace": "艮",
+        "year_in_palace": 11,
+        "accumulation": 13331
+      }
+    },
+    "source": "vol05.txt#推五福太乙法",
+    "oracle_kind": "explicit_classical_worked_result"
+  },
+  {
+    "id": "junji-915-miao-2019",
+    "year": 915,
+    "expected": {
+      "junji": {
+        "palace": "子",
+        "year_in_palace": 22,
+        "accumulation": 285202,
+        "cycle_year": 82
+      }
+    },
+    "source": "https://www.lhp.sdu.edu.cn/__local/3/FB/9D/4B8E48F090D37A9A92FEFE5F735_279BE8FA_4F736B.pdf#page=104",
+    "oracle_kind": "independent_published_historical_reconstruction",
+    "author": "苗润博",
+    "title": "被改写的政治时间：再论契丹开国年代问题",
+    "publication": "文史哲，2019年第6期，99页，PDF第104图"
+  },
+  {
+    "id": "epochs-724",
+    "year": 724,
+    "expected_accumulations": {
+      "junji": 285011,
+      "chenji": 285011,
+      "minji": 285011,
+      "wufu": 13331,
+      "dayou": 13331,
+      "dayou_tianmu": 13331,
+      "xiaoyou": 3361,
+      "sishen": 3361,
+      "tianyi": 3361,
+      "diyi": 3361,
+      "zhifu": 3361
+    },
+    "source": "vol05.txt#推積年法；推五福太乙法；推大遊太乙入紀年及天目法；推小遊太乙積年法",
+    "oracle_kind": "explicit_classical_epoch_values"
+  },
+  {
+    "id": "ncl-xiaoyou-904",
+    "year": 904,
+    "expected": {
+      "xiaoyou": {
+        "palace_number": 6
+      }
+    },
+    "source": "ncl06604-page72.jpg",
+    "source_context": "天祐元年甲子，小游入六宫；版本中的帝号另有问题，本例只核给定纪年的数学宫位。",
+    "oracle_kind": "explicit_historical_position_in_independent_ming_manuscript",
+    "scope": "只核原文年度与宫位；不移植原文政治灾祥叙事，也不认证现实预测。"
+  },
+  {
+    "id": "ncl-sishen-907",
+    "year": 907,
+    "expected": {
+      "sishen": {
+        "palace_number": 6
+      }
+    },
+    "source": "ncl06604-page73.jpg",
+    "source_context": "天祐四年丁卯，四神入六宫。",
+    "oracle_kind": "explicit_historical_position_in_independent_ming_manuscript",
+    "scope": "只核原文年度与宫位；不移植原文政治灾祥叙事，也不认证现实预测。"
+  },
+  {
+    "id": "ncl-tianyi-622",
+    "year": 622,
+    "expected": {
+      "tianyi": {
+        "palace": "玉堂"
+      }
+    },
+    "source": "ncl06604-page73.jpg",
+    "source_context": "唐高祖武德五年壬午，天乙入玉堂。",
+    "oracle_kind": "explicit_historical_position_in_independent_ming_manuscript",
+    "scope": "只核原文年度与宫位；不移植原文政治灾祥叙事，也不认证现实预测。"
+  },
+  {
+    "id": "ncl-dayou-930",
+    "year": 930,
+    "expected": {
+      "dayou": {
+        "palace_number": 7
+      }
+    },
+    "source": "ncl06604-page71.jpg",
+    "source_context": "后唐明宗长兴元年庚寅，大游入七宫；此例能区分大游288年整周的处理。",
+    "oracle_kind": "explicit_historical_position_in_independent_ming_manuscript",
+    "scope": "只核原文年度与宫位；不移植原文政治灾祥叙事，也不认证现实预测。"
+  },
+  {
+    "id": "ncl-diyi-934",
+    "year": 934,
+    "expected": {
+      "diyi": {
+        "palace": "明堂"
+      }
+    },
+    "source": "ncl06604-page74.jpg",
+    "source_context": "后唐闵帝应顺元年甲午，地乙明堂。",
+    "oracle_kind": "explicit_historical_position_in_independent_ming_manuscript",
+    "scope": "只核原文年度与宫位；不移植原文政治灾祥叙事，也不认证现实预测。"
+  },
+  {
+    "id": "ncl-zhifu-976",
+    "year": 976,
+    "expected": {
+      "zhifu": {
+        "palace_number": 9
+      }
+    },
+    "source": "ncl06604-page74.jpg",
+    "source_context": "宋太祖开宝九年丙子，直符入九宫。",
+    "oracle_kind": "explicit_historical_position_in_independent_ming_manuscript",
+    "scope": "只核原文年度与宫位；不移植原文政治灾祥叙事，也不认证现实预测。"
+  }
+]

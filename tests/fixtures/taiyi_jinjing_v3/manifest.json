@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "scope": "卷五十神年度巡行核心；三元五纪原表60行12列共720项，独立古例与现代学术算例",
+  "oracle_origin": "原典表格与指定课例人工转录；不由生产算法生成预期值",
+  "source_files": [
+    {
+      "file": "cadal06056495-page12.jpg",
+      "sha256": "c68a5c5d4333d34b74971df9f6ee2aad26e775347f85f71c36130264f8b5f69f",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page12-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page13.jpg",
+      "sha256": "fd6156a2d28ae20672cacdf1c8cf6c8e0c663c98313953b00efdde48c06d8ab9",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page13-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page15.jpg",
+      "sha256": "a1306f91880403e03b523098fb5b958a2df21e76fb781b6f5c36f9710498f245",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page15-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page16.jpg",
+      "sha256": "bc09c89e69b192155f2b843da0f85c657ea602e4858694c5766434c9da1f7af3",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page16-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page23.jpg",
+      "sha256": "180475feb822475182e9734ef091a17e2ba26b49dda2fee5eef6c1bb008fd344",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page23-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page24.jpg",
+      "sha256": "fb01e211d3c339fa8817937c8fae00653c9a0e344ac66b00b462182424bbc095",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page24-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page25.jpg",
+      "sha256": "f9b10ac77743e193498928a6de4680a85a34888cbc5727cfd89db628b208d27b",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page25-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page26.jpg",
+      "sha256": "145a89afe77b70bc023afa2600ec1d178c585d68cf05162e241b90a26912af4f",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page26-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page27.jpg",
+      "sha256": "93641749528ab542f6c39f15e7ed3bb9d4a9f41dbccd24d957281e871b4da55f",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page27-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page28.jpg",
+      "sha256": "d8db0016546c5eef4c21bdbf511ce22f7e3f0ae4cb4393d06f72664a4d79d8dd",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page28-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page29.jpg",
+      "sha256": "5526c7ed9ed09f1defa00a775f9eb3f36516c801429027f4a08ef0af238d470e",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page29-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page30.jpg",
+      "sha256": "5dfdc805006f424aac59e9f627411775a8a01aa7b1bf79f4cb7bc905b2b69162",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page30-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page31.jpg",
+      "sha256": "f13b28209dc91afae0819c49233af1bfc5ceedb4926814f8c406890475ff5b86",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page31-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page4.jpg",
+      "sha256": "d54c2599b10beced1eb8a73fda3400bdfe1c63ab843f257da8d355ae1a9b8650",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page4-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page5.jpg",
+      "sha256": "e4cffe320baf72afd568c5a65e41e5297d9f0e6a562e0239df556bbe8e4e2588",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page5-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page7.jpg",
+      "sha256": "a11fcb626f219791d67db716f22270e046740afe3031d7ab2aee556e9d58618e",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page7-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "cadal06056495-page8.jpg",
+      "sha256": "706477011d71749816da79c66fe224394a7385c4404d9f25daf2a12805fc1760",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu/page8-960px-CADAL06056495_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93%C2%B7%E5%8D%B7%E4%BA%94~%E5%8D%B7%E5%8D%81.djvu.jpg"
+    },
+    {
+      "file": "collation.json",
+      "sha256": "632219ec635c763d27c85b29950aff684554be975db1c9ac08a57f0e30a1b3dc",
+      "kind": "classical_source_or_collation"
+    },
+    {
+      "file": "four-spirit-cases.json",
+      "sha256": "02942f892c02223cce282ca956b19b6e06c2327b4b317d393af996f0cdaa3619",
+      "kind": "manual_frozen_expectations"
+    },
+    {
+      "file": "vol05.html",
+      "sha256": "b2dddea1fd4ffc644c09733402996b21fc61ff41d39155c73eb42e56fbe2fde2",
+      "kind": "classical_source_or_collation"
+    },
+    {
+      "file": "vol05.txt",
+      "sha256": "b8583bb743f17b90825907ee92cc671cd39b048a196e86588b36a509ce94490e",
+      "kind": "classical_source_or_collation"
+    },
+    {
+      "file": "worked-cases.json",
+      "sha256": "fee323e581c7120414788a87e507f003fc1c238e4f2706e7183b15f8bb22618d",
+      "kind": "manual_frozen_expectations"
+    },
+    {
+      "file": "ncl06604-page71.jpg",
+      "sha256": "3ac6b3bad73ea631a922bc4d51493f678ac6b5f9c1c2185f2ff473dde83f145c",
+      "source_catalog": "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf",
+      "kind": "NCL-06604明钞本的正文和年度宫位算例补证"
+    },
+    {
+      "file": "ncl06604-page72.jpg",
+      "sha256": "42480e27285abcb0832931c1bb739d9c213975eff38105b1de2160498b3f67ab",
+      "source_catalog": "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf",
+      "kind": "NCL-06604明钞本的正文和年度宫位算例补证"
+    },
+    {
+      "file": "ncl06604-page73.jpg",
+      "sha256": "500c877cfad03f94bda34bec9d9dbbbd87a0b3afcd1d1ac37759c98c2cee0b76",
+      "source_catalog": "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf",
+      "kind": "NCL-06604明钞本的正文和年度宫位算例补证"
+    },
+    {
+      "file": "ncl06604-page74.jpg",
+      "sha256": "4e64d7f1284359abbc61deb5e598cdb74b4c6d819e1051a69dc31841e7b2dbf8",
+      "source_catalog": "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf",
+      "kind": "NCL-06604明钞本的正文和年度宫位算例补证"
+    },
+    {
+      "file": "page-locations.json",
+      "sha256": "bad2034df2cd7341a09acb20af8b92640246766c37844f934ba2b8bce4aeb279",
+      "kind": "header_and_disputed_cell_page_spans"
+    }
+  ],
+  "redistribution": {
+    "scans": "Public domain originals and mechanical scans; Commons PD-old and NCL PD-scan. Catalogs identified below, checked 2026-11-25.",
+    "wikisource": "vol05.html and vol05.txt retain the linked Wikisource transcription and attribution under CC BY-SA. No modern article PDF is redistributed; worked cases contain only cited factual values."
+  },
+  "classical_url": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷05",
+  "facsimile_catalog": "https://commons.wikimedia.org/wiki/File:CADAL06056495_太乙金鏡式經·卷五~卷十.djvu",
+  "independent_reference": {
+    "author": "苗润博",
+    "title": "被改写的政治时间：再论契丹开国年代问题",
+    "journal": "文史哲",
+    "year": 2019,
+    "issue": 6,
+    "page": 99,
+    "pdf_page_one_based": 104,
+    "url": "https://www.lhp.sdu.edu.cn/__local/3/FB/9D/4B8E48F090D37A9A92FEFE5F735_279BE8FA_4F736B.pdf",
+    "scope": "只取915年君基数学推步的事实数值，不把政治史论述当现实预测验证。"
+  },
+  "known_disagreements": 33,
+  "completion_claim": false
+}

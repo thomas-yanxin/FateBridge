@@ -1,0 +1,27 @@
+{
+  "status": "append_only_cell_locator_clarification_not_rule_adjudication",
+  "source": "CADAL06056495",
+  "page_unit": "one_based_djvu_image",
+  "header_page": 16,
+  "prose_page": 15,
+  "field": "zhifu.middle",
+  "header_order": ["sishen.upper", "sishen.middle", "sishen.lower", "tianyi.upper", "tianyi.middle", "tianyi.lower", "diyi.upper", "diyi.middle", "diyi.lower", "zhifu.upper", "zhifu.middle", "zhifu.lower"],
+  "layout": "Each year occupies two vertical columns. Read the first nine cells downward in the right column, then the remaining three at the top of its left column. The middle zhifu cell is the second cell of that continuation column. The last row on images 23 through 30 continues on the next image; image 31 contains both columns of year 60.",
+  "disputed_row_spans": [
+    {"first_year_index": 28, "last_year_index": 31, "row_start_page": 23, "last_row_cell_page": 24, "first_ganzhi": "辛卯", "last_ganzhi": "甲午"},
+    {"first_year_index": 32, "last_year_index": 35, "row_start_page": 24, "last_row_cell_page": 25, "first_ganzhi": "乙未", "last_ganzhi": "戊戌"},
+    {"first_year_index": 36, "last_year_index": 39, "row_start_page": 25, "last_row_cell_page": 26, "first_ganzhi": "己亥", "last_ganzhi": "壬寅"},
+    {"first_year_index": 40, "last_year_index": 43, "row_start_page": 26, "last_row_cell_page": 27, "first_ganzhi": "癸卯", "last_ganzhi": "丙午"},
+    {"first_year_index": 44, "last_year_index": 47, "row_start_page": 27, "last_row_cell_page": 28, "first_ganzhi": "丁未", "last_ganzhi": "庚戌"},
+    {"first_year_index": 48, "last_year_index": 51, "row_start_page": 28, "last_row_cell_page": 29, "first_ganzhi": "辛亥", "last_ganzhi": "甲寅"},
+    {"first_year_index": 52, "last_year_index": 55, "row_start_page": 29, "last_row_cell_page": 30, "first_ganzhi": "乙卯", "last_ganzhi": "戊午"},
+    {"first_year_index": 56, "last_year_index": 59, "row_start_page": 30, "last_row_cell_page": 31, "first_ganzhi": "己未", "last_ganzhi": "壬戌"},
+    {"first_year_index": 60, "last_year_index": 60, "row_start_page": 31, "last_row_cell_page": 31, "first_ganzhi": "癸亥", "last_ganzhi": "癸亥"}
+  ],
+  "edition_comparison": {
+    "siku": "Image 15 states origin five and three years per palace; image 16 supplies the shared header. The 33 frozen middle-yuan readings remain different from continuous progression.",
+    "ming_ncl06604": "Image 74 independently states origin five, three years per palace, nine palaces followed by three extra palaces, and gives 976 CE at palace nine. These prose and worked observations do not collate a second 720-cell table or settle the Siku middle column.",
+    "wikisource": "vol05.html and vol05.txt are a transcription of the Siku edition, not a third independent edition."
+  },
+  "original_collation": "collation.json remains unchanged. Its facsimile_page is the row-start locator; this addition identifies the continuation-cell image explicitly, including eight page boundaries."
+}

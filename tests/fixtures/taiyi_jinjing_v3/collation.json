@@ -1,0 +1,414 @@
+{
+  "disputed_cells": [
+    {
+      "year_index": 28,
+      "ganzhi": "辛卯",
+      "field": "zhifu.middle",
+      "reading": "1",
+      "facsimile_page": 23,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        23,
+        24
+      ]
+    },
+    {
+      "year_index": 29,
+      "ganzhi": "壬辰",
+      "field": "zhifu.middle",
+      "reading": "1",
+      "facsimile_page": 23,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        23,
+        24
+      ]
+    },
+    {
+      "year_index": 30,
+      "ganzhi": "癸巳",
+      "field": "zhifu.middle",
+      "reading": "1",
+      "facsimile_page": 23,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        23,
+        24
+      ]
+    },
+    {
+      "year_index": 31,
+      "ganzhi": "甲午",
+      "field": "zhifu.middle",
+      "reading": "2",
+      "facsimile_page": 23,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        23,
+        24
+      ]
+    },
+    {
+      "year_index": 32,
+      "ganzhi": "乙未",
+      "field": "zhifu.middle",
+      "reading": "2",
+      "facsimile_page": 24,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        23,
+        25
+      ]
+    },
+    {
+      "year_index": 33,
+      "ganzhi": "丙申",
+      "field": "zhifu.middle",
+      "reading": "2",
+      "facsimile_page": 24,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        23,
+        25
+      ]
+    },
+    {
+      "year_index": 34,
+      "ganzhi": "丁酉",
+      "field": "zhifu.middle",
+      "reading": "3",
+      "facsimile_page": 24,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        23,
+        25
+      ]
+    },
+    {
+      "year_index": 35,
+      "ganzhi": "戊戌",
+      "field": "zhifu.middle",
+      "reading": "3",
+      "facsimile_page": 24,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        23,
+        25
+      ]
+    },
+    {
+      "year_index": 36,
+      "ganzhi": "己亥",
+      "field": "zhifu.middle",
+      "reading": "3",
+      "facsimile_page": 25,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        24,
+        26
+      ]
+    },
+    {
+      "year_index": 37,
+      "ganzhi": "庚子",
+      "field": "zhifu.middle",
+      "reading": "4",
+      "facsimile_page": 25,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        24,
+        26
+      ]
+    },
+    {
+      "year_index": 38,
+      "ganzhi": "辛丑",
+      "field": "zhifu.middle",
+      "reading": "4",
+      "facsimile_page": 25,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        24,
+        26
+      ]
+    },
+    {
+      "year_index": 39,
+      "ganzhi": "壬寅",
+      "field": "zhifu.middle",
+      "reading": "4",
+      "facsimile_page": 25,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        24,
+        26
+      ]
+    },
+    {
+      "year_index": 40,
+      "ganzhi": "癸卯",
+      "field": "zhifu.middle",
+      "reading": "5",
+      "facsimile_page": 26,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        25,
+        27
+      ]
+    },
+    {
+      "year_index": 41,
+      "ganzhi": "甲辰",
+      "field": "zhifu.middle",
+      "reading": "5",
+      "facsimile_page": 26,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        25,
+        27
+      ]
+    },
+    {
+      "year_index": 42,
+      "ganzhi": "乙巳",
+      "field": "zhifu.middle",
+      "reading": "5",
+      "facsimile_page": 26,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        25,
+        27
+      ]
+    },
+    {
+      "year_index": 43,
+      "ganzhi": "丙午",
+      "field": "zhifu.middle",
+      "reading": "6",
+      "facsimile_page": 26,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        25,
+        27
+      ]
+    },
+    {
+      "year_index": 44,
+      "ganzhi": "丁未",
+      "field": "zhifu.middle",
+      "reading": "6",
+      "facsimile_page": 27,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        26,
+        28
+      ]
+    },
+    {
+      "year_index": 45,
+      "ganzhi": "戊申",
+      "field": "zhifu.middle",
+      "reading": "6",
+      "facsimile_page": 27,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        26,
+        28
+      ]
+    },
+    {
+      "year_index": 46,
+      "ganzhi": "己酉",
+      "field": "zhifu.middle",
+      "reading": "7",
+      "facsimile_page": 27,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        26,
+        28
+      ]
+    },
+    {
+      "year_index": 47,
+      "ganzhi": "庚戌",
+      "field": "zhifu.middle",
+      "reading": "7",
+      "facsimile_page": 27,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        26,
+        28
+      ]
+    },
+    {
+      "year_index": 48,
+      "ganzhi": "辛亥",
+      "field": "zhifu.middle",
+      "reading": "7",
+      "facsimile_page": 28,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        27,
+        29
+      ]
+    },
+    {
+      "year_index": 49,
+      "ganzhi": "壬子",
+      "field": "zhifu.middle",
+      "reading": "8",
+      "facsimile_page": 28,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        27,
+        29
+      ]
+    },
+    {
+      "year_index": 50,
+      "ganzhi": "癸丑",
+      "field": "zhifu.middle",
+      "reading": "8",
+      "facsimile_page": 28,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        27,
+        29
+      ]
+    },
+    {
+      "year_index": 51,
+      "ganzhi": "甲寅",
+      "field": "zhifu.middle",
+      "reading": "8",
+      "facsimile_page": 28,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        27,
+        29
+      ]
+    },
+    {
+      "year_index": 52,
+      "ganzhi": "乙卯",
+      "field": "zhifu.middle",
+      "reading": "9",
+      "facsimile_page": 29,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        28,
+        30
+      ]
+    },
+    {
+      "year_index": 53,
+      "ganzhi": "丙辰",
+      "field": "zhifu.middle",
+      "reading": "9",
+      "facsimile_page": 29,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        28,
+        30
+      ]
+    },
+    {
+      "year_index": 54,
+      "ganzhi": "丁巳",
+      "field": "zhifu.middle",
+      "reading": "9",
+      "facsimile_page": 29,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        28,
+        30
+      ]
+    },
+    {
+      "year_index": 55,
+      "ganzhi": "戊午",
+      "field": "zhifu.middle",
+      "reading": "绛",
+      "facsimile_page": 29,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        28,
+        30
+      ]
+    },
+    {
+      "year_index": 56,
+      "ganzhi": "己未",
+      "field": "zhifu.middle",
+      "reading": "绛",
+      "facsimile_page": 30,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        29,
+        31
+      ]
+    },
+    {
+      "year_index": 57,
+      "ganzhi": "庚申",
+      "field": "zhifu.middle",
+      "reading": "绛",
+      "facsimile_page": 30,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        29,
+        31
+      ]
+    },
+    {
+      "year_index": 58,
+      "ganzhi": "辛酉",
+      "field": "zhifu.middle",
+      "reading": "明",
+      "facsimile_page": 30,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        29,
+        31
+      ]
+    },
+    {
+      "year_index": 59,
+      "ganzhi": "壬戌",
+      "field": "zhifu.middle",
+      "reading": "明",
+      "facsimile_page": 30,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        29,
+        31
+      ]
+    },
+    {
+      "year_index": 60,
+      "ganzhi": "癸亥",
+      "field": "zhifu.middle",
+      "reading": "明",
+      "facsimile_page": 31,
+      "status": "facsimile_confirms_table_reading_not_rule_adjudication",
+      "facsimile_page_range": [
+        30,
+        31
+      ]
+    }
+  ],
+  "interpretation": "33个原表读数均已核CADAL图23至31；源表中元从辛卯至癸亥与正文顺行并接三宫规则不一致。保留双方，未据程序改预期。",
+  "missing_source_rule": "四库卷五独立地乙推法缺载；NCL-06604图73/74已取得完整推法，明确九宫起、顺行尽九宫再接绛明玉，与四库三元表吻合。生产积年仍用已核四库3361，不静默导入明钞本另处的积年读数。",
+  "ming_supplement": {
+    "source_catalog": "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf",
+    "pages": [
+      71,
+      72,
+      73,
+      74
+    ],
+    "diyi_rule": "同四神入纪年，以三除为宫数，命起九宫，顺行尽九宫再接绛宫明堂玉堂。",
+    "supplement_scope": "明示补证地乙行序及六条年度宫位算例，未替换四库积年常数。",
+    "unresolved_variant": "图71小游积年疑有一万三千三百六十一字样，与四库图12三千三百六十一不同；保留图像待进一步逐字复核，未将不确定读数纳入生产。"
+  }
+}
