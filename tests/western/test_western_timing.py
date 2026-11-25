@@ -139,7 +139,9 @@ def test_transit_exact_hits_match_flint_supplied_angles(
 
 
 def _assert_predictive_reference_clock(moment: datetime, reference):
-    assert moment.astimezone(timezone.utc) == datetime.fromisoformat(reference["UTC"])
+    assert moment.astimezone(timezone.utc) == datetime.fromisoformat(
+        reference["UTC"].replace("Z", "+00:00")
+    )
     assert (
         moment.replace(tzinfo=None).isoformat(timespec="microseconds")
         == reference["local_plain"]
@@ -243,7 +245,7 @@ def test_profection_anniversary_and_months_match_temporal(
         birth_longitude=0,
         birth_latitude=40,
     )
-    target = datetime.fromisoformat(case["analysis_UTC"])
+    target = datetime.fromisoformat(case["analysis_UTC"].replace("Z", "+00:00"))
     zone = parse_timezone_name(row["zone"])
     output = profections.build_annual_profection_payload(
         info, predictive_clock_operands, analysis_datetime=target
@@ -452,7 +454,7 @@ def test_given_year_preserves_anniversary_interval_in_return_zone(
         birth_longitude=0,
         birth_latitude=40,
     )
-    target = datetime.fromisoformat(case["analysis_UTC"])
+    target = datetime.fromisoformat(case["analysis_UTC"].replace("Z", "+00:00"))
     annual = profections.build_annual_profection_payload(
         info, predictive_clock_operands, analysis_datetime=target
     )
@@ -468,10 +470,10 @@ def test_given_year_preserves_anniversary_interval_in_return_zone(
     expected = case["expected_window"]
     assert datetime.fromisoformat(result["year_start"]).astimezone(
         timezone.utc
-    ) == datetime.fromisoformat(expected["start"]["UTC"])
+    ) == datetime.fromisoformat(expected["start"]["UTC"].replace("Z", "+00:00"))
     assert datetime.fromisoformat(result["year_end"]).astimezone(
         timezone.utc
-    ) == datetime.fromisoformat(expected["end"]["UTC"])
+    ) == datetime.fromisoformat(expected["end"]["UTC"].replace("Z", "+00:00"))
     assert [m["month_index"] for m in result["monthly_profections"] if m["active"]] == [
         case["month_index"] + 1
     ]

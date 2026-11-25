@@ -287,3 +287,32 @@ def test_correct_progression_frames_reach_rest_mcp_cli(
                 )[1]
                 assert row["natal_declination"] == round(natal_declination, 4)
                 assert row["progressed_declination"] == round(progressed_declination, 4)
+
+
+@pytest.mark.parametrize("arc_source,planet", [("Sun", 0), ("Moon", 1)])
+def test_planetary_arc_uses_independent_secondary_clock_on_all_surfaces(
+    arc_source: str, planet: int, surface_calls
+) -> None:
+    response, protocol, code, cli = surface_calls(
+        SPECS["astro_planetaryarc"],
+        {**BIRTH_INPUTS, "arc_source": arc_source},
+        projection={
+            "fields": ["natal_reference.sun", "planetary_arc"],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+    )
+    assert response.status_code == 200, response.text
+    assert not protocol.is_error and code == 0
+    result = response.json()
+    assert business(result) == business(protocol.structured_content) == business(cli)
+    progression = result["planetary_arc"]
+    assert datetime.fromisoformat(progression["progressed_datetime"]) == PROGRESSED
+    arc = (
+        native_coordinates(planet, PROGRESSED)[0] - native_coordinates(planet, BIRTH)[0]
+    ) % 360
+    assert progression["arc_degrees"] == pytest.approx(arc, abs=0.00005)
+    natal_sun = result["natal_reference"]["sun"]["absolute_degree"]
+    assert progression["positions"]["sun"]["absolute_degree"] == pytest.approx(
+        (natal_sun + arc) % 360, abs=1e-8
+    )

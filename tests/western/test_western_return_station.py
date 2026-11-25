@@ -1,8 +1,8 @@
 """Observed station-loop roots survive a daily return-search cell.
 
 The exposed 2001 Jupiter case has an independently generated Skyfield1.54 /
-DE421 reference, using no FateBridge or Swiss imports. Frozen protocol and raw
-1001-point scan: /tmp/fatebridge-unmet-audit-20261103/astrology/.
+DE421 reference, using no FateBridge or Swiss imports. The comparison used
+a 1001-point scan.
 Kernel SHA256: a20a7139da04cbc462454634918e9a9ca69127044e2cc9d4f9c16e238d2deedc.
 The 30-second comparison line was fixed before the independent comparison;
 this is a development case, not a blind sample or all-event completeness proof.
@@ -126,7 +126,7 @@ def test_native_speed_is_only_a_split_guide_and_cannot_invent_a_longitude_contac
 def test_local_station_refinement_rejects_changed_native_source(
     monkeypatch: pytest.MonkeyPatch, change: str
 ) -> None:
-    synthetic_clock(monkeypatch)
+    origin = synthetic_clock(monkeypatch)
 
     def motion(at, body, **kwargs):
         modified = at == 0.5
@@ -136,7 +136,9 @@ def test_local_station_refinement_rejects_changed_native_source(
 
     monkeypatch.setattr(astrology_events, "_planet_motion", motion)
     with pytest.raises(EphemerisSourceError) as caught:
-        astrology_events._longitude_crossings(5, 120, 0, 1, 1)
+        astrology_events.resolve_longitude_crossing(
+            5, 120, origin + timedelta(days=0.5), window_days=0.5, step_days=1.0
+        )
     assert caught.value.reason == "model_changed"
 
 
@@ -201,3 +203,136 @@ def test_signed_residual_preserves_true_longitude_wrap(
     longitude: float, target: float, expected
 ) -> None:
     assert astrology_events._wrapped_diff(longitude, target) == expected
+
+
+@pytest.mark.parametrize("speed_zero", [0.0, 0.70, 1.0])
+@pytest.mark.parametrize(
+    "target_offset,expected_count", [(0, 1), (0.0001, 2), (-0.0001, 0)]
+)
+def test_return_contact_uses_actual_longitude_extremum(
+    monkeypatch: pytest.MonkeyPatch,
+    speed_zero: float,
+    target_offset: float,
+    expected_count: int,
+) -> None:
+    origin = synthetic_clock(monkeypatch)
+    turn = 0.46
+    monkeypatch.setattr(
+        astrology_events,
+        "_planet_motion",
+        lambda jd, body, **kw: (
+            120 + min((jd - turn) ** 2, 1.0),
+            2 * (jd - speed_zero),
+            0,
+            (),
+        ),
+    )
+    result = astrology_events.resolve_planet_returns(
+        5, 120 + target_offset, period_days=720, reference_utc=origin, past=0, future=2
+    )
+    # The synthetic coordinate reaches the target only near the prescribed turn.
+    assert len(result.future) == expected_count
+    expected_days = [turn] if target_offset == 0 else [turn - 0.01, turn + 0.01]
+    for event, expected_day in zip(result.future, expected_days):
+        assert event.tt.as_float() == pytest.approx(expected_day, abs=1e-7)
+
+
+def test_return_rejects_changed_flags_even_in_a_cell_without_a_root(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    origin = synthetic_clock(monkeypatch)
+    monkeypatch.setattr(
+        astrology_events,
+        "_planet_motion",
+        lambda at, body, **kw: (120 + at - 0.25, 1.0, int(at < 1.5), ()),
+    )
+    with pytest.raises(EphemerisSourceError) as caught:
+        astrology_events.resolve_planet_returns(
+            5,
+            120,
+            period_days=0.5,
+            reference_utc=origin + timedelta(days=2),
+            past=1,
+            future=0,
+        )
+    assert caught.value.reason == "model_changed"
+
+
+@pytest.mark.parametrize("direction", [-1.0, 1.0])
+def test_return_stops_before_a_more_distant_native_source_change(
+    monkeypatch: pytest.MonkeyPatch, direction: float
+) -> None:
+    origin = synthetic_clock(monkeypatch)
+    monkeypatch.setattr(
+        astrology_events,
+        "_planet_motion",
+        lambda at, body, **kw: (
+            120 + at - direction * 0.25,
+            1.0,
+            int(abs(at) > 0.5),
+            (),
+        ),
+    )
+    result = astrology_events.resolve_planet_returns(
+        5,
+        120,
+        period_days=0.5,
+        reference_utc=origin,
+        past=int(direction < 0),
+        future=int(direction > 0),
+    )
+    selected = result.past or result.future
+    assert len(selected) == 1
+    assert selected[0].utc_datetime == origin + timedelta(days=direction * 0.25)
+
+
+def test_return_rejects_a_different_known_de_edition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    origin = synthetic_clock(monkeypatch)
+    monkeypatch.setattr(
+        astrology_events,
+        "_planet_motion",
+        lambda at, body, **kw: (120 + at - 0.25, 1.0, 2, (("segment", 0.0, 2.0, 441),)),
+    )
+    with pytest.raises(EphemerisSourceError) as caught:
+        astrology_events.resolve_planet_returns(
+            5,
+            120,
+            period_days=2,
+            reference_utc=origin,
+            past=0,
+            future=1,
+            natal_motion=(120, 1.0, 2, (("earlier", -2.0, 0.0, 431),)),
+        )
+    assert caught.value.reason == "model_changed"
+
+
+def test_return_retains_contact_at_a_single_representable_tt(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    reference_tt = 2451545.0
+    turn = math.nextafter(reference_tt + 0.46, math.inf)
+    monkeypatch.setattr(astrology_events, "_julian_day", lambda at: reference_tt)
+    monkeypatch.setattr(
+        astrology_events, "utc_from_tt", lambda at, **options: (None, None, False)
+    )
+    monkeypatch.setattr(
+        astrology_events,
+        "_planet_motion",
+        lambda at, body, **options: (
+            (at - turn) ** 2,
+            2 * (at - reference_tt - 0.52),
+            0,
+            (),
+        ),
+    )
+    result = astrology_events.resolve_planet_returns(
+        5,
+        0.0,
+        period_days=720,
+        reference_utc=BIRTH,
+        past=0,
+        future=1,
+    )
+    assert tuple(event.tt.as_float() for event in result.future) == (turn,)

@@ -169,6 +169,9 @@ class AlmutenFigurisMethod(PartialOutput):
 
 
 class AlmutenFiguris(PartialOutput):
+    status: Literal["partial"] | None = None
+    unknown_points: list[AlmutenPointId] | None = None
+    known_totals: dict[str, int] | None = None
     method: AlmutenFigurisMethod | None = None
     points: dict[str, AlmutenPoint] | None = None
     totals: dict[str, int] | None = None
@@ -233,6 +236,9 @@ class Syzygy(PartialOutput):
 
 
 class Temperament(PartialOutput):
+    status: Literal["partial"] | None = None
+    unknown_components: list[Literal["ascendant_sign", "ascendant_ruler"]] | None = None
+    known_tally: dict[str, int] | None = None
     cn: str | None = None
     humor: str | None = None
     hygral: str | None = None

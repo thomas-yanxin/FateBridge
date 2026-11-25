@@ -2,16 +2,15 @@
 
 from typing import Any
 
+from fatebridge.core.astro.angle_definitions import is_ascendant_resolved
+
 # Swiss documentation6.2.5/7/8/9: these partitions use MC/ARMC, fixed Aries,
 # or the independently defined horizon directions, rather than a unique ASC.
 ASC_INDEPENDENT_HOUSES = frozenset({"D", "N", "X", "M", "H"})
 
 
-def unresolved_ascendant(subject: Any) -> bool:
-    definition = (getattr(subject, "calculation_basis", None) or {}).get(
-        "angle_definition"
-    ) or {}
-    return definition.get("geometric_ascendant_resolved") is False
+def unresolved_ascendant(subject: object) -> bool:
+    return not is_ascendant_resolved(subject)
 
 
 def unresolved_houses(subject: Any) -> bool:

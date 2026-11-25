@@ -8,14 +8,13 @@ from typing import Any
 from fatebridge.core.astro.angle_definitions import is_ascendant_resolved
 from fatebridge.core.astro.astrology_tables import RULER_BY_SIGN, SIGNS
 from fatebridge.core.astro.birth import AstroBirthInfo
-from fatebridge.core.astro.event_reference import ASC_INDEPENDENT_HOUSES
 from fatebridge.core.predictive._common import (
     build_subject,
     collect_aspect_hits,
     extract_reference_longitudes,
+    extract_reference_points,
     normalize_sign_name,
     planet_label,
-    point_to_dict,
     resolve_last_birthday,
     resolve_local_birthday_anniversary,
     sign_label,
@@ -221,55 +220,20 @@ def build_given_year_payload(
     )
     source_longitudes = extract_reference_longitudes(given_year_subject)
     target_longitudes = extract_reference_longitudes(natal_subject)
-    if not given_year_asc_resolved:
-        source_longitudes.pop("Ascendant", None)
-    else:
-        pass
-    if not natal_asc_resolved:
-        target_longitudes.pop("Ascendant", None)
-    else:
-        pass
     hits = collect_aspect_hits(
         source_longitudes=source_longitudes,
         target_longitudes=target_longitudes,
         orb_limit=1.5,
     )
-    sun_point = point_to_dict("Sun", given_year_subject.sun)
-    moon_point = point_to_dict("Moon", given_year_subject.moon)
-    mc_point = point_to_dict("Medium_Coeli", given_year_subject.medium_coeli)
-    if given_year_asc_resolved or (
-        given_year_subject.houses_system_identifier in ASC_INDEPENDENT_HOUSES
-    ):
-        pass
-    else:
-        for point in (sun_point, moon_point, mc_point):
-            point["house"] = None
-            point["house_label"] = None
-    asc_point = (
-        point_to_dict("Ascendant", given_year_subject.ascendant)
-        if given_year_asc_resolved
-        else {
-            "point": "Ascendant",
-            "point_label": planet_label("Ascendant"),
-            "sign": None,
-            "sign_label": None,
-            "degree": None,
-            "absolute_degree": None,
-            "longitude": None,
-            "house": None,
-            "house_label": None,
-            "retrograde": None,
-            "status": "underdetermined_ascendant",
-        }
-    )
+    reference = extract_reference_points(given_year_subject)
     payload: dict[str, Any] = {
         "analysis_datetime": format_local_time_or_utc(analysis_local),
         "year_start": format_local_time_or_utc(last_birthday),
         "year_end": format_local_time_or_utc(year_end),
-        "sun": sun_point,
-        "moon": moon_point,
-        "ascendant": asc_point,
-        "medium_coeli": mc_point,
+        "sun": reference["sun"],
+        "moon": reference["moon"],
+        "ascendant": reference["ascendant"],
+        "medium_coeli": reference["medium_coeli"],
         "annual_profection": annual_profection,
         "monthly_profections": monthly_profections,
         "hits": hits[:8],

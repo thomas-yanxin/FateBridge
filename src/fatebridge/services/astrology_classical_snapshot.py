@@ -259,12 +259,15 @@ def _build_temperament_lines(payload: dict[str, Any]) -> str:
         return "无"
     else:
         pass
-    tally = temperament.get("tally", {})
-    lines = [
-        f"气质：{temperament.get('cn', '?')}"
-        f"（热{tally.get('hot', 0)}寒{tally.get('cold', 0)} "
-        f"燥{tally.get('dry', 0)}湿{tally.get('moist', 0)}）"
-    ]
+    tally = temperament.get("tally")
+    if tally is None:
+        lines = ["气质：未知（上升及其守护星分量无法确定）。"]
+    else:
+        lines = [
+            f"气质：{temperament.get('cn', '?')}"
+            f"（热{tally.get('hot', 0)}寒{tally.get('cold', 0)} "
+            f"燥{tally.get('dry', 0)}湿{tally.get('moist', 0)}）"
+        ]
     dodeka = []
     ninth = []
     for planet in _CLASSICAL_PLANET_ORDER:
@@ -332,7 +335,13 @@ def _build_almuten_figuris_line(payload: dict[str, Any]) -> str:
     lines = (
         [f"命主：{PLANET_LABELS_ZH.get(winner, winner)}（{totals.get(winner, 0)}分）"]
         if winner
-        else ["命主：未形成计分候选"]
+        else [
+            (
+                "命主：未知（上升与福点无法确定）。"
+                if figuris.get("status") == "partial"
+                else "命主：未形成计分候选"
+            )
+        ]
     )
     if method:
         included = method.get("included_points", [])

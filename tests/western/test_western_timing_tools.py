@@ -69,7 +69,7 @@ def _assert_decennial_reference(actual, expected):
         if key in {"start", "end"}:
             moment = datetime.fromisoformat(actual[key])
             assert moment.astimezone(timezone.utc) == datetime.fromisoformat(
-                value["UTC"]
+                value["UTC"].replace("Z", "+00:00")
             )
             assert (
                 moment.replace(tzinfo=None).isoformat(timespec="microseconds")
@@ -131,7 +131,7 @@ def test_decennial_clock_and_current_path_match_temporal(case) -> None:
         birth_latitude=40,
     )
     subject = _decennial_subject(case["profile"])
-    target = datetime.fromisoformat(case["analysis_UTC"])
+    target = datetime.fromisoformat(case["analysis_UTC"].replace("Z", "+00:00"))
     output = build_decennials_payload(birth, subject, analysis_datetime=target)
     assert output == build_decennials_payload(
         birth,
@@ -583,3 +583,76 @@ def test_singular_ascendant_blocks_profection_givenyear_and_zr_while_keeping_fac
         == "underdetermined_ascendant"
     )
     assert "None" not in combined["summary"]
+
+
+@pytest.mark.parametrize("house_system,houses_known", [("W", False), ("M", True)])
+def test_singular_ascendant_keeps_independent_timing_facts(
+    house_system: str, houses_known: bool
+) -> None:
+    request = {
+        **western_payload(),
+        "birth_place": "",
+        "birth_year": 2000,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_timezone": "UTC",
+        **J2000_UNRESOLVED_ASC_SITE,
+        "house_system": house_system,
+        "analysis_year": 2000,
+        "analysis_month": 1,
+        "analysis_day": 1,
+        "analysis_hour": 12,
+        "analysis_minute": 0,
+    }
+    for method in ("transit", "solararc"):
+        result = calculate_timing_tool(method, render_snapshot=False, **request)
+        assert "error" not in result, result
+        reference = result["natal_reference"]
+        assert reference["ascendant"]["longitude"] is None
+        assert (reference["sun"]["house"] is not None) == houses_known
+        payload = result[method]
+        assert payload["ascendant"] is None
+        assert payload["sun"]["longitude"] is not None
+        assert payload["medium_coeli"]["longitude"] is not None
+        assert payload["hits"]
+        assert all(
+            "Ascendant" not in (hit["source"], hit["target"]) for hit in payload["hits"]
+        )
+        if method == "transit":
+            assert bool(payload["house_emphasis"]) == houses_known
+
+
+@pytest.mark.parametrize("method", ["astroapp_alchabitius", "equatorial"])
+def test_singular_ascendant_and_lots_cannot_form_primary_directions(
+    method: str,
+) -> None:
+    request = {
+        **western_payload(),
+        "birth_place": "",
+        "birth_year": 2000,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_timezone": "UTC",
+        **J2000_UNRESOLVED_ASC_SITE,
+        "house_system": "W",
+        "pd_method": method,
+    }
+    result = calculate_timing_tool("pd", render_snapshot=False, **request)
+    assert "error" not in result, result
+    assert result["pd"]["promissors"] == ["Medium_Coeli"]
+    assert not result["pd"]["coordinate_lots"]
+    assert result["pd"]["timeline"]
+    assert all(
+        event["significator"] not in {"Ascendant", "Fortune", "Spirit"}
+        for event in result["pd"]["timeline"]
+    )
+    chart = calculate_timing_tool("pdchart", render_snapshot=False, **request)[
+        "pdchart"
+    ]
+    assert chart["directed_ascendant"] is None
+    assert chart["directed_medium_coeli"]["longitude"] is not None
+    assert not chart["directed_lots"]

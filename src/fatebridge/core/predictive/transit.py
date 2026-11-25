@@ -85,7 +85,9 @@ def build_transit_payload(
         "exact_orb_limit": exact_orb_limit,
         "sun": transit_reference["sun"],
         "moon": transit_reference["moon"],
-        "ascendant": transit_reference["ascendant"],
+        "ascendant": (
+            transit_reference["ascendant"] if "Ascendant" in source_longitudes else None
+        ),
         "medium_coeli": transit_reference["medium_coeli"],
         "transit_reference": transit_reference,
         "natal_reference": natal_reference,

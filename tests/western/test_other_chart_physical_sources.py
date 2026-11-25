@@ -22,7 +22,9 @@ from fatebridge.core.astro.time_scales import datetime_from_tt
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.transports import rest as rest
 from tests.support.transports import surface_calls as surface_calls
-from tests.unit_test.fixtures.western_ephemeris import birth
+from tests.unit_test.fixtures.western_ephemeris import (
+    birth,
+)
 from tests.unit_test.fixtures.western_ephemeris import (
     ephemeris_files as ephemeris_files,
 )

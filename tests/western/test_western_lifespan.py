@@ -7,6 +7,8 @@ not certify natal ephemeris accuracy, complete classical methods or prediction.
 
 import math
 
+import pytest
+
 from fatebridge.core.astro.astrology_lifespan import (
     BALBILLUS_SMALL_YEARS,
     DOROTHEAN_TRIPLICITY_RULERS,
@@ -33,6 +35,7 @@ from fatebridge.services.western_lifespan import (
 )
 from fatebridge.services.western_timing_tools import calculate_timing_tool
 from tests.fixtures.surface_payloads import J2000_UNRESOLVED_ASC_SITE
+from tests.support.transports import AS_OF, SPECS, business
 
 BIRTH = dict(
     name="测试者",
@@ -438,3 +441,31 @@ def test_balbillus_source_metadata_has_no_redundant_sha256() -> None:
     result = calculate_balbillus(**BIRTH)
     source = result["balbillus"]["reduction_model"]["source"]
     assert "sha256" not in source
+
+
+@pytest.mark.parametrize(
+    "age_limit,expected_count", [(19.0, 1), (math.nextafter(19.0, math.inf), 2)]
+)
+def test_small_year_preview_is_half_open_on_all_surfaces(
+    age_limit: float, expected_count: int, surface_calls
+) -> None:
+    response, protocol, code, cli = surface_calls(
+        SPECS["astro_yearsystem129"],
+        {**BIRTH, "max_age_years": age_limit, "start_planet": "Sun"},
+        projection={
+            "fields": ["yearsystem129"],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        rest_as_of=AS_OF,
+    )
+    assert response.status_code == 200, response.text
+    assert code == 0 and not protocol.is_error
+    result = response.json()
+    assert business(result) == business(protocol.structured_content) == business(cli)
+    periods = result["yearsystem129"]["periods"]
+    assert len(periods) == expected_count
+    assert periods[0]["planet"] == "Sun"
+    assert periods[0]["duration_years"] == 19
+    if expected_count == 2:
+        assert periods[1]["start_age_years"] == 19

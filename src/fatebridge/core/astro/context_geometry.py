@@ -43,6 +43,8 @@ def build_context_geometry(
     ayanamsha: float,
     chart_sect: str,
     fortune_method: str = "sect_reversing",
+    ascendant_resolved: bool = True,
+    houses_resolved: bool = True,
     zodiac_longitudes: dict[str, float] | None = None,
     house_projection: EclipticHouseProjection | None = None,
     house_coordinates: dict[str, HouseCoordinate] | None = None,
@@ -84,11 +86,12 @@ def build_context_geometry(
     else:
         pass
     markers = {name.lower(): lon for name, lon in longitudes.items()}
-    markers["asc"] = ascendant
+    if ascendant_resolved:
+        markers["asc"] = ascendant
     if fortune_method == "ptolemy_iii10":
         fortune = (
             fortune_working_longitude(ascendant, longitudes["Sun"], longitudes["Moon"])
-            if {"Sun", "Moon"} <= longitudes.keys()
+            if ascendant_resolved and {"Sun", "Moon"} <= longitudes.keys()
             else None
         )
         fortune_definition = {
@@ -120,7 +123,7 @@ def build_context_geometry(
     else:
         pass
     projected_positions: dict[str, HouseCoordinate] = {}
-    if house_projection is not None:
+    if houses_resolved and house_projection is not None:
         for name, lon in longitudes.items():
             if house_coordinates is not None and name in house_coordinates:
                 projected_positions[name] = house_coordinates[name]
@@ -170,6 +173,7 @@ def build_context_geometry(
                 "sign_zh": h["sign_zh"],
             }
             for h in houses
+            if houses_resolved
         ],
         "objects": [
             {
@@ -177,7 +181,11 @@ def build_context_geometry(
                 "lon": lon,
                 "signlon": lon % 30.0,
                 "sign": _sign_name(lon),
-                "house": f"House{int(projected_positions[name].position) if house_projection is not None else _house_for_longitude(partition_longitudes.get(name, lon), ascendant, house_system, house_cusps=house_cusps)}",
+                "house": (
+                    f"House{int(projected_positions[name].position) if house_projection is not None else _house_for_longitude(partition_longitudes.get(name, lon), ascendant, house_system, house_cusps=house_cusps)}"
+                    if houses_resolved
+                    else None
+                ),
                 **(
                     {
                         "motion": context_motion(
@@ -204,13 +212,16 @@ def build_context_geometry(
                             projected_positions[name].phase_degrees
                         ),
                     }
-                    if house_projection is not None
+                    if houses_resolved and house_projection is not None
                     else {}
                 ),
             }
             for name, lon in longitudes.items()
         ],
-        "angles": {"ascendant": ascendant, "midheaven": midheaven},
+        "angles": {
+            "ascendant": ascendant if ascendant_resolved else None,
+            "midheaven": midheaven,
+        },
         "fortune_definition": fortune_definition,
         "auxiliary_point_sources": {
             "South Node": "opposite_unrounded_core_north_node",

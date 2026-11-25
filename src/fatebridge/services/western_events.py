@@ -10,7 +10,7 @@ from fatebridge.core.astro.astrology_events import (
     CARDINAL_INGRESS_LABELS,
     CARDINAL_INGRESSES,
     RETURN_BODIES,
-    planet_longitude_at_utc,
+    planet_motion_at_utc,
     resolve_cardinal_ingress,
     resolve_planet_returns,
 )
@@ -180,13 +180,13 @@ def calculate_extrareturns(
         return_summaries: list[str] = []
         for body_name, spec in RETURN_BODIES.items():
             planet_id = int(spec["planet_id"])  # type: ignore[call-overload]
-            sidereal = zodiac_type.lower() == "sidereal"
             try:
-                natal_longitude = planet_longitude_at_utc(
+                natal_motion = planet_motion_at_utc(
                     planet_id,
                     birth_info.utc_calendar,
                     sidereal=sidereal,
                 )
+                natal_longitude = natal_motion[0]
                 resolved = resolve_planet_returns(
                     planet_id,
                     natal_longitude,
@@ -195,6 +195,7 @@ def calculate_extrareturns(
                     past=1,
                     future=1,
                     sidereal=sidereal,
+                    natal_motion=natal_motion,
                 )
             except Exception as body_err:
                 if body_name == "Chiron":
