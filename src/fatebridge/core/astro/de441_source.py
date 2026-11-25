@@ -105,6 +105,22 @@ def _parameters() -> Parameters:
     return result
 
 
+def coefficient_files_available() -> bool:
+    """Check whether every coefficient chunk is present before loading any."""
+    archive_dir = os.getenv("FATEBRIDGE_DE441_DIR")
+    base = (
+        Path(archive_dir)
+        if archive_dir
+        else files("fatebridge").joinpath("data/astronomy")
+    )
+    try:
+        return all(
+            base.joinpath(chunk["file"]).is_file() for chunk in _parameters()["chunks"]
+        )
+    except (EphemerisSourceError, OSError):
+        return False
+
+
 def source_details() -> dict[str, object]:
     """Describe the verified loaded representation, separately from JPL's file."""
     parameters = _parameters()

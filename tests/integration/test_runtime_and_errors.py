@@ -18,6 +18,7 @@ import fatebridge.mcp_server as mcp
 from fatebridge.application.execution import execute_tool
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.cli import run as cli_run
+from fatebridge.core import ephemeris_runtime
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.core.predictive import _common as predictive_runtime
 from fatebridge.core.receipt_models import RunMetadata
@@ -176,6 +177,22 @@ def test_ready_endpoint_reports_required_and_optional_checks() -> None:
     assert payload["checks"]["api_key_auth"]["enabled"] is False
     assert "api_key_quota" not in payload["checks"]
     assert isinstance(payload["checks"]["western_predictive_runtime"]["ok"], bool)
+
+
+def test_ready_requires_available_offline_ephemeris(
+    rest: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("FATEBRIDGE_DE441_DIR", str(tmp_path))
+
+    response = rest.get("/ready")
+    assert response.status_code == 200
+    assert response.json()["checks"]["offline_astrology"]["fallback_available"] is False
+
+    monkeypatch.setattr(ephemeris_runtime, "swe", None)
+    response = rest.get("/ready")
+    assert response.status_code == 503
+    assert response.json()["status"] == "not_ready"
+    assert response.json()["checks"]["offline_astrology"]["ok"] is False
 
 
 def test_metrics_endpoint_exposes_request_counters() -> None:

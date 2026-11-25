@@ -9,6 +9,7 @@ from typing import Final, Literal, TypedDict
 from fastapi import Request
 
 import fatebridge.core.ephemeris_runtime as ephemeris_runtime
+from fatebridge.core.astro.de441_source import coefficient_files_available
 
 API_KEY_EXEMPT_PATHS: Final = frozenset(
     {"/health", "/ready", "/metrics", "/docs", "/redoc", "/openapi.json"}
@@ -98,13 +99,14 @@ class ReadinessPayload(TypedDict):
 
 def build_readiness_payload(authenticator: ApiKeyAuthenticator) -> ReadinessPayload:
     is_swisseph_available = ephemeris_runtime.swe is not None
+    has_de441_coefficients = coefficient_files_available()
     checks: ReadinessChecks = {
         "core_api": {"ok": True, "required": True, "detail": "FastAPI app initialized"},
         "offline_astrology": {
-            "ok": True,
+            "ok": is_swisseph_available or has_de441_coefficients,
             "required": True,
             "swisseph_available": is_swisseph_available,
-            "fallback_available": True,
+            "fallback_available": has_de441_coefficients,
         },
         "western_predictive_runtime": {
             "ok": is_swisseph_available,
