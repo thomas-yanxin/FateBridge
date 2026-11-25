@@ -17,6 +17,7 @@ from fatebridge.services.metaphysics import _build_analysis_seed, _build_person_
 from fatebridge.services.timing import calculate_dayun_analysis
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.timezones import parse_timezone_name
+from tests.support.transports import AS_OF, SPECS, rest, surface_calls, three_surfaces
 
 
 def _person(moment: datetime, *, longitude: float = 116.4074):
@@ -110,6 +111,84 @@ def test_beijing_lichun_birth_and_metaphysics_paths_keep_civil_year_month():
     assert nongli["yearGanZi"] == "甲辰"
     assert nongli["monthGanZi"] == "丙寅"
     assert nongli["jieqi"] == "立春"
+
+
+@pytest.mark.parametrize(
+    "clock,year_pillar,month_pillar",
+    [("16:25", "癸卯", "乙丑"), ("16:29", "甲辰", "丙寅")],
+)
+def test_published_lichun_minute_keeps_civil_season_on_three_surfaces(
+    clock, year_pillar, month_pillar, tmp_path, monkeypatch, capsys
+):
+    """HKO's 2024 16:27 minute separates seasonal facts despite solar displacement."""
+    result = three_surfaces(
+        SPECS["nongli_time"],
+        dict(
+            date="2024-02-04", time=clock, zone="Asia/Shanghai", gps_lon=60, time_alg=0
+        ),
+        ["yearGanZi", "monthGanZi", "analysis_context"],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    assert result["yearGanZi"] == year_pillar
+    assert result["monthGanZi"] == month_pillar
+    assert result["analysis_context"]["corrected_datetime"] < "2024-02-04 16:25"
+
+
+def test_solar_midnight_crossing_keeps_previous_lunar_day_on_three_surfaces(
+    tmp_path, monkeypatch, capsys
+):
+    """The synthetic western longitude moves New Year's civil clock to lunar eve."""
+    result = three_surfaces(
+        SPECS["nongli_time"],
+        dict(
+            date="2024-02-10",
+            time="00:10",
+            zone="Asia/Shanghai",
+            gps_lon=60,
+            time_alg=0,
+        ),
+        [
+            "analysis_context",
+            "yearGanZi",
+            "monthGanZi",
+            "dayGanZi",
+            "monthInt",
+            "dayInt",
+        ],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    assert result["analysis_context"]["corrected_datetime"].startswith("2024-02-09 ")
+    assert (result["monthInt"], result["dayInt"]) == (12, 30)
+    assert (result["yearGanZi"], result["monthGanZi"], result["dayGanZi"]) == (
+        "甲辰",
+        "丙寅",
+        "癸卯",
+    )
+
+
+@pytest.mark.parametrize("date", ["2024-03-10", "2024-11-03"])
+def test_calendar_gap_and_fold_are_errors_on_three_surfaces(date, surface_calls):
+    """An unqualified repeated or nonexistent New York clock cannot select a date."""
+    http, protocol, code, local = surface_calls(
+        SPECS["nongli_time"],
+        dict(
+            date=date,
+            time="02:30" if "03-10" in date else "01:30",
+            zone="America/New_York",
+            time_alg=1,
+        ),
+        params={"as_of": AS_OF},
+    )
+    assert http.status_code == 400 and code == 1 and protocol.is_error
+    for result in (http.json(), protocol.structured_content, local):
+        assert result["error_code"] == "validation_error"
+        assert "yearGanZi" not in result
 
 
 def test_solar_clock_crossing_midnight_preserves_existing_lunar_and_day_rules():

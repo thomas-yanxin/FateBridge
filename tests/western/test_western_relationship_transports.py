@@ -1,14 +1,130 @@
 """Davison variants and both Marks charts agree over actual public transports."""
 
 import asyncio
+from datetime import datetime, timezone
 
 import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views, suggested_fields
+from fatebridge.core.astro.time_scales import ephemeris_time
 from tests.support.relationship_inputs import payloads
-from tests.support.transports import SPECS, business, call_cli, native, rest
+from tests.support.transports import AS_OF, SPECS, business, call_cli, native, rest
 from tests.western.test_western_relationship_scoring import replay
+
+
+@pytest.mark.parametrize("mode", ["TimeSpace", "Marks"])
+def test_relationship_dst_elapsed_hour_keeps_ut1_mean_and_quarters(
+    mode, rest, tmp_path, capsys
+):
+    """Two hours on the spring clock are one elapsed hour for both derived methods."""
+    nested, flat = payloads(mode, "uncorrected")
+    for role, hour, zone in [("inner", 1, "-05:00"), ("outer", 3, "-04:00")]:
+        updates = dict(
+            birth_year=2024,
+            birth_month=3,
+            birth_day=10,
+            birth_hour=hour,
+            birth_minute=30,
+            birth_timezone=zone,
+        )
+        nested[role] = {**nested[role], **updates}
+        flat.update({f"{role}_{name}": value for name, value in updates.items()})
+    fields = (
+        [
+            "chart.chart_profile.julian_day_ut1",
+            "chart.chart_profile.derivation_policy",
+            "marks_charts",
+        ]
+        if mode == "Marks"
+        else [
+            "chart.chart_profile.julian_day_ut1",
+            "chart.chart_profile.derivation_policy",
+        ]
+    )
+    response = rest.post(
+        "/api/astro/relative",
+        json=nested,
+        params=[
+            ("as_of", AS_OF),
+            ("strict_fields", "true"),
+            ("include_snapshot_text", "false"),
+            ("response_char_limit", "0"),
+            *[("fields", field) for field in fields],
+        ],
+    )
+    code, local = call_cli(
+        SPECS["astro_relative_chart"],
+        flat,
+        tmp_path,
+        capsys,
+        flags=[
+            "--fields",
+            *fields,
+            "--strict-fields",
+            "--no-include-snapshot-text",
+            "--response-char-limit",
+            "0",
+        ],
+    )
+    protocol = asyncio.run(
+        native(
+            SPECS["astro_relative_chart"],
+            flat,
+            fields=fields,
+            strict_fields=True,
+            include_snapshot_text=False,
+        )
+    )
+    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    assert (
+        business(response.json())
+        == business(local)
+        == business(protocol.structured_content)
+    )
+    first, second = [
+        ephemeris_time(datetime(2024, 3, 10, hour, 30, tzinfo=timezone.utc)).jd_ut1
+        for hour in (6, 7)
+    ]
+    result = response.json()
+    if mode == "TimeSpace":
+        assert result["chart"]["chart_profile"]["julian_day_ut1"] == pytest.approx(
+            (first + second) / 2, abs=1e-9, rel=0
+        )
+    else:
+        for role, expected in [
+            ("inner", (3 * first + second) / 4),
+            ("outer", (first + 3 * second) / 4),
+        ]:
+            assert result["marks_charts"][role]["chart_profile"][
+                "julian_day_ut1"
+            ] == pytest.approx(expected, abs=1e-9, rel=0)
+
+
+@pytest.mark.parametrize("mode", ["TimeSpace", "Marks"])
+@pytest.mark.parametrize("month,day,hour", [(3, 10, 2), (11, 3, 1)])
+def test_relationship_rejects_unqualified_dst_clock_before_derivation(
+    mode, month, day, hour, rest, tmp_path, capsys
+):
+    """A missing fold choice or nonexistent clock must not become a derived chart."""
+    nested, flat = payloads(mode, "uncorrected")
+    updates = dict(
+        birth_year=2024,
+        birth_month=month,
+        birth_day=day,
+        birth_hour=hour,
+        birth_minute=30,
+        birth_timezone="America/New_York",
+    )
+    nested["outer"] = {**nested["outer"], **updates}
+    flat.update({f"outer_{name}": value for name, value in updates.items()})
+    response = rest.post("/api/astro/relative", json=nested, params={"as_of": AS_OF})
+    code, local = call_cli(SPECS["astro_relative_chart"], flat, tmp_path, capsys)
+    protocol = asyncio.run(native(SPECS["astro_relative_chart"], flat))
+    assert response.status_code == 400 and code == 1 and protocol.is_error
+    for result in (response.json(), local, protocol.structured_content):
+        assert result["error_code"] == "validation_error"
+        assert "chart" not in result and "marks_charts" not in result
 
 
 @pytest.mark.parametrize("mode", ["TimeSpace", "Marks"])

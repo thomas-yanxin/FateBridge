@@ -10,6 +10,44 @@ from fatebridge.services.astrology import (
     calculate_core_chart_analysis,
     calculate_germany_chart_analysis,
 )
+from tests.support.transports import AS_OF, SPECS, three_surfaces
+
+
+@pytest.mark.parametrize("entry", ["astro_chart13", "astro_chart"])
+def test_northern_degenerate_sector_candidate_survives_both_public_entries(
+    entry, tmp_path, monkeypatch, capsys
+):
+    """An unresolved sampled ASC is unknown, not a fourteenth sector or stability."""
+    longitude, latitude = LOCATIONS[1]
+    request = {**PAYLOAD, "birth_longitude": longitude, "birth_latitude": latitude}
+    if entry == "astro_chart":
+        request["chart_variant"] = "chart13"
+    else:
+        pass
+    result = three_surfaces(
+        SPECS[entry],
+        request,
+        [
+            "sector_profile",
+            "thirteen_sectors",
+            "planets",
+            "time_sensitivity.sector_assignments",
+            "time_sensitivity.samples",
+        ],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    assert result["sector_profile"]["status"] == "underdetermined_ascendant"
+    assert result["sector_profile"]["anchor_longitude"] is None
+    assert result["thirteen_sectors"] == []
+    assert all(planet["sector13"] is None for planet in result["planets"])
+    assert len(result["time_sensitivity"]["samples"]) == 5
+    for assignment in result["time_sensitivity"]["sector_assignments"]:
+        assert assignment["sector_by_sample"][2] is None
+        assert assignment["unresolved_sample_count"] == 1
+
 
 PAYLOAD = dict(
     name="虚构：黄道地平面退化核验",

@@ -260,6 +260,12 @@ ASC无法在本角度模型中解析时，实际13扇区返回未定，后端约
 
 方法参考包含[汉堡中点取证卡](interpretation/xingpan/hamburg-evidence.md)，明确本命／推运 MC、直接／折叠占据、同一依据去重及出生误差条件。真实模型解释仍需按当前工具合同另行验收；执行和审阅方法见[Agent 验收](agent-evaluation.md)。
 
+## 十三分区的未知样点边界（单元25）
+
+[北侧退化回归](../tests/western/test_other_chart_angle_qualification.py)沿用J2000合成位置−10.4585560625195°经度、66.56232328397007°纬度及±1分钟五样点，补核专用 `astro_chart13` 与通用 `astro_chart(chart_variant=chart13)`。对应REST为 `/api/astro/chart13`、`/api/astro/chart`，MCP／CLI使用各自工具名；实际路径仍由中央目录提供。真实三端读取同一固定 `as_of` 的严格字段，核对名义ASC未决时 `anchor_longitude=null`、`thirteen_sectors=[]`、各星 `sector13=null`，以及每个星的五样点中有一个未决。未知不是第14区，不得从其余四点推出整个连续区间稳定。
+
+该位置是既有数值退化反例，非观察地点；结果只检查共同模型的资格传递，不新增物理精度、独立出版坐标或现实预测样本。星历实质修复留在单元2，现有不确定性门槛保持。
+
 ## 调用与复现
 
 使用虚构示例，参数与返回内容都来自当前工具目录：

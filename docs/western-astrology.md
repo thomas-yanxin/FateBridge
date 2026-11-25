@@ -325,6 +325,8 @@ uv run --locked --extra dev python -m scripts.western.audit_western_lunations_ho
 
 原典关系判断的缺口也需单独保留：[Ptolemy《Tetrabiblos》IV.7，Robbins 1940](https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/4B%2A.html#7)优先考察双方日、月、上升和福点的星座关系，并继续考察位置高低与其他行星的见证；它没有给出此处的七曜百分制。当前自定义评分尚未实现该章完整判断链，不能称为该章的实现，也不能将其综合分解释成关系成败概率。
 
+单元25另在[关系三端回归](../tests/western/test_western_relationship_transports.py)固定2024-03-10的两个输入：01:30−05:00与03:30−04:00，相应UTC为06:30与07:30。`TimeSpace/uncorrected`用二者模型UT1平均，双方Marks分别用3:1及1:3加权，按绝对1×10⁻⁹日门槛核对、不启用相对容差；UT1转换沿用共同钟时所有者，这是独立权重算术与接线检查，不是第二套地球自转资料。纽约同日02:30缺口及2024-11-03的01:30重叠未指定偏移时，两种方法均须在派生前报输入错误。REST `/api/astro/relative`传嵌套双方，MCP／CLI `astro_relative_chart`传扁平双方，固定同一 `as_of` 后保留各端状态、完整业务事实或严格投影。本组不重复PR200的Composite／Synastry宫位资格改动，也没有新增Davison原书或Marks镜像校勘。
+
 球面几何有47个来自独立 GeographicLib 2.1 的冻结参考（本地数据：`../tests/fixtures/western-geographiclib-midpoints.json`）；该参考只证明所列球面中点，不验证MC星历或原典解释。关系盘审计与 `tests/western/test_western_relationship_geometry.py`、`tests/western/test_western_relationship_transports.py` 分开记录外部几何、内部一致性和真实三端协议检查。
 
 ```bash

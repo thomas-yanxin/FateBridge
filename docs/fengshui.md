@@ -129,6 +129,12 @@ asyncio.run(main())
 - 两卦三爻从初爻开始编码为 bit0/1/2；异或0至7分别对应伏位、祸害、绝命、天医、生气、六煞、五鬼、延年。
 - 年星入中 `wrap9(1 - (Y - 1864))`；路径 `C,NW,W,NE,S,N,SW,E,SE` 逐宫递增。年际入中递减与同年顺飞不同。
 
+### 剩余边界的有限回放（单元25）
+
+[三端回归](../tests/fengshui/test_fengshui_surfaces.py)增加两种区分：2026年模型立春前后61秒与交点本身，以及2026南宫同时出现年星五黄、坎宅延年和金锁喜水的组合。立春交点使用包内DE440选择与既有五秒操作保护，交点处保留2025／2026年及上一／下一节月候选，不交付确定宫盘；该测试是所选模型区间和协议的一致性检查，不是新的独立太阳精度样本。年/月工具分别走 `/api/fengshui/annual_stars`、`/api/fengshui/monthly_stars`，对应同名 `fengshui_` 前缀MCP／CLI工具。
+
+组合通过 `/api/fengshui/assess`、`fengshui_assess` 回放 `bazhai_sitting_v1@1.1.0`、`jinsuo_basic_fixed_v1@1.0.0`、`annual_zibai_lichun_v1@1.0.0`，保留 `rulesets` 和 `rule_trace`。南宫5取既有Joey Yap 2026教材第67页的年盘记录；延年取所选八宅大游年；喜水取署名陈益峰注解所引传本。砂、水、未知是三个合成输入，未知不能被五黄或延年改写为已确认砂水。这里复用既有书目元数据，不新增书影或独立校勘分母；没有真实现场观察、动作许可或预测结果。玄空宅盘版次与五黄顺逆的实质改动属于单元13。
+
 ## 输入语义和边界
 
 工位／合租／家居可传 `scene=workstation|shared_rental|home`；未显式传方法时按已有事实选层，独立形态/桌面不再自动引入无关三法。局部优先顺序只组织核对和说明，不补历史定运、年份或方位。家具动作许可与独立候选方案分别用 `layout_constraints` / `layout_alternatives`，详见[场景选法与候选布局合同](interpretation/fengshui/scene-planning.md)。候选重算现有规则、不继承旧形态、不平均评分；完整古典形势、独立阳宅三要结构、三合/大卦及完整玄空组合解释仍明确未覆盖。

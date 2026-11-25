@@ -3,19 +3,111 @@
 import asyncio
 import json
 import math
+from datetime import timedelta
 
 import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application.description import describe_spec, spec_is_cli_safe
 from fatebridge.cli import run
+from fatebridge.core.fengshui.calendar import lichun
 from tests.fixtures.fengshui import PAYLOADS, payload
 from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
-from tests.support.transports import rest_client
+from tests.support.transports import AS_OF, rest_client, three_surfaces
+
+
+@pytest.mark.parametrize("name", ["annual_stars", "monthly_stars"])
+@pytest.mark.parametrize("seconds", [-61, 0, 61])
+def test_lichun_candidate_guard_and_both_sides_match_three_surfaces(
+    name, seconds, monkeypatch, tmp_path, capsys
+):
+    """A model boundary retains both candidates rather than claiming a firm chart."""
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    boundary = lichun(2026, "Asia/Shanghai")
+    result = three_surfaces(
+        SPECS[name],
+        {"query_at": (boundary + timedelta(seconds=seconds)).isoformat()},
+        ["status", "layers", "rulesets", "rule_trace"],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    layer = result["layers"][name]
+    context = layer["time_context"]
+    if seconds == 0:
+        assert result["status"] == layer["status"] == "partial"
+        assert layer["palaces"] == {}
+        if name == "annual_stars":
+            assert context["candidate_effective_years"] == [2025, 2026]
+            assert context["effective_year"] is None
+        else:
+            assert context["month_status"] == "requires_confirmation"
+            assert {
+                (candidate["effective_solar_year"], candidate["solar_month_number"])
+                for candidate in context["candidate_months"]
+            } == {(2025, 12), (2026, 1)}
+    else:
+        assert result["status"] == layer["status"] == "complete"
+        assert len(layer["palaces"]) == 9
+        if name == "annual_stars":
+            assert layer["effective_year"] == (2025 if seconds < 0 else 2026)
+            assert layer["center_star_number"] == (2 if seconds < 0 else 1)
+        else:
+            assert context["effective_solar_year"] == (2025 if seconds < 0 else 2026)
+            assert context["solar_month_number"] == (12 if seconds < 0 else 1)
+    assert result["rulesets"] and result["rule_trace"]
+
+
+@pytest.mark.parametrize(
+    "classification,finding",
+    [
+        ("water", "matches_preference"),
+        ("sand", "opposes_preference"),
+        ("unknown", "undetermined"),
+    ],
+)
+def test_five_yellow_does_not_replace_named_bazhai_or_jinsuo_rule(
+    classification, finding, tmp_path, monkeypatch, capsys
+):
+    """The same southern sector keeps three method scopes and unknown observation."""
+    request = {
+        "methods": ["bazhai", "jinsuo", "annual_stars"],
+        "effective_year": 2026,
+        "house": {"sitting_trigram": "坎"},
+        "features": [
+            {
+                "object_id": "synthetic-south",
+                "direction": "S",
+                "classification": classification,
+                "classification_basis": "user_confirmed",
+                "evidence": "Synthetic rule input, no observed site",
+            }
+        ],
+    }
+    result = three_surfaces(
+        SPECS["assess"],
+        request,
+        ["status", "layers", "conflicts", "rulesets", "rule_trace"],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    assert result["layers"]["annual_stars"]["palaces"]["S"]["annual_star_number"] == 5
+    assert result["layers"]["bazhai"]["house"]["sectors"]["S"]["star"]["name"] == "延年"
+    assert result["layers"]["jinsuo"]["feature_findings"][0]["finding"] == finding
+    assert {record["ruleset_id"] for record in result["rulesets"]} >= {
+        "bazhai_sitting_v1",
+        "jinsuo_basic_fixed_v1",
+        "annual_zibai_lichun_v1",
+    }
+    assert all(record["source_ids"] for record in result["rule_trace"])
 
 
 @pytest.mark.parametrize("name", list(PAYLOADS))
