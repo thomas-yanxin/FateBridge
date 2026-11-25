@@ -1,0 +1,32 @@
+{
+  "source_title": "河洛理數 卷六 國立公文書館305-0271明刊清印本",
+  "source_url": "https://www.digital.archives.go.jp/DAS/contents/pdf/lossy/03050271000050/0001.pdf",
+  "source_pdf_sha256": "199c7c1100a86857bc6973da4f0cfb27be473fdd5ede7b0241fc8cdb101877ea",
+  "scope": "Water-part consecutive PDF pages 65–73 only. Page counts and endpoint headers read from existing whole-page witnesses. This is no independent second human review and no new corpus collation. A locally absent reachable number is not evidence of a missing source page.",
+  "distribution": "Only factual coordinates and minimal classical text excerpts; no scan images or full modern transcription redistributed. Credit: National Archives of Japan, 河洛理數 卷六, catalogue 305-0271.",
+  "water_pages": [
+    {"pdf_page": 65, "row_count": 4, "first_number": 3330, "last_number": 2433},
+    {"pdf_page": 66, "row_count": 10, "first_number": 2534, "last_number": 2233},
+    {"pdf_page": 67, "row_count": 10, "first_number": 2334, "last_number": 3334},
+    {"pdf_page": 68, "row_count": 10, "first_number": 2235, "last_number": 3336},
+    {"pdf_page": 69, "row_count": 10, "first_number": 2237, "last_number": 2239},
+    {"pdf_page": 70, "row_count": 10, "first_number": 2340, "last_number": 2443},
+    {"pdf_page": 71, "row_count": 10, "first_number": 2544, "last_number": 3344},
+    {"pdf_page": 72, "row_count": 10, "first_number": 2245, "last_number": 2249},
+    {"pdf_page": 73, "row_count": 4, "first_number": 2350, "last_number": 3352}
+  ],
+  "literal_cells": [
+    {"element": "水", "number": 3330, "kind": "male", "pdf_page": 65, "text": "洞門無鎖鑰，便是一閒人。"},
+    {"element": "水", "number": 2231, "kind": "luck", "pdf_page": 65, "text": "酒醒何處去，柳岸臨風輕。"}
+  ],
+  "reachable_cells": 1620,
+  "status_counts": {
+    "source_cell_visually_collated": 1079,
+    "row_absent_in_local_corpus": 450,
+    "source_reading_uncertain": 47,
+    "source_printed_partial_blank": 23,
+    "source_printed_blank": 21
+  },
+  "independent_second_human_reviews": 0,
+  "new_historical_instants": 0
+}
