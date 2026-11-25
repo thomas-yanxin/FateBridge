@@ -6,14 +6,17 @@ from datetime import datetime
 from typing import Any, Dict, List, Mapping, Optional
 
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.event_reference import unresolved_ascendant
+from fatebridge.core.predictive.native_chart import NativeSubject
 from fatebridge.utils.house_systems import house_system_fields
 
 from ._common import (
+    TIMING_POINT_NAMES,
     build_lot_payloads,
     build_natal_subject,
     calculate_age_years,
     determine_sect,
-    extract_reference_points,
+    extract_qualified_timing_reference,
     sect_label,
 )
 from .decennials import build_decennials_payload
@@ -49,13 +52,20 @@ def _resolve_western_timing_return_location(
     }
 
 
-def _build_western_timing_natal_reference(natal_subject: Any) -> Dict[str, Any]:
-    natal_reference = extract_reference_points(natal_subject)
-    natal_reference["calculation_basis"] = natal_subject.calculation_basis
+def _build_western_timing_natal_reference(
+    natal_subject: NativeSubject,
+) -> Dict[str, Any]:
+    ascendant_resolved = not unresolved_ascendant(natal_subject)
+    natal_reference = extract_qualified_timing_reference(
+        natal_subject, TIMING_POINT_NAMES, ascendant_resolved=ascendant_resolved
+    )
     sect = determine_sect(natal_subject)
-    natal_reference["sect"] = {"key": sect, "label": sect_label(sect)}
-    natal_reference["lots"] = build_lot_payloads(natal_subject)
-    return natal_reference
+    return {
+        **natal_reference,
+        "calculation_basis": natal_subject.calculation_basis,
+        "sect": {"key": sect, "label": sect_label(sect)},
+        "lots": build_lot_payloads(natal_subject) if ascendant_resolved else None,
+    }
 
 
 def _build_western_timing_analysis_context(
@@ -441,11 +451,7 @@ def build_western_timing_payload(
         house_system=house_system,
         zodiac_type=zodiac_type,
     )
-    natal_reference = extract_reference_points(natal_subject)
-    natal_reference["calculation_basis"] = natal_subject.calculation_basis
-    sect = determine_sect(natal_subject)
-    natal_reference["sect"] = {"key": sect, "label": sect_label(sect)}
-    natal_reference["lots"] = build_lot_payloads(natal_subject)
+    natal_reference = _build_western_timing_natal_reference(natal_subject)
 
     effective_return_longitude = (
         birth_info.longitude if return_longitude is None else return_longitude

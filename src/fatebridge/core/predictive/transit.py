@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import Any, Dict
 
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.event_reference import unresolved_ascendant
 from fatebridge.utils.timezones import parse_timezone_name
 
 from ._common import (
@@ -14,7 +15,8 @@ from ._common import (
     build_subject,
     collect_aspect_hits,
     extract_named_longitudes,
-    extract_named_points,
+    extract_qualified_timing_reference,
+    qualified_point_names,
 )
 from .native_chart import NativeSubject
 
@@ -41,10 +43,28 @@ def build_transit_payload(
         house_system=house_system,
         zodiac_type=zodiac_type,
     )
-    transit_reference = extract_named_points(transit_subject, TRANSIT_POINT_NAMES)
-    natal_reference = extract_named_points(natal_subject, TRANSIT_POINT_NAMES)
-    source_longitudes = extract_named_longitudes(transit_subject, TRANSIT_POINT_NAMES)
-    target_longitudes = extract_named_longitudes(natal_subject, TRANSIT_POINT_NAMES)
+    transit_ascendant_resolved = not unresolved_ascendant(transit_subject)
+    natal_ascendant_resolved = not unresolved_ascendant(natal_subject)
+    transit_reference = extract_qualified_timing_reference(
+        transit_subject,
+        TRANSIT_POINT_NAMES,
+        ascendant_resolved=transit_ascendant_resolved,
+    )
+    natal_reference = extract_qualified_timing_reference(
+        natal_subject, TRANSIT_POINT_NAMES, ascendant_resolved=natal_ascendant_resolved
+    )
+    source_longitudes = extract_named_longitudes(
+        transit_subject,
+        qualified_point_names(
+            TRANSIT_POINT_NAMES, ascendant_resolved=transit_ascendant_resolved
+        ),
+    )
+    target_longitudes = extract_named_longitudes(
+        natal_subject,
+        qualified_point_names(
+            TRANSIT_POINT_NAMES, ascendant_resolved=natal_ascendant_resolved
+        ),
+    )
     hits = collect_aspect_hits(
         source_longitudes=source_longitudes,
         target_longitudes=target_longitudes,
@@ -83,7 +103,9 @@ def build_transit_payload(
         "exact_orb_limit": exact_orb_limit,
         "sun": transit_reference["sun"],
         "moon": transit_reference["moon"],
-        "ascendant": transit_reference["ascendant"],
+        "ascendant": (
+            transit_reference["ascendant"] if transit_ascendant_resolved else None
+        ),
         "medium_coeli": transit_reference["medium_coeli"],
         "transit_reference": transit_reference,
         "natal_reference": natal_reference,

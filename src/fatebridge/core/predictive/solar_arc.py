@@ -5,7 +5,9 @@ from __future__ import annotations
 from fractions import Fraction
 from typing import Any, Dict
 
+from fatebridge.core.astro.event_reference import unresolved_ascendant
 from fatebridge.core.astro.geometry import longitude_float
+from fatebridge.core.predictive.native_chart import NativeSubject
 
 from ._common import (
     collect_aspect_hits,
@@ -17,12 +19,16 @@ from .progressions import ProgressionCalculationOptions
 
 
 def build_solar_arc_payload(
-    natal_subject: Any,
-    progressed_subject: Any,
+    natal_subject: NativeSubject,
+    progressed_subject: NativeSubject,
     *,
     progression_options: ProgressionCalculationOptions | None = None,
 ) -> Dict[str, Any]:
     natal_longitudes = extract_reference_longitudes(natal_subject)
+    if unresolved_ascendant(natal_subject):
+        natal_longitudes.pop("Ascendant")
+    else:
+        pass
     arc_degrees = (
         Fraction(point_absolute_position(progressed_subject, "Sun"))
         - Fraction(point_absolute_position(natal_subject, "Sun"))
@@ -48,9 +54,12 @@ def build_solar_arc_payload(
         "moon": longitude_to_point_dict(
             "Moon", longitude_float(directed_points["Moon"])
         ),
-        "ascendant": longitude_to_point_dict(
-            "Ascendant",
-            longitude_float(directed_points["Ascendant"]),
+        "ascendant": (
+            longitude_to_point_dict(
+                "Ascendant", longitude_float(directed_points["Ascendant"])
+            )
+            if "Ascendant" in directed_points
+            else None
         ),
         "medium_coeli": longitude_to_point_dict(
             "Medium_Coeli",

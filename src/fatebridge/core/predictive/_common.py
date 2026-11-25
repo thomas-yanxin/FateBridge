@@ -15,6 +15,7 @@ from fatebridge.core.astro.birth import (
     build_astro_birth_info,
     require_resolved_birth_timezone,
 )
+from fatebridge.core.astro.event_reference import ASC_INDEPENDENT_HOUSES
 from fatebridge.core.astro.geometry import (
     Angle,
     angular_separation_fraction,
@@ -553,6 +554,34 @@ def extract_named_points(
             getattr(subject, point_attribute_name(point_name)),
         )
     return result
+
+
+def qualified_point_names(
+    point_names: list[str], *, ascendant_resolved: bool
+) -> list[str]:
+    """Select physical points available for calculation."""
+    return [name for name in point_names if ascendant_resolved or name != "Ascendant"]
+
+
+def extract_qualified_timing_reference(
+    subject: NativeSubject, point_names: list[str], *, ascendant_resolved: bool
+) -> dict[str, dict[str, object]]:
+    """Retain independent points while withholding unresolved ASC and houses."""
+    reference = extract_named_points(subject, point_names)
+    if ascendant_resolved:
+        pass
+    else:
+        reference["ascendant"] = {
+            key: value if key in {"point", "point_label"} else None
+            for key, value in reference["ascendant"].items()
+        }
+        if subject.houses_system_identifier not in ASC_INDEPENDENT_HOUSES:
+            for point in reference.values():
+                point["house"] = None
+                point["house_label"] = None
+        else:
+            pass
+    return reference
 
 
 def extract_reference_longitudes(subject: NativeSubject) -> Dict[str, float]:

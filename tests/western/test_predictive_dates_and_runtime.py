@@ -134,8 +134,8 @@ def test_transit_timezone_conversion_preserves_the_instant(monkeypatch):
     point = {"sign_label": "test", "house": 1}
     monkeypatch.setattr(
         transit,
-        "extract_named_points",
-        lambda *args: dict.fromkeys(
+        "extract_qualified_timing_reference",
+        lambda *args, ascendant_resolved: dict.fromkeys(
             ("sun", "moon", "ascendant", "medium_coeli"), point
         ),
     )

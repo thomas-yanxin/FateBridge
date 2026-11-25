@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
+from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.predictive import western_timing as astrology_predictive
 from fatebridge.core.predictive._common import build_predictive_birth_info
 from fatebridge.core.predictive.decennials import (
@@ -15,6 +16,7 @@ from fatebridge.core.predictive.decennials import (
 from fatebridge.core.predictive.native_chart import NativePoint, NativeSubject
 from fatebridge.services.western_timing_tools import calculate_timing_tool
 from tests.fixtures.surface_payloads import western_payload
+from tests.support.transports import SPECS, three_surfaces
 
 DECENNIAL_REFERENCE = json.loads(
     (Path(__file__).parents[1] / "fixtures/decennials-reference.json").read_text()
@@ -346,3 +348,208 @@ def test_decennials_payload_is_bounded_for_agent_consumption():
         for child in children:
             assert child["level"] == child_level
             assert child.get("sublevel", []) == []
+
+
+J2000_UNRESOLVED_ASC_SITE = dict(
+    birth_longitude=169.54144401512139, birth_latitude=-66.5623231709126
+)
+
+
+@pytest.mark.parametrize("technique", ["pd", "pdchart"])
+@pytest.mark.parametrize(
+    "method", ["astroapp_alchabitius", "equatorial", "fatebridge_mundane_semiarc"]
+)
+def test_primary_directions_exclude_unresolved_ascendant_before_events(
+    technique, method, tmp_path, monkeypatch, capsys
+):
+    """Unresolved Ascendant and its lots cannot enter a direction or a chart."""
+    arguments = western_payload()
+    arguments.update(pd_method=method, show_pd_bounds=True, house_system="W")
+    if method == "fatebridge_mundane_semiarc":
+        # This location supplies valid semiarcs for all planets.
+        build_natal_subject = astrology_predictive.build_natal_subject
+
+        def unresolved_subject(
+            birth_info: AstroBirthInfo,
+            *,
+            house_system: str = "P",
+            zodiac_type: str = "Tropic",
+        ) -> NativeSubject:
+            subject = build_natal_subject(
+                birth_info, house_system=house_system, zodiac_type=zodiac_type
+            )
+            subject.calculation_basis["angle_definition"] = {
+                "geometric_ascendant_resolved": False,
+            }
+            return subject
+
+        monkeypatch.setattr(
+            astrology_predictive, "build_natal_subject", unresolved_subject
+        )
+    else:
+        arguments.pop("birth_place")
+        arguments.update(
+            birth_year=2000,
+            birth_month=1,
+            birth_day=1,
+            birth_hour=12,
+            birth_minute=0,
+            birth_timezone="UTC",
+            **J2000_UNRESOLVED_ASC_SITE,
+        )
+    response = three_surfaces(
+        SPECS[technique],
+        arguments,
+        ["natal_reference.ascendant.longitude", technique],
+        "2026-05-20T12:00:00Z",
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    assert response["natal_reference"]["ascendant"]["longitude"] is None
+    directions = response[technique]
+    assert "Ascendant" not in directions["coordinate_diagnostics"]
+    if technique == "pd":
+        assert directions["promissors"] == ["Medium_Coeli"]
+        assert "Sun" in directions["coordinate_points"]
+        assert "Ascendant" not in directions["coordinate_points"]
+        assert "Ascendant" not in directions["current_coordinate_points"]
+        assert (
+            directions["coordinate_lots"] == directions["current_coordinate_lots"] == {}
+        )
+        windows = [
+            "timeline",
+            "past_window",
+            "future_window",
+            "current_window",
+            "exact_window",
+        ]
+    else:
+        assert directions["directed_ascendant"] is None
+        assert directions["directed_medium_coeli"]["longitude"] is not None
+        assert "Sun" in directions["directed_points"]
+        assert "Ascendant" not in directions["directed_points"]
+        assert directions["directed_lots"] == {}
+        assert all(
+            change["point"] != "Ascendant" for change in directions["sign_changes"]
+        )
+        windows = ["coordinate_hits", "hits", "exact_hits"]
+    excluded_points = {"Ascendant", "Fortune", "Spirit"}
+    assert all(
+        excluded_points.isdisjoint((event["promissor"], event["significator"]))
+        for window in windows
+        for event in directions[window]
+    )
+
+
+@pytest.mark.parametrize(
+    "unresolved_natal,unresolved_transit,house_system",
+    [(True, False, "W"), (False, True, "W"), (True, True, "M"), (False, False, "W")],
+)
+def test_transit_qualifies_each_chart_before_aspects_and_house_counts(
+    unresolved_natal, unresolved_transit, house_system, tmp_path, monkeypatch, capsys
+):
+    """Each chart's Ascendant and houses depend on that chart alone."""
+    ordinary_location = dict(birth_longitude=0.0, birth_latitude=40.0)
+    natal_location = (
+        J2000_UNRESOLVED_ASC_SITE if unresolved_natal else ordinary_location
+    )
+    transit_location = (
+        J2000_UNRESOLVED_ASC_SITE if unresolved_transit else ordinary_location
+    )
+    arguments = dict(
+        birth_year=2000,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=12,
+        birth_minute=0,
+        birth_timezone="UTC",
+        **natal_location,
+        analysis_year=2000,
+        analysis_month=1,
+        analysis_day=1,
+        analysis_hour=12,
+        analysis_minute=0,
+        return_longitude=transit_location["birth_longitude"],
+        return_latitude=transit_location["birth_latitude"],
+        return_timezone="UTC",
+        house_system=house_system,
+    )
+    response = three_surfaces(
+        SPECS["transit"],
+        arguments,
+        ["natal_reference.ascendant.longitude", "transit"],
+        "2026-05-20T12:00:00Z",
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    transit = response["transit"]
+    assert (
+        response["natal_reference"]["ascendant"]["longitude"] is None
+    ) == unresolved_natal
+    assert (transit["ascendant"] is None) == unresolved_transit
+    for reference_key, unresolved in (
+        ("natal_reference", unresolved_natal),
+        ("transit_reference", unresolved_transit),
+    ):
+        reference = transit[reference_key]
+        assert (reference["ascendant"]["longitude"] is None) == unresolved
+        assert reference["medium_coeli"]["longitude"] is not None
+        assert reference["sun"]["longitude"] is not None
+        assert (reference["sun"]["house"] is None) == (
+            unresolved and house_system == "W"
+        )
+    assert bool(transit["house_emphasis"]) == (
+        not unresolved_transit or house_system == "M"
+    )
+    assert transit["hits"] and transit["exact_hits"]
+    assert all(
+        (not unresolved_transit or hit["source"] != "Ascendant")
+        and (not unresolved_natal or hit["target"] != "Ascendant")
+        for hit in transit["hits"] + transit["exact_hits"]
+    )
+
+
+@pytest.mark.parametrize("house_system", ["W", "M"])
+def test_solar_arc_withholds_unresolved_ascendant_and_retains_independent_points(
+    house_system, tmp_path, monkeypatch, capsys
+):
+    """A true solar arc cannot resolve an undefined natal Ascendant."""
+    arguments = western_payload()
+    arguments.update(
+        name="synthetic-solar-arc-qualification",
+        birth_place="",
+        birth_year=2000,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=12,
+        birth_minute=0,
+        birth_timezone="UTC",
+        house_system=house_system,
+        **J2000_UNRESOLVED_ASC_SITE,
+    )
+    response = three_surfaces(
+        SPECS["solararc"],
+        arguments,
+        ["natal_reference", "solararc"],
+        "2026-05-20T12:00:00Z",
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    reference = response["natal_reference"]
+    assert reference["ascendant"]["longitude"] is None
+    assert reference["lots"] is None
+    assert (reference["sun"]["house"] is not None) == (house_system == "M")
+    arc = response["solararc"]
+    assert arc["ascendant"] is None
+    assert arc["arc_degrees"] > 0
+    assert (
+        arc["calculation_options"]["arc_method"]
+        == "true_progressed_Sun_ecliptic_longitude"
+    )
+    for point_name in ("sun", "moon", "medium_coeli"):
+        assert arc[point_name]["longitude"] is not None
+    assert arc["hits"]
+    assert all("Ascendant" not in (hit["source"], hit["target"]) for hit in arc["hits"])
