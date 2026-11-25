@@ -565,7 +565,7 @@ def qualified_point_names(
 
 def extract_qualified_timing_reference(
     subject: NativeSubject, point_names: list[str], *, ascendant_resolved: bool
-) -> dict[str, dict[str, object]]:
+) -> dict[str, dict[str, str | float | int | bool | None]]:
     """Retain independent points while withholding unresolved ASC and houses."""
     reference = extract_named_points(subject, point_names)
     if ascendant_resolved:
