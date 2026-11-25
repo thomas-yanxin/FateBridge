@@ -2,3 +2,4 @@
 # Historical data outside Git retains its original bytes in the data bundle.
 * text=auto eol=lf
 src/fatebridge/data/sukuyo_dayan_reference_LICENSE.txt -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tests/fixtures/ren_timescale_v1/iers-history.txt -text -whitespace

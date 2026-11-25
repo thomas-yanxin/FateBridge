@@ -148,6 +148,16 @@ docs/reviews/
 !/tests/fixtures/western-ninth-part-pvr2000.json
 !/tests/fixtures/western-ramesey-marriage-1653.json
 !/tests/fixtures/western-election-worked-sources.json
+# Small public references required by CI collection and documentation links.
+!/tests/fixtures/western-horizons.json
+!/tests/fixtures/western-ptolemy-sign-relations-robbins-1940.json
+!/tests/fixtures/ren_clock_profiles_v1/freeze.json
+!/tests/fixtures/ren_clock_profiles_v1/protocol.json
+!/tests/fixtures/ren_clock_profiles_v1/source-links.json
+!/tests/fixtures/ren_timescale_v1/iers-history.txt
+!/tests/fixtures/heluo_structure_v1/reference.json
+!/tests/fixtures/guolao-ruler-calendar-v1/reference.json
+!/tests/fixtures/guolao-anchor-days-v1/reference.json
 # Preserve small source commitments and collation beside their local raw corpora.
 !/tests/fixtures/meihua_situational_v1/source-files.json
 !/tests/fixtures/taiyi_dangshi_noble_v40/freeze-original.json

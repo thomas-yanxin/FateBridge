@@ -1,0 +1,52 @@
+{
+  "scope": "Counterfactual loaded-table reloads are engineering faults, not changes to real historical UTC or independent astronomical events. Expected arithmetic is hand declared before code changes. No historical coefficient file is modified.",
+  "historical_cases": [
+    {
+      "id": "sofa1960",
+      "year": 1960,
+      "table": "utc1960",
+      "entry_effective": "1960-01-01",
+      "offset_increment_seconds": 2.0,
+      "rate_seconds_per_day": 0.001296,
+      "expected_context_changes": true,
+      "expected_cache_equals_fresh": true,
+      "expected_utc_shift_formula": "-offset_increment_seconds / (1 + rate_seconds_per_day / 86400)",
+      "expected_tt_preserved": true
+    },
+    {
+      "id": "iers1969",
+      "year": 1969,
+      "table": "historical_utc",
+      "entry_effective": "1968-02-01",
+      "offset_increment_seconds": 2.0,
+      "rate_seconds_per_day": 0.002592,
+      "expected_context_changes": true,
+      "expected_cache_equals_fresh": true,
+      "expected_utc_shift_formula": "-offset_increment_seconds / (1 + rate_seconds_per_day / 86400)",
+      "expected_tt_preserved": true
+    }
+  ],
+  "receipt_cases": [
+    {
+      "id": "expiry",
+      "field": "expires_at",
+      "value": "2026-01-01T00:00:00+00:00",
+      "moment": "2026-06-01T00:00:00+00:00",
+      "expected_future_assumption": true
+    },
+    {
+      "id": "source",
+      "field": "source_url",
+      "value": "https://example.invalid/hypothetical-reloaded-iers-profile",
+      "moment": "2026-06-01T00:00:00+00:00",
+      "expected_future_assumption": false
+    }
+  ],
+  "criteria": {
+    "utc_shift_absolute_error_seconds": 0.0002,
+    "tt_roundtrip_absolute_error_seconds": 0.0002,
+    "year_term_count": 24
+  },
+  "event_count": 0,
+  "full_calendar_certified": false
+}

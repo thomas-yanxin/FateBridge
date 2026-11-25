@@ -123,6 +123,7 @@ def test_invalid_packaged_source_cannot_become_a_polar_no_event(monkeypatch):
     assert raised.value is failure
 
 
+@pytest.mark.local_data
 @pytest.mark.parametrize(
     "row", FILE_REFERENCE["rows"], ids=lambda row: str(row["case"])
 )
@@ -151,6 +152,7 @@ def test_selected_original_file_uses_full_tdb_optics(row, selected_jpl):
         assert abs(event.julian_day_tt - root["tt"]) * 86400 <= 0.001
 
 
+@pytest.mark.local_data
 @pytest.mark.parametrize("row", FILE_REFERENCE["split_epoch_states"])
 def test_selected_file_preserves_sub_ulp_source_epochs(row):
     epoch = Fraction(row["jd0"]) + Fraction(*row["tdb_fraction"])
@@ -159,6 +161,7 @@ def test_selected_file_preserves_sub_ulp_source_epochs(row):
     assert math.dist(values[3:6], row["velocity_au_day"]) * 149597870700 / 86400 <= 1e-8
 
 
+@pytest.mark.local_data
 def test_no_event_packet_retains_selected_file_identity(selected_jpl):
     with use_ut1_source("swiss_delta_t"):
         packet = solar_packet(2451545.0, 0, 90, "require_data_files")
@@ -175,6 +178,7 @@ def test_no_event_packet_retains_selected_file_identity(selected_jpl):
     )
 
 
+@pytest.mark.local_data
 def test_file_reader_failure_cannot_become_a_polar_no_event(selected_jpl, monkeypatch):
     failure = EphemerisSourceError("jpl_kinematics_invalid")
 
