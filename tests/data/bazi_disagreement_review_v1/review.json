@@ -1,0 +1,986 @@
+{
+  "review_id": "remaining_bazi_authority_v1",
+  "base_commit": "c63968b5fe11b59e24a37d8aec4bd2c3d87751ed",
+  "source_annotations_sha256": "3f38d35ed00c7bfa8c5539a579c33b66d451fde840fbf01eb6d2a7abfd099170",
+  "source_conditions_sha256": "b4ac55d88026d5aff7ede30f82301eb26c045c9975d7985fbd5188ae6d4ca59d",
+  "frozen_denominators": {
+    "records": 367,
+    "distinct_inputs": 321,
+    "unknown_strength_records": 244,
+    "disagreement_inputs": 17,
+    "constraints": 3,
+    "constraint_violations": 2
+  },
+  "rules": {
+    "engineering_weights_changed": false,
+    "source_labels_changed": false,
+    "negative_set_assigns_exact_grade": false,
+    "case_labels_enter_production_adjudication": false,
+    "independent_human_double_read": "not_completed",
+    "new_independent_validation_credit": 0,
+    "blind_holdout_status": "not_available_previously_exposed_controls_only"
+  },
+  "disagreements": [
+    {
+      "reference_id": "original:ZP37-LIANG",
+      "pillars": [
+        "丁未",
+        "癸卯",
+        "癸亥",
+        "癸丑"
+      ],
+      "retained_strength": "强",
+      "engineering_strength": "弱",
+      "registered_original_anchor": "如身強食旺而財透大貴之格",
+      "original_anchor_status": "registered_transcription_not_independently_reread",
+      "registered_context_reading": {
+        "review_id": "original19-source-conditions:ZP37-LIANG",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "reading_excerpt": "如身強食旺而財透，大貴之格",
+        "source_page_anchors": [
+          {
+            "pdf_page": 76,
+            "image_sha256": "47c5b4f77e2d78e9b1ec1f7ce6211462d43a8c98325feadbe8472ad8c6cfc15d"
+          }
+        ],
+        "body_seal_conditions": "癸日、亥根与印星辛金须分列；此段同时要求食旺、财透、财有根，不能只将食财能量相加便否定所举身强。",
+        "passage_conditions": "原局明见亥卯未，完整关系回执中的合绊或转化状态须照录，不能据元素连续断通关。",
+        "independent_expert_review": "not_completed"
+      },
+      "editorial_reading": "本段先说身强食旺财透，接列梁、谢二例；是段落归属裁定，非逐例另有强字",
+      "source_reference": {
+        "title": "秘本子平真诠",
+        "edition": "《秘本子平真诠》，上海世界图书馆发行，国家图书馆藏本，NLC416-11jh010455-35296",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_id": "ZP-WORLDBOOK-NLC",
+        "pdf_pages": [
+          76
+        ],
+        "locator": "p76 右起第3-5列及梁丞相命式",
+        "whole_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620"
+      },
+      "application_domain": "食神生财段落归属；财根、身食财承载条件，不推出通用充分判级。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "original:ZP37-XIE",
+      "pillars": [
+        "己未",
+        "壬申",
+        "戊子",
+        "庚申"
+      ],
+      "retained_strength": "强",
+      "engineering_strength": "弱",
+      "registered_original_anchor": "己未壬申戊子庚申謝閣老是也",
+      "original_anchor_status": "registered_transcription_not_independently_reread",
+      "registered_context_reading": {
+        "review_id": "original19-source-conditions:ZP37-XIE",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "reading_excerpt": "如身強食旺而財透，大貴之格",
+        "source_page_anchors": [
+          {
+            "pdf_page": 76,
+            "image_sha256": "47c5b4f77e2d78e9b1ec1f7ce6211462d43a8c98325feadbe8472ad8c6cfc15d"
+          }
+        ],
+        "body_seal_conditions": "与梁例共用同段分类；两申藏戊及未土的物理根不能抹去，也不能因此直接判定工程强档。",
+        "passage_conditions": "壬财和庚食神有透不等于全部食神生财条件已通过；保留原典类别与工程弱的差异。",
+        "independent_expert_review": "not_completed"
+      },
+      "editorial_reading": "同段身强食旺财透所举第二例；保留原文段落标签而非本次重算",
+      "source_reference": {
+        "title": "秘本子平真诠",
+        "edition": "《秘本子平真诠》，上海世界图书馆发行，国家图书馆藏本，NLC416-11jh010455-35296",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_id": "ZP-WORLDBOOK-NLC",
+        "pdf_pages": [
+          76
+        ],
+        "locator": "p76 梁例紧接谢例，两例同属身强食旺财透段",
+        "whole_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620"
+      },
+      "application_domain": "同段第二例；长生及余气根、食财承载条件，不以土权重回填。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "hurt:ZP41-SHI",
+      "pillars": [
+        "壬午",
+        "己酉",
+        "戊辰",
+        "庚申"
+      ],
+      "retained_strength": "强",
+      "engineering_strength": "弱",
+      "registered_original_anchor": null,
+      "original_anchor_status": "not_separately_registered",
+      "registered_context_reading": {
+        "review_id": "original19-source-conditions:ZP41-SHI",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "reading_excerpt": "只要身強而財有根，便為貴格",
+        "source_page_anchors": [
+          {
+            "pdf_page": 82,
+            "image_sha256": "dc6c84cf50aa953808a473a47199956365de86ae294900d46d77e454cd76bc13"
+          }
+        ],
+        "body_seal_conditions": "“如壬午己酉戊辰庚申史春芳命”接在条件后；戊土自身根、午印与财根各核，不把印计入本体。",
+        "passage_conditions": "伤官生财是该段格局条件；工程图的存在性不能替代财根与身强条件。",
+        "independent_expert_review": "not_completed"
+      },
+      "editorial_reading": "伤官生财段先说只要身强而财有根，紧接此命例。",
+      "source_reference": {
+        "title": "秘本子平真诠",
+        "edition": "《秘本子平真诠》，上海世界图书馆发行，国家图书馆藏本，NLC416-11jh010455-35296",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          82
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620"
+      },
+      "application_domain": "伤官生财段落归属；辰酉关系及财根条件。原句未单独登记，不把编释当逐字引文。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "root:ZP-PROSPECTIVE-02-YANG",
+      "pillars": [
+        "壬寅",
+        "壬寅",
+        "庚辰",
+        "辛巳"
+      ],
+      "retained_strength": "强",
+      "engineering_strength": "弱",
+      "registered_original_anchor": null,
+      "original_anchor_status": "not_separately_registered",
+      "registered_context_reading": {
+        "review_id": "original19-source-conditions:ZP-PROSPECTIVE-02-YANG",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "reading_excerpt": "身強而不露官，略帶一位比肩，益覺有情",
+        "source_page_anchors": [
+          {
+            "pdf_page": 69,
+            "image_sha256": "190c96c30976433d5e8d6af304e68db013ce3ead6787e3477f53c590caba0bb9"
+          }
+        ],
+        "body_seal_conditions": "杨侍郎例接在身强条件后；寅月失令不能独自定弱，辰土印、巳根及比肩分列。",
+        "passage_conditions": "壬水财、庚日与辛比肩各自位置和相互作用需要完整记录；本段没有给统一通关系数。",
+        "independent_expert_review": "not_completed"
+      },
+      "editorial_reading": "财用食生段明确身强而不露官，紧接杨侍郎例。",
+      "source_reference": {
+        "title": "秘本子平真诠",
+        "edition": "《秘本子平真诠》，上海世界图书馆发行，国家图书馆藏本，NLC416-11jh010455-35296",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          69
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620"
+      },
+      "application_domain": "财用食生段落归属；长生根与印比、食财流通。原句未单独登记。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "root:ZP-PROSPECTIVE-17-MAO-HEAVY",
+      "pillars": [
+        "壬寅",
+        "戊申",
+        "壬辰",
+        "壬寅"
+      ],
+      "retained_strength": "强",
+      "engineering_strength": "中和",
+      "registered_original_anchor": null,
+      "original_anchor_status": "not_separately_registered",
+      "registered_context_reading": {
+        "review_id": "original19-source-conditions:ZP-PROSPECTIVE-17-MAO-HEAVY",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "reading_excerpt": "此身重印輕也",
+        "source_page_anchors": [
+          {
+            "pdf_page": 73,
+            "image_sha256": "ff262123f33324bda2c055b472e73afdf2a7ebe32c7d2a4c171009e20d8a1d13"
+          }
+        ],
+        "body_seal_conditions": "原页所印姓名为馬參政，旧编号及旧登记名保留。身重、印轻是两个主语判断；工程body_greater只比较两种能量，不等于原典强弱已裁定。",
+        "passage_conditions": "不能由戊土、申金、壬水存在就宣布杀印相生有效；原文此处论印格分类。",
+        "independent_expert_review": "not_completed"
+      },
+      "editorial_reading": "原文直接称此身重印轻。身重映射强，另存原术语与标签类型。",
+      "source_reference": {
+        "title": "秘本子平真诠",
+        "edition": "《秘本子平真诠》，上海世界图书馆发行，国家图书馆藏本，NLC416-11jh010455-35296",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          73
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620"
+      },
+      "application_domain": "身重印轻为相对身印术语；保留强映射，不以身印合计代替。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "root:ZP-PROSPECTIVE-18-MA-LIGHT",
+      "pillars": [
+        "己巳",
+        "癸酉",
+        "癸未",
+        "庚申"
+      ],
+      "retained_strength": "弱",
+      "engineering_strength": "强",
+      "registered_original_anchor": null,
+      "original_anchor_status": "not_separately_registered",
+      "registered_context_reading": {
+        "review_id": "original19-source-conditions:ZP-PROSPECTIVE-18-MA-LIGHT",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "reading_excerpt": "此身輕印重也",
+        "source_page_anchors": [
+          {
+            "pdf_page": 73,
+            "image_sha256": "ff262123f33324bda2c055b472e73afdf2a7ebe32c7d2a4c171009e20d8a1d13"
+          }
+        ],
+        "body_seal_conditions": "原页所印姓名为茅狀元，旧编号及旧登记名保留。癸日轻与金印重并陈，最直接反证“印多必身强”。",
+        "passage_conditions": "金印重不自动证明金水生扶可全部承受；工程强与原映射弱的矛盾保持。",
+        "independent_expert_review": "not_completed"
+      },
+      "editorial_reading": "原文直接称此身轻印重。身轻映射弱，另存原术语与标签类型。",
+      "source_reference": {
+        "title": "秘本子平真诠",
+        "edition": "《秘本子平真诠》，上海世界图书馆发行，国家图书馆藏本，NLC416-11jh010455-35296",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          73
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620"
+      },
+      "application_domain": "身轻印重为相对身印术语；保留弱映射，不以重印直接判身强。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "prior_stem_transformation:DTCW1947-HJ-01",
+      "pillars": [
+        "辛亥",
+        "庚寅",
+        "丙子",
+        "乙未"
+      ],
+      "retained_strength": "弱",
+      "engineering_strength": "强",
+      "registered_original_anchor": "丙子日元生於春初，火虛木嫩",
+      "original_anchor_status": "registered_transcription_not_independently_reread",
+      "registered_context_reading": {
+        "review_id": "original19-source-conditions:DTCW1947-HJ-01",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "reading_excerpt": "火虛木嫩，用神在木，忌神在金",
+        "source_page_anchors": [
+          {
+            "pdf_page": 414,
+            "image_sha256": "8f780d29959c2178a5e097f98ae3c79778ffc2482063901b627f9b4f1d3b61ac"
+          }
+        ],
+        "body_seal_conditions": "“春初”限定火虚木嫩；印木数量大不能倒推丙身强。辛亥、庚寅、丙子、乙未各层仍保留。",
+        "passage_conditions": "亥水流通金性、合寅生木及乙木盘根制未土均为所选段条件；工程生克图未算出完整清浊和承载。",
+        "independent_expert_review": "not_completed"
+      },
+      "editorial_reading": null,
+      "source_reference": {
+        "title": null,
+        "edition": null,
+        "url": null,
+        "source_id": null,
+        "pdf_pages": [
+          414
+        ],
+        "locator": null
+      },
+      "application_domain": "火虚木嫩为初春日元及气候语境；合宜、合去不等同物质成化。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "prior_stem_transformation:DTCW1947-HJ-06",
+      "pillars": [
+        "丁未",
+        "壬寅",
+        "甲子",
+        "丙寅"
+      ],
+      "retained_strength": "弱",
+      "engineering_strength": "强",
+      "registered_original_anchor": "木嫩氣虛；最喜丁壬之合化木",
+      "original_anchor_status": "registered_transcription_not_independently_reread",
+      "registered_context_reading": {
+        "review_id": "original19-source-conditions:DTCW1947-HJ-06",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "reading_excerpt": "木嫩氣虛；最喜丁壬之合化木，反生丙火",
+        "source_page_anchors": [
+          {
+            "pdf_page": 416,
+            "image_sha256": "5c8ad058e5cf9f6f0f13e730ba3e087fe214be73f8784c527fb56fa4f4e59edb"
+          }
+        ],
+        "body_seal_conditions": "寅月寅时仍被作者称木嫩气虚，寒暖与生长阶段不能被“当令=强”替代。",
+        "passage_conditions": "原文丁壬合化木属该例作者论断；当前工程仅列关系/候选时，应并列差异，不擅自把候选改成已化或更改系数。",
+        "independent_expert_review": "not_completed"
+      },
+      "editorial_reading": null,
+      "source_reference": {
+        "title": null,
+        "edition": null,
+        "url": null,
+        "source_id": null,
+        "pdf_pages": [
+          416
+        ],
+        "locator": null
+      },
+      "application_domain": "寅月寅时木嫩气虚；寒暖、生发与丁壬成化前提，不能一见禄根即强。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "prior_ganzhi:GH-15",
+      "pillars": [
+        "丙子",
+        "己亥",
+        "乙酉",
+        "壬午"
+      ],
+      "retained_strength": "弱",
+      "engineering_strength": "强",
+      "registered_original_anchor": null,
+      "original_anchor_status": "not_separately_registered",
+      "registered_context_reading": {
+        "review_id": "original19-source-conditions:GH-15",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "reading_excerpt": "日主本衰，未嘗不喜其生",
+        "source_page_anchors": [
+          {
+            "pdf_page": 106,
+            "image_sha256": "833b1903a628600f3a6b830116c52f5c9d34fc737045a946b188c6604811ee7d"
+          }
+        ],
+        "body_seal_conditions": "乙日冬令，壬印紧贴与丙火向阳、己土砥水是不同作用；水印大不等于乙身已强。",
+        "passage_conditions": "原文强调壬水远隔与日主紧贴的区别及天干地支各立门户；不能把所有水印统一当作有效生扶。",
+        "independent_expert_review": "not_completed"
+      },
+      "editorial_reading": "正文明确日主本衰，未尝不喜其生；保留本体衰与印生作用之别，没有从高官传记定强。",
+      "source_reference": {
+        "title": "任注滴天髓闡微·干支總論",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          106
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "application_domain": "日主本衰与喜印生分列；资源量不替代本体承受力。原句未单独登记。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "prior_shape_bureau:XX-19",
+      "pillars": [
+        "庚申",
+        "辛巳",
+        "丙辰",
+        "乙未"
+      ],
+      "retained_strength": "弱",
+      "engineering_strength": "中和",
+      "registered_original_anchor": null,
+      "original_anchor_status": "not_separately_registered",
+      "registered_context_reading": {
+        "review_id": "original19-source-conditions:XX-19",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "reading_excerpt": "獨印受傷，弱可知矣；此財多身弱",
+        "source_page_anchors": [
+          {
+            "pdf_page": 137,
+            "image_sha256": "724ad0cbd4807b9cf48398fedd6dd51c1cc15486f4233d5634bc6e2309a12aae"
+          }
+        ],
+        "body_seal_conditions": "巳月建禄不保证身强；庚辛叠透根深、乙印受伤和无根是原文明示条件。",
+        "passage_conditions": "“帮之则有功”在这里带条件，不能把任何印路径认定已通关，或拿后续甲申乙酉发财改写原局标签。",
+        "independent_expert_review": "not_completed"
+      },
+      "editorial_reading": "作者反驳建禄必用财俗论，明说弱可知矣、财多身弱。",
+      "source_reference": {
+        "title": "任注滴天髓闡微·形象·方局上下及干支总论尾例",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          137
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "application_domain": "反驳建禄必用财；有根仍可财多身弱。原句未单独登记。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "prior_body_spirit_month_hour:SP-02",
+      "pillars": [
+        "癸未",
+        "乙卯",
+        "丙辰",
+        "庚寅"
+      ],
+      "retained_strength": "弱",
+      "engineering_strength": "强",
+      "registered_original_anchor": null,
+      "original_anchor_status": "not_separately_registered",
+      "registered_context_reading": {
+        "review_id": "original19-source-conditions:SP-02",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "reading_excerpt": "木之勢愈旺而火熾，火熾則氣餒",
+        "source_page_anchors": [
+          {
+            "pdf_page": 169,
+            "image_sha256": "68c773aea8cf7a54eb3b4df6443f0e291828c4b496c811c0617bc9647fc4a9ed"
+          },
+          {
+            "pdf_page": 170,
+            "image_sha256": "cf99ded0c28b2f3f62629d82891a05e3571e66485726cca2ff1e48cd72a46084"
+          }
+        ],
+        "body_seal_conditions": "本例确为癸未乙卯丙辰庚寅，PDF169左栏续170首行；不是170另列的四柱皆土命。旧弱标签为“气馁”到丙身弱的人工语义映射，不是逐字身弱判词，保持但不新增认可。",
+        "passage_conditions": "需结合168精气神论的不同所指，不能将“火炽”单词或“气馁”单词直接变成统一强弱档；19例复核仍记分歧，不借此删除负例。",
+        "independent_expert_review": "not_completed"
+      },
+      "editorial_reading": "作者按精气神论，气是日主本气；原局称气馁，映射为丙日弱，是语义映射而非原文明写身弱。木旺与印相生不等于日主有力；不以未来运中伤丙火生成标签。",
+      "source_reference": {
+        "title": "任注滴天髓闡微·体用·精神·月令·生时及八格已录尾例",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          169,
+          170
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "application_domain": "气馁是精气神篇语义映射，不是原文明写身弱；待独立核读。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "body_hidden_seal_v5:DTCW1947-JC-02",
+      "pillars": [
+        "丁丑",
+        "壬寅",
+        "丙申",
+        "壬辰"
+      ],
+      "retained_strength": "弱",
+      "engineering_strength": "强",
+      "registered_original_anchor": "丙火生於初春，火虛木嫩；嫩木逢金緊貼相冲，連根拔盡。",
+      "original_anchor_status": "registered_transcription_not_independently_reread",
+      "registered_context_reading": null,
+      "editorial_reading": null,
+      "source_reference": {
+        "title": "任注滴天髓闡微",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          382
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "application_domain": "初春火虚、嫩木与贴冲根损条件；根位不认证有效印力。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "drywet_hiddenvisible_manyfew_v6:DTCW1947-YX-01",
+      "pillars": [
+        "己卯",
+        "辛未",
+        "丙子",
+        "辛卯"
+      ],
+      "retained_strength": "强",
+      "engineering_strength": "弱",
+      "registered_original_anchor": "丙火生於未月，火氣正盛；坐下官星被未土傷盡。",
+      "original_anchor_status": "registered_transcription_not_independently_reread",
+      "registered_context_reading": null,
+      "editorial_reading": null,
+      "source_reference": {
+        "title": "任注滴天髓闡微",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          264
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "application_domain": "未月火气正盛的具名语境；官星受伤条件，不全局调季相。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "drywet_hiddenvisible_manyfew_v6:DTCW1947-ZQ-02",
+      "pillars": [
+        "戊午",
+        "壬戌",
+        "丁卯",
+        "癸卯"
+      ],
+      "retained_strength": "强",
+      "engineering_strength": "弱",
+      "registered_original_anchor": "戌午拱火，日時逢印，日主旺極，莫作用印而推，亦不可作去官留殺論也。",
+      "original_anchor_status": "registered_transcription_not_independently_reread",
+      "registered_context_reading": null,
+      "editorial_reading": null,
+      "source_reference": {
+        "title": "任注滴天髓闡微",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          267
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "application_domain": "日主旺极与戌午拱火、日时印并列；不是见印即旺。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "complete_role_units_root_load_v2:DTCW1947-CX-04",
+      "pillars": [
+        "甲寅",
+        "丙子",
+        "己酉",
+        "己巳"
+      ],
+      "retained_strength": "强",
+      "engineering_strength": "弱",
+      "registered_original_anchor": null,
+      "original_anchor_status": "not_separately_registered",
+      "registered_context_reading": null,
+      "editorial_reading": "己酉日生仲冬，甲寅官坐禄、子水财当令生官、时逢印比，作者明确君臣两盛。月丙使寒土向阳转生己，酉金又得巳拱，火生金、金生水、水养木；后段另论日土能够克财以及重财而忘君恩。这是有寒暖与流通条件的最终叙述，不能只因见印比或己巳根断其充分。",
+      "source_reference": {
+        "title": "任注滴天髓闡微",
+        "edition": "任鐵樵增注，李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          422
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "application_domain": "君臣两盛映射强；寒暖、财官印身连续生化及承财条件，原句未单独登记。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "complete_xingqing_mediated_capacity_v1:DTCW1947-XQ-30",
+      "pillars": [
+        "庚午",
+        "乙酉",
+        "庚午",
+        "壬午"
+      ],
+      "retained_strength": "弱",
+      "engineering_strength": "强",
+      "registered_original_anchor": "五行無土弱可知矣",
+      "original_anchor_status": "registered_transcription_not_independently_reread",
+      "registered_context_reading": null,
+      "editorial_reading": "和中堂造；庚仲秋酉阳刃受三午官星制，原注五行无土、弱可知，壬吐秀。传统常用藏干表午含己，与原注无土语境分列；不删藏己、不把有藏印反驳为已能生身。",
+      "source_reference": {
+        "title": "任注滴天髓闡微·性情",
+        "edition": "任鐵樵增注，李雨田校訂兼發行，上海大東書局經售1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          448
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "application_domain": "弱可知与五行无土语境；午藏己事实不删除，有藏印不等于有效印生。",
+      "status": "unresolved"
+    },
+    {
+      "reference_id": "complete_qingqi_zhuoqi_v1:DTCW1947-QQ-01",
+      "pillars": [
+        "癸酉",
+        "甲子",
+        "丙寅",
+        "乙未"
+      ],
+      "retained_strength": "强",
+      "engineering_strength": "弱",
+      "registered_original_anchor": "丙生子月坐下長生印透根深弱中之旺",
+      "original_anchor_status": "registered_transcription_not_independently_reread",
+      "registered_context_reading": null,
+      "editorial_reading": "原注在丙日语境直言弱中之旺，映射强；不是因为清气或人物官位判强。官星当令及印透根深分别记录。原书校语认为透而生财之财字疑为印字，保留校语，不擅改八字和标签。",
+      "source_reference": {
+        "title": "任注滴天髓闡微·清氣·濁氣",
+        "edition": "任鐵樵增注，李雨田校訂兼發行，上海大東書局經售1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": "ditian_ren_1947_qingqi_zhuoqi",
+        "pdf_pages": [
+          238
+        ],
+        "locator": "清氣",
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "application_domain": "弱中之旺保留强映射；官当令、印透根深与财印校语分别待核。",
+      "status": "unresolved"
+    }
+  ],
+  "constraints": [
+    {
+      "constraint_id": "prior_ganzhi:GH-07#/body_constraints/0",
+      "reference_id": "prior_ganzhi:GH-07",
+      "annotation_location": "/body_constraints/0",
+      "forbidden_strengths": [
+        "强"
+      ],
+      "retained_anchor": "四甲一寅似乎强旺，秋木凋零根已拔，不作旺论；否定强不擅自补弱或中和标签。",
+      "retained_context": null,
+      "source_reference": {
+        "title": "任注滴天髓闡微·干支總論",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          99
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "original_annotation": {
+        "case_id": "GH-07",
+        "forbidden_strengths": [
+          "强"
+        ],
+        "source_pdf_page": 99,
+        "source_basis": "四甲一寅似乎强旺，秋木凋零根已拔，不作旺论；否定强不擅自补弱或中和标签。"
+      },
+      "does_not_assign_an_exact_source_label": true,
+      "pillars": [
+        "甲申",
+        "甲戌",
+        "甲寅",
+        "甲戌"
+      ],
+      "application_domain": "negative_set_only",
+      "engineering_strength": "弱",
+      "constraint_matches": true,
+      "full_context_reading": null,
+      "exact_strength_assigned": false
+    },
+    {
+      "constraint_id": "parallel_shunju_fanju_v5_followup:DTCW1947-SJ05#case:DTCW1947-SJ05/negative_constraints/0",
+      "reference_id": "parallel_shunju_fanju_v5_followup:DTCW1947-SJ05",
+      "annotation_location": "case:DTCW1947-SJ05/negative_constraints/0",
+      "forbidden_strengths": [
+        "弱"
+      ],
+      "retained_anchor": "非身弱論也",
+      "retained_context": null,
+      "source_reference": {
+        "title": "任注滴天髓闡微",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          393
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "original_annotation": {
+        "forbidden_strengths": [
+          "弱"
+        ],
+        "source_anchor": "非身弱論也",
+        "case_id": "DTCW1947-SJ05"
+      },
+      "does_not_assign_an_exact_source_label": true,
+      "pillars": [
+        "甲午",
+        "丁丑",
+        "甲午",
+        "丙寅"
+      ],
+      "application_domain": "from_child_route_not_body_grade",
+      "engineering_strength": "弱",
+      "constraint_matches": false,
+      "full_context_reading": {
+        "review_id": "bounded-force-source-conditions:DTCW1947-SJ05",
+        "case_id": "DTCW1947-SJ05",
+        "pillars": [
+          "甲午",
+          "丁丑",
+          "甲午",
+          "丙寅"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "contextual_semantic_mapping_needs_expert_adjudication",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none",
+        "source_page_anchors": [
+          {
+            "pdf_page": 393,
+            "image_sha256": "a5c53c49b87665b800045df1172ec72069790f3aee882aa9b0d3a6241e0daa5d"
+          }
+        ],
+        "reading_excerpt": "甲木生於季冬，火虛而幸通根有焰，格取從兒，木雖進氣，又逢祿比幫身，所謂從兒不論身強弱，非身弱論也。",
+        "body_seal_conditions": "原文先说火虚而幸通根有焰，随后另说木进气及禄比帮身，不能把火虚当甲木身弱。旧retained_anchor末句“火虛是食傷，不是甲木身弱”为登记编释，不是本页原句。非身弱论也紧承从儿不论身强弱，须区分论法适用条件与身力排除；本次不把它改判为身强、中和，也不撤掉原禁止弱约束或抹去工程弱的旧失败。",
+        "passage_conditions": "从儿成格及食伤生财力量仍待裁定；月丁、时丙、两午与寅中丙的存在不等于实际有效火力。任注明确木有禄比仍可论从儿，不能先以普通弱档替代路线资格；邻页392与394的成气、根气和财星条件不能删去。"
+      },
+      "exact_strength_assigned": false
+    },
+    {
+      "constraint_id": "complete_qingqi_zhuoqi_v1:DTCW1947-QQ-02#/body_constraints/0",
+      "reference_id": "complete_qingqi_zhuoqi_v1:DTCW1947-QQ-02",
+      "annotation_location": "/body_constraints/0",
+      "forbidden_strengths": [
+        "弱"
+      ],
+      "retained_anchor": "而日主之氣不薄",
+      "retained_context": "Only excludes weak under retained editorial reading; does not choose strong versus balanced. Not an exact-labeled correction credit.",
+      "source_reference": {
+        "title": "任注滴天髓闡微·清氣·濁氣",
+        "edition": "任鐵樵增注，李雨田校訂兼發行，上海大東書局經售1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": "ditian_ren_1947_qingqi_zhuoqi",
+        "pdf_pages": [
+          238
+        ],
+        "locator": "清氣",
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "original_annotation": {
+        "case_id": "DTCW1947-QQ-02",
+        "forbidden_strengths": [
+          "弱"
+        ],
+        "anchor": "而日主之氣不薄",
+        "scope": "Only excludes weak under retained editorial reading; does not choose strong versus balanced. Not an exact-labeled correction credit."
+      },
+      "does_not_assign_an_exact_source_label": true,
+      "pillars": [
+        "甲子",
+        "丙寅",
+        "己亥",
+        "辛未"
+      ],
+      "application_domain": "officer_seal_capacity_not_numeric_threshold",
+      "engineering_strength": "弱",
+      "constraint_matches": false,
+      "full_context_reading": {
+        "review_id": "bounded-force-source-conditions:DTCW1947-QQ-02",
+        "case_id": "DTCW1947-QQ-02",
+        "pillars": [
+          "甲子",
+          "丙寅",
+          "己亥",
+          "辛未"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "contextual_semantic_mapping_needs_expert_adjudication",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none",
+        "source_page_anchors": [
+          {
+            "pdf_page": 238,
+            "image_sha256": "f973580c1aafa8cfcf8502f50731a0bee3706f7322b197a95e208551f065bbc1"
+          }
+        ],
+        "reading_excerpt": "春土坐亥，財官太旺，最喜獨印逢生，財藏生官，則印綬之元神愈旺，氣貫生時，而日主之氣不薄，更妙連珠生化。",
+        "body_seal_conditions": "日主之气不薄的对象明确是己土；财官太旺与独印逢生、印绶元神愈旺、气贯生时是同一段前提。保留气不薄不唯一决定强或中和的未知标签，也保留旧禁止弱约束与工程弱的差异；原文没有给工程支持占比阈值，不把工程数值改名为原典身力。",
+        "passage_conditions": "原文主张连续生化而非把财官一概作耗克；应逐一核财、官、印、身的位置、根与承接，不凭五行齐见或任意相生路径宣布通关。气贯生时属于本段力量措辞，不据此重建出生瞬间、节气日数或新增司令结论。"
+      },
+      "exact_strength_assigned": false
+    }
+  ],
+  "previously_exposed_controls": [
+    {
+      "reference_id": "prior_root_v4:DTCW1947-GS-01",
+      "group": "prior_root_v4",
+      "case_id": "DTCW1947-GS-01",
+      "pillars": [
+        "己酉",
+        "丙寅",
+        "庚申",
+        "庚辰"
+      ],
+      "retained_strength_annotation": "强",
+      "annotation_status": "annotated_body_strength",
+      "annotation_basis": "先引俗论失令而必要扶身，随后作者纠正，原局两禄与辰印令弱中变旺；取最终原局判断。",
+      "retained_anchor": "印比幫身，弱中變旺",
+      "retained_context": "先引俗论失令而必要扶身，随后作者纠正，原局两禄与辰印令弱中变旺；取最终原局判断。",
+      "source_reference": {
+        "title": "任注滴天髓闡微·官殺",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          203
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "independent_annotation_review": "not_certified",
+      "editorial_annotation_provenance": {
+        "content_kind": "registered_editorial_annotation",
+        "case_id": "DTCW1947-GS-01",
+        "annotation_sha256": "cf45bea140386086d8c74a794cc867fdedc1961ce61e765a246069c7e849902c",
+        "source_label_kind": "explicit_day_master_or_day_element_judgment",
+        "is_verbatim_original_text": false,
+        "strength_label_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0
+      },
+      "engineering_strength": "强"
+    },
+    {
+      "reference_id": "prior_root_v4:DTCW1947-GS-03",
+      "group": "prior_root_v4",
+      "case_id": "DTCW1947-GS-03",
+      "pillars": [
+        "戊子",
+        "甲寅",
+        "戊午",
+        "甲寅"
+      ],
+      "retained_strength_annotation": "强",
+      "annotation_status": "annotated_body_strength",
+      "annotation_basis": "同页后例明确回指前造日主坚旺；前段土衰木盛是初始季势，不以它覆盖后文最终原局判断。",
+      "retained_anchor": "前則坐下印綬……而日主堅旺",
+      "retained_context": "同页后例明确回指前造日主坚旺；前段土衰木盛是初始季势，不以它覆盖后文最终原局判断。",
+      "source_reference": {
+        "title": "任注滴天髓闡微·官殺",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          205
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "independent_annotation_review": "not_certified",
+      "editorial_annotation_provenance": {
+        "content_kind": "registered_editorial_annotation",
+        "case_id": "DTCW1947-GS-03",
+        "annotation_sha256": "f822bea208d1959ec9000b6aa9fb533b23eca22eb7050c71484304f0ff45cd9d",
+        "source_label_kind": "explicit_day_master_or_day_element_judgment",
+        "is_verbatim_original_text": false,
+        "strength_label_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0
+      },
+      "engineering_strength": "强"
+    },
+    {
+      "reference_id": "prior_root_v4:DTCW1947-GS-12",
+      "group": "prior_root_v4",
+      "case_id": "DTCW1947-GS-12",
+      "pillars": [
+        "癸丑",
+        "戊午",
+        "丙午",
+        "壬辰"
+      ],
+      "retained_strength_annotation": "强",
+      "annotation_status": "annotated_body_strength",
+      "annotation_basis": "丙日火为日主，旺之极直接判断该原局，戊癸合化与壬引通另述。",
+      "retained_anchor": "此造火長夏天，旺之極矣",
+      "retained_context": "丙日火为日主，旺之极直接判断该原局，戊癸合化与壬引通另述。",
+      "source_reference": {
+        "title": "任注滴天髓闡微·官殺",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          209
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "independent_annotation_review": "not_certified",
+      "editorial_annotation_provenance": {
+        "content_kind": "registered_editorial_annotation",
+        "case_id": "DTCW1947-GS-12",
+        "annotation_sha256": "792316ae0815670e1365ee03d6b5f40e75defd5fdb00b1d9e1f645a382a7b197",
+        "source_label_kind": "explicit_day_master_or_day_element_judgment",
+        "is_verbatim_original_text": false,
+        "strength_label_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0
+      },
+      "engineering_strength": "强"
+    },
+    {
+      "reference_id": "prior_dizhi:DZ-12",
+      "group": "prior_dizhi",
+      "case_id": "DZ-12",
+      "pillars": [
+        "戊辰",
+        "辛酉",
+        "丙午",
+        "癸巳"
+      ],
+      "retained_strength_annotation": "强",
+      "annotation_status": "annotated_body_strength",
+      "annotation_basis": "同页后一例正文明确回指前造身财并旺；只用这一日主明示，不从富家或传记成败得标签。",
+      "retained_anchor": null,
+      "retained_context": "同页后一例正文明确回指前造身财并旺；只用这一日主明示，不从富家或传记成败得标签。",
+      "source_reference": {
+        "title": "任注滴天髓闡微",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          91
+        ],
+        "locator": null,
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "independent_annotation_review": "not_certified",
+      "editorial_annotation_provenance": {
+        "content_kind": "registered_editorial_annotation",
+        "case_id": "DZ-12",
+        "annotation_sha256": "e7e92def65f5f8ec40b320bb000d12bbfad27055c7d27d2c10366ec82ea89676",
+        "source_label_kind": "explicit_backreference_body_strong",
+        "is_verbatim_original_text": false,
+        "strength_label_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0
+      },
+      "engineering_strength": "强"
+    }
+  ],
+  "scope": "Frozen public documentary replay only. Null anchors remain missing; editorial text is not promoted to verbatim source. No new original-page rereading or independent human judgment occurred in this unit."
+}

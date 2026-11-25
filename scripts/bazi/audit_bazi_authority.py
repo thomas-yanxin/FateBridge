@@ -77,7 +77,7 @@ def template_axis() -> dict[str, Any]:
     chart = dict(
         zip(
             ("year", "month", "day", "hour"),
-            map(tuple, ("甲子", "乙卯", "丁酉", "丙辰")),
+            ((pillar[0], pillar[1]) for pillar in ("甲子", "乙卯", "丁酉", "丙辰")),
         )
     )
     education = EducationAnalysis.analyze_education(chart)
@@ -85,7 +85,7 @@ def template_axis() -> dict[str, Any]:
     wealth_chart = dict(
         zip(
             ("year", "month", "day", "hour"),
-            map(tuple, ("辛丑", "丁巳", "丙子", "乙未")),
+            ((pillar[0], pillar[1]) for pillar in ("辛丑", "丁巳", "丙子", "乙未")),
         )
     )
     wealth = WealthAnalysis.analyze_wealth(wealth_chart, liunian_pillar=("辛", "未"))
@@ -179,26 +179,129 @@ def build_report() -> dict[str, Any]:
     }
 
 
+def strength_review_axis() -> dict[str, object]:
+    """Replay frozen disagreements without turning documentary gaps into passes."""
+    manifest = (
+        ROOT / "tests/data/bazi_disagreement_review_v1/review.json"
+    ).read_bytes()
+    if hashlib.sha256(manifest).hexdigest() != (
+        "6943730d8c161020a276995c36d7528a5c2da56c5a1100a1e49b9e6ee25b3aa1"
+    ):
+        raise ValueError("Frozen strength review manifest hash mismatch")
+    review = json.loads(manifest)
+    for filename, fingerprint in (
+        ("bazi-source-annotations.json", "source_annotations_sha256"),
+        ("bazi-source-conditions.json", "source_conditions_sha256"),
+    ):
+        source = ROOT / "src/fatebridge/data/reference" / filename
+        if hashlib.sha256(source.read_bytes()).hexdigest() != review[fingerprint]:
+            raise ValueError(f"Frozen documentary source hash mismatch: {filename}")
+    specification = importlib.util.spec_from_file_location(
+        "source_corpus_authority_audit",
+        ROOT / "scripts/bazi/audit_bazi_source_corpus.py",
+    )
+    assert specification and specification.loader
+    source_audit = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(source_audit)
+    current = source_audit.audit()
+    denominators = {
+        "records": current["record_count"],
+        "distinct_inputs": current["distinct_inputs"],
+        "unknown_strength_records": current["unknown_strength_records"],
+        "disagreement_inputs": len(current["all_distinct_disagreements"]),
+        "constraints": len(current["bounded_strength_constraints"]),
+        "constraint_violations": len(current["bounded_strength_constraint_violations"]),
+    }
+    expected_groups = {tuple(record["pillars"]) for record in review["disagreements"]}
+    actual_groups = {
+        tuple(group["pillars"]) for group in current["all_distinct_disagreements"]
+    }
+    frozen_constraints = [
+        {
+            "constraint_id": constraint["constraint_id"],
+            "reference_id": constraint["reference_id"],
+            "forbidden_strengths": constraint["forbidden_strengths"],
+            "actual_strength": constraint["engineering_strength"],
+            "matches": constraint["constraint_matches"],
+        }
+        for constraint in review["constraints"]
+    ]
+    current_grades = {
+        row["group"] + ":" + row["id"]: row["actual_strength"]
+        for row in current["rows"]
+    }
+    changed_cases = [
+        record["reference_id"]
+        for record in (
+            review["disagreements"]
+            + review["constraints"]
+            + review["previously_exposed_controls"]
+        )
+        if current_grades[record["reference_id"]] != record["engineering_strength"]
+    ]
+    changed_adjudications = [
+        row["group"] + ":" + row["id"]
+        for row in current["rows"]
+        if row["classical_adjudication"]["status"] != "not_adjudicated"
+        or row["classical_adjudication"]["body_strength"] is not None
+        or row["classical_adjudication"]["ordinary_fuyi_applicable"] is not None
+    ]
+    return {
+        "review_id": review["review_id"],
+        "frozen_denominators": review["frozen_denominators"],
+        "current_denominators": denominators,
+        "baseline_reproduced": denominators == review["frozen_denominators"]
+        and expected_groups == actual_groups
+        and frozen_constraints == current["bounded_strength_constraints"]
+        and not changed_cases
+        and not changed_adjudications,
+        "changed_case_grades": changed_cases,
+        "changed_classical_adjudications": changed_adjudications,
+        "rules": review["rules"],
+        "documentary_disagreements": review["disagreements"],
+        "documentary_constraints": review["constraints"],
+        "current_disagreements": current["all_distinct_disagreements"],
+        "current_constraints": current["bounded_strength_constraints"],
+        "classical_grade_comparison": current["classical_grade_comparison"],
+        "independent_human_double_read": "not_completed",
+        "new_independent_validation_credit": 0,
+        "blind_holdout_status": review["rules"]["blind_holdout_status"],
+        "authority_certified": False,
+        "scope": review["scope"],
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    result = build_report()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                "calendar": f"{result['calendar']['matched']}/{result['calendar']['total']}",
-                "classical": result["classical"]["summary"],
-                "real_world_prediction": result["real_world_prediction"][
-                    "real_world_efficacy"
-                ],
-                "four_axis_full_marks": False,
-            },
-            ensure_ascii=False,
-        )
+    parser.add_argument(
+        "--strength-review-only",
+        action="store_true",
+        help="Replay the frozen strength disagreements and bounded constraints only.",
     )
+    args = parser.parse_args()
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    if args.strength_review_only:
+        review = strength_review_axis()
+        args.output.write_text(json.dumps(review, ensure_ascii=False, indent=2) + "\n")
+        summary = {
+            "denominators": review["current_denominators"],
+            "baseline_reproduced": review["baseline_reproduced"],
+            "authority_certified": False,
+            "independent_human_double_read": "not_completed",
+        }
+    else:
+        result = build_report()
+        args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+        summary = {
+            "calendar": f"{result['calendar']['matched']}/{result['calendar']['total']}",
+            "classical": result["classical"]["summary"],
+            "real_world_prediction": result["real_world_prediction"][
+                "real_world_efficacy"
+            ],
+            "four_axis_full_marks": False,
+        }
+    print(json.dumps(summary, ensure_ascii=False))
     return 1
 
 

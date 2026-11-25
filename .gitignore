@@ -95,6 +95,7 @@ docs/reviews/
 /tests/data/**
 !/tests/data/**/
 !/tests/data/**/*.py
+!/tests/data/bazi_disagreement_review_v1/review.json
 !/tests/data/ren_boundary_sources_v1/README.md
 !/tests/data/ren_boundary_sources_v1/reference.json.gz
 !/tests/data/metaphysics_primitives_reference_v1/README.md
