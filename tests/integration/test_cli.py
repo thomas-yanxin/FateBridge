@@ -11,8 +11,8 @@ from tests.support.result_delivery import reconstruct, store  # noqa: F401
 from tests.support.transports import (  # noqa: F401
     AS_OF,
     business,
-    projected_outputs,
     rest,
+    surface_calls,
 )
 
 
@@ -664,13 +664,27 @@ def shanghai_subject(tmp_path):
 
 
 def test_profile_shared_delivery_matches_single_tool_surfaces(
-    shanghai_subject, rest, tmp_path, capsys
+    shanghai_subject, surface_calls, capsys
 ):
     data, subject = shanghai_subject
     fields = ["bazi_birth.four_pillars", "run_metadata.runtime"]
     spec = next(spec for spec in CATALOG if spec.key == "bazi_birth")
-    controls = projected_outputs(
-        spec, data, fields, rest, tmp_path, capsys, include_snapshot_text=False
+    response, protocol, code, local = surface_calls(
+        spec,
+        data,
+        projection={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+            "as_of": AS_OF,
+        },
+        rest_as_of=AS_OF,
+    )
+    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    controls = [response.json(), local, protocol.structured_content]
+    assert all(
+        body["run_metadata"]["effective_time"]["as_of"] == AS_OF for body in controls
     )
     assert (
         run(
