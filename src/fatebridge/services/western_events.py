@@ -17,8 +17,8 @@ from fatebridge.core.astrology_events import (
     CARDINAL_INGRESSES,
     RETURN_BODIES,
     find_cardinal_ingress_utc,
-    find_planet_returns,
-    planet_longitude_at_utc,
+    planet_motion_at_utc,
+    resolve_planet_returns,
 )
 from fatebridge.core.predictive._common import (
     build_analysis_datetime,
@@ -163,12 +163,13 @@ def calculate_extrareturns(
         returns: List[Dict[str, Any]] = []
         for body_name, spec in RETURN_BODIES.items():
             planet_id = int(spec["planet_id"])  # type: ignore[call-overload]
-            natal_longitude = planet_longitude_at_utc(
+            natal_motion = planet_motion_at_utc(
                 planet_id,
                 birth_info.require_utc_datetime,
                 sidereal=zodiac_type == "Sidereal",
             )
-            moments = find_planet_returns(
+            natal_longitude = natal_motion[0]
+            previous, following = resolve_planet_returns(
                 planet_id,
                 natal_longitude,
                 period_days=float(spec["period_days"]),  # type: ignore[arg-type]
@@ -176,11 +177,10 @@ def calculate_extrareturns(
                 past=1,
                 future=1,
                 sidereal=zodiac_type == "Sidereal",
+                expected_flags=natal_motion[2],
             )
-            most_recent = next(
-                (m for m in reversed(moments) if m <= reference_utc), None
-            )
-            upcoming = next((m for m in moments if m > reference_utc), None)
+            most_recent = previous[-1] if previous else None
+            upcoming = following[0] if following else None
             returns.append(
                 {
                     "body": body_name,

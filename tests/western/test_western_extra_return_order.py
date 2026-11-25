@@ -192,6 +192,7 @@ def test_nearest_return_and_zodiac_agree_across_rest_mcp_cli(
         ("strict_fields", "true"),
         ("include_snapshot_text", "false"),
         ("response_char_limit", 0),
+        ("as_of", "2026-10-12T02:00:00Z"),
     ]
     http, protocol, code, cli = surface_calls(
         spec,
@@ -202,7 +203,16 @@ def test_nearest_return_and_zodiac_agree_across_rest_mcp_cli(
             "strict_fields": True,
             "include_snapshot_text": False,
         },
-        flags=["--fields", *fields],
+        flags=[
+            "--fields",
+            *fields,
+            "--strict-fields",
+            "true",
+            "--include-snapshot-text",
+            "false",
+            "--response-char-limit",
+            "0",
+        ],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

@@ -14,6 +14,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from fatebridge.core import astrology_events
+from fatebridge.services import western_events
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.transports import SPECS, business, rest, surface_calls
 
@@ -108,6 +109,53 @@ def test_native_speed_is_only_a_split_guide_and_cannot_invent_a_longitude_contac
     assert roots == [origin + timedelta(days=0.25)]
 
 
+@pytest.mark.parametrize(
+    "offset, expected_count",
+    [(-0.000025, 2), (0.0, 1), (math.ulp(120.0), 0)],
+)
+@pytest.mark.parametrize("speed_turn", [0.52, 0.7, 0.0, 1.0])
+@pytest.mark.parametrize("curvature", [-1, 1])
+def test_actual_extremum_decides_close_pairs_contacts_and_unreachable_targets(
+    monkeypatch, offset, expected_count, speed_turn, curvature
+):
+    origin = synthetic_clock(monkeypatch)
+    # A speed zero is a search guide, not the extremum of the returned longitude.
+    # Endpoint zero-speed samples must trigger the same coordinate search.
+    turn = 0.5 if 0 < speed_turn < 1 else (0.01 if speed_turn == 0 else 0.99)
+    monkeypatch.setattr(
+        astrology_events,
+        "_planet_motion",
+        lambda at, body, **kw: (
+            120 + curvature * ((at - turn) ** 2 + offset),
+            curvature * 2 * (at - speed_turn),
+            0,
+            (),
+        ),
+    )
+    roots = astrology_events._longitude_crossings_utc(5, 120, 0, 1, 1)
+    assert len(roots) == expected_count
+    expected = [turn - 0.005, turn + 0.005] if offset < 0 else [turn]
+    for root, day in zip(roots, expected):
+        assert abs((root - (origin + timedelta(days=day))).total_seconds()) < 0.02
+
+
+def test_return_side_is_selected_before_civil_rounding(monkeypatch):
+    reference = datetime(2000, 1, 1, tzinfo=timezone.utc)
+    reference_jd = 2451545.0
+    root = math.nextafter(reference_jd, math.inf)
+    monkeypatch.setattr(astrology_events, "_julian_day", lambda at: reference_jd)
+    monkeypatch.setattr(astrology_events, "datetime_from_tt", lambda at: reference)
+    monkeypatch.setattr(
+        astrology_events,
+        "_planet_motion",
+        lambda at, body, **kw: (120 + at - root, 1.0, 0, ()),
+    )
+    roots = astrology_events.find_planet_returns(
+        5, 120, period_days=0.01, reference_utc=reference, past=0, future=1
+    )
+    assert roots == [reference]
+
+
 @pytest.mark.parametrize("change", ["model", "file"])
 def test_local_station_refinement_rejects_changed_native_source(monkeypatch, change):
     synthetic_clock(monkeypatch)
@@ -148,13 +196,23 @@ def test_station_cell_root_is_the_same_on_rest_mcp_cli(surface_calls):
             ("strict_fields", "true"),
             ("include_snapshot_text", "false"),
             ("response_char_limit", 0),
+            ("as_of", "2026-10-12T02:00:00Z"),
         ],
         options={
             "fields": fields,
             "strict_fields": True,
             "include_snapshot_text": False,
         },
-        flags=["--fields", *fields],
+        flags=[
+            "--fields",
+            *fields,
+            "--strict-fields",
+            "true",
+            "--include-snapshot-text",
+            "false",
+            "--response-char-limit",
+            "0",
+        ],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error
@@ -181,3 +239,104 @@ def test_signed_residual_retains_the_negative_neighbor_of_the_target(base):
 )
 def test_signed_residual_preserves_true_longitude_wrap(longitude, target, expected):
     assert astrology_events._wrapped_diff(longitude, target) == expected
+
+
+@pytest.mark.parametrize("change_at", [0.5, 1.5])
+def test_return_chunks_share_the_same_native_model(monkeypatch, change_at):
+    origin = synthetic_clock(monkeypatch)
+    monkeypatch.setattr(
+        astrology_events,
+        "_planet_motion",
+        lambda at, body, **kw: (120 + at - 0.25, 1, int(at < change_at), ()),
+    )
+    with pytest.raises(EphemerisSourceError) as caught:
+        astrology_events.find_planet_returns(
+            5,
+            120,
+            period_days=0.5,
+            reference_utc=origin + timedelta(days=2),
+            past=1,
+            future=0,
+        )
+    assert caught.value.reason == "model_changed"
+
+
+def test_non_event_cell_can_cross_adjacent_files_without_mixing_a_root(monkeypatch):
+    origin = synthetic_clock(monkeypatch)
+    monkeypatch.setattr(
+        astrology_events,
+        "_planet_motion",
+        lambda at, body, **kw: (
+            120 + at - 1.5,
+            1,
+            2,
+            (("old" if at < 1 else "new", 0.0, 2.0, 441),),
+        ),
+    )
+    assert astrology_events._longitude_crossings_utc(5, 120, 0, 2, 1) == [
+        origin + timedelta(days=1.5)
+    ]
+
+
+def test_service_preserves_native_partition_when_both_labels_round_to_reference(
+    monkeypatch,
+):
+    reference = datetime(2001, 1, 27, tzinfo=timezone.utc)
+    monkeypatch.setattr(
+        western_events,
+        "resolve_planet_returns",
+        lambda *args, **kwargs: ([reference], [reference]),
+    )
+    result = western_events.calculate_extrareturns(
+        birth_year=2001,
+        birth_month=1,
+        birth_day=25,
+        birth_hour=3,
+        birth_minute=0,
+        birth_timezone="UTC",
+        birth_longitude=0,
+        birth_latitude=40,
+        analysis_year=2001,
+        analysis_month=1,
+        analysis_day=27,
+    )
+    assert "error" not in result, result
+    for row in result["extrareturns"]["returns"]:
+        assert row["most_recent_return"]["datetime_utc"] == reference.isoformat()
+        assert row["next_return"]["datetime_utc"] == reference.isoformat()
+
+
+def test_contact_at_one_representable_tt_sample_is_not_skipped(monkeypatch):
+    base = 2451545.0
+    turn = math.nextafter(base + 0.46, math.inf)
+    monkeypatch.setattr(
+        astrology_events,
+        "_planet_motion",
+        lambda at, body, **kw: ((at - turn) ** 2, 2 * (at - base - 0.52), 0, ()),
+    )
+    assert astrology_events._longitude_crossings_tt(5, 0, base, base + 1, 1) == [turn]
+
+
+@pytest.mark.parametrize("speed", [-1.0, 1.0])
+def test_ingress_display_still_preserves_crossed_side_after_tt_selection(
+    monkeypatch, speed
+):
+    origin = datetime(2000, 1, 1, tzinfo=timezone.utc)
+    after = origin + timedelta(microseconds=1)
+    monkeypatch.setattr(
+        astrology_events, "_longitude_crossings_tt", lambda *a, **kw: [1.0]
+    )
+    monkeypatch.setattr(
+        astrology_events, "datetime_from_tt", lambda at: origin if at <= 1 else after
+    )
+    monkeypatch.setattr(
+        astrology_events,
+        "_julian_day",
+        lambda at: math.nextafter(1.0, -math.inf if at == origin else math.inf),
+    )
+    monkeypatch.setattr(
+        astrology_events,
+        "_planet_motion",
+        lambda at, body, **kw: (speed * (at - 1), speed, 0, ()),
+    )
+    assert astrology_events.find_longitude_crossing_utc(0, 0, origin) == after

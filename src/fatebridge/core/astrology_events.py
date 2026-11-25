@@ -99,16 +99,12 @@ def _planet_motion(
     return float(result[0] % 360.0), float(result[3]), int(returned), tuple(contexts)
 
 
-def _planet_longitude(jd: float, planet_id: int, *, sidereal: bool = False) -> float:
-    return _planet_motion(jd, planet_id, sidereal=sidereal)[0]
-
-
 def _wrapped_diff(longitude: float, target: float) -> float:
     """Signed residual in [-180,180], retaining small nonzero root offsets."""
     return math.remainder(longitude - target, 360.0)
 
 
-def _longitude_crossings_utc(
+def _longitude_crossings_tt(
     planet_id: int,
     target_longitude: float,
     start_jd: float,
@@ -116,14 +112,21 @@ def _longitude_crossings_utc(
     step_days: float,
     *,
     sidereal: bool = False,
-) -> List[datetime]:
-    """Scan the whole finite TT window and refine each observed crossing."""
-    moments: List[datetime] = []
+    expected_flags: int | None = None,
+) -> List[float]:
+    """Solve observed longitude crossings/contacts on the native float TT axis."""
+    roots: List[float] = []
     previous_jd = start_jd
     previous = _planet_motion(previous_jd, planet_id, sidereal=sidereal)
+    if expected_flags is None:
+        expected_flags = previous[2]
+    if previous[2] != expected_flags:
+        raise EphemerisSourceError("model_changed")
     while previous_jd < end_jd:
         jd = min(previous_jd + step_days, end_jd)
         current = _planet_motion(jd, planet_id, sidereal=sidereal)
+        if current[2] != expected_flags:
+            raise EphemerisSourceError("model_changed")
 
         def same_source(at: float) -> MotionSample:
             value = _planet_motion(at, planet_id, sidereal=sidereal)
@@ -132,26 +135,77 @@ def _longitude_crossings_utc(
             return value
 
         knots = [(previous_jd, previous[0])]
-        if previous[1] * current[1] < 0:
+        if previous[1] * current[1] < 0 or (
+            (previous[1] == 0.0) != (current[1] == 0.0)
+        ):
             if previous[2:] != current[2:]:
                 raise EphemerisSourceError("model_changed")
-            low, high = previous_jd, jd
-            for _ in range(64):
-                mid = (low + high) / 2
-                if mid in (low, high):
+            if previous[1] == 0.0:
+                turn = previous_jd
+            elif current[1] == 0.0:
+                turn = jd
+            else:
+                low, high = previous_jd, jd
+                for _ in range(64):
+                    mid = (low + high) / 2
+                    if mid in (low, high):
+                        break
+                    sample = same_source(mid)
+                    if sample[1] == 0:
+                        low = high = mid
+                        break
+                    if (sample[1] < 0) == (previous[1] < 0):
+                        low = mid
+                    else:
+                        high = mid
+                turn = (low + high) / 2
+            splits = {turn} if previous_jd < turn < jd else set()
+            # Speed brackets guide a finite cell-wide probe of actual longitude.
+            # Only a strict coordinate improvement adds an extremum candidate;
+            # no angular tolerance turns a nearly reached target into a contact.
+            a, b = previous_jd, jd
+            maximize = 1.0 if previous[1] > 0 or current[1] < 0 else -1.0
+            ratio = (math.sqrt(5.0) - 1.0) / 2.0
+            c, d = b - ratio * (b - a), a + ratio * (b - a)
+            fc = maximize * _wrapped_diff(same_source(c)[0], target_longitude)
+            fd = maximize * _wrapped_diff(same_source(d)[0], target_longitude)
+            best = max((fc, c), (fd, d))
+            for _ in range(96):
+                if b - a <= 4 * math.ulp(max(abs(a), abs(b))) or c >= d:
                     break
-                sample = same_source(mid)
-                if sample[1] == 0:
-                    low = high = mid
-                    break
-                if (sample[1] < 0) == (previous[1] < 0):
-                    low = mid
+                if fc < fd:
+                    a, c, fc = c, d, fd
+                    d = a + ratio * (b - a)
+                    fd = maximize * _wrapped_diff(same_source(d)[0], target_longitude)
                 else:
-                    high = mid
-            turn = (low + high) / 2
-            # Native speed only locates a candidate split. The actual
-            # longitude on both sides must still bracket each returned root.
-            knots.append((turn, same_source(turn)[0]))
+                    b, d, fd = d, c, fc
+                    c = b - ratio * (b - a)
+                    fc = maximize * _wrapped_diff(same_source(c)[0], target_longitude)
+                best = max(best, (fc, c), (fd, d))
+            # At physical TT epochs the final bracket contains at most a few
+            # floats. Visit them all: a grazing contact can occupy just one.
+            probe = a
+            for _ in range(8):
+                if probe > b:
+                    break
+                best = max(
+                    best,
+                    (
+                        maximize
+                        * _wrapped_diff(same_source(probe)[0], target_longitude),
+                        probe,
+                    ),
+                )
+                probe = math.nextafter(probe, math.inf)
+            extremum = best[1]
+            if (
+                previous_jd < extremum < jd
+                and maximize
+                * _wrapped_diff(same_source(extremum)[0], same_source(turn)[0])
+                > 0
+            ):
+                splits.add(extremum)
+            knots.extend((at, same_source(at)[0]) for at in sorted(splits))
         knots.append((jd, current[0]))
         for (left_jd, left_longitude), (right_jd, right_longitude) in zip(
             knots, knots[1:]
@@ -184,26 +238,28 @@ def _longitude_crossings_utc(
                         low = mid
                     else:
                         high = mid
-                # Preserve the post-crossing side through civil-time quantization.
-                for _ in range(8):
-                    moment = datetime_from_tt(high)
-                    recovered = _julian_day(moment)
-                    value = _wrapped_diff(
-                        same_source(recovered)[0],
-                        target_longitude,
-                    )
-                    on_crossed_side = value >= 0.0 if low_negative else value <= 0.0
-                    if on_crossed_side:
-                        if not moments or moment != moments[-1]:
-                            moments.append(moment)
-                        break
-                    high = math.nextafter(high, math.inf)
-                else:
-                    raise EphemerisUnavailableError(
-                        "Civil crossing instant could not preserve its crossing side"
-                    )
+                if not roots or high != roots[-1]:
+                    roots.append(high)
         previous_jd, previous = jd, current
-    return moments
+    return roots
+
+
+def _longitude_crossings_utc(
+    planet_id: int,
+    target_longitude: float,
+    start_jd: float,
+    end_jd: float,
+    step_days: float,
+    *,
+    sidereal: bool = False,
+) -> List[datetime]:
+    """Civil display adapter; root selection and deduplication happen in TT."""
+    return [
+        datetime_from_tt(at)
+        for at in _longitude_crossings_tt(
+            planet_id, target_longitude, start_jd, end_jd, step_days, sidereal=sidereal
+        )
+    ]
 
 
 def find_longitude_crossing_utc(
@@ -222,7 +278,7 @@ def find_longitude_crossing_utc(
     """
     _require_swe()
     anchor_jd = _julian_day(anchor_utc)
-    moments = _longitude_crossings_utc(
+    roots = _longitude_crossings_tt(
         planet_id,
         target_longitude,
         anchor_jd - window_days,
@@ -230,15 +286,49 @@ def find_longitude_crossing_utc(
         step_days,
         sidereal=sidereal,
     )
-    return min(moments, key=lambda at: abs(at - anchor_utc), default=None)
+    nearest = min(roots, key=lambda at: abs(at - anchor_jd), default=None)
+    if nearest is None:
+        return None
+    # Preserve the ingress chart's crossing side without changing which TT root
+    # was selected. Ordinary civil labels can round to the preceding TT sample.
+    native = _planet_motion(nearest, planet_id, sidereal=sidereal)
+    candidate = nearest
+    original = datetime_from_tt(nearest)
+    for _ in range(8):
+        moment = datetime_from_tt(candidate)
+        recovered = _planet_motion(_julian_day(moment), planet_id, sidereal=sidereal)
+        if recovered[2:] != native[2:]:
+            raise EphemerisSourceError("model_changed")
+        residual = _wrapped_diff(recovered[0], target_longitude)
+        if residual == 0.0 or residual * native[1] > 0.0:
+            return moment
+        following = math.nextafter(candidate, math.inf)
+        sample = _planet_motion(following, planet_id, sidereal=sidereal)
+        if sample[2:] != native[2:]:
+            raise EphemerisSourceError("model_changed")
+        # An exact grazing contact may have no civil label on its root. Keep
+        # its display rather than move away from the independently solved point.
+        if _wrapped_diff(sample[0], target_longitude) * native[1] <= 0.0:
+            return original
+        candidate = following
+    raise EphemerisUnavailableError(
+        "Civil crossing instant could not preserve its crossing side"
+    )
 
 
 def planet_longitude_at_utc(
     planet_id: int, moment: datetime, *, sidereal: bool = False
 ) -> float:
     """Tropical or native Lahiri longitude at a civil instant, used as natal anchor."""
+    return planet_motion_at_utc(planet_id, moment, sidereal=sidereal)[0]
+
+
+def planet_motion_at_utc(
+    planet_id: int, moment: datetime, *, sidereal: bool = False
+) -> MotionSample:
+    """Native coordinates and source for a natal anchor used by return solving."""
     _require_swe()
-    return _planet_longitude(_julian_day(moment), planet_id, sidereal=sidereal)
+    return _planet_motion(_julian_day(moment), planet_id, sidereal=sidereal)
 
 
 def find_cardinal_ingress_utc(year: int, term: str) -> datetime:
@@ -260,7 +350,7 @@ def find_cardinal_ingress_utc(year: int, term: str) -> datetime:
     return moment
 
 
-def find_planet_returns(
+def resolve_planet_returns(
     planet_id: int,
     natal_longitude: float,
     *,
@@ -269,8 +359,9 @@ def find_planet_returns(
     past: int = 1,
     future: int = 1,
     sidereal: bool = False,
-) -> List[datetime]:
-    """Return the requested nearest past/future crossings in a bounded scan.
+    expected_flags: int | None = None,
+) -> tuple[List[datetime], List[datetime]]:
+    """Partition the requested roots by native TT before civil display.
 
     One mean-period seed can choose a remote revolution while skipping a closer
     retrograde recrossing. Scan one contiguous window instead, retaining each
@@ -280,9 +371,11 @@ def find_planet_returns(
     """
     _require_swe()
     reference_jd = _julian_day(reference_utc)
-    selected: List[datetime] = []
+    if expected_flags is None:
+        expected_flags = _planet_motion(reference_jd, planet_id, sidereal=sidereal)[2]
+    selected: list[List[datetime]] = []
     for direction, count in ((-1, past), (1, future)):
-        found: set[datetime] = set()
+        found: set[float] = set()
         cursor = reference_jd
         limit = reference_jd + direction * (period_days * (count + 0.5) + 5.0)
         while len(found) < count and cursor != limit:
@@ -294,25 +387,48 @@ def find_planet_returns(
                 if direction < 0
                 else min(limit, cursor + min(period_days, 365.25))
             )
-            moments = _longitude_crossings_utc(
+            roots = _longitude_crossings_tt(
                 planet_id,
                 natal_longitude,
                 min(cursor, following),
                 max(cursor, following),
                 min(1.0, period_days / 360.0),
                 sidereal=sidereal,
+                expected_flags=expected_flags,
             )
             found.update(
                 at
-                for at in moments
-                if (at <= reference_utc if direction < 0 else at > reference_utc)
+                for at in roots
+                if (at <= reference_jd if direction < 0 else at > reference_jd)
             )
             cursor = following
         ordered = sorted(found)
-        selected.extend(
-            ordered[-count:] if direction < 0 and count else ordered[:count]
-        )
-    return selected
+        chosen = ordered[-count:] if direction < 0 and count else ordered[:count]
+        selected.append([datetime_from_tt(at) for at in chosen])
+    return selected[0], selected[1]
+
+
+def find_planet_returns(
+    planet_id: int,
+    natal_longitude: float,
+    *,
+    period_days: float,
+    reference_utc: datetime,
+    past: int = 1,
+    future: int = 1,
+    sidereal: bool = False,
+) -> List[datetime]:
+    """Civil display adapter for roots already selected on their native TT axis."""
+    previous, following = resolve_planet_returns(
+        planet_id,
+        natal_longitude,
+        period_days=period_days,
+        reference_utc=reference_utc,
+        past=past,
+        future=future,
+        sidereal=sidereal,
+    )
+    return previous + following
 
 
 __all__ = [
@@ -323,5 +439,7 @@ __all__ = [
     "find_longitude_crossing_utc",
     "find_cardinal_ingress_utc",
     "find_planet_returns",
+    "resolve_planet_returns",
     "planet_longitude_at_utc",
+    "planet_motion_at_utc",
 ]
