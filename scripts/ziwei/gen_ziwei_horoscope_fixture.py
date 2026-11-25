@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Generate a pinned iztro 2.5.8 oracle, including actual active palaces.
+"""Generate a version-checked software oracle, including actual active palaces.
 
 npm install --prefix /tmp/iztro-oracle iztro@2.5.8
 python scripts/ziwei/gen_ziwei_horoscope_fixture.py \
-  --iztro /tmp/iztro-oracle/node_modules/iztro
+  --iztro /tmp/iztro-oracle/node_modules/iztro \
+  --output /tmp/ziwei-2.5.8-current.json
 
 The old py-iztro fixture recorded monthly/daily/hourly calendar branches,
 which are not active palace branches. Always resolve a scope's .index into
-chart.palaces. Preserve FateBridge's late-zi=current convention and normal
-lunar year/month/age boundaries. No production code is imported here.
+chart.palaces. Freeze the selected day split and normal year/month/age
+boundaries. Version-specific late-zi differences remain visible in the fixtures.
 """
 
 from __future__ import annotations
@@ -49,8 +50,9 @@ SCRIPT = r"""
 const fs=require('fs');
 const path=require('path');
 const mod=process.argv[1];
-if(JSON.parse(fs.readFileSync(path.join(mod,'package.json'),'utf8')).version!=='2.5.8')
-  throw new Error('Oracle version must be iztro 2.5.8');
+const version=process.argv[3];
+if(JSON.parse(fs.readFileSync(path.join(mod,'package.json'),'utf8')).version!==version)
+  throw new Error('Oracle version does not match requested version');
 const {astro}=require(mod);astro.config(JSON.parse(process.argv[2]));
 const cases=JSON.parse(fs.readFileSync(0,'utf8'));const out={};
 for(const [label,bdate,bidx,gender,tdate,tidx] of cases){
@@ -61,7 +63,7 @@ for(const [label,bdate,bidx,gender,tdate,tidx] of cases){
     if(!chart.palaces[scope.index]) throw new Error(label+'/'+name+' unsupported index');
     scopes[name]={branch:chart.palaces[scope.index].earthlyBranch,mutagen:scope.mutagen};
   }
-  out[label]={birth:{date:bdate,time_index:bidx,gender},target:{date:tdate,time_index:tidx},nominal_age:h.age.nominalAge,scopes,oracle:{name:'iztro',version:'2.5.8',config:JSON.parse(process.argv[2])}};
+  out[label]={birth:{date:bdate,time_index:bidx,gender},target:{date:tdate,time_index:tidx},nominal_age:h.age.nominalAge,scopes,oracle:{name:'iztro',version,config:JSON.parse(process.argv[2])}};
 }
 process.stdout.write(JSON.stringify(out));
 """
@@ -70,17 +72,26 @@ process.stdout.write(JSON.stringify(out));
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--iztro", type=Path, required=True)
+    parser.add_argument("--version", choices=("2.5.8", "2.6.5"), default="2.5.8")
+    parser.add_argument(
+        "--day-divide", choices=("current", "forward"), default="current"
+    )
+    parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     fixture = json.loads(
         subprocess.check_output(
-            ["node", "-e", SCRIPT, str(args.iztro.resolve()), json.dumps(CONFIG)],
+            [
+                "node",
+                "-e",
+                SCRIPT,
+                str(args.iztro.resolve()),
+                json.dumps({**CONFIG, "dayDivide": args.day_divide}),
+                args.version,
+            ],
             input=json.dumps(CASES).encode(),
         )
     )
-    out = (
-        Path(__file__).resolve().parents[2]
-        / "tests/data/ziwei_horoscope_reference.json"
-    )
+    out = args.output
     out.write_text(
         json.dumps(fixture, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",

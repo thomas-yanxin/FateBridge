@@ -90,7 +90,20 @@ def test_horoscope_matches_iztro_oracle():
                 )
             # ordered [化禄, 化权, 化科, 化忌]; the fixture mutagen list is in the
             # same order, so compare as a tuple to also catch role swaps.
-            if list(got["mutagen"].values()) != list(ref["mutagen"]):
+            if label == "late_zi" and scope in {"流日", "流时"}:
+                frozen = {
+                    "流日": ["太阴", "天同", "天机", "巨门"],
+                    "流时": ["太阳", "武曲", "太阴", "天同"],
+                }
+                current = {
+                    "流日": ("丙", ["天同", "天机", "文昌", "廉贞"]),
+                    "流时": ("戊", ["贪狼", "太阴", "右弼", "天机"]),
+                }
+                assert ref["mutagen"] == frozen[scope]
+                assert got["stem"] == current[scope][0]
+                assert list(got["mutagen"].values()) == current[scope][1]
+                assert list(got["mutagen"].values()) != ref["mutagen"]
+            elif list(got["mutagen"].values()) != list(ref["mutagen"]):
                 mismatches.append(
                     f"{label}/{scope} 四化: ours={list(got['mutagen'].values())} ref={list(ref['mutagen'])}"
                 )

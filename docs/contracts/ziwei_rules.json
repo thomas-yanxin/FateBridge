@@ -38,6 +38,15 @@
         "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
         "type": "boolean"
       },
+      "day_divide": {
+        "default": "current",
+        "description": "晚子（23:00-23:59）分日：current（默认，当日农历与当日早子日/时干）；forward（本命与目标均用次日早子农历与日/时干）。岁序仍按出生民用时区午夜换岁。",
+        "enum": [
+          "current",
+          "forward"
+        ],
+        "type": "string"
+      },
       "fields": {
         "anyOf": [
           {

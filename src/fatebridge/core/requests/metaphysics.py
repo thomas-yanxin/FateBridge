@@ -14,7 +14,9 @@ from fatebridge.core.requests.base import _DeferredModel
 from fatebridge.core.requests.birth import FateBridgeRequest
 from fatebridge.core.ziwei_age import ZiweiAgeBasis
 from fatebridge.core.ziwei_rulesets import (
+    DEFAULT_ZIWEI_DAY_DIVIDE,
     DEFAULT_ZIWEI_PROFILE,
+    ZiweiDayDivide,
     ZiweiRuleProfile,
     ZiweiSihuaSource,
 )
@@ -35,6 +37,10 @@ class ZiweiBirthRequest(FateBridgeRequest):
     sihua_source: ZiweiSihuaSource = Field(
         default="rule_profile",
         description="四化表：rule_profile沿用基础配置；naj_ming_v1显式取明刊卷三原页（庚日武同相、壬梁紫府武）。只选四化表，不代表整部原典获认证。",
+    )
+    day_divide: ZiweiDayDivide = Field(
+        default=DEFAULT_ZIWEI_DAY_DIVIDE,
+        description="晚子（23:00-23:59）分日：current（默认，当日农历与当日早子日/时干）；forward（本命与目标均用次日早子农历与日/时干）。岁序仍按出生民用时区午夜换岁。",
     )
     selected_sections: List[str] = Field(
         default_factory=list,
@@ -80,6 +86,10 @@ class ZiweiHoroscopeRequest(FateBridgeRequest):
         default="rule_profile",
         description="本命与可用运限层共用所选四化表；naj_ming_v1取明刊原页。运限按宫干／时间干复用仍为软件约定，不据此认证古典运限法。",
     )
+    day_divide: ZiweiDayDivide = Field(
+        default=DEFAULT_ZIWEI_DAY_DIVIDE,
+        description="晚子（23:00-23:59）分日：current（默认，当日农历与当日早子日/时干）；forward（本命与目标均用次日早子农历与日/时干）。岁序仍按出生民用时区午夜换岁。",
+    )
     selected_sections: List[str] = Field(
         default_factory=list,
         description="Optional snapshot section titles for filtered export payload",
@@ -100,6 +110,10 @@ class ZiweiRulesRequest(_DeferredModel):
     year_stem: Optional[str] = Field(
         default=None,
         description="Optional heavenly stem filter, e.g. 甲",
+    )
+    day_divide: ZiweiDayDivide = Field(
+        default=DEFAULT_ZIWEI_DAY_DIVIDE,
+        description="晚子（23:00-23:59）分日：current（默认，当日农历与当日早子日/时干）；forward（本命与目标均用次日早子农历与日/时干）。岁序仍按出生民用时区午夜换岁。",
     )
     selected_sections: List[str] = Field(
         default_factory=list,

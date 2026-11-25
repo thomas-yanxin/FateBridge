@@ -103,7 +103,10 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
             for month in range(1, 13):
                 for gender in ("男", "女"):
                     chart = build_ziwei_chart(
-                        _seed(year, month), gender, rule_profile=profile
+                        _seed(year, month),
+                        gender,
+                        rule_profile=profile,
+                        day_divide="current",
                     )
                     is_yang = (year - 1904) % 2 == 0
                     direction = 1 if is_yang == (gender == "男") else -1
@@ -214,7 +217,10 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
         for month in range(1, 13):
             for hour in BRANCHES:
                 chart = build_ziwei_chart(
-                    _seed(1904, month, hour=hour), "男", rule_profile=profile
+                    _seed(1904, month, hour=hour),
+                    "男",
+                    rule_profile=profile,
+                    day_divide="current",
                 )
                 for year in range(1944, 1956):
                     target = BRANCHES[(year - 1984) % 12]
@@ -251,7 +257,10 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
             )
             for hour in BRANCHES:
                 c = build_ziwei_chart(
-                    _seed(year, hour=hour), "女", rule_profile=profile
+                    _seed(year, hour=hour),
+                    "女",
+                    rule_profile=profile,
+                    day_divide="current",
                 )
                 actual = {
                     s["name"]: p["ganzhi"][1]

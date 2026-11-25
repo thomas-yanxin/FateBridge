@@ -1,3 +1,5 @@
+import pytest
+
 from fatebridge.core.metaphysics.ziwei import (
     ZIWEI_SIHUA_RULES,
     build_ziwei_chart,
@@ -66,6 +68,27 @@ def test_liunian_branch_matches_year_pillar_and_mutagen_from_year_stem():
     assert liunian["branch"] == year_branch
     assert liunian["stem"] == year_stem
     assert liunian["mutagen"] == dict(ZIWEI_SIHUA_RULES[year_stem])
+
+
+def test_horoscope_rejects_a_different_day_divide_than_its_natal_chart():
+    person = create_person_info(**BIRTH)
+    natal_seed = _build_person_seed(person)
+    chart = build_ziwei_chart(natal_seed, "男", day_divide="forward")
+    target_seed = _build_analysis_seed(
+        analysis_year=2026, analysis_month=6, analysis_day=19, analysis_hour=23
+    )
+    with pytest.raises(ValueError, match="分日口径不一致"):
+        build_ziwei_horoscope(
+            birth_seed=natal_seed,
+            chart=chart,
+            gender="男",
+            target_seed=target_seed,
+            day_divide="current",
+        )
+    inherited = build_ziwei_horoscope(
+        birth_seed=natal_seed, chart=chart, gender="男", target_seed=target_seed
+    )
+    assert inherited["ruleset"]["day_divide"] == "forward"
 
 
 def test_daxian_palace_age_range_contains_nominal_age():

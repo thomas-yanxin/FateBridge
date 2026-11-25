@@ -7,16 +7,19 @@ choice of clock, move stars, or recompute lunations for a foreign time zone.
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import timedelta
 from typing import Any
 
 from dateutil import tz
 
 from fatebridge.core.almanac import get_lunar_context, localize_datetime
+from fatebridge.core.calendar import LATE_ZI_HOUR
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.ziwei_date_sources import (
     LIBRARY_ADAPTER,
     date_conversion_provenance,
 )
+from fatebridge.core.ziwei_rulesets import DEFAULT_ZIWEI_DAY_DIVIDE, ZiweiDayDivide
 from fatebridge.utils.civil_clock import format_utc_offset, utc_instant
 from fatebridge.utils.timezones import parse_timezone_name, timezone_rules_metadata
 
@@ -27,9 +30,22 @@ def _date_fields(lunar: dict[str, Any] | None) -> dict[str, Any] | None:
     return {key: lunar[key] for key in ("year", "month", "day", "is_leap_month")}
 
 
-def calendar_basis(seed: MetaphysicsSeed) -> dict[str, Any]:
-    """Compare date-table lookups while preserving the physical civil instant."""
-    placement_context = seed.calendar_context.get("lunar_calendar")
+def calendar_basis(
+    seed: MetaphysicsSeed, *, day_divide: ZiweiDayDivide = DEFAULT_ZIWEI_DAY_DIVIDE
+) -> dict[str, Any]:
+    """Compare selected placement dates while preserving the physical civil instant."""
+    placement_datetime = seed.corrected_datetime
+    if day_divide == "forward" and placement_datetime.hour == LATE_ZI_HOUR:
+        placement_datetime = (
+            placement_datetime.replace(tzinfo=None) + timedelta(days=1)
+        ).replace(hour=0, minute=0, second=0, microsecond=0)
+        placement_context = get_lunar_context(
+            placement_datetime,
+            timezone_name=seed.timezone,
+            civil_datetime=seed.input_datetime,
+        )
+    else:
+        placement_context = seed.calendar_context.get("lunar_calendar")
     civil_context = get_lunar_context(seed.input_datetime, timezone_name=seed.timezone)
     placement = _date_fields(placement_context)
     civil = _date_fields(civil_context)
@@ -42,7 +58,7 @@ def calendar_basis(seed: MetaphysicsSeed) -> dict[str, Any]:
     reference_lunar = _date_fields(reference_context)
     provenance = date_conversion_provenance(
         {
-            "placement": seed.corrected_datetime.date().isoformat(),
+            "placement": placement_datetime.date().isoformat(),
             "civil": seed.input_datetime.date().isoformat(),
             "reference_utc_plus_08": reference.date().isoformat(),
         },
@@ -58,18 +74,23 @@ def calendar_basis(seed: MetaphysicsSeed) -> dict[str, Any]:
     result = {
         "method_id": "ziwei_calendar_basis_v1",
         "placement_clock": "apparent_solar" if seed.applied_true_solar else "civil",
-        "placement_datetime": seed.corrected_datetime.strftime("%Y-%m-%d %H:%M:%S"),
+        "placement_datetime": placement_datetime.strftime("%Y-%m-%d %H:%M:%S"),
         "civil_datetime": seed.input_datetime.strftime("%Y-%m-%d %H:%M:%S"),
         "timezone": seed.timezone,
         "date_shift_days": (
-            seed.corrected_datetime.date() - seed.input_datetime.date()
+            placement_datetime.date() - seed.input_datetime.date()
         ).days,
         "placement_lunar_date": placement,
         "civil_date_lunar_date": civil,
         "reference_datetime_utc_plus_08": reference.strftime("%Y-%m-%d %H:%M:%S"),
         "reference_lunar_date": reference_lunar,
         "date_lookup_convention": "fixed_east_asian_date_table_not_local_lunation_recalculation",
-        "day_boundary": "00:00_in_selected_clock",
+        "day_divide": day_divide,
+        "day_boundary": (
+            "23:00_in_selected_clock"
+            if day_divide == "forward"
+            else "00:00_in_selected_clock"
+        ),
         "solar_terms_basis": "physical_civil_instant",
         "classical_clock_rule_verified": False,
         "source_scope": "HKO verifies published UTC+08 civil dates, not the apparent-solar placement policy",
@@ -114,9 +135,24 @@ def calendar_basis(seed: MetaphysicsSeed) -> dict[str, Any]:
 def context_basis(basis: dict[str, Any]) -> dict[str, Any]:
     """Small first-turn receipt; the full comparison has its own evidence view."""
     result = {
-        "lunar_date_basis": basis["placement_clock"] + "_date_label_at_midnight",
+        "lunar_date_basis": basis["placement_clock"]
+        + (
+            "_date_label_at_23"
+            if basis["day_divide"] == "forward"
+            else "_date_label_at_midnight"
+        ),
         "calendar_date_shift_days": basis["date_shift_days"],
     }
+    if basis["day_divide"] == "forward":
+        placement = basis["placement_lunar_date"]
+        result["lunar_display"] = (
+            f"{placement['year']}年{'闰' if placement['is_leap_month'] else ''}"
+            f"{placement['month']}月{placement['day']}日"
+            if placement
+            else "超出支持范围"
+        )
+    else:
+        pass
     if basis.get("time_input"):
         result["time_input_status"] = basis["time_input"]["status"]
         sensitivity = basis["time_input"].get("minute_sensitivity", {})
@@ -149,8 +185,16 @@ def basis_text(basis: dict[str, Any]) -> str:
         if civil
         else "超出支持范围"
     )
+    boundary = "23:00" if basis["day_divide"] == "forward" else "00:00"
+    placement = basis["placement_lunar_date"]
+    placement_label = (
+        f"{placement['year']}年{placement['month']}月{placement['day']}日"
+        f"{'（闰月）' if placement['is_leap_month'] else ''}"
+        if placement
+        else "超出支持范围"
+    )
     text = (
-        f"排盘农历依据：{clock}，所选时钟00:00换日；"
+        f"排盘农历依据：{clock}，所选时钟{boundary}换日；排盘所用农历：{placement_label}；"
         f"相对钟表日期偏移{basis['date_shift_days']:+d}日；钟表日期查表农历：{label}；"
         "节气按实际钟表时刻判定；真太阳日期口径未获原典认证"
     )

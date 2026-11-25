@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from datetime import date, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,6 +16,14 @@ from fatebridge.services.metaphysics import (
     calculate_ziwei_horoscope,
 )
 from fatebridge.utils.birth_input import create_person_info
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    business,
+    rest,
+    surface_calls,
+    three_surfaces,
+)
 
 TARGET = dict(target_year=2027, target_month=6, target_day=15, target_hour=12)
 BIRTH = dict(
@@ -138,6 +147,207 @@ def test_late_zi_natal_day_keeps_current_day_with_explicit_solar_convention():
     result = calculate_ziwei_horoscope(person, **TARGET)
     assert result["birth_context"]["lunar_display"] == "腊月廿一"
     assert result["ziwei_horoscope"]["nominal_age"] == 43
+
+
+@pytest.mark.parametrize("day_divide", ["current", "forward"])
+@pytest.mark.parametrize(
+    "calendar_date",
+    [date(2026, 10, 9), date(2024, 2, 9), date(2023, 3, 21), date(2033, 12, 21)],
+)
+def test_late_zi_uses_one_selected_date_for_natal_and_flowing_scopes(
+    calendar_date, day_divide
+):
+    """Late Zi previously mixed today's lunar placement with tomorrow's stems."""
+    selected_date = calendar_date + timedelta(days=day_divide == "forward")
+    birth = {
+        **BIRTH,
+        "birth_year": calendar_date.year,
+        "birth_month": calendar_date.month,
+        "birth_day": calendar_date.day,
+        "birth_hour": 23,
+        "birth_minute": 30,
+        "use_true_solar_time": False,
+    }
+    midnight_birth = {
+        **birth,
+        "birth_year": selected_date.year,
+        "birth_month": selected_date.month,
+        "birth_day": selected_date.day,
+        "birth_hour": 0,
+        "birth_minute": 0,
+    }
+    actual_result = calculate_ziwei_birth(
+        create_person_info(**birth), day_divide=day_divide
+    )
+    actual = actual_result["ziwei_birth"]
+    placement = actual["lunar_date"]
+    assert (
+        f"{placement['year']}年{placement['month']}月{placement['day']}日"
+        in actual_result["snapshot_text"]
+    )
+    expected = calculate_ziwei_birth(create_person_info(**midnight_birth))[
+        "ziwei_birth"
+    ]
+    for field in ("lunar_date", "ming_gong", "shen_gong", "palaces", "sihua"):
+        assert actual[field] == expected[field]
+    person = create_person_info(**{**BIRTH, "use_true_solar_time": False})
+    target = dict(
+        target_year=calendar_date.year,
+        target_month=calendar_date.month,
+        target_day=calendar_date.day,
+        target_hour=23,
+        target_minute=30,
+    )
+    actual_flow = calculate_ziwei_horoscope(person, **target, day_divide=day_divide)[
+        "ziwei_horoscope"
+    ]
+    expected_flow = calculate_ziwei_horoscope(
+        person,
+        target_year=selected_date.year,
+        target_month=selected_date.month,
+        target_day=selected_date.day,
+        target_hour=0,
+    )["ziwei_horoscope"]
+    for actual_scope, expected_scope in zip(
+        actual_flow["scopes"][2:], expected_flow["scopes"][2:]
+    ):
+        for field in ("branch", "stem", "mutagen", "palace_map", "mutagen_natal_links"):
+            assert actual_scope[field] == expected_scope[field]
+    assert actual_flow["ruleset"]["day_divide"] == day_divide
+    if calendar_date == date(2024, 2, 9) and day_divide == "forward":
+        assert actual_flow["nominal_age"] + 1 == expected_flow["nominal_age"]
+        assert actual_flow["scopes"][2]["stem"] == "甲"
+    else:
+        assert actual_flow["nominal_age"] == expected_flow["nominal_age"]
+
+
+@pytest.mark.parametrize("day_divide", ["current", "forward"])
+@pytest.mark.parametrize("target_hour", [23, 0])
+def test_late_zi_selection_survives_strict_public_projection(
+    day_divide, target_hour, tmp_path, monkeypatch, capsys
+):
+    payload = {
+        **BIRTH,
+        "use_true_solar_time": False,
+        "day_divide": day_divide,
+        "target_year": 2024,
+        "target_month": 2,
+        "target_day": 9 if target_hour == 23 else 10,
+        "target_hour": target_hour,
+        "target_minute": 30,
+    }
+    result = three_surfaces(
+        SPECS["ziwei_horoscope"],
+        payload,
+        [
+            "ziwei_horoscope.scopes",
+            "ziwei_horoscope.ruleset.day_divide",
+            "ziwei_horoscope.calendar_rules",
+            "ziwei_horoscope.nominal_age_calendar",
+            "ziwei_horoscope.calendar_basis.target",
+        ],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )["ziwei_horoscope"]
+    assert result["ruleset"]["day_divide"] == day_divide
+    assert result["nominal_age_calendar"]["target_civil_lunar_year"] == (
+        2023 if target_hour == 23 else 2024
+    )
+    assert result["calendar_rules"]["day_divide"] == day_divide
+    basis = result["calendar_basis"]["target"]
+    selected_new_year = day_divide == "forward" or target_hour == 0
+    assert basis["placement_lunar_date"] == dict(
+        year=2024 if selected_new_year else 2023,
+        month=1 if selected_new_year else 12,
+        day=1 if selected_new_year else 30,
+        is_leap_month=False,
+    )
+    assert all(scope["stem_origin"] for scope in result["scopes"])
+    assert len(result["scopes"][2]["flowing_stars"]) == 3
+    daily = result["scopes"][4]
+    hourly = result["scopes"][5]
+    assert daily["stem"] == (
+        "甲" if day_divide == "forward" or target_hour == 0 else "癸"
+    )
+    assert hourly["stem"] == ("甲" if daily["stem"] == "甲" else "壬")
+
+
+@pytest.mark.parametrize("day_divide", ["current", "forward"])
+@pytest.mark.parametrize("tool", ["ziwei_birth", "ziwei_rules"])
+def test_late_zi_natal_and_rules_publish_selection(
+    day_divide, tool, tmp_path, monkeypatch, capsys
+):
+    birth = {
+        **BIRTH,
+        "birth_year": 2024,
+        "birth_month": 2,
+        "birth_day": 9,
+        "birth_hour": 23,
+        "birth_minute": 30,
+        "use_true_solar_time": False,
+    }
+    payload = {"day_divide": day_divide}
+    if tool == "ziwei_birth":
+        payload.update(birth)
+        fields = [
+            "ziwei_birth.lunar_date",
+            "ziwei_birth.ruleset.day_divide",
+            "ziwei_birth.calendar_basis",
+        ]
+    else:
+        fields = ["rule_catalogue.ruleset.day_divide"]
+    result = three_surfaces(
+        SPECS[tool], payload, fields, AS_OF, tmp_path, monkeypatch, capsys
+    )
+    if tool == "ziwei_birth":
+        natal = result["ziwei_birth"]
+        basis = natal["calendar_basis"]
+        assert basis["placement_lunar_date"] == natal["lunar_date"]
+        assert basis["civil_date_lunar_date"] == dict(
+            year=2023, month=12, day=30, is_leap_month=False
+        )
+        assert basis["date_shift_days"] == (day_divide == "forward")
+        assert basis["day_boundary"].startswith(
+            "23:00" if day_divide == "forward" else "00:00"
+        )
+        assert natal["ruleset"]["day_divide"] == day_divide
+    else:
+        assert result["rule_catalogue"]["ruleset"]["day_divide"] == day_divide
+
+
+def test_forward_late_zi_full_response_matches_all_transports(surface_calls):
+    """Selected dates must agree in complete receipts as well as strict projections."""
+    payload = {
+        **BIRTH,
+        "use_true_solar_time": False,
+        "day_divide": "forward",
+        "target_year": 2024,
+        "target_month": 2,
+        "target_day": 9,
+        "target_hour": 23,
+        "target_minute": 30,
+    }
+    options = {"response_char_limit": 0, "include_snapshot_text": False}
+    response, protocol, code, local = surface_calls(
+        SPECS["ziwei_horoscope"],
+        payload,
+        params={"as_of": AS_OF, **options},
+        options=options,
+        flags=["--response-char-limit", "0", "--no-include-snapshot-text"],
+    )
+    assert response.status_code == 200, response.text
+    assert not protocol.is_error, protocol.content
+    assert code == 0, local
+    bodies = [response.json(), protocol.structured_content, local]
+    assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
+    for body in bodies:
+        SPECS["ziwei_horoscope"].output_model.model_validate(body)
+    assert bodies[0]["analysis_context"]["lunar_display"] == "2024年1月1日"
+    target_basis = bodies[0]["ziwei_horoscope"]["calendar_basis"]["target"]
+    assert target_basis["placement_datetime"] == "2024-02-10 00:00:00"
+    assert target_basis["civil_datetime"] == "2024-02-09 23:30:00"
 
 
 def test_context_scope_and_natal_linkage_match_rest_mcp_cli(monkeypatch, capsys):

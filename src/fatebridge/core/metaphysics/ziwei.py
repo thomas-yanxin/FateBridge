@@ -8,8 +8,12 @@ identity. Geometry and evidence links stay separate from event interpretations.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from datetime import timedelta
 from typing import Any, Dict, List, Optional, Tuple, cast
 
+from fatebridge.core.almanac import get_lunar_context, lunar_supported_range_message
+from fatebridge.core.calendar import LATE_ZI_HOUR, BaZiCalendar
 from fatebridge.core.ziwei_age import nominal_age_calendar
 from fatebridge.core.ziwei_aux_sources import auxiliary_placement_source_evidence
 from fatebridge.core.ziwei_auxiliary import (
@@ -35,12 +39,15 @@ from fatebridge.core.ziwei_evidence import (
 from fatebridge.core.ziwei_limit_sources import limit_source_evidence
 from fatebridge.core.ziwei_ming_properties import ming_property_evidence
 from fatebridge.core.ziwei_rulesets import (
+    DEFAULT_ZIWEI_DAY_DIVIDE,
     DEFAULT_ZIWEI_PROFILE,
 )
 from fatebridge.core.ziwei_rulesets import ZIWEI_SIHUA_RULES as ZIWEI_SIHUA_RULES
 from fatebridge.core.ziwei_rulesets import (
+    ZiweiDayDivide,
     effective_lunar_month,
     sihua_rules_for,
+    validate_day_divide,
     validate_rule_profile,
     validate_sihua_source,
     ziwei_ruleset_metadata,
@@ -183,27 +190,101 @@ def _apply_sihua_to_palaces(
     return cast(Dict[str, str], ordered_sihua_mapping(sihua))
 
 
+@dataclass(frozen=True)
+class ZiweiClockState:
+    lunar_year: int
+    lunar_month: int
+    lunar_day: int
+    is_leap_month: bool
+    hour_branch: str
+    day_stem: str
+    hour_stem: str
+    is_late_zi: bool
+
+
+def resolve_ziwei_clock_state(
+    seed: MetaphysicsSeed, day_divide: ZiweiDayDivide, *, technique: str
+) -> ZiweiClockState:
+    """Keep lunar placement and flowing stems on the selected late-zi date."""
+    moment = seed.corrected_datetime
+    is_late_zi = moment.hour == LATE_ZI_HOUR
+    rollover = is_late_zi and day_divide == "forward"
+    if rollover:
+        next_midnight = (moment.replace(tzinfo=None) + timedelta(days=1)).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+        lunar = get_lunar_context(
+            next_midnight,
+            timezone_name=seed.timezone,
+            civil_datetime=seed.input_datetime,
+        )
+        if lunar is None:
+            raise ValueError(
+                f"{technique}需要农历月日：{lunar_supported_range_message()}"
+            )
+        else:
+            lunar_month = lunar["month"]
+            lunar_day = lunar["day"]
+            if not isinstance(lunar_month, int) or not isinstance(lunar_day, int):
+                raise ValueError(f"{technique}需要完整农历月日")
+            else:
+                pass
+    else:
+        lunar, lunar_month, lunar_day = require_lunar_month_day(seed, technique)
+    lunar_year = lunar.get("year")
+    if not isinstance(lunar_year, int):
+        raise ValueError(f"{technique}农历年缺失，无法起盘")
+    else:
+        pass
+    if is_late_zi:
+        day_stem = BaZiCalendar.calculate_day_pillar(
+            moment.year,
+            moment.month,
+            moment.day,
+            hour=moment.hour,
+            apply_late_zi_rollover=rollover,
+        )[0]
+        hour_stem, hour_branch = BaZiCalendar.calculate_hour_pillar(
+            moment.year,
+            moment.month,
+            moment.day,
+            moment.hour,
+            apply_late_zi_rollover=rollover,
+        )
+    else:
+        day_stem = seed.pillars["day"][0]
+        hour_stem, hour_branch = seed.pillars["hour"]
+    return ZiweiClockState(
+        lunar_year=lunar_year,
+        lunar_month=lunar_month,
+        lunar_day=lunar_day,
+        is_leap_month=bool(lunar.get("is_leap_month")),
+        hour_branch=hour_branch,
+        day_stem=day_stem,
+        hour_stem=hour_stem,
+        is_late_zi=is_late_zi,
+    )
+
+
 def build_ziwei_chart(
     seed: MetaphysicsSeed,
     gender: str,
     *,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
     sihua_source: str = "rule_profile",
+    day_divide: ZiweiDayDivide = DEFAULT_ZIWEI_DAY_DIVIDE,
 ) -> Dict[str, Any]:
     validate_rule_profile(rule_profile)
     validate_sihua_source(sihua_source)
-    lunar, lunar_month, lunar_day = require_lunar_month_day(seed, "紫微斗数")
-
+    resolved_day_divide = validate_day_divide(day_divide)
+    state = resolve_ziwei_clock_state(seed, resolved_day_divide, technique="紫微斗数")
     lunar_month = effective_lunar_month(
-        lunar_month, lunar_day, bool(lunar.get("is_leap_month")), rule_profile
+        state.lunar_month, state.lunar_day, state.is_leap_month, rule_profile
     )
-    hour_branch = seed.pillars["hour"][1]
+    lunar_day = state.lunar_day
+    hour_branch = state.hour_branch
     hour_index = _branch_from_hour(hour_branch)
-    # 年干支按农历年（正月初一为界）取，而非八字立春年柱——见 _lunar_year_ganzhi。
-    lunar_year = lunar.get("year")
-    if lunar_year is None:
-        raise ValueError("紫微斗数需要完整农历年月日，无法起盘：农历年缺失")
-    year_stem, year_branch = _lunar_year_ganzhi(int(lunar_year))
+    year_stem, year_branch = _lunar_year_ganzhi(state.lunar_year)
 
     ming_index = (lunar_month - hour_index) % 12
     shen_index = (lunar_month + hour_index - 2) % 12
@@ -737,9 +818,9 @@ def build_ziwei_chart(
         ),
         "auxiliary_placement_sources": auxiliary_placement_source_evidence(
             palaces,
-            lunar_month=int(lunar["month"]),
+            lunar_month=state.lunar_month,
             lunar_day=lunar_day,
-            is_leap=bool(lunar.get("is_leap_month")),
+            is_leap=state.is_leap_month,
             hour_branch=hour_branch,
             year_branch=year_branch,
             rule_profile=rule_profile,
@@ -789,18 +870,20 @@ def build_ziwei_chart(
             {
                 "rule_id": "lunar_month_for_placement",
                 "source": (
-                    ziwei_ruleset_metadata(rule_profile, sihua_source=sihua_source)[
-                        "classical_source"
-                    ]
+                    ziwei_ruleset_metadata(
+                        rule_profile,
+                        sihua_source=sihua_source,
+                        day_divide=resolved_day_divide,
+                    )["classical_source"]
                     if rule_profile == "quanshu_v2_excerpt"
                     else ziwei_ruleset_metadata(
                         rule_profile, sihua_source=sihua_source
                     )["baseline_source"]
                 ),
                 "inputs": {
-                    "month": int(lunar["month"]),
+                    "month": state.lunar_month,
                     "day": lunar_day,
-                    "is_leap_month": bool(lunar.get("is_leap_month")),
+                    "is_leap_month": state.is_leap_month,
                 },
                 "outputs": {"effective_month": lunar_month},
             },
@@ -814,7 +897,7 @@ def build_ziwei_chart(
                 "rule_id": "wuhu_dun_nayin_ju",
                 "source": "起五行寅例与命宫干支纳音",
                 "inputs": {
-                    "lunar_year": int(lunar["year"]),
+                    "lunar_year": state.lunar_year,
                     "year_stem": year_stem,
                     "ming_ganzhi": ming_palace["ganzhi"],
                 },
@@ -822,8 +905,8 @@ def build_ziwei_chart(
                     "nayin": wuxing_ju["nayin"],
                     "ju_number": wuxing_ju["number"],
                     "source_comparison": ziwei_prerequisite_source_evidence(
-                        lunar_month=int(lunar["month"]),
-                        is_leap=bool(lunar.get("is_leap_month")),
+                        lunar_month=state.lunar_month,
+                        is_leap=state.is_leap_month,
                         effective_month=lunar_month,
                         hour_branch=hour_branch,
                         year_stem=year_stem,
@@ -869,15 +952,20 @@ def build_ziwei_chart(
         ],
         "year_stem": year_stem,
         "lunar_date": {
-            "year": int(lunar["year"]),
-            "month": int(lunar["month"]),
-            "day": int(lunar["day"]),
-            "is_leap_month": bool(lunar.get("is_leap_month")),
+            "year": state.lunar_year,
+            "month": state.lunar_month,
+            "day": state.lunar_day,
+            "is_leap_month": state.is_leap_month,
         },
         "hour_branch": hour_branch,
         "calendar_rules": {
             "year_boundary": "农历正月初一",
-            "late_zi": "晚子时本命农历日期算当天",
+            "late_zi": (
+                "晚子算次日早子；农历日序与流日/流时天干同步翻至次日"
+                if resolved_day_divide == "forward"
+                else "晚子算当日；农历日序与流日/流时天干均取当日早子"
+            ),
+            "day_divide": resolved_day_divide,
             "leap_month": (
                 "闰月全月作下月（全书卷二转录摘录）"
                 if rule_profile == "quanshu_v2_excerpt"
@@ -885,7 +973,9 @@ def build_ziwei_chart(
             ),
             "effective_birth_month": lunar_month,
         },
-        "ruleset": ziwei_ruleset_metadata(rule_profile, sihua_source=sihua_source),
+        "ruleset": ziwei_ruleset_metadata(
+            rule_profile, sihua_source=sihua_source, day_divide=resolved_day_divide
+        ),
         "ming_gong": {
             "name": "命宫",
             "branch": ming_branch,
@@ -1025,6 +1115,7 @@ def build_ziwei_horoscope(
     target_seed: MetaphysicsSeed,
     birth_seed: Optional[MetaphysicsSeed] = None,
     nominal_age_basis: str = "birth_civil_timezone",
+    day_divide: ZiweiDayDivide | None = None,
 ) -> Dict[str, Any]:
     """Six scopes using lunar-year ages and the natal-month/hour Dou Jun.
 
@@ -1038,6 +1129,16 @@ def build_ziwei_horoscope(
     validate_rule_profile(rule_profile)
     sihua_source = chart.get("ruleset", {}).get("sihua_source", "rule_profile")
     validate_sihua_source(sihua_source)
+    chart_day_divide = validate_day_divide(
+        chart.get("ruleset", {}).get("day_divide", DEFAULT_ZIWEI_DAY_DIVIDE)
+    )
+    resolved_day_divide = (
+        validate_day_divide(day_divide) if day_divide is not None else chart_day_divide
+    )
+    if resolved_day_divide != chart_day_divide:
+        raise ValueError("本命与运限晚子分日口径不一致，须按同一口径重建命盘")
+    else:
+        pass
     named_rule = chart.get("ruleset", {}).get("sihua_rule") == "naj_ming_v1"
     named_version = str(chart.get("ruleset", {}).get("version", "")).endswith(
         "+sihua.naj-ming-v1"
@@ -1054,22 +1155,20 @@ def build_ziwei_horoscope(
         raise ValueError("本命四化与所选明刊来源不一致，须按实际来源重建命盘")
     if normalize_gender(gender) not in {"男", "女"}:
         raise ValueError("紫微运限的大限、小限顺逆需要明确性别；本命非运限部分仍可计算")
-    target_lunar, target_month, target_day = require_lunar_month_day(
-        target_seed, "紫微斗数运限"
+    target_state = resolve_ziwei_clock_state(
+        target_seed, resolved_day_divide, technique="紫微运限目标"
     )
-    if target_lunar.get("year") is None:
-        raise ValueError("紫微运限目标农历年缺失")
     natal_lunar = chart["lunar_date"]
     age_calendar = nominal_age_calendar(
         birth_seed=birth_seed,
         target_seed=target_seed,
         birth_placement_year=int(natal_lunar["year"]),
-        target_civil_year=int(target_lunar["year"]),
+        target_civil_year=target_seed.calendar_context["lunar_calendar"]["year"],
         basis=nominal_age_basis,
     )
     nominal_age = age_calendar["nominal_age"]
     natal_year_branch = _lunar_year_ganzhi(int(natal_lunar["year"]))[1]
-    target_year_stem, target_year_branch = _lunar_year_ganzhi(int(target_lunar["year"]))
+    target_year_stem, target_year_branch = _lunar_year_ganzhi(target_state.lunar_year)
 
     first_daxian_age = int(chart["wuxing_ju"]["number"])
     daxian: Dict[str, Any]
@@ -1124,9 +1223,9 @@ def build_ziwei_horoscope(
         rule_profile,
     )
     target_month = effective_lunar_month(
-        target_month,
-        target_day,
-        bool(target_lunar.get("is_leap_month")),
+        target_state.lunar_month,
+        target_state.lunar_day,
+        target_state.is_leap_month,
         # The excerpt concerns natal 身命, not flowing leap months.
         DEFAULT_ZIWEI_PROFILE,
     )
@@ -1139,10 +1238,8 @@ def build_ziwei_horoscope(
         + 1
     ) % 12
     month_index = (doujun_index + target_month - 1) % 12
-    day_index = (month_index + target_day - 1) % 12
-    hour_index = (
-        day_index + EARTHLY_BRANCHES.index(target_seed.pillars["hour"][1])
-    ) % 12
+    day_index = (month_index + target_state.lunar_day - 1) % 12
+    hour_index = (day_index + EARTHLY_BRANCHES.index(target_state.hour_branch)) % 12
     month_stem = HEAVENLY_STEMS[
         (HEAVENLY_STEMS.index(target_year_stem) * 2 + 2 + target_month - 1) % 10
     ]
@@ -1157,8 +1254,8 @@ def build_ziwei_horoscope(
     ]
     for scope, index, stem in (
         ("流月", month_index, month_stem),
-        ("流日", day_index, target_seed.pillars["day"][0]),
-        ("流时", hour_index, target_seed.pillars["hour"][0]),
+        ("流日", day_index, target_state.day_stem),
+        ("流时", hour_index, target_state.hour_stem),
     ):
         flowing.append(
             _horoscope_scope(
@@ -1171,13 +1268,27 @@ def build_ziwei_horoscope(
         )
 
     scopes = [daxian, xiaoxian, *flowing]
+    if target_state.is_late_zi:
+        day_origin = (
+            "目标次日日干（晚子算次日）"
+            if resolved_day_divide == "forward"
+            else "目标当日日干（晚子算当日）"
+        )
+        hour_origin = (
+            "目标次日早子时干（晚子算次日）"
+            if resolved_day_divide == "forward"
+            else "目标当日早子时干（晚子算当日）"
+        )
+    else:
+        day_origin = "目标日柱天干"
+        hour_origin = "目标时柱天干"
     stem_origins = (
         "本命所临宫干",
         "本命所临宫干",
         "目标农历年干",
         "目标农历月序五虎遁月干",
-        "目标日柱天干",
-        "目标时柱天干",
+        day_origin,
+        hour_origin,
     )
     for scope_record, stem_origin in zip(scopes, stem_origins):
         if scope_record.get("status") == "not_started":
@@ -1226,7 +1337,9 @@ def build_ziwei_horoscope(
             palaces, scopes, nominal_age=nominal_age
         ),
         "calendar_rules": chart["calendar_rules"],
-        "ruleset": ziwei_ruleset_metadata(rule_profile, sihua_source=sihua_source),
+        "ruleset": ziwei_ruleset_metadata(
+            rule_profile, sihua_source=sihua_source, day_divide=resolved_day_divide
+        ),
         "source_comparison": limit_source_evidence(
             chart,
             scopes,
@@ -1258,7 +1371,9 @@ def build_ziwei_rules(
     *,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
     sihua_source: str = "rule_profile",
+    day_divide: ZiweiDayDivide = DEFAULT_ZIWEI_DAY_DIVIDE,
 ) -> Dict[str, Any]:
+    resolved_day_divide = validate_day_divide(day_divide)
     rules = sihua_rules_for(ZIWEI_SIHUA_RULES, rule_profile, sihua_source=sihua_source)
     catalogue = {
         "palace_sequence": ZIWEI_PALACE_SEQUENCE,
@@ -1268,7 +1383,9 @@ def build_ziwei_rules(
         "sihua_source_comparison": sihua_source_comparison(
             rules, compared_assignments_applied=sihua_source == "naj_ming_v1"
         ),
-        "ruleset": ziwei_ruleset_metadata(rule_profile, sihua_source=sihua_source),
+        "ruleset": ziwei_ruleset_metadata(
+            rule_profile, sihua_source=sihua_source, day_divide=resolved_day_divide
+        ),
         "cycle_methods": {
             "pre_decade": "所选局数起岁前不取大限宫、不生成大限四化；童限独立",
             "daxian_start": (

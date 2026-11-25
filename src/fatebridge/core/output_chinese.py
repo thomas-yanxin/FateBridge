@@ -517,6 +517,7 @@ class ZiweiDateConversionProvenance(PartialOutput):
 
 
 class ZiweiCalendarBasis(PartialOutput):
+    day_divide: Literal["current", "forward"] | None = None
     method_id: Optional[str] = None
     placement_clock: Optional[str] = None
     placement_datetime: Optional[str] = None
@@ -608,6 +609,7 @@ class ZiweiSihuaSourceComparison(PartialOutput):
 
 
 class ZiweiRuleset(PartialOutput):
+    day_divide: Literal["current", "forward"] | None = None
     sihua_source: Optional[str] = None
     sihua_source_url: Optional[str] = None
     id: Optional[str] = None
@@ -905,6 +907,7 @@ class ZiweiReadingView(PartialOutput):
 
 
 class ZiweiCalendarRules(PartialOutput):
+    day_divide: Literal["current", "forward"] | None = None
     late_zi: Optional[str] = None
     leap_month: Optional[str] = None
     year_boundary: Optional[str] = None

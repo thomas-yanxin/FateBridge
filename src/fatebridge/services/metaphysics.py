@@ -51,7 +51,11 @@ from fatebridge.core.metaphysics.ziwei import (
     build_ziwei_rules,
 )
 from fatebridge.core.ziwei_calendar import basis_text, calendar_basis, context_basis
-from fatebridge.core.ziwei_rulesets import DEFAULT_ZIWEI_PROFILE
+from fatebridge.core.ziwei_rulesets import (
+    DEFAULT_ZIWEI_DAY_DIVIDE,
+    DEFAULT_ZIWEI_PROFILE,
+    ZiweiDayDivide,
+)
 from fatebridge.core.ziwei_time_input import birth_clock_receipt
 from fatebridge.services.snapshot_builders import (
     build_snapshot_export as _build_snapshot_export,
@@ -1161,7 +1165,7 @@ def _build_ziwei_snapshot_text(
             "起盘信息",
             _join_snapshot_lines(
                 [
-                    f"农历：{lunar_calendar.get('display') or '无'}",
+                    f"排盘时钟原日期农历：{lunar_calendar.get('display') or '无'}",
                     f"输入钟表时间：{seed.input_datetime.strftime('%Y-%m-%d %H:%M:%S')}",
                     f"排盘时间：{seed.calendar_context['solar_datetime']}",
                     (
@@ -1394,6 +1398,7 @@ def calculate_ziwei_birth(
     selected_sections: Optional[List[str]] = None,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
     sihua_source: str = "rule_profile",
+    day_divide: ZiweiDayDivide = DEFAULT_ZIWEI_DAY_DIVIDE,
     birth_utc_offset: Optional[str] = None,
 ) -> Dict[str, Any]:
     seed = _build_person_seed(person, birth_utc_offset=birth_utc_offset)
@@ -1402,9 +1407,10 @@ def calculate_ziwei_birth(
         person.gender or "未知",
         rule_profile=rule_profile,
         sihua_source=sihua_source,
+        day_divide=day_divide,
     )
     ziwei_birth["engine"] = "fatebridge-offline"
-    ziwei_birth["calendar_basis"] = calendar_basis(seed)
+    ziwei_birth["calendar_basis"] = calendar_basis(seed, day_divide=day_divide)
     snapshot_text = _build_ziwei_snapshot_text(seed=seed, ziwei_birth=ziwei_birth)
     snapshot_export = _build_snapshot_export(
         technique="ziwei",
@@ -1453,6 +1459,7 @@ def calculate_ziwei_horoscope(
     birth_utc_offset: Optional[str] = None,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
     sihua_source: str = "rule_profile",
+    day_divide: ZiweiDayDivide = DEFAULT_ZIWEI_DAY_DIVIDE,
     nominal_age_basis: str = "birth_civil_timezone",
     selected_sections: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
@@ -1462,6 +1469,7 @@ def calculate_ziwei_horoscope(
         person.gender or "未知",
         rule_profile=rule_profile,
         sihua_source=sihua_source,
+        day_divide=day_divide,
     )
     target_seed = _build_analysis_seed(
         analysis_year=target_year,
@@ -1485,10 +1493,11 @@ def calculate_ziwei_horoscope(
         target_seed=target_seed,
         birth_seed=seed,
         nominal_age_basis=nominal_age_basis,
+        day_divide=day_divide,
     )
     horoscope["calendar_basis"] = {
-        "birth": calendar_basis(seed),
-        "target": calendar_basis(target_seed),
+        "birth": calendar_basis(seed, day_divide=day_divide),
+        "target": calendar_basis(target_seed, day_divide=day_divide),
         "nominal_age_rule": horoscope["nominal_age_calendar"]["rule"],
         "age_boundary_classically_verified": False,
     }
@@ -1551,11 +1560,15 @@ def calculate_ziwei_rules(
     selected_sections: Optional[List[str]] = None,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
     sihua_source: str = "rule_profile",
+    day_divide: ZiweiDayDivide = DEFAULT_ZIWEI_DAY_DIVIDE,
 ) -> Dict[str, Any]:
     if year_stem is not None and year_stem not in set(GAN):
         raise ValueError("year_stem 必须是单个天干")
     payload = build_ziwei_rules(
-        year_stem, rule_profile=rule_profile, sihua_source=sihua_source
+        year_stem,
+        rule_profile=rule_profile,
+        sihua_source=sihua_source,
+        day_divide=day_divide,
     )
     payload["engine"] = "fatebridge-offline"
     snapshot_text = _build_ziwei_rules_snapshot_text(payload)

@@ -14,6 +14,8 @@ from fatebridge.core.ziwei_sources import _ming_sihua_source
 ZiweiRuleProfile = Literal["iztro_2_5_8", "quanshu_v2_excerpt"]
 DEFAULT_ZIWEI_PROFILE: ZiweiRuleProfile = "iztro_2_5_8"
 ZiweiSihuaSource = Literal["rule_profile", "naj_ming_v1"]
+ZiweiDayDivide = Literal["current", "forward"]
+DEFAULT_ZIWEI_DAY_DIVIDE: ZiweiDayDivide = "current"
 QUANSHU_SOURCE = (
     "https://zh.wikisource.org/w/index.php?title=紫微斗數全書/卷二&oldid=1963110"
 )
@@ -63,6 +65,15 @@ def validate_sihua_source(source: str) -> ZiweiSihuaSource:
     raise ValueError(f"不支持的紫微四化来源：{source!r}")
 
 
+def validate_day_divide(day_divide: str) -> ZiweiDayDivide:
+    if day_divide == "current":
+        return "current"
+    elif day_divide == "forward":
+        return "forward"
+    else:
+        raise ValueError(f"不支持的紫微晚子分日口径：{day_divide!r}")
+
+
 def sihua_rules_for(
     baseline: Dict[str, Dict[str, str]],
     profile: str,
@@ -90,10 +101,14 @@ def sihua_rules_for(
 
 
 def ziwei_ruleset_metadata(
-    profile: str, *, sihua_source: str = "rule_profile"
+    profile: str,
+    *,
+    sihua_source: str = "rule_profile",
+    day_divide: ZiweiDayDivide = DEFAULT_ZIWEI_DAY_DIVIDE,
 ) -> Dict[str, Any]:
     validate_rule_profile(profile)
     validate_sihua_source(sihua_source)
+    resolved_day_divide = validate_day_divide(day_divide)
     excerpt = profile == "quanshu_v2_excerpt"
     result: Dict[str, Any] = {
         "id": profile,
@@ -119,6 +134,7 @@ def ziwei_ruleset_metadata(
             if excerpt
             else []
         ),
+        "day_divide": resolved_day_divide,
         "leap_month_rule": "all_next_month" if excerpt else "split_at_day_15",
         "sihua_rule": "quanshu_v2_transcription" if excerpt else "iztro_2_5_8",
         "target_leap_month_rule": "iztro_split_at_day_15_not_classically_verified",
