@@ -33,7 +33,11 @@
         "ziwei_birth.calendar_basis.placement_clock",
         "ziwei_birth.calendar_basis.placement_datetime",
         "ziwei_birth.calendar_basis.civil_datetime",
+        "ziwei_birth.calendar_basis.civil_instant_utc",
+        "ziwei_birth.calendar_basis.apparent_solar_datetime",
         "ziwei_birth.calendar_basis.timezone",
+        "ziwei_birth.calendar_basis.day_divide",
+        "ziwei_birth.calendar_basis.late_zi_rollover_applied",
         "ziwei_birth.calendar_basis.date_shift_days",
         "ziwei_birth.calendar_basis.placement_lunar_date",
         "ziwei_birth.calendar_basis.civil_date_lunar_date",
@@ -51,7 +55,7 @@
         "ziwei_birth.lunar_date",
         "ziwei_birth.hour_branch"
       ],
-      "purpose": "核对钟表／真太阳排盘／UTC+08参考日期及显式偏移；此视图保留既有时钟证据，换算实施来源和印刷日期参照另用calendar_sources。原典时钟、混合年界岁序未认证。"
+      "purpose": "核对民用时刻、真太阳钟、晚子分日后的实际排盘标签及UTC+08参考日期。换算实现与印刷日期参照另读calendar_sources。原典时钟未认证。"
     },
     "calendar_sources": {
       "fields": [
@@ -133,6 +137,13 @@
       ],
       "purpose": "明刊卷三星义定义与实际本命星曜、四化、博士循环的分层连接；完整来源视图可按同run分页读取。"
     },
+    "named_patterns": {
+      "fields": [
+        "ziwei_birth.ruleset",
+        "ziwei_birth.named_patterns"
+      ],
+      "purpose": "核对选定明刊格表的必要、附加与阻断条件及实际星位。昌曲夹命列独立几何，条文及未决条件定义见 ziwei_rules 的同名证据视图。"
+    },
     "natal": {
       "fields": [
         "analysis_context",
@@ -149,6 +160,12 @@
         "ziwei_birth.calendar_cycles.boshi_rule"
       ],
       "purpose": "全部本命星曜落点、亮度、四化与三方四正地支引用的紧凑首轮视图；摘录配置旬空两支形成67条落点，66种星名均保留。"
+    },
+    "palace_sihua": {
+      "fields": [
+        "ziwei_birth.palace_sihua_relations"
+      ],
+      "purpose": "按化名和目标星反查十二宫宫干四化，复用所选生年四化表。逐组列出全部发出宫和本命候选星位；星位为空表示未定位，发出宫内有同星落点则记自化。生年与运限标记独立。"
     },
     "rules": {
       "fields": [
@@ -207,6 +224,12 @@
         "ziwei_birth.reading_view"
       ],
       "purpose": "核对旬空双支和软件单支口径，以及古天空/今地空、古解神/今年解的名称映射。"
+    },
+    "year_branch_cycles": {
+      "fields": [
+        "ziwei_birth.calendar_cycles.year_branch_cycles"
+      ],
+      "purpose": "按出生排盘农历年支读取岁前与将前十二神的完整地支序列、各自起点及软件来源。与同名本命辅星和博士标记分开。"
     }
   },
   "first_view": {
@@ -321,6 +344,21 @@
         "title": "Birth Year",
         "type": "integer"
       },
+      "brightness_source": {
+        "default": "rule_profile",
+        "description": "本命庙旺表。rule_profile（默认）沿用基础盘式。iztro_2_5_8 取软件原表，quanshu_v2_selected_table 取《紫微斗数全书》卷二转录的十二宫表。ziwei_doushu_qs、ziwei_doushu_xd1、ziwei_doushu_zz、ziwei_doushu_xd2 取 Renhuai123/ziwei-doushu 固定版本软件对照表。空格为 null，不跨表补值。安星、历法、四化及运限起法仍按各自规则。",
+        "enum": [
+          "rule_profile",
+          "iztro_2_5_8",
+          "quanshu_v2_selected_table",
+          "ziwei_doushu_qs",
+          "ziwei_doushu_xd1",
+          "ziwei_doushu_zz",
+          "ziwei_doushu_xd2"
+        ],
+        "title": "Brightness Source",
+        "type": "string"
+      },
       "day_divide": {
         "default": "current",
         "description": "晚子（23:00-23:59）分日口径：current（默认，当日农历与当日日/时干）或 forward（算次日早子农历与次日早子日/时干）。",
@@ -356,6 +394,24 @@
         "default": "未提供",
         "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）",
         "title": "Name"
+      },
+      "natal_leap_month_policy": {
+        "anyOf": [
+          {
+            "enum": [
+              "split_at_day_15",
+              "all_current_month",
+              "all_next_month"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "本命闰月安星月序：split_at_day_15（初一至十五沿用同名月序，十六日起后移一月）、all_current_month（全月原位）、all_next_month（全月后移）。保留出生农历年、日、闰月标记；闰十二月后移为本年安星月序13。省略按rule_profile：iztro分半，摘录全月后移。",
+        "title": "Natal Leap Month Policy"
       },
       "rule_profile": {
         "default": "iztro_2_5_8",
@@ -433,7 +489,10 @@
       "role": "calculation",
       "selector_fields": [
         "rule_profile",
-        "sihua_source"
+        "natal_leap_month_policy",
+        "sihua_source",
+        "brightness_source",
+        "day_divide"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"

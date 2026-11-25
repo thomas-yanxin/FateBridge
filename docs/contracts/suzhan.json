@@ -454,7 +454,7 @@
           }
         ],
         "default": null,
-        "description": "已知钟时须明确纬度；文本或十进制度，gps_lat优先；未知钟时不用于历法层",
+        "description": "星图所需纬度，与经度成对提供。接受文本或十进制度，gps_lat优先且0有效。",
         "title": "Lat"
       },
       "leap_month_policy": {
@@ -477,7 +477,7 @@
           }
         ],
         "default": null,
-        "description": "已知钟时须明确经度；文本或十进制度，gps_lon优先；未知钟时不用于历法层",
+        "description": "星图所需经度，与纬度成对提供。接受文本或十进制度，gps_lon优先且0有效。",
         "title": "Lon"
       },
       "mansion_method": {
@@ -540,7 +540,7 @@
           }
         ],
         "default": null,
-        "description": "已确认的当地钟时；已知时须同时提供完整经纬度以计算星图。未知时省略或null，保留历法日期／半日候选，不计算星图、宫位或瞬时天文宿位，不补00:00或示例钟时。空字符串无效。",
+        "description": "已确认的当地钟时，用于按宿主时区定位历日。提供钟时和完整经纬度时计算星图。钟时未知时可省略，保留历法日期或半日候选。空字符串无效。",
         "title": "Time"
       },
       "zodiacal": {

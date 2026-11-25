@@ -3,6 +3,12 @@
     "sihua_source": "sihua_source=rule_profile沿用基础配置；仅在明确指定明刊四化时选naj_ming_v1。三工具同选项，组合版本含+sihua.naj-ming-v1，sihua_source_url专指四化，classical_source仍是基础配置来源。庚日武同相会实际改本命标记及各层按干查表；不因此更改安星、亮度、岁序，也不认证古典运限复用或整书。"
   },
   "evidence_views": {
+    "named_patterns": {
+      "fields": [
+        "rule_catalogue.named_patterns"
+      ],
+      "purpose": "按图号读取选定格表条文、条件角色、采用口径与明刊书影和转录身份。"
+    },
     "sihua_source": {
       "fields": [
         "rule_catalogue.ruleset",
@@ -22,6 +28,21 @@
     "additionalProperties": false,
     "description": "Request model for Zi Wei rule catalogue lookup.",
     "properties": {
+      "brightness_source": {
+        "default": "rule_profile",
+        "description": "本命庙旺表。rule_profile（默认）沿用基础盘式。iztro_2_5_8 取软件原表，quanshu_v2_selected_table 取《紫微斗数全书》卷二转录的十二宫表。ziwei_doushu_qs、ziwei_doushu_xd1、ziwei_doushu_zz、ziwei_doushu_xd2 取 Renhuai123/ziwei-doushu 固定版本软件对照表。空格为 null，不跨表补值。安星、历法、四化及运限起法仍按各自规则。",
+        "enum": [
+          "rule_profile",
+          "iztro_2_5_8",
+          "quanshu_v2_selected_table",
+          "ziwei_doushu_qs",
+          "ziwei_doushu_xd1",
+          "ziwei_doushu_zz",
+          "ziwei_doushu_xd2"
+        ],
+        "title": "Brightness Source",
+        "type": "string"
+      },
       "day_divide": {
         "default": "current",
         "description": "晚子（23:00-23:59）分日口径：current 或 forward。",
@@ -106,7 +127,9 @@
       "role": "reference",
       "selector_fields": [
         "rule_profile",
-        "sihua_source"
+        "sihua_source",
+        "brightness_source",
+        "day_divide"
       ],
       "source_refs": [
         "docs/ziwei.md"

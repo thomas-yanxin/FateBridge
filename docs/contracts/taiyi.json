@@ -509,6 +509,24 @@
         "title": "Selected Sections",
         "type": "array"
       },
+      "shiji_profile": {
+        "anyOf": [
+          {
+            "enum": [
+              "jinjing_vol2_rotation_v1",
+              "jinjing_vol3_table_v1",
+              "jinjing_vol3_table_literal_v1"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "始击来源。默认 jinjing_vol2_rotation_v1 按《金镜》卷二推演。jinjing_vol3_table_v1 对阴遁37、43、44局采用卷三表列始击并按卷二重算客算。jinjing_vol3_table_literal_v1 对这三局采用卷三表列始击和客算。",
+        "title": "Shiji Profile"
+      },
       "use_true_solar_time": {
         "default": false,
         "description": "年计农历岁首按输入钟表日期；月计按真实节气瞬间。日/时计为true时用经度及均时差的本地真太阳钟，为false时按时区钟表标签计数。日计所选钟面零时换日，时计23时子初，不能混用。",
@@ -577,7 +595,8 @@
         "calculation_mode",
         "hour_profile",
         "month_profile",
-        "year_profile"
+        "year_profile",
+        "shiji_profile"
       ],
       "source_refs": [
         "docs/taiyi-sanshi-audit.md"
