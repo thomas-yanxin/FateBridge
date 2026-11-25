@@ -117,6 +117,7 @@ def build_analysis_seed(
     analysis_second: int = 0,
     analysis_timezone: str | None = None,
     analysis_utc_offset: str | None = None,
+    timezone_field: str = "analysis_timezone",
     utc_offset_field: str = "analysis_utc_offset",
     analysis_longitude: float | None = None,
     use_true_solar_time: bool = False,
@@ -136,7 +137,7 @@ def build_analysis_seed(
         timezone_name,
         analysis_utc_offset,
         offset_field=utc_offset_field,
-        timezone_field="analysis_timezone",
+        timezone_field=timezone_field,
     )
     return build_metaphysics_seed(
         civil=civil,

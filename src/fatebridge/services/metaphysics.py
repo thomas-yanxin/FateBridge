@@ -235,6 +235,7 @@ def calculate_ziwei_horoscope(
         analysis_minute=target_minute,
         analysis_timezone=target_timezone,
         analysis_utc_offset=target_utc_offset,
+        timezone_field="target_timezone",
         utc_offset_field="target_utc_offset",
     )
     # Compare actual civil instants, not corrected apparent-solar labels or
