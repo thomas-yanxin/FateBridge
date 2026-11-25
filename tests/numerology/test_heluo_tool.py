@@ -1,15 +1,4 @@
-"""Historical port regression tests for heluo (河洛理数).
-
-Two parity goldens, both produced by horosa's own `heluoLocal.js` / `runHeluo`:
-
-- ``heluo_judge_snapshot.txt`` — fixed pillars 甲子/丁卯/庚申/庚辰 (阳男·辰时) +
-  an explicit 清明 化工, so it pins the 节气-*independent* algorithm
-  (起命/元堂/爻辞/大限) **and** the 命运篇 judge logic, with no ephemeris in play.
-- ``heluo_e2e_snapshot.txt`` — horosa's full `runHeluo` for 2000-05-15 09:33 (a
-  节气-safe date). It is retained as migration evidence, with explicit changes
-  for corrected Najia matching and overconfident labels. Independent scanned
-  fixtures, rather than historical port parity, establish the rule checks.
-"""
+"""Heluo named examples, transformation rules and service checks."""
 
 from __future__ import annotations
 
