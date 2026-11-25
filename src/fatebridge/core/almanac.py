@@ -18,10 +18,8 @@ from typing import Any, TypedDict
 
 try:
     from lunardate import LunarDate
-    from lunardate import __version__ as LUNARDATE_VERSION
-except ImportError:  # pragma: no cover - optional import failure path
+except ImportError:  # pragma: no cover - installed environments supply lunardate
     LunarDate = None
-    LUNARDATE_VERSION = ""
 
 from fatebridge.core import (
     aa1996_solar,
@@ -217,29 +215,14 @@ def _lunar_date_from_solar(solar_date: date) -> _LunarDateValue:
     supplement = _supplement_lunar_date(solar_date)
     if supplement is not None:
         return _LunarDateValue(*supplement)
-    # note (lunardate): The 0.2 API needs camelCase; 0.3 deprecates those names.
-    uses_legacy_lunar_api = LUNARDATE_VERSION.startswith("0.2.")
-    year, month, day = solar_date.year, solar_date.month, solar_date.day
-    if uses_legacy_lunar_api:
-        lunar = LunarDate.fromSolarDate(year, month, day)
-        round_trip_solar_date = lunar.toSolarDate()
-        is_leap_month = lunar.isLeapMonth
-    else:
-        lunar = LunarDate.from_solar_date(year, month, day)
-        round_trip_solar_date = lunar.to_solar_date()
-        is_leap_month = lunar.is_leap_month
-    if round_trip_solar_date != solar_date:
+    lunar = LunarDate.from_solar_date(solar_date.year, solar_date.month, solar_date.day)
+    if lunar.to_solar_date() != solar_date:
         raise ValueError("农历转换无法反向验证")
     corrected_year_encoding = LUNAR_YEAR_INFO_CORRECTIONS.get(lunar.year)
     if corrected_year_encoding is None:
-        return _LunarDateValue(lunar.year, lunar.month, lunar.day, is_leap_month)
+        return _LunarDateValue(lunar.year, lunar.month, lunar.day, lunar.is_leap_month)
 
-    lunar_new_year = LunarDate(lunar.year, 1, 1)
-    solar_new_year = (
-        lunar_new_year.toSolarDate()
-        if uses_legacy_lunar_api
-        else lunar_new_year.to_solar_date()
-    )
+    solar_new_year = LunarDate(lunar.year, 1, 1).to_solar_date()
     remaining = (solar_date - solar_new_year).days
     leap_month = corrected_year_encoding & 0xF
     for month in range(1, 13):

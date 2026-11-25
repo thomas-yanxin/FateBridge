@@ -10,13 +10,7 @@ import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
 from jsonschema import Draft202012Validator
-
-from tests.support.transports import call_calculation, describe_capability
-
-try:
-    from mcp.shared.exceptions import McpError
-except ImportError:  # MCP SDK 2.x uses the capitalized spelling.
-    from mcp.shared.exceptions import MCPError as McpError
+from mcp import MCPError
 
 import fatebridge.api as api
 import fatebridge.application.discovery as discovery
@@ -26,6 +20,7 @@ from fatebridge.cli import run
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
 from tests.fixtures.surface_payloads import REST_POST_CASES
+from tests.support.transports import call_calculation, describe_capability
 
 BIRTH = {
     **REST_POST_CASES["/api/bazi/birth-chart"](),
@@ -378,7 +373,7 @@ def test_mcp_family_profile_filters_real_tools_and_resource_contracts(rest) -> N
             )
             result = await call_calculation(client, "bazi_birth_chart", BIRTH)
             assert not result.is_error
-            with pytest.raises(McpError):
+            with pytest.raises(MCPError):
                 await client.read_resource("fatebridge://tools/astrology_chart")
             return tools, summary
 
