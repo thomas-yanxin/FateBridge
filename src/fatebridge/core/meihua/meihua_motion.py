@@ -18,7 +18,7 @@ def _profile() -> dict[str, Any]:
             Path(__file__).resolve().parents[2] / "data/meihua/motion-nlc1925-v1.json"
         ).read_text(encoding="utf-8")
     )
-    if profile["id"] != "meihua_motion_nlc1925_v1" or profile["version"] != "1.0.0":
+    if profile["id"] != "meihua_motion_nlc1925_v1" or profile["version"] != "1.1.0":
         raise ValueError("Unknown selected Meihua motion profile")
     else:
         pass
@@ -42,7 +42,9 @@ def _reading(
         raise ValueError("Motion requires all four actual auxiliary roles")
     else:
         pass
-    rules = {r["id"]: r for r in _profile()["rules"]}
+    profile = _profile()
+    rules = {r["id"]: r for r in profile["rules"]}
+    orientation_source = profile["orientation_reference"]
     inner = [
         {
             "role": "body",
@@ -87,10 +89,14 @@ def _reading(
         "scope": "observer_activity_only_not_mental_stillness_or_omen_valence",
     }
     rows = []
-    for index, observation in enumerate(
-        external["reported_observations"] if external else []
-    ):
+    observations = (
+        zip(external["reported_observations"], external["observations"], strict=True)
+        if external
+        else ()
+    )
+    for index, (observation, qualification) in enumerate(observations):
         motion = observation.get("motion")
+        orientation = observation.get("orientation")
         motion_met = None if motion is None else motion == "moving"
         clauses = [
             {
@@ -109,9 +115,40 @@ def _reading(
                 ("moving_unfavorable", "unfavorable"),
             ]
         ]
+        orientation_clauses = []
+        for clause in orientation_source["clauses"]:
+            orientation_met = (
+                False
+                if motion == "stationary"
+                else (
+                    None
+                    if orientation is None
+                    else orientation == clause["orientation"]
+                )
+            )
+            relation_met = qualification["raw_relation_to_body"] == clause["relation"]
+            orientation_clauses.append(
+                {
+                    **clause,
+                    "orientation_condition_met": orientation_met,
+                    "symbolic_relation_condition_met": relation_met,
+                    "cross_chapter_qualification_met": None,
+                    "full_clause_applies": (
+                        False if orientation_met is False or not relation_met else None
+                    ),
+                }
+            )
         rows.append(
             {
                 "record_index": index,
+                "orientation": orientation,
+                "orientation_declaration_status": (
+                    "not_collected"
+                    if orientation is None
+                    else "caller_reported_unverified"
+                ),
+                "orientation_clauses": orientation_clauses,
+                "orientation_motion_synthesis": "not_adjudicated",
                 "motion": motion,
                 "declaration_status": (
                     "not_collected" if motion is None else "caller_reported_unverified"
@@ -145,6 +182,8 @@ def _reading(
             pass
     else:
         pass
+    if any(row["orientation"] is not None for row in rows):
+        summary += "外应向背按卷二《向背》逐项列出相向而来、相背而去的条文条件；外物资格与动静速应的跨篇合参未定。"
     if summary:
         summary = (
             "体互静、用变动是内卦符号角色，不等同现场运动。"
@@ -153,10 +192,13 @@ def _reading(
         )
     else:
         pass
+    motion_profile = motion_ruleset()
+    orientation_reference = motion_profile.pop("orientation_reference")
     return {
-        "ruleset_id": _profile()["id"],
-        "version": _profile()["version"],
-        "ruleset": motion_ruleset(),
+        "ruleset_id": profile["id"],
+        "version": profile["version"],
+        "ruleset": motion_profile,
+        "orientation_source": orientation_reference,
         "reference_body": "original_static_body_of_this_candidate",
         "inner_roles": inner,
         "inner_role_motion_scope": "source_symbolic_roles_not_physical_movement",

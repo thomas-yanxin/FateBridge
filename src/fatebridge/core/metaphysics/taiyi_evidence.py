@@ -157,7 +157,13 @@ def evidence_text(board: dict[str, Any]) -> str:
             if not trace["terminal_excluded"]
             else f"止于{trace['terminal_palace']}宫前"
         )
-        lines.append(f"{label}：{path} = {trace['count']}；{ending}。")
+        if "selected_count" in trace:
+            lines.append(
+                f"{label}卷二重算：{path} = {trace['count']}；{ending}。"
+                f"本盘选用{label}{trace['selected_count']}；{trace['selected_count_basis']}。"
+            )
+        else:
+            lines.append(f"{label}：{path} = {trace['count']}；{ending}。")
     lines.append(
         f"主大/主参：{core['main_general']}/{core['main_vice_general']}；客大/客参：{core['guest_general']}/{core['guest_vice_general']}。"
     )

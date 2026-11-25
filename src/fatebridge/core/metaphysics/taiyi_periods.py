@@ -37,6 +37,8 @@ def build_period_board(
     mode: str,
     hour_profile: str | None = None,
     month_profile: str | None = None,
+    *,
+    shiji_profile: str | None = None,
 ) -> dict[str, Any]:
 
     instant = localize_datetime(seed.input_datetime, seed.timezone)
@@ -46,7 +48,9 @@ def build_period_board(
     hour_clock_basis = (
         "local_apparent_solar" if seed.applied_true_solar else "civil_wall_clock"
     )
-    core = cyclic_core(frame["accumulation"], yin=frame["yin"])
+    core = cyclic_core(
+        frame["accumulation"], yin=frame["yin"], shiji_profile=shiji_profile
+    )
     ruler = frame["ruler_branch"]
     # A month/hour branch is a time label, not the annual 太岁. Do not put it
     # in suijun or render the annual name on a monthly/hourly board.

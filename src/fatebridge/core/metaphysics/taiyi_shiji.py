@@ -18,6 +18,7 @@ class ShijiEditionWitness(TypedDict):
 
 class ResolvedShiji(TypedDict):
     profile: str
+    requested_profile: str
     shiji: str
     guest_count_override: int | None
 
@@ -153,11 +154,12 @@ def resolve_shiji_variant(
         )
     rotation = rotate_shiji(wenchang, jishen)
     return {
-        "profile": profile,
+        "profile": profile if witness else DEFAULT_SHIJI_PROFILE,
+        "requested_profile": profile,
         "shiji": witness["shiji"] if witness else rotation["derived_shiji"],
         "guest_count_override": (
             witness["guest_count"]
-            if witness and profile == "jinjing_vol3_table_literal_v1" and ju == 37
+            if witness and profile == "jinjing_vol3_table_literal_v1"
             else None
         ),
     }
@@ -232,12 +234,29 @@ def shiji_derivation(core: dict[str, Any]) -> dict[str, Any]:
         pass
     profile = str(core.get("shiji_profile") or DEFAULT_SHIJI_PROFILE)
     ju = core.get("kook_number")
-    variants = (
-        [dict(row) for row in YIN_37_43_44_VARIANTS if row["ju"] == ju]
-        if core.get("yin_dun") is True and ju in (37, 43, 44)
-        else None
-    )
+    variants = None
+    selected_witness = None
+    if type(ju) is int and core.get("yin_dun") is True and ju in (37, 43, 44):
+        variants = [dict(row) for row in YIN_37_43_44_VARIANTS if row["ju"] == ju]
+        if profile != DEFAULT_SHIJI_PROFILE:
+            selected_witness = SHIJI_EDITION_WITNESSES.get((ju, profile))
+    selected_evidence = {}
+    requested_profile = core.get("requested_shiji_profile")
+    if requested_profile is not None:
+        selected_evidence["requested_shiji_profile"] = requested_profile
+    if selected_witness is not None and actual == selected_witness["shiji"]:
+        selected_evidence.update(
+            {
+                "selected_source": selected_witness["source"],
+                "guest_count_basis": (
+                    "卷三原表字面"
+                    if profile == "jinjing_vol3_table_literal_v1"
+                    else "卷二算路重算"
+                ),
+            }
+        )
     return {
+        **selected_evidence,
         **common,
         "shiji_profile": profile,
         "status": "computed_from_actual_inputs",
@@ -262,8 +281,10 @@ def shiji_derivation_text(assessment: dict[str, Any]) -> str:
         f"顺行{assessment['step_count']}个间隔，天盘文昌{assessment['wenchang']}"
         f"临地盘{assessment['derived_shiji']}；本盘实际始击{assessment['actual_shiji']}。"
     )
-    if not assessment["matches_actual"]:
+    if "requested_shiji_profile" in assessment:
+        text += f"请求口径{assessment['requested_shiji_profile']}在本局无适用卷三行，采用卷二轮转。"
+    if "guest_count_basis" in assessment:
+        text += f"按所选卷三实读始击，客算口径：{assessment['guest_count_basis']}。"
+    elif not assessment["matches_actual"]:
         text += "推步终位与实际始击不同，保留本盘值待核。"
-    else:
-        pass
     return text + str(assessment["scope"])

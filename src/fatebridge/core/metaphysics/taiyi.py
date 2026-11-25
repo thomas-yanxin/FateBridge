@@ -18,6 +18,7 @@ def build_taiyi_board(
     hour_profile: str | None = None,
     month_profile: str | None = None,
     year_profile: str | None = None,
+    shiji_profile: str | None = None,
 ) -> dict[str, Any]:
     """Build the selected year/month/day/hour frame with explicit source profiles."""
 
@@ -36,14 +37,15 @@ def build_taiyi_board(
     else:
         pass
     if calculation_mode == "year":
-        return build_year_board(seed, gender, year_profile)
-    else:
-        pass
+        return build_year_board(seed, gender, year_profile, shiji_profile=shiji_profile)
     if calculation_mode == "day":
-        return build_key_day_board(seed, gender)
-    else:
-        pass
+        return build_key_day_board(seed, gender, shiji_profile=shiji_profile)
 
     return build_period_board(
-        seed, gender, calculation_mode, hour_profile, month_profile
+        seed,
+        gender,
+        calculation_mode,
+        hour_profile,
+        month_profile,
+        shiji_profile=shiji_profile,
     )

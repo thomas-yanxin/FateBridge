@@ -62,10 +62,12 @@ def key_day_origin(
     }
 
 
-def key_day_numeric_board(count: int, ruler: str, yin: bool) -> dict[str, Any]:
+def key_day_numeric_board(
+    count: int, ruler: str, yin: bool, *, shiji_profile: str | None = None
+) -> dict[str, Any]:
     """The same numeric chain used by the date adapter and source audit."""
 
-    core = cyclic_core(count, yin=yin)
+    core = cyclic_core(count, yin=yin, shiji_profile=shiji_profile)
     if ruler != BRANCHES[(count - 1) % 12]:
         raise ValueError("从甲子起计的积日与所给日支不一致")
     else:
@@ -110,7 +112,9 @@ def key_day_numeric_board(count: int, ruler: str, yin: bool) -> dict[str, Any]:
     return board
 
 
-def build_key_day_board(seed: MetaphysicsSeed, gender: str) -> dict[str, Any]:
+def build_key_day_board(
+    seed: MetaphysicsSeed, gender: str, *, shiji_profile: str | None = None
+) -> dict[str, Any]:
 
     instant = localize_datetime(seed.input_datetime, seed.timezone)
     validate_seed_civil_clock(seed)
@@ -124,7 +128,9 @@ def build_key_day_board(seed: MetaphysicsSeed, gender: str) -> dict[str, Any]:
     )
     count = origin["accumulation"]
     ruler = origin["target_day_ganzhi"][1]
-    board = key_day_numeric_board(count, ruler, anchor.name == "夏至")
+    board = key_day_numeric_board(
+        count, ruler, anchor.name == "夏至", shiji_profile=shiji_profile
+    )
     board.update(
         style_label="太乙金钥匙续集·日计现代日期适配",
         accumulation_label=f"日计冬至前甲子积日：{count}",

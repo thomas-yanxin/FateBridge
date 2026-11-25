@@ -80,6 +80,12 @@ def cyclic_core(
     guest = count_to_taiyi(shiji, taiyi_number)
     printed_guest_count = starting_spirit["guest_count_override"]
     guest_count = guest["count"] if printed_guest_count is None else printed_guest_count
+    guest_trace = dict(guest)
+    if printed_guest_count is not None:
+        guest_trace.update(
+            selected_count=printed_guest_count,
+            selected_count_basis="卷三原表字面；count与path保留卷二重算",
+        )
     main_general = general_for_count(home["count"])
     guest_general = general_for_count(guest_count)
     return {
@@ -93,6 +99,11 @@ def cyclic_core(
         "jishen": jishen,
         "shiji": shiji,
         "shiji_profile": starting_spirit["profile"],
+        **(
+            {"requested_shiji_profile": starting_spirit["requested_profile"]}
+            if starting_spirit["requested_profile"] != starting_spirit["profile"]
+            else {}
+        ),
         "main_count": home["count"],
         "guest_count": guest_count,
         "main_count_des": count_categories(home["count"]),
@@ -101,7 +112,7 @@ def cyclic_core(
         "guest_general": guest_general,
         "main_vice_general": main_general * 3 % 10,
         "guest_vice_general": guest_general * 3 % 10,
-        "count_trace": {"main": home, "guest": guest},
+        "count_trace": {"main": home, "guest": guest_trace},
     }
 
 
@@ -124,7 +135,11 @@ def yearly_core(year: int, *, shiji_profile: str | None = None) -> dict[str, Any
 
 
 def build_year_board(
-    seed: MetaphysicsSeed, gender: str, year_profile: str | None = None
+    seed: MetaphysicsSeed,
+    gender: str,
+    year_profile: str | None = None,
+    *,
+    shiji_profile: str | None = None,
 ) -> dict[str, Any]:
 
     # Yearly counting uses the input civil date. Apparent-solar correction of
@@ -158,7 +173,7 @@ def build_year_board(
     else:
         pass
     year = year_value
-    core = yearly_core(year)
+    core = yearly_core(year, shiji_profile=shiji_profile)
     board = assemble_board(core, calculation_mode="year")
     board.update(
         {

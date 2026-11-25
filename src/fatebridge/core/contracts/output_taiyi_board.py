@@ -90,6 +90,7 @@ class TaiyiCore(PartialOutput):
     set_vice_general: int | None = None
     shiji: str | None = None
     shiji_profile: str | None = None
+    requested_shiji_profile: str | None = None
     sishen: str | None = None
     suijun: str | None = None
     taiyi_position: str | None = None
@@ -184,6 +185,8 @@ class TaiyiCountTrace(PartialOutput):
     terminal_excluded: bool | None = None
     counting_rule: str | None = None
     source: str | None = None
+    selected_count: int | None = None
+    selected_count_basis: str | None = None
 
 
 class TaiyiRuleTrace(PartialOutput):
