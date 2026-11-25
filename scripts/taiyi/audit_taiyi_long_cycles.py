@@ -47,7 +47,6 @@ def walk_spirits(year_count: int) -> list[dict[str, tuple[str, int]]]:
 def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest = json.loads((corpus / "manifest.json").read_text(encoding="utf-8"))
     required = {
-        "vol05.html",
         "vol05.txt",
         "four-spirit-cases.json",
         "worked-cases.json",

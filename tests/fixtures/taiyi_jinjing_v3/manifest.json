@@ -99,11 +99,6 @@
       "kind": "manual_frozen_expectations"
     },
     {
-      "file": "vol05.html",
-      "sha256": "b2dddea1fd4ffc644c09733402996b21fc61ff41d39155c73eb42e56fbe2fde2",
-      "kind": "classical_source_or_collation"
-    },
-    {
       "file": "vol05.txt",
       "sha256": "b8583bb743f17b90825907ee92cc671cd39b048a196e86588b36a509ce94490e",
       "kind": "classical_source_or_collation"
@@ -143,9 +138,39 @@
       "kind": "header_and_disputed_cell_page_spans"
     }
   ],
+  "local_only_archives": [
+    {
+      "file": "vol05.html",
+      "sha256": "b2dddea1fd4ffc644c09733402996b21fc61ff41d39155c73eb42e56fbe2fde2",
+      "reason": "Full website wrapper duplicates the retained text; not required by CI or redistributed. Original bytes remain unchanged locally."
+    }
+  ],
   "redistribution": {
-    "scans": "Public domain originals and mechanical scans; Commons PD-old and NCL PD-scan. Catalogs identified below, checked 2026-11-25.",
-    "wikisource": "vol05.html and vol05.txt retain the linked Wikisource transcription and attribution under CC BY-SA. No modern article PDF is redistributed; worked cases contain only cited factual values."
+    "checked_on": "2026-11-25",
+    "cadal_scans": {
+      "files": "cadal06056495-page{4,5,7,8,12,13,15,16,23..31}.jpg (17 images)",
+      "license": "Public domain; Commons PD-old / Public Domain Mark 1.0",
+      "catalog": "https://commons.wikimedia.org/w/index.php?title=File:CADAL06056495_太乙金鏡式經·卷五~卷十.djvu&oldid=949880897",
+      "purpose": "Offline source-integrity evidence: annual epoch and movement prose (4,5,7,8,12,13,15), table header (16), and all 33 disputed cells with their eight cross-page continuations (23..31). CI hashes images; it does not OCR them or compute positions from pixels."
+    },
+    "ncl_scans": {
+      "files": "ncl06604-page{71,72,73,74}.jpg (4 images)",
+      "license": "Public domain mechanical scans; Commons PD-scan (PD-old) / Public Domain Mark 1.0",
+      "catalog": "https://commons.wikimedia.org/w/index.php?title=File:NCL-06604_太乙金鏡式經.pdf&oldid=900008921",
+      "purpose": "Offline evidence for six named manuscript worked examples: dayou (71), xiaoyou (72), sishen and tianyi (73), diyi and zhifu (74); also corroborates diyi origin nine and zhifu origin five."
+    },
+    "transcription": {
+      "file": "vol05.txt",
+      "original_author": "唐·王希明",
+      "attribution": "Chinese Wikisource contributors; page revision 773936",
+      "source_revision": "https://zh.wikisource.org/w/index.php?title=太乙金鏡式經_(四庫全書本)/卷05&oldid=773936",
+      "contributors": "https://zh.wikisource.org/w/index.php?title=太乙金鏡式經_(四庫全書本)/卷05&action=history",
+      "license": "Underlying ancient text is marked Public domain; the Wikisource transcription is retained under CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "changes": "Original frozen text bytes retained unchanged; text extraction from the saved HTML is the existing fixture, not a new edition.",
+      "purpose": "Offline prose context for cited section anchors and epoch/rate facts in worked-cases.json; SHA verification detects source changes. Numerical expectations remain the independent frozen JSON."
+    },
+    "modern_article": "No modern article PDF is redistributed; worked cases contain only cited factual values."
   },
   "classical_url": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷05",
   "facsimile_catalog": "https://commons.wikimedia.org/wiki/File:CADAL06056495_太乙金鏡式經·卷五~卷十.djvu",
