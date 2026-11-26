@@ -400,7 +400,7 @@
       },
       "doubing_su28": {
         "default": true,
-        "description": "是否按mansion_method标注天文28宿；不用于农历本命宿；默认仅七个物理七曜有现代研究宿位",
+        "description": "是否按当日视赤经和已声明现代距星标注七曜的不等宽天文宿位；历日本命宿单独计算",
         "title": "Doubing Su28",
         "type": "boolean"
       },
@@ -479,16 +479,6 @@
         "default": null,
         "description": "星图所需经度，与纬度成对提供。接受文本或十进制度，gps_lon优先且0有效。",
         "title": "Lon"
-      },
-      "mansion_method": {
-        "default": "equatorial_research28",
-        "description": "天文28宿：默认采用当日视赤经和已声明现代距星的不等宽研究宿界（七曜）；legacy_equal28仅作旧版等分黄道示意；均不决定农历本命宿",
-        "enum": [
-          "equatorial_research28",
-          "legacy_equal28"
-        ],
-        "title": "Mansion Method",
-        "type": "string"
       },
       "natal_mansion": {
         "anyOf": [
@@ -607,7 +597,6 @@
       "selector_fields": [
         "calendar_basis",
         "calendar_profile",
-        "mansion_method",
         "leap_month_policy",
         "house_start_mode"
       ],

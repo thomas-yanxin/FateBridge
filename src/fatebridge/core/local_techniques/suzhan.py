@@ -9,7 +9,6 @@ from fatebridge.core.local_techniques.chart import (
     _build_local_chart_response,
     _normalize_date_text,
     _normalize_time_text,
-    _su28_position,
 )
 from fatebridge.core.local_techniques.snapshot import join_lines, render_snapshot_text
 from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence, rulesets
@@ -96,13 +95,7 @@ def _build_suzhan_snapshot_text(
             su28 = str(item.get("su28") or "").strip()
             # A zodiac-sign degree is not a degree within a 360/28 band.
             value = (
-                (
-                    item["su28_degree"]
-                    if "su28_degree" in item
-                    else _su28_position(float(item["lon"]))[1]
-                )
-                if su28
-                else item.get("signlon", item.get("lon"))
+                (item["su28_degree"]) if su28 else item.get("signlon", item.get("lon"))
             )
             if su28:
                 # Some real RA mansion bands exceed 30 degrees; do not apply
@@ -147,11 +140,7 @@ def _build_suzhan_snapshot_text(
                 (
                     "未标注天文宿位。\n"
                     if not (input_normalized.get("doubingSu28", True))
-                    else (
-                        "现代距星研究口径：当日视赤经、不等宽宿界；不等于唐代宿界复原。\n"
-                        if (response.get("params") or {}).get("su28Method") == METHOD
-                        else "旧版等分黄道示意，不是中国不等宽赤道宿度。\n"
-                    )
+                    else "现代距星研究口径：当日视赤经与不等宽宿界。\n"
                 )
                 + epoch_text
                 + (join_lines(house_lines) or "无"),
@@ -196,7 +185,6 @@ def build_suzhan_result(
     zodiacal: int = 0,
     leap_month_policy: str = "unresolved",
     natal_mansion: Optional[str] = None,
-    mansion_method: str = "equatorial_research28",
     activity: Optional[str] = None,
     activity_details: Optional[List[str]] = None,
     calendar_profile: str = "t1299_fullmoon27",
@@ -216,8 +204,6 @@ def build_suzhan_result(
         or (gps_lon is None and (lon is None or not str(lon).strip()))
     ):
         raise ValueError("计算宿占星图需要完整经纬度，请提供lat/lon或gps_lat/gps_lon。")
-    if mansion_method not in {"equatorial_research28", "legacy_equal28"}:
-        raise ValueError("mansion_method仅支持equatorial_research28或legacy_equal28")
     normalized_szchart = 1 if szchart else 0
     normalized_szshape = 1 if szshape else 0
     normalized_house_start_mode = 2 if house_start_mode == 2 else 1
@@ -241,7 +227,6 @@ def build_suzhan_result(
         "zodiacal": zodiacal,
         "leap_month_policy": leap_month_policy,
         "natal_mansion": natal_mansion,
-        "mansion_method": mansion_method,
         "activity": activity,
         "activity_details": activity_details or [],
         "calendar_profile": calendar_profile,
@@ -341,7 +326,7 @@ def build_suzhan_result(
         gps_lat=gps_lat,
         gps_lon=gps_lon,
         tradition=False,
-        include_su28=include_su28,
+        include_su28=False,
         chart_variant=chart_variant,
         house_start_mode=normalized_house_start_mode,
         shape_mode=normalized_szshape,
@@ -359,7 +344,7 @@ def build_suzhan_result(
     )
     chart = response["chart"]
     astronomy = None
-    if include_su28 and mansion_method == "equatorial_research28":
+    if include_su28:
         birth, _, _ = _build_birth_info(
             date_text=input_normalized["date"],
             time_text=input_normalized["time"],
@@ -371,6 +356,8 @@ def build_suzhan_result(
         )
         astronomy = build_equatorial_mansions(birth)
         apply_equatorial_mansions(chart, astronomy)
+    else:
+        pass
     response["sukuyo"] = day_evidence(
         calendar_mansion(
             input_normalized["date"],
@@ -386,15 +373,11 @@ def build_suzhan_result(
         activity_details=activity_details,
         textual_pada=textual_pada,
     )
-    response["params"]["su28Method"] = (
-        METHOD
-        if mansion_method == "equatorial_research28"
-        else "legacy_equal_ecliptic28_illustration"
-    )
+    response["params"]["su28Method"] = METHOD
     response["params"]["su28AstronomicalAccuracy"] = (
         "declared_modern_anchor_model_not_classical_certified"
         if astronomy
-        else "not_computed" if not include_su28 else "not_validated_as_chinese_mansions"
+        else "not_computed"
     )
     calculation_layers = {
         "calendar": response["sukuyo"]["calendar"]["status"],
@@ -436,11 +419,7 @@ def build_suzhan_result(
         + (
             "天文宿位采用现代距星不等宽研究口径。"
             if astronomy
-            else (
-                "按请求关闭了天文28宿标注。"
-                if not include_su28
-                else "已标注旧版二十八等分示意宿位。"
-            )
+            else "按请求关闭了天文28宿标注。"
         )
         + (
             "所选参考宫位不可用，星体数据已保留。"

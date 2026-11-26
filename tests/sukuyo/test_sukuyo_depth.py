@@ -195,19 +195,6 @@ def test_snapshot_does_not_replace_invalid_longitude_with_zero(
         _build_suzhan_snapshot_text(payload, result)
 
 
-def test_legacy_diagram_requires_explicit_method_and_remains_labelled() -> None:
-    r = calculate_suzhan_analysis(
-        lat="31n13",
-        lon="121e28",
-        date="2025-03-04",
-        time="12:00:00",
-        mansion_method="legacy_equal28",
-    )
-    assert r["astronomy"] is None
-    assert r["params"]["su28Method"] == "legacy_equal_ecliptic28_illustration"
-    assert "旧版等分黄道示意" in r["snapshot_text"]
-
-
 def test_missing_physical_engine_does_not_fabricate_equal_sky_mansions(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

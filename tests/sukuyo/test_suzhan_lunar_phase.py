@@ -225,17 +225,14 @@ def test_full_chart_keeps_calendar_naming_separate_from_physical_tithi(
     assert "原典以月满名白十五的用语另存" in result["snapshot_text"]
 
 
-@pytest.mark.parametrize(
-    "options", [{"doubing_su28": False}, {"mansion_method": "legacy_equal28"}]
-)
-def test_non_astronomical_modes_do_not_manufacture_phase_coordinates(options) -> None:
+def test_disabled_astronomy_does_not_return_phase_coordinates() -> None:
     result = build_suzhan_result(
         lat="31n13",
         lon="121e28",
         date="2026-10-24",
         time="05:30:00",
         zone="+08:00",
-        **options,
+        doubing_su28=False,
     )
     assert result["astronomy"] is None
     assert "现代月日黄经差未计算" in result["snapshot_text"]

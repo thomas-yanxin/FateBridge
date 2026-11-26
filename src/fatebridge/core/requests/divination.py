@@ -246,10 +246,6 @@ class SuZhanRequest(AstroHouseValidatorMixin, _DeferredModel):
         default_factory=list,
         description="已确认的事项细节，须与activity对应；不从出生资料、GPS或目的地猜测。本人启程personal_departure不等于因私出行private_journey；王公百官行旅身份royal_or_official_traveler不由出差或使节任务推断。明确结交交友forming_friendship（不限首次相识）与聚会social_gathering分别核对，不互相代填。远行人入宅long_distance_traveler_entering_residence不自动当启程；出家人请教法要monastic_dharma_request需明确身份与动作。借贷、买卖、远近、方向及技艺等条件只在给定时匹配；空列表保留条件文，未列条件不等于已排除。",
     )
-    mansion_method: Literal["equatorial_research28", "legacy_equal28"] = Field(
-        default="equatorial_research28",
-        description="天文28宿：默认采用当日视赤经和已声明现代距星的不等宽研究宿界（七曜）；legacy_equal28仅作旧版等分黄道示意；均不决定农历本命宿",
-    )
     activity: (
         Literal[
             "social",
@@ -304,7 +300,7 @@ class SuZhanRequest(AstroHouseValidatorMixin, _DeferredModel):
     )
     doubing_su28: bool = Field(
         default=True,
-        description="是否按mansion_method标注天文28宿；不用于农历本命宿；默认仅七个物理七曜有现代研究宿位",
+        description="是否按当日视赤经和已声明现代距星标注七曜的不等宽天文宿位；历日本命宿单独计算",
     )
     hsys: int = Field(
         default=8,
@@ -326,7 +322,6 @@ class SuZhanRequest(AstroHouseValidatorMixin, _DeferredModel):
             "house_start_mode",
             "hsys",
             "zodiacal",
-            "mansion_method",
         }
         return bool(chart_fields & self.model_fields_set) or (
             "doubing_su28" in self.model_fields_set and self.doubing_su28

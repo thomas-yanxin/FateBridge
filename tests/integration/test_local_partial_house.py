@@ -78,14 +78,9 @@ def _assert_partial_house_value(
     assert layers["chart"] == layers["planet_positions"] == "computed"
     assert layers["house_geometry"] == "unavailable_selected_reference"
     if control["payload"]["doubing_su28"]:
-        if control["payload"]["mansion_method"] == "equatorial_research28":
-            assert value["astronomy"] is not None
-            assert "Sun" in {p["id"] for p in value["astronomy"]["bodies"]}
-            assert layers["astronomy"] == "computed"
-        else:
-            assert value["astronomy"] is None
-            assert all(point["su28"] for point in chart["objects"])
-            assert layers["astronomy"] == "not_computed"
+        assert value["astronomy"] is not None
+        assert "Sun" in {p["id"] for p in value["astronomy"]["bodies"]}
+        assert layers["astronomy"] == "computed"
     else:
         assert value["astronomy"] is None
         assert all("su28" not in point for point in chart["objects"])
@@ -110,7 +105,13 @@ def test_canonical_partial_geometry_survives_each_local_option(
     }
     for control in partial_source["controls"]:
         response = rest.post(
-            SPECS["suzhan"].rest_path, json=control["payload"], params=params
+            SPECS["suzhan"].rest_path,
+            json={
+                name: value
+                for name, value in control["payload"].items()
+                if name != "mansion_method"
+            },
+            params=params,
         )
         assert response.status_code == 200, response.text
         _assert_partial_house_value(response.json(), control, partial_source)
@@ -123,23 +124,22 @@ def test_canonical_partial_geometry_representative_options_agree_across_transpor
         return copy.deepcopy(partial_source["core"])
 
     monkeypatch.setattr(local_chart, "build_core_chart_payload", source)
-    buckets = {
-        "no_doubing": lambda p: not p["doubing_su28"],
-        "equatorial": lambda p: (
-            bool(p["doubing_su28"]) and p["mansion_method"] == "equatorial_research28"
-        ),
-        "other_doubing": lambda p: (
-            bool(p["doubing_su28"]) and p["mansion_method"] != "equatorial_research28"
-        ),
-    }
     representatives = [
-        next(c for c in partial_source["controls"] if pred(c["payload"]))
-        for pred in buckets.values()
+        next(
+            control
+            for control in partial_source["controls"]
+            if control["payload"]["doubing_su28"] is include_mansions
+        )
+        for include_mansions in (False, True)
     ]
     for control in representatives:
         response, protocol, code, cli = surface_calls(
             SPECS["suzhan"],
-            control["payload"],
+            {
+                name: value
+                for name, value in control["payload"].items()
+                if name != "mansion_method"
+            },
             projection=dict(
                 as_of="2026-11-12T00:00:00Z",
                 response_char_limit=0,
