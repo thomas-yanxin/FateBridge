@@ -34,13 +34,13 @@ uv run --locked --extra dev python -m pytest -q
 | 人类图、印度占星 | [human_design/](human_design/) · [jyotish/](jyotish/) |
 | 果老、紫微、宿曜 | [guolao/](guolao/) · [ziwei/](ziwei/) · [sukuyo/](sukuyo/) |
 | 梅花、六爻、河洛与参评 | [meihua/](meihua/) · [liuyao/](liuyao/) · [numerology/](numerology/) |
-| 六壬、金口诀、奇门与太乙 | [ren/](ren/) · [qimen/](qimen/) · [taiyi/](taiyi/) |
+| 六壬、金口诀、奇门与太乙 | [qimen/](qimen/) · [taiyi/](taiyi/) |
 | 家居风水、地磁、玄空与布局 | [fengshui/](fengshui/) |
 | 心理测量量表 | [psychometrics/](psychometrics/) |
-| 共享协议调用、时间冻结、星历上下文与参考数据 | [support/](support/) · [fixtures/](fixtures/) · [data/](data/) |
+| 共享协议调用、时间冻结、星历上下文与夹具 | [support/](support/) · [fixtures/](fixtures/) |
 
 ## 测试约定
 
 - 跨领域共享辅助统一放入 `tests/support/`（如三端调用封装 `support/transports.py`、风水传输封装 `support/fengshui_transports.py`、交付存储夹具 `support/result_delivery.py` 与空星历隔离 `support/ephemeris_context.py`）。
-- 独立数值参考与原典转录数据放在 `tests/data/` 与 `tests/fixtures/`；不得通过运行当前生产计算重新生成测试期望值或放宽断言门槛。
+- 独立测试夹具放在 `tests/fixtures/`；不得通过运行当前生产计算重新生成测试期望值或放宽断言门槛。
 - 严格嵌套输出模型检查由 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 控制，详见[开发指南](../docs/development-guide.md#设计与测试约束)。

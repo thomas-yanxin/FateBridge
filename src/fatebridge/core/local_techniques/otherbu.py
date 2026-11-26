@@ -97,7 +97,7 @@ def _solar_position_snapshot(policy: dict[str, Any]) -> str:
     lines.extend(
         [
             "以上是题问时刻的模型几何，不是可见性、遮掩接触时刻或观测精度证明；不用于改写骰面或定位应期。",
-            f"依据：{policy['source_url']} {policy['source_section']}；原生版本 {policy['native_version']}。",
+            f"依据：{policy['source_section']}；原生版本 {policy['native_version']}。",
         ]
     )
     return "\n".join(lines)
@@ -218,7 +218,7 @@ def build_otherbu_result(
         (
             "依据与边界",
             "\n".join(
-                f"{r['author']} | {r['version']} | {r.get('source_url') or r['source_path']}"
+                f"{r['author']} | {r['version']} | {r.get('source_path') or r['source_kind']}"
                 for r in evidence["rulesets"]
             ),
         ),

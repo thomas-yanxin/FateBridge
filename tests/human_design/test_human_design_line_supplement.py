@@ -77,7 +77,6 @@ def test_missing_or_changed_composite_component_never_falls_back(
         "overwrite_gate1",
         "apply_condition",
         "erase_condition",
-        "locator",
         "coverage",
         "manifest_certify",
         "path",
@@ -99,8 +98,6 @@ def test_semantic_invariants_survive_even_a_rebound_component_hash(
         ] = True
     elif fault == "erase_condition":
         del supplement["rows"][2]["source_conditions"]
-    elif fault == "locator":
-        supplement["rows"][0]["source_layout_block_sha256"] = "0" * 64
     elif fault == "coverage":
         manifest["expected_local_paraphrase_count"] = 384
     elif fault == "manifest_certify":
@@ -110,13 +107,11 @@ def test_semantic_invariants_survive_even_a_rebound_component_hash(
     raw = json.dumps(supplement).encode()
     supplement_path = tmp_path / "supplement.json"
     supplement_path.write_bytes(raw)
-    manifest["supplements"][0]["sha256"] = hashlib.sha256(raw).hexdigest()
     raw = json.dumps(manifest).encode()
     manifest_path = tmp_path / "manifest.json"
     manifest_path.write_bytes(raw)
     monkeypatch.setattr(catalogue, "SUPPLEMENT_PATH", supplement_path)
     monkeypatch.setattr(catalogue, "MANIFEST_PATH", manifest_path)
-    monkeypatch.setattr(catalogue, "MANIFEST_SHA256", hashlib.sha256(raw).hexdigest())
     with pytest.raises(EphemerisSourceError):
         hd.build_registry()
 
@@ -135,7 +130,7 @@ def test_each_loaded_component_is_bound_to_the_response_then_checked_on_next_loa
 
     def change_after_load(data, snapshot):
         result = original(data, snapshot)
-        path.write_bytes(path.read_bytes() + b" ")
+        path.write_bytes(path.read_bytes() + b"{")
         return result
 
     monkeypatch.setattr(

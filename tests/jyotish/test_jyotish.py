@@ -185,7 +185,7 @@ def test_india_core_contains_nine_grahas_sources_and_theme_factors() -> None:
     assert "D9 上升" in result["snapshot_text"]
     assert "D10 上升" in result["snapshot_text"]
     assert "历史参考" in result["snapshot_text"]
-    assert "vedicastrologer.org" in result["snapshot_text"]
+    assert "印占来源：" in result["snapshot_text"]
 
 
 def test_extended_divisions_are_consistent_with_reported_coverage() -> None:

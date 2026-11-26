@@ -61,7 +61,6 @@ class SixyaoDescription(PartialOutput):
     name: str | None = None
     卦辞: str | None = None
     象曰: str | None = None
-    classical_source_url: str | None = None
     raw: Hexagram | None = None
 
 

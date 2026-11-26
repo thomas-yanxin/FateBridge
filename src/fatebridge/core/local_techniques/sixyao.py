@@ -85,7 +85,6 @@ def _hexagram_desc_payload(code: str) -> dict[str, Any]:
         "name": detail.get("name"),
         "卦辞": detail["classical"]["guaci"],
         "象曰": detail["classical"]["daxiang"],
-        "classical_source_url": detail["classical"]["source_url"],
         "raw": detail,
     }
 
@@ -358,10 +357,7 @@ def build_sixyao_result(
                 "current_code": current_code,
                 "changed_code": changed_hexagram_binary_code,
             },
-            "sources": [
-                text_evidence["base_source_url"],
-                text_evidence["changed_source_url"],
-            ],
+            "sources": [text_evidence["selection_policy"]],
         }
     )
 

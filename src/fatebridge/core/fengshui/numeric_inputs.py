@@ -8,12 +8,14 @@ from datetime import date, datetime
 from decimal import Decimal
 from fractions import Fraction
 from numbers import Integral, Real
-from typing import Annotated, Any, Literal, Union, get_args, get_origin
+from typing import Annotated, Any, Literal, get_args, get_origin
 
 from pydantic import BeforeValidator
 from pydantic_core import PydanticCustomError
 
 from fatebridge.core.requests.base import _DeferredModel
+
+UNION_ORIGINS = (types.UnionType, get_origin(Annotated[int, "u"] | None))
 
 
 def _unwrap(annotation: Any) -> Any:
@@ -32,7 +34,7 @@ def _kind(annotation: Any) -> str | None:
     if origin is Literal:
         if args and all(type(v) in (int, float) for v in args):
             return "number" if any(type(v) is float for v in args) else "integer"
-    if origin in (Union, types.UnionType):
+    if origin in UNION_ORIGINS:
         kinds = [_kind(arg) for arg in args if arg is not type(None)]
         if kinds and all(kinds):
             return "number" if "number" in kinds else "integer"
@@ -45,7 +47,7 @@ def _temporal_kind(annotation: Any) -> str | None:
         return "datetime"
     if annotation is date:
         return "date"
-    if get_origin(annotation) in (Union, types.UnionType):
+    if get_origin(annotation) in UNION_ORIGINS:
         kinds = [
             _temporal_kind(arg) for arg in get_args(annotation) if arg is not type(None)
         ]
@@ -69,7 +71,7 @@ def _allows_bool(annotation: Any, value: bool) -> bool:
         return True
     if get_origin(annotation) is Literal:
         return any(type(arg) is bool and arg is value for arg in get_args(annotation))
-    if get_origin(annotation) in (Union, types.UnionType):
+    if get_origin(annotation) in UNION_ORIGINS:
         return any(_allows_bool(arg, value) for arg in get_args(annotation))
     return False
 
@@ -140,7 +142,7 @@ def _normalize(annotation: Any, value: Any) -> Any:
                 return integer
         return value
     origin, args = get_origin(annotation), get_args(annotation)
-    if origin in (Union, types.UnionType):
+    if origin in UNION_ORIGINS:
         choices = [arg for arg in args if arg is not type(None)]
         if len(choices) == 1:
             return _normalize(choices[0], value)

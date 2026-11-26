@@ -217,7 +217,6 @@ class TaiyiWinterOriginSelection(PartialOutput):
     count_origin_date: str | None = None
     count_origin_clock: str | None = None
     clock_basis: str | None = None
-    source: str | None = None
     classical_source_scope: str | None = None
     classical_activation_adjudicated: bool | None = None
     scope: str | None = None

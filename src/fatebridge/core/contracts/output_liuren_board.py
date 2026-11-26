@@ -193,7 +193,6 @@ class RenTermDependency(PartialOutput):
     civil_time_method: str | None = None
     future_leap_seconds_assumed_unchanged: bool | None = None
     leap_table_expires_at: str | None = None
-    leap_table_source: str | None = None
 
     @model_validator(mode="after")
     def published_date_matches_dependency(self) -> "RenTermDependency":

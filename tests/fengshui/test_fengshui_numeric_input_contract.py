@@ -146,7 +146,10 @@ async def test_mcp_arguments_retain_calendar_field_preconditions() -> None:
     async with Client(cached_mcp_app("fengshui")) as client:
         for invalid in [2026, "2026", True, "2026-06-01"]:
             result = await call_calculation(
-                client, "fengshui_annual", {"query_at": invalid}, raise_on_error=False
+                client,
+                "fengshui_annual_stars",
+                {"query_at": invalid},
+                raise_on_error=False,
             )
             assert result.is_error
             assert any(
@@ -154,6 +157,6 @@ async def test_mcp_arguments_retain_calendar_field_preconditions() -> None:
                 for issue in result.structured_content["issues"]
             )
         result = await call_calculation(
-            client, "fengshui_annual", {"query_at": "2026-06-01T12:00:00+08:00"}
+            client, "fengshui_annual_stars", {"query_at": "2026-06-01T12:00:00+08:00"}
         )
         assert not result.is_error

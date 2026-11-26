@@ -8,9 +8,11 @@ import re
 from collections.abc import Sequence
 from pathlib import Path
 from types import UnionType
-from typing import Annotated, Literal, NoReturn, Union, get_args, get_origin
+from typing import Annotated, Literal, NoReturn, get_args, get_origin
 
 from pydantic.fields import FieldInfo
+
+UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
 
 from fatebridge.application.description import is_model_field, spec_is_cli_safe
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
@@ -116,14 +118,12 @@ def _argument_type(annotation: object) -> object:
     if get_origin(annotation) is Annotated:
         return _argument_type(get_args(annotation)[0])
     # note (unions): Keep textual branches lexical so named house systems reach validation.
-    if get_origin(annotation) in (Union, UnionType):
+    if get_origin(annotation) in UNION_ORIGINS:
         members = [a for a in get_args(annotation) if a is not type(None)]
         resolved = [_argument_type(a) for a in members]
         if str in resolved:
             return str
-        if len(resolved) == 1:
-            return resolved[0]
-        if get_origin(annotation) is Union and resolved:
+        if resolved:
             return resolved[0]
     return annotation
 

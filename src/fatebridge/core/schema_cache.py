@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from pydantic.json_schema import JsonSchemaValue
 from pydantic_core import CoreSchema
 
-_SCHEMA_CACHE_LOCK = RLock()
+SCHEMA_CACHE_LOCK = RLock()
 
 
 class _SchemaRevision:
@@ -44,7 +44,7 @@ def model_schema(model: type[BaseModel]) -> JsonSchemaValue:
     The lock prevents concurrent cold calls from generating the same schema
     multiple times. Neither transports nor callers can mutate the snapshot.
     """
-    with _SCHEMA_CACHE_LOCK:
+    with SCHEMA_CACHE_LOCK:
         return deepcopy(_schema(model, _revision(model)))
 
 
@@ -55,5 +55,5 @@ def clear_contract_caches() -> None:
     and dynamic integrations must clear this cache when changing schema hooks
     or nested models without rebuilding their root models.
     """
-    with _SCHEMA_CACHE_LOCK:
+    with SCHEMA_CACHE_LOCK:
         _schema.cache_clear()

@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge import cli_inputs
 from fatebridge.application.execution import result_is_error
 from fatebridge.cli import run
 from fatebridge.cli_arguments import _BooleanFlagAction
@@ -478,6 +479,7 @@ def test_missing_yaml_dependency_only_blocks_yaml_subjects(
 ) -> None:
     """Base installations can read JSON and give an actionable YAML usage error."""
     monkeypatch.setitem(sys.modules, "yaml", None)
+    monkeypatch.setattr(cli_inputs, "yaml", None)
     subject = {"birth_year": 1988, "birth_month": 8, "birth_day": 8, "birth_hour": 8}
     json_path = _write(tmp_path / "subject.json", json.dumps(subject))
     yaml_path = _write(

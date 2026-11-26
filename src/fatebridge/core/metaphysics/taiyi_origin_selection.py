@@ -18,7 +18,6 @@ def winter_origin_selection(
             "origin_clock", origin["origin_effective_date"] + "T00:00:00"
         ),
         "clock_basis": clock_basis,
-        "source": origin["source"],
         "classical_source_scope": "原书给冬至前甲子起计；该引文不裁定每年何时启用下一起元。",
         "classical_activation_adjudicated": False,
         "scope": (

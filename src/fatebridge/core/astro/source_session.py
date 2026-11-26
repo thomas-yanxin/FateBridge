@@ -20,8 +20,8 @@ from fatebridge.core.ephemeris_runtime import (
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.utils.errors import EphemerisSourceError
 
-_P = ParamSpec("_P")
-_R = TypeVar("_R")
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
 class EphemerisSourceSession:
@@ -79,9 +79,9 @@ def source_session(
             _SESSION.reset(token)
 
 
-def coherent_ephemeris_sources(function: Callable[_P, _R]) -> Callable[_P, _R]:
+def coherent_ephemeris_sources(function: Callable[P, R]) -> Callable[P, R]:
     @wraps(function)
-    def wrapped(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+    def wrapped(*args: P.args, **kwargs: P.kwargs) -> R:
         with source_session():
             return function(*args, **kwargs)
 

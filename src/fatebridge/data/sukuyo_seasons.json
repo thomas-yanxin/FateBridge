@@ -3,22 +3,13 @@
   "edition": "CBETA fixed electronic Taisho selected main text; source-specific inline annotation kept separate. Not full manuscript collation.",
   "source_files": {
     "T13n0397.xml": {
-      "sha256": "64d0dbf21d28e11d76488a2bf7ff0f651883f1f7d5d76392616b97da5d38ce17",
-      "bytes": 6969939,
-      "reused_exact_prior_capture": "/Users/thomas/.codex/artifacts/fatebridge/sukuyo-month-names-v67/T13n0397.xml",
-      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T13/T13n0397.xml"
+      "bytes": 6969939
     },
     "T21n1299.xml": {
-      "sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
-      "bytes": 387099,
-      "reused_exact_prior_capture": "/Users/thomas/.codex/artifacts/fatebridge/sukuyo-month-names-v67/T21n1299.xml",
-      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1299.xml"
+      "bytes": 387099
     },
     "T25n1509.xml": {
-      "sha256": "f1f8be755336c8745f6a92d8a8a749998fc331d1f50d631ca1e88f5c0e153619",
-      "bytes": 17164919,
-      "reused_exact_prior_capture": "/Users/thomas/.codex/artifacts/fatebridge/sukuyo-weekday-origin-v30/T25n1509.xml",
-      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T25/T25n1509.xml"
+      "bytes": 17164919
     }
   },
   "all12_season_rows": [

@@ -55,14 +55,14 @@ def empty_ephemeris_path() -> Generator[None, None, None]:
         pass
 
     with TemporaryDirectory(prefix="fatebridge-empty-ephemeris-") as empty_directory:
-        with runtime._EPHEMERIS_LOCK:
+        with runtime.EPHEMERIS_LOCK:
             previous_env = os.environ.get("SE_EPHE_PATH")
             previous_solar_model = os.environ.get("FATEBRIDGE_SOLAR_TERM_MODEL")
             runtime.configured_ephemeris_path()
             previous_configured = runtime._configured_path
         token = _EMPTY_EPHEMERIS_DEPTH.set(1)
         try:
-            with runtime._EPHEMERIS_LOCK:
+            with runtime.EPHEMERIS_LOCK:
                 os.environ["SE_EPHE_PATH"] = empty_directory
                 # Pin the native selection policy; its solar fallback may use
                 # bundled DE441 even when direct Swiss calls return Moshier.
@@ -73,7 +73,7 @@ def empty_ephemeris_path() -> Generator[None, None, None]:
             yield
         finally:
             _EMPTY_EPHEMERIS_DEPTH.reset(token)
-            with runtime._EPHEMERIS_LOCK:
+            with runtime.EPHEMERIS_LOCK:
                 if previous_env is None:
                     os.environ.pop("SE_EPHE_PATH", None)
                 else:

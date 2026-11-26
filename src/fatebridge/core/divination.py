@@ -398,7 +398,6 @@ def build_meihua_interpretation(
         "classical_text_reference": {
             "moving_yaoci": moving_line_oracle.get("classical_yaoci"),
             "moving_yaoci_rendering": moving_line_oracle["classical_yaoci_rendering"],
-            "source_url": moving_line_oracle.get("classical_source_url"),
             "selection_policy": "actual_moving_line_reference_only",
             "scope": "按实际卦码和动爻引用《周易》经文；所选原法的经文参照不自动推导现实成败。",
         },

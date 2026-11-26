@@ -1,9 +1,11 @@
 """Schema and compact capability descriptions derived from ToolSpec."""
 
 from types import UnionType
-from typing import Any, Union, get_args, get_origin
+from typing import Annotated, Any, get_args, get_origin
 
 from pydantic import BaseModel
+
+UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
 
 from fatebridge.application.examples import (
     call_guidance,
@@ -23,7 +25,7 @@ def resolve_spec(specs: list[ToolSpec], name: str) -> ToolSpec | None:
 
 def unwrap_optional(annotation: object) -> object:
     """Return the first non-null union member for nested-model inspection."""
-    if get_origin(annotation) in (Union, UnionType):
+    if get_origin(annotation) in UNION_ORIGINS:
         non_none = [a for a in get_args(annotation) if a is not type(None)]
         if non_none:
             return non_none[0]
@@ -38,7 +40,7 @@ def is_model_field(annotation: object) -> bool:
 
 def field_type_name(annotation: object) -> str:
     """Render a field annotation as a short, agent-readable type string."""
-    if get_origin(annotation) in (Union, UnionType):
+    if get_origin(annotation) in UNION_ORIGINS:
         non_none = [a for a in get_args(annotation) if a is not type(None)]
         if len(non_none) > 1:
             return " | ".join(field_type_name(a) for a in non_none)

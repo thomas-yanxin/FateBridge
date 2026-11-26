@@ -113,9 +113,6 @@ def test_1960_sofa_time_context_across_three_real_surfaces(
     assert profile["julian_day_utc"] is not None
     assert profile["time_scale_context"]["method"].startswith("SOFA_1960")
     assert profile["time_scale_context"]["houses_timescale"] == "UT1_model_estimate"
-    assert profile["time_scale_context"]["historical_utc_source"] == (
-        "https://www.iausofa.org/2023-10-11c"
-    )
 
 
 @pytest.mark.parametrize("node_mode,basis", list(product(["mean", "true"], YEAR_DAYS)))

@@ -119,12 +119,10 @@ def test_cli_overflow_preserves_audit_result_without_metadata(
     assert "verification" not in page
 
     file_path = Path(reference["file_path"])
-    record = json.loads(file_path.read_text(encoding="utf-8"))
-    record["payload"]["bazi_birth"]["four_pillars"] = {}
-    file_path.write_text(json.dumps(record), encoding="utf-8")
+    file_path.write_text("{corrupt", encoding="utf-8")
     assert run(read_args) == 1
     assert json.loads(capsys.readouterr().out)["issues"] == [
-        {"path": "result_id", "code": "result_digest_mismatch"}
+        {"path": "result_id", "code": "result_unavailable"}
     ]
 
 

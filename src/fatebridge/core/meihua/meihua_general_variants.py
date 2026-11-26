@@ -68,7 +68,6 @@ def build_general_casting_readings(
                 "classical_text_reference": {
                     "moving_yaoci": verse,
                     "moving_yaoci_rendering": render_yaoci_text(verse["text"]),
-                    "source_url": chapter["source_url"],
                     "base_fact_path": prefix + ".base_hexagram",
                     "moving_line_fact_path": prefix + ".moving_line",
                     "selection_policy": "this_candidate_actual_moving_line_reference_only",

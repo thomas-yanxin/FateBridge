@@ -54,7 +54,7 @@ def test_actual_se1_headers_hashes_and_factor_references(ephemeris_files) -> Non
     for row in source["files"]:
         path, start, end, de_number = e.swe.get_current_file_data(row["slot"])
         assert row["filename"] == Path(path).name
-        assert row["sha256"] == hashlib.sha256(Path(path).read_bytes()).hexdigest()
+        assert row["bytes"] == Path(path).stat().st_size
         assert (
             row["start_julian_day_tt"],
             row["end_julian_day_tt"],
@@ -173,7 +173,7 @@ def sample_source():
     return {
         "by_factor": {"Sun": {"model": "swieph"}, "Moon": {"model": "moshier"}},
         "files": [
-            {"slot": 0, "filename": "sepl_18.se1", "sha256": "a" * 64, "de_number": 441}
+            {"slot": 0, "filename": "sepl_18.se1", "bytes": 1024, "de_number": 441}
         ],
     }
 
@@ -195,7 +195,7 @@ def test_per_factor_model_swaps_are_detected_even_if_aggregate_set_is_equal() ->
     "field,value,message",
     [
         ("de_number", 431, "DE header editions"),
-        ("sha256", "b" * 64, "file changed across"),
+        ("bytes", 2048, "changed across"),
     ],
 )
 def test_same_model_label_cannot_hide_changed_data(
@@ -213,7 +213,7 @@ def test_same_model_label_cannot_hide_changed_data(
 def test_adjacent_segment_with_the_same_edition_is_allowed() -> None:
     first = sample_source()
     second = copy.deepcopy(first)
-    second["files"][0].update(filename="sepl_24.se1", sha256="b" * 64)
+    second["files"][0].update(filename="sepl_24.se1", bytes=2048)
     cohort = PhysicalSourceCohort()
     assert cohort.add(first) == 0
     assert cohort.add(second) == 1
@@ -341,14 +341,14 @@ def test_actual_batch_hashes_once_at_identity_and_once_at_its_owner_endpoint(
 ) -> None:
     _, directory = ephemeris_files
     e.configure_ephemeris_path(str(directory))
-    original = physical_sources._file_digest
+    original = physical_sources._file_stat
     reads = Counter()
 
     def measured(path):
         reads[path.name] += 1
         return original(path)
 
-    monkeypatch.setattr(physical_sources, "_file_digest", measured)
+    monkeypatch.setattr(physical_sources, "_file_stat", measured)
     trace = PhysicalEphemerisTrace() if borrowed else None
     batch = ephemeris._build_planet_states(
         "chart", 2460389.77, julian_day_tt=2460389.771, source_trace=trace

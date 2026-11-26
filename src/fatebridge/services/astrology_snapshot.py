@@ -115,7 +115,7 @@ def _build_standard_chart_snapshot_sections(
                     f"{chart_name} {planet['label_zh']}：{planet['sign_zh']} {_format_zodiac_degree(planet['degree_in_sign'])}，第{planet['house']}宫，尊贵状态 {planet['dignity']['state']}"
                 )
         for source in india.get("rulesets", []):
-            detail_lines.append(f"印占来源：{source['title']} {source['url']}")
+            detail_lines.append(f"印占来源：{source['title']}")
         if "birth_time_sensitivity" in india:
             detail_lines.append(
                 f"生时敏感性：{india['birth_time_sensitivity']['status']}；{india['birth_time_sensitivity']['limitation']}"

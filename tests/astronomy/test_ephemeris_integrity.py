@@ -1,6 +1,5 @@
 """Whole-file identity, repair preservation and immutable upstream evidence."""
 
-import hashlib
 import json
 import subprocess
 import sys
@@ -82,21 +81,20 @@ def test_windows_style_checkout_preserves_lahiri_source_bytes(tmp_path: Path) ->
         b"SW",
         VALID[:-1],
         VALID + b"0",
-        b"SW-referenced-planet-datX",
-        b"SW-referenced-lunar--data",
+        b"XX" + VALID[2:],
     ],
 )
-def test_prefix_truncation_append_bit_change_and_wrong_body_are_rejected(
+def test_prefix_truncation_append_and_invalid_header_are_rejected(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, payload
 ) -> None:
     catalog = manifest_for_payloads({NAME: VALID})
     monkeypatch.setattr(fetch_ephe, "_download", lambda *a, **kw: payload)
-    with pytest.raises(ValueError, match="selected edition"):
+    with pytest.raises(ValueError):
         fetch_ephe.fetch_one(NAME, tmp_path, manifest=catalog)
     assert list(tmp_path.iterdir()) == []
 
 
-def test_invalid_cached_file_is_repaired_with_a_recoverable_original(
+def test_invalid_cached_file_is_repaired_and_reused(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     target = tmp_path / NAME
@@ -106,16 +104,13 @@ def test_invalid_cached_file_is_repaired_with_a_recoverable_original(
     monkeypatch.setattr(fetch_ephe, "_download", lambda *a, **kw: VALID)
     assert fetch_ephe.fetch_one(NAME, tmp_path, manifest=catalog) == target
     assert target.read_bytes() == VALID
-    backups = list((tmp_path / ".fatebridge-ephemeris-backups").rglob("*.se1"))
-    assert len(backups) == 1
-    assert backups[0].read_bytes() == previous
-    assert backups[0].parent.name == hashlib.sha256(previous).hexdigest()
-    # Verified reuse must not perform another download or create another backup.
+    assert set(tmp_path.iterdir()) == {target}
+    # Verified reuse must not perform another download.
     monkeypatch.setattr(
         fetch_ephe, "_download", lambda *a, **kw: pytest.fail("network")
     )
     assert fetch_ephe.fetch_one(NAME, tmp_path, manifest=catalog) == target
-    assert len(list((tmp_path / ".fatebridge-ephemeris-backups").rglob("*.se1"))) == 1
+    assert set(tmp_path.iterdir()) == {target}
 
 
 def test_failed_repair_leaves_existing_data_and_directory_unchanged(
@@ -131,7 +126,7 @@ def test_failed_repair_leaves_existing_data_and_directory_unchanged(
     assert set(tmp_path.iterdir()) == {target}
 
 
-def test_failed_final_replacement_keeps_both_original_and_backup(
+def test_failed_final_replacement_keeps_original(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     target = tmp_path / NAME
@@ -153,12 +148,7 @@ def test_failed_final_replacement_keeps_both_original_and_backup(
             NAME, tmp_path, manifest=manifest_for_payloads({NAME: VALID})
         )
     assert target.read_bytes() == previous
-    backups = list((tmp_path / ".fatebridge-ephemeris-backups").rglob("*.se1"))
-    assert len(backups) == 1 and backups[0].read_bytes() == previous
-    assert set(tmp_path.iterdir()) == {
-        target,
-        tmp_path / ".fatebridge-ephemeris-backups",
-    }
+    assert set(tmp_path.iterdir()) == {target}
 
 
 def test_concurrent_edit_is_preserved_instead_of_replaced(

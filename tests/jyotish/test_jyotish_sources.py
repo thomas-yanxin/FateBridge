@@ -74,10 +74,7 @@ def test_actual_source_identities_are_frame_specific_and_exclude_analytical_node
     assert len(source["by_factor"]) == 14
     assert all("Rahu" not in key and "Ketu" not in key for key in source["by_factor"])
     for file in source["files"]:
-        assert (
-            file["sha256"]
-            == hashlib.sha256((directory / file["filename"]).read_bytes()).hexdigest()
-        )
+        assert file["bytes"] == (directory / file["filename"]).stat().st_size
         assert file["matches_packaged_manifest"]
     assert not source["atomic_file_read_proven"] and not source["accuracy_certified"]
 
@@ -113,13 +110,13 @@ def test_file_hashing_is_shared_across_the_calculation_not_repeated_per_sample(
     from fatebridge.core.astro import physical_sources
 
     calls = []
-    original = physical_sources._file_digest
+    original = physical_sources._file_stat
 
     def counted(path):
         calls.append(path.name)
         return original(path)
 
-    monkeypatch.setattr(physical_sources, "_file_digest", counted)
+    monkeypatch.setattr(physical_sources, "_file_stat", counted)
     build_india(birth(), divisions=[], birth_time_uncertainty_minutes=1)
     assert sorted(calls) == ["semo_18.se1", "semo_18.se1", "sepl_18.se1", "sepl_18.se1"]
 

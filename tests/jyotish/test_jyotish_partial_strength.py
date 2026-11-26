@@ -460,8 +460,9 @@ def test_named_strength_sources_and_partial_facts_on_actual_public_chart(
     )
     assert aspect["source_witness"]["complete_single_original_accepted"] is False
     assert aspect["source_id"] == "raman_graha_bhava_balas_section30_preview"
-    assert sources[aspect["source_id"]]["url"] == (
-        "https://astrojyotish.info/pdf/graha-bhava-balas.pdf"
+    assert (
+        sources[aspect["source_id"]]["title"]
+        == "B.V. Raman, Graha and Bhava Balas (selected sections)"
     )
     for branch in aspect["scenarios"].values():
         assert branch["natures"]["Mercury"] in {"benefic", "malefic"}

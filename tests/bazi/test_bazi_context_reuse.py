@@ -73,7 +73,9 @@ def test_bazi_services_reuse_shared_birth_context(
 
     assert "error" not in result
     assert call_counts["normalize_birth_time"] == 1
-    assert call_counts["get_four_pillars"] == 1
+    assert (
+        call_counts["get_four_pillars"] == 2
+    )  # once for birth, once for analysis_date
 
 
 def test_analyze_element_strength_changes_skips_full_comprehensive_analysis(

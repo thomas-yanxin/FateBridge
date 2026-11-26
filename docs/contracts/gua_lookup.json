@@ -65,7 +65,7 @@
         "lookup_mode"
       ],
       "source_refs": [
-        "docs/numerology-audit.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "categorical",
       "validation_scope": {

@@ -11,7 +11,7 @@ from fatebridge.utils.civil_time import UTCCalendar, gregorian_ordinal, utc_cale
 
 EPOCH = utc_calendar(datetime(1970, 1, 1, tzinfo=timezone.utc))
 DAY_SECONDS = 86_400
-_SECOND_MICROSECONDS = 1_000_000
+SECOND_MICROSECONDS = 1_000_000
 NAME = rb"(?:[A-Za-z]{3,}|<[A-Za-z0-9+-]{3,}>)"
 MINUTE_SECOND = rb"(?::[0-5][0-9](?::[0-5][0-9])?)?"
 OFFSET = rb"[+-]?[0-9]{1,2}" + MINUTE_SECOND
@@ -70,12 +70,12 @@ class TZifTransitions:
     ) -> tuple[UTCCalendar, ...] | None:
         """Return UTC candidates in (lower, upper] when the index covers it."""
         first = (lower.ordinal - EPOCH.ordinal) * DAY_SECONDS + (
-            lower.microseconds_of_day // _SECOND_MICROSECONDS
+            lower.microseconds_of_day // SECOND_MICROSECONDS
         )
         last = (upper.ordinal - EPOCH.ordinal) * DAY_SECONDS + (
-            upper.microseconds_of_day // _SECOND_MICROSECONDS
+            upper.microseconds_of_day // SECOND_MICROSECONDS
         )
-        last_microsecond = upper.microseconds_of_day % _SECOND_MICROSECONDS
+        last_microsecond = upper.microseconds_of_day % SECOND_MICROSECONDS
         beyond = not self.seconds or (last, last_microsecond) > (self.seconds[-1], 0)
         if beyond and not self.fixed_tail and self.recurring is None:
             return None
@@ -98,7 +98,7 @@ class TZifTransitions:
         return tuple(
             UTCCalendar(
                 EPOCH.ordinal + second // DAY_SECONDS,
-                second % DAY_SECONDS * _SECOND_MICROSECONDS,
+                second % DAY_SECONDS * SECOND_MICROSECONDS,
             )
             for second in seconds
         )

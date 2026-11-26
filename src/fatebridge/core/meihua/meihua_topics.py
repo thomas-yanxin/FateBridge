@@ -348,7 +348,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
         "classical_text_reference": {
             "moving_yaoci": verse,
             "moving_yaoci_rendering": render_yaoci_text(verse["text"]),
-            "source_url": reference["source_url"],
             "selection_policy": "actual_moving_line_reference_only",
             "scope": "周易经文为独立参照，未据此替换所选题篇的条款或核定现实结果。",
         },

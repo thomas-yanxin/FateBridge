@@ -22,7 +22,7 @@ from fatebridge.core.astro.profiles import (
     _resolve_relative_zodiacal_mode,
 )
 from fatebridge.core.astro.reference import (
-    _RELATIONSHIP_FOCUS_ALIASES,
+    RELATIONSHIP_FOCUS_ALIASES,
     RELATIONSHIP_FOCUS_DEFS,
     RELATIVE_MODE_EXACT_ALIASES,
     RELATIVE_MODE_FALLBACK_ALIASES,
@@ -106,7 +106,7 @@ def relationship_focus_block(
     normalized = (
         "general"
         if focus is None
-        else _RELATIONSHIP_FOCUS_ALIASES.get(str(focus).strip().casefold())
+        else RELATIONSHIP_FOCUS_ALIASES.get(str(focus).strip().casefold())
     )
     if normalized is None:
         raise ValueError(

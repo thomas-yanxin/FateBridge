@@ -386,7 +386,7 @@ def test_authored_surfaces_match_rest_mcp_cli_and_strict_projection(
         async with Client(create_mcp_app()) as client:
             schemas = await capability_contracts(client)
             Draft202012Validator(schemas["fengshui_assess"]["input_schema"]).validate(
-                {**inputs, **controls}
+                inputs
             )
             result = await call_calculation(
                 client, "fengshui_assess", {**inputs, **controls}

@@ -313,7 +313,7 @@
       "role": "calculation",
       "selector_fields": [],
       "source_refs": [
-        "docs/bazi-assessment.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "per_field",
       "validation_scope": {

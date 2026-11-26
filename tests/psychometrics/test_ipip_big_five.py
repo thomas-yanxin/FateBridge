@@ -22,8 +22,6 @@ from fatebridge.core.psychometrics.ipip_big_five import (
     ITEMS_BY_ID,
     METHOD_ID,
     SCALE_ID,
-    SCALE_URL,
-    SCORING_URL,
     IpipBigFiveRequest,
     score_ipip_big_five,
 )
@@ -303,8 +301,6 @@ def test_output_stays_within_psychometric_engine_boundary() -> None:
     assert not re.search(r"[0-9a-f]{64}", serialized)
     assert res["provenance"]["scale_id"] == SCALE_ID
     assert res["provenance"]["method_id"] == METHOD_ID
-    assert res["provenance"]["scale_url"] == SCALE_URL
-    assert res["provenance"]["scoring_url"] == SCORING_URL
     assert set(ITEMS_BY_ID) == set(range(1, 51))
 
 

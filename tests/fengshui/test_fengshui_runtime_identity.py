@@ -2,6 +2,7 @@
 
 import pytest
 
+from fatebridge.application.domain_validators import detect_fengshui_approximate
 from fatebridge.core.fengshui import calendar
 from fatebridge.services import replay_metadata
 from fatebridge.services.fengshui import (
@@ -65,9 +66,11 @@ def test_used_calendar_fallback_reaches_outer_receipt_even_away_from_boundary(
         result = calculate_xuankong_natal(**request)
     assert result["status"] == "complete"
     assert (
-        attach_run_metadata(result, tool_name="fengshui_" + kind)["run_metadata"][
-            "engine_is_approximate"
-        ]
+        attach_run_metadata(
+            result,
+            tool_name="fengshui_" + kind,
+            approximate_record=detect_fengshui_approximate,
+        )["run_metadata"]["engine_is_approximate"]
         is True
     )
 
@@ -82,9 +85,11 @@ def test_no_false_degradation_from_unused_solver_or_statistical_uncertainty(
     )
     result = calculate_minggua(effective_birth_year=2000, gender_convention="male")
     assert (
-        attach_run_metadata(result, tool_name="fengshui_minggua")["run_metadata"][
-            "engine_is_approximate"
-        ]
+        attach_run_metadata(
+            result,
+            tool_name="fengshui_minggua",
+            approximate_record=detect_fengshui_approximate,
+        )["run_metadata"]["engine_is_approximate"]
         is False
     )
     result = calculate_directions(
@@ -97,15 +102,19 @@ def test_no_false_degradation_from_unused_solver_or_statistical_uncertainty(
         }
     )
     assert (
-        attach_run_metadata(result, tool_name="fengshui_directions")["run_metadata"][
-            "engine_is_approximate"
-        ]
+        attach_run_metadata(
+            result,
+            tool_name="fengshui_directions",
+            approximate_record=detect_fengshui_approximate,
+        )["run_metadata"]["engine_is_approximate"]
         is False
     )
     unrelated = {"approximate": True, "evidence": {"provider": "linear_fallback"}}
     assert (
-        attach_run_metadata(unrelated, tool_name="fengshui_assess")["run_metadata"][
-            "engine_is_approximate"
-        ]
+        attach_run_metadata(
+            unrelated,
+            tool_name="fengshui_assess",
+            approximate_record=detect_fengshui_approximate,
+        )["run_metadata"]["engine_is_approximate"]
         is False
     )

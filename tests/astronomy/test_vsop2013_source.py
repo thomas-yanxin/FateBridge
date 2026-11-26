@@ -57,18 +57,14 @@ def test_invalid_bracket_precedes_native_loading(
 
 
 def _manifest():
-    profile, digest = source_profile()
+    profile = source_profile()
     return dict(
         model_id=profile["model_id"],
         version=profile["version"],
         abi_version=1,
-        source_profile_sha256=digest,
-        calculation_source_sha256=profile["calculation_source_sha256"],
-        embedded_series_sha256=profile["embedded_series_sha256"],
         system=platform.system(),
         machine=platform.machine(),
         binary="unread-library.so",
-        binary_sha256="0" * 64,
     )
 
 
@@ -77,8 +73,6 @@ def _manifest():
     [
         {"abi_version": True},
         {"model_id": "moshier"},
-        {"source_profile_sha256": "0" * 64},
-        {"embedded_series_sha256": "0" * 64},
         {"binary": "../outside.so"},
         {"binary": "/absolute.so"},
     ],
@@ -106,16 +100,15 @@ def test_duplicate_manifest_key_is_rejected(tmp_path: Path) -> None:
     assert caught.value.reason == "solar_vsop2013_invalid"
 
 
-def test_binary_hash_is_checked_before_dlopen(
+def test_missing_binary_is_rejected_before_dlopen(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     path = tmp_path / "manifest.json"
     data = _manifest()
-    (tmp_path / data["binary"]).write_bytes(b"not a native image")
     path.write_text(json.dumps(data))
     monkeypatch.setenv(solar.MANIFEST_ENV, str(path))
     monkeypatch.setattr(
-        solar.ctypes, "CDLL", lambda *a, **k: pytest.fail("corrupt image loaded")
+        solar.ctypes, "CDLL", lambda *a, **k: pytest.fail("missing image loaded")
     )
     with pytest.raises(EphemerisSourceError) as caught:
         solar._Source(path, solar._signature(path))

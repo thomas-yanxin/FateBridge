@@ -219,7 +219,6 @@ def context_reading(report: dict[str, Any]) -> dict[str, Any]:
                 "defined_center_hanging_gates",
             )
         ],
-        "source_urls": [r["url"] for r in source_records()],
     }
 
 
@@ -242,7 +241,6 @@ def add_gate_context_evidence(
                 "context_path": "gate_activation_context",
                 "context_count": report["context_count"],
             },
-            "source_url": source_records()[0]["url"],
         }
     )
     return evidence

@@ -34,23 +34,23 @@ def main() -> None:
         output.write(execution.message_bytes(message))
         output.flush()
 
-    line = sys.stdin.buffer.readline(execution._MAX_MESSAGE + 1)
-    if len(line) > execution._MAX_MESSAGE or not line.endswith(b"\n"):
+    line = sys.stdin.buffer.readline(execution.MAX_MESSAGE + 1)
+    if len(line) > execution.MAX_MESSAGE or not line.endswith(b"\n"):
         raise execution.NativeExecutionError("Invalid private calculation request")
     request = json.loads(line)
-    if request["entry"] not in execution._ENTRIES:
+    if request["entry"] not in execution.ENTRIES:
         raise execution.NativeExecutionError("Unsupported private calculation entry")
     acknowledgements: Queue[bytes] = Queue(maxsize=1)
 
     def watch_parent() -> None:
         while True:
-            acknowledgement = sys.stdin.buffer.readline(execution._MAX_MESSAGE + 1)
+            acknowledgement = sys.stdin.buffer.readline(execution.MAX_MESSAGE + 1)
             if not acknowledgement:
                 # The owning process exited (including SIGKILL), or closed its
                 # request pipe after receiving the final result. Never carry
                 # on a long grid after the sole result recipient disappears.
                 os._exit(0)
-            if len(acknowledgement) > execution._MAX_MESSAGE:
+            if len(acknowledgement) > execution.MAX_MESSAGE:
                 os._exit(1)
             acknowledgements.put(acknowledgement)
 
@@ -58,7 +58,7 @@ def main() -> None:
     owner.start()
     # Process lifetime is exactly one operation. No parent native module, cache,
     # fixed Delta-T override, or fault-injection monkeypatch is inherited.
-    execution._WORKER_ACTIVE = True
+    execution.WORKER_ACTIVE = True
     selected = request["path"]
     if selected:
         os.environ["SE_EPHE_PATH"] = selected

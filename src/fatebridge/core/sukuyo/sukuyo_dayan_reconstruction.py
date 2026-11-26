@@ -71,16 +71,9 @@ def reconstruction_scope_lines(
             "该模型的1212月实现对照不能移作本次所选历日或现实效力的验收。"
         ),
     ]
-    if (
-        "research_scope_delivery_round" in reference
-        or "fixed_host_research_scope" in reference
-    ):
-
+    if "fixed_host_research_scope" in reference:
         comparison = reference.get("fixed_host_research_scope")
-        if (
-            reference.get("research_scope_delivery_round") != 89
-            or comparison != research_scope()
-        ):
+        if comparison != research_scope():
             raise ValueError("全表研究方向、不利结果或未知行与具名来源不一致")
         unknown = "、".join(str(n) for n in comparison["unknown_direction_rows"])
         lines.append(

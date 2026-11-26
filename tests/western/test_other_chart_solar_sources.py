@@ -92,13 +92,13 @@ def test_other_managed_worker_cannot_change_configuration_mid_arc(
             return
         else:
             pass
-        got = e._EPHEMERIS_LOCK.acquire(blocking=False)
+        got = e.EPHEMERIS_LOCK.acquire(blocking=False)
         acquired.append(got)
         if got:
             try:
                 e.configure_ephemeris_path(str(empty))
             finally:
-                e._EPHEMERIS_LOCK.release()
+                e.EPHEMERIS_LOCK.release()
         else:
             pass
         done.set()

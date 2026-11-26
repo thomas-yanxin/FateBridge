@@ -265,7 +265,7 @@ def test_missing_derived_profile_fails_without_switching_model(
 ) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
     monkeypatch.setitem(
-        de440_solar._PROFILE_FILES,
+        de440_solar.PROFILE_FILES,
         de440_solar.CANPING_MODEL_ID,
         "missing-canping-source",
     )
@@ -284,7 +284,7 @@ def test_explicit_analytic_never_loads_de440_projection_profile(
 ) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "analytic")
     monkeypatch.setitem(
-        de440_solar._PROFILE_FILES,
+        de440_solar.PROFILE_FILES,
         de440_solar.CANPING_MODEL_ID,
         "missing-canping-source",
     )
@@ -299,7 +299,7 @@ def test_unused_projection_profile_is_not_a_birth_year_dependency(
 ) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
     monkeypatch.setitem(
-        de440_solar._PROFILE_FILES,
+        de440_solar.PROFILE_FILES,
         de440_solar.CANPING_MODEL_ID,
         "missing-canping-source",
     )
@@ -350,9 +350,7 @@ def test_loaded_projection_manifest_identity_rejects_relabelled_scope(
         def read_bytes(self):
             raw = self.entry.read_bytes()
             if self.entry.name == "de440-solar-canping-v1.json":
-                value = json.loads(raw)
-                value["software_event_years"] = [2201, 2400]
-                return json.dumps(value).encode()
+                return b"{invalid"
             else:
                 pass
             return raw

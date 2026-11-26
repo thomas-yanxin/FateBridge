@@ -132,7 +132,6 @@ def _term_time_scale_cached(
         "civil_time_method": epoch.method,
         "future_leap_seconds_assumed_unchanged": epoch.future_leap_seconds_assumed_unchanged,
         "leap_table_expires_at": table["expires_at"],
-        "leap_table_source": table["source_url"],
     }
 
 
@@ -330,8 +329,6 @@ def require_ren_calendar(
                 else "per_dependency_named_models"
             ),
             "horizons_frame_equivalence_certified": False,
-            "source_url": (current.solar_model_details or {}).get("source_url")
-            or result["solar_longitude_definition"]["source_url"],
             "source_section": "Per-boundary model details: ERFA epv00/pfw06/nut00b or native Swiss source",
             "scope": "逐交气列出实际模型；具名解析模型使用ERFA简化VSOP2000、IAU2006/P03与IAU2000B日期真黄道。没有将其更名为Swiss默认IERS2010或认证与Horizons参考系等同；TT替代TDB及作者范围警告见各边界元数据。",
         }

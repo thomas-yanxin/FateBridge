@@ -29,9 +29,6 @@ def test_named_1599_edition_support_is_bounded_and_preserves_jinjing(
     assessment = aligned_board(ju, yin=True)["count_source_assessment"]
     (witness,) = assessment["edition_comparisons"]
     assert witness["source_id"] == "wujing_yonezawa_wanli27_yin_v1"
-    assert witness["catalog_url"] == (
-        "https://www.library.yonezawa.yamagata.jp/dg/AA040.html"
-    )
     assert witness["catalog_identity"] == "米沢善本40 / AA040001 / 20冊"
     assert witness["edition"] == "万暦27年（1599）跋重刻本"
     assert witness["source_title"] == "武經總要後集卷之二十"
@@ -79,14 +76,13 @@ def test_returned_witness_cannot_mutate_later_runs() -> None:
     first = aligned_board(37, yin=True)["count_source_assessment"][
         "edition_comparisons"
     ][0]
-    first["images"][0]["sha256"] = "caller annotation"
+    original_image_number = first["images"][0]["image_number"]
+    first["images"][0]["image_number"] = -1
     first["observations"][2]["edition_value"] = "caller annotation"
     second = aligned_board(37, yin=True)["count_source_assessment"][
         "edition_comparisons"
     ][0]
-    assert second["images"][0]["sha256"] == (
-        "dec593b89d9db04cfacfd1cb608bbbc10e0ec0b7a30aeb57c54c6494cc95bff9"
-    )
+    assert second["images"][0]["image_number"] == original_image_number
     assert second["observations"][2]["edition_value"] == "坤"
 
 

@@ -41,7 +41,7 @@ def test_quadrant_house_swisseph_runtime_failure_fails_loud(
     Not a raw swisseph error, and crucially NOT a silent degrade to
     equal-from-ascendant cusps mislabeled as Placidus.
     """
-    monkeypatch.setattr(astrology_core, "_SWE_RUNTIME_FAILURE_LOGGED", False)
+    monkeypatch.setattr(astrology_core, "SWE_RUNTIME_FAILURE_LOGGED", False)
 
     def _boom(*args, **kwargs):
         raise RuntimeError("swisseph houses_armc exploded")
@@ -60,7 +60,7 @@ def test_planetary_hours_degrades_to_none_when_civil_conversion_fails(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """A failed UT1-to-civil conversion yields the documented unavailable value."""
-    monkeypatch.setattr(astrology_core, "_SWE_RUNTIME_FAILURE_LOGGED", False)
+    monkeypatch.setattr(astrology_core, "SWE_RUNTIME_FAILURE_LOGGED", False)
     info = build_astro_birth_info(**_NATAL)
     julian_day = _julian_day(info.utc_datetime)
 

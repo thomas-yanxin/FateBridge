@@ -160,5 +160,5 @@ def test_nearby_latitudes_are_not_reclassified_as_exact_poles(latitude) -> None:
 
 def test_pole_definition_cannot_be_mutated_for_later_calls() -> None:
     first = geographic_pole_angle_definition(90)
-    first["source_urls"].clear()
-    assert len(geographic_pole_angle_definition(90)["source_urls"]) == 2
+    first["dependent_quantities"].clear()
+    assert len(geographic_pole_angle_definition(90)["dependent_quantities"]) == 5

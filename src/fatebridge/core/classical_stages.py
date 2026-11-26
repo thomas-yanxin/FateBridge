@@ -20,7 +20,7 @@ TWELVE_STAGES: tuple[str, ...] = (
 )
 
 # 阳干顺行、阴干逆行. A stage hit alone does not adjudicate a hidden root.
-_CHANGSHENG_START: dict[str, tuple[str, int]] = {
+CHANGSHENG_START: dict[str, tuple[str, int]] = {
     "甲": ("亥", +1),
     "丙": ("寅", +1),
     "戊": ("寅", +1),
@@ -45,7 +45,7 @@ def life_stage_profile() -> dict[str, Any]:
         "stage_cycle": list(TWELVE_STAGES),
         "growth_starts": {
             stem: {"growth_branch": branch, "direction": direction}
-            for stem, (branch, direction) in _CHANGSHENG_START.items()
+            for stem, (branch, direction) in CHANGSHENG_START.items()
         },
     }
     return {
@@ -89,7 +89,7 @@ def life_stage_profile() -> dict[str, Any]:
 
 def twelve_life_stage(day_stem: str, branch: str) -> str:
     """Look up the stage; make no whole-chart strength or root-loss decision."""
-    start_branch, direction = _CHANGSHENG_START[day_stem]
+    start_branch, direction = CHANGSHENG_START[day_stem]
     steps = (
         (EARTHLY_BRANCHES.index(branch) - EARTHLY_BRANCHES.index(start_branch))
         * direction

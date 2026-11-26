@@ -105,7 +105,7 @@ def test_default_ephe_dir_detects_se1_files(
     ephe = tmp_path / "ephe"
     ephe.mkdir()
     (ephe / "sepl_18.se1").write_bytes(b"SWdata")
-    monkeypatch.setattr(ephemeris_runtime, "_PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(ephemeris_runtime, "PROJECT_ROOT", tmp_path)
 
     assert ephemeris_runtime.default_ephe_dir() == str(ephe)
 
@@ -114,7 +114,7 @@ def test_default_ephe_dir_ignores_empty_dir(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     (tmp_path / "ephe").mkdir()
-    monkeypatch.setattr(ephemeris_runtime, "_PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(ephemeris_runtime, "PROJECT_ROOT", tmp_path)
 
     # A directory with no .se1 files must not mask the Moshier fallback.
     assert ephemeris_runtime.default_ephe_dir() is None
@@ -125,7 +125,7 @@ def test_default_ephe_dir_falls_back_when_se1_match_is_directory(
 ) -> None:
     (tmp_path / "ephe" / "sepl_18.se1").mkdir(parents=True)
     cache = tmp_path / "cache"
-    monkeypatch.setattr(ephemeris_runtime, "_PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(ephemeris_runtime, "PROJECT_ROOT", tmp_path)
     monkeypatch.setattr(
         ephemeris_runtime, "verified_user_ephemeris_dir", lambda: str(cache)
     )
@@ -136,7 +136,7 @@ def test_default_ephe_dir_falls_back_when_se1_match_is_directory(
 def test_default_ephe_dir_absent(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr(ephemeris_runtime, "_PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(ephemeris_runtime, "PROJECT_ROOT", tmp_path)
 
     assert ephemeris_runtime.default_ephe_dir() is None
 

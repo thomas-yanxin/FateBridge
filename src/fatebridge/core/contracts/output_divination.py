@@ -25,7 +25,6 @@ class ClassicalHexagram(PartialOutput):
     daxiang: str | None = None
     yaoci: list[ClassicalLine] | None = None
     special: ClassicalLine | None = None
-    source_url: str | None = None
     source_revision: int | None = None
 
 
@@ -35,8 +34,6 @@ class ClassicalTextEvidence(PartialOutput):
     changed_guaci: str | None = None
     moving_yaoci: list[ClassicalLine] | None = None
     all_moving_special: ClassicalLine | None = None
-    base_source_url: str | None = None
-    changed_source_url: str | None = None
     scope: str | None = None
 
 

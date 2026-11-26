@@ -57,7 +57,6 @@
         "taiyi.ten_jing.version",
         "taiyi.ten_jing.author",
         "taiyi.ten_jing.classical_author",
-        "taiyi.ten_jing.source",
         "taiyi.ten_jing.classical_acceptance_passed",
         "taiyi.ten_jing.scope",
         "taiyi.ten_jing.records.emperor.label",
@@ -172,19 +171,15 @@
         "taiyi.ruleset",
         "qimen.stem_context.day",
         "qimen.stem_context.hour",
-        "qimen.stem_context.source",
         "qimen.stem_context.day_jia_policy_automatically_selected",
         "qimen.rule_profiles.god.id",
         "qimen.rule_profiles.god.title",
-        "qimen.rule_profiles.god.source",
         "qimen.rule_profiles.god.variant_note",
         "qimen.rule_profiles.season.id",
         "qimen.rule_profiles.season.title",
-        "qimen.rule_profiles.season.source",
         "qimen.rule_profiles.season.variant_note",
         "qimen.rule_profiles.wonder_tomb.id",
         "qimen.rule_profiles.wonder_tomb.title",
-        "qimen.rule_profiles.wonder_tomb.source",
         "qimen.rule_profiles.wonder_tomb.variant_note",
         "qimen.rule_profiles.wonder_tomb.source_priority_resolved",
         "qimen.rule_profiles.wonder_tomb.whole_book_conformance_established",
@@ -192,7 +187,6 @@
         "liureng.ruleset.id",
         "liureng.ruleset.version",
         "liureng.ruleset.source_title",
-        "liureng.ruleset.source_urls",
         "liureng.ruleset.classical_conformance",
         "liureng.ruleset.classical_acceptance_passed"
       ],
@@ -210,19 +204,15 @@
         "qimen.zhishi",
         "qimen.stem_context.day",
         "qimen.stem_context.hour",
-        "qimen.stem_context.source",
         "qimen.stem_context.day_jia_policy_automatically_selected",
         "qimen.rule_profiles.god.id",
         "qimen.rule_profiles.god.title",
-        "qimen.rule_profiles.god.source",
         "qimen.rule_profiles.god.variant_note",
         "qimen.rule_profiles.season.id",
         "qimen.rule_profiles.season.title",
-        "qimen.rule_profiles.season.source",
         "qimen.rule_profiles.season.variant_note",
         "qimen.rule_profiles.wonder_tomb.id",
         "qimen.rule_profiles.wonder_tomb.title",
-        "qimen.rule_profiles.wonder_tomb.source",
         "qimen.rule_profiles.wonder_tomb.variant_note",
         "qimen.rule_profiles.wonder_tomb.source_priority_resolved",
         "qimen.rule_profiles.wonder_tomb.whole_book_conformance_established",
@@ -233,7 +223,6 @@
         "liureng.ruleset.id",
         "liureng.ruleset.version",
         "liureng.ruleset.source_title",
-        "liureng.ruleset.source_urls",
         "liureng.ruleset.classical_conformance",
         "liureng.ruleset.classical_acceptance_passed",
         "synthesis.noble_source_assessment",
@@ -443,19 +432,15 @@
       "qimen.zhishi",
       "qimen.stem_context.day",
       "qimen.stem_context.hour",
-      "qimen.stem_context.source",
       "qimen.stem_context.day_jia_policy_automatically_selected",
       "qimen.rule_profiles.god.id",
       "qimen.rule_profiles.god.title",
-      "qimen.rule_profiles.god.source",
       "qimen.rule_profiles.god.variant_note",
       "qimen.rule_profiles.season.id",
       "qimen.rule_profiles.season.title",
-      "qimen.rule_profiles.season.source",
       "qimen.rule_profiles.season.variant_note",
       "qimen.rule_profiles.wonder_tomb.id",
       "qimen.rule_profiles.wonder_tomb.title",
-      "qimen.rule_profiles.wonder_tomb.source",
       "qimen.rule_profiles.wonder_tomb.variant_note",
       "qimen.rule_profiles.wonder_tomb.source_priority_resolved",
       "qimen.rule_profiles.wonder_tomb.whole_book_conformance_established",
@@ -466,7 +451,6 @@
       "liureng.ruleset.id",
       "liureng.ruleset.version",
       "liureng.ruleset.source_title",
-      "liureng.ruleset.source_urls",
       "liureng.ruleset.classical_conformance",
       "liureng.ruleset.classical_acceptance_passed",
       "synthesis.time_scopes",
@@ -663,7 +647,7 @@
         "liureng_guiren_profile"
       ],
       "source_refs": [
-        "docs/taiyi-sanshi-audit.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "categorical",
       "validation_scope": {
@@ -710,7 +694,7 @@
         "liureng_guiren_profile"
       ],
       "source_refs": [
-        "docs/liuren-jinkou-audit.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "categorical",
       "validation_scope": {
@@ -757,7 +741,7 @@
         "liureng_guiren_profile"
       ],
       "source_refs": [
-        "docs/qimen-depth-audit.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "categorical",
       "validation_scope": {
@@ -804,7 +788,7 @@
         "liureng_guiren_profile"
       ],
       "source_refs": [
-        "docs/taiyi-sanshi-audit.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "per_field",
       "validation_scope": {

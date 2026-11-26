@@ -51,9 +51,9 @@ except ImportError:  # pragma: no cover - exercised only in minimal installs
 # ``<root>/src/fatebridge/core/ephemeris_runtime.py``, so the root is three
 # parents up.
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-_EPHEMERIS_LOCK = RLock()
+EPHEMERIS_LOCK = RLock()
 _configured_path: str | None = None
-_THREAD_STATE = local()
+THREAD_STATE = local()
 # Some native builds share this path across threads. Keep both caches under
 # the same lock; other builds still require each thread's own initialization.
 _LAST_APPLIED_PATH: tuple[int, str | None] | None = None
@@ -85,7 +85,7 @@ def default_ephe_dir() -> str | None:
 
 def configured_ephemeris_path() -> str | None:
     """Return the selected path, including Swiss's nonempty environment override."""
-    with _EPHEMERIS_LOCK:
+    with EPHEMERIS_LOCK:
         return _validated_ephemeris_path(
             os.environ.get("SE_EPHE_PATH") or _configured_path
         )
@@ -97,7 +97,7 @@ def effective_ephemeris_search_path() -> str | None:
     These defaults can include the current directory and optional auxiliary
     files even when physical bodies fall back to Moshier.
     """
-    with _EPHEMERIS_LOCK:
+    with EPHEMERIS_LOCK:
         return configured_ephemeris_path() or getattr(swe, "EPHE_PATH", None)
 
 
@@ -115,7 +115,7 @@ def configure_ephemeris_path(path: str | None = None) -> str | None:
     the importing thread alone is insufficient for a fresh REST worker.
     """
     global _configured_path, _LAST_APPLIED_PATH
-    with _EPHEMERIS_LOCK:
+    with EPHEMERIS_LOCK:
         if swe is None:
             return None
         resolved = _validated_ephemeris_path(
@@ -125,7 +125,7 @@ def configure_ephemeris_path(path: str | None = None) -> str | None:
         # Initialisation and reset also matter with no custom data directory.
         swe.set_ephe_path(resolved or "")
         signature = (id(swe), resolved)
-        _THREAD_STATE.signature = signature
+        THREAD_STATE.signature = signature
         _LAST_APPLIED_PATH = signature
         _configured_path = resolved
         return resolved
@@ -134,7 +134,7 @@ def configure_ephemeris_path(path: str | None = None) -> str | None:
 @contextmanager
 def lock_ephemeris_configuration() -> Iterator[None]:
     """Pin managed configuration without touching the caller's native state."""
-    with _EPHEMERIS_LOCK:
+    with EPHEMERIS_LOCK:
         yield
 
 
@@ -147,7 +147,7 @@ def preserve_ephemeris_path() -> Iterator[None]:
     both success and failure.
     """
     global _LAST_APPLIED_PATH
-    with _EPHEMERIS_LOCK:
+    with EPHEMERIS_LOCK:
         try:
             yield
         finally:
@@ -155,7 +155,7 @@ def preserve_ephemeris_path() -> Iterator[None]:
                 selected = configured_ephemeris_path()
                 swe.set_ephe_path(selected or "")
                 signature = (id(swe), selected)
-                _THREAD_STATE.signature = signature
+                THREAD_STATE.signature = signature
                 _LAST_APPLIED_PATH = signature
 
 
@@ -163,7 +163,7 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
     """Run a direct Swiss Ephemeris call outside third-party path changes."""
     global _LAST_APPLIED_PATH
     with (
-        _EPHEMERIS_LOCK,
+        EPHEMERIS_LOCK,
         native_call_policy(
             swe,
             operation,
@@ -178,13 +178,13 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
         selected = configured_ephemeris_path()
         signature = (id(swe), selected)
         if (
-            getattr(_THREAD_STATE, "signature", None) != signature
+            getattr(THREAD_STATE, "signature", None) != signature
             or _LAST_APPLIED_PATH != signature
         ):
             # deltat_ex requires initialisation even with no .se1 files.
             # Apply once per thread/path, avoiding a cache reset on every call.
             swe.set_ephe_path(selected or "")
-            _THREAD_STATE.signature = signature
+            THREAD_STATE.signature = signature
             _LAST_APPLIED_PATH = signature
         jpl = configured_jpl_file()
         invoke = partial(

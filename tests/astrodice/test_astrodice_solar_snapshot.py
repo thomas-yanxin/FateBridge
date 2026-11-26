@@ -103,7 +103,6 @@ def test_native_extension_is_explained_without_rewriting_the_dice(
         )
         assert "不代表采用 Horizons 的全部视位置约定" in result["snapshot_text"]
         assert "不是可见性、遮掩接触时刻或观测精度证明" in result["snapshot_text"]
-        assert policy["source_url"] in result["snapshot_text"]
         assert "连续延拓" not in result["snapshot_text"]
         assert policy["source_model_regularity"]["axis_continuity_certified"] is False
         result.pop("run_metadata")

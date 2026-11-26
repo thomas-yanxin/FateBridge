@@ -199,8 +199,10 @@ class CanpingScheduleBasis(PartialOutput):
                 if expected_source is None:
                     raise ValueError("未登记的配运书目来源。")
                 for key, expected in expected_source.items():
-                    value = getattr(source, key)
-                    if key in source.model_fields_set and value != expected:
+                    if (
+                        key in source.model_fields_set
+                        and getattr(source, key) != expected
+                    ):
                         raise ValueError("配运书名、版本或书影身份不能互换。")
         if self.timezone_rules is not None:
             expected_policy = clock_policy_for_rules(self.timezone_rules)

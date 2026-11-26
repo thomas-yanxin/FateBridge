@@ -318,7 +318,6 @@ def build_sixyao_snapshot_text(
                             f"{v['label']}：{v['text']}"
                             for v in text_evidence["moving_yaoci"]
                         ],
-                        f"原文来源：{text_evidence['base_source_url']}",
                         text_evidence["scope"],
                     ]
                 ),

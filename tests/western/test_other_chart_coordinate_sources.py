@@ -70,13 +70,13 @@ def test_same_tt_ecliptic_and_equatorial_calls_share_configuration(
             return
         else:
             pass
-        got = e._EPHEMERIS_LOCK.acquire(blocking=False)
+        got = e.EPHEMERIS_LOCK.acquire(blocking=False)
         acquired.append(got)
         if got:
             try:
                 e.configure_ephemeris_path(str(empty))
             finally:
-                e._EPHEMERIS_LOCK.release()
+                e.EPHEMERIS_LOCK.release()
         else:
             pass
         done.set()
@@ -195,13 +195,13 @@ def test_whole_chart_lock_spans_physical_and_lahiri_passes(
             return
         else:
             pass
-        got = e._EPHEMERIS_LOCK.acquire(blocking=False)
+        got = e.EPHEMERIS_LOCK.acquire(blocking=False)
         acquired.append(got)
         if got:
             try:
                 e.configure_ephemeris_path(str(empty))
             finally:
-                e._EPHEMERIS_LOCK.release()
+                e.EPHEMERIS_LOCK.release()
         else:
             pass
         done.set()

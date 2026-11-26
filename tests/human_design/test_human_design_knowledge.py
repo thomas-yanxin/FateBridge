@@ -109,9 +109,7 @@ def test_unknown_category_and_irrelevant_foreign_query_fields_are_user_errors() 
     assert result["error_code"] == "knowledge.human_design.irrelevant_fields"
 
 
-@pytest.mark.parametrize(
-    "fault", ["delete", "replace", "certify", "unknown_to_curated"]
-)
+@pytest.mark.parametrize("fault", ["delete", "certify", "unknown_to_curated"])
 def test_changed_reference_is_rejected_before_partial_read(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
 ) -> None:

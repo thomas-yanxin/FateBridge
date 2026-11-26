@@ -454,7 +454,7 @@
         "relative_mode"
       ],
       "source_refs": [
-        "docs/western-astrology.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "per_field",
       "validation_scope": {
@@ -499,7 +499,7 @@
         "relative_mode"
       ],
       "source_refs": [
-        "docs/western-astrology.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "per_field",
       "validation_scope": {

@@ -430,7 +430,7 @@
         "guiren_profile"
       ],
       "source_refs": [
-        "docs/liuren-jinkou-audit.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "categorical",
       "validation_scope": {

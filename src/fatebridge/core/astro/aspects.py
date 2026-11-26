@@ -13,9 +13,9 @@ from fatebridge.core.astro.geometry import (
     longitude_float,
 )
 from fatebridge.core.astro.reference import (
-    _TRADITIONAL_PLANET_IDS,
     ASPECTS,
     DEFAULT_PLANET_ORBS,
+    TRADITIONAL_PLANET_IDS,
 )
 from fatebridge.core.astro.relationship_geometry import midpoint_candidates_fraction
 
@@ -121,12 +121,12 @@ def _build_directional_relative_aspects(
     grouped: list[dict[str, Any]] = []
 
     for source_planet in source_planets:
-        if source_planet["id"] not in _TRADITIONAL_PLANET_IDS:
+        if source_planet["id"] not in TRADITIONAL_PLANET_IDS:
             continue
 
         matches: list[tuple[Fraction, dict[str, Any]]] = []
         for target_planet in target_planets:
-            if target_planet["id"] not in _TRADITIONAL_PLANET_IDS:
+            if target_planet["id"] not in TRADITIONAL_PLANET_IDS:
                 continue
             matched = _match_cross_aspect_fraction(
                 source_planet["longitude"],
@@ -196,7 +196,7 @@ def _relative_midpoint_catalog_fraction(
     target_planets: list[dict[str, Any]],
 ) -> list[tuple[Fraction, dict[str, Any]]]:
     midpoint_bodies = [
-        item for item in target_planets if item["id"] in _TRADITIONAL_PLANET_IDS
+        item for item in target_planets if item["id"] in TRADITIONAL_PLANET_IDS
     ]
     catalog: list[tuple[Fraction, dict[str, Any]]] = []
     for index, first in enumerate(midpoint_bodies):
@@ -229,7 +229,7 @@ def _build_directional_relative_midpoints(
     midpoint_hits: dict[str, list[dict[str, Any]]] = {}
 
     for source_planet in source_planets:
-        if source_planet["id"] not in _TRADITIONAL_PLANET_IDS:
+        if source_planet["id"] not in TRADITIONAL_PLANET_IDS:
             continue
 
         hits: list[tuple[Fraction, dict[str, Any]]] = []
@@ -277,11 +277,11 @@ def _build_directional_relative_antiscia(
     matched_items: list[tuple[Fraction, dict[str, Any]]] = []
 
     for source_planet in source_planets:
-        if source_planet["id"] not in _TRADITIONAL_PLANET_IDS:
+        if source_planet["id"] not in TRADITIONAL_PLANET_IDS:
             continue
 
         for target_planet in target_planets:
-            if target_planet["id"] not in _TRADITIONAL_PLANET_IDS:
+            if target_planet["id"] not in TRADITIONAL_PLANET_IDS:
                 continue
             target = angle_fraction(target_planet["longitude"])
             reference_longitude = -target if contra else 180 - target

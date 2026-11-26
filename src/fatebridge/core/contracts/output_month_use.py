@@ -19,7 +19,6 @@ class MonthUseSource(PartialOutput):
     author: Annotated[str | None, FULL_FACT] = None
     title: Annotated[str | None, FULL_FACT] = None
     edition: Annotated[str | None, FULL_FACT] = None
-    url: Annotated[str | None, FULL_FACT] = None
     claims: Annotated[dict[str, MonthUseClaim] | None, FULL_FACT] = None
 
 

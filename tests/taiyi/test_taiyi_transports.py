@@ -179,7 +179,6 @@ def test_published_first_views_preserve_evidence_under_default_limits(
         profiles = body["qimen"]["rule_profiles"]
         for profile in ("god", "season", "wonder_tomb"):
             assert profiles[profile]["id"]
-            assert profiles[profile]["source"]
             assert profiles[profile]["variant_note"]
         assert profiles["wonder_tomb"]["source_priority_resolved"] is False
         assert profiles["wonder_tomb"]["whole_book_conformance_established"] is False

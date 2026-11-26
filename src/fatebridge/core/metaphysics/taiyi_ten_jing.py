@@ -155,7 +155,7 @@ def attach_ten_jing(board: dict[str, Any]) -> None:
 
 
 def ten_jing_text(data: dict[str, Any]) -> str:
-    lines = [f"金钥匙十精：{data['ruleset_id']}；来源：{data['source']}。"]
+    lines = [f"金钥匙十精：{data['ruleset_id']}（{data['classical_author']}）。"]
     for record in data["records"].values():
         location = record.get("palace") or (
             f"第{record['ordinal']}局（非宫位）" if "ordinal" in record else "未裁定"
@@ -166,8 +166,7 @@ def ten_jing_text(data: dict[str, Any]) -> str:
         evidence = record.get("rule_evidence")
         if evidence:
             lines.append(
-                f"{record['label']}取法依据：{evidence['basis']}；未决：{evidence['unresolved']}；补证来源："
-                + "；".join(f"{k}={v}" for k, v in evidence["sources"].items())
+                f"{record['label']}取法依据：{evidence['basis']}；未决：{evidence['unresolved']}。"
             )
         for comparison in record.get("source_comparisons", []):
             lines.append(

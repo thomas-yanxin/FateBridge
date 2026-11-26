@@ -44,7 +44,7 @@ def test_not_shared_does_not_promise_a_nonexistent_matrix_key(
         first["natal_su27"] = second["natal_su27"] = "毕"
     else:
         pass
-    second["profile_calculation"]["source_bundle_sha256"] = "different"
+    second["profile_calculation"]["ruleset_id"] = "different"
     analysis = candidate_relation_analysis(first, second)
     assert analysis["shared_reconstruction_analysis"]["status"] == "not_shared"
     assert "unconstrained_rows" not in analysis

@@ -599,7 +599,7 @@
         "year_basis"
       ],
       "source_refs": [
-        "docs/western-astrology.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "per_field",
       "validation_scope": {
@@ -651,7 +651,7 @@
         "year_basis"
       ],
       "source_refs": [
-        "docs/jyotish.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "per_field",
       "validation_scope": {

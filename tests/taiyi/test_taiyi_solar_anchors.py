@@ -153,7 +153,13 @@ def test_actual_rest_mcp_cli_and_same_run_source_view(
         )
     assert r.status_code == 200, r.text
     expected = r.json()["taiyi"]
-    argv = [tool, "--strict-fields", "--no-include-snapshot-text", "--fields", *fields]
+    argv = [
+        spec.tool_name,
+        "--strict-fields",
+        "--no-include-snapshot-text",
+        "--fields",
+        *fields,
+    ]
     for key, value in values.items():
         if key == "use_true_solar_time":
             argv.append("--no-use-true-solar-time")

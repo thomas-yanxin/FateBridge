@@ -21,7 +21,7 @@ def test_comprehensive_default_source_matches_its_actual_mcp_and_cli_surfaces(
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     spec = SPECS["analyze_destiny"]
-    assert spec.rest_path is None
+    assert spec.rest_path == "/api/bazi/overview"
     payload = {**inputs(spec), "use_true_solar_time": False}
     opts = dict(include_snapshot_text=False, response_char_limit=0)
     flags = ["--include-snapshot-text", "false", "--response-char-limit", "0"]
