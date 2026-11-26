@@ -95,7 +95,7 @@
 - 选法：有场景／环境上下文才读 `method_policy`，核对推荐顺序、实际所选层、`priority_review_status` 与 `not_selected_reason`。方法五行、职业／器物象意或砂水细节请求再读 `method_details`；它是 `reference_only`，不是新的吉凶判定。
 - 环境上下文：`layout_analysis.environmental_context` 下的 `orientation_review`、`household_correspondences`、`floor_review`、`environment_findings`、`separation_policy`、`missing_inputs`；保留方向门槛、家庭／生肖及对宫主次、局部／共享层级、专家版本与未覆盖形态。
 
-返回含 `result_delivery.deferred_fields` 时，先检查本次判断、理由及来源是否已在首屏。缺少所需分支就从同一 run 的结果文件或分页读取，按 `file_payload_path` 取业务结果；这属于读取已有结果，无需重算或追加用户资料。区分交付裁剪与真实缺项，再按已有事实回答；`partial` 只描述实际未完成的范围。
+默认使用 `detail=compact` 返回核心层；需要完整业务载荷与全部未裁剪字段时，使用 `detail=audit` 且 `fields=null`。区分 `detail=compact` 默认裁剪与真实缺项，再按已有事实回答；`partial` 只描述实际未完成的范围。
 
 ## 交付与复核
 

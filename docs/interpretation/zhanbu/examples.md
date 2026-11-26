@@ -7,19 +7,19 @@ CLI 示例使用已安装并激活的仓库虚拟环境，准备方法见[引擎
 ```bash
 python3 -m fatebridge.cli meihua_time_cast --question "是否先做小规模项目试点" \
   --analysis-year 2026 --analysis-month 6 --analysis-day 18 --analysis-hour 15 --analysis-minute 20 \
-  --analysis-timezone Asia/Shanghai --strict-fields --no-include-snapshot-text \
+  --analysis-timezone Asia/Shanghai \
   --fields analysis_context meihua.base_hexagram.name meihua.seed.moving_line meihua.changed_hexagram.name meihua.body_use_relation interpretation.classical_text_reference interpretation.traditional_stage_readings
 
 python3 -m fatebridge.cli qimen \
   --analysis-year 2026 --analysis-month 6 --analysis-day 18 --analysis-hour 15 \
-  --strict-fields --no-include-snapshot-text --fields analysis_context qimen.ju_text qimen.dun_type qimen.zhifu qimen.zhishi qimen.palaces
+  --fields analysis_context qimen.ju_text qimen.dun_type qimen.zhifu qimen.zhishi qimen.palaces
 
 python3 -m fatebridge.cli combine_four_gua \
   --taiyin 巽 --taiyang 坤 --shaoyang 震 --shaoyin 震 --fields summary
 
 python3 -m fatebridge.cli liuyao --question "这个项目试点有什么需要留意" \
   --date 2026-06-18 --time 15:00:00 --seed 20260618 \
-  --strict-fields --no-include-snapshot-text --fields input_normalized nongli current_hexagram changed_hexagram moving_lines lines hexagram_info
+  --fields input_normalized nongli current_hexagram changed_hexagram moving_lines lines hexagram_info
 
 python3 -m fatebridge.cli horary_chart --category career \
   --question-year 2026 --question-month 6 --question-day 18 --question-hour 15 \

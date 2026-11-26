@@ -14,15 +14,14 @@
 uv run --locked --extra dev fatebridge interpret_astrology_dice \
   --planet Mercury --sign Virgo --house 6 \
   --question '虚构示例：合作沟通中应核对什么？' \
-  --fields method_id planet sign house symbolic_details rulesets rule_trace validation \
-  --strict-fields
+  --fields method_id planet sign house symbolic_details rulesets rule_trace validation
 ```
 
 REST 请求示例（字段投影参数放在 URL query）：
 
 ```bash
 curl -sS -X POST \
-  'http://localhost:8010/api/divination/astrology-dice/interpret?fields=method_id&fields=planet&fields=sign&fields=house&fields=symbolic_details&fields=rulesets&fields=rule_trace&fields=validation&strict_fields=true&include_snapshot_text=false' \
+  'http://localhost:8010/api/divination/astrology-dice/interpret?fields=method_id&fields=planet&fields=sign&fields=house&fields=symbolic_details&fields=rulesets&fields=rule_trace&fields=validation' \
   -H 'Content-Type: application/json' \
   -d '{"planet":"Mercury","sign":"Virgo","house":6}'
 ```

@@ -1,15 +1,13 @@
-# 同次交付与核验
+# 完整结果与核验
 
-返回包含 `result_delivery` 即读取本页，包括业务完整显示、仅延后回执的 `compact_reference`。先核验原 run 与存储完整性，再确认所需业务字段已经读取；两者分别确认。
+需要核验完整计算回执、时钟来源或全部选文时读取本页。
 
 未请求、未返回、未读取、未选择与未计算须分别说明。河洛未指定 `analysis_year` 时仍生成 `heluo_timing.annual_rows`，只是 `selected_annual=null`；只能据此说未选定或未解读具体年。字段被投影排除或尚未读取时保留证据缺口，不据此否定已经生成的内容，也不为自证另排一次。年序已生成同样不证明民用历法映射或预测有效。
 
-长结果使用[同run核验读取](../shared/fatebridge-engine.md#怎么调引擎)：
+需要完整结果与审计证据时，使用 `detail=audit` 且 `fields=null`（CLI 省略 `--fields`）；仅核验时钟与核心字段时，按 `fields` 精确投影：
 
 ```bash
-fatebridge result-read RESULT_ID --run-id ORIGINAL_RUN_ID --path numerology_evidence.birth_clock --offset 0
+python3 -m fatebridge.cli heluo --date 1990-05-15 --time 10:30 --lon 116.40 --gender 男 --fields input_normalized numerology_evidence.birth_clock
 ```
 
-结果 ID 与 run ID 取自原回执。接口以内部清单检查完整保留 payload，再返回所选字段页。其他所需事实继续读取同 run，直到所需字段的 `next_offset=null`。核验成功不表示已经读取全部业务事实。摘要调用的文件只保留实际投影范围，完整业务须首次 `fields=null`。
-
-客户端不能读取资源且没有已安装的引擎环境时，保留该项核验缺口，交付已有可答部分；不猜解释器位置、不为咨询安装依赖、不重算冒充原run。结果读取只维护引擎的共享实现。
+摘要调用只保留实际投影范围，完整业务须使用 `detail=audit` 且 `fields=null`。如果本地没有可用的引擎环境（且非连接咨询），保留核验缺口并交付已有可答部分；不猜解释器位置、不为咨询安装依赖，也不重算冒充已有运行。调用规范见[引擎调用](../shared/fatebridge-engine.md#怎么调引擎)。

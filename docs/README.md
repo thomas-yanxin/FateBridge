@@ -12,7 +12,7 @@ FateBridge 提供术数、占星与心理测量计算，接入应用提供模型
 | 接入应用或 AI Agent | [快速入门](getting-started.md) → [Agent 接入指南](agent-guide.md) |
 | 贡献代码或文档 | [贡献指南](../CONTRIBUTING.md) → [开发指南](development-guide.md) |
 
-CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由客户端启动。各端名称与可用范围见[三端能力边界](api-reference.md#24-三端能力边界)。
+CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由客户端启动。各端名称与可用范围见[三端能力边界](api-reference.md#22-三端能力边界)。
 
 ## 安装、接入与交付
 
@@ -23,7 +23,7 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 | 下载星历与核对实际模型 | [星历数据安装](ephemeris.md) |
 | 本地 stdio、远程 HTTP 与停用 | [MCP 部署](mcp-deployment.md) |
 | 工具发现、错误恢复与字段投影 | [Agent 接入](agent-guide.md) |
-| 读取和保存同次完整结果 | [完整结果交付](agent-guide.md#完整结果交付与同次导出) |
+| 输出分级、字段投影与结果读取 | [输出控制与结果读取](agent-guide.md#输出控制与结果读取) |
 | 按能力选择计算方法 | [工具覆盖](algorithm-coverage.md) · [方法参考](interpretation/README.md) |
 | 运行请求示例 | [示例索引](examples/README.md) |
 | 升级旧接口或解决故障 | [故障排除](troubleshooting.md) |

@@ -6,7 +6,7 @@
 
 历史时标按实际返回说明：1960年使用IAU SOFA的UTC偏移／日漂移，1961–1971年使用IERS，1960年前仍采用历史UT1约定。233个独立SOFA时刻对照只验证标准换算，不证明实际出生钟或地方授时实现；1961年元旦的5毫秒调整若无唯一民用标签，保留TT与对应状态。
 
-首轮按实际问题选择已发布 evidence_view 的 fields，`strict_fields=true`、`include_snapshot_text=false`：类型／权威用 `structure`，固定摘要用 `fixing`，逐项固定用 `depth`，周期用 `cycles`，太阳圆盘口径用 `apparent_positions`。细分、真／平交点或时间边界用 `precision`／`root_endpoints`。卡名不是请求参数；完整 JSON 首次 `fields=null`，沿用同 run 的结果交付。投影没有某字段不表示该项未评估，也不能把投影交付文件当成完整业务盘。
+首轮按实际问题选择已发布 evidence_view 的 fields（三端始终严格校验路径）：类型／权威用 `structure`，固定摘要用 `fixing`，逐项固定用 `depth`，周期用 `cycles`，太阳圆盘口径用 `apparent_positions`。细分、真／平交点或时间边界用 `precision`／`root_endpoints`。卡名不是请求参数；完整 JSON 使用 `detail=audit`、`fields=null`。投影没有某字段不表示该项未评估，也不能把摘要结果当成完整业务盘。
 
 从 `bodygraph.channels` 与 `definition.components` 说明类型和定义：两端激活才构成通道，两侧激活合并计算。`generator` 的 `manifesting_generator` 是子型，马达至喉可经间接路径。`undefined` 仍可能有激活门，`completely_open` 才表示该中心没有激活门；不能解释为能力或人格缺陷。
 
@@ -64,9 +64,9 @@
 
 ## 完整交付与核验
 
-完整回执的JSON对象键可重新排序，数组与其`calculation_path`索引不能重排。分页经引擎校验读取原run；字段核验逐值检查实际完整结果。独立保管的原始文件可另做内部完整性校验，不能用重新生成的结果替代。核验失败时按具体字段查因。官方样例只匹配类型或定义也不能代替生时、全部激活及完整解释验收；历史出生注记缺时区时，不用匹配结果挑选时区或改写午前／午后。
+完整回执的JSON对象键可重新排序，数组与其`calculation_path`索引不能重排。字段核验逐值检查实际完整结果；独立保管的原始文件不能用重新生成的结果替代，核验失败时按具体字段查因。官方样例只匹配类型或定义也不能代替生时、全部激活及完整解释验收；历史出生注记缺时区时，不用匹配结果挑选时区或改写午前／午后。
 
-交付核验须区分原run一致性与业务读取范围。请求了 `fields` 时，同run文件只包含实际保留字段；存储核验通过不能证明已经取得投影前完整业务对象。完整交付须首次 `fields=null`，再读取同run全部所需业务字段；不重算替代原run。
+交付核验须区分原run一致性与业务读取范围。请求了 `fields` 时，返回只包含实际保留字段；完整交付须使用 `detail=audit`、`fields=null` 取得全部所需业务字段，不重算替代原run。
 
 
 索取全部激活／固定时覆盖双侧实际26项，依据各项 `calculation_path` 列侧、星体、门线和 `fixing_state`。`status` 的单极性类别不等于本盘已经上升触发；`unfixed` 不等于无极性星体，也不等于行运或人际互动永远不触发。固定机制及其逐项reading不构成完整原典爻义，未取得的正文不补写为已验收解释。

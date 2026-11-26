@@ -55,7 +55,7 @@
 
 关系事实和属性事实分开：`interior_relations` 明确源／目标对象及各自角色，不把“厨厕相邻”改写成门对灶，不把普通门自动当主门／厕门；床位柱角规则只接受 `pillar_corner`，普通家具尖角不升级为柱角。床头／灶背共墙规则须确认墙另一侧实际便器，不以任意卫生间隔墙替代。`present=null` 是未知，确认 false 仅说明该条关系不成立，照片中的 true 或 false 都保留 `candidate_only`。`material_facts` 的材质、器形、颜色、活植物状态各按已确认粒度保存，不同属性可分事实并带同一明确 `element_use`，不重复属性或声明矛盾用途，也不自动拼接；未知不由另一个属性补齐。`element_use` 仅表示用户明确询问能否充当某元素代表物，资格成立不证明当前宫位需要它、摆位可行或可以 ready。
 
-已连接 MCP 直接调用，不为咨询先搜代码或运行命令。按实际工具描述采用首轮 `fields`、`strict_fields=true`、`include_snapshot_text=false`。所有风水解读都保留 `rulesets` 与 `rule_trace`，包括单独命卦和无可做动作的形态审查；有 `scene` 或环境上下文时追加 `method_policy`，有 `environmental_context` 才追加 `layout_analysis.environmental_context`。本次实际提供 `interior_relations` 才加 `layout_analysis.interior_analysis`，提供 `material_facts` 才加 `layout_analysis.material_analysis`，逐桌面物件请求再加 `layout_analysis.surface_analysis`。`method_details` 是较大的参考分支，按细节请求另读；没有对应输入的旧请求不追加可缺路径，避免严格投影报错。旧连接没有所需参数时如实说明并请求重连，不能伪装已经计算；只有可用的本地 CLI 才作为后备，用 JSON `--request-file`，不改安装或用户配置。
+已连接 MCP 直接调用，不为咨询先搜代码或运行命令。按实际工具描述采用首轮 `fields`（三端始终严格校验路径）。所有风水解读都保留 `rulesets` 与 `rule_trace`，包括单独命卦和无可做动作的形态审查；有 `scene` 或环境上下文时追加 `method_policy`，有 `environmental_context` 才追加 `layout_analysis.environmental_context`。本次实际提供 `interior_relations` 才加 `layout_analysis.interior_analysis`，提供 `material_facts` 才加 `layout_analysis.material_analysis`，逐桌面物件请求再加 `layout_analysis.surface_analysis`。`method_details` 是较大的参考分支，按细节请求另读；没有对应输入的旧请求不追加可缺路径，避免严格投影报错。旧连接没有所需参数时如实说明并请求重连，不能伪装已经计算；只有可用的本地 CLI 才作为后备，用 JSON `--request-file`，不改安装或用户配置。
 
 ## 实际候选布局
 
@@ -77,4 +77,4 @@
 
 输出长度随请求范围变化：简单问题回答要点；完整审查覆盖用户提出的对象与方法，列出可做、条件式、受限及未覆盖项目。交付前核对最终答复是否包含本次采用的方法／版本及对应来源标题或链接；来源只在工具回执或阅读过的文件中出现，尚不算向用户交付依据。把五鬼等名称解释为所选传统关系，不预言灾祸或承诺升职、发财。
 
-用户更正事实后，替换旧观察并重建受影响输入；新座位的旧入口／背靠关系不能沿用。沿用 `trace_id` 和 `parent_run_id`，仅解释未变结果无需重算。调整后按可观察的验收点确认是否落实；不得从软件运行成功声称现实运势改善。
+用户更正事实后，替换旧观察并重建受影响输入；新座位的旧入口／背靠关系不能沿用。仅解释未变结果无需重算。调整后按可观察的验收点确认是否落实；不得从软件运行成功声称现实运势改善。

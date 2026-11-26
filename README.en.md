@@ -33,7 +33,7 @@ FateBridge provides local Chinese metaphysics, astrology, and psychometrics calc
 | Feng Shui | Eight Mansions, basic sand/water rules, annual/monthly stars, historical Xuan Kong charts, layouts, and measured workstations | [Home assessment](docs/fengshui.md) · [Consultation guide](docs/interpretation/fengshui/consultation.md) |
 | Psychometrics | IPIP 50-item Big Five factor markers (Goldberg 1992 public domain) | [Coverage](docs/algorithm-coverage.md#212-psychometrics--心理测量量表implemented) |
 
-The current source exposes **93 business REST routes**. Four MCP tools provide access to **93 capabilities** across **14 families**. The central catalog contains 93 entries, with 93 available through the CLI. All three interfaces share the same domain calculations; see [interface boundaries](docs/api-reference.md#24-三端能力边界) and the [algorithm coverage matrix](docs/algorithm-coverage.md).
+The current source exposes **91 business REST routes**. Two MCP tools (`discover_tools` and `run_calculation`) provide access to **91 capabilities** across **12 families**. The central catalog contains 91 entries, with 91 available through the CLI. All three interfaces share the same domain calculations; see [interface boundaries](docs/api-reference.md#22-三端能力边界) and the [algorithm coverage matrix](docs/algorithm-coverage.md).
 
 ## Quick start
 
@@ -71,15 +71,14 @@ fatebridge bazi_birth_chart \
   --birth-hour 10 --birth-minute 30 --gender 男 \
   --birth-place 北京 --birth-timezone Asia/Shanghai \
   --fields bazi_birth.day_master.stem bazi_birth.day_master.element \
-    bazi_birth.day_master.polarity --strict-fields --no-include-snapshot-text \
-  --response-char-limit 8192
+    bazi_birth.day_master.polarity
 ```
 
-On success, the command exits with `0` and returns the day master `庚 / 金 / 阳` (Geng / Metal / Yang) plus `run_metadata`. Large execution evidence is deferred through `result_delivery`; see [reading results](#read-and-verify-results). Discover other tools and their inputs with:
+On success, the command exits with `0` and returns the day master `庚 / 金 / 阳` (Geng / Metal / Yang) plus `run_metadata`. `--detail compact` is the default across all interfaces; pass `--detail audit` for complete payloads and method evidence. Discover other tools and their inputs with:
 
 ```bash
 fatebridge discover --family bazi
-fatebridge describe bazi_birth_chart --detail input
+fatebridge discover bazi_birth_chart
 ```
 
 ## Connect an assistant or application
@@ -98,7 +97,7 @@ Start REST locally with `API_HOST=127.0.0.1 fatebridge-api`. The default port is
 ## Read and verify results
 
 - **Inputs and time:** use confirmed information, including time zone, location, and analysis time. Do not fill an unknown birth hour with a default or example. Read the actual time convention returned by each method.
-- **Summary and full output:** project task-specific `fields` for a summary. For complete JSON, retain all fields on the first call and follow `result_delivery` to read the same run. See [full-result delivery](docs/agent-guide.md#完整结果交付与同次导出).
+- **Summary and full output:** `detail=compact` is the default on all three surfaces; project task-specific `fields` (strictly validated) for targeted views, or pass `detail=audit` with `fields=null` for complete JSON and method evidence. See [output controls and result reading](docs/agent-guide.md#输出控制与结果读取).
 - **Ephemeris and precision:** an installed Python library does not establish that external data files were used. Check the actual model, source, and approximation flag. See [ephemeris setup](docs/ephemeris.md).
 - **Evidence and limits:** software regression, classical sources, and runtime dependencies are reported separately. A `partial` status limits its own layer. See [core concepts](docs/concepts.md).
 

@@ -4,11 +4,11 @@
 
 ## 选择与资料
 
-本命用 `vedic_chart`（或 `astrology_chart` 的 `chart_variant=india_chart`），达沙用 `vimshottari_dasha`。默认使用出生民用时刻，城市可由引擎解析；未知生时不能猜测。核心固定 Lahiri 恒星黄道与整宫制，`node_mode` 区分平／真交点；缺少星历时不以低精度轨道替代分盘或达沙。仅当用户确认生时误差范围时传 `birth_time_uncertainty_minutes`。
+本命用 `vedic_chart`，达沙用 `vimshottari_dasha`。默认使用出生民用时刻，城市可由引擎解析；未知生时不能猜测。核心固定 Lahiri 恒星黄道与整宫制，`node_mode` 区分平／真交点；缺少星历时不以低精度轨道替代分盘或达沙。仅当用户确认生时误差范围时传 `birth_time_uncertainty_minutes`。
 
 ## 首次字段与解释
 
-按工具公开 `evidence_views` 复制 `fields`，设置 `strict_fields=true`、`include_snapshot_text=false`；完整 JSON 首次用 `fields=null` 并从同次 `result_delivery` 读取。
+按工具公开 `evidence_views` 复制 `fields`（三端始终严格校验路径）；完整 JSON 使用 `detail=audit` 且 `fields=null`。
 
 | 本轮任务 | 视图／工具 | 主证 |
 | --- | --- | --- |

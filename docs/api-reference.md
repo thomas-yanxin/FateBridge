@@ -2,13 +2,13 @@
 
 本文列出 FateBridge 的 REST 路由、FastMCP 工具、CLI 约定、共享请求族与响应字段。首次安装请看[快速入门](getting-started.md)，客户端集成代码与分页交付示例见[接入指南](agent-guide.md)，各能力范围见[算法覆盖矩阵](algorithm-coverage.md)。
 
-OpenAPI 发布 93 个业务 REST 路由，另有 `/health`、`/ready`、`/metrics` 三个运维端点。中央目录共有 93 条记录，CLI 可执行 93 条目录命令，MCP 通过四个入口提供 93 项业务能力。字段约束以当前服务的 `/openapi.json`、MCP `describe_capability` 或 CLI `describe` 为准。
+OpenAPI 发布 91 个业务 REST 路由，另有 `/health`、`/ready`、`/metrics` 三个运维端点。目录共有 91 条记录，CLI 可执行 91 条目录命令，MCP 通过两个入口提供 91 项业务能力。字段约束以当前服务的 `/openapi.json`、MCP `discover_tools(tool=...)` 或 CLI `fatebridge discover <tool>` 为准。
 
 ## 阅读导航
 
 | 要查什么 | 章节 |
 | --- | --- |
-| 接口命名、错误、快照、投影与复现 | [公共约定](#2-公共约定) |
+| 接口命名、错误、输出控制与复现 | [公共约定](#2-公共约定) |
 | 咨询禁区与范围校验 | [咨询范围与禁区校验](#咨询范围与禁区校验) |
 | 输入字段与默认值 | [共享请求族](#3-共享请求族) |
 | REST 路由与风水入口 | [REST 端点家族](#4-rest-端点家族) |
@@ -21,7 +21,7 @@ OpenAPI 发布 93 个业务 REST 路由，另有 `/health`、`/ready`、`/metric
 ### REST
 
 - 基础地址：`http://localhost:8010`（Swagger UI `/docs`，ReDoc `/redoc`，OpenAPI Schema `/openapi.json`，能力发现 `/api/tools`）。
-- 请求格式：`Content-Type: application/json`。业务输入放在 JSON 请求体；通用控制项（`fields`、`strict_fields`、`detail`、`include_snapshot_text`、`response_char_limit`、`as_of`、`trace_id`、`parent_run_id`）放在 URL 查询参数，多个 `fields` 重复传参。
+- 请求格式：`Content-Type: application/json`。业务输入放在 JSON 请求体；通用控制项（`detail`、`fields`、`as_of`）放在 URL 查询参数，多个 `fields` 重复传参。
 
 ### FastMCP
 
@@ -59,72 +59,40 @@ OpenAPI 发布 93 个业务 REST 路由，另有 `/health`、`/ready`、`/metric
 
 CLI 成功退出 `0`，计算或校验失败退出 `1`，参数语法或未知 flag 错误退出 `2`。
 
-### 2.2 快照协议
+### 2.2 三端能力边界
 
-支持双层快照的工具可返回人读文本 `snapshot_text` 及结构化导出 `snapshot_export`（含 `selected_sections`、`section_titles_detected` 与 `export_text`），并附带 `run_metadata`：
-
-```json
-{
-  "run_metadata": {
-    "run_id": "f5c3...",
-    "trace_id": "5f17...",
-    "tool_name": "qimen",
-    "generated_at": "2026-04-13T08:00:00Z",
-    "engine": "fatebridge-offline",
-    "engine_is_approximate": false
-  },
-  "snapshot_text": "[起盘信息]\n...",
-  "snapshot_export": {
-    "technique": {"key": "qimen"},
-    "selected_sections": ["起盘信息", "九宫方盘"],
-    "section_titles_detected": ["起盘信息", "九宫方盘", "离九宫"],
-    "export_text": "[起盘信息]\n..."
-  }
-}
-```
-
-`ToolSpec.required_output_fields` 声明完整结果必需业务根；启用 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 后校验完整嵌套输出模型。`astrology_chart` 按请求 `chart_variant` 附加对应业务根（`chart` 无额外根、`chart13` 需 `thirteen_sectors`、`hellen_chart` 需 `hellenistic`、`guolao_chart` 需 `guolao`、`india_chart` 需 `india`、`germany` 需 `base_chart` 与 `midpoints`）。
-
-### 2.3 `selected_sections`
-
-支持 `selected_sections` 的主要入口包括：`bazi_birth_chart`、全部时运与历法 helper、`gua_lookup` / `gua_meanings`、`sanshi_combined_chart`、中国术数独立盘（紫微、六壬、奇门、太乙、金口诀）、`knowledge_*`、`export_parse` 及 11 个独立西占推运工具。八字九专题、核心/关系星盘、事件与生命周期、梅花等本地占法不支持此字段。显式非空选择未命中任何标题时 `export_text` 为空；紫微命盘的导出章节为 `起盘信息` 与 `宫位总览`。
-
-### 2.4 三端能力边界
-
-中央目录含 93 条记录。REST 和 MCP 默认公开全量，CLI 可执行 93 条目录命令（另有 `list`、`discover`、`describe`、`profile`、`doctor` 与 `result-read`）。三端共用公开工具名和业务输入合同，部分主要命名映射如下：
+目录共有 91 条记录。REST 和 MCP 默认公开全量，CLI 可执行 91 条目录命令（另有 `list`、`discover` 与 `doctor`）。三端共用规范工具名（`spec.name`）和业务输入合同，部分主要命名映射如下：
 
 | 能力 | REST | MCP / CLI | 差异说明 |
 | --- | --- | --- | --- |
 | 独立八字命盘 | `/api/bazi/birth-chart` | `bazi_birth_chart` | 业务数据位于 `bazi_birth` |
 | 综合命理分析 | `/api/bazi/overview` | `bazi_overview` | 提供出生盘、喜用与格局事实 |
 | 关系盘 | `/api/astrology/relationship-chart` | `relationship_chart` | 三端统一使用 `inner_birth_*` / `outer_birth_*` |
-| 家居风水 | `/api/fengshui/*` | `fengshui_*` | 八个工具同名；CLI 支持 `--request-file` 传入 JSON |
+| 家居风水 | `/api/fengshui/*` | `fengshui_*` | 八个工具同名；全部 91 个 CLI 命令均支持 `--request-file` 传入 JSON |
 
-### 2.5 字段投影与输出体积
+### 2.3 输出控制与字段投影
 
-| 选项 | REST（查询参数） | MCP | CLI（工具名后） |
+| 选项 | REST（查询参数） | MCP（`run_calculation`） | CLI（工具名后） |
 | --- | --- | --- | --- |
+| 结果级别 | `?detail=compact`（默认 `compact`，可选 `audit`） | `detail="compact"`（默认，可选 `"audit"`） | `--detail compact`（默认，可选 `audit`） |
 | 字段投影 | `?fields=bazi_birth.day_master&fields=person_info` | `fields=["bazi_birth.day_master", "person_info"]` | `--fields bazi_birth.day_master person_info` |
-| 严格投影 | `?strict_fields=true` | `strict_fields=true` | `--strict-fields` |
-| 结果级别 | `?detail=compact`（默认 `standard`） | `detail="compact"`（默认） | `--detail compact`（默认 `standard`） |
-| 省略顶层快照文本 | `?include_snapshot_text=false` | `include_snapshot_text=false` | `--no-include-snapshot-text` |
-| 响应字符预算 | `?response_char_limit=8192`（默认 `0`） | `response_char_limit=8192`（默认 `8192`） | `--response-char-limit 8192`（默认 `0`） |
+| 冻结时钟 | `?as_of=2026-06-01T12:00:00+08:00` | `as_of="2026-06-01T12:00:00+08:00"` | `--as-of 2026-06-01T12:00:00+08:00` |
 
-`compact` 在省略 `fields` 时返回领域首轮视图，`standard` 返回常规业务体，`audit` 返回完整业务体及方法与误差预算信息。11 个单项西占时运工具与 `horary_chart`、`evaluate_election_time` 在 `standard` 下默认省略快照，需要时可显式启用 `include_snapshot_text=true` 或 `detail=audit`。
+`compact`（三端默认）在省略 `fields` 时返回领域精简核心字段及精简 `run_metadata`；`audit` 返回完整业务载荷、全部时间线及 `run_metadata.calculation_evidence` 与误差预算信息。
 
-`strict_fields=false` 时无效路径附带 `projection_warnings`，`strict_fields=true` 则报 `validation_error`。超出字符预算时响应包含 `result_delivery`，可通过 `GET /api/results/{result_id}/payload`、`/pages`、`/verified?expected_run_id=...`、CLI `fatebridge result-read RESULT_ID --run-id ORIGINAL_RUN_ID` 或 MCP `read_result` / 资源 URI 读取同一次运行保留的结果，详见[完整结果交付](agent-guide.md#完整结果交付与同次导出)。
+`fields` 在三端始终严格校验点号对象路径：无效路径返回 `validation_error`（`issues[].code="unknown_projection_path"`、`retryable=false`），并在 `issues[].constraints.available` 列出可用键名；`run_metadata` 始终保留。`ToolSpec.required_output_fields` 声明完整结果必需业务根，启用 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 后校验完整嵌套输出模型。
 
-### 2.6 精度与依赖
+### 2.4 精度与依赖
 
 核心占星盘优先使用本地 `swisseph`，缺失时回退内置近似轨道；西占推运、事件与生命周期工具依赖 `swisseph` 后端，缺失时返回 `dependency_missing`。`swisseph` 可导入不等于已加载 `.se1` 数据文件，请核对 `chart_profile.ephemeris_model` 与 `run_metadata.engine_is_approximate`，配置方式见[星历数据安装](ephemeris.md)。
 
-### 2.7 渐进发现与执行提示
+### 2.5 渐进发现与执行提示
 
-REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surface=...`，CLI 使用 `discover` / `list` / `describe`，MCP 使用 `discover_capabilities`、`describe_capability` 与资源 `fatebridge://catalog/summary`、`fatebridge://families/{family}`、`fatebridge://tools/{tool}`。单工具输入契约可附 `evidence_views` 提供可直接复制的 `fields` 路径列表。
+REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surface=...`，CLI 使用 `list` / `discover [tool]`，MCP 使用 `discover_tools`。发现响应始终包含全局 `counts` 与各分类 `families` 计数；`detail=summary`（默认）在未指定 `tool` 时返回摘要，指定 `tool` 时返回完整输入 Schema、参数与 `evidence_views`，`detail=full` 额外返回 `output_schema`。工具名不存在时返回 `unknown_tool`（404）并在 `issues[].constraints.suggestions` 列出候选名称。
 
-### 2.8 确定性与复现元数据
+### 2.6 确定性与复现元数据
 
-三端支持 `as_of`（ISO 8601 带时区时刻，公历 1–9999 年）、`trace_id` 与 `parent_run_id`（1–128 字符字母数字及 `_ . : -`）。`run_metadata`（2.0）包含 `effective_time`、`determinism`、`replay`、`runtime` 与 `provenance`；随机起卦保留 `replay.overrides.seed`。CLI `profile` 支持统一传入 `--as-of` 与 `--trace-id` 并自动关联子运行的 `parent_run_id`。
+三端支持 `as_of`（ISO 8601 带时区时刻，公历 1–9999 年）。`run_metadata`（2.0）包含 `run_id`、`tool_name`、`generated_at`、`engine`、`engine_is_approximate`、`effective_time`、`determinism`、`replay` 与 `warnings`（`detail=audit` 额外包含 `runtime`、`provenance`、`calculation_evidence` 等）；随机起卦保留 `replay.overrides.seed`。将 `replay.overrides` 与 `replay.as_of` 传回同一工具可在相同环境中复现同一计算结果。
 
 ## 3. 共享请求族
 
@@ -149,11 +117,11 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 
 ### 3.3 `WesternTimingRequest` 家族（`/api/astrology/timing*`）
 
-`birth_longitude` 与 `birth_latitude` 必填，并支持 `analysis_year/month/day/hour/minute`（省略 `analysis_hour` / `analysis_minute` 时沿用出生时分）、`return_longitude/latitude/timezone`、`house_system`、`zodiac_type`、`pd_method/pd_time_key/pd_type/pd_aspects/show_pd_bounds`、`firdaria_night_order`（`nodes_at_end` / `nodes_after_mars`）、`firdaria_year_basis`（`fixed_365_2425` / `calendar_anniversary`）及独立工具的 `selected_sections`。
+`birth_longitude` 与 `birth_latitude` 必填，并支持 `analysis_year/month/day/hour/minute`（省略 `analysis_hour` / `analysis_minute` 时沿用出生时分）、`return_longitude/latitude/timezone`、`house_system`、`zodiac_type`，聚合入口及对应单项工具按各自契约提供 `pd_method/pd_time_key/pd_type/pd_aspects/show_pd_bounds`、`firdaria_night_order`（`nodes_at_end` / `nodes_after_mars`）、`firdaria_year_basis`（`fixed_365_2425` / `calendar_anniversary`）。
 
 ### 3.4 本地技法请求约定
 
-`liuyao`、`suzhan`、`interpret_astrology_dice` 与 `sanshi_combined_chart` 等使用 `date` / `time`、`zone`（常见默认 `+08:00`）、`lat` / `lon`、`gps_lat` / `gps_lon` 与可选 `selected_sections`。`suzhan` 在省略 `time` 时仅做日期历法候选计算；已知钟时则需完整经纬度。
+`liuyao`、`suzhan`、`interpret_astrology_dice` 与 `sanshi_combined_chart` 等使用 `date` / `time`、`zone`（常见默认 `+08:00`）、`lat` / `lon`、`gps_lat` / `gps_lon`。`suzhan` 在省略 `time` 时仅做日期历法候选计算；已知钟时则需完整经纬度。
 
 ### 3.5 双人关系请求
 
@@ -199,7 +167,7 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 | `POST` | `/api/bazi/timing/hourly` | 流时分析 |
 | `POST` | `/api/calendar/solar-term-timeline` | 全年节气节点时间轴 |
 
-### 4.3 Calendar / knowledge / export helper
+### 4.3 Calendar / knowledge helper
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
@@ -207,8 +175,6 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 | `POST` | `/api/calendar/lunar-time` | 农历与干支换算（`time_alg=0` 真太阳时 / `1` 直接时间） |
 | `POST` | `/api/divination/gua` | 卦义检索 |
 | `POST` | `/api/divination/gua/meanings` | 批量查询卦象结构与《周易》经文 |
-| `POST` | `/api/export/formats` | 导出合同注册表 |
-| `POST` | `/api/export/parse` | 快照文本解析 |
 | `POST` | `/api/knowledge/catalog` | 内置知识目录 |
 | `POST` | `/api/knowledge/read` | 内置知识条目读取 |
 
@@ -243,7 +209,7 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| `POST` | `/api/astrology/chart` | 标准占星本命盘（支持 `chart_variant` 与 `apparent_model=native\|opaque_solar`） |
+| `POST` | `/api/astrology/chart` | 标准占星本命盘（纯本命盘，支持 `apparent_model=native\|opaque_solar`） |
 | `POST` | `/api/astrology/thirteen-sector-chart` | 上升起点 13 等分扇区盘 |
 | `POST` | `/api/astrology/hellenistic-chart` | 希腊风格盘 |
 | `POST` | `/api/astrology/guolao-chart` | 果老 / 七政四余盘 |
@@ -306,10 +272,6 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 | `GET` | `/health` | 存活检查，返回 `{"status":"healthy"}` |
 | `GET` | `/ready` | 服务就绪与可选西占运行时检查（`checks`） |
 | `GET` | `/metrics` | Prometheus 文本指标 |
-| `GET` | `/api/results/{result_id}` | 同次结果交付 manifest |
-| `GET` | `/api/results/{result_id}/payload` | 下载同次结果保留的完整 JSON |
-| `GET` | `/api/results/{result_id}/pages` | 字符分页读取（支持 `offset` 与 `path`） |
-| `GET` | `/api/results/{result_id}/verified` | 使用 `expected_run_id` 校验后按页读取 |
 | `GET` | `/api/tools` | 机读能力发现清单（支持 `detail`/`family`/`q`/`tool`/`surface`） |
 
 ### 4.11 家居风水（family `fengshui`）
@@ -361,17 +323,8 @@ curl -X POST http://localhost:8010/api/astrology/timing/solar-return \
     "birth_timezone": "Asia/Shanghai",
     "birth_longitude": 121.4667, "birth_latitude": 31.2167, "birth_place": "上海",
     "analysis_year": 2028, "analysis_month": 4, "analysis_day": 6,
-    "analysis_hour": 12, "analysis_minute": 0,
-    "selected_sections": ["起盘信息", "星盘信息"]
+    "analysis_hour": 12, "analysis_minute": 0
   }'
-```
-
-### 5.3 导出解析 helper
-
-```bash
-curl -X POST http://localhost:8010/api/export/parse \
-  -H "Content-Type: application/json" \
-  -d '{"technique":"qimen","content":"[起盘信息]\n示例\n\n[九宫方盘]\n示例","selected_sections":["起盘信息"]}'
 ```
 
 ## 6. FastMCP 工具面
@@ -384,7 +337,7 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 
 ### 6.2 MCP 工具分组
 
-全部 93 项业务能力由 `discover_capabilities`、`describe_capability`、`run_calculation` 与 `read_result` 四个协议工具暴露，按 `family` 分组如下：
+全部 91 项业务能力由 `discover_tools` 与 `run_calculation` 两个协议工具暴露（不暴露 MCP 资源），按 `family` 分组如下：
 
 #### 基础命理（family `bazi`）
 
@@ -445,10 +398,8 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 - `taiyi`
 - `jinkou`
 
-#### export / knowledge helper
+#### knowledge helper（family `knowledge`）
 
-- `export_formats`
-- `export_parse`
 - `knowledge_catalog`
 - `knowledge_read`
 
@@ -464,7 +415,7 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 - `human_design`
 - `relationship_chart`
 
-#### 西占推运（family `western_timing` / `western_timing_tool`）
+#### 西占推运（family `western_timing`）
 
 - `western_timing`
 - `solar_return`
@@ -529,12 +480,12 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 ## 7. 常见响应字段
 
 - **命理类**：`person_info`、`four_pillars`、`day_master`、`element_distribution`、`favorable_elements`、`structure_profile`、`ten_gods`、`patterns`、`calendar_context`。
-- **占星类**：`chart_profile`、`angles`、`houses`、`planets`、`aspects`、`aspect_evidence`、`classical`、`snapshot_text`、`snapshot_export`。
-- **推运类**：`summary`、`analysis_context`、各技法字段（如 `solarreturn`、`pd`、`firdaria`）、`snapshot_text`、`snapshot_export`。
+- **占星类**：`chart_profile`、`angles`、`houses`、`planets`、`aspects`、`aspect_evidence`、`classical`。
+- **推运类**：`summary`、`analysis_context`、各技法字段（如 `solarreturn`、`pd`、`firdaria`）。
 
 ## 8. 调试建议
 
-- **`selected_sections` 不生效**：核对 `snapshot_export.section_titles_detected` 与 `missing_selected_sections`。
+- **字段投影报错**：核对错误 `issues[].constraints.available` 提示的可用路径，或用 `discover_tools` / `fatebridge discover <tool> --detail full` 查看 `output_schema`。
 - **占星精度下降**：同时核对 `chart_profile.engine_precision`、`engine_backend`、`ephemeris_model` 与 `run_metadata.engine_is_approximate`。
 - **西占推运报错**：检查当前进程解释器是否具备 `swisseph` 运行时依赖；更多排错见[故障排除](troubleshooting.md)。
 

@@ -1,10 +1,10 @@
 # 汉堡中点与德国盘取证
 
-只在指定德国／汉堡／中点盘及其太阳弧时读取。使用 `hamburg_midpoint_chart`；通用 `astrology_chart(chart_variant=germany)` 等价，不重复计算两份。全部几何由引擎计算。
+只在指定德国／汉堡／中点盘及其太阳弧时读取，使用 `hamburg_midpoint_chart`。全部几何由引擎计算。
 
 ## 先选本次需要的层
 
-从当前公开 `evidence_views` 复制所选视图的 `fields`，设 `strict_fields=true`、`include_snapshot_text=false`；视图名不是参数。
+从当前公开 `evidence_views` 复制所选视图的 `fields`（三端始终严格校验路径）；视图名不是参数。
 
 | 问题 | 视图与必须核对的内容 |
 | --- | --- |
@@ -16,7 +16,7 @@
 | 要核对某条两／三／四因素式 | `geometry` 或 `contact_evidence`：因素种类、原始经度、实际度盘及命中式 |
 | Witte1924换基或镜点四点系统 | `comparative_geometry`：来源、实际白羊点、五个锚点框架及自身生时条件；需要具体点时首次加入框架或`radix_systems`路径；样点须选择完整`birth_time_sensitivity.samples`数组，再读各项`point_systems` |
 
-已取得同 run 的 `result_delivery` 时，读取其字段或分页；需要完整性核对时使用同一结果的核验入口。首次未选择的字段不会由分页恢复；完整 JSON 首次 `fields=null`。不另算一个盘补齐已交付的全文。
+完整 JSON 使用 `detail=audit`、`fields=null`；不另算一个盘补齐摘要未选的字段。
 
 ## 本命几何与原文含义
 
@@ -32,7 +32,7 @@
 
 仅使用用户确认的名义时刻与 `birth_time_uncertainty_minutes`；未声明误差为未知，不能写作零误差。未知生时不猜一个名义值。±N 分钟是资料范围，不是统计分布。
 
-用户已记录秒数时，德国盘、13 等分盘及通用工具的对应变体可传 `birth_second=0..59`。省略仅表示用该分钟的起点计算，不表示生时精确到秒；有秒数也不自动把未知误差改成零。按实际 `base_chart.person_info`（13 等分为 `person_info`）核对钟时及 UTC，不截掉已给出的秒数。
+用户已记录秒数时，德国盘及 13 等分盘可传 `birth_second=0..59`。省略仅表示用该分钟的起点计算，不表示生时精确到秒；有秒数也不自动把未知误差改成零。按实际 `base_chart.person_info`（13 等分为 `person_info`）核对钟时及 UTC，不截掉已给出的秒数。
 
 已知输入记录是地方平太阳时／真太阳时，才传 `birth_clock_basis=local_mean_solar/local_apparent_solar`，同时省略 `birth_timezone`、保持 `use_true_solar_time=false`；默认 `civil` 表示民用区时。读取 `person_info.clock_conversion`（德国盘在 `base_chart` 下）的原始钟时与换算后 UTC。太阳钟时的误差区间先转换端点后才生成 UTC 样点，不把输入 ±N 分钟当成精确等长的 UTC 秒数。
 

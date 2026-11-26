@@ -10,7 +10,7 @@
 
 ## 本命古典细问（`evidence_views`）
 
-按问题复制工具公开 `evidence_views` 的 `fields`（卡名不是请求参数），设 `strict_fields=true`、`include_snapshot_text=false`：
+按问题复制工具公开 `evidence_views` 的 `fields`（卡名不是请求参数，三端对 `fields` 始终严格校验）：
 
 | 追问场景 | 视图 / 字段 | 读取重点 |
 | --- | --- | --- |

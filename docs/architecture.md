@@ -9,16 +9,16 @@ FateBridge 的计算请求依次经过传输校验、共享执行层、领域服
 ```mermaid
 flowchart TD
     Catalog["services/tool_catalog.py<br/>CATALOG / ToolSpec"] --> Registrar["transports/rest.py<br/>register_rest"]
-    Catalog --> CLI["cli.py<br/>目录命令 + profile"]
+    Catalog --> CLI["cli.py<br/>list / discover / doctor + 目录命令"]
     Registrar --> REST["api.py / FastAPI"]
-    Catalog --> MCP["mcp_server.py / FastMCP"]
+    Catalog --> MCP["mcp_server.py / FastMCP<br/>discover_tools + run_calculation"]
     REST --> Execution["application/execution.py<br/>共享执行、输出校验、receipt"]
     MCP --> Execution
     CLI --> Execution
     Execution --> Bind["application/bindings.py<br/>ToolSpec.bind 绑定已校验请求"]
     Bind --> Services["services/*<br/>领域编排与响应构造"]
     Services --> Analysis["analysis/*<br/>专项与复合分析"]
-    Services --> Core["core/*<br/>领域计算与导出合同"]
+    Services --> Core["core/*<br/>领域计算与输出契约"]
     Services --> Utils["utils/*<br/>输入归一化、地点、时区、错误"]
     Core --> Ephe["ephemeris_runtime.py<br/>Swiss Ephemeris 路径与共享锁"]
     Core --> Data["data/*<br/>知识及规则 JSON"]
@@ -27,20 +27,20 @@ flowchart TD
 
 `services/catalog/` 按领域声明 `ToolSpec`，`services/tool_catalog.py` 将其有序装配为唯一的中央目录 `CATALOG`；请求模型位于 `core/requests/`，响应根模型与嵌套契约位于 `core/response_models.py` 及 `core/contracts/`。
 
-目录共有 93 条记录。OpenAPI 发布 93 个业务 REST 路由，FastAPI 另提供 `/api/tools`、`/health`、`/ready` 与 `/metrics`。MCP 通过四个入口提供 93 项业务能力。CLI 可执行 93 条目录命令，并提供 `list`、`discover`、`describe`、`profile`、`doctor` 与 `result-read`。各端入口映射见[三端能力边界](api-reference.md#24-三端能力边界)。
+目录共有 91 条记录。OpenAPI 发布 91 个业务 REST 路由，FastAPI 另提供 `/api/tools`、`/health`、`/ready` 与 `/metrics`。MCP 通过两个入口提供 91 项业务能力。CLI 可执行 91 条目录命令，并提供 `list`、`discover` 与 `doctor`。各端入口映射见[三端能力边界](api-reference.md#22-三端能力边界)。
 
 ## 分层职责
 
 | 层 | 主要路径 | 职责 |
 | --- | --- | --- |
 | 工具声明 | `services/catalog/`、`services/tool_catalog.py`、`application/domain_plugin.py`、`application/tool_spec.py` | 领域插件装配与协议无关的工具描述 |
-| 应用编排 | `application/bindings.py`、`execution.py`、`response_delivery.py`、`result_delivery.py` | 请求绑定、统一执行、输出校验、字段投影与超预算交付 |
+| 应用编排 | `application/bindings.py`、`execution.py`、`projection.py`、`response_delivery.py` | 请求绑定、统一执行、输出校验、分级视图与严格字段投影 |
 | 能力发现 | `application/description.py`、`discovery.py` | 三端共用的工具摘要与 Schema 筛选 |
-| 协议传输 | `transports/rest.py`、`api.py`、`mcp_server.py`、`cli.py` | REST 路由注册、FastMCP 协议工具与 CLI 参数生成 |
+| 协议传输 | `transports/rest.py`、`transports/flags.py`、`api.py`、`mcp_server.py`、`cli.py` | REST 路由注册、FastMCP 两工具协议与 CLI 参数生成 |
 | 请求与响应模型 | `core/requests/`、`core/response_models.py`、`core/contracts/` | Pydantic 输入校验、输出根契约与 `PartialOutput` 嵌套模型 |
-| 服务与分析 | `services/*.py`、`analysis/*.py` | 领域编排、时运复合分析、快照构造与 `run_metadata` |
+| 服务与分析 | `services/*.py`、`analysis/*.py` | 领域编排、时运复合分析与 `run_metadata` |
 | 核心计算与数据 | `core/*.py`、`core/metaphysics/`、`core/predictive/`、`core/fengshui/`、`data/*` | 各体系算法实现、知识条目、规则表与内置数据 |
-| 公共基础与导出 | `utils/*`、`core/ephemeris_runtime.py`、`core/export_contracts.py`、`core/export_parser.py` | 出生时间/地点/时区、星历共享锁、统一错误与快照导出解析 |
+| 公共基础 | `utils/*`、`core/ephemeris_runtime.py`、`core/execution_context.py` | 出生时间/地点/时区、星历共享锁、调用时钟与统一错误 |
 | 测试与工具 | `tests/`、`scripts/` | 领域回归、三端契约检查与文档/合同生成校验 |
 
 ## 典型请求流
@@ -57,25 +57,25 @@ sequenceDiagram
     participant S as services/bazi.py
     C->>R: POST /api/bazi/birth-chart
     R->>R: 鉴权与请求模型校验
-    R->>E: 线程池执行 execute_tool
+    R->>E: 线程池执行 execute_with_receipt
     E->>E: 固定默认时钟与调用上下文
     E->>B: 绑定已校验的请求
     B-->>E: service 与参数
     E->>S: calculate_bazi_birth
     S->>S: 归一化出生时间与领域计算
-    S-->>E: 业务结果与快照
+    S-->>E: 结构化业务结果
     E->>E: 输出校验与 run_metadata
     E-->>R: 完整结果
-    R->>D: 字段投影、快照选项与响应预算
+    R->>D: detail 分级与严格 fields 投影
     D-->>R: 交付响应
     R-->>C: JSON 响应
 ```
 
-所有传输层均通过 `application/execution.py` 调用领域服务，重计算由 `application/compute_limits.py` 按 `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` 进行进程内信号量限流。请求成功返回后，共享交付管线依次执行：业务输出合同校验 -> 附加 `run_metadata` -> 字段投影（`fields` / `strict_fields`）-> 顶层 `snapshot_text` 开关 -> 响应字符预算与 `result_delivery` 分页存储。
+所有传输层均通过 `application/execution.py` 调用领域服务，重计算由 `application/compute_limits.py` 按 `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` 进行进程内信号量限流。请求成功返回后，共享交付管线依次执行：业务输出合同校验 -> 附加 `run_metadata` -> 若传入 `fields` 则按点号路径严格投影（`projection.py`，无效路径报错并附可用字段），否则在 `detail=compact`（默认）时裁剪为核心业务字段与精简 `run_metadata`，`detail=audit` 返回完整业务载荷与方法依据。
 
-### 合同缓存与大结果交付
+### 合同缓存
 
-`core/schema_cache.py` 按模型类与必需根声明缓存公开 JSON Schema（每类最多 256 条），动态重建模型后可通过 `clear_contract_caches()` 清理缓存。超预算响应由 `application/result_delivery.py` 写入用户隔离的私有临时目录（POSIX 使用仅所有者权限与 `flock`，Windows 使用用户 SID、私有 ACL 与原生锁），通过 `result_id` 与原 `run_id` 提供同一次运行的分页、点路径与完整性校验读取。
+`core/schema_cache.py` 按模型类与必需根声明缓存公开 JSON Schema（每类最多 256 条），动态重建模型后可通过 `clear_contract_caches()` 清理缓存。服务本身不持久化历史运行或分页结果存储。
 
 ## 关键实现约束
 

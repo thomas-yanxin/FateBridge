@@ -42,7 +42,7 @@ FateBridge 提供八个离线风水计算工具，覆盖公共方位、个人命
 curl -X POST http://localhost:8010/api/fengshui/assess -H 'Content-Type: application/json' --data-binary @home.json
 
 # CLI（嵌套请求使用 --request-file，显式参数可覆盖文件顶层字段）
-uv run --locked --extra dev fatebridge fengshui_assess --request-file home.json --compact
+uv run --locked --extra dev fatebridge fengshui_assess --request-file home.json --detail compact
 uv run --locked --extra dev fatebridge fengshui_minggua --effective-birth-year 1990 --gender-convention female
 uv run --locked --extra dev fatebridge fengshui_annual_stars --query-at '2026-02-04T04:03:00+08:00'
 ```
