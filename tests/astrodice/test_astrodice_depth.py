@@ -102,7 +102,6 @@ def test_optional_sky_preserves_canonical_fortune_and_house_assignments(
         hsys=hsys,
         zodiacal=zodiacal,
         allow_extended_hsys=True,
-        include_su28=False,
         preserve_context_geometry=True,
     )
     points = {p["id"]: p for p in local["chart"]["objects"]}
@@ -141,7 +140,6 @@ def test_preformatted_cusp_values_do_not_reassign_a_core_house() -> None:
     points = _adapt_chart_objects(
         source,
         tradition=False,
-        include_su28=False,
         geometry=HouseGeometry.equal(0),
         preserve_core_houses=True,
     )

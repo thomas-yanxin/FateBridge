@@ -1,5 +1,3 @@
-from fractions import Fraction
-
 import pytest
 
 from fatebridge.core.ephemeris_runtime import swe
@@ -533,16 +531,8 @@ def test_suzhan_uses_shared_local_chart_runtime(surface_calls) -> None:
         suzhan_sun["su28_degree"]
         == (source["right_ascension"] - boundary["right_ascension"]) % 360
     )
-    # Independent equal-band definition on the unrounded source longitude.
-    # The four-decimal displayed longitude is not the calculation input.
-    longitude = Fraction(source["longitude"]) % 360
-    sector = int(longitude * 28 / 360)
-    assert local_sun["su28_degree"] == float(longitude - sector * Fraction(360, 28))
     assert local_sun["lon"] == source["longitude"]
-    # This original failing clock is a counterexample to equating RA
-    # mansion degrees with the legacy equal-ecliptic-band coordinates.
-    assert suzhan_sun["su28"] != local_sun["su28"]
-    assert suzhan_sun["su28_degree"] != local_sun["su28_degree"]
+    assert "su28" not in local_sun
     assert local_chart["params"]["enginePrecision"] == expected_precision
     assert local_chart["params"]["engineBackend"] == expected_backend
 

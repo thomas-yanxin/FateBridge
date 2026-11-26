@@ -317,7 +317,6 @@ def build_suzhan_result(
         gps_lat=gps_lat,
         gps_lon=gps_lon,
         tradition=False,
-        include_su28=False,
         chart_variant=chart_variant,
         house_start_mode=normalized_house_start_mode,
         shape_mode=normalized_szshape,

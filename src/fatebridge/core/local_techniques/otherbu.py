@@ -197,7 +197,6 @@ def build_otherbu_result(
             gps_lat=gps_lat,
             gps_lon=gps_lon,
             tradition=tradition,
-            include_su28=False,
             hsys=hsys,
             zodiacal=zodiacal,
             allow_extended_hsys=True,
