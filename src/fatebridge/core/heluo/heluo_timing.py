@@ -14,10 +14,11 @@ from typing import Any
 from fatebridge.core.heluo.heluo import _flip_line, _ying, da_yun
 from fatebridge.core.heluo.heluo_clock import source_clock_evidence
 from fatebridge.core.heluo.heluo_hexagrams import GAN, ZHI, lines_to_gua
-from fatebridge.core.heluo.heluo_snapshot import yao_name, yao_text
 from fatebridge.core.heluo.heluo_texts import (
     text_reading_notes_snapshot,
     text_status_snapshot,
+    yao_name,
+    yao_text,
 )
 from fatebridge.core.zhouyi import classical_hexagram
 

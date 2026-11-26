@@ -26,7 +26,6 @@ from fatebridge.core.liuyao.liuyao_najia import (
     build_sixyao_enrichment,
 )
 from fatebridge.core.liuyao.liuyao_patterns import detect_sixyao_patterns
-from fatebridge.core.liuyao.liuyao_snapshot import build_sixyao_snapshot_text
 from fatebridge.core.local_techniques.chart import (
     _normalize_date_text,
     _normalize_time_text,
@@ -110,7 +109,6 @@ def build_sixyao_result(
     focus_kind: str | None = None,
     timing_days: int = 0,
     event_horizon: str | None = None,
-    render_snapshot: bool = True,
 ) -> dict[str, Any]:
     if event_horizon not in (None, "near", "long_term"):
         raise ValueError("event_horizon 必须是 near、long_term 或省略。")
@@ -425,20 +423,5 @@ def build_sixyao_result(
         "descriptions": descriptions,
         "current_hexagram": current_payload["raw"],
         "changed_hexagram": changed_payload["raw"],
-        **(
-            {
-                "snapshot_text": build_sixyao_snapshot_text(
-                    input_normalized=input_normalized,
-                    nongli=context["nongli"],
-                    current_payload=current_payload,
-                    changed_payload=changed_payload,
-                    lines=normalized_lines,
-                    evidence=evidence,
-                    text_evidence=text_evidence,
-                )
-            }
-            if render_snapshot
-            else {}
-        ),
         "summary": f"本卦{current_payload['name']}（{current_code}），之卦{changed_payload['name']}（{changed_hexagram_binary_code}），动爻{moving_lines or '无'}。已装世应、六亲、六神并列日月关系与原典动爻；尚未据用神旺衰断现实成败。",
     }

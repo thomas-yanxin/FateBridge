@@ -4,21 +4,21 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from fatebridge.application.bindings import lazy_service, resolve_service
+from fatebridge.application.bindings import resolve_service, service_ref
 from fatebridge.application.tool_spec import BoundServiceCall, ServiceInput
-from fatebridge.core.requests.astrology import AstroChartPolyRequest
+from fatebridge.core.requests.astrology import AstroNatalChartRequest
 
-calculate_core_chart_analysis = lazy_service(
+calculate_core_chart_analysis = service_ref(
     "fatebridge.services.astrology", "calculate_core_chart_analysis"
 )
 
 
-calculate_germany_chart_analysis = lazy_service(
+calculate_germany_chart_analysis = service_ref(
     "fatebridge.services.astrology", "calculate_germany_chart_analysis"
 )
 
 
-calculate_relative_chart_analysis = lazy_service(
+calculate_relative_chart_analysis = service_ref(
     "fatebridge.services.astrology", "calculate_relative_chart_analysis"
 )
 
@@ -26,33 +26,13 @@ calculate_relative_chart_analysis = lazy_service(
 def _astro_chart_bind(
     req: BaseModel,
 ) -> BoundServiceCall:
-    assert isinstance(req, AstroChartPolyRequest)
+    assert isinstance(req, AstroNatalChartRequest)
     data = req.service_inputs()
-    variant = data.pop("chart_variant", "chart")
-    apparent_model = data.pop("apparent_model", "native")
-    if variant == "chart":
-        data["apparent_model"] = apparent_model
-    if variant == "germany":
-        for key in (
-            "guolao_month_basis",
-            "guolao_seasonal_anchor_policy",
-            "node_mode",
-            "divisions",
-            "saptavargaja_profile",
-            "drekkana_profile",
-            "cheshta_model",
-            "birth_microsecond",
-        ):
-            data.pop(key, None)
-        return BoundServiceCall(
-            resolve_service(calculate_germany_chart_analysis), (), data
-        )
-    else:
-        return BoundServiceCall(
-            resolve_service(calculate_core_chart_analysis),
-            (),
-            {**data, "chart_variant": variant},
-        )
+    return BoundServiceCall(
+        resolve_service(calculate_core_chart_analysis),
+        (),
+        {**data, "chart_variant": "chart"},
+    )
 
 
 def _astro_relative_flat_bind(

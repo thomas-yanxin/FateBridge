@@ -4,13 +4,10 @@ from pydantic import JsonValue
 
 from fatebridge.application.tool_spec import DetailLevel, ServiceResult
 
-STANDARD_FIELDS = {
+COMPACT_FIELDS = {
     ("", "solar_model_details"),
     ("structure_profile", "evidence_chain"),
     ("day_master", "assessment"),
-}
-COMPACT_FIELDS = {
-    ("", "snapshot_export"),
     ("", "analysis_calendar_context"),
     ("", "calendar_context"),
     ("structure_profile", "candidate_selection"),
@@ -25,9 +22,7 @@ def traditional_detail_view(
     *,
     keep_lunar_meihua: bool = False,
 ) -> ServiceResult:
-    omitted = set(STANDARD_FIELDS)
-    if detail == "compact":
-        omitted.update(COMPACT_FIELDS)
+    omitted = set(COMPACT_FIELDS) if detail == "compact" else set()
     if not keep_lunar_meihua:
         omitted.add(("lunar_calendar", "meihua"))
 

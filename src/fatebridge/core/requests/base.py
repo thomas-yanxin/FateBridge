@@ -7,6 +7,7 @@ from datetime import datetime
 from pydantic import (
     BaseModel,
     ConfigDict,
+    Field,
     ValidationError,
     field_validator,
     model_validator,
@@ -154,3 +155,26 @@ class AstroHouseValidatorMixin:
                 "invalid_house_code", INVALID_HOUSE_CODE_MESSAGE
             ) from None
         return value
+
+
+class AnalysisDateFields(BaseModel):
+    """Shared optional analysis calendar date fields (year, month, day)."""
+
+    analysis_year: int | None = Field(default=None, description="Analysis year")
+    analysis_month: int | None = Field(
+        default=None, ge=1, le=12, description="Analysis month (1-12)"
+    )
+    analysis_day: int | None = Field(
+        default=None, ge=1, le=31, description="Analysis day (1-31)"
+    )
+
+
+class OptionalAnalysisClockFields(AnalysisDateFields):
+    """Shared optional analysis clock fields (year, month, day, hour, minute)."""
+
+    analysis_hour: int | None = Field(
+        default=None, ge=0, le=23, description="Analysis hour (0-23)"
+    )
+    analysis_minute: int | None = Field(
+        default=None, ge=0, le=59, description="Analysis minute (0-59)"
+    )

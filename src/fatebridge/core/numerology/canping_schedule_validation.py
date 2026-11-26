@@ -13,7 +13,6 @@ from fatebridge.core.numerology.canping_schedule_basis import (
     APPLIED,
     LEGACY,
     build_schedule_basis,
-    schedule_basis_snapshot,
 )
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import NumerologySourceError
@@ -306,14 +305,6 @@ def require_schedule_binding(
             expected = build_schedule_basis(profile, timing, clock)
             if not _registered_facts_match(basis, expected):
                 raise ValueError("配运回执与同次实际政策或钟面不符。")
-        snapshot = result.get("snapshot_text")
-        if snapshot is not None:
-            marker = "[配运原典与日期映射]"
-            if not isinstance(snapshot, str) or snapshot.count(marker) != 1:
-                raise ValueError("配运释文段缺失或重复。")
-            section = snapshot[snapshot.index(marker) :].split("\n\n[", 1)[0]
-            if section.strip() != schedule_basis_snapshot(basis).strip():
-                raise ValueError("配运释文与同次回执不符。")
     except (KeyError, TypeError, ValueError, ValidationError) as exc:
         raise NumerologySourceError(
             "runtime_canping_schedule_binding_conflict"

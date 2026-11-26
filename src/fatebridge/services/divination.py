@@ -71,94 +71,9 @@ from fatebridge.core.sukuyo.sukuyo_historical_calendar import (
 from fatebridge.core.sukuyo.sukuyo_padas import palace_reference
 from fatebridge.core.sukuyo.sukuyo_relations import relation_between_su27
 from fatebridge.core.zhouyi import classical_hexagram
-from fatebridge.services.snapshot_builders import (
-    build_snapshot_export as _build_snapshot_export,
-)
-from fatebridge.services.snapshot_builders import (
-    render_snapshot_lines as _render_snapshot_text,
-)
-from fatebridge.services.structured_snapshot import render_structured_snapshot_text
 from fatebridge.utils.errors import ParameterError, calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
-
-
-def _build_gua_lookup_snapshot_text(
-    *,
-    query: str,
-    lookup_mode: str,
-    result: dict[str, Any],
-) -> str:
-    query_lines = [
-        f"查询：{query}",
-        f"模式：{lookup_mode}",
-        f"命中类型：{result.get('lookup_type', '未知')}",
-        f"命中卦名：{result.get('name', '未知')}",
-        f"匹配文本：{result.get('matched_query', query)}",
-        f"卦码：{result.get('code') or result.get('binary_code') or '无'}",
-    ]
-    upper = result.get("upper") or {}
-    lower = result.get("lower") or {}
-    structure_lines = [
-        f"符号：{result.get('symbol', '无')}",
-        f"卦爻：{''.join(str(item) for item in result.get('lines', []) or []) or '无'}",
-    ]
-    if upper:
-        structure_lines.append(
-            f"上卦：{upper.get('name', '无')} / {upper.get('nature', '无')} / "
-            f"{upper.get('element', '无')}"
-        )
-    if lower:
-        structure_lines.append(
-            f"下卦：{lower.get('name', '无')} / {lower.get('nature', '无')} / "
-            f"{lower.get('element', '无')}"
-        )
-
-    sections = [("查询信息", query_lines), ("卦象结构", structure_lines)]
-    classical = result.get("classical")
-    if classical:
-        sections.extend(
-            [
-                (
-                    "经文",
-                    [
-                        f"《周易》卦辞：{classical['guaci']}",
-                        f"《象传》大象：{classical['daxiang']}",
-                        *[
-                            f"{line['label']}：{line['text']}"
-                            for line in classical["yaoci"]
-                        ],
-                    ],
-                ),
-                ("来源", [classical["edition_status"]]),
-            ]
-        )
-    return _render_snapshot_text(sections)
-
-
-def _build_gua_meiyi_snapshot_text(
-    *,
-    queries: list[str],
-    results: dict[str, dict[str, Any]],
-    summary: str,
-) -> str:
-    overview_lines = [
-        f"查询数量：{len(queries)}",
-        f"原始请求：{'、'.join(queries) or '无'}",
-        f"摘要：{summary}",
-    ]
-    result_lines: list[str] = []
-    for query in queries:
-        item = results[query]
-        result_lines.append(f"{query} -> {item['name']}（{item['code']}）")
-        if classical := item.get("classical"):
-            result_lines.append(f"《周易》卦辞：{classical['guaci']}")
-    return _render_snapshot_text(
-        [
-            ("查询概览", overview_lines),
-            ("批量结果", result_lines),
-        ]
-    )
 
 
 @calculation_guard("梅花时卦分析")
@@ -501,30 +416,17 @@ def calculate_gua_lookup(
     *,
     query: str,
     lookup_mode: str = "auto",
-    selected_sections: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     卦义检索工具 - 支持六十四卦与八卦的离线义理查询。
     """
     result = lookup_gua(query, lookup_mode=lookup_mode)
-    snapshot_text = _build_gua_lookup_snapshot_text(
-        query=query,
-        lookup_mode=lookup_mode,
-        result=result,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="gua_lookup",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
     return {
         "analysis_type": "卦义检索",
         "query": query,
         "lookup_mode": lookup_mode,
         "result": result,
         "summary": f"{result['name']}（{result['code']}）",
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
 
 
@@ -532,7 +434,6 @@ def calculate_gua_lookup(
 def calculate_gua_meiyi(
     *,
     name: list[str],
-    selected_sections: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     梅易卦义辅助工具 - 批量返回偏梅花易数语境的卦义说明。
@@ -545,24 +446,12 @@ def calculate_gua_meiyi(
     ordered_names = [results[query]["name"] for query in queries]
 
     summary = f"共查询{len(queries)}项梅易卦义：{'、'.join(ordered_names)}。"
-    snapshot_text = _build_gua_meiyi_snapshot_text(
-        queries=queries,
-        results=results,
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="gua_meiyi",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
 
     return {
         "analysis_type": "梅易卦义",
         "queries": queries,
         "results": results,
         "summary": summary,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
 
 
@@ -679,7 +568,6 @@ def calculate_sixyao_analysis(
     focus_kind: str | None = None,
     timing_days: int = 0,
     event_horizon: str | None = None,
-    render_snapshot: bool = True,
 ) -> dict[str, Any]:
     """六爻 / 易卦分析工具。"""
     return build_sixyao_result(
@@ -702,7 +590,6 @@ def calculate_sixyao_analysis(
         focus_kind=focus_kind,
         timing_days=timing_days,
         event_horizon=event_horizon,
-        render_snapshot=render_snapshot,
     )
 
 
@@ -889,13 +776,6 @@ def calculate_sukuyo_compatibility(
         )
     if calendar_basis != "chinese_hko_utc08":
         result["calendar_basis"] = calendar_basis
-    snapshot_text = render_structured_snapshot_text(
-        result, title="宿曜双人相性 / T1299三九法"
-    )
-    result["snapshot_text"] = snapshot_text
-    result["snapshot_export"] = _build_snapshot_export(
-        technique="generic", snapshot_text=snapshot_text
-    )
     return result
 
 
@@ -953,11 +833,10 @@ def calculate_sanshiunited_analysis(
     liureng_yue: str | None = None,
     liureng_is_diurnal: bool | None = None,
     liureng_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
-    selected_sections: list[str] | None = None,
     use_true_solar_time: bool = True,
 ) -> dict[str, Any]:
     """三式合一本地聚合工具。"""
-    result = build_sanshiunited_result(
+    return build_sanshiunited_result(
         date=date,
         time=time,
         zone=zone,
@@ -972,11 +851,3 @@ def calculate_sanshiunited_analysis(
         liureng_guiren_profile=liureng_guiren_profile,
         use_true_solar_time=use_true_solar_time,
     )
-    snapshot_text = result.get("snapshot_text")
-    if isinstance(snapshot_text, str) and snapshot_text.strip():
-        result["snapshot_export"] = _build_snapshot_export(
-            technique="sanshiunited",
-            snapshot_text=snapshot_text,
-            selected_sections=selected_sections,
-        )
-    return result

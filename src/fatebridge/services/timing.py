@@ -10,9 +10,6 @@ from fatebridge.core.almanac import (
     get_jieqi_year_grid,
 )
 from fatebridge.services.birth_context import build_birth_computation_context
-from fatebridge.services.snapshot_builders import (
-    build_snapshot_export as _build_snapshot_export,
-)
 from fatebridge.services.timing_clock import (
     AnalysisClockReference,
     age_only_reference,
@@ -23,13 +20,6 @@ from fatebridge.services.timing_periods import (
     calculate_liuri_analysis,
     calculate_liushi_analysis,
     calculate_liuyue_analysis,
-)
-from fatebridge.services.timing_snapshots import (
-    _build_comprehensive_timing_snapshot_text,
-    _build_dayun_snapshot_text,
-    _build_jieqi_timeline_snapshot_text,
-    with_analysis_reference,
-    with_birth_clock_reference,
 )
 from fatebridge.services.timing_state import (
     build_current_timing_state,
@@ -63,7 +53,6 @@ def calculate_comprehensive_timing(
     analysis_day: int | None = None,
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
-    selected_sections: list[str] | None = None,
     birth_time_uncertainty_minutes: int | None = None,
 ) -> dict[str, Any]:
     """
@@ -221,29 +210,6 @@ def calculate_comprehensive_timing(
         )
 
     result["comprehensive_summary"] = timing_result["comprehensive_summary"]
-    result["snapshot_text"] = _build_comprehensive_timing_snapshot_text(
-        person_name=person.name,
-        birth_datetime=input_birth_datetime,
-        normalized_birth_datetime=birth_date,
-        timezone_name=normalized_birth_time.timezone,
-        analysis_date=analysis_date,
-        current_age=current_age,
-        analysis_calendar_context=analysis_calendar_context,
-        dayun_info=result["dayun_analysis"],
-        liunian_info=result["liunian_analysis"],
-        liuyue_info=result["liuyue_analysis"],
-        liuri_info=result["liuri_analysis"],
-        liushi_info=result["liushi_analysis"],
-        combined_effects=result["combined_effects"],
-        summary=result["comprehensive_summary"],
-        birth_time_sensitivity=result.get("birth_time_sensitivity"),
-        interaction_analysis=result["interaction_analysis"],
-    )
-    result["snapshot_export"] = _build_snapshot_export(
-        technique="timing_analysis",
-        snapshot_text=result["snapshot_text"],
-        selected_sections=selected_sections,
-    )
 
     # Keep every current-period fact/status. The starter view omits only the
     # complete twelve-period table; full JSON retains its original timeline.
@@ -253,19 +219,14 @@ def calculate_comprehensive_timing(
     if isinstance(timeline, dict):
         timeline.pop("periods", None)
     result["dayun_analysis"]["first_view"] = first_view
-    return with_analysis_reference(
-        result,
-        resolution.reference,
-        technique="timing_analysis",
-        selected_sections=selected_sections,
-    )
+    result["analysis_reference"] = resolution.reference
+    return result
 
 
 @calculation_guard("大运分析计算")
 def calculate_dayun_analysis(
     person: PersonInfo,
     analysis_age: int | None = None,
-    selected_sections: list[str] | None = None,
     analysis_year: int | None = None,
     analysis_month: int | None = None,
     analysis_day: int | None = None,
@@ -380,37 +341,14 @@ def calculate_dayun_analysis(
             analysis_age=analysis_age if analysis_moment is None else None,
         )
 
-    snapshot_text = _build_dayun_snapshot_text(
-        person_name=person.name,
-        birth_datetime=normalized_birth_time.input_datetime,
-        normalized_birth_datetime=birth_date,
-        timezone_name=normalized_birth_time.timezone,
-        analysis_age=analysis_age,
-        dayun_info=result["dayun_info"],
-        element_effects=result.get("element_effects", {}),
-        summary=result["summary"],
-        birth_time_sensitivity=result.get("birth_time_sensitivity"),
-    )
-    result["snapshot_text"] = snapshot_text
-    result["snapshot_export"] = _build_snapshot_export(
-        technique="dayun_analysis",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
-
-    return with_analysis_reference(
-        result,
-        analysis_reference,
-        technique="dayun_analysis",
-        selected_sections=selected_sections,
-    )
+    result["analysis_reference"] = analysis_reference
+    return result
 
 
 @calculation_guard("节气时间轴分析计算")
 def calculate_jieqi_timeline_analysis(
     person: PersonInfo,
-    target_year: int | None = None,
-    selected_sections: list[str] | None = None,
+    analysis_year: int | None = None,
 ) -> dict[str, Any]:
     """
     节气节点时间轴分析 - 输出全年 24 节气节点的流月/流日切换信息
@@ -419,8 +357,11 @@ def calculate_jieqi_timeline_analysis(
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
 
-    if target_year is None:
-        target_year = current_local_datetime(normalized_birth_time.timezone).year
+    target_year = (
+        analysis_year
+        if analysis_year is not None
+        else current_local_datetime(normalized_birth_time.timezone).year
+    )
 
     jieqi_timeline = enrich_jieqi_timeline(
         birth_context,
@@ -438,23 +379,8 @@ def calculate_jieqi_timeline_analysis(
             f"{target_year}年共生成{len(jieqi_timeline)}个节气节点，"
             f"其中{unavailable}个区间没有可重放的当地整分。"
         )
-    snapshot_text = _build_jieqi_timeline_snapshot_text(
-        person_name=person.name,
-        birth_datetime=normalized_birth_time.input_datetime,
-        normalized_birth_datetime=birth_date,
-        timezone_name=normalized_birth_time.timezone,
-        target_year=target_year,
-        target_year_jieqi=target_year_jieqi,
-        jieqi_timeline=jieqi_timeline,
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="jieqi_timeline_analysis",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
 
-    result = {
+    return {
         "analysis_type": "节气节点时间轴分析",
         "personal_info": {
             "name": person.name,
@@ -472,9 +398,4 @@ def calculate_jieqi_timeline_analysis(
         "target_year_jieqi": target_year_jieqi,
         "jieqi_timeline": jieqi_timeline,
         "summary": summary,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
-    return with_birth_clock_reference(
-        result, technique="jieqi_timeline_analysis", selected_sections=selected_sections
-    )

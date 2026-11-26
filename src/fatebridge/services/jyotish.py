@@ -19,7 +19,6 @@ from fatebridge.core.jyotish.jyotish_dasha_levels import (
 )
 from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
 from fatebridge.core.jyotish.jyotish_sources import coherent_sources
-from fatebridge.services.structured_snapshot import render_structured_snapshot_text
 from fatebridge.utils.errors import ParameterError, calculation_guard
 from fatebridge.utils.timezones import (
     is_unspecified_local_time,
@@ -269,7 +268,4 @@ def calculate_vimshottari(
             f"按名义生时，目标时刻运主链为{chain}；按{year_basis}递归细分，"
             "给定生时误差另见完整运主链候选；细分边界不代表现实事件精度。"
         )
-    output["snapshot_text"] = render_structured_snapshot_text(
-        output, title="印占 Vimshottari 分期"
-    )
     return output

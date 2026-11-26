@@ -9,33 +9,24 @@ from typing import Any
 from fatebridge.core.heluo.heluo import calculate as _heluo_calculate
 from fatebridge.core.heluo.heluo import da_yun as _heluo_da_yun
 from fatebridge.core.heluo.heluo import judge as _heluo_judge
-from fatebridge.core.heluo.heluo_clock import (
-    attach_clock_evidence,
-    source_clock_snapshot,
-)
+from fatebridge.core.heluo.heluo_clock import attach_clock_evidence
 from fatebridge.core.heluo.heluo_jiehou import (
     attach_jiehou_evidence,
     jiehou_evidence,
-    jiehou_snapshot,
 )
 from fatebridge.core.heluo.heluo_months import (
     DEFAULT_MONTH_ASSIGNMENT,
     MonthAssignmentMethod,
 )
-from fatebridge.core.heluo.heluo_snapshot import (
-    build_snapshot_text as _heluo_snapshot_text,
-)
 from fatebridge.core.heluo.heluo_solar_context import (
     attach_solar_context,
     bind_seasonal_context,
     bind_solar_context,
-    solar_context_snapshot,
 )
 from fatebridge.core.heluo.heluo_solar_context import solar_term as _heluo_solar_term
 from fatebridge.core.heluo.heluo_timing import (
     HeluoYearContextError,
     build_heluo_timing,
-    selected_timing_snapshot,
 )
 from fatebridge.core.local_techniques.chart import (
     _build_metaphysics_analysis_context,
@@ -46,7 +37,6 @@ from fatebridge.core.numerology.numerology_clock_policy import parse_birth_clock
 from fatebridge.core.numerology.numerology_evidence import heluo_evidence
 from fatebridge.core.numerology.numerology_inputs import (
     attach_birth_clock,
-    birth_clock_snapshot,
     normalize_numerology_utc_offset,
     numerology_birth_clock,
     numerology_seed_time,
@@ -55,7 +45,6 @@ from fatebridge.core.numerology.numerology_inputs import (
 )
 from fatebridge.core.numerology.numerology_pillars import (
     attach_pillar_links,
-    pillar_link_snapshot,
     verified_computed_pillars,
 )
 from fatebridge.utils.birth_input import normalize_gender
@@ -179,10 +168,6 @@ def build_heluo_result(
         birth_datetime=seed.input_datetime,
     )
     bind_seasonal_context(st, judgment["seasonal_numbers"])
-    snapshot_text = _heluo_snapshot_text(chart, judgment, dayun)
-    timing_text = selected_timing_snapshot(timing)
-    if timing_text:
-        snapshot_text += "\n\n" + timing_text
     analysis_context = _build_metaphysics_analysis_context(seed)
     analysis_context["longitude"] = longitude
     clock = numerology_birth_clock(
@@ -192,18 +177,13 @@ def build_heluo_result(
         birth_utc_offset=confirmed_offset,
         input_clock=birth_clock,
     )
-    snapshot_text += "\n\n" + birth_clock_snapshot(clock)
     evidence = heluo_evidence(chart, judgment, st, four_pillars)
     attach_solar_context(evidence, st)
-    snapshot_text += "\n\n" + solar_context_snapshot(st["boundary_context"])
     attach_birth_clock(evidence, clock)
     attach_pillar_links(evidence, pillar_links)
-    snapshot_text += "\n\n" + pillar_link_snapshot(pillar_links)
     attach_clock_evidence(evidence, timing["source_clock"], timing["year_context"])
-    snapshot_text += "\n\n" + source_clock_snapshot(timing["source_clock"])
     jiehou = jiehou_evidence(st)
     attach_jiehou_evidence(evidence, jiehou)
-    snapshot_text += "\n\n" + jiehou_snapshot(jiehou)
 
     return {
         "analysis_type": "河洛理数",
@@ -218,7 +198,6 @@ def build_heluo_result(
         "judge": judgment,
         "solar_term": st,
         "numerology_evidence": evidence,
-        "snapshot_text": snapshot_text,
         "summary": (
             f"已生成河洛理数输出。先天卦：{chart['xian']['name']}，"
             f"后天卦：{chart['hou']['name']}。综合葉否尚未完成原典验收。"

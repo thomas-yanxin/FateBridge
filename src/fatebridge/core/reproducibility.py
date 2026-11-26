@@ -7,11 +7,11 @@ from pydantic import BaseModel
 
 BAZI_ANALYSIS_CLOCK_TOOLS = frozenset(
     {
-        "timing_analysis",
-        "dayun_analysis",
-        "liuyue_analysis",
-        "liuri_analysis",
-        "liushi_analysis",
+        "bazi_timing",
+        "bazi_luck_cycles",
+        "bazi_monthly_timing",
+        "bazi_daily_timing",
+        "bazi_hourly_timing",
     }
 )
 
@@ -51,50 +51,51 @@ class ReproducibilityPolicy:
             "random_seed_field": self.random_seed_field or None,
             "requires_seed_for_replay": bool(self.random_seed_field),
             "seed_condition": self.seed_condition,
-            "replay_controls": ["as_of", "trace_id", "parent_run_id"],
+            "replay_controls": ["as_of"],
             "scope": "business_payload; excludes run_metadata and output shaping",
             "environment_sensitive": True,
         }
 
 
-def policy_for(key: str, model: type[BaseModel]) -> ReproducibilityPolicy:
+def policy_for(name: str, model: type[BaseModel]) -> ReproducibilityPolicy:
     """Default policies for the current catalog, overridable on new ToolSpecs."""
     fields = model.model_fields
     clock_fields: tuple[str, ...] = ()
     date_fields = ("analysis_year", "analysis_month", "analysis_day")
-    if key in BAZI_ANALYSIS_CLOCK_TOOLS:
+    if name in BAZI_ANALYSIS_CLOCK_TOOLS:
         clock_fields = (*date_fields, "analysis_hour", "analysis_minute")
-    elif (
-        key.startswith("bazi_")
-        or key.startswith("astro_")
-        or key
-        in {
-            "western_timing_analysis",
-            "solarreturn",
-            "lunarreturn",
-            "transit",
-            "solararc",
-            "givenyear",
-            "profection",
-            "pd",
-            "pdchart",
-            "zr",
-            "firdaria",
-            "decennials",
-        }
-    ):
+    elif name.startswith("bazi_") or name in {
+        "vimshottari_dasha",
+        "planetary_returns",
+        "planetary_ages",
+        "planetary_arc_directions",
+        "sidereal_progressions",
+        "declination_progressions",
+        "western_timing",
+        "solar_return",
+        "lunar_return",
+        "transit_chart",
+        "solar_arc",
+        "chart_for_year",
+        "profection",
+        "primary_directions",
+        "primary_directions_chart",
+        "zodiacal_releasing",
+        "firdaria",
+        "decennials",
+    }:
         clock_fields = tuple(
             f for f in date_fields if f in fields and not fields[f].is_required()
         )
-    elif key == "jieqi_timeline_analysis":
-        clock_fields = ("target_year",)
+    elif name == "solar_term_timeline":
+        clock_fields = ("analysis_year",)
     return ReproducibilityPolicy(
         current_time_fields=clock_fields,
-        implicit_current_time=key == "analyze_destiny",
-        random_seed_field="seed" if key == "sixyao" else "",
+        implicit_current_time=name == "bazi_overview",
+        random_seed_field="seed" if name == "liuyao" else "",
         seed_condition=(
             "method=coin without coins/lines/binary hexagram codes"
-            if key == "sixyao"
+            if name == "liuyao"
             else None
         ),
     )

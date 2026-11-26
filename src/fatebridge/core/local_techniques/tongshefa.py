@@ -6,7 +6,6 @@ from typing import TypedDict
 
 from fatebridge.core.divination import BAGUA_BY_NAME, HEXAGRAM_NAMES
 from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
-from fatebridge.core.local_techniques.snapshot import join_lines, render_snapshot_text
 
 
 class TrigramPayload(TypedDict):
@@ -47,7 +46,6 @@ class TongSheFaResult(TypedDict):
     analysis_type: str
     input_normalized: dict[str, str]
     tongshefa: TongSheFaComparison
-    snapshot_text: str
     summary: str
 
 
@@ -117,48 +115,6 @@ def _element_relationship(left_element: str, right_element: str) -> str:
     return "思同实"
 
 
-def _build_tongshefa_snapshot(model: TongSheFaComparison) -> str:
-    rows = []
-    for index in range(5, -1, -1):
-        rows.append(
-            f"第{index + 1}爻：左{'阳' if model['baseLeft']['lines'][index] == 1 else '阴'} / "
-            f"右{'阳' if model['baseRight']['lines'][index] == 1 else '阴'} / "
-            f"{'不变' if model['baseLeft']['lines'][index] == model['baseRight']['lines'][index] else '已变'}"
-        )
-    return render_snapshot_text(
-        [
-            (
-                "本卦",
-                join_lines(
-                    [
-                        f"左卦：{model['baseLeft']['name']}（上卦{model['baseLeft']['upper']['name']} / 下卦{model['baseLeft']['lower']['name']}）",
-                        f"右卦：{model['baseRight']['name']}（上卦{model['baseRight']['upper']['name']} / 下卦{model['baseRight']['lower']['name']}）",
-                    ]
-                ),
-            ),
-            ("六爻", join_lines(rows)),
-            (
-                "潜藏",
-                join_lines(
-                    [
-                        f"左潜藏：{model['mutualLeft']['name']}",
-                        f"右潜藏：{model['mutualRight']['name']}",
-                    ]
-                ),
-            ),
-            (
-                "亲和",
-                join_lines(
-                    [
-                        f"左亲和：{model['oppositeLeft']['name']}",
-                        f"右亲和：{model['oppositeRight']['name']}",
-                    ]
-                ),
-            ),
-        ]
-    )
-
-
 def build_tongshefa_result(
     *,
     taiyin: str | None = None,
@@ -202,11 +158,9 @@ def build_tongshefa_result(
         "right_elem": right_element,
         "main_relation": main_relation,
     }
-    snapshot_text = _build_tongshefa_snapshot(model)
     return {
         "analysis_type": "统摄法分析",
         "input_normalized": selected,
         "tongshefa": model,
-        "snapshot_text": snapshot_text,
         "summary": f"已运行本地统摄法算法。本卦：左{base_left['name']}，右{base_right['name']}。主关系：{main_relation}。",
     }

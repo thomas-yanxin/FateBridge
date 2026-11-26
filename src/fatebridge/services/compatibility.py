@@ -5,10 +5,8 @@ from typing import Literal
 from pydantic import JsonValue
 
 from fatebridge.core.bazi.bazi_evidence import cross_chart_relations
-from fatebridge.core.export_parser import ParsedExport, parse_export_content
 from fatebridge.services.birth_context import build_birth_computation_context
 from fatebridge.services.birth_payload import build_destiny_payload
-from fatebridge.services.structured_snapshot import render_structured_snapshot_text
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS, get_ten_god
 from fatebridge.utils.elements import get_element_relationship
@@ -22,7 +20,7 @@ def calculate_compatibility_analysis(
     relationship_type: Literal[
         "general", "marriage", "friendship", "business", "family"
     ] = "general",
-) -> dict[str, JsonValue | ParsedExport]:
+) -> dict[str, JsonValue]:
     """Publish both natal contexts and directed ten-god evidence."""
     contexts = {
         "person1": build_birth_computation_context(person1, field_prefix="person1_"),
@@ -108,18 +106,4 @@ def calculate_compatibility_analysis(
         ),
         "directional_ten_gods": directional_ten_gods,
     }
-    snapshot_text = render_structured_snapshot_text(
-        {
-            "person_info": result["person_info"],
-            "element_relationship": result["element_relationship"],
-            "cross_chart_relations": result["cross_chart_relations"],
-        },
-        title="双人八字取证",
-    )
-    return {
-        **result,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": parse_export_content(
-            technique="generic", content=snapshot_text
-        ),
-    }
+    return result

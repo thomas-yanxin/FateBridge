@@ -14,17 +14,30 @@ from fatebridge.core.astro.opaque_solar import opaque_solar_positions
 from fatebridge.core.astro.relationship import build_relative_payload
 from fatebridge.core.astro.sensitivity import enrich_specialty_sensitivity
 from fatebridge.core.astro.solar_arc import enrich_solar_arc
-from fatebridge.core.export_parser import parse_export_content
 from fatebridge.core.guolao.guolao_anchor_days import POLICIES
 from fatebridge.core.guolao.guolao_birth_clock import coherent_guolao_solar_call
 from fatebridge.core.guolao.guolao_timing import enrich_guolao_timing
 from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
 from fatebridge.core.jyotish.jyotish_sources import coherent_india_call
-from fatebridge.services.astrology_snapshot import _build_chart_snapshot
-from fatebridge.services.astrology_snapshot_sections import _chart_calculation_notes
 from fatebridge.services.jyotish import enrich_india_chart
-from fatebridge.services.structured_snapshot import render_structured_snapshot_text
 from fatebridge.utils.errors import calculation_guard
+
+
+def _chart_calculation_notes(payload: dict[str, Any]) -> list[str]:
+    notes: list[str] = []
+    for field in (
+        "ephemeris_reference_points",
+        "angle_definition",
+        "house_axis_convention",
+        "house_position_projection",
+        "orbital_fallback",
+        "fixed_stars",
+    ):
+        qualification = payload.get("chart_profile", {}).get(field) or {}
+        note = qualification.get("note_zh")
+        if note and note not in notes:
+            notes.append(note)
+    return notes
 
 __all__ = [
     "SUPPORTED_CHART_VARIANTS",
@@ -275,7 +288,6 @@ def calculate_core_chart_analysis(
             kind="chart13",
             uncertainty_minutes=birth_time_uncertainty_minutes,
         )
-    result.update(_build_chart_snapshot(result, chart_variant))
     if apparent_model == "opaque_solar":
         result["apparent_model_positions"] = opaque_solar_positions(
             result["chart_profile"]["julian_day_tt"]
@@ -358,7 +370,7 @@ def calculate_relative_chart_analysis(
     """
     inner_birth = _build_birth_info(inner_payload)
     outer_birth = _build_birth_info(outer_payload)
-    payload = build_relative_payload(
+    return build_relative_payload(
         inner_birth=inner_birth,
         outer_birth=outer_birth,
         relative_mode=relative_mode,
@@ -367,24 +379,3 @@ def calculate_relative_chart_analysis(
         relationship_focus=relationship_focus,
         davison_variant=davison_variant,
     )
-    if "error" not in payload:
-        # Allowlist the relationship-facing summary; the raw inner/outer/
-        # composite charts and the directional aspect/midpoint dumps stay in
-        # the structured payload only (they would flood the snapshot).
-        summary_view: dict[str, Any] = {
-            key: payload[key]
-            for key in (
-                "relationship_profile",
-                "synastry_aspects",
-                "summary",
-            )
-            if key in payload
-        }
-        snapshot_text = render_structured_snapshot_text(
-            summary_view, title="关系星盘分析"
-        )
-        payload["snapshot_text"] = snapshot_text
-        payload["snapshot_export"] = parse_export_content(
-            technique="relative", content=snapshot_text
-        )
-    return payload

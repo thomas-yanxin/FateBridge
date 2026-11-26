@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.heluo.heluo_hexagrams import _gua_tables, gua_lines
-from fatebridge.core.heluo.heluo_snapshot import yao_name
+from fatebridge.core.heluo.heluo_texts import yao_name
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import NumerologySourceError
 

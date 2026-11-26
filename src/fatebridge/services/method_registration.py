@@ -24,7 +24,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
         groups.append(
             MethodGroup(
                 method_name=f"western_{tool_name}",
-                consuming_tools=f"{tool_name} western_timing_analysis",
+                consuming_tools=f"{tool_name} western_timing",
                 implementation_path="core/predictive/western_timing.py",
                 source_path="docs/algorithm-coverage.md",
                 quantity_kind="astronomy_and_rule_result",
@@ -44,7 +44,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
         groups.append(
             MethodGroup(
                 method_name=f"western_{tool_name}",
-                consuming_tools=f"astro_{tool_name}",
+                consuming_tools=tool_name,
                 implementation_path="core/astro/astrology_lifespan.py",
                 source_path="docs/algorithm-coverage.md",
                 quantity_kind="astronomy_and_rule_result",
@@ -62,7 +62,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
         groups.append(
             MethodGroup(
                 method_name=f"western_{tool_name}",
-                consuming_tools=f"astro_{tool_name}",
+                consuming_tools=tool_name,
                 implementation_path="services/western_events.py",
                 source_path="docs/algorithm-coverage.md",
                 quantity_kind="astronomy_and_rule_result",
@@ -79,14 +79,14 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
             )
         )
     for group in groups:
-        if spec.key not in group.consuming_tools.split():
+        if spec.name not in group.consuming_tools.split():
             continue
         implementation_refs: tuple[str, ...] = (
             f"src/fatebridge/{group.implementation_path}",
         )
         source_refs: tuple[str, ...] = (group.source_path,)
         error_sources = group.error_sources
-        if group.method_name == "western_lunation_phase":
+        if group.method_name == "western_lunar_phase_progressions":
             implementation_refs += (
                 "src/fatebridge/core/lunar_phase_events.py",
                 "src/fatebridge/core/predictive/progressions.py",
@@ -139,7 +139,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 ),
             )
         )
-    if spec.key == "otherbu":
+    if spec.name == "interpret_astrology_dice":
         records.append(
             MethodContract(
                 method_id="fatebridge.astrodice_symbolic_rules.contract_v1",
@@ -202,7 +202,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 requires_non_null_output="chart",
             )
         )
-    if spec.key == "human_design":
+    if spec.name == "human_design":
         records.append(
             MethodContract(
                 method_id=HUMAN_DESIGN_POINT_MASS_METHOD_ID,
@@ -250,7 +250,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 ),
             )
         )
-    if spec.key == "astro_chart":
+    if spec.name == "astrology_chart":
         records.append(
             MethodContract(
                 method_id=OPAQUE_SOLAR_METHOD_ID,
@@ -282,7 +282,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
             )
         )
     if not records:
-        raise ValueError(f"未登记领域方法：{spec.key}")
+        raise ValueError(f"未登记领域方法：{spec.name}")
     # note (methods): Preserve the published method IDs of the two numerical indices.
     return tuple(
         (

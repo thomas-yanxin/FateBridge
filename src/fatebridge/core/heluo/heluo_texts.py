@@ -789,3 +789,23 @@ def collated_line(gua: str, pos: int, inherited: dict[str, Any]) -> dict[str, An
     apply_poems(gua, pos, result, provenance)
     result["text_provenance"] = provenance
     return result
+
+
+LINE_POSITION_LABELS = ["初", "二", "三", "四", "五", "上"]
+
+
+def yao_text(gua_name: str, pos: int) -> dict[str, Any] | None:
+    """本卦元堂(动爻)之爻辞。"""
+    g = heluo_hexagrams._tiaowen().get(gua_name)
+    if not g or not g.get("yao", {}).get(str(pos)):
+        return None
+    return collated_line(gua_name, pos, g["yao"][str(pos)])
+
+
+def yao_name(lines: list[int], pos: int) -> str:
+    yang = lines[pos - 1] == 1
+    if pos == 1:
+        return f"初{'九' if yang else '六'}"
+    if pos == 6:
+        return f"上{'九' if yang else '六'}"
+    return f"{'九' if yang else '六'}{LINE_POSITION_LABELS[pos - 1]}"
