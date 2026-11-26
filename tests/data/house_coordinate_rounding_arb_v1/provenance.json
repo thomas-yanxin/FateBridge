@@ -11,7 +11,7 @@
     "file": "fixed-72.json",
     "bytes": 65010,
     "sha256": "6dccb27c0cc269aaa6952a401e76b76fa6f4d53c4de4ccd526a806bedc4f5e2f",
-    "copy": "byte-identical, all original B supplied arguments/order retained"
+    "copy": "The checked-in inputs retain the original arguments and row order. Source file references use basenames."
   },
   "independent_gold": {
     "source_basename": "reference.jsonl",
@@ -87,8 +87,8 @@
   "fixture_payloads": [
     {
       "file": "inputs.json",
-      "bytes": 65010,
-      "sha256": "6dccb27c0cc269aaa6952a401e76b76fa6f4d53c4de4ccd526a806bedc4f5e2f"
+      "bytes": 64510,
+      "sha256": "baf139dd808ae684ed4198e92476b73322df0c872738c1e304a9a9daa07be8b4"
     },
     {
       "file": "reference.jsonl.gz",

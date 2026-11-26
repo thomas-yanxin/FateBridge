@@ -1949,22 +1949,22 @@
   "expected_rows": 72,
   "source_files": [
     {
-      "path": "~/.codex/artifacts/fatebridge-audit-20261119-round41/native-adapter-authority-preparation/materialized-authority/M01-inputs.json",
+      "file": "M01-inputs.json",
       "bytes": 54637,
       "sha256": "d4e9e02f0b6a0f8c640cbbb5b854df2c23606d07108a650262f09e8c3bef116b"
     },
     {
-      "path": "~/.codex/artifacts/fatebridge-audit-20261119-round41/native-adapter-authority-preparation/materialized-authority/M02-inputs.json",
+      "file": "M02-inputs.json",
       "bytes": 54502,
       "sha256": "8fa731efc4d5d4546e80e844e0bb00890e7f6485e239bbd9b2e88d50fa607177"
     },
     {
-      "path": "~/.codex/artifacts/fatebridge-audit-20261119-round41/native-adapter-authority-preparation/materialized-authority/result-seal.json",
+      "file": "result-seal.json",
       "bytes": 813,
       "sha256": "e45036dbdb74413a7c77c642f8fe8b978d054657d69699c864dcaf23341c8160"
     },
     {
-      "path": "~/.codex/artifacts/fatebridge-audit-20261119-round41/native-adapter-authority-preparation/materialized-authority/input-bindings.json",
+      "file": "input-bindings.json",
       "bytes": 460303,
       "sha256": "0ce52461b800691337d5fa108ee7d488f8ef5bb24eafe8e11feb066285b0fb0f"
     }
