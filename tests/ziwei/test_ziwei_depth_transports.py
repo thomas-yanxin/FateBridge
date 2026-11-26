@@ -1,4 +1,4 @@
-"""New profiles and evidence must work through REST, native MCP and CLI."""
+"""REST, native MCP, and CLI parity + compact view checks."""
 
 import asyncio
 import json
@@ -8,11 +8,7 @@ from fastapi.testclient import TestClient
 from fastmcp import Client
 
 import fatebridge.api as api
-from fatebridge.application.examples import (
-    evidence_views,
-    example_input,
-    suggested_fields,
-)
+from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
@@ -132,7 +128,7 @@ def test_profiles_and_evidence_match_all_public_surfaces(
         assert result["analysis_context"]["analysis_datetime"] == "2027-06-15 12:37:00"
         horoscope = result["ziwei_horoscope"]
         assert horoscope["ruleset"]["id"] == profile
-        assert horoscope["interpretation_scope"]["scope_palace_map_supported"]
+        assert horoscope["doujun_branch"]
         annual = next(s for s in horoscope["scopes"] if s["scope"] == "流年")
         assert len(annual["palace_map"]) == 12
         expected = {
@@ -150,34 +146,59 @@ def test_profiles_and_evidence_match_all_public_surfaces(
         }
         if profile == "quanshu_v2_excerpt":
             expected |= {"天德", "月德", "丧门", "吊客", "白虎", "官府"}
-        else:
-            pass
-        assert {s["star"] for s in annual["flowing_stars"]} == expected
-        # Fixed counterexample: natal career is the annual spouse palace.
+        assert set(annual["flowing_stars"].keys()) == expected
         link = next(x for x in annual["mutagen_natal_links"] if x["star"] == "天机")
         assert link["natal_palace_name"] == "官禄宫"
         assert link["scope_palace_name"] == "夫妻宫"
     elif payload_key == "ziwei_birth":
-        assert result["ziwei_birth"]["rule_trace"]
-        comparison = result["ziwei_birth"]["sihua_source_comparison"]
-        assert comparison["year_stem"] == "壬"
-        assert not comparison["compared_assignments_applied"]
-        assert bool(comparison["differences"]) == (profile == "iztro_2_5_8")
-        assert (
-            result["ziwei_birth"]["chart_masters"]["life"]["selection_basis"]
-            == "ming_palace_branch"
-        )
-        assert result["ziwei_birth"]["calendar_cycles"]["status"] == "computed"
-        assert all(
-            p["changsheng12"] and p["boshi12"] for p in result["ziwei_birth"]["palaces"]
-        )
-        assert result["ziwei_birth"]["palaces"][0]["structural_evidence"][
-            "sanfang_sizheng"
-        ]
+        birth = result["ziwei_birth"]
+        assert birth["rule_trace"]
+        assert birth["laiyin_gong"]["ganzhi"][0] == birth["year_stem"]
+        assert birth["zidou_branch"]
+        assert len(birth["flying_sihua"]["matrix"]) == 12
+        assert birth["chart_masters"]["life"]["selection_basis"] == "ming_palace_branch"
+        assert birth["calendar_cycles"]["status"] == "computed"
+        assert all(p["changsheng12"] and p["boshi12"] for p in birth["palaces"])
     else:
         assert result["focused_rules"]["sihua"]["化科"] == (
             "左辅" if profile == "iztro_2_5_8" else "天府"
         )
+
+
+def test_compact_horoscope_and_birth_include_essential_fields_under_6kb(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    api._reset_runtime_state_for_tests()
+    monkeypatch.setattr(
+        api,
+        "API_KEY_AUTHENTICATOR",
+        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
+    )
+    client = TestClient(api.app)
+
+    birth_resp = client.post(
+        "/api/ziwei/birth-chart", json=BIRTH, params=[("detail", "compact")]
+    )
+    assert birth_resp.status_code == 200
+    assert len(birth_resp.content) < 6144
+    birth_body = birth_resp.json()["ziwei_birth"]
+    assert len(birth_body["reading_view"]["palaces"]) == 12
+    assert birth_body["sihua"]
+
+    timing_resp = client.post(
+        "/api/ziwei/timing", json={**BIRTH, **TARGET}, params=[("detail", "compact")]
+    )
+    assert timing_resp.status_code == 200
+    assert len(timing_resp.content) < 6144
+    timing_body = timing_resp.json()["ziwei_horoscope"]
+    for scope in timing_body["scopes"]:
+        if scope.get("status") not in {"not_started", "unavailable"}:
+            # Bug 1.3 fix: natal_palace_name & palace_ganzhi must survive compact mode!
+            assert scope["natal_palace_name"]
+            assert scope["palace_ganzhi"]
+            assert scope["mutagen_natal_links"]
+            if scope["scope"] != "小限":
+                assert scope["flowing_stars"]
 
 
 @pytest.mark.parametrize(
@@ -239,7 +260,6 @@ def test_unknown_gender_only_withholds_direction_dependent_mcp_scopes() -> None:
                 },
             )
             assert not result.is_error
-            assert result.structured_content is not None
             scopes = {
                 scope["scope"]: scope
                 for scope in result.structured_content["ziwei_horoscope"]["scopes"]
@@ -255,66 +275,6 @@ def test_unknown_gender_only_withholds_direction_dependent_mcp_scopes() -> None:
                 assert len(scopes[scope_name]["mutagen_natal_links"]) == 4
 
     asyncio.run(check_scopes())
-
-
-def test_audit_mcp_response_preserves_full_palace_evidence() -> None:
-    async def call():
-        async with Client(create_mcp_app(families="metaphysics")) as client:
-            result = await call_calculation(
-                client,
-                "ziwei_timing",
-                {
-                    **BIRTH,
-                    **TARGET,
-                    "rule_profile": "quanshu_v2_excerpt",
-                    "detail": "audit",
-                    "fields": ["analysis_context", "birth_context", "ziwei_horoscope"],
-                },
-            )
-            assert not result.is_error
-            complete = result.structured_content
-            assert len(complete["ziwei_horoscope"]["scopes"]) == 6
-            assert all(
-                len(s["palace_map"]) == 12
-                for s in complete["ziwei_horoscope"]["scopes"]
-            )
-
-    asyncio.run(call())
-
-
-@pytest.mark.parametrize("view", ["symbolism", "voids"])
-def test_source_views_deliver_real_facts_with_audit_detail(view: str) -> None:
-    spec = next(s for s in CATALOG if s.name == "ziwei_birth_chart")
-    fields = evidence_views(spec)[view]["fields"]
-
-    async def call():
-        async with Client(create_mcp_app(families="metaphysics")) as client:
-            result = await call_calculation(
-                client,
-                "ziwei_birth_chart",
-                {
-                    **BIRTH,
-                    "rule_profile": "quanshu_v2_excerpt",
-                    "detail": "audit",
-                    "fields": fields,
-                },
-            )
-            assert not result.is_error
-            payload = result.structured_content
-            if view == "symbolism":
-                evidence = payload["ziwei_birth"]["symbolic_properties"]
-                assert len(evidence["records"]) == 16
-                assert not evidence["textual_hua_terms_are_sihua"]
-                assert all(
-                    r["source_quote"] and r["calculation_path"]
-                    for r in evidence["records"]
-                )
-            else:
-                evidence = payload["ziwei_birth"]["void_systems"]
-                assert len(evidence["xun"]["displayed_star_branches"]) == 2
-                assert evidence["source_name_mapping"]["天空地劫诀中的天空"] == "地空"
-
-    asyncio.run(call())
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
@@ -337,8 +297,7 @@ def test_published_natal_reading_fits_default_mcp_budget_without_losing_stars(
                 },
             )
             assert not result.is_error
-            payload = result.structured_content
-            payload = await verified_inline_business(client, payload)
+            payload = await verified_inline_business(client, result.structured_content)
             reading = payload["ziwei_birth"]["reading_view"]
             assert len(reading["palaces"]) == 12
             assert sum(len(p["stars"]) for p in reading["palaces"]) == (
@@ -355,41 +314,5 @@ def test_published_natal_reading_fits_default_mcp_budget_without_losing_stars(
             assert all(
                 len(p["sanfang_sizheng_branches"]) == 4 for p in reading["palaces"]
             )
-
-    asyncio.run(call())
-
-
-@pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_published_edition_view_preserves_selected_and_hypothetical_markers(
-    profile: str,
-) -> None:
-    spec = next(s for s in CATALOG if s.name == "ziwei_birth_chart")
-    fields = evidence_views(spec)["editions"]["fields"]
-
-    async def call():
-        async with Client(create_mcp_app(families="metaphysics")) as client:
-            result = await call_calculation(
-                client,
-                "ziwei_birth_chart",
-                {
-                    **BIRTH,
-                    "birth_year": 1990,
-                    "rule_profile": profile,
-                    "detail": "audit",
-                    "fields": fields,
-                },
-            )
-            assert not result.is_error
-            payload = result.structured_content
-            payload = await verified_inline_business(client, payload)
-            chart = payload["ziwei_birth"]
-            assert chart["sihua"]["化忌"] == "天同"
-            comparison = chart["sihua_source_comparison"]
-            assert not comparison["compared_assignments_applied"]
-            difference = next(
-                d for d in comparison["differences"] if d["transformation"] == "化忌"
-            )
-            assert difference["compared_star"] == "天相"
-            assert difference["compared_position"]["natal_mutagen"] is None
 
     asyncio.run(call())

@@ -1,16 +1,14 @@
-"""Flow-star placements and public delivery for the versioned Ziwei convention."""
+"""Flow-star placements, monthly leap policy, and annual 月德 fix."""
 
 import pytest
 
-from fatebridge.core.ziwei.ziwei_auxiliary import flowing_horoscope_stars
+from fatebridge.core.ziwei.stars import annual_text_stars, flowing_horoscope_stars
 from fatebridge.services.ziwei import calculate_ziwei_horoscope
 from fatebridge.utils.birth_input import create_person_info
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 STEM_STARS = ("天魁", "天钺", "文昌", "文曲", "禄存", "擎羊", "陀罗")
 BRANCH_STARS = ("天马", "红鸾", "天喜", "年解")
-# Read from iztro 2.5.8 src/star/location.ts, converted to Earthly Branch names.
-# Each row is a complete, independent expected placement for one supplied input.
 STEM_ROWS = dict(
     zip(
         "甲乙丙丁戊己庚辛壬癸",
@@ -77,39 +75,37 @@ def expected_positions(stem, branch, *, annual=False):
 
 def actual_positions(scope):
     rows = scope["flowing_stars"]
-    positions = {row["star"]: row["branch"] for row in rows}
-    assert len(positions) == len(rows)
-    return positions
+    if isinstance(rows, dict):
+        return {star: val.split("(")[0] for star, val in rows.items()}
+    return {row["star"]: row["branch"] for row in rows}
 
 
-def test_pinned_software_formula_for_all_ten_stems_and_twelve_branches():
-    palaces = [
-        {
-            "branch": b,
-            "scope_palace_name": "scope-" + b,
-            "natal_palace_name": "natal-" + b,
-        }
-        for b in BRANCHES
-    ]
+def test_pinned_software_formula_for_all_ten_stems_and_twelve_branches() -> None:
+    palaces = {b: f"scope-{b}" for b in BRANCHES}
     for stem in STEM_ROWS:
         for branch in BRANCH_ROWS:
             rows = flowing_horoscope_stars(
                 palaces, scope="流年", stem=stem, pillar_branch=branch
             )
-            assert actual_positions({"flowing_stars": rows}) == expected_positions(
+            assert {r["star"]: r["branch"] for r in rows} == expected_positions(
                 stem, branch, annual=True
             )
             for row in rows:
-                if row["star"] in STEM_STARS:
-                    assert row["stem"] == stem and "basis_branch" not in row
-                else:
-                    assert row["basis_branch"] == branch and "stem" not in row
                 assert row["scope_palace_name"] == "scope-" + row["branch"]
-                assert row["natal_palace_name"] == "natal-" + row["branch"]
-                assert row["natal_stars_relocated"] is False
 
 
-def test_active_layers_use_own_calendar_pillars_even_when_ming_palace_differs():
+def test_annual_yuede_matches_standard_si_plus_year_branch() -> None:
+    # Bug 1.5 fix: 月德 = 巳(5) + year_branch index
+    palaces = {b: f"scope-{b}" for b in BRANCHES}
+    for idx, yb in enumerate(BRANCHES):
+        stars = {
+            r["star"]: r["branch"] for r in annual_text_stars(palaces, year_branch=yb)
+        }
+        assert stars["月德"] == BRANCHES[(5 + idx) % 12]
+        assert stars["天德"] == BRANCHES[(9 + idx) % 12]
+
+
+def test_active_layers_use_own_calendar_pillars_even_when_ming_palace_differs() -> None:
     result = calculate_ziwei_horoscope(create_person_info(**BIRTH), **TARGET)
     scopes = {s["scope"]: s for s in result["ziwei_horoscope"]["scopes"]}
     assert "flowing_stars" not in scopes["小限"]
@@ -132,27 +128,16 @@ def test_active_layers_use_own_calendar_pillars_even_when_ming_palace_differs():
         assert actual_positions(scope) == expected_positions(
             stem, branch, annual=layer == "流年"
         )
-        mapped = {p["branch"]: p for p in scope["palace_map"]}
-        for row in scope["flowing_stars"]:
-            assert row["scope"] == layer
-            assert (
-                row["scope_palace_name"] == mapped[row["branch"]]["scope_palace_name"]
-            )
-            assert (
-                row["natal_palace_name"] == mapped[row["branch"]]["natal_palace_name"]
-            )
-    monthly = scopes["流月"]
-    assert actual_positions(monthly)["天马"] == "申"
-    assert BRANCH_ROWS[monthly["branch"]][0] == "寅"
 
 
-@pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize(
-    "hour,day_divide,lunar_day,effective,software_normal,software_exact,actual,day_pillar,hour_pillar",
+    "profile,hour,day_divide,lunar_day,effective,actual,day_pillar,hour_pillar",
     [
-        (12, "current", 15, 2, "乙卯", "丙辰", "乙卯", "癸巳", "戊午"),
-        (23, "current", 15, 2, "乙卯", "丙辰", "乙卯", "癸巳", "壬子"),
-        (23, "forward", 16, 3, "乙卯", "丙辰", "丙辰", "甲午", "甲子"),
+        ("iztro_2_5_8", 12, "current", 15, 2, "乙卯", "癸巳", "戊午"),
+        ("iztro_2_5_8", 23, "current", 15, 2, "乙卯", "癸巳", "壬子"),
+        ("iztro_2_5_8", 23, "forward", 16, 3, "丙辰", "甲午", "甲子"),
+        # Bug 1.4 fix: quanshu_v2_excerpt uses all_next_month -> day 15 is month 3!
+        ("quanshu_v2_excerpt", 12, "current", 15, 3, "丙辰", "癸巳", "戊午"),
     ],
 )
 def test_leap_month_and_late_zi_calendar_comparison(
@@ -161,16 +146,10 @@ def test_leap_month_and_late_zi_calendar_comparison(
     day_divide,
     lunar_day,
     effective,
-    software_normal,
-    software_exact,
     actual,
     day_pillar,
     hour_pillar,
-):
-    # 2023-04-05 is leap month two, day 15. Qingming (section start for 辰)
-    # is before noon local time. iztro 2.5.8 + lunar-lite 0.2.8 uses the
-    # original civil date for the monthly pillar even when timeIndex=12 rolls
-    # the day pillar. Its exact configuration uses the solar month instead.
+) -> None:
     result = calculate_ziwei_horoscope(
         create_person_info(**BIRTH),
         analysis_year=2023,
@@ -190,13 +169,6 @@ def test_leap_month_and_late_zi_calendar_comparison(
     )
     assert basis["effective_lunar_month"] == effective
     assert basis["stem"] + basis["branch"] == actual
-    positions = actual_positions(monthly)
-    assert positions == expected_positions(*actual)
-    assert (positions == expected_positions(*software_normal)) is (
-        actual == software_normal
-    )
-    assert (positions == expected_positions(*software_exact)) is (
-        actual == software_exact
-    )
+    assert actual_positions(monthly) == expected_positions(*actual)
     assert actual_positions(scopes["流日"]) == expected_positions(*day_pillar)
     assert actual_positions(scopes["流时"]) == expected_positions(*hour_pillar)

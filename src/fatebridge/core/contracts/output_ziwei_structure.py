@@ -1,4 +1,4 @@
-"""Ziwei natal structure and interpretation evidence."""
+"""Ziwei natal structure, flying SiHua matrix, and pattern output contracts."""
 
 from typing import Annotated, Literal
 
@@ -14,143 +14,36 @@ from fatebridge.core.contracts.output_ziwei_calendar import ZiweiCalendarBasis
 from fatebridge.core.contracts.output_ziwei_palaces import (
     ZiweiChartMasters,
     ZiweiCycleRules,
-    ZiweiCycleSourceComparison,
     ZiweiPosition,
     ZiweiRuleset,
     ZiweiRuleTrace,
-    ZiweiSihuaSourceComparison,
     ZiweiStar,
     ZiweiStructuralEvidence,
-    ZiweiSymbolicProperties,
 )
-from fatebridge.core.ziwei.ziwei_named_patterns import NatalPatternStar, PatternRecord
 
 
-class ZiweiMingEntity(PartialOutput):
-    kind: str | None = None
-    name: str | None = None
+class ZiweiConditionSourceRevision(PartialOutput):
+    """Retained placeholder symbol for output_chinese.py until Wave 3 cleanup."""
 
 
-class ZiweiMingDefinition(PartialOutput):
-    id: str | None = None
-    frame: int | None = None
-    quote: str | None = None
-    elements: list[str] | None = None
-    entities: list[ZiweiMingEntity] | None = None
-    glyph_note: str | None = None
-    source_names: list[str] | None = None
-    name_mapping: str | None = None
-    identity_note: str | None = None
-    quote_scope: str | None = None
-    unresolved_tail_candidates: list[str] | None = None
-    unresolved_tail_note: str | None = None
-    element_status: str | None = None
-
-
-class ZiweiMingOccurrence(PartialOutput):
-    kind: str | None = None
-    name: str | None = None
-    definition_id: str | None = None
-    star: str | None = None
-    natal_palace_name: str | None = None
-    natal_branch: str | None = None
-    natal_mutagen: str | None = None
-    calculation_path: str | None = None
-
-
-class ZiweiLianzhenReading(PartialOutput):
-    definition_id: str | None = None
-    frame: int | None = None
-    quote: str | None = None
-    calculation_path: str | None = None
-    natal_palace_name: str | None = None
-    natal_branch: str | None = None
-    at_career_palace: bool | None = None
-    at_ming_branch: bool | None = None
-    at_shen_branch: bool | None = None
-    selected_mingshen_reading: str | None = None
-    mingshen_reading_independently_adjudicated: bool | None = None
-    applicable_terms_given_selected_reading: list[str] | None = None
-    terms_are_new_palace_names: bool | None = None
-
-
-class ZiweiQishaReading(PartialOutput):
-    definition_id: str | None = None
-    frame: int | None = None
-    quote: str | None = None
-    qisha_calculation_path: str | None = None
-    ziwei_calculation_path: str | None = None
-    separation_steps: int | None = None
-    same_palace: bool | None = None
-    opposite_palace: bool | None = None
-    trine: bool | None = None
-    source_encounter_geometry_defined: bool | None = None
-    condition_match: bool | None = None
-    unresolved_reason: str | None = None
-    actual_qisha_mutagen: str | None = None
-    symbolic_quan_is_new_sihua_assignment: bool | None = None
-
-
-class ZiweiMingConditionalReadings(PartialOutput):
-    lianzhen: ZiweiLianzhenReading | None = None
-    qisha: ZiweiQishaReading | None = None
-
-
-class ZiweiMingCountNote(PartialOutput):
-    printed_quote: str | None = None
-    printed_count: int | None = None
-    enumerated_modern_star_names: int | None = None
-    status: str | None = None
-
-
-class ZiweiUnresolvedRelation(PartialOutput):
-    definition_id: str | None = None
-    source_phrase: str | None = None
-    condition_match: bool | None = None
-    status: str | None = None
-
-
-class ZiweiMingProperties(PartialOutput):
-    method_id: str | None = None
-    version: str | None = None
-    source: str | None = None
-    source_title: str | None = None
-    printed_volume: str | None = None
-    source_section: str | None = None
-    manual_reader_count: int | None = None
-    scope: str | None = None
-    definitions: dict[str, ZiweiMingDefinition] | None = None
-    occurrences: list[ZiweiMingOccurrence] | None = None
-    unlocated_natal_source_stars: list[str] | None = None
-    unresolved_boshi_labels: list[str] | None = None
-    unassigned_source_labels: list[str] | None = None
-    conditional_readings: ZiweiMingConditionalReadings | None = None
-    unresolved_relational_definitions: list[ZiweiUnresolvedRelation] | None = None
-    name_mapping: dict[str, str] | None = None
-    positive_star_count_note: ZiweiMingCountNote | None = None
-    source_elements_replace_bureau_or_star_brightness: bool | None = None
-    source_taxonomy_applied_to_modern_classification: bool | None = None
-    symbolic_verbs_create_sihua_assignments: bool | None = None
-    actual_assignments_modified: bool | None = None
-    full_section_transcription_certified: bool | None = None
-    whole_book_acceptance_passed: bool | None = None
+class ZiweiStructuralConditionRecord(PartialOutput):
+    """Retained placeholder symbol for output_chinese.py until Wave 3 cleanup."""
 
 
 class ZiweiXunVoid(PartialOutput):
     source_branches: list[str] | None = None
     displayed_star_branches: list[str] | None = None
     display_rule: str | None = None
-    source: str | None = None
 
 
 class ZiweiVoidSystems(PartialOutput):
     xun: ZiweiXunVoid | None = None
-    source_name_mapping: dict[str, str] | None = None
 
 
 class ZiweiPalace(PartialOutput):
     name: Annotated[str | None, FULL_FACT] = None
     ganzhi: Annotated[str | None, FULL_FACT] = None
+    is_original_palace: bool | None = None
     daxian: str | None = None
     daxian_period: int | None = None
     stars: list[str] | None = None
@@ -183,6 +76,7 @@ class ZiweiReadingView(PartialOutput):
 class ZiweiCalendarRules(PartialOutput):
     late_zi: str | None = None
     day_divide: Literal["current", "forward"] | None = None
+    year_divide: Literal["normal", "exact"] | None = None
     leap_month: str | None = None
     year_boundary: str | None = None
     effective_birth_month: int | None = None
@@ -195,112 +89,6 @@ class WuxingJu(PartialOutput):
     number: int | None = None
 
 
-class ZiweiAuxPlacementSourceRow(PartialOutput):
-    star: str | None = None
-    basis_id: str | None = None
-    actual_branch: str | None = None
-    expected_branch: str | None = None
-    matches_source_rule: bool | None = None
-    calculation_path: str | None = None
-    unresolved_reason: str | None = None
-
-
-class ZiweiAuxPlacementSources(PartialOutput):
-    method_id: str | None = None
-    version: str | None = None
-    source: str | None = None
-    printed_volume: str | None = None
-    scope: str | None = None
-    inputs: dict[str, OpenJsonValue] | None = None
-    methods: dict[str, OpenJsonValue] | None = None
-    placements: list[ZiweiAuxPlacementSourceRow] | None = None
-    source_name_mapping: dict[str, str] | None = None
-    unchecked_star_names: list[str] | None = None
-    manual_reader_count: int | None = None
-    compared_rules_applied: bool | None = None
-    whole_book_conformance_claimed: bool | None = None
-
-
-class ZiweiConditionOccurrence(PartialOutput):
-    star: str | None = None
-    natal_palace_name: str | None = None
-    natal_branch: str | None = None
-    natal_mutagen: str | None = None
-    calculation_path: str | None = None
-
-
-class ZiweiConditionExample(PartialOutput):
-    ming: str | None = None
-    positions: dict[str, str] | None = None
-
-
-class ZiweiStructuralConditionIndex(PartialOutput):
-    id: str | None = None
-    source_frame: int | None = None
-    source_quote: str | None = None
-    geometry_match: bool | None = None
-    evaluated_necessary_premises_match: bool | None = None
-    source_literal_example_matches: bool | None = None
-    source_qualifications_not_evaluated: list[str] | None = None
-    full_traditional_judgment: None = None
-    source_outcome_claim_adopted: Literal[False] | None = None
-
-
-class ZiweiConditionAnnotationRevision(PartialOutput):
-    prior_annotation: str | None = None
-    reader_annotations: list[str] | None = None
-    status: (
-        Literal[
-            "unresolved_after_independent_rereading",
-            "corrected_after_independent_rereading",
-        ]
-        | None
-    ) = None
-    reason: str | None = None
-
-
-class ZiweiConditionSourceRevision(PartialOutput):
-    id: str | None = None
-    changed_clause_ids: list[str] | None = None
-    isolated_model_readers: int | None = None
-    external_human_experts: Literal[0] | None = None
-    new_witnesses: Literal[0] | None = None
-    numeric_or_geometric_rules_modified: Literal[False] | None = None
-    whole_book_acceptance_passed: Literal[False] | None = None
-
-
-class ZiweiStructuralConditionRecord(ZiweiStructuralConditionIndex):
-    source_annotation: str | None = None
-    annotation_revision: ZiweiConditionAnnotationRevision | None = None
-    geometry_rule: str | None = None
-    actual_occurrences: dict[str, list[ZiweiConditionOccurrence]] | None = None
-    ming_branch_requirement_met: bool | None = None
-    year_stem_requirement_met: bool | None = None
-    literal_example: ZiweiConditionExample | None = None
-    missing_or_duplicated_stars: list[str] | None = None
-
-
-class ZiweiStructuralConditions(PartialOutput):
-    method_id: str | None = None
-    version: str | None = None
-    source: str | None = None
-    source_title: str | None = None
-    source_section: str | None = None
-    source_section_is_editorial_label: bool | None = None
-    source_status: str | None = None
-    manual_reader_count: int | None = None
-    source_revision: ZiweiConditionSourceRevision | None = None
-    ming_branch: str | None = None
-    year_stem: str | None = None
-    adjacent_branches: list[str] | None = None
-    flanking_reading: str | None = None
-    index: list[ZiweiStructuralConditionIndex] | None = None
-    records: list[ZiweiStructuralConditionRecord] | None = None
-    scope: str | None = None
-    actual_assignments_modified: Literal[False] | None = None
-    whole_book_acceptance_passed: Literal[False] | None = None
-
-
 class ZiweiPalaceSihuaOccurrence(PartialOutput):
     palace_name: str
     branch: str
@@ -311,20 +99,13 @@ class ZiweiPalaceSihuaOrigin(PartialOutput):
     source_palace: str
     source_stem: str
     source_branch: str
-    self_transformation: bool | None = Field(
-        description=(
-            "True when any target occurrence is in the source palace, false when "
-            "all located targets are elsewhere, and null when no target is located."
-        )
-    )
+    self_transformation: bool | None = None
 
 
 class ZiweiPalaceSihuaGroup(PartialOutput):
     transformation: Literal["化禄", "化权", "化科", "化忌"]
     target_star: str
-    target_occurrences: list[ZiweiPalaceSihuaOccurrence] = Field(
-        description="Natal placements in chart order. Empty when unlocated."
-    )
+    target_occurrences: list[ZiweiPalaceSihuaOccurrence]
     origins: list[ZiweiPalaceSihuaOrigin] = Field(min_length=1)
 
 
@@ -334,41 +115,62 @@ class ZiweiPalaceSihuaRelations(PartialOutput):
     groups: list[ZiweiPalaceSihuaGroup] | None = None
 
 
-class ZiweiChangQuFlank(PartialOutput):
-    ming_branch: str | None = None
-    adjacent_branches: list[str] | None = None
+class ZiweiFlyingMatrixRow(PartialOutput):
+    palace: str | None = None
+    ganzhi: str | None = None
+    is_original_palace: bool | None = None
+    transforms: dict[str, str] | None = None
+    outward_self: list[str] | None = None
+    inward_self: list[str] | None = None
+    ji_clash: str | None = None
+    lu_to_ji: str | None = None
+    ji_to_ji: str | None = None
+
+
+class ZiweiFlyingSihua(PartialOutput):
+    sihua_rule: str | None = None
+    laiyin_gong: ZiweiPosition | None = None
+    matrix: list[ZiweiFlyingMatrixRow] | None = None
+
+
+class ZiweiPatternRecord(PartialOutput):
+    id: str | None = None
+    name: str | None = None
+    category: str | None = None
     matched: bool | None = None
+    conditions: dict[str, bool] | None = None
+    borrowed_opposite_palace: str | None = None
+    borrowed_opposite_branch: str | None = None
+    borrowed_opposite_major_stars: list[str] | None = None
 
 
 class ZiweiNamedPatternEvidence(PartialOutput):
     method_id: str | None = None
-    version: str | None = None
-    source: str | None = None
-    records: list[PatternRecord] | None = None
-    stars: list[NatalPatternStar] | None = None
-    chang_qu_flank: ZiweiChangQuFlank | None = None
+    total_checked: int | None = None
+    matched_count: int | None = None
+    matched: list[ZiweiPatternRecord] | None = None
+    unmatched_ids: list[str] | None = None
 
 
 class ZiweiBirth(PartialOutput):
     engine: Annotated[str | None, FULL_FACT] = None
+    school: str | None = None
+    astro_type: str | None = None
     calendar_basis: Annotated[ZiweiCalendarBasis | None, FULL_FACT] = None
     calendar_rules: Annotated[ZiweiCalendarRules | None, FULL_FACT] = None
     ruleset: Annotated[ZiweiRuleset | None, FULL_FACT] = None
     rule_trace: Annotated[list[ZiweiRuleTrace] | None, FULL_FACT] = None
     reading_view: ZiweiReadingView | None = None
-    symbolic_properties: ZiweiSymbolicProperties | None = None
-    ming_textual_properties: ZiweiMingProperties | None = None
-    ming_structural_conditions: ZiweiStructuralConditions | None = None
     named_patterns: ZiweiNamedPatternEvidence | None = None
-    sihua_source_comparison: ZiweiSihuaSourceComparison | None = None
+    flying_sihua: ZiweiFlyingSihua | None = None
     palace_sihua_relations: ZiweiPalaceSihuaRelations | None = None
-    auxiliary_placement_sources: ZiweiAuxPlacementSources | None = None
     void_systems: ZiweiVoidSystems | None = None
     chart_masters: ZiweiChartMasters | None = None
     calendar_cycles: Annotated[ZiweiCycleRules | None, FULL_FACT] = None
-    cycle_source_comparison: ZiweiCycleSourceComparison | None = None
     daxian_direction: str | None = None
     hour_branch: str | None = None
+    zidou_branch: str | None = None
+    laiyin_gong: ZiweiPosition | None = None
     lunar_date: LunarDate | None = None
     ming_gong: Annotated[ZiweiPosition | None, FULL_FACT] = None
     shen_gong: Annotated[ZiweiPosition | None, FULL_FACT] = None

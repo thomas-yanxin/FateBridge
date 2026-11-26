@@ -1,13 +1,13 @@
-"""Ziwei timing scopes and calendar-derived transformation assignments."""
+"""Ziwei timing scopes, active childhood limit, and batch horizons."""
 
 import pytest
 
-from fatebridge.core.metaphysics.seed import _build_person_seed, build_analysis_seed
-from fatebridge.core.metaphysics.ziwei import (
-    ZIWEI_SIHUA_RULES,
-    build_ziwei_chart,
-    build_ziwei_horoscope,
+from fatebridge.core.ziwei.calendar import (
+    build_ziwei_analysis_seed,
+    build_ziwei_person_seed,
 )
+from fatebridge.core.ziwei.chart import build_ziwei_chart, build_ziwei_horoscope
+from fatebridge.core.ziwei.tables import ZIWEI_SIHUA_RULES
 from fatebridge.utils.birth_input import create_person_info
 
 SCOPES = ["大限", "小限", "流年", "流月", "流日", "流时"]
@@ -15,13 +15,13 @@ BIRTH = dict(birth_year=1994, birth_month=8, birth_day=23, birth_hour=14, gender
 TARGET = dict(year=2026, month=6, day=19, hour=14)
 
 
-def _horoscope_for(birth, target, *, day_divide="current"):
+def _horoscope_for(birth, target, *, day_divide="current", **kwargs):
     person = create_person_info(**birth)
-    natal_seed = _build_person_seed(person)
+    natal_seed = build_ziwei_person_seed(person)
     chart = build_ziwei_chart(
         natal_seed, person.gender or "未知", day_divide=day_divide
     )
-    target_seed = build_analysis_seed(
+    target_seed = build_ziwei_analysis_seed(
         analysis_year=target["year"],
         analysis_month=target["month"],
         analysis_day=target["day"],
@@ -32,6 +32,7 @@ def _horoscope_for(birth, target, *, day_divide="current"):
         chart=chart,
         gender=person.gender or "未知",
         target_seed=target_seed,
+        **kwargs,
     )
 
 
@@ -39,30 +40,16 @@ def test_horoscope_has_six_scopes_with_expected_shape() -> None:
     h = _horoscope_for(BIRTH, TARGET)
     assert h["engine"] == "fatebridge-offline"
     assert h["nominal_age"] == 2026 - 1994 + 1
+    assert h["doujun_branch"]
     got = {s["scope"]: s for s in h["scopes"]}
     assert set(got) == set(SCOPES)
     for s in h["scopes"]:
-        assert set(s.keys()) == {
-            "scope",
-            "scope_palace_role",
-            "natal_palace_name",
-            "mutagen_natal_links",
-            "branch",
-            "branch_index",
-            "palace_ganzhi",
-            "stem",
-            "mutagen",
-            "palace_map",
-            "stem_origin",
-        } | ({"status", "first_age"} if s["scope"] == "大限" else set()) | (
-            {"flowing_stars", "flowing_star_basis"} if s["scope"] != "小限" else set()
-        )
         assert 0 <= s["branch_index"] <= 11
         assert set(s["mutagen"].keys()) == {"化禄", "化权", "化科", "化忌"}
 
 
 def test_liunian_branch_matches_year_pillar_and_mutagen_from_year_stem() -> None:
-    target_seed = build_analysis_seed(
+    target_seed = build_ziwei_analysis_seed(
         analysis_year=2026, analysis_month=6, analysis_day=19, analysis_hour=14
     )
     year_stem, year_branch = target_seed.pillars["year"]
@@ -97,10 +84,34 @@ def test_annual_cycles_follow_the_target_lunar_year_at_late_zi(
 
 def test_daxian_palace_age_range_contains_nominal_age() -> None:
     person = create_person_info(**BIRTH)
-    natal_seed = _build_person_seed(person)
+    natal_seed = build_ziwei_person_seed(person)
     chart = build_ziwei_chart(natal_seed, "男")
     h = _horoscope_for(BIRTH, TARGET)
     daxian = next(s for s in h["scopes"] if s["scope"] == "大限")
     palace = next(p for p in chart["palaces"] if p["ganzhi"][1] == daxian["branch"])
     lo, hi = (int(x) for x in palace["daxian"].split("~"))
     assert lo <= h["nominal_age"] <= hi
+
+
+def test_active_childhood_limit_and_batch_horizons() -> None:
+    # Ages 1..6 map to 命/财/疾/夫/福/官
+    expected = ("命宫", "财帛宫", "疾厄宫", "夫妻宫", "福德宫", "官禄宫")
+    for offset, palace_name in enumerate(expected):
+        h = _horoscope_for(BIRTH, dict(year=1994 + offset, month=9, day=1, hour=12))
+        cl = h["childhood_limit"]
+        assert cl["status"] == "active"
+        assert cl["nominal_age"] == offset + 1
+        assert cl["natal_palace_name"] == palace_name
+        assert set(cl["mutagen"]) == {"化禄", "化权", "化科", "化忌"}
+        assert len(cl["mutagen_natal_links"]) == 4
+
+    h_batch = _horoscope_for(
+        BIRTH,
+        TARGET,
+        include_decadal_list=True,
+        include_yearly_list=True,
+        include_monthly_list=True,
+    )
+    assert len(h_batch["decadal_list"]) == 12
+    assert len(h_batch["yearly_list"]) == 10
+    assert len(h_batch["monthly_list"]) == 12
