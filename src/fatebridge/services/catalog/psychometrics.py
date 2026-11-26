@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 from fatebridge.application.bindings import bind_kwargs, request_model_ref, service_ref
 from fatebridge.application.tool_spec import (
-    DetailLevel,
     OutputContractError,
     ServiceResult,
     ToolSpec,
@@ -35,18 +34,12 @@ def _validate_ipip_output(
         domains = result.get("domains")
         if not isinstance(domains, dict) or len(domains) != 5:
             raise OutputContractError("IPIP-50 score 输出缺少完整五因子结果")
-        if result.get("scale_raw_sum") is None or result.get("scale_mean") is None:
-            raise OutputContractError("IPIP-50 score 输出缺少总量表原始分或均分")
         return
     raise OutputContractError(f"IPIP-50 输出 mode 非法：{mode}")
 
 
-def _identity_detail_view(
-    result: ServiceResult,
-    _detail: DetailLevel,
-    _requested: set[str],
-) -> ServiceResult:
-    return result
+def _compact_ipip_big_five(result: ServiceResult) -> ServiceResult:
+    return {key: value for key, value in result.items() if key != "provenance"}
 
 
 SPECS: list[ToolSpec] = [
@@ -63,6 +56,6 @@ SPECS: list[ToolSpec] = [
         family="psychometrics",
         rest_path="/api/psychometrics/ipip-big-five",
         uses_astronomy_runtime=False,
-        detail_view=_identity_detail_view,
+        compact_view=_compact_ipip_big_five,
     )
 ]

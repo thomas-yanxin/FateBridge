@@ -228,6 +228,19 @@ def load_knowledge_index() -> dict[str, JsonValue]:
     return KNOWLEDGE_JSON_OBJECT.validate_json(_data_path("index.json").read_bytes())
 
 
+@lru_cache(maxsize=1)
+def _domain_index_by_name() -> dict[str, dict[str, Any]]:
+    domain_index = load_knowledge_index().get("domains")
+    assert isinstance(domain_index, list)
+    by_name: dict[str, dict[str, Any]] = {}
+    for domain_record in domain_index:
+        assert isinstance(domain_record, dict)
+        name = domain_record.get("domain")
+        if isinstance(name, str):
+            by_name[name] = domain_record
+    return by_name
+
+
 def _domain_index(domain: str) -> dict[str, Any]:
     if domain in RULE_REFERENCE_DOMAINS:
         return {
@@ -239,13 +252,7 @@ def _domain_index(domain: str) -> dict[str, Any]:
                 ].items()
             ],
         }
-    domain_index = load_knowledge_index().get("domains")
-    assert isinstance(domain_index, list)
-    for domain_record in domain_index:
-        assert isinstance(domain_record, dict)
-        if domain_record.get("domain") == domain:
-            return deepcopy(domain_record)
-    return {}
+    return dict(_domain_index_by_name().get(domain, {}))
 
 
 class KnowledgeProvenance(TypedDict, total=False):
@@ -304,7 +311,7 @@ def _knowledge_provenance(
         )
     ]
     if supplements:
-        provenance["supplements"] = deepcopy(supplements)
+        provenance["supplements"] = list(supplements)
         provenance["coverage_scope"] = "original_index_plus_declared_supplements"
     return provenance
 

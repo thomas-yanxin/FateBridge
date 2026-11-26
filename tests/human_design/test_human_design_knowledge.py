@@ -1,4 +1,4 @@
-"""Complete line keyspace, honest unknowns and immutable editorial provenance."""
+"""Consolidated Human Design 384-line knowledge catalogue tests."""
 
 import json
 from copy import deepcopy
@@ -7,21 +7,19 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.contracts.output_reference import HumanDesignKnowledgeDetails
-from fatebridge.core.human_design import human_design_knowledge as hd
-from fatebridge.core.human_design import human_design_line_catalogue as catalogue
-from fatebridge.core.human_design.human_design_depth import depth_reference
+from fatebridge.core.human_design import depth
+from fatebridge.core.human_design import knowledge as hd
 from fatebridge.services.knowledge import (
     calculate_knowledge_read,
     calculate_knowledge_registry,
 )
 from fatebridge.utils.errors import EphemerisSourceError
 
-ROOT = Path(__file__).resolve().parents[2]
 
-
-def test_all384_keys_retain_source_poles_and_unknown_meanings() -> None:
+def test_all384_keys_retain_source_poles_and_curated_gates_1_to_6() -> None:
     seen = []
     curated = []
+    ref = depth.depth_reference()
     for gate in range(1, 65):
         for line in range(1, 7):
             key = f"{gate}.{line}"
@@ -30,7 +28,7 @@ def test_all384_keys_retain_source_poles_and_unknown_meanings() -> None:
             seen.append(row["key"])
             assert (
                 row["catalogue_glyph_polarity"]
-                == depth_reference()["gates"][gate - 1]["line_polarities"][line - 1]
+                == ref["gates"][gate - 1]["line_polarities"][line - 1]
             )
             assert row["source_pdf_page_one_based"] == 7 + 2 * (gate - 1)
             assert row["personal_applicability_assessed"] is False
@@ -47,15 +45,15 @@ def test_all384_keys_retain_source_poles_and_unknown_meanings() -> None:
                 assert row["meaning_status"] == "not_yet_curated"
                 assert "爻义" in entry["title"] and "待整理" in entry["title"]
     assert len(seen) == len(set(seen)) == 384
-    assert curated[:6] == [f"1.{line}" for line in range(1, 7)]
-    assert curated[6:] == [f"2.{line}" for line in range(1, 7)]
+    assert len(curated) == 36
+    assert curated == [f"{g}.{l}" for g in range(1, 7) for l in range(1, 7)]
 
 
 @pytest.mark.parametrize(
     "key,expected", [("11.4", ["Moon", "Venus"]), ("25.4", ["Venus", "Jupiter"])]
 )
 def test_untriggered_additional_source_planets_are_visible_but_not_applied(
-    key: str, expected
+    key: str, expected: list[str]
 ) -> None:
     entry = calculate_knowledge_read(domain="human_design", key=key)
     record = entry["reference_details"]["record"]
@@ -97,7 +95,7 @@ def test_invalid_keys_do_not_guess_or_use_profile_lines(key: str | None) -> None
 
 def test_unknown_category_and_irrelevant_foreign_query_fields_are_user_errors() -> None:
     result = calculate_knowledge_read(
-        domain="human_design", category="profile", key="1.1"
+        domain="human_design", category="lines_v3", key="1.1"
     )
     assert result["status_code"] == 400
     result = calculate_knowledge_read(domain="human_design", key="1.1", object_a="Sun")
@@ -106,14 +104,12 @@ def test_unknown_category_and_irrelevant_foreign_query_fields_are_user_errors() 
 
 
 @pytest.mark.parametrize("fault", ["delete", "certify", "unknown_to_curated"])
-def test_changed_reference_is_rejected_before_partial_read(
+def test_changed_reference_is_rejected(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
 ) -> None:
-    value = json.loads(catalogue.CATALOGUE_PATH.read_bytes())
+    value = json.loads(hd.CATALOGUE_PATH.read_bytes())
     if fault == "delete":
         value["rows"].pop()
-    elif fault == "replace":
-        value["rows"][0]["editorial_paraphrase"]["exaltation"] = "guaranteed success"
     elif fault == "certify":
         value["complete384_line_meanings_accepted"] = True
     else:
@@ -122,9 +118,7 @@ def test_changed_reference_is_rejected_before_partial_read(
         )
     path = tmp_path / "changed.json"
     path.write_text(json.dumps(value))
-    from fatebridge.core.human_design import human_design_line_catalogue
-
-    monkeypatch.setattr(human_design_line_catalogue, "CATALOGUE_PATH", path)
+    monkeypatch.setattr(hd, "CATALOGUE_PATH", path)
     with pytest.raises(EphemerisSourceError):
         hd.read_reference(category="lines", key="1.1")
     result = calculate_knowledge_read(domain="human_design", key="1.1")
@@ -159,7 +153,7 @@ def test_public_reference_contract_cannot_become_personal_applicability(
     from pydantic import ValidationError
 
     details = {
-        "policy_id": catalogue.POLICY_ID,
+        "policy_id": hd.POLICY_ID,
         "reference_only": True,
         "personal_applicability_assessed": False,
         "record": {},
@@ -169,27 +163,15 @@ def test_public_reference_contract_cannot_become_personal_applicability(
         HumanDesignKnowledgeDetails.model_validate(details)
 
 
-def test_current_public_registry_preserves_all_explicit_human_design_categories() -> (
-    None
-):
+def test_consolidated_registry_exposes_single_lines_category() -> None:
     registry = calculate_knowledge_registry(domain="human_design")
     human = registry["domains"][0]
     assert human["source"] == hd.SOURCE
-    assert [c["name"] for c in human["categories"]] == [
-        "lines",
-        "lines_v3",
-        "lines_v4",
-        "lines_v5",
-        "lines_v6",
-        "lines_v7",
-    ]
-    for category, curated in zip(
-        human["categories"], [12, 18, 18, 24, 30, 36], strict=True
-    ):
-        assert category["coverage"] == {
-            "line_locators": 384,
-            "local_editorial_paraphrases": curated,
-            "meanings_pending": 384 - curated,
-            "independently_accepted_line_meanings": 0,
-            "full_source_meanings_accepted": False,
-        }
+    assert [c["name"] for c in human["categories"]] == ["lines"]
+    assert human["categories"][0]["coverage"] == {
+        "line_locators": 384,
+        "local_editorial_paraphrases": 36,
+        "meanings_pending": 348,
+        "independently_accepted_line_meanings": 0,
+        "full_source_meanings_accepted": False,
+    }

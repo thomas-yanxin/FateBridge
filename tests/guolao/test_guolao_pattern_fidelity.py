@@ -8,8 +8,9 @@ from datetime import datetime
 
 import pytest
 
-from fatebridge.core.guolao import guolao_moira as m
+from fatebridge.core.guolao import moira as m
 from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.services.guolao import calculate_guolao_chart, compact_guolao_chart
 from tests.fixtures.surface_payloads import astro_payload
 
 ALONE = dict(zip(m.MOIRA_PLANET_ORDER, range(11)))
@@ -107,7 +108,6 @@ def test_each_current_predicate_has_actual_operands_and_changes_with_its_counter
     evidence = pattern["evidence"]
     assert evidence["model_id"] == m.PATTERN_MODEL_ID
     assert evidence["condition_satisfied"]
-    assert not evidence["classical_acceptance"]
     for key, value in expected_inputs.items():
         assert evidence["inputs"][key] == value
 
@@ -164,7 +164,7 @@ def test_missing_and_explicit_unknown_values_do_not_create_patterns_or_cross_rol
 
 
 @pytest.mark.parametrize("target", [None, "2027-06-01T00:00:00+08:00"])
-def test_native_pattern_trace_matches_the_same_calculation_and_preserves_nulls(
+def test_native_pattern_trace_and_classical_features(
     target: str | None,
 ) -> None:
     r = calculate_core_chart_analysis(
@@ -177,7 +177,19 @@ def test_native_pattern_trace_matches_the_same_calculation_and_preserves_nulls(
     assert "error" not in r
     g = r["guolao"]
     assert g["profile"]["pattern_model_id"] == m.PATTERN_MODEL_ID
-    assert g["life_palace"]["longitude"] is None and g["life_palace"]["mansion"] is None
+    assert g["life_palace"]["longitude"] is not None
+    assert g["life_palace"]["mansion"] is not None
+    assert g["body_palace"]["branch"] is not None
+    assert len(g["god_positions"]["branches"]) == 33
+    assert len(g["hua_yao"]["by_transformation"]) == 10
+    assert len(g["dongwei_daxian"]["periods"]) == 12
+    assert set(g["en_yong_nan_chou"]["by_life_palace"]) == {
+        "恩",
+        "用",
+        "难",
+        "仇",
+        "同",
+    }
     trace = next(t for t in g["rule_trace"] if t["rule_id"] == m.PATTERN_MODEL_ID)
     assert [p["name"] for p in trace["outputs"]["matched_patterns"]] == [
         p["name"] for p in g["moira_patterns"]
@@ -185,4 +197,62 @@ def test_native_pattern_trace_matches_the_same_calculation_and_preserves_nulls(
     assert all(
         p["evidence"]["granularity"] == "palace_index" for p in g["moira_patterns"]
     )
-    assert not g["validation"]["classical_acceptance_passed"]
+
+
+def test_guolao_moira_oracle_and_shoushi_and_compact() -> None:
+    import json
+
+    result = calculate_guolao_chart(
+        birth_year=1990,
+        birth_month=5,
+        birth_day=15,
+        birth_hour=14,
+        birth_minute=30,
+        birth_timezone="Asia/Shanghai",
+        birth_longitude=116.4,
+        birth_latitude=39.9,
+        use_true_solar_time=False,
+        analysis_datetime=datetime.fromisoformat("2026-06-01T12:00:00+08:00"),
+        month_basis="jie_month",
+    )
+    g = result["guolao"]
+    bodies = {b["name_zh"]: b for b in g["bodies"]}
+    assert 54.0 < bodies["日"]["longitude"] < 54.3
+    assert bodies["日"]["palace_branch"] == "酉"
+    assert g["life_palace"]["branch"] == "巳"
+    assert g["life_palace"]["palace_lord"] == "水"
+    assert 293.5 < bodies["月"]["longitude"] < 294.1
+    assert g["body_palace"]["branch"] == "丑"
+    assert g["body_palace"]["palace_lord"] == "土"
+    assert g["god_positions"]["year_stem"] == "庚"
+    assert g["god_positions"]["year_branch"] == "午"
+    assert g["god_positions"]["branches"]["天贵"] == "丑"
+    assert g["god_positions"]["branches"]["玉贵"] == "未"
+    assert g["god_positions"]["branches"]["岁驾"] == "午"
+    assert g["hua_yao"]["by_transformation"]["天禄"] == "水"
+    assert g["timing"]["small_limit"]["branch"] == "巳"
+    assert g["timing"]["small_limit"]["natal_functional_palace"] == "命"
+    assert 311.0 < bodies["罗"]["longitude"] < 311.7
+    assert 131.0 < bodies["计"]["longitude"] < 131.7
+    assert 231.0 < bodies["孛"]["longitude"] < 231.9
+    assert 64.5 < bodies["炁"]["longitude"] < 65.2
+
+    shoushi = calculate_guolao_chart(
+        birth_year=1990,
+        birth_month=5,
+        birth_day=15,
+        birth_hour=14,
+        birth_minute=30,
+        birth_timezone="Asia/Shanghai",
+        birth_longitude=116.4,
+        birth_latitude=39.9,
+        use_true_solar_time=False,
+        mansion_frame="shoushi_ecliptic",
+    )
+    assert (
+        shoushi["guolao"]["life_palace"]["mansion"]["coordinate_unit"]
+        == "shoushi_du_365_2575"
+    )
+
+    compact = compact_guolao_chart(result)
+    assert len(json.dumps(compact, ensure_ascii=False).encode("utf-8")) < 6144

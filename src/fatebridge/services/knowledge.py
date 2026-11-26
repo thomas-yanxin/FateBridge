@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import Any
 
 from pydantic import JsonValue
 
-from fatebridge.core.human_design import human_design_knowledge
+from fatebridge.core.human_design import knowledge as human_design_knowledge
 from fatebridge.core.knowledge_store import (
     ToolValidationError,
     build_knowledge_registry,
@@ -34,6 +35,41 @@ def _validation_error_payload(error: ToolValidationError) -> dict[str, JsonValue
     }
 
 
+@lru_cache(maxsize=16)
+def _cached_registry(lookup_domain: str | None) -> dict[str, Any]:
+    if lookup_domain == human_design_knowledge.DOMAIN:
+        return human_design_knowledge.build_registry()
+    if lookup_domain in DOMAINS:
+        return build_registry(lookup_domain)
+    if lookup_domain is None or lookup_domain == "":
+        base_registry = build_knowledge_registry(domain=lookup_domain)
+        added = [build_registry(name) for name in DOMAINS]
+        added.append(human_design_knowledge.build_registry())
+        return {
+            **base_registry,
+            "source": "fatebridge_mixed_knowledge",
+            "bundle_version": None,
+            "domains": [
+                *base_registry["domains"],
+                *(
+                    domain_record
+                    for provider in added
+                    for domain_record in provider["domains"]
+                ),
+            ],
+            "provenance": {
+                "source_domain": "fatebridge_mixed_knowledge",
+                "components": [
+                    base_registry["provenance"],
+                    *(provider["provenance"] for provider in added),
+                ],
+                "added_reference_source": SOURCE,
+                "added_reference_scope": SCOPE,
+            },
+        }
+    return build_knowledge_registry(domain=lookup_domain)
+
+
 def calculate_knowledge_registry(
     *,
     domain: str | None = None,
@@ -41,39 +77,7 @@ def calculate_knowledge_registry(
     """List bundled knowledge domains and their available categories."""
     try:
         lookup_domain = domain.strip() if domain is not None else None
-        if lookup_domain == human_design_knowledge.DOMAIN:
-            registry = human_design_knowledge.build_registry()
-        elif lookup_domain in DOMAINS:
-            registry = build_registry(lookup_domain)
-        elif domain is None or domain == "":
-            base_registry = build_knowledge_registry(domain=domain)
-            added = [build_registry(name) for name in DOMAINS]
-            added.append(human_design_knowledge.build_registry())
-            registry = {
-                **base_registry,
-                "source": "fatebridge_mixed_knowledge",
-                "bundle_version": None,
-                "domains": [
-                    *base_registry["domains"],
-                    *(
-                        domain_record
-                        for provider in added
-                        for domain_record in provider["domains"]
-                    ),
-                ],
-                "provenance": {
-                    "source_domain": "fatebridge_mixed_knowledge",
-                    "components": [
-                        base_registry["provenance"],
-                        *(provider["provenance"] for provider in added),
-                    ],
-                    "added_reference_source": SOURCE,
-                    "added_reference_scope": SCOPE,
-                },
-            }
-        else:
-            registry = build_knowledge_registry(domain=domain)
-        return registry
+        return _cached_registry(lookup_domain)
     except ToolValidationError as exc:
         return _validation_error_payload(exc)
     except Exception as exc:

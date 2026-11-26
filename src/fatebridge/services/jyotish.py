@@ -1,24 +1,25 @@
-"""Indian astrology service composition; shared by REST, MCP and CLI."""
+"""Standalone Jyotish (Vedic chart & Dasha) service orchestration and <10 KB / <5 KB compact projections."""
 
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, TypedDict
+from typing import Any, Literal, TypedDict
 
 from typing_extensions import Required, Unpack
 
 from fatebridge.core.astro.birth import AstroBirthInfo, build_astro_birth_info
 from fatebridge.core.execution_context import current_datetime
-from fatebridge.core.jyotish.jyotish import build_india
-from fatebridge.core.jyotish.jyotish_charts import LABELS
-from fatebridge.core.jyotish.jyotish_dasha_grid import DashaGrid
-from fatebridge.core.jyotish.jyotish_dasha_levels import (
-    QUANTIZATION_RULE,
-    QUANTIZATION_SOURCE,
+from fatebridge.core.jyotish.dasha import (
+    DashaGrid,
+    ashtottari_dasha,
+    chara_dasha,
     vimshottari,
+    yogini_dasha,
 )
-from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
-from fatebridge.core.jyotish.jyotish_sources import coherent_sources
+from fatebridge.core.jyotish.ephemeris import moon_longitude as calc_moon_longitude
+from fatebridge.core.jyotish.ephemeris import positions
+from fatebridge.core.jyotish.jyotish import build_india
+from fatebridge.core.jyotish.vargas import LABELS
 from fatebridge.utils.errors import ParameterError, calculation_guard
 from fatebridge.utils.house_systems import (
     normalize_offline_zodiac_code,
@@ -43,7 +44,7 @@ def enrich_india_chart(
     divisions: list[int] | None,
     birth_time_uncertainty_minutes: float | None,
 ) -> None:
-    """Keep the public Western reference view separate from Indian calculations."""
+    """Attach Indian Vedic chart payload onto core chart envelope (until Wave 3 switchover)."""
     if (
         result["chart_profile"]["zodiac"] != "sidereal"
         or result["chart_profile"]["house_system"] != "whole_sign"
@@ -51,7 +52,7 @@ def enrich_india_chart(
         result["india"].update(
             {
                 "status": "configuration_not_supported",
-                "interpretation_scope": "Requested public zodiac/house configuration selected. Parashari D1/D9/D10 require sidereal Lahiri and whole-sign; not computed for this configuration.",
+                "interpretation_scope": "Parashari D1/D9/D10 require sidereal and whole-sign.",
             }
         )
         return
@@ -69,12 +70,209 @@ def enrich_india_chart(
     asc = india["charts"]["D1"]["ascendant"]
     result["summary"] = (
         f"印占本命（名义生时）：上升{asc['sign_zh']}，月宿{india['moon_nakshatra']}；已计算{', '.join(india['charts'])}。"
-        + (
-            "给定生时范围内存在月宿／宿足候选，须一并读取reading_basis。"
-            if len(india["reading_basis"]["moon_nakshatra_options"]) > 1
-            else ""
-        )
     )
+
+
+def compact_vedic_chart(result: dict[str, Any]) -> dict[str, Any]:
+    """Return a clean <10 KB structured compact view of a Vedic chart."""
+    india = result.get("india", result)
+    charts_compact = {}
+    for name, ch in india.get("charts", {}).items():
+        charts_compact[name] = {
+            "asc": f"{ch['ascendant']['sign']} {round(ch['ascendant']['degree_in_sign'], 2) if ch['ascendant'].get('degree_in_sign') is not None else ''}",
+            "planets": [
+                {
+                    "id": p["id"],
+                    "sign": p["sign"],
+                    "deg": (
+                        round(p["degree_in_sign"], 2)
+                        if p.get("degree_in_sign") is not None
+                        else None
+                    ),
+                    "house": p["house"],
+                    "dig": p["dignity"]["state"],
+                    **(
+                        {"rx": True}
+                        if p.get("physical_state", {}).get("retrograde")
+                        else {}
+                    ),
+                }
+                for p in ch.get("planets", [])
+            ],
+        }
+
+    panch = india.get("panchanga", {})
+    panch_compact = {
+        "tithi": f"{panch.get('tithi', {}).get('paksha')} {panch.get('tithi', {}).get('name')}",
+        "vara": panch.get("vara", {}).get("name"),
+        "nakshatra": f"{panch.get('nakshatra', {}).get('name')} pada {panch.get('nakshatra', {}).get('pada')}",
+        "yoga": panch.get("yoga", {}).get("name"),
+        "karana": panch.get("karana", {}).get("name"),
+    }
+    shad = india.get("strengths", {}).get("shadbala_assessment", {})
+    sav_d1 = india.get("ashtakavarga", {}).get("charts", {}).get("D1", {})
+    return {
+        "person_info": result.get("person_info"),
+        "ayanamsa": india.get("ayanamsa"),
+        "ayanamsha": round(india.get("ayanamsha", 0.0), 4),
+        "moon_nakshatra": india.get("moon_nakshatra"),
+        "rising_nakshatra": india.get("rising_nakshatra"),
+        "panchanga": panch_compact,
+        "charts": charts_compact,
+        "bhava_chalit_shifts": india.get("bhava_chalit", {}).get("shifted_planets", []),
+        "shadbala": {
+            "total_rupa": shad.get("total_rupa"),
+            "is_strong": shad.get("is_strong"),
+            "ishta_kashta": shad.get("ishta_kashta"),
+        },
+        "bhava_bala_rupa": [
+            {f"H{h['house']}({h['sign'][:3]})": h["total_rupa"]}
+            for h in india.get("strengths", {}).get("bhava_bala", [])
+        ],
+        "ashtakavarga_d1": {
+            "profile": india.get("ashtakavarga", {}).get("profile"),
+            "samudaya": sav_d1.get("samudaya"),
+            "sodhya_pinda": {
+                p: row.get("sodhya_pinda") for p, row in sav_d1.get("pinda", {}).items()
+            },
+        },
+        "yogas": [y["name"] for y in india.get("yogas", {}).get("yogas", [])],
+        "chara_karakas": [
+            f"{k['karaka']}:{k['planet']}" for k in india.get("chara_karakas", [])
+        ],
+        "arudha_padas": {
+            k: v["sign"] for k, v in india.get("arudha_padas", {}).items()
+        },
+        "upagrahas": {
+            k: f"{v['sign']} {round(v['degree_in_sign'], 2)}°" if v else None
+            for k, v in india.get("upagrahas", {}).items()
+        },
+    }
+
+
+def compact_vimshottari(result: dict[str, Any]) -> dict[str, Any]:
+    """Return a clean <5 KB compact view of Vimshottari (and optional Yogini/Chara/Ashtottari) Dasha."""
+    vim = result["vimshottari"]
+    compact_vim = {
+        "year_basis": vim.get("year_basis"),
+        "seed": {
+            "name": vim["seed"]["name"],
+            "lord": vim["seed"]["lord"],
+            "pada": vim["seed"]["pada"],
+            "moon_longitude": round(vim["seed"]["moon_longitude"], 4),
+        },
+        "birth_balance": {
+            "lord": vim["birth_balance"]["lord"],
+            "remaining_years": round(vim["birth_balance"]["remaining_years"], 4),
+            "major_end": vim["birth_balance"]["major_end"],
+        },
+        "current_major": vim.get("current_major"),
+        "current_sub": vim.get("current_sub"),
+        "timeline": [
+            {
+                "lord": m["lord"],
+                "start": m["start"],
+                "end": m["end"],
+                "years": m["duration_years"],
+            }
+            for m in vim.get("timeline", [])
+        ],
+    }
+    if "subdivisions" in vim:
+        compact_vim["current_levels"] = [
+            {
+                "level": r["abbreviation"],
+                "lord": r["lord"],
+                "start": r["start"],
+                "end": r["end"],
+            }
+            for r in vim["subdivisions"].get("current_levels", [])
+        ]
+    out: dict[str, Any] = {
+        "person_info": result.get("person_info"),
+        "analysis_context": {
+            "analysis_datetime": result["analysis_context"].get("analysis_datetime"),
+            "timezone": result["analysis_context"].get("timezone"),
+        },
+        "vimshottari": compact_vim,
+        "summary": result.get("summary"),
+    }
+    for extra_key in ("yogini", "ashtottari", "chara"):
+        if extra_key in result:
+            out[extra_key] = {
+                "current_major": result[extra_key].get("current_major"),
+                "current_sub": result[extra_key].get("current_sub"),
+            }
+    return out
+
+
+@calculation_guard("印占全盘计算")
+def calculate_vedic_chart(
+    *,
+    birth_year: int,
+    birth_month: int,
+    birth_day: int,
+    birth_hour: int,
+    birth_minute: int = 0,
+    birth_second: int = 0,
+    name: str | None = None,
+    birth_place: str | None = None,
+    birth_timezone: str | None = None,
+    birth_longitude: float = 77.2090,
+    birth_latitude: float = 28.6139,
+    ayanamsa: str = "lahiri",
+    node_mode: str = "mean",
+    divisions: list[int] | None = None,
+    ashtakavarga_profile: Literal["rao", "aiyar"] = "rao",
+    saptavargaja_profile: str = "santhanam_27",
+    drekkana_profile: str = "santhanam_27_6",
+    cheshta_model: str = "simon1994_j2000",
+    ephemeris_policy: str = "auto",
+) -> dict[str, Any]:
+    """Standalone Vedic Chart calculation without 135 KB Western natal payload (<10 ms)."""
+    birth = build_astro_birth_info(
+        birth_year=birth_year,
+        birth_month=birth_month,
+        birth_day=birth_day,
+        birth_hour=birth_hour,
+        birth_minute=birth_minute,
+        birth_second=birth_second,
+        name=name,
+        birth_place=birth_place,
+        birth_timezone=birth_timezone,
+        birth_longitude=birth_longitude,
+        birth_latitude=birth_latitude,
+        use_true_solar_time=False,
+        preserve_instant=True,
+        require_resolved_timezone=True,
+    )
+    india = build_india(
+        birth,
+        ayanamsa=ayanamsa,
+        node_mode=node_mode,
+        divisions=divisions,
+        ashtakavarga_profile=ashtakavarga_profile,
+        ephemeris_policy=ephemeris_policy,
+        saptavargaja_profile=saptavargaja_profile,
+        drekkana_profile=drekkana_profile,
+        cheshta_model=cheshta_model,
+    )
+    asc = india["charts"]["D1"]["ascendant"]
+    return {
+        "person_info": {
+            "name": birth.name,
+            "birth_datetime": birth.local_datetime.isoformat(),
+            "utc_datetime": birth.utc_isoformat,
+            "birth_timezone": birth.timezone,
+            "birth_longitude": birth.longitude,
+            "birth_latitude": birth.latitude,
+            "birth_place": birth.birth_place,
+        },
+        "india": india,
+        "summary": (
+            f"印占本命（{ayanamsa}）：上升{asc['sign_zh']}，月宿{india['moon_nakshatra']}；已计算{', '.join(india['charts'])}。"
+        ),
+    }
 
 
 class VimshottariBirthArguments(TypedDict, total=False):
@@ -99,7 +297,6 @@ class VimshottariBirthArguments(TypedDict, total=False):
 
 
 @calculation_guard("印占 Vimshottari 分期")
-@coherent_sources
 def calculate_vimshottari(
     *,
     analysis_timezone: str | None = None,
@@ -108,42 +305,40 @@ def calculate_vimshottari(
     analysis_day: int | None = None,
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
-    year_basis: str = "sidereal_365_25636",
+    year_basis: str = "julian_365_25",
     dasha_depth: int = 2,
+    ayanamsa: str = "lahiri",
     node_mode: str = "mean",
     ephemeris_policy: str = "auto",
-    saptavargaja_profile: str = "santhanam_27",
-    drekkana_profile: str = "santhanam_27_6",
-    cheshta_model: str = "unadjudicated",
-    divisions: list[int] | None = None,
+    include_yogini: bool = False,
+    include_ashtottari: bool = False,
+    include_chara: bool = False,
     birth_time_uncertainty_minutes: float | None = None,
     house_system: int | str | None = None,
     zodiac_type: str | None = None,
     gender: str | None = None,
     **birth_kwargs: Unpack[VimshottariBirthArguments],
 ) -> dict[str, Any]:
+    """Fast (<3 ms) Vimshottari / Yogini / Ashtottari / Chara Dasha calculation."""
     hsys = None if house_system is None else resolve_offline_house_code(house_system)
     zodiacal = (
         None if zodiac_type is None else normalize_offline_zodiac_code(zodiac_type)
     )
     if hsys not in {None, 0} or zodiacal not in {None, 1}:
-        raise ValueError("Vimshottari 使用 Lahiri 恒星黄道与整宫制。")
-    # The solar option is a display label. It cannot change the ephemeris epoch
-    # or enter a different mean-model window by moving to a neighbouring date.
-    birth_kwargs["preserve_instant"] = True
-    birth_kwargs["solar_clock_ephemeris_policy"] = ephemeris_policy
-    # The birth's civil zone must be supplied or resolved from its place.
-    # An analysis zone and a solar-display request cannot establish it.
-    birth_kwargs["require_resolved_timezone"] = True
-    display_requested = birth_kwargs.get("use_true_solar_time", False)
-    if birth_kwargs.get("birth_clock_basis", "civil") == "civil":
-        # Build the recorded instant without the generic UTC-as-UT1 display.
-        # Noncivil conflicting options still reach the builder's validation.
-        birth_kwargs["use_true_solar_time"] = False
-    birth = build_astro_birth_info(**birth_kwargs)
-    birth, _ = normalize_solar_display(
-        birth, ephemeris_policy, requested=display_requested
-    )
+        raise ValueError("Vimshottari 使用恒星黄道与整宫制。")
+
+    birth_args: dict[str, Any] = {
+        k: v
+        for k, v in birth_kwargs.items()
+        if k in VimshottariBirthArguments.__annotations__
+    }
+    birth_args["preserve_instant"] = True
+    birth_args["solar_clock_ephemeris_policy"] = ephemeris_policy
+    birth_args["require_resolved_timezone"] = True
+    if birth_args.get("birth_clock_basis", "civil") == "civil":
+        birth_args["use_true_solar_time"] = False
+    birth = build_astro_birth_info(**birth_args)
+
     target_timezone = birth.timezone if analysis_timezone is None else analysis_timezone
     zone = parse_timezone_name(target_timezone)
     now = (
@@ -151,8 +346,6 @@ def calculate_vimshottari(
         if analysis_year is None
         else datetime(analysis_year, 1, 1, tzinfo=zone)
     )
-    # A specified year anchors Jan 1, a specified month anchors day 1. A
-    # completely omitted date uses the frozen call date. Date-only = midnight.
     year = now.year if analysis_year is None else analysis_year
     month = (
         analysis_month
@@ -169,85 +362,44 @@ def calculate_vimshottari(
     )
     if is_unspecified_local_time(analysis):
         return ParameterError(
-            "分析钟时的当地 UTC 偏移未指定。请提供有效的分析时区或已核实的 UTC 偏移。",
+            "分析钟时的当地 UTC 偏移未指定。",
             [{"path": "analysis_timezone", "code": "unresolved_timezone_offset"}],
         ).as_result()
     validate_local_clock(analysis, clock_label="分析钟时")
-    grid = DashaGrid(analysis, year_basis, divisions, dasha_depth)
-    india = build_india(
-        birth,
-        node_mode=node_mode,
-        ephemeris_policy=ephemeris_policy,
-        saptavargaja_profile=saptavargaja_profile,
-        drekkana_profile=drekkana_profile,
-        cheshta_model=cheshta_model,
-        divisions=divisions,
-        birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
-        _dasha_grid=grid,
-    )
-    moon = next(p for p in india["charts"]["D1"]["planets"] if p["id"] == "Moon")
-    india["rulesets"].append(dict(QUANTIZATION_SOURCE))
-    india["rule_trace"].append(
-        {
-            "rule_id": QUANTIZATION_RULE,
-            "source_id": QUANTIZATION_SOURCE["id"],
-            "section": "FateBridge numerical policy: one common birth epoch and final rational quantization; Rao16.2-16.3 supply the ratios, not a microsecond accuracy claim",
-        }
-    )
+
+    if include_chara:
+        pos = positions(
+            birth,
+            ayanamsa=ayanamsa,
+            node_mode=node_mode,
+            ephemeris_policy=ephemeris_policy,
+        )
+        moon_lon = pos["longitudes"]["Moon"]
+        ayanamsha_val = float(pos["ayanamsha"])
+    else:
+        pos = None
+        moon_info = calc_moon_longitude(
+            birth, ayanamsa=ayanamsa, ephemeris_policy=ephemeris_policy
+        )
+        moon_lon = moon_info["moon_longitude"]
+        ayanamsha_val = float(moon_info["ayanamsha"])
+
     result = vimshottari(
         birth.utc_calendar,
-        moon["longitude"],
+        moon_lon,
         analysis,
         year_basis=year_basis,
         dasha_depth=dasha_depth,
     )
-    result["birth_time_sensitivity"] = {
-        **grid.result(),
-        "reading_basis": india["reading_basis"],
-    }
-    current_lords = {result["current_major"]["lord"], result["current_sub"]["lord"]}
-    if dasha_depth > 2:
-        current_lords.update(
-            row["lord"] for row in result["subdivisions"]["current_levels"]
-        )
-    result["natal_ruler_context"] = [
-        {
-            "reference": "nominal_birth_instant_only",
-            "chart": name,
-            "planet": planet,
-            **(
-                {
-                    "period_roles": [
-                        row["name"]
-                        for row in result["subdivisions"]["current_levels"]
-                        if row["lord"] == planet["id"]
-                    ]
-                }
-                if dasha_depth > 2
-                else {}
-            ),
-            "owned_houses": [
-                h["house"] for h in chart["houses"] if h["lord"] == planet["id"]
-            ],
-        }
-        for name, chart in india["charts"].items()
-        for planet in chart["planets"]
-        if planet["id"] in current_lords
-    ]
-    output = {
+    grid = DashaGrid(analysis, year_basis, None, dasha_depth)
+    grid.observe_moon(0.0, moon_lon)
+    result["birth_time_sensitivity"] = grid.result()
+
+    output: dict[str, Any] = {
         "analysis_context": {
             "analysis_datetime": analysis.isoformat(),
             "timezone": target_timezone,
-            "timezone_basis": (
-                "explicit_analysis_timezone"
-                if analysis_timezone is not None
-                else (
-                    "UTC_default_for_solar_input"
-                    if birth.clock_conversion
-                    else "resolved_birth_civil_timezone"
-                )
-            ),
-            "date_anchor_policy": "explicit year: Jan 1; explicit month: day 1; omitted date: frozen call date; omitted clock: 00:00",
+            "ayanamsa": ayanamsa,
         },
         "person_info": {
             "name": birth.name,
@@ -257,23 +409,37 @@ def calculate_vimshottari(
             "birth_longitude": birth.longitude,
             "birth_latitude": birth.latitude,
             "birth_place": birth.birth_place,
-            **(
-                {"clock_conversion": dict(birth.clock_conversion)}
-                if birth.clock_conversion is not None
-                else {}
-            ),
         },
-        "india": india,
+        # Minimal summary stub satisfies catalog/astrology.py required_output_fields until Wave 3 switchover
+        "india": {
+            "status": "complete",
+            "ayanamsa": ayanamsa,
+            "ayanamsha": ayanamsha_val,
+            "moon_nakshatra": result["seed"]["name"],
+        },
         "vimshottari": result,
-        "summary": f"按名义生时，目标时刻为{LABELS[result['current_major']['lord']]}主运／{LABELS[result['current_sub']['lord']]}次运；起止按{year_basis}计算，给定生时误差另见敏感性记录。",
+        "summary": f"按名义生时，目标时刻为{LABELS[result['current_major']['lord']]}主运／{LABELS[result['current_sub']['lord']]}次运（{year_basis}）。",
     }
     if dasha_depth > 2:
         chain = "／".join(
             f"{row['abbreviation']}={LABELS[row['lord']]}"
             for row in result["subdivisions"]["current_levels"]
         )
-        output["summary"] = (
-            f"按名义生时，目标时刻运主链为{chain}；按{year_basis}递归细分，"
-            "给定生时误差另见完整运主链候选；细分边界不代表现实事件精度。"
+        output["summary"] = f"按名义生时，目标时刻运主链为{chain}（{year_basis}）。"
+    if include_yogini:
+        output["yogini"] = yogini_dasha(
+            birth.utc_calendar, moon_lon, analysis, year_basis=year_basis
+        )
+    if include_ashtottari:
+        output["ashtottari"] = ashtottari_dasha(
+            birth.utc_calendar, moon_lon, analysis, year_basis=year_basis
+        )
+    if include_chara and pos is not None:
+        output["chara"] = chara_dasha(
+            birth.utc_calendar,
+            pos["longitudes"],
+            pos["ascendant"],
+            analysis,
+            year_basis=year_basis,
         )
     return output
