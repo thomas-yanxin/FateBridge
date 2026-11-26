@@ -22,7 +22,7 @@ def resolve_spec(specs: list[ToolSpec], name: str) -> ToolSpec | None:
 
 
 def unwrap_optional(annotation: object) -> object:
-    """Strip a single ``Optional[...]`` / ``Union[..., None]`` wrapper."""
+    """Return the first non-null union member for nested-model inspection."""
     if get_origin(annotation) in (Union, UnionType):
         non_none = [a for a in get_args(annotation) if a is not type(None)]
         if non_none:
@@ -38,12 +38,6 @@ def is_model_field(annotation: object) -> bool:
 
 def field_type_name(annotation: object) -> str:
     """Render a field annotation as a short, agent-readable type string."""
-    # Multi-member Unions (e.g. ``house_system: Union[int, str]``) must surface
-    # every accepted type, not just the first — otherwise an agent reading the
-    # self-describe surface sees only ``int`` and never learns it may pass
-    # ``"placidus"``/``"equal_mc"``. (MCP input validation is unaffected; it
-    # binds the live annotation, but the human/agent-readable ``type`` string
-    # comes from here.)
     if get_origin(annotation) in (Union, UnionType):
         non_none = [a for a in get_args(annotation) if a is not type(None)]
         if len(non_none) > 1:
@@ -67,13 +61,7 @@ def spec_is_cli_safe(spec: ToolSpec) -> bool:
 
 
 def describe_spec(spec: ToolSpec) -> dict[str, Any]:
-    """Self-describing, transport-agnostic record for one tool.
-
-    The CLI ``describe`` command and the REST ``GET /api/tools`` endpoint both
-    render this, so an agent sees the same parameter schema, surfaces, and family
-    regardless of how it discovers the tool. ``surfaces.mcp_name`` is ``None`` for
-    REST-only tools so an agent never assumes an MCP tool that does not exist.
-    """
+    """Describe one tool's schemas, capabilities and available transports."""
     return _describe_contract(spec, include_output_schema=True)
 
 

@@ -15,6 +15,6 @@
 
 三合关系按[地支成员口径](bazi-relations-audit.md)区分三字齐、含中神的半合及缺中神的拱候选。盘内已齐与跨盘共同出现可以同时记录。`effect_status=relation_only` 表示接触资格，取用与作用仍按双方各自的状态解释。
 
-Agent 用已取得的柱位与方向组织解读，并结合当事人已确认的实际互动。旧综合分与传统净分字段已移除。固定历史账本仍见 `tests/data/compatibility/score-ledger.json` 和 `tests/data/compatibility/source-condition-ledger.json`。
+Agent 用已取得的柱位与方向组织解读，并结合当事人已确认的实际互动。
 
 实现见[双人服务](../src/fatebridge/services/compatibility.py)及[共享八字关系](../src/fatebridge/core/bazi/bazi_evidence.py)。全量交付与严格投影见[Agent 接入](agent-guide.md)。

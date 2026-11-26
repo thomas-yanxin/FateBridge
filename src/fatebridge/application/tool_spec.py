@@ -63,7 +63,7 @@ class BoundServiceCall(NamedTuple):
 
 
 class Bind(Protocol):
-    """Bind a validated request while supporting existing tuple consumers."""
+    """Bind a validated request to its service and arguments."""
 
     def __call__(
         self, request: BaseModel, /
@@ -81,8 +81,8 @@ class OutputValidator(Protocol):
         self,
         spec: ToolSpec,
         result: ServiceResult,
-        validation_model: BaseModel | None,
         request: BaseModel | None,
+        validated: BaseModel | None,
         /,
     ) -> None: ...
 

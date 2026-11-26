@@ -15,7 +15,7 @@ from pydantic import ValidationError
 import fatebridge.api as api_module
 import fatebridge.mcp_server as mcp_module
 from fatebridge.cli import run as cli_run
-from fatebridge.core.psychometrics import (
+from fatebridge.core.psychometrics.ipip_big_five import (
     DOMAIN_ORDER,
     IPIP_BIG_FIVE_ITEMS,
     ITEMS_BY_DOMAIN,
