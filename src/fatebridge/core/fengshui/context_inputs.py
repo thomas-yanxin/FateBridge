@@ -22,7 +22,7 @@ from fatebridge.core.fengshui.interior_inputs import (
     validate_relation_references,
 )
 from fatebridge.core.fengshui.material_inputs import MaterialShapeFact
-from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
 from fatebridge.core.fengshui.workstation_inputs import WorkstationReview
 
 ContextBasis = Literal["measured", "user_confirmed"]
@@ -60,7 +60,7 @@ CONTEXT_FACT_SCHEMA: dict[str, Any] = {
 }
 
 
-class ContextFact(_DeferredModel):
+class ContextFact(FengshuiInput):
     observation_basis: ContextBasis = "user_confirmed"
     evidence: str = Field(min_length=1, max_length=1000)
 
@@ -321,7 +321,7 @@ class EnvironmentalObject(ContextFact):
         return self
 
 
-class EnvironmentalContext(_DeferredModel):
+class EnvironmentalContext(FengshuiInput):
     model_config = ConfigDict(json_schema_extra=CONTEXT_FACT_SCHEMA)
 
     ruleset_id: Literal["expert_environment_2026_10_v1"] = (

@@ -8,29 +8,18 @@ from typing import Annotated
 from pydantic import Field, model_validator
 from pydantic_core import PydanticCustomError
 
-from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.core.requests.base import FateBridgeBaseRequest
 from fatebridge.utils.birth_input import MAX_PERSON_BIRTH_YEAR, MIN_PERSON_BIRTH_YEAR
 
 
-class FateBridgeRequest(_DeferredModel):
-    """Request model for individual destiny analysis"""
+class BirthClockBase(FateBridgeBaseRequest):
+    """Shared birth clock and optional place/longitude fields across domains."""
 
     name: str | None = Field(
         default="未提供",
-        description="姓名（可选，仅用于结果快照中的标识，不参与计算）",
+        description="姓名（可选，仅用于结果标识，不参与计算）",
     )
-    gender: str | None = Field(
-        default="未知",
-        description=(
-            "性别（可选但建议提供：影响大运顺逆排布与部分六亲判断）。"
-            "接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法。"
-        ),
-    )
-    birth_year: int = Field(
-        ge=MIN_PERSON_BIRTH_YEAR,
-        le=MAX_PERSON_BIRTH_YEAR,
-        description="Birth year (1900–2100, the existing individual-birth service range)",
-    )
+    birth_year: int = Field(description="Birth year")
     birth_month: int = Field(ge=1, le=12, description="Birth month (1-12)")
     birth_day: int = Field(ge=1, le=31, description="Birth day (1-31)")
     birth_hour: int = Field(ge=0, le=23, description="Birth hour (0-23)")
@@ -43,6 +32,23 @@ class FateBridgeRequest(_DeferredModel):
     )
     birth_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="Birth longitude (optional)"
+    )
+
+
+class FateBridgeRequest(BirthClockBase):
+    """Request model for individual destiny analysis"""
+
+    gender: str | None = Field(
+        default="未知",
+        description=(
+            "性别（可选但建议提供：影响大运顺逆排布与部分六亲判断）。"
+            "接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法。"
+        ),
+    )
+    birth_year: int = Field(
+        ge=MIN_PERSON_BIRTH_YEAR,
+        le=MAX_PERSON_BIRTH_YEAR,
+        description="Birth year (1900–2100, the existing individual-birth service range)",
     )
     use_true_solar_time: bool = Field(
         default=True,
@@ -97,15 +103,11 @@ class BaziClockRequest(FateBridgeRequest):
 AstroBirthYear = Annotated[int, Field(ge=MINYEAR, le=MAXYEAR)]
 
 
-class AstroBirthRequest(_DeferredModel):
-    """Base birth request model for offline astrology endpoints."""
+class AstroBirthBase(BirthClockBase):
+    """Shared astrology birth request with optional coordinates."""
 
     name: str | None = Field(default="未提供", description="Name (optional)")
     birth_year: AstroBirthYear = Field(description="Birth year, e.g., 1990")
-    birth_month: int = Field(ge=1, le=12, description="Birth month (1-12)")
-    birth_day: int = Field(ge=1, le=31, description="Birth day (1-31)")
-    birth_hour: int = Field(ge=0, le=23, description="Birth hour (0-23)")
-    birth_minute: int = Field(default=0, ge=0, le=59, description="Birth minute (0-59)")
     birth_timezone: str | None = Field(
         default=None,
         description=(
@@ -117,6 +119,14 @@ class AstroBirthRequest(_DeferredModel):
             "historical clock accuracy."
         ),
     )
+    birth_latitude: float | None = Field(
+        default=None, ge=-90, le=90, description="Birth latitude (optional)"
+    )
+    birth_place: str | None = Field(default="未提供", description="Birth place")
+
+
+class AstroBirthRequest(AstroBirthBase):
+    """Base birth request model requiring explicit coordinates for Western endpoints."""
+
     birth_longitude: float = Field(ge=-180, le=180, description="Birth longitude")
     birth_latitude: float = Field(ge=-90, le=90, description="Birth latitude")
-    birth_place: str | None = Field(default="未提供", description="Birth place")

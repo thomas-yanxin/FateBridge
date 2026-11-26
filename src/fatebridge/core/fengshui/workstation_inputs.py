@@ -4,16 +4,16 @@ from typing import Any, Literal
 
 from pydantic import ConfigDict, Field, StrictBool, StrictInt, model_validator
 
-from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
 
 
-class ObservedCondition(_DeferredModel):
+class ObservedCondition(FengshuiInput):
     value: StrictBool | None
     observation_basis: Literal["measured", "user_confirmed", "image_observed"]
     evidence: str = Field(min_length=1, max_length=1000, pattern=r"\S")
 
 
-class WorkstationActivity(_DeferredModel):
+class WorkstationActivity(FengshuiInput):
     ruleset_id: Literal["workstation_activity_authored_v1"]
     object_id: str = Field(min_length=1, max_length=100, pattern=r"\S")
     activity: Literal["work", "study", "meditation", "storage", "mixed", "unknown"]
@@ -25,7 +25,7 @@ class WorkstationActivity(_DeferredModel):
     )
 
 
-class EntryBarrier(_DeferredModel):
+class EntryBarrier(FengshuiInput):
     ruleset_id: Literal["afsi_entry_barrier_v1"]
     relation_id: str = Field(min_length=1, max_length=100, pattern=r"\S")
     entrance_id: str = Field(min_length=1, max_length=100, pattern=r"\S")
@@ -50,12 +50,12 @@ class EntryBarrier(_DeferredModel):
         return self
 
 
-class EvaluationPeriod(_DeferredModel):
+class EvaluationPeriod(FengshuiInput):
     number: StrictInt = Field(ge=1, le=9)
     evidence: str = Field(min_length=1, max_length=1000, pattern=r"\S")
 
 
-class WorkstationReview(_DeferredModel):
+class WorkstationReview(FengshuiInput):
     model_config = ConfigDict(
         json_schema_extra={
             "anyOf": [
@@ -90,7 +90,7 @@ class WorkstationReview(_DeferredModel):
         return self
 
 
-class MaterialApplication(_DeferredModel):
+class MaterialApplication(FengshuiInput):
     ruleset_id: Literal["afsi_application_conditions_v1"]
     target_request_id: str | None = Field(
         default=None,

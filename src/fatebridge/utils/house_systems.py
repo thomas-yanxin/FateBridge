@@ -9,9 +9,10 @@ INVALID_HOUSE_SYSTEM_MESSAGE = (
     "House system must be a supported letter, name, or integer code0..8."
 )
 INVALID_HOUSE_CODE_MESSAGE = (
-    "hsys must be an integer code0..8; boolean and floating-point values are invalid."
+    "house_system must be an integer code 0..8 or a supported offline house system letter/name (W, B, R, P, K, V, T, S, D); "
+    "boolean and floating-point values are invalid."
 )
-OFFLINE_HOUSE_CODE_NOTE = " Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected."
+OFFLINE_HOUSE_CODE_NOTE = " Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected."
 GAUQUELIN_UNSUPPORTED_MESSAGE = "Gauquelin (G) uses 36 clockwise sectors and is unavailable in the twelve-house interface."
 GAUQUELIN_IDENTIFIERS = frozenset(
     {
@@ -299,3 +300,38 @@ def normalize_house_system(house_system: object, default: str = "P") -> str:
         if house_system is None
         else _resolve_house_identifier(house_system)
     )
+
+
+def resolve_offline_house_code(value: object) -> int:
+    """Resolve an offline house selector (0..8 or supported letter/name) to code 0..8."""
+    try:
+        letter = _resolve_house_identifier(value)
+    except UnsupportedGauquelinError:
+        raise
+    except InvalidHouseSystemError:
+        raise InvalidHouseCodeError(INVALID_HOUSE_CODE_MESSAGE) from None
+    code = HOUSE_SYSTEM_LETTER_INFO.get(letter, (None, "", ""))[0]
+    if code is None:
+        raise InvalidHouseCodeError(INVALID_HOUSE_CODE_MESSAGE)
+    return code
+
+
+def normalize_zodiac_type(value: object) -> object:
+    """Normalize Tropic/Tropical/Sidereal strings to 'Tropic' or 'Sidereal'."""
+    if isinstance(value, str):
+        token = value.strip().casefold()
+        if token in {"tropic", "tropical"}:
+            return "Tropic"
+        if token == "sidereal":
+            return "Sidereal"
+    return value
+
+
+def normalize_offline_zodiac_code(value: object) -> int:
+    """Resolve a zodiac type string ('Tropic'/'tropical' -> 0, 'Sidereal'/'sidereal' -> 1)."""
+    normalized = normalize_zodiac_type(value)
+    if normalized == "Tropic":
+        return 0
+    if normalized == "Sidereal":
+        return 1
+    raise ValueError("zodiac_type must be 'Tropic' or 'Sidereal'")

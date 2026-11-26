@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from pydantic import Field
 
-from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.core.requests.base import FateBridgeBaseRequest
 
 
-class KnowledgeRegistryRequest(_DeferredModel):
+class KnowledgeRegistryRequest(FateBridgeBaseRequest):
     """Request model for bundled knowledge registry."""
 
     domain: str | None = Field(
@@ -16,7 +16,7 @@ class KnowledgeRegistryRequest(_DeferredModel):
     )
 
 
-class KnowledgeReadRequest(_DeferredModel):
+class KnowledgeReadRequest(FateBridgeBaseRequest):
     """Request model for bundled knowledge lookup."""
 
     domain: str = Field(

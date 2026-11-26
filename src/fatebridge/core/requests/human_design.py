@@ -8,10 +8,10 @@ from fatebridge.core.human_design.human_design_birth_clock import resolve_birth_
 from fatebridge.core.human_design.human_design_cycle_input import (
     validate_cycle_reference,
 )
-from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.core.requests.base import FateBridgeBaseRequest
 
 
-class HumanDesignRequest(_DeferredModel):
+class HumanDesignRequest(FateBridgeBaseRequest):
     name: str | None = Field(default=None, description="显示名称，不参与计算")
     birth_year: int = Field(ge=1800, le=2399, description="公历年；不自动转换儒略历")
     birth_month: int = Field(ge=1, le=12, description="公历出生月，1至12")

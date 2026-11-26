@@ -20,6 +20,10 @@ from fatebridge.core.jyotish.jyotish_dasha_levels import (
 from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
 from fatebridge.core.jyotish.jyotish_sources import coherent_sources
 from fatebridge.utils.errors import ParameterError, calculation_guard
+from fatebridge.utils.house_systems import (
+    normalize_offline_zodiac_code,
+    resolve_offline_house_code,
+)
 from fatebridge.utils.timezones import (
     is_unspecified_local_time,
     parse_timezone_name,
@@ -113,11 +117,15 @@ def calculate_vimshottari(
     cheshta_model: str = "unadjudicated",
     divisions: list[int] | None = None,
     birth_time_uncertainty_minutes: float | None = None,
-    hsys: int | None = None,
-    zodiacal: int | None = None,
+    house_system: int | str | None = None,
+    zodiac_type: str | None = None,
     gender: str | None = None,
     **birth_kwargs: Unpack[VimshottariBirthArguments],
 ) -> dict[str, Any]:
+    hsys = None if house_system is None else resolve_offline_house_code(house_system)
+    zodiacal = (
+        None if zodiac_type is None else normalize_offline_zodiac_code(zodiac_type)
+    )
     if hsys not in {None, 0} or zodiacal not in {None, 1}:
         raise ValueError("Vimshottari 使用 Lahiri 恒星黄道与整宫制。")
     # The solar option is a display label. It cannot change the ephemeris epoch

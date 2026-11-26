@@ -4,10 +4,10 @@ from typing import Literal
 
 from pydantic import Field, StrictBool, model_validator
 
-from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
 
 
-class FormObservation(_DeferredModel):
+class FormObservation(FengshuiInput):
     """床桌灶的独立室内形态。无需罗盘、生辰或 placements；未知字段省略，
     至少提供一项观察。入口可见性不能推导精确相对位置或入口直线关系。
     """
@@ -118,7 +118,7 @@ class FormObservation(_DeferredModel):
         return self
 
 
-class ElementAdjustment(_DeferredModel):
+class ElementAdjustment(FengshuiInput):
     request_id: str = Field(min_length=1, max_length=100)
     object_id: str = Field(min_length=1, max_length=100)
     target_method: Literal["bazhai", "annual_stars", "xuankong_natal"]

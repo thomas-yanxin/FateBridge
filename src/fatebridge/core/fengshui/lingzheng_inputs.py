@@ -4,10 +4,10 @@ from typing import Literal
 
 from pydantic import ConfigDict, Field, StrictBool, model_validator
 
-from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
 
 
-class LingzhengObservation(_DeferredModel):
+class LingzhengObservation(FengshuiInput):
     model_config = ConfigDict(
         json_schema_extra={
             "anyOf": [
@@ -44,7 +44,7 @@ class LingzhengObservation(_DeferredModel):
         return self
 
 
-class FixedLingzhengRequest(_DeferredModel):
+class FixedLingzhengRequest(FengshuiInput):
     model_config = ConfigDict(
         json_schema_extra={
             "anyOf": [

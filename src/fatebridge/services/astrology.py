@@ -21,6 +21,10 @@ from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
 from fatebridge.core.jyotish.jyotish_sources import coherent_india_call
 from fatebridge.services.jyotish import enrich_india_chart
 from fatebridge.utils.errors import calculation_guard
+from fatebridge.utils.house_systems import (
+    normalize_offline_zodiac_code,
+    resolve_offline_house_code,
+)
 
 
 def _chart_calculation_notes(payload: dict[str, Any]) -> list[str]:
@@ -102,8 +106,8 @@ def calculate_core_chart_analysis(
     name: str | None = None,
     birth_place: str | None = None,
     gender: str | None = None,  # accepted for uniform args; unused in chart math
-    hsys: int | None = None,
-    zodiacal: int | None = None,
+    house_system: int | str | None = None,
+    zodiac_type: str | None = None,
     use_true_solar_time: bool = False,
     node_mode: str = "mean",
     ephemeris_policy: str = "auto",
@@ -185,12 +189,16 @@ def calculate_core_chart_analysis(
             name=name,
             birth_place=birth_place,
             gender=gender,
-            hsys=hsys,
-            zodiacal=zodiacal,
+            house_system=house_system,
+            zodiac_type=zodiac_type,
             use_true_solar_time=use_true_solar_time,
             birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
             analysis_datetime=analysis_datetime,
         )
+    hsys = None if house_system is None else resolve_offline_house_code(house_system)
+    zodiacal = (
+        None if zodiac_type is None else normalize_offline_zodiac_code(zodiac_type)
+    )
 
     if analysis_datetime is not None and chart_variant != "guolao_chart":
         raise ValueError(
@@ -312,8 +320,8 @@ def calculate_germany_chart_analysis(
     name: str | None = None,
     birth_place: str | None = None,
     gender: str | None = None,  # accepted for uniform args; unused in chart math
-    hsys: int | None = None,
-    zodiacal: int | None = None,
+    house_system: int | str | None = None,
+    zodiac_type: str | None = None,
     use_true_solar_time: bool = False,
     birth_time_uncertainty_minutes: float | None = None,
     analysis_datetime: datetime | None = None,
@@ -321,6 +329,10 @@ def calculate_germany_chart_analysis(
     """
     Build the FateBridge midpoint/germany chart payload.
     """
+    hsys = None if house_system is None else resolve_offline_house_code(house_system)
+    zodiacal = (
+        None if zodiac_type is None else normalize_offline_zodiac_code(zodiac_type)
+    )
     birth_info = _build_birth_info(
         {
             "birth_year": birth_year,
@@ -359,16 +371,18 @@ def calculate_relative_chart_analysis(
     inner_payload: dict[str, Any],
     outer_payload: dict[str, Any],
     relative_mode: Any = None,
-    hsys: int = 3,
-    zodiacal: int = 0,
+    house_system: int | str = "P",
+    zodiac_type: str = "Tropic",
     relationship_focus: Any = None,
     davison_variant: str = "uncorrected",
 ) -> dict[str, Any]:
     """
     Build synastry/composite payloads for two parties.
 
-    hsys defaults to Placidus (3), matching both published request forms.
+    house_system defaults to Placidus ('P', code 3), matching both published request forms.
     """
+    hsys = resolve_offline_house_code(house_system)
+    zodiacal = normalize_offline_zodiac_code(zodiac_type)
     inner_birth = _build_birth_info(inner_payload)
     outer_birth = _build_birth_info(outer_payload)
     return build_relative_payload(

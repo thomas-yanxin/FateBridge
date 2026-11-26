@@ -4,7 +4,7 @@ from typing import Literal, get_args
 
 from pydantic import ConfigDict, Field, StrictBool, StrictInt, model_validator
 
-from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
 
 Mountain = Literal[
     "子",
@@ -43,7 +43,7 @@ CITY_GATE_FACT_FIELDS = (
 )
 
 
-class CityGateObservation(_DeferredModel):
+class CityGateObservation(FengshuiInput):
     model_config = ConfigDict(
         json_schema_extra={
             "anyOf": [
@@ -107,7 +107,7 @@ class CityGateObservation(_DeferredModel):
         return self
 
 
-class CityGateRequest(_DeferredModel):
+class CityGateRequest(FengshuiInput):
     ruleset_id: Literal["shen_city_gate_v1"] = "shen_city_gate_v1"
     reference_period_number: StrictInt = Field(
         ge=1,

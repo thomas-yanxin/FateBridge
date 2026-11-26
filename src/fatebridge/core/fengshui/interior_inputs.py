@@ -9,7 +9,7 @@ from typing import Any, Iterable, Literal, Mapping, get_args
 
 from pydantic import Field, StrictBool, field_validator, model_validator
 
-from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
 
 InteriorRole = Literal[
     "main_entry_door",
@@ -55,7 +55,7 @@ RELATION_ROLES: Mapping[str, tuple[str, str]] = {
 }
 
 
-class InteriorRelation(_DeferredModel):
+class InteriorRelation(FengshuiInput):
     """An explicit predicate; merely sharing a room never establishes it."""
 
     relation_id: str = Field(min_length=1, max_length=100)
