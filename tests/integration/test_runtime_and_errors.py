@@ -49,18 +49,29 @@ def test_load_runtime_env_reads_local_env_without_overriding_existing_values(
     assert os.environ["LOG_LEVEL"] == "WARNING"
 
 
-def test_parse_allowed_origins_filters_blank_entries(
+@pytest.mark.parametrize(
+    ("configured_origins", "expected_origins"),
+    [
+        (None, []),
+        ("", []),
+        (
+            "http://a.test, http://b.test,  ,http://c.test",
+            ["http://a.test", "http://b.test", "http://c.test"],
+        ),
+    ],
+)
+def test_cors_requires_explicit_origins(
     monkeypatch: pytest.MonkeyPatch,
+    configured_origins: str | None,
+    expected_origins: list[str],
 ) -> None:
-    monkeypatch.setenv(
-        "ALLOWED_ORIGINS", "http://a.test, http://b.test,  ,http://c.test"
-    )
+    """An unconfigured deployment must not trust a development browser origin."""
+    if configured_origins is None:
+        monkeypatch.delenv("ALLOWED_ORIGINS", raising=False)
+    else:
+        monkeypatch.setenv("ALLOWED_ORIGINS", configured_origins)
 
-    assert parse_allowed_origins() == [
-        "http://a.test",
-        "http://b.test",
-        "http://c.test",
-    ]
+    assert parse_allowed_origins() == expected_origins
 
 
 def test_handle_calculation_error_returns_structured_validation_payload() -> None:

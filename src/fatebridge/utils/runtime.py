@@ -46,10 +46,8 @@ def get_log_level(default: str = "INFO") -> str:
     return os.getenv("LOG_LEVEL", default).strip().upper() or default
 
 
-def parse_allowed_origins(
-    default: str = "http://localhost:3000",
-) -> list[str]:
-    origins = os.getenv("ALLOWED_ORIGINS", default)
+def parse_allowed_origins() -> list[str]:
+    origins = os.getenv("ALLOWED_ORIGINS", "")
     return [origin.strip() for origin in origins.split(",") if origin.strip()]
 
 

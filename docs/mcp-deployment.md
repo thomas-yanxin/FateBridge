@@ -266,10 +266,6 @@ WantedBy=multi-user.target
 
 上述服务没有 MCP 网络鉴权，保持回环监听并通过 SSH 使用。若要开放公网，需在 FastMCP 或前置网关实现客户端兼容的鉴权、TLS 与访问限制，并验证 MCP POST / GET / DELETE 和流式响应可通过；不能只转发普通 REST POST。**`FATEBRIDGE_API_KEYS` 只保护 REST，不保护此 MCP 服务。** 当前共享结果存储不提供多租户结果所有权隔离；不同信任边界应隔离运行用户与实例，详见[安全策略](../SECURITY.md)。
 
-## 旧 Onda 插件退役
-
-当前源码已移除 Onda 技能和插件打包入口。使用本页的本地 stdio 或远程 HTTP 方式连接 FateBridge；结果读取与来源说明见[方法参考](interpretation/README.md)。已安装的旧插件属于独立副本，源码删除不会自动卸载它；请在原宿主中停用旧插件并重新加载连接。
-
 ## 客户端验收与排错
 
 1. 本地 stdio 运行 doctor；HTTP 使用上面的协议脚本，确认服务本身可用。

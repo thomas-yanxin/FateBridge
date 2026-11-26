@@ -16,7 +16,7 @@ cp -n .env.example .env
 | --- | --- | --- |
 | `API_HOST` | `0.0.0.0` | REST 监听地址；仅本机使用时改成 `127.0.0.1` |
 | `API_PORT` | `8010` | REST 端口 |
-| `ALLOWED_ORIGINS` | `http://localhost:3000` | 逗号分隔的浏览器 CORS 来源 |
+| `ALLOWED_ORIGINS` | 空 | 逗号分隔的浏览器 CORS 来源；默认不允许跨域浏览器请求 |
 | `LOG_LEVEL` | `INFO` | 日志级别 |
 | `FATEBRIDGE_API_KEYS` | 空 | REST API Key；为空关闭鉴权 |
 | `API_KEY_HEADER_NAME` | `X-API-Key` | 密钥请求头名称 |
