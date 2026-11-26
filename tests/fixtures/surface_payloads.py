@@ -697,7 +697,10 @@ MCP_CASES = {
             "shaoyin": "震",
         },
     ),
-    "liuyao": ("liuyao", lambda: {**_local_base(), "latitude": 31.2, "longitude": 121.4}),
+    "liuyao": (
+        "liuyao",
+        lambda: {**_local_base(), "latitude": 31.2, "longitude": 121.4},
+    ),
     "canping": (
         "canping",
         lambda: {**_local_base(), "gender": "男", "method": "ming"},

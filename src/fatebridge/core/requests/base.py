@@ -11,7 +11,6 @@ from pydantic import (
     ConfigDict,
     Field,
     ValidationError,
-    ValidationInfo,
     field_validator,
     model_validator,
 )
@@ -169,14 +168,11 @@ class OfflineHouseValidatorMixin:
 
     @field_validator("house_system", mode="before", check_fields=False)
     @classmethod
-    def _validate_offline_house_system(
-        cls, value: object, info: ValidationInfo
-    ) -> object:
+    def _validate_offline_house_system(cls, value: object) -> object:
         if value is None:
-            field_name = info.field_name
             field = (
-                cls.model_fields.get(field_name)
-                if field_name and issubclass(cls, BaseModel)
+                cls.model_fields.get("house_system")
+                if issubclass(cls, BaseModel)
                 else None
             )
             if field is not None and _allows_none(field.annotation):

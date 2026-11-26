@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
-
-from pydantic import Field, ValidationInfo, field_validator
+from pydantic import Field, field_validator
 
 from fatebridge.core.requests.base import FateBridgeBaseRequest
 from fatebridge.utils.coordinates import parse_geo_coordinate
@@ -28,15 +26,15 @@ class LocalLocationFields(FateBridgeBaseRequest):
         description="Longitude in decimal degrees or text (e.g. 121.47 or '121e28')",
     )
 
-    @field_validator("latitude", "longitude", mode="before")
+    @field_validator("latitude", mode="before")
     @classmethod
-    def _parse_local_coordinate(
-        cls, value: object, info: ValidationInfo
-    ) -> float | None:
-        axis: Literal["latitude", "longitude"] = (
-            "latitude" if info.field_name == "latitude" else "longitude"
-        )
-        return parse_geo_coordinate(value, axis=axis)
+    def _parse_local_latitude(cls, value: object) -> float | None:
+        return parse_geo_coordinate(value, axis="latitude")
+
+    @field_validator("longitude", mode="before")
+    @classmethod
+    def _parse_local_longitude(cls, value: object) -> float | None:
+        return parse_geo_coordinate(value, axis="longitude")
 
 
 class JieqiYearRequest(LocalLocationFields):
