@@ -23,7 +23,6 @@ STEM_SOURCE = {
     "author": "沈孝瞻",
     "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
     "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-    "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
     "locator": "PDF18–19、56–57；印页9–10、47–48；正文篇题作論行動，目录作論行運",
     "supported_layer": "dayun",
     "scope": "原页行运规则仅用于大运层，其他时间粒度有配对时保留未裁。唯一配对是有限工程准入，0.85仍为既有工程系数，非原典数值或完整成化、合去和格局裁定。",

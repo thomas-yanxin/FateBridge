@@ -85,7 +85,7 @@ def build_nongli_time_snapshot_text(
     lon: str | None,
     gps_lat: float | None,
     gps_lon: float | None,
-    gender: Any | None,
+    gender: str | None,
     time_alg: int,
     time_algorithm_label: str,
     ad: int,

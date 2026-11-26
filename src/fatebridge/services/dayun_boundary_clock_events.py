@@ -3,7 +3,7 @@
 from calendar import isleap
 from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from functools import lru_cache
-from typing import TypedDict
+from typing import Literal, TypedDict
 
 from dateutil.relativedelta import relativedelta
 from typing_extensions import NotRequired
@@ -28,7 +28,7 @@ class BoundaryClockWindow(TypedDict):
 
 
 class BoundaryClockScan(TypedDict):
-    status: str
+    status: Literal["fixed_offset", "calculated"]
     timezone: NotRequired[str]
     scan_basis: NotRequired[str]
     boundary_count: NotRequired[int]

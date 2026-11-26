@@ -7,7 +7,6 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.contracts.output_timing import TimingInteractions
-from fatebridge.core.contracts.output_timing_strength import TimingRootEffectLayer
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.timing_interactions import analyze_timing_interactions
 from fatebridge.core.timing_strength import (
@@ -78,9 +77,12 @@ def test_unique_time_stem_changes_only_the_existing_month_stem_budget() -> None:
     assert sum(Q(r["remaining_mass_exact"]) for r in row["hidden_roots"]) == 10
     assert result["full_timing_strength_status"] == "not_adjudicated"
     assert result["baseline"]["parameters"]["binding"] == 0.85
-    assert (
-        result["stem_binding_source"]["source_sha256"]
-        == "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620"
+    assert result["stem_binding_source"]["author"] == "沈孝瞻"
+    assert result["stem_binding_source"]["edition"] == (
+        "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行"
+    )
+    assert result["stem_binding_source"]["locator"] == (
+        "PDF18–19、56–57；印页9–10、47–48；正文篇题作論行動，目录作論行運"
     )
 
 

@@ -1,7 +1,7 @@
 """Invert future civil gap ends through the existing dayun calendar policy."""
 
 from datetime import date, datetime, timezone
-from typing import TypedDict
+from typing import Literal, TypedDict
 
 from typing_extensions import NotRequired
 
@@ -22,7 +22,12 @@ from fatebridge.utils.timezones import parse_timezone_name
 
 
 class FutureClockScan(TypedDict):
-    status: str
+    status: Literal[
+        "not_applicable_explicit_age",
+        "fixed_offset",
+        "unavailable_clock_window",
+        "calculated",
+    ]
     timezone: NotRequired[str]
     analysis_utc_day: NotRequired[str]
     scan_start_utc: NotRequired[str]
