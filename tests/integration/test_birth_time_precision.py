@@ -233,9 +233,7 @@ def test_calculate_comprehensive_timing_uses_corrected_birth_time() -> None:
     assert result["birth_pillars"]["hour"]["branch"] == "亥"
 
 
-def test_calculate_comprehensive_timing_supports_snapshot_export_and_age_override() -> (
-    None
-):
+def test_calculate_comprehensive_timing_supports_age_override() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -255,7 +253,6 @@ def test_calculate_comprehensive_timing_supports_snapshot_export_and_age_overrid
         analysis_hour=21,
         analysis_minute=55,
         analysis_age=42,
-        selected_sections=["查询信息", "综合影响"],
     )
     dayun_result = calculate_dayun_analysis(person, 42)
 
@@ -266,16 +263,6 @@ def test_calculate_comprehensive_timing_supports_snapshot_export_and_age_overrid
         result["dayun_analysis"]["current_dayun"]
         == dayun_result["dayun_info"]["current_dayun"]
     )
-    assert "[查询信息]" in result["snapshot_text"]
-    assert "[大运摘要]" in result["snapshot_text"]
-    assert "[流年流月流日]" in result["snapshot_text"]
-    assert "[综合影响]" in result["snapshot_text"]
-    assert "[来源]" in result["snapshot_text"]
-    assert result["snapshot_export"]["selected_sections"] == ["查询信息", "综合影响"]
-    assert "[查询信息]" in result["snapshot_export"]["export_text"]
-    assert "[综合影响]" in result["snapshot_export"]["export_text"]
-    assert "[大运摘要]" not in result["snapshot_export"]["export_text"]
-    assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
 def test_calculate_comprehensive_timing_supports_analysis_day_boundaries() -> None:
@@ -446,7 +433,7 @@ def test_time_precision_aligns_liuri_and_timing_with_jieqi_anchor() -> None:
     )
 
 
-def test_calculate_dayun_analysis_supports_snapshot_export() -> None:
+def test_calculate_dayun_analysis_returns_current_dayun() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -461,36 +448,6 @@ def test_calculate_dayun_analysis_supports_snapshot_export() -> None:
     result = calculate_dayun_analysis(person, 38)
 
     assert "current_dayun" in result["dayun_info"]
-    assert "[查询信息]" in result["snapshot_text"]
-    assert "[大运信息]" in result["snapshot_text"]
-    assert "[影响摘要]" in result["snapshot_text"]
-    assert "[来源]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-
-
-def test_calculate_dayun_analysis_supports_selected_export_sections() -> None:
-    person = create_person_info(
-        birth_year=1990,
-        birth_month=5,
-        birth_day=15,
-        birth_hour=10,
-        birth_minute=30,
-        birth_timezone="Asia/Shanghai",
-        name="测试",
-        gender="男",
-    )
-
-    result = calculate_dayun_analysis(
-        person,
-        38,
-        selected_sections=["查询信息", "大运信息"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == ["查询信息", "大运信息"]
-    assert "[查询信息]" in result["snapshot_export"]["export_text"]
-    assert "[大运信息]" in result["snapshot_export"]["export_text"]
-    assert "[影响摘要]" not in result["snapshot_export"]["export_text"]
-    assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
 def test_calculate_liuri_analysis_returns_expected_pillar() -> None:
@@ -516,38 +473,6 @@ def test_calculate_liuri_analysis_returns_expected_pillar() -> None:
         ]
         == "春分"
     )
-    assert "[查询信息]" in result["snapshot_text"]
-    assert "[流日信息]" in result["snapshot_text"]
-    assert "[影响摘要]" in result["snapshot_text"]
-    assert "[来源]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-
-
-def test_calculate_liuri_analysis_supports_selected_export_sections() -> None:
-    person = create_person_info(
-        birth_year=2028,
-        birth_month=4,
-        birth_day=6,
-        birth_hour=9,
-        birth_minute=33,
-        birth_timezone="Asia/Shanghai",
-        name="测试",
-        gender="男",
-    )
-
-    result = calculate_liuri_analysis(
-        person,
-        analysis_year=2028,
-        analysis_month=4,
-        analysis_day=1,
-        selected_sections=["查询信息", "流日信息"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == ["查询信息", "流日信息"]
-    assert "[查询信息]" in result["snapshot_export"]["export_text"]
-    assert "[流日信息]" in result["snapshot_export"]["export_text"]
-    assert "[影响摘要]" not in result["snapshot_export"]["export_text"]
-    assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
 def test_calculate_liushi_analysis_returns_expected_pillar() -> None:
@@ -584,43 +509,9 @@ def test_calculate_liushi_analysis_returns_expected_pillar() -> None:
         ]
         == "春分"
     )
-    assert "[查询信息]" in result["snapshot_text"]
-    assert "[流时信息]" in result["snapshot_text"]
-    assert "[影响摘要]" in result["snapshot_text"]
-    assert "[来源]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_liushi_analysis_supports_selected_export_sections() -> None:
-    person = create_person_info(
-        birth_year=2028,
-        birth_month=4,
-        birth_day=6,
-        birth_hour=9,
-        birth_minute=33,
-        birth_timezone="Asia/Shanghai",
-        name="测试",
-        gender="男",
-    )
-
-    result = calculate_liushi_analysis(
-        person,
-        analysis_year=2028,
-        analysis_month=4,
-        analysis_day=1,
-        analysis_hour=21,
-        analysis_minute=55,
-        selected_sections=["查询信息", "流时信息"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == ["查询信息", "流时信息"]
-    assert "[查询信息]" in result["snapshot_export"]["export_text"]
-    assert "[流时信息]" in result["snapshot_export"]["export_text"]
-    assert "[影响摘要]" not in result["snapshot_export"]["export_text"]
-    assert "[来源]" not in result["snapshot_export"]["export_text"]
-
-
-def test_calculate_liunian_analysis_supports_snapshot_export() -> None:
+def test_calculate_liunian_analysis_returns_expected_pillar() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -638,36 +529,6 @@ def test_calculate_liunian_analysis_supports_snapshot_export() -> None:
     )
 
     assert result["liunian_info"]["pillar"] == "戊申"
-    assert "[查询信息]" in result["snapshot_text"]
-    assert "[流年信息]" in result["snapshot_text"]
-    assert "[影响摘要]" in result["snapshot_text"]
-    assert "[来源]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-
-
-def test_calculate_liunian_analysis_supports_selected_export_sections() -> None:
-    person = create_person_info(
-        birth_year=2028,
-        birth_month=4,
-        birth_day=6,
-        birth_hour=9,
-        birth_minute=33,
-        birth_timezone="Asia/Shanghai",
-        name="测试",
-        gender="男",
-    )
-
-    result = calculate_liunian_analysis(
-        person,
-        2028,
-        selected_sections=["查询信息", "流年信息"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == ["查询信息", "流年信息"]
-    assert "[查询信息]" in result["snapshot_export"]["export_text"]
-    assert "[流年信息]" in result["snapshot_export"]["export_text"]
-    assert "[影响摘要]" not in result["snapshot_export"]["export_text"]
-    assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
 def test_calculate_liuyue_analysis_returns_expected_pillar() -> None:
@@ -699,39 +560,6 @@ def test_calculate_liuyue_analysis_returns_expected_pillar() -> None:
         == "清明"
     )
     assert result["liunian_info"]["pillar"] == "戊申"
-    assert "[查询信息]" in result["snapshot_text"]
-    assert "[流月信息]" in result["snapshot_text"]
-    assert "[流年联动]" in result["snapshot_text"]
-    assert "[影响摘要]" in result["snapshot_text"]
-    assert "[来源]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-
-
-def test_calculate_liuyue_analysis_supports_selected_export_sections() -> None:
-    person = create_person_info(
-        birth_year=2028,
-        birth_month=4,
-        birth_day=6,
-        birth_hour=9,
-        birth_minute=33,
-        birth_timezone="Asia/Shanghai",
-        name="测试",
-        gender="男",
-    )
-
-    result = calculate_liuyue_analysis(
-        person,
-        analysis_year=2028,
-        analysis_month=4,
-        analysis_day=1,
-        selected_sections=["查询信息", "流月信息"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == ["查询信息", "流月信息"]
-    assert "[查询信息]" in result["snapshot_export"]["export_text"]
-    assert "[流月信息]" in result["snapshot_export"]["export_text"]
-    assert "[流年联动]" not in result["snapshot_export"]["export_text"]
-    assert "[影响摘要]" not in result["snapshot_export"]["export_text"]
 
 
 def test_calculate_jieqi_timeline_analysis_returns_qingming_node() -> None:
@@ -746,7 +574,7 @@ def test_calculate_jieqi_timeline_analysis_returns_qingming_node() -> None:
         gender="男",
     )
 
-    result = calculate_jieqi_timeline_analysis(person, target_year=2028)
+    result = calculate_jieqi_timeline_analysis(person, analysis_year=2028)
 
     assert len(result["jieqi_timeline"]) == 24
     qingming_node = next(
@@ -755,36 +583,6 @@ def test_calculate_jieqi_timeline_analysis_returns_qingming_node() -> None:
     assert qingming_node["analysis_anchor"] == "2028-04-04 14:04:00"
     assert qingming_node["liuyue"]["pillar"] == "丙辰"
     assert qingming_node["liuri"]["pillar"] == "己未"
-    assert "[查询信息]" in result["snapshot_text"]
-    assert "[年度节气]" in result["snapshot_text"]
-    assert "[节点时间轴]" in result["snapshot_text"]
-    assert "[来源]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-
-
-def test_calculate_jieqi_timeline_analysis_supports_selected_export_sections() -> None:
-    person = create_person_info(
-        birth_year=2028,
-        birth_month=4,
-        birth_day=6,
-        birth_hour=9,
-        birth_minute=33,
-        birth_timezone="Asia/Shanghai",
-        name="测试",
-        gender="男",
-    )
-
-    result = calculate_jieqi_timeline_analysis(
-        person,
-        target_year=2028,
-        selected_sections=["查询信息", "节点时间轴"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == ["查询信息", "节点时间轴"]
-    assert "[查询信息]" in result["snapshot_export"]["export_text"]
-    assert "[节点时间轴]" in result["snapshot_export"]["export_text"]
-    assert "[年度节气]" not in result["snapshot_export"]["export_text"]
-    assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
 def test_liuyue_timeline_anchor_is_minute_safe_and_replayable() -> None:

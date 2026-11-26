@@ -102,7 +102,7 @@ def test_all_sign_origins_have_contiguous_nonempty_cells_and_correct_midpoint_la
 def test_correct_bound_sequence_reaches_rest_mcp_cli(
     time_key: str, surface_calls
 ) -> None:
-    spec = SPECS["astro_distributions"]
+    spec = SPECS["bounds_directions"]
     inputs = dict(
         birth_year=2001,
         birth_month=5,
@@ -116,21 +116,16 @@ def test_correct_bound_sequence_reaches_rest_mcp_cli(
         max_age_years=90,
     )
     fields = ["distributions", "natal_reference.ascendant.absolute_degree"]
-    query = [("fields", field) for field in fields] + [
-        ("strict_fields", "true"),
-        ("include_snapshot_text", "false"),
-        ("response_char_limit", 0),
-    ]
+    query = [("fields", field) for field in fields] + [("detail", "audit")]
     http, protocol, code, cli = surface_calls(
         spec,
         inputs,
         params=query,
         options={
             "fields": fields,
-            "strict_fields": True,
-            "include_snapshot_text": False,
+            "detail": "audit",
         },
-        flags=["--fields", *fields],
+        flags=["--fields", *fields, "--detail", "audit"],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

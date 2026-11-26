@@ -194,11 +194,7 @@ def test_actual_mcp_schema_and_runtime_agree_for_empty_and_real_context_facts() 
                 result = await call_calculation(
                     client,
                     "fengshui_assess",
-                    {
-                        **inputs,
-                        "include_snapshot_text": False,
-                        "response_char_limit": 0,
-                    },
+                    {**inputs, "detail": "audit"},
                     raise_on_error=False,
                 )
                 assert result.is_error is (not accepted), name
@@ -246,7 +242,7 @@ def test_nested_candidate_uses_the_same_schema_fact_gate() -> None:
             result = await call_calculation(
                 client,
                 "fengshui_assess",
-                {**inputs, "include_snapshot_text": False, "response_char_limit": 0},
+                {**inputs, "detail": "audit"},
                 raise_on_error=False,
             )
             assert result.is_error
@@ -265,6 +261,7 @@ def test_method_reference_and_annual_query_need_no_placeholder_environment() -> 
                 "effective_year": 2026,
             }
             delivery_options = {
+                "detail": "audit",
                 "fields": [
                     "status",
                     "layers.annual_stars.palaces.N",
@@ -274,9 +271,6 @@ def test_method_reference_and_annual_query_need_no_placeholder_environment() -> 
                     "rulesets",
                     "rule_trace",
                 ],
-                "strict_fields": True,
-                "include_snapshot_text": False,
-                "response_char_limit": 0,
             }
             assert "environmental_context" not in inputs
             Draft202012Validator(tool["input_schema"]).validate(inputs)

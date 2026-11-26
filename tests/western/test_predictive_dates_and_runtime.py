@@ -318,7 +318,7 @@ def test_predictive_house_source_error_reaches_rest_mcp_cli(
         raise EphemerisSourceError("model_changed")
 
     monkeypatch.setattr(native_chart, "ephemeris_call", fail)
-    spec = SPECS["transit"]
+    spec = SPECS["transit_chart"]
     http, protocol, code, local = surface_calls(spec, inputs(spec))
     assert http.status_code == 503 and protocol.is_error and code != 0
     for output in (http.json(), protocol.structured_content, local):

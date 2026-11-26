@@ -307,7 +307,7 @@ def test_output_stays_within_psychometric_engine_boundary() -> None:
 def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    spec = next(s for s in CATALOG if s.key == "ipip_big_five")
+    spec = next(s for s in CATALOG if s.name == "ipip_big_five")
     client = _client(monkeypatch)
 
     tools_manifest = client.get("/api/tools", params={"family": "psychometrics"}).json()
@@ -322,14 +322,20 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
         "include_item_breakdown": True,
     }
     rest_list = client.post(
-        "/api/psychometrics/ipip-big-five", json={"action": "list_items"}
+        "/api/psychometrics/ipip-big-five",
+        params={"detail": "audit"},
+        json={"action": "list_items"},
     )
     assert rest_list.status_code == 200
     rest_list_body = rest_list.json()
     assert rest_list_body["item_count"] == 50
     Draft202012Validator(spec.output_model.model_json_schema()).validate(rest_list_body)
 
-    rest_score = client.post("/api/psychometrics/ipip-big-five", json=score_payload)
+    rest_score = client.post(
+        "/api/psychometrics/ipip-big-five",
+        params={"detail": "audit"},
+        json=score_payload,
+    )
     assert rest_score.status_code == 200
     rest_score_body = rest_score.json()
     assert rest_score_body["scale_raw_sum"] == 150
@@ -360,7 +366,7 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
             all_tools = await discover_capabilities(mcp_client)
             assert "ipip_big_five" in all_tools
             filtered = await mcp_client.call_tool(
-                "discover_capabilities", {"family": "psychometrics"}
+                "discover_tools", {"family": "psychometrics"}
             )
             assert [item["tool"] for item in filtered.structured_content["tools"]] == [
                 "ipip_big_five"
@@ -371,7 +377,9 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
             assert contract["family"] == "psychometrics"
             assert contract["example_context"]["fictional"] is True
             mcp_list = await call_calculation(
-                mcp_client, "ipip_big_five", contract["example_input"]
+                mcp_client,
+                "ipip_big_five",
+                {**contract["example_input"], "detail": "audit"},
             )
             assert not mcp_list.is_error
             assert "result_delivery" not in mcp_list.structured_content
@@ -383,14 +391,14 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
             )
             assert not mcp_list_compact.is_error
             assert "result_delivery" not in mcp_list_compact.structured_content
-            assert mcp_list_compact.structured_content["item_count"] == 50
+            assert len(mcp_list_compact.structured_content["items"]) == 50
             mcp_score_compact = await call_calculation(
                 mcp_client, "ipip_big_five", {**score_payload, "detail": "compact"}
             )
             assert not mcp_score_compact.is_error
             assert "result_delivery" not in mcp_score_compact.structured_content
             mcp_score = await call_calculation(
-                mcp_client, "ipip_big_five", {**score_payload, "response_char_limit": 0}
+                mcp_client, "ipip_big_five", {**score_payload, "detail": "audit"}
             )
             assert not mcp_score.is_error
             assert "result_delivery" not in mcp_score.structured_content
@@ -405,7 +413,7 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
 
     mcp_list_body, mcp_score_body = asyncio.run(run_mcp())
 
-    assert cli_run(["ipip_big_five", "--action", "list_items", "--compact"]) == 0
+    assert cli_run(["ipip_big_five", "--action", "list_items", "--detail", "audit"]) == 0
     cli_list_body = json.loads(capsys.readouterr().out)
     assert (
         cli_run(
@@ -414,14 +422,15 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
                 "--responses",
                 json.dumps(score_payload["responses"]),
                 "--include-item-breakdown",
-                "--compact",
+                "--detail",
+                "audit",
             ]
         )
         == 0
     )
     cli_score_body = json.loads(capsys.readouterr().out)
 
-    assert cli_run(["ipip_big_five", "--ratings", *(["3"] * 50), "--compact"]) == 0
+    assert cli_run(["ipip_big_five", "--ratings", *(["3"] * 50), "--detail", "compact"]) == 0
     cli_ratings_body = json.loads(capsys.readouterr().out)
     assert cli_ratings_body["scale_raw_sum"] == 150
     assert cli_ratings_body["scale_mean"] == 3.0

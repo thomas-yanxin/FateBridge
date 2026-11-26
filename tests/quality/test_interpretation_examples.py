@@ -18,11 +18,10 @@ REFERENCES_ROOT = Path(__file__).resolve().parents[2] / "docs/interpretation"
 
 # note (cli): These global flags are accepted independently of the tool request model.
 GLOBAL_CLI_FLAGS = {
-    "--no-metadata",
+    "--detail",
     "--fields",
-    "--selected-sections",
-    "--strict-fields",
-    "--no-include-snapshot-text",
+    "--as-of",
+    "--request-file",
 }
 
 PLACEHOLDER_RE = re.compile(r"[<>\[\]]|\.\.\.")
@@ -67,9 +66,7 @@ def documented_cli_examples() -> list[CliExample]:
                     pass
                 tokens = line.split()
                 module_position = tokens.index("fatebridge.cli")
-                rest = [
-                    t for t in tokens[module_position + 1 :] if t != "--no-metadata"
-                ]
+                rest = tokens[module_position + 1 :]
                 if not rest:
                     continue
                 else:
@@ -132,12 +129,10 @@ def test_documented_cli_examples_run_clean(
     ), example.command
     if example.tool_name in {
         "horary_chart",
-        "astro_horary",
         "evaluate_election_time",
-        "astro_election",
     }:
         parsed = build_cli_parser().parse_args(command[3:])
-        assert parsed._spec.tool_name == example.tool_name
+        assert parsed._spec.name == example.tool_name
         return
     else:
         pass
@@ -152,9 +147,9 @@ def test_documented_cli_entrypoint_smoke() -> None:
     """Verify the CLI subprocess can start and run a documented chart."""
     examples = documented_cli_examples()
     birth_tool = next(
-        spec.tool_name
+        spec.name
         for spec in cli_specs_by_name().values()
-        if spec.key == "bazi_birth"
+        if spec.name == "bazi_birth_chart"
     )
     example = next(example for example in examples if example.tool_name == birth_tool)
     command = shlex.split(example.command)

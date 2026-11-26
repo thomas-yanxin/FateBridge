@@ -106,7 +106,6 @@ async def test_real_mcp_pair_keeps_each_person_explicitness_separate() -> None:
                         f"natal_contexts.person{person_number}.calendar_context.birth_time_input"
                         for person_number in (1, 2)
                     ],
-                    "strict_fields": True,
                 },
             )
             assert result.structured_content is not None
@@ -175,8 +174,8 @@ async def verify_default_app():
 
     assert app is server.app
     async with Client(app) as client:
-        resource = (await client.read_resource('fatebridge://catalog/summary'))[0]
-    catalog = json.loads(resource.text)
+        result = await client.call_tool('discover_tools', {})
+    catalog = result.structured_content
     assert {tool['family'] for tool in catalog['tools']} == {'bazi'}
 
 asyncio.run(verify_default_app())

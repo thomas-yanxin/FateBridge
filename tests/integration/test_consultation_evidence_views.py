@@ -18,18 +18,17 @@ from fatebridge.application.examples import (
 )
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.mcp_result_delivery import read_full_result
 from tests.support.transports import call_calculation
 
 
-def spec_for(key):
-    return next(s for s in CATALOG if s.key == key)
+def spec_for(name):
+    return next(s for s in CATALOG if s.name == name)
 
 
 @pytest.mark.asyncio
 async def test_published_knowledge_query_can_resolve_an_actual_aspect_source() -> None:
     guidance = call_guidance(spec_for("knowledge_read"))
-    registry = call_guidance(spec_for("knowledge_registry"))
+    registry = call_guidance(spec_for("knowledge_catalog"))
     async with Client(create_mcp_app()) as client:
         catalog = await original_payload(
             client,
@@ -39,8 +38,6 @@ async def test_published_knowledge_query_can_resolve_an_actual_aspect_source() -
                 {
                     "domain": "astro",
                     "fields": registry["output_fields"],
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                 },
             ),
         )
@@ -63,8 +60,6 @@ async def test_published_knowledge_query_can_resolve_an_actual_aspect_source() -
                         "citation",
                         "provenance.reference_only",
                     ],
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                 },
             ),
         )
@@ -76,20 +71,18 @@ async def test_published_knowledge_query_can_resolve_an_actual_aspect_source() -
 
 async def original_payload(client, result):
     assert not result.is_error, result
-    return await read_full_result(client, result.structured_content)
+    return result.structured_content
 
 
-async def call_view(client, key, view=None, **overrides):
-    spec = spec_for(key)
+async def call_view(client, name, view=None, **overrides):
+    spec = spec_for(name)
     return await call_calculation(
         client,
-        spec.tool_name,
+        spec.name,
         {
             **example_input(spec),
             "as_of": "2026-10-20T12:00:00+08:00",
             "fields": suggested_fields(spec, view=view),
-            "strict_fields": True,
-            "include_snapshot_text": False,
             **overrides,
         },
     )
@@ -100,7 +93,7 @@ async def call_view(client, key, view=None, **overrides):
     "mode", ["compare", "composite", "influence", "timespace", "marks"]
 )
 async def test_named_relationship_mode_keeps_its_primary_evidence(mode: str) -> None:
-    spec = spec_for("astro_relative_chart")
+    spec = spec_for("relationship_chart")
     card = evidence_views(spec)[mode]
     # Exercise actual engine aliases, including the unintuitive Synastry mapping.
     alias = {
@@ -113,7 +106,7 @@ async def test_named_relationship_mode_keeps_its_primary_evidence(mode: str) -> 
     assert alias in card["aliases"]
     async with Client(create_mcp_app()) as client:
         for view in [mode, None]:
-            result = await call_view(client, spec.key, view, relative_mode=alias)
+            result = await call_view(client, spec.name, view, relative_mode=alias)
             payload = await original_payload(client, result)
             assert payload["relationship_profile"]["relative_mode_normalized"] == mode
             assert (
@@ -157,11 +150,11 @@ async def test_named_relationship_mode_keeps_its_primary_evidence(mode: str) -> 
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("key", ["qimen", "sixyao"])
-async def test_divination_views_keep_palaces_and_line_cast_facts(key: str) -> None:
+@pytest.mark.parametrize("name", ["qimen", "liuyao"])
+async def test_divination_views_keep_palaces_and_line_cast_facts(name: str) -> None:
     async with Client(create_mcp_app()) as client:
-        payload = await original_payload(client, await call_view(client, key))
-    if key == "qimen":
+        payload = await original_payload(client, await call_view(client, name))
+    if name == "qimen":
         assert len(payload["qimen"]["palaces"]) == 9
         assert payload["qimen"]["zhifu"] and payload["qimen"]["zhishi"]
         assert payload["four_pillars"]["day"]
@@ -183,7 +176,7 @@ async def test_western_timing_views_preserve_time_bounds_and_relevant_positions(
 ) -> None:
     async with Client(create_mcp_app()) as client:
         payload = await original_payload(
-            client, await call_view(client, "western_timing_analysis", view)
+            client, await call_view(client, "western_timing", view)
         )
     if view in [None, "stage", "annual"]:
         firdaria = payload["time_lords"]["firdaria"]
@@ -256,7 +249,7 @@ async def test_natal_deep_views_read_real_branches_without_other_details(
 ) -> None:
     async with Client(create_mcp_app()) as client:
         payload = await original_payload(
-            client, await call_view(client, "astro_chart", view)
+            client, await call_view(client, "astrology_chart", view)
         )
     assert payload["person_info"] and payload["chart_profile"]
     if view == "classical_detail":
@@ -285,23 +278,24 @@ async def test_natal_deep_views_read_real_branches_without_other_details(
 async def test_views_are_discoverable_on_demand_and_aliases_are_not_guessed() -> None:
     async with Client(create_mcp_app()) as client:
         tools = await client.list_tools()
-        for key in [
-            "astro_relative_chart",
-            "astro_chart",
+        for name in [
+            "relationship_chart",
+            "astrology_chart",
             "qimen",
-            "sixyao",
-            "western_timing_analysis",
+            "liuyao",
+            "western_timing",
         ]:
-            spec = spec_for(key)
+            spec = spec_for(name)
             views = evidence_views(spec)
-            uri = f"fatebridge://tools/{spec.tool_name}/input"
             assert all(
                 json.dumps(views, ensure_ascii=False) not in (tool.description or "")
                 for tool in tools
             )
-            resource = json.loads((await client.read_resource(uri))[0].text)
-            assert resource["tools"][0]["evidence_views"] == json.loads(
-                json.dumps(views)
+            discovered = await client.call_tool(
+                "discover_tools", {"tool": spec.name, "detail": "summary"}
+            )
+            assert discovered.structured_content["tools"][0]["evidence_views"] == (
+                json.loads(json.dumps(views))
             )
             assert describe_spec(spec)["evidence_views"] == views
             assert describe_input_spec(spec)["evidence_views"] == views
@@ -311,22 +305,20 @@ async def test_views_are_discoverable_on_demand_and_aliases_are_not_guessed() ->
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "key,view", [("qimen", "directional"), ("western_timing_analysis", "short_term")]
+    "name,view", [("qimen", "directional"), ("western_timing", "short_term")]
 )
 async def test_task_evidence_agrees_across_rest_mcp_and_cli(
-    key: str, view: str, capsys: pytest.CaptureFixture[str]
+    name: str, view: str, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    spec = spec_for(key)
+    spec = spec_for(name)
     fields = suggested_fields(spec, view=view)
     as_of = "2026-10-20T12:00:00+08:00"
     async with Client(create_mcp_app()) as client:
-        result = await call_view(client, key, view, response_char_limit=0)
+        result = await call_view(client, name, view)
         mcp = await original_payload(client, result)
     query = [("fields", f) for f in fields] + [
         ("as_of", as_of),
-        ("strict_fields", "true"),
-        ("include_snapshot_text", "false"),
-        ("response_char_limit", "0"),
+        ("detail", "audit"),
     ]
     with TestClient(app) as client:
         response = client.post(spec.rest_path, json=example_input(spec), params=query)
@@ -339,10 +331,8 @@ async def test_task_evidence_agrees_across_rest_mcp_and_cli(
             as_of,
             "--fields",
             *fields,
-            "--strict-fields",
-            "--no-include-snapshot-text",
-            "--response-char-limit",
-            "0",
+            "--detail",
+            "audit",
         ]
     )
     output = json.loads(capsys.readouterr().out)
@@ -355,14 +345,17 @@ async def test_task_evidence_agrees_across_rest_mcp_and_cli(
 
 
 @pytest.mark.asyncio
-async def test_full_export_keeps_full_original_run_despite_new_task_views() -> None:
+async def test_audit_detail_keeps_full_result_despite_compact_views() -> None:
     async with Client(create_mcp_app()) as client:
         result = await call_view(
-            client, "astro_relative_chart", relative_mode="Composite", fields=None
+            client,
+            "relationship_chart",
+            relative_mode="Composite",
+            fields=None,
+            detail="audit",
         )
-        assert "result_delivery" in result.structured_content
+        assert "result_delivery" not in result.structured_content
         payload = await original_payload(client, result)
     assert payload["chart"]["planets"]
     assert payload["inner_chart"]["planets"]
     assert payload["in_to_out_midpoint"]
-    assert payload["snapshot_export"]["technique"]["key"] == "relative"

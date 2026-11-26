@@ -11,7 +11,7 @@ from fastmcp import Client
 
 import fatebridge.api as api
 from fatebridge.application.description import describe_spec
-from fatebridge.application.execution import execute_tool
+from fatebridge.application.execution import execute_with_receipt, invoke_validated_service
 from fatebridge.cli import run
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.core.jyotish.jyotish_dasha_levels import YEAR_DAYS
@@ -19,10 +19,9 @@ from fatebridge.core.jyotish.jyotish_strength import SOURCE as STRENGTH_SOURCE
 from fatebridge.core.public_output import same_public_value
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import astro_payload
-from tests.support.result_delivery import assert_same_run_receipt
 from tests.support.transports import cached_mcp_app, call_calculation
 
-SPECS = {s.key: s for s in CATALOG}
+SPECS = {s.name: s for s in CATALOG}
 AS_OF = "2026-10-22T12:00:00+08:00"
 
 
@@ -36,19 +35,15 @@ def call_surfaces(monkeypatch, capsys, key, payload, fields):
     )
     options = {
         "as_of": AS_OF,
+        "detail": "audit",
         "fields": fields,
-        "strict_fields": True,
-        "include_snapshot_text": False,
-        "response_char_limit": 0,
     }
     response = TestClient(api.app).post(
         spec.rest_path,
         json=payload,
         params=[
             ("as_of", AS_OF),
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
+            ("detail", "audit"),
             *[("fields", f) for f in fields],
         ],
     )
@@ -56,12 +51,12 @@ def call_surfaces(monkeypatch, capsys, key, payload, fields):
     async def protocol():
         async with Client(cached_mcp_app()) as client:
             return await call_calculation(
-                client, spec.tool_name, {**payload, **options}, raise_on_error=False
+                client, spec.name, {**payload, **options}, raise_on_error=False
             )
 
     protocol_result = asyncio.run(protocol())
     native = protocol_result.structured_content
-    args = [spec.tool_name]
+    args = [spec.name]
     for name, value in payload.items():
         args += [
             "--" + name.replace("_", "-"),
@@ -70,10 +65,8 @@ def call_surfaces(monkeypatch, capsys, key, payload, fields):
     args += [
         "--as-of",
         AS_OF,
-        "--strict-fields",
-        "--no-include-snapshot-text",
-        "--response-char-limit",
-        "0",
+        "--detail",
+        "audit",
         "--fields",
         *fields,
     ]
@@ -97,7 +90,7 @@ def test_1960_sofa_time_context_across_three_real_surfaces(
     result = call_surfaces(
         monkeypatch,
         capsys,
-        "astro_india",
+        "vedic_chart",
         {
             **astro_payload(),
             "birth_year": 1960,
@@ -136,7 +129,7 @@ def test_vimshottari_all_configurations_across_three_real_surfaces(
     result = call_surfaces(
         monkeypatch,
         capsys,
-        "astro_vimshottari",
+        "vimshottari_dasha",
         payload,
         [
             "analysis_context",
@@ -159,7 +152,7 @@ def test_india_birth_uncertainty_and_theme_evidence_across_surfaces(
     result = call_surfaces(
         monkeypatch,
         capsys,
-        "astro_india",
+        "vedic_chart",
         {
             **astro_payload(),
             "node_mode": node_mode,
@@ -172,7 +165,7 @@ def test_india_birth_uncertainty_and_theme_evidence_across_surfaces(
     assert result["india"]["topic_evidence"]["career"]["factors"]
 
 
-@pytest.mark.parametrize("key", ["astro_india", "astro_vimshottari"])
+@pytest.mark.parametrize("key", ["vedic_chart", "vimshottari_dasha"])
 @pytest.mark.parametrize("profile", ["santhanam_27", "raman_30"])
 def test_extended_vargas_and_strength_profile_across_real_surfaces(
     monkeypatch: pytest.MonkeyPatch,
@@ -214,7 +207,7 @@ def test_nested_strength_summary_field_projects_across_real_surfaces(
     result = call_surfaces(
         monkeypatch,
         capsys,
-        "astro_india",
+        "vedic_chart",
         astro_payload(),
         [
             "india.strengths.sthana_bala.summary.Sun.total_virupa",
@@ -228,7 +221,7 @@ def test_nested_strength_summary_field_projects_across_real_surfaces(
 
 
 @pytest.mark.native_engine_fault
-@pytest.mark.parametrize("key", ["astro_india", "astro_vimshottari"])
+@pytest.mark.parametrize("key", ["vedic_chart", "vimshottari_dasha"])
 def test_strict_data_file_policy_rejects_fallback_on_all_surfaces(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -250,13 +243,13 @@ def test_strict_data_file_policy_rejects_fallback_on_all_surfaces(
     async def protocol():
         async with Client(cached_mcp_app()) as client:
             return await call_calculation(
-                client, spec.tool_name, payload, raise_on_error=False
+                client, spec.name, payload, raise_on_error=False
             )
 
     native = asyncio.run(protocol())
     assert native.is_error
     assert "require_data_files" in native.structured_content["error"]
-    args = [spec.tool_name]
+    args = [spec.name]
     for name, value in payload.items():
         args += ["--" + name.replace("_", "-"), str(value)]
     capsys.readouterr()
@@ -272,7 +265,7 @@ def test_physical_state_and_dispositor_fields_project_across_three_surfaces(
     result = call_surfaces(
         monkeypatch,
         capsys,
-        "astro_india",
+        "vedic_chart",
         astro_payload(),
         [
             "india.profile.ephemeris_quality",
@@ -288,12 +281,12 @@ def test_physical_state_and_dispositor_fields_project_across_three_surfaces(
     )
 
 
-@pytest.mark.parametrize("key", ["astro_india", "astro_vimshottari"])
+@pytest.mark.parametrize("key", ["vedic_chart", "vimshottari_dasha"])
 def test_future_time_context_and_identified_author_rules_across_surfaces(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], key: str
 ) -> None:
     payload = {**astro_payload(), "birth_year": 2099}
-    if key == "astro_vimshottari":
+    if key == "vimshottari_dasha":
         payload["analysis_year"] = 2101
     else:
         pass
@@ -332,7 +325,7 @@ def test_future_time_context_and_identified_author_rules_across_surfaces(
 
 
 def test_discovery_has_nested_output_contracts_and_task_views() -> None:
-    for key in ["astro_india", "astro_vimshottari"]:
+    for key in ["vedic_chart", "vimshottari_dasha"]:
         description = describe_spec(SPECS[key])
         assert description["evidence_views"]
         assert description["call_guidance"]
@@ -343,15 +336,17 @@ def test_discovery_has_nested_output_contracts_and_task_views() -> None:
         assert {"SthanaBala", "SthanaValues", "JyotishStrengths"} <= set(
             schema["$defs"]
         )
-    schema = SPECS["astro_vimshottari"].output_model.model_json_schema()
+    schema = SPECS["vimshottari_dasha"].output_model.model_json_schema()
     assert {"Vimshottari", "DashaBirthBalance", "DashaPeriod"} <= set(schema["$defs"])
 
 
 def test_as_of_date_anchor_and_declared_current_clock_use() -> None:
-    spec = SPECS["astro_vimshottari"]
+    spec = SPECS["vimshottari_dasha"]
     request = spec.request_model.model_validate(astro_payload())
-    result = execute_tool(
-        spec, request, options=ExecutionOptions(as_of="2026-10-21T20:00:00Z")
+    result = execute_with_receipt(
+        spec,
+        request,
+        options=ExecutionOptions(as_of="2026-10-21T20:00:00Z", detail="audit"),
     )
     assert (
         result["analysis_context"]["analysis_datetime"] == "2026-10-22T00:00:00+08:00"
@@ -376,57 +371,25 @@ def test_as_of_date_anchor_and_declared_current_clock_use() -> None:
 )
 def test_invalid_options_are_rejected_at_shared_schema(changes) -> None:
     with pytest.raises(ValueError):
-        SPECS["astro_vimshottari"].request_model.model_validate(
+        SPECS["vimshottari_dasha"].request_model.model_validate(
             {**astro_payload(), **changes}
         )
 
 
-def test_polymorphic_india_matches_dedicated_service_and_other_variants_reject_options() -> (
-    None
-):
-    payload = {**astro_payload(), "node_mode": "true", "divisions": [9]}
-    dedicated = execute_tool(
-        SPECS["astro_india"],
-        SPECS["astro_india"].request_model.model_validate(payload),
-        include_metadata=False,
-    )
-    poly = execute_tool(
-        SPECS["astro_chart"],
-        SPECS["astro_chart"].request_model.model_validate(
-            {**payload, "chart_variant": "india_chart"}
-        ),
-        include_metadata=False,
-    )
-    assert poly == dedicated
-    with pytest.raises(ValueError):
-        SPECS["astro_chart"].request_model.model_validate(payload)
+def test_astrology_chart_rejects_jyotish_only_options() -> None:
+    for bad in (
+        {"chart_variant": "india_chart"},
+        {"node_mode": "true"},
+        {"divisions": [9]},
+        {"saptavargaja_profile": "santhanam_27"},
+    ):
+        with pytest.raises(ValueError):
+            SPECS["astrology_chart"].request_model.model_validate(
+                {**astro_payload(), **bad}
+            )
 
 
-def test_non_indian_chart_accepts_protocol_materialized_neutral_defaults() -> None:
-    spec = SPECS["astro_chart"]
-    plain = execute_tool(
-        spec, spec.request_model.model_validate(astro_payload()), include_metadata=False
-    )
-    request = spec.request_model.model_validate(
-        {
-            **astro_payload(),
-            "node_mode": "mean",
-            "divisions": [9, 10],
-            "birth_time_uncertainty_minutes": None,
-            "saptavargaja_profile": "santhanam_27",
-        }
-    )
-    assert execute_tool(spec, request, include_metadata=False) == plain
-
-
-def test_non_indian_chart_rejects_custom_saptavargaja_profile() -> None:
-    with pytest.raises(ValueError, match="india_chart"):
-        SPECS["astro_chart"].request_model.model_validate(
-            {**astro_payload(), "saptavargaja_profile": "raman_30"}
-        )
-
-
-@pytest.mark.parametrize("key", ["astro_india", "astro_vimshottari"])
+@pytest.mark.parametrize("key", ["vedic_chart", "vimshottari_dasha"])
 def test_additional_balas_across_real_surfaces(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], key: str
 ) -> None:
@@ -472,15 +435,7 @@ def test_additional_balas_across_real_surfaces(
     assert motion["summary"]["Mars"] is None
 
 
-def test_full_timeline_uses_same_run_pagination_and_hash(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    from fatebridge.application import result_delivery as delivery
-    from fatebridge.services import jyotish
-
-    store = delivery.ResultStore(tmp_path / "private-results")
-    monkeypatch.setattr(delivery, "RESULT_STORE", store)
-    monkeypatch.setattr(api, "RESULT_STORE", store)
+def test_audit_detail_returns_full_timeline(monkeypatch: pytest.MonkeyPatch) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -491,38 +446,9 @@ def test_full_timeline_uses_same_run_pagination_and_hash(
     response = client.post(
         "/api/astrology/vimshottari-dasha",
         json={**astro_payload(), "analysis_year": 2026},
-        params={
-            "include_snapshot_text": "false",
-            "as_of": AS_OF,
-            "response_char_limit": 8192,
-        },
+        params={"as_of": AS_OF, "detail": "audit"},
     )
     assert response.status_code == 200
-    shaped = response.json()
-    ref = shaped["result_delivery"]
-
-    def must_not_recalculate(*args, **kwargs):
-        pytest.fail("reading the saved complete result must not recalculate")
-
-    monkeypatch.setattr(jyotish, "calculate_vimshottari", must_not_recalculate)
-    chunks = []
-    offset = 0
-    while True:
-        page_response = client.get(
-            f"/api/results/{ref['result_id']}/pages", params={"offset": offset}
-        )
-        assert page_response.status_code == 200
-        page = page_response.json()
-        chunks.append(page["text"])
-        if page["next_offset"] is None:
-            break
-        else:
-            pass
-        offset = page["next_offset"]
-    text = "".join(chunks)
-    assert len(text) == ref["total_chars"]
-    full = json.loads(text)
-    assert_same_run_receipt(store, shaped, full)
-    assert full["run_metadata"]["run_id"] == shaped["run_metadata"]["run_id"]
+    full = response.json()
     assert len(full["vimshottari"]["timeline"]) == 9
     assert sum(len(p["antardashas"]) for p in full["vimshottari"]["timeline"]) == 81

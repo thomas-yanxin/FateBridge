@@ -117,11 +117,11 @@ def test_historical_half_candidates_and_directed_relations_across_three_surfaces
     payload.update(calendar_basis=BASIS, calendar_profile="hinoo_t1299_host27")
     spec = SPECS[tool_name]
     response = rest_client(monkeypatch).post(
-        spec.rest_path, json=payload, params={"as_of": AS_OF, "response_char_limit": 0}
+        spec.rest_path, json=payload, params={"as_of": AS_OF, "detail": "audit"}
     )
-    protocol = asyncio.run(native(spec, payload))
+    protocol = asyncio.run(native(spec, payload, detail="audit"))
     exit_code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+        spec, payload, tmp_path, capsys, flags=["--detail", "audit"]
     )
     assert response.status_code == 200 and exit_code == 0 and not protocol.is_error
     assert (

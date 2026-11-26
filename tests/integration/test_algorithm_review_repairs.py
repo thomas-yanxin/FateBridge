@@ -18,11 +18,11 @@ from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import REST_POST_CASES
 from tests.support.transports import call_calculation
 
-SPECS = {spec.key: spec for spec in CATALOG}
+SPECS = {spec.name: spec for spec in CATALOG}
 
 
 def unresolved_pair():
-    inputs = example_input(SPECS["two_person_compatibility"])
+    inputs = example_input(SPECS["bazi_compatibility"])
     for index, day in ((1, 2), (2, 17)):
         for key, value in {
             "birth_year": 1990,
@@ -67,8 +67,8 @@ def test_empty_preferences_do_not_become_penalty_support_or_definite_match(
         return payload
 
     monkeypatch.setattr(compatibility, "build_destiny_payload", empty_preferences)
-    spec = SPECS["two_person_compatibility"]
-    result = execution.execute_tool(
+    spec = SPECS["bazi_compatibility"]
+    result = execution.execute_with_receipt(
         spec, spec.request_model.model_validate(unresolved_pair())
     )
     assert "error" not in result
@@ -92,7 +92,7 @@ def test_compatibility_reports_both_out_of_range_birth_years(
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    spec = SPECS["two_person_compatibility"]
+    spec = SPECS["bazi_compatibility"]
     inputs = example_input(spec) | {
         "person1_birth_year": 1899,
         "person2_birth_year": 2101,
@@ -122,10 +122,10 @@ def test_compatibility_reports_both_out_of_range_birth_years(
     [
         ("qimen", {"qimen": {}}),
         ("taiyi", {"taiyi": {}}),
-        ("ziwei_birth", {"ziwei_birth": {}}),
-        ("astro_chart", {"planets": [], "chart_profile": {}}),
+        ("ziwei_birth_chart", {"ziwei_birth": {}}),
+        ("astrology_chart", {"planets": [], "chart_profile": {}}),
         (
-            "two_person_compatibility",
+            "bazi_compatibility",
             {
                 "natal_contexts": {},
                 "cross_chart_relations": {},
@@ -140,7 +140,7 @@ def test_original_empty_success_counterexamples_are_internal_errors(
     spec = SPECS[key]
     request = spec.request_model.model_validate(example_input(spec))
     broken = replace(spec, bind=lambda _: (lambda: body, (), {}))
-    result = execution.execute_tool(broken, request)
+    result = execution.execute_with_receipt(broken, request)
     assert result["error_code"] == "internal_error"
     assert "run_metadata" not in result
     # An explicitly projected object may omit facts; it is not a full execution.
@@ -151,8 +151,8 @@ def test_original_empty_success_counterexamples_are_internal_errors(
     "key,root,identity",
     [
         ("qimen", "qimen", "palaces"),
-        ("ziwei_birth", "ziwei_birth", "palaces"),
-        ("astro_chart", None, "planets"),
+        ("ziwei_birth_chart", "ziwei_birth", "palaces"),
+        ("astrology_chart", None, "planets"),
     ],
 )
 def test_complete_collections_require_distinct_members_without_restricting_projection(
@@ -160,7 +160,7 @@ def test_complete_collections_require_distinct_members_without_restricting_proje
 ) -> None:
     spec = SPECS[key]
     request = spec.request_model.model_validate(example_input(spec))
-    result = execution.execute_spec(spec, request)
+    result = execution.invoke_validated_service(spec, request)
     damaged = deepcopy(result)
     owner = damaged[root] if root else damaged
     owner[identity][-1] = deepcopy(owner[identity][0])
@@ -183,7 +183,7 @@ def test_complete_nested_fact_rules_are_published_and_fingerprinted() -> None:
     assert field["anyOf"][0]["minItems"] == field["anyOf"][0]["maxItems"] == 9
 
 
-@pytest.mark.parametrize("spec", CATALOG, ids=lambda spec: spec.key)
+@pytest.mark.parametrize("spec", CATALOG, ids=lambda spec: spec.name)
 def test_no_catalog_tool_accepts_empty_objects_for_all_required_business_roots(
     spec,
 ) -> None:
@@ -210,7 +210,7 @@ def test_missing_required_timing_layer_fails_on_every_transport(
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    spec = SPECS["liushi_analysis"]
+    spec = SPECS["bazi_hourly_timing"]
     inputs = REST_POST_CASES[spec.rest_path]()
     http = TestClient(api.app).post(spec.rest_path, json=inputs)
 
@@ -219,7 +219,7 @@ def test_missing_required_timing_layer_fails_on_every_transport(
             return await call_calculation(
                 client,
                 "bazi_hourly_timing",
-                {**inputs, "response_char_limit": 0},
+                inputs,
                 raise_on_error=False,
             )
 

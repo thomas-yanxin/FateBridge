@@ -136,7 +136,7 @@ def test_actual_rest_mcp_cli_keep_both_editions(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # Modern hour-phase twins exercise delivery; no ancient civil date is inferred.
-    if key == "taiyi":
+    if key in {"taiyi", "taiyi_chart"}:
         payload = {
             "analysis_year": 2026,
             "analysis_month": 6,
@@ -155,7 +155,8 @@ def test_actual_rest_mcp_cli_keep_both_editions(
             "use_true_solar_time": False,
         }
     fields = ["taiyi.core_board", "taiyi.count_source_assessment"]
-    spec = next(s for s in CATALOG if s.key == key)
+    target_name = "taiyi" if key == "taiyi" else ("sanshi_combined_chart" if key == "sanshiunited" else key)
+    spec = next(s for s in CATALOG if s.name == target_name)
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -167,8 +168,7 @@ def test_actual_rest_mcp_cli_keep_both_editions(
             spec.rest_path,
             json=payload,
             params=[
-                ("strict_fields", "true"),
-                ("include_snapshot_text", "false"),
+                ("detail", "audit"),
                 *[("fields", f) for f in fields],
             ],
         )
@@ -183,9 +183,11 @@ def test_actual_rest_mcp_cli_keep_both_editions(
     )
     assert assessment["edition_comparisons"][0]["ju"] == ju
     args = [
-        spec.tool_name,
-        "--strict-fields",
-        "--no-use-true-solar-time",
+        spec.name,
+        "--detail",
+        "audit",
+        "--use-true-solar-time",
+        "false",
         "--fields",
         *fields,
     ]
@@ -204,13 +206,11 @@ def test_actual_rest_mcp_cli_keep_both_editions(
         async with Client(cached_mcp_app()) as client:
             result = await call_calculation(
                 client,
-                spec.tool_name,
+                spec.name,
                 {
                     **payload,
+                    "detail": "audit",
                     "fields": fields,
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
-                    "response_char_limit": 0,
                 },
             )
             assert not result.is_error

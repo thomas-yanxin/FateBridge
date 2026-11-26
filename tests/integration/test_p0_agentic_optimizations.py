@@ -10,17 +10,16 @@ from fastmcp import Client
 
 import fatebridge.services.knowledge as kn
 from fatebridge.application.examples import example_input, suggested_fields
-from fatebridge.application.execution import execute_tool
+from fatebridge.application.execution import execute_with_receipt
 from fatebridge.application.response_delivery import deliver_response
-from fatebridge.application.result_delivery import DEFAULT_MCP_RESPONSE_CHARS
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services import bazi, replay_metadata
+from fatebridge.services import replay_metadata
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import call_calculation
 
 
-def test_knowledge_registry_runs_once_without_redundant_reexecution(
+def test_knowledge_catalog_runs_once_without_redundant_reexecution(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     orig = kn.build_knowledge_registry
@@ -32,24 +31,18 @@ def test_knowledge_registry_runs_once_without_redundant_reexecution(
         return orig(*args, **kwargs)
 
     monkeypatch.setattr(kn, "build_knowledge_registry", spy)
-    spec = next(s for s in CATALOG if s.key == "knowledge_registry")
+    spec = next(s for s in CATALOG if s.name == "knowledge_catalog")
     request = spec.request_model()
     compact_options = ExecutionOptions(detail="compact")
-    result = execute_tool(spec, request, options=compact_options)
+    result = execute_with_receipt(spec, request, options=compact_options)
     assert calls == 1 and "domains" in result
     assert "snapshot_text" not in result and "snapshot_export" not in result
-
-    with_snapshot = execute_tool(
-        spec, request, options=compact_options, fields=["snapshot_export"]
-    )
-    assert calls == 2 and with_snapshot["domains"] == result["domains"]
-    assert with_snapshot["snapshot_text"] and with_snapshot["snapshot_export"]
 
 
 def test_bazi_birth_tiered_detail_and_inline_suggested_fields(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    spec = next(s for s in CATALOG if s.key == "bazi_birth")
+    spec = next(s for s in CATALOG if s.name == "bazi_birth_chart")
     req = spec.request_model(
         birth_year=1990,
         birth_month=5,
@@ -66,142 +59,61 @@ def test_bazi_birth_tiered_detail_and_inline_suggested_fields(
 
     inventory_calls = 0
     original_inventory = replay_metadata.ephemeris_inventory
-    snapshot_calls = 0
-    original_snapshot = bazi._build_snapshot_text
 
     def inventory():
         nonlocal inventory_calls
         inventory_calls += 1
         return original_inventory()
 
-    def snapshot(**kwargs):
-        nonlocal snapshot_calls
-        snapshot_calls += 1
-        return original_snapshot(**kwargs)
-
     monkeypatch.setattr(replay_metadata, "ephemeris_inventory", inventory)
-    monkeypatch.setattr(bazi, "_build_snapshot_text", snapshot)
     compact = ExecutionOptions(detail="compact", as_of="2026-11-23T04:00:00Z")
-    compact_raw = execute_tool(spec, req, options=compact)
+    compact_raw = execute_with_receipt(spec, req, options=compact)
     assert inventory_calls == 0
-    assert snapshot_calls == 0
     assert "runtime" not in compact_raw["run_metadata"]
     assert "snapshot_text" not in compact_raw
     assert "snapshot_export" not in compact_raw
 
-    explicit = execute_tool(
-        spec, req, options=compact, fields=["run_metadata.runtime.solar_term_policy"]
-    )
-    assert inventory_calls == 1
-    assert snapshot_calls == 0
-    assert "solar_term_policy" in explicit["run_metadata"]["runtime"]
-
-    standard_raw = execute_tool(
-        spec, req, options=compact.model_copy(update={"detail": "standard"})
-    )
-    audit_raw = execute_tool(
+    audit_raw = execute_with_receipt(
         spec, req, options=compact.model_copy(update={"detail": "audit"})
     )
-    assert inventory_calls == 3
-    assert snapshot_calls == 2
-    assert (
-        compact_raw["bazi_birth"]
-        == standard_raw["bazi_birth"]
-        == audit_raw["bazi_birth"]
-    )
+    assert inventory_calls == 1
+    assert compact_raw["bazi_birth"] == audit_raw["bazi_birth"]
 
     compact_out = deliver_response(compact_raw, spec=spec, detail="compact")
     assert (
         deliver_response(compact_raw, spec=spec, detail="compact", fields=[])
         == compact_out
     )
-    standard_out = deliver_response(standard_raw, spec=spec, detail="standard")
     audit_out = deliver_response(audit_raw, spec=spec, detail="audit")
 
     assert "calculation_evidence" not in compact_out["run_metadata"]
-    assert "calculation_evidence" not in standard_out["run_metadata"]
     assert "calculation_evidence" in audit_out["run_metadata"]
+    assert dump_len(compact_out) < dump_len(audit_out)
 
-    assert dump_len(compact_out) < dump_len(standard_out) < dump_len(audit_out)
-    assert dump_len(standard_out) < 120_000
-
-    with_snapshot = execute_tool(spec, req, options=compact, include_snapshot_text=True)
-    with_export = execute_tool(spec, req, options=compact, fields=["snapshot_export"])
-    assert snapshot_calls == 4
-    assert with_snapshot["snapshot_text"] == standard_raw["snapshot_text"]
-    assert with_export["snapshot_export"] == standard_raw["snapshot_export"]
-
-    # With suggested_fields, bazi_birth fits inline within the default MCP budget.
+    # With suggested_fields, bazi_birth_chart fits cleanly without result_delivery.
     mcp_view = deliver_response(
-        standard_raw,
+        audit_raw,
         spec=spec,
         fields=suggested_fields(spec),
-        strict_fields=True,
-        include_snapshot_text=False,
-        response_char_limit=DEFAULT_MCP_RESPONSE_CHARS,
-        detail="standard",
+        detail="compact",
     )
     assert "result_delivery" not in mcp_view
     assert "bazi_birth" in mcp_view
-    assert dump_len(mcp_view) <= DEFAULT_MCP_RESPONSE_CHARS
+    assert dump_len(mcp_view) <= 8192
 
 
-def test_western_timing_snapshots_are_available_on_request() -> None:
-    spec = next(s for s in CATALOG if s.key == "profection")
-    request = spec.request_model.model_validate(example_input(spec))
-    as_of = "2026-10-12T02:00:00Z"
-    standard = ExecutionOptions(as_of=as_of, detail="standard")
-    result = execute_tool(spec, request, options=standard)
-    assert "snapshot_text" not in result and "snapshot_export" not in result
-
-    audit = execute_tool(
-        spec, request, options=ExecutionOptions(as_of=as_of, detail="audit")
-    )
-    assert result["profection"] == audit["profection"]
-    audit = deliver_response(audit, spec=spec, detail="audit")
-    assert audit["snapshot_text"] and audit["snapshot_export"]
-
-    fields = ["snapshot_text", "snapshot_export"]
-    requested = execute_tool(spec, request, options=standard, fields=fields)
-    projected = deliver_response(
-        requested, spec=spec, fields=fields, strict_fields=True
-    )
-    assert projected["snapshot_text"] == audit["snapshot_text"]
-    assert projected["snapshot_export"] == audit["snapshot_export"]
-
-    selected = request.model_copy(update={"selected_sections": ["出生时间"]})
-    requested_sections = execute_tool(spec, selected, options=standard)
-    assert requested_sections["snapshot_export"]["selected_sections"] == ["出生时间"]
-
-
-def test_election_renders_snapshot_only_on_request() -> None:
-    spec = next(s for s in CATALOG if s.key == "astro_election")
-    request = spec.request_model.model_validate(example_input(spec))
-    standard = execute_tool(spec, request)
-    assert "election" in standard and "snapshot_text" not in standard
-    audit = execute_tool(spec, request, options=ExecutionOptions(detail="audit"))
-    assert audit["election"] == standard["election"]
-    assert (
-        "[候选盘条件]"
-        in deliver_response(audit, spec=spec, detail="audit")["snapshot_text"]
-    )
-
-
-def test_mcp_exposes_four_tools_and_executes_end_to_end() -> None:
+def test_mcp_exposes_two_tools_and_zero_resources() -> None:
     app = create_mcp_app()
-    by_key = {spec.key: spec for spec in CATALOG}
+    by_name = {spec.name: spec for spec in CATALOG}
 
     async def check():
         async with Client(app) as client:
             tools = await client.list_tools()
             names = {t.name for t in tools}
-            assert names == {
-                "discover_capabilities",
-                "describe_capability",
-                "run_calculation",
-                "read_result",
-            }
+            assert names == {"discover_tools", "run_calculation"}
             assert all(tool.output_schema is None for tool in tools)
+            assert await client.list_resources() == []
+            assert await client.list_resource_templates() == []
             direct = await client.call_tool(
                 "bazi_birth_chart", {}, raise_on_error=False
             )
@@ -217,24 +129,16 @@ def test_mcp_exposes_four_tools_and_executes_end_to_end() -> None:
             )
             assert wire_size < 5_000
 
-            summary = (await client.read_resource("fatebridge://catalog/summary"))[0]
-            assert len(summary.text.encode("utf-8")) < 12_000
-            index = json.loads(summary.text)
-            assert index["matched_count"] == len(index["tools"])
-            assert {record["tool"] for record in index["tools"]} == {
-                spec.tool_name for spec in CATALOG if spec.mcp_name
-            }
-
-            found = await client.call_tool("discover_capabilities", {"family": "bazi"})
+            found = await client.call_tool("discover_tools", {"family": "bazi"})
             assert not found.is_error
             tool_names = {t["tool"] for t in found.structured_content["tools"]}
-            assert by_key["bazi_birth"].tool_name in tool_names
+            assert "bazi_birth_chart" in tool_names
 
             described = await client.call_tool(
-                "describe_capability", {"tool": "bazi_birth_chart", "detail": "input"}
+                "discover_tools", {"tool": "bazi_birth_chart", "detail": "summary"}
             )
             assert not described.is_error
-            assert "suggested_fields" in described.structured_content
+            assert "suggested_fields" in described.structured_content["tools"][0]
 
             ran = await client.call_tool(
                 "run_calculation",
@@ -251,8 +155,6 @@ def test_mcp_exposes_four_tools_and_executes_end_to_end() -> None:
                         "birth_timezone": "Asia/Shanghai",
                     },
                     "fields": ["bazi_birth.four_pillars", "bazi_birth.day_master"],
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                     "detail": "compact",
                 },
             )
@@ -261,22 +163,20 @@ def test_mcp_exposes_four_tools_and_executes_end_to_end() -> None:
             assert "result_delivery" not in payload
             assert payload["bazi_birth"]["day_master"]["stem"] == "庚"
 
-            for key in ("qimen", "fengshui_assess", "sixyao"):
-                spec = by_key[key]
+            for name in ("qimen", "fengshui_assess", "liuyao"):
+                spec = by_name[name]
                 arguments = example_input(spec)
-                if key == "sixyao":
+                if name == "liuyao":
                     arguments = {**arguments, "method": "coin"}
-                else:
-                    pass
                 response = await client.call_tool(
                     "run_calculation",
-                    {"tool": spec.tool_name, "arguments": arguments},
+                    {"tool": spec.name, "arguments": arguments},
                 )
                 business = response.structured_content
                 assert "result_delivery" not in business
-                if key == "qimen":
+                if name == "qimen":
                     assert len(business["qimen"]["palaces"]) == 9
-                elif key == "fengshui_assess":
+                elif name == "fengshui_assess":
                     findings = business["layout_analysis"]["placement_findings"]
                     assert {item["object_id"] for item in findings} == {"stove", "bed"}
                     assert business["rule_trace"]

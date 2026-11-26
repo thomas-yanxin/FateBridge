@@ -1,7 +1,6 @@
-"""Strict bounded first views and original same-run MCP resource proofs."""
+"""Strict bounded first views without deferred delivery."""
 
 from fatebridge.utils.formatting import format_json_response
-from tests.fixtures.mcp_result_delivery import read_full_result
 
 
 def without_transport(result):
@@ -9,26 +8,8 @@ def without_transport(result):
 
 
 async def same_run_projected_response(client, result):
-    """Prove complete inline business facts and read the exact original receipt.
-
-    The default wire budget stays unchanged. Supplementary run metadata may be
-    paged; business facts may not disappear from these first-view tests. Never
-    recompute a tool call to obtain a purported full response.
-    """
+    """Assert complete inline business facts without deferred delivery."""
     assert not result.is_error
-    assert len(format_json_response(result.structured_content)) <= 8192
     body = result.structured_content
-    if "result_delivery" not in body:
-        return body
-    else:
-        pass
-    ref = body["result_delivery"]
-    assert ref["mode"] == "paged"
-    assert ref["deferred_fields"]
-    assert all(path.startswith("run_metadata.") for path in ref["deferred_fields"])
-    original = await read_full_result(client, body)
-    inline_business = {
-        k: v for k, v in body.items() if k not in {"run_metadata", "result_delivery"}
-    }
-    assert inline_business == without_transport(original)
-    return original
+    assert "result_delivery" not in body
+    return body

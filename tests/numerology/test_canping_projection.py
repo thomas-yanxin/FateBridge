@@ -74,7 +74,6 @@ def test_complete_120_years_and_query_use_same_selected_model(
     assert selected["year_start_boundary"] == boundaries[-2]
     assert selected["year_end_boundary"] == boundaries[-1]
     assert selected["dayun_index"] != 0
-    assert "[参平年序·实际立春来源]" in result["snapshot_text"]
     assert CanpingSeries.model_validate(series).model_dump(exclude_unset=True) == series
     assert CanpingTiming.model_validate(timing).model_dump(exclude_unset=True) == timing
 

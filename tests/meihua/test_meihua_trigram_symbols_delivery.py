@@ -14,7 +14,6 @@ import fatebridge
 from fatebridge.core.public_output import same_public_value
 from fatebridge.core.requests.meihua import MeihuaCasting
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.fixtures.mcp_result_delivery import read_full_result
 from tests.support.transports import call_calculation
 
 METHODS = [
@@ -128,16 +127,12 @@ async def test_bounded_stdio_read_restores_complete_same_run_field(
             {
                 "casting": METHODS[0],
                 "fields": [FIELD],
-                "strict_fields": True,
-                "include_snapshot_text": False,
-                "response_char_limit": 4096,
             },
             raise_on_error=False,
         )
         assert not reply.is_error
         result = reply.structured_content
-        assert "result_delivery" in result
-        restored = await read_full_result(client, result)
+        assert "result_delivery" not in result
         assert same_public_value(
-            restored["interpretation"][FIELD.split(".")[1]], expected
+            result["interpretation"][FIELD.split(".")[1]], expected
         )

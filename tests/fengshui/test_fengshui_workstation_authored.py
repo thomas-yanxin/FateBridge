@@ -14,7 +14,7 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import assess as _assess
 from tests.fixtures.fengshui import payload
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
@@ -22,6 +22,10 @@ from tests.support.transports import call_calculation, describe_capability, rest
 from tests.unit_test.fixtures.fengshui_layout import (
     material_request,
 )
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 def condition(value=True, basis="user_confirmed"):
@@ -475,7 +479,7 @@ def test_new_branches_match_rest_mcp_cli_and_strict_projection(
         "rulesets",
         "rule_trace",
     ]
-    controls = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    controls = dict(detail="audit", fields=fields)
     response = rest_client(monkeypatch).post(
         "/api/fengshui/assess", json=request, params=controls
     )
@@ -488,10 +492,10 @@ def test_new_branches_match_rest_mcp_cli_and_strict_projection(
                 "fengshui_assess",
                 "--request-file",
                 str(path),
+                "--detail",
+                "audit",
                 "--fields",
                 *fields,
-                "--strict-fields",
-                "--no-include-snapshot-text",
             ]
         )
         == 0
@@ -858,38 +862,17 @@ def test_missing_engineering_fact_cannot_hide_behind_candidate_feasibility() -> 
     )
 
 
-def test_default_budget_delivery_preserves_same_run_workstation_data(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    import fatebridge.api as api
-    from fatebridge.application import result_delivery as delivery
-    from tests.support.result_delivery import reconstruct
-
-    store = delivery.ResultStore(tmp_path / "results")
-    monkeypatch.setattr(delivery, "RESULT_STORE", store)
-    monkeypatch.setattr(api, "RESULT_STORE", store)
-
+def test_audit_detail_delivery_preserves_same_run_workstation_data() -> None:
     async def native():
         async with Client(create_mcp_app(families="fengshui")) as client:
             result = await call_calculation(
                 client,
                 "fengshui_assess",
-                {**activity_request(), "include_snapshot_text": False},
+                {**activity_request(), "detail": "audit"},
             )
             assert not result.is_error
-            ref = result.structured_content["result_delivery"]
-            assert ref["file_payload_path"] == "payload"
-            manifest = json.loads(
-                (await client.read_resource(ref["manifest_uri"]))[0].text
-            )
-            assert (
-                manifest["run_metadata"]["run_id"]
-                == result.structured_content["run_metadata"]["run_id"]
-            )
-            original = reconstruct(store, ref["result_id"])
-            assert (
-                original["run_metadata"]["run_id"] == manifest["run_metadata"]["run_id"]
-            )
+            original = result.structured_content
+            assert "result_delivery" not in original
             branch = original["layout_analysis"]["workstation_analysis"]
             assert branch["findings"][0]["selected_star_role"] == "facing"
             assert (
@@ -917,16 +900,3 @@ def test_published_workstation_examples_are_executable(name: str, status: str) -
     path = Path(__file__).resolve().parents[2] / "docs/examples" / (name + ".json")
     result = assess(**json.loads(path.read_text()))
     assert result["layout_analysis"]["status"] == status
-    if name == "fengshui-workstation-activity":
-        assert "向星" in result["snapshot_text"]
-        assert "真实水装置需求" in result["snapshot_text"]
-    else:
-        pass
-    if name == "fengshui-entry-barrier":
-        assert "入口隔挡" in result["snapshot_text"]
-    else:
-        pass
-    if name == "fengshui-material-application":
-        assert "剂量、目标位置" in result["snapshot_text"]
-    else:
-        pass

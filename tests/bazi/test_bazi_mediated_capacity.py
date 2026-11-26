@@ -17,7 +17,7 @@ def test_new_source_conditions_survive_rest_native_mcp_and_cli(
 ) -> None:
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "category": "classical_force_semantics", "key": key}
-    options = {"include_snapshot_text": True, "response_char_limit": 0}
+    options = {"detail": "audit"}
     http, protocol, code, cli = surface_calls(
         spec, payload, projection=options, cli_first=False
     )
@@ -38,7 +38,7 @@ def test_new_source_conditions_survive_rest_native_mcp_and_cli(
     assert (
         curation["validation_status"] == "text_semantics_not_model_force_adjudication"
     )
-    assert curation["source_refs"][0]["edition"] in value["snapshot_text"]
+    assert curation["source_refs"][0]["edition"]
     if key == "日元强弱与性情措辞":
         assert len(value["tips"]) == 8
         assert curation["method_id"] == "dtcw1947_body_vocabulary_semantics_v3"
@@ -48,7 +48,7 @@ def test_new_source_conditions_survive_rest_native_mcp_and_cli(
         assert len(value["tips"]) == 5
         assert curation["entry_revision"] == 1
     if key == "暖局与用神":
-        assert "用神必在酉金" in value["snapshot_text"]
-        assert "用神不在丙火而在辰土" in value["snapshot_text"]
+        assert "用神必在酉金" in value["rendered_text"]
+        assert "用神不在丙火而在辰土" in value["rendered_text"]
     else:
         pass

@@ -145,4 +145,3 @@ def test_chart_exposes_lots_layer() -> None:
     lots = result["classical"]["lots"]
     assert set(lots) == {"fortune", "spirit", "marriage", "children"}
     assert lots["fortune"]["dispositor"] is not None
-    assert "[阿拉伯点]" in result["snapshot_text"]

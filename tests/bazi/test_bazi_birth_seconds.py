@@ -17,7 +17,7 @@ from tests.support.transports import inputs, rest, surface_calls
 from tests.unit_test.fixtures.bazi_birth_clock import BASE, SPECS
 
 
-@pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)
+@pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.name)
 def test_every_actual_bazi_and_timing_binding_preserves_second_and_presence(
     spec,
 ) -> None:
@@ -55,7 +55,7 @@ def test_second_requires_an_explicit_minute_instead_of_assuming_one(
 def test_missing_minute_points_to_the_required_field_on_every_transport(
     surface_calls,
 ) -> None:
-    spec = next(spec for spec in SPECS if spec.key == "bazi_birth")
+    spec = next(spec for spec in SPECS if spec.name == "bazi_birth_chart")
     response, protocol, code, cli = surface_calls(spec, {**BASE, "birth_second": 0})
     assert response.status_code == 422 and protocol.is_error and code == 1
     for result in (response.json(), protocol.structured_content, cli):
@@ -93,7 +93,7 @@ def test_receipt_distinguishes_provided_zero_from_compatibility_defaults(
         data["birth_second"] = second
     else:
         pass
-    spec = next(s for s in SPECS if s.key == "bazi_birth")
+    spec = next(s for s in SPECS if s.name == "bazi_birth_chart")
     _, args, _ = spec.bind(spec.request_model.model_validate(data))
     person = args[0]
     receipt = birth_clock_input_receipt(person, normalize_birth_time(person))

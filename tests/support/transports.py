@@ -15,7 +15,7 @@ AS_OF = "2026-10-12T02:00:00Z"
 def _specs():
     from fatebridge.services.tool_catalog import CATALOG
 
-    return {spec.key: spec for spec in CATALOG}
+    return {spec.name: spec for spec in CATALOG}
 
 
 def __getattr__(name: str):
@@ -50,21 +50,12 @@ async def call_calculation(
     *,
     raise_on_error: bool = True,
 ) -> CallToolResult:
-    controls = {
-        "as_of",
-        "trace_id",
-        "parent_run_id",
-        "detail",
-        "fields",
-        "strict_fields",
-        "include_snapshot_text",
-        "response_char_limit",
-    }
+    controls = {"as_of", "detail", "fields"}
     arguments = {}
     request: dict[str, object] = {
         "tool": tool,
         "arguments": arguments,
-        "detail": "standard",
+        "detail": "audit",
     }
     for name, value in (values or {}).items():
         if name in controls:
@@ -76,21 +67,22 @@ async def call_calculation(
     )
 
 
-async def describe_capability(client: Client, tool: str, *, detail="input"):
+async def describe_capability(client: Client, tool: str, *, detail="summary"):
+    wire_detail = "summary" if detail == "input" else detail
     result = await client.call_tool(
-        "describe_capability", {"tool": tool, "detail": detail}
+        "discover_tools", {"tool": tool, "detail": wire_detail}
     )
     assert result.structured_content is not None
-    return result.structured_content
+    return result.structured_content["tools"][0]
 
 
 async def discover_capabilities(client: Client):
-    result = await client.call_tool("discover_capabilities", {})
+    result = await client.call_tool("discover_tools", {})
     assert result.structured_content is not None
     return [item["tool"] for item in result.structured_content["tools"]]
 
 
-async def capability_contracts(client: Client, *, detail="input"):
+async def capability_contracts(client: Client, *, detail="summary"):
     return {
         name: await describe_capability(client, name, detail=detail)
         for name in await discover_capabilities(client)
@@ -131,7 +123,7 @@ def inputs(spec):
     factory = (
         REST_POST_CASES[spec.rest_path]
         if spec.rest_path
-        else MCP_CASES[spec.tool_name][1]
+        else MCP_CASES[spec.name][1]
     )
     return spec.request_model.model_validate(factory()).model_dump(exclude_unset=True)
 
@@ -139,20 +131,22 @@ def inputs(spec):
 def call_cli(spec, payload, tmp_path, capsys, flags=()):
     from fatebridge.cli import run as cli_run
 
-    subject = tmp_path / "subject.json"
-    subject.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
-    prefix = ["--no-metadata"] if "--no-metadata" in flags else []
-    flags = [flag for flag in flags if flag != "--no-metadata"]
+    request_file = tmp_path / "request.json"
+    request_file.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    extra_flags = list(flags)
+    if "--detail" not in extra_flags and not any(
+        f.startswith("--detail=") for f in extra_flags
+    ):
+        extra_flags.extend(["--detail", "audit"])
     capsys.readouterr()
     code = cli_run(
         [
-            *prefix,
-            spec.tool_name,
-            "--subject-file",
-            str(subject),
+            spec.name,
+            "--request-file",
+            str(request_file),
             "--as-of",
             AS_OF,
-            *flags,
+            *extra_flags,
         ]
     )
     return code, json.loads(capsys.readouterr().out)
@@ -166,8 +160,8 @@ async def native(spec, payload, **flags):
     async with Client(mcp.app) as client:
         return await call_calculation(
             client,
-            spec.tool_name,
-            {**payload, "as_of": AS_OF, "response_char_limit": 0, **flags},
+            spec.name,
+            {**payload, "as_of": AS_OF, **flags},
             raise_on_error=False,
         )
 
@@ -176,32 +170,19 @@ def run_three(spec, payload, fields, rest, tmp_path, capsys):
     response = rest.post(
         spec.rest_path,
         json=payload,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("response_char_limit", "0")],
+        params=[("fields", f) for f in fields] + [("detail", "audit")],
     )
     code, cli = call_cli(
         spec,
         payload,
         tmp_path,
         capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        flags=["--fields", *fields, "--detail", "audit"],
     )
     mcp = asyncio.run(
         native(
             spec,
-            {
-                **payload,
-                "fields": fields,
-                "strict_fields": True,
-                "response_char_limit": 0,
-            },
+            {**payload, "fields": fields, "detail": "audit"},
         )
     )
     return response, code, cli, mcp
@@ -211,30 +192,11 @@ def business(payload):
     return {k: v for k, v in payload.items() if k != "run_metadata"}
 
 
-def projected_outputs(
-    spec, payload, fields, rest, tmp_path, capsys, *, include_snapshot_text=None
-):
+def projected_outputs(spec, payload, fields, rest, tmp_path, capsys):
     """Call the same strict projection on REST, CLI and native MCP."""
-    options = dict(fields=fields, strict_fields=True, response_char_limit=0)
-    params = [("fields", f) for f in fields] + [
-        ("strict_fields", "true"),
-        ("response_char_limit", "0"),
-    ]
-    flags = [
-        "--fields",
-        *fields,
-        "--strict-fields",
-        "true",
-        "--response-char-limit",
-        "0",
-    ]
-    if include_snapshot_text is not None:
-        options["include_snapshot_text"] = include_snapshot_text
-        text_flag = str(include_snapshot_text).lower()
-        params.append(("include_snapshot_text", text_flag))
-        flags.extend(["--include-snapshot-text", text_flag])
-    else:
-        pass
+    options = dict(fields=fields, detail="audit")
+    params = [("fields", f) for f in fields] + [("detail", "audit")]
+    flags = ["--fields", *fields, "--detail", "audit"]
     response = rest.post(
         spec.rest_path,
         json=payload,
@@ -290,10 +252,16 @@ def surface_calls(rest, tmp_path, capsys):
                     )
         else:
             pass
+        if params is None:
+            params = {"detail": "audit"}
+        elif isinstance(params, dict) and "detail" not in params:
+            params = {**params, "detail": "audit"}
+        elif isinstance(params, list) and not any(k == "detail" for k, _ in params):
+            params = [*params, ("detail", "audit")]
         http = rest.post(
             spec.rest_path,
             json=payload,
-            **({"params": params} if params is not None else {}),
+            params=params,
         )
         if cli_first:
             code, local = call_cli(spec, payload, tmp_path, capsys, flags=flags)
@@ -310,7 +278,6 @@ def surface_calls(rest, tmp_path, capsys):
 
 
 def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
-    from fastapi.testclient import TestClient
     from fastmcp import Client
 
     from fatebridge.cli import run as cli_run
@@ -321,9 +288,7 @@ def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
         json=payload,
         params=[
             ("as_of", as_of),
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
+            ("detail", "audit"),
             *[("fields", f) for f in fields],
         ],
     )
@@ -332,14 +297,12 @@ def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
         async with Client(cached_mcp_app()) as client:
             return await call_calculation(
                 client,
-                spec.tool_name,
+                spec.name,
                 {
                     **payload,
                     "as_of": as_of,
                     "fields": fields,
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
-                    "response_char_limit": 0,
+                    "detail": "audit",
                 },
                 raise_on_error=False,
             )
@@ -350,15 +313,13 @@ def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
     capsys.readouterr()
     code = cli_run(
         [
-            spec.tool_name,
-            "--subject-file",
+            spec.name,
+            "--request-file",
             str(request),
             "--as-of",
             as_of,
-            "--strict-fields",
-            "--no-include-snapshot-text",
-            "--response-char-limit",
-            "0",
+            "--detail",
+            "audit",
             "--fields",
             *fields,
         ]

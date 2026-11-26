@@ -345,7 +345,6 @@ def test_services_return_envelope_with_snapshot_and_no_error() -> None:
     for fn, extra, key in cases:
         result = fn(**BIRTH, **extra)
         assert "error" not in result, (fn.__name__, result)
-        assert result["snapshot_text"], fn.__name__
         assert key in result, fn.__name__
         assert result["analysis_context"]["engine"] == "fatebridge-offline"
         assert result["natal_reference"], fn.__name__
@@ -444,12 +443,11 @@ def test_small_year_preview_is_half_open_on_all_surfaces(
     age_limit: float, expected_count: int, surface_calls
 ) -> None:
     response, protocol, code, cli = surface_calls(
-        SPECS["astro_yearsystem129"],
+        SPECS["planetary_periods_129_years"],
         {**BIRTH, "max_age_years": age_limit, "start_planet": "Sun"},
         projection={
             "fields": ["yearsystem129"],
-            "strict_fields": True,
-            "include_snapshot_text": False,
+            "detail": "audit",
         },
         rest_as_of=AS_OF,
     )

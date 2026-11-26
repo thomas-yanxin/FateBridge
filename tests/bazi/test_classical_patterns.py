@@ -15,9 +15,6 @@ from fatebridge.core.classical_western import (
 )
 from fatebridge.core.ephemeris_runtime import swe
 from fatebridge.services.astrology import calculate_core_chart_analysis
-from fatebridge.services.astrology_classical_snapshot import (
-    _build_classical_patterns_lines,
-)
 
 
 def test_whole_sign_aspect_and_aversion() -> None:
@@ -112,7 +109,6 @@ def test_chart_exposes_classical_patterns() -> None:
     cp = result["classical_patterns"]
     assert cp["sect_benefic"] in {"Jupiter", "Venus"}
     assert "aversions" in cp and "overcoming" in cp and "besiegement" in cp
-    assert "[古典格局]" in result["snapshot_text"]
 
 
 _NATAL = dict(
@@ -246,24 +242,3 @@ def test_chart_exposes_light_and_nodal_patterns() -> None:
     patterns = build_core_chart_payload(info, "hellen_chart")["classical_patterns"]
     for key in ("translation_of_light", "collection_of_light", "nodal_bending"):
         assert isinstance(patterns[key], list)
-
-
-def test_snapshot_renders_light_and_nodal_configurations() -> None:
-    payload = {
-        "classical_patterns": {
-            "sect_benefic": "Jupiter",
-            "sect_malefic": "Saturn",
-            "overcoming": [],
-            "besiegement": {},
-            "bonification": {},
-            "translation_of_light": [
-                {"translator": "Moon", "from": "Saturn", "to": "Jupiter"}
-            ],
-            "collection_of_light": [{"collector": "Saturn", "from": ["Mars", "Venus"]}],
-            "nodal_bending": [{"planet": "Mars", "bending": "north", "orb": 1.0}],
-        }
-    }
-    text = _build_classical_patterns_lines(payload)
-    assert "光的传递（结构候选）：月亮 自 土星 递光至 木星" in text
-    assert "光的聚集（结构候选）：土星 聚 火星、金星 之光" in text
-    assert "交点弯曲：火星北弯" in text

@@ -244,40 +244,32 @@ def test_explicit_base_fallback_does_not_discard_native_midpoint_layer(
 
 
 @pytest.mark.parametrize(
-    "key,variant",
+    "name",
     [
-        ("astro_chart13", None),
-        ("astro_chart", "chart13"),
-        ("astro_germany", None),
-        ("astro_chart", "germany"),
+        "thirteen_sector_chart",
+        "hamburg_midpoint_chart",
+        "astrology_chart",
     ],
 )
 def test_nominal_source_and_metadata_across_three_surfaces(
     files,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-    key: str,
-    variant: str | None,
+    name: str,
     surface_calls,
 ) -> None:
     _, directory = files
     empty = tmp_path / "empty"
     empty.mkdir()
-    spec = next(s for s in CATALOG if s.key == key)
-    germany = key == "astro_germany" or variant == "germany"
+    spec = next(s for s in CATALOG if s.name == name)
+    germany = name == "hamburg_midpoint_chart"
     path = (
         "base_chart.chart_profile" if germany else "chart_profile"
     ) + ".physical_ephemeris_source"
     payload = {**BIRTH, "birth_time_uncertainty_minutes": 1.0}
-    if variant:
-        payload["chart_variant"] = variant
-    else:
-        pass
     options = dict(
         fields=[path],
-        strict_fields=True,
-        include_snapshot_text=False,
-        response_char_limit=0,
+        detail="audit",
         as_of="2026-10-22T00:00:00Z",
     )
 

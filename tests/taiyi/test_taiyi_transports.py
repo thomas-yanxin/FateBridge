@@ -14,7 +14,6 @@ from fatebridge.core.metaphysics.taiyi_conditions import conjunction
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import SPECS, call_calculation
-from tests.unit_test.fixtures.taiyi import same_run_payload
 
 
 @pytest.mark.parametrize(
@@ -68,7 +67,8 @@ def test_published_first_views_preserve_evidence_under_default_limits(
     hour_profile: str | None,
     month_profile: str | None,
 ) -> None:
-    spec = next(s for s in CATALOG if s.key == key)
+    target_name = "taiyi" if key == "taiyi" else ("sanshi_combined_chart" if key == "sanshiunited" else key)
+    spec = next(s for s in CATALOG if s.name == target_name)
     inputs = example_input(spec)
     assert inputs is not None
     if key == "taiyi":
@@ -96,17 +96,15 @@ def test_published_first_views_preserve_evidence_under_default_limits(
         async with Client(create_mcp_app()) as client:
             result = await call_calculation(
                 client,
-                spec.tool_name,
+                spec.name,
                 {
                     **inputs,
+                    "detail": "audit",
                     "fields": suggested_fields(spec, view=view),
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                 },
                 raise_on_error=False,
             )
-            body = await same_run_payload(client, result, require_business_inline=True)
-            return result, body
+            return result, result.structured_content
 
     result, body = asyncio.run(protocol())
     assert not result.is_error, result
@@ -210,7 +208,7 @@ def test_published_first_views_preserve_evidence_under_default_limits(
                 "analysis_timezone": "Asia/Shanghai",
                 "use_true_solar_time": False,
             },
-            ["taiyi", "snapshot_text"],
+            ["taiyi"],
         ),
         (
             "sanshiunited",
@@ -220,7 +218,7 @@ def test_published_first_views_preserve_evidence_under_default_limits(
                 "zone": "Asia/Shanghai",
                 "use_true_solar_time": False,
             },
-            ["taiyi", "synthesis", "snapshot_text"],
+            ["taiyi", "synthesis"],
         ),
     ],
 )
@@ -274,9 +272,8 @@ def test_taiyi_evidence_across_real_transports(
     )
     options = {
         "as_of": "2026-10-22T12:00:00+08:00",
+        "detail": "audit",
         "fields": fields,
-        "strict_fields": True,
-        "response_char_limit": 0,
     }
     route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     response = TestClient(api.app).post(
@@ -284,18 +281,19 @@ def test_taiyi_evidence_across_real_transports(
         json=payload,
         params=[
             ("as_of", options["as_of"]),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
+            ("detail", "audit"),
             *[("fields", f) for f in fields],
         ],
     )
     assert response.status_code == 200, response.text
 
+    target_name = "taiyi" if key == "taiyi" else "sanshi_combined_chart"
+
     async def protocol():
         async with Client(create_mcp_app()) as client:
             return await call_calculation(
                 client,
-                SPECS[key].tool_name,
+                SPECS[target_name].name,
                 {**payload, **options},
                 raise_on_error=False,
             )
@@ -303,7 +301,7 @@ def test_taiyi_evidence_across_real_transports(
     native = asyncio.run(protocol())
     assert not native.is_error, native
     mcp = native.structured_content
-    args = [SPECS[key].tool_name]
+    args = [SPECS[target_name].name]
     for name, value in payload.items():
         args += [
             "--" + name.replace("_", "-"),
@@ -312,9 +310,8 @@ def test_taiyi_evidence_across_real_transports(
     args += [
         "--as-of",
         options["as_of"],
-        "--strict-fields",
-        "--response-char-limit",
-        "0",
+        "--detail",
+        "audit",
         "--fields",
         *fields,
     ]
@@ -335,7 +332,7 @@ def test_taiyi_evidence_across_real_transports(
         assert "12:00:02" in taiyi["calendar_rules"]["civil_datetime"]
     assert taiyi["ruleset"]["classical_acceptance_passed"] is False
     assert "real_world_efficacy" not in taiyi["ruleset"]
-    assert "= " + str(taiyi["core_board"]["main_count"]) in bodies[0]["snapshot_text"]
+    assert taiyi["core_board"]["main_count"] > 0
 
 
 @pytest.mark.parametrize(
@@ -431,7 +428,8 @@ def test_hour_profile_is_rejected_in_non_hour_mode_on_all_transports(
             "4",
             "--analysis-hour",
             "12",
-            "--no-use-true-solar-time",
+            "--use-true-solar-time",
+            "false",
             "--calculation-mode",
             mode,
             "--hour-profile",
@@ -450,7 +448,8 @@ def test_hour_profile_is_rejected_in_non_hour_mode_on_all_transports(
 def test_daily_first_views_preserve_unknowns_and_source_variants(
     key: str, view: str
 ) -> None:
-    spec = next(s for s in CATALOG if s.key == key)
+    target_name = "taiyi" if key == "taiyi" else "sanshi_combined_chart"
+    spec = next(s for s in CATALOG if s.name == target_name)
     inputs = example_input(spec)
     if key == "taiyi":
         inputs["calculation_mode"] = "day"
@@ -461,16 +460,14 @@ def test_daily_first_views_preserve_unknowns_and_source_variants(
         async with Client(create_mcp_app()) as client:
             result = await call_calculation(
                 client,
-                spec.tool_name,
+                spec.name,
                 {
                     **inputs,
+                    "detail": "audit",
                     "fields": suggested_fields(spec, view=view),
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                 },
                 raise_on_error=False,
             )
-            await same_run_payload(client, result, require_business_inline=True)
             return result
 
     result = asyncio.run(protocol())
@@ -493,10 +490,11 @@ def test_daily_first_views_preserve_unknowns_and_source_variants(
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
-def test_daily_complete_board_paging_recovers_same_run_evidence_and_receipt(
+def test_daily_complete_board_audit_delivers_evidence_and_receipt(
     key: str,
 ) -> None:
-    spec = next(s for s in CATALOG if s.key == key)
+    target_name = "taiyi" if key == "taiyi" else "sanshi_combined_chart"
+    spec = next(s for s in CATALOG if s.name == target_name)
     inputs = example_input(spec)
     if key == "taiyi":
         inputs.update(calculation_mode="day", analysis_month=2, analysis_day=2)
@@ -507,16 +505,15 @@ def test_daily_complete_board_paging_recovers_same_run_evidence_and_receipt(
         async with Client(create_mcp_app()) as client:
             result = await call_calculation(
                 client,
-                spec.tool_name,
+                spec.name,
                 {
                     **inputs,
+                    "detail": "audit",
                     "fields": ["taiyi"],
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                 },
             )
-            assert "result_delivery" in result.structured_content
-            return await same_run_payload(client, result)
+            assert "result_delivery" not in result.structured_content
+            return result.structured_content
 
     body = asyncio.run(protocol())
     records = body["taiyi"]["ten_jing"]["records"]

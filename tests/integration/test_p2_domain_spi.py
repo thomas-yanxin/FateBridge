@@ -5,12 +5,13 @@ from __future__ import annotations
 import asyncio
 from typing import Dict
 
+import pytest
 from fastmcp import Client, FastMCP
 from pydantic import BaseModel, Field
 
-from fatebridge.application.bindings import raw_invoke
+from fatebridge.application.bindings import bind_kwargs
 from fatebridge.application.domain_plugin import DomainPlugin, assemble_catalog
-from fatebridge.application.execution import execute_tool
+from fatebridge.application.execution import execute_with_receipt
 from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.execution_context import ExecutionOptions
@@ -52,14 +53,13 @@ def _score_big_five(
 
 def test_non_metaphysics_psychometric_plugin_runs_end_to_end() -> None:
     spec = ToolSpec(
-        key="psych_big_five",
-        bind=raw_invoke(_score_big_five),
+        name="psych_big_five",
+        bind=bind_kwargs(_score_big_five),
         request_model=_BigFiveRequest,
         summary="Big Five 性格五因素确定性计分器",
         operation_label_zh="大五人格计分",
         family="psychometrics",
         rest_path="/api/psych/big-five",
-        mcp_name="psych_big_five",
         required_output_fields=("traits", "dominant_trait"),
     )
     plugin = DomainPlugin(
@@ -67,7 +67,7 @@ def test_non_metaphysics_psychometric_plugin_runs_end_to_end() -> None:
         specs=(spec,),
     )
     assembled = assemble_catalog([plugin])
-    assert [item.key for item in assembled] == ["psych_big_five"]
+    assert [item.name for item in assembled] == ["psych_big_five"]
 
     req = _BigFiveRequest(
         openness=5,
@@ -76,7 +76,7 @@ def test_non_metaphysics_psychometric_plugin_runs_end_to_end() -> None:
         agreeableness=4,
         neuroticism=2,
     )
-    raw = execute_tool(spec, req)
+    raw = execute_with_receipt(spec, req)
     delivered = deliver_response(raw, spec=spec, detail="compact")
     assert delivered["traits"]["openness"] == 100.0
     assert delivered["dominant_trait"] == "openness"
@@ -84,36 +84,39 @@ def test_non_metaphysics_psychometric_plugin_runs_end_to_end() -> None:
     assert delivered["run_metadata"]["tool_name"] == "psych_big_five"
     assert "calculation_evidence" not in delivered["run_metadata"]
 
-    for tier in ("standard", "audit"):
-        tiered = execute_tool(spec, req, options=ExecutionOptions(detail=tier))
-        assert "ephemeris" not in tiered["run_metadata"]["runtime"]
-        assert "solar_term_policy" not in tiered["run_metadata"]["runtime"]
+    audit = execute_with_receipt(spec, req, options=ExecutionOptions(detail="audit"))
+    assert "ephemeris" not in audit["run_metadata"]["runtime"]
+    assert "solar_term_policy" not in audit["run_metadata"]["runtime"]
 
     custom_policy = ReproducibilityPolicy(
         random_seed_field="seed", seed_condition="bootstrap_resampling"
     )
     assert custom_policy.as_manifest()["seed_condition"] == "bootstrap_resampling"
 
+    import fatebridge.mcp_server as mcp_server
+
     server = FastMCP("psych-test")
     _register_mcp_tools(server, assembled)
 
     async def call_mcp():
-        async with Client(server) as client:
-            contract = await describe_capability(client, "psych_big_five")
-            assert contract["tool"] == "psych_big_five"
-            res = await call_calculation(
-                client,
-                "psych_big_five",
-                {
-                    "openness": 5,
-                    "conscientiousness": 4,
-                    "extraversion": 3,
-                    "agreeableness": 4,
-                    "neuroticism": 2,
-                    "detail": "compact",
-                },
-            )
-            assert not res.is_error
-            assert res.structured_content["dominant_trait"] == "openness"
+        with pytest.MonkeyPatch.context() as mp:
+            mp.setattr(mcp_server, "CATALOG", assembled)
+            async with Client(server) as client:
+                contract = await describe_capability(client, "psych_big_five")
+                assert contract["tool"] == "psych_big_five"
+                res = await call_calculation(
+                    client,
+                    "psych_big_five",
+                    {
+                        "openness": 5,
+                        "conscientiousness": 4,
+                        "extraversion": 3,
+                        "agreeableness": 4,
+                        "neuroticism": 2,
+                        "detail": "compact",
+                    },
+                )
+                assert not res.is_error
+                assert res.structured_content["dominant_trait"] == "openness"
 
     asyncio.run(call_mcp())

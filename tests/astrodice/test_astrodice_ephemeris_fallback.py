@@ -93,7 +93,7 @@ def test_single_failure_preserves_every_other_native_longitude(
         MEAN_NODE_MODEL if failed_planet == "North Node" else APPROXIMATE
     )
     assert all(models[name] != APPROXIMATE for name in models if name != failed_planet)
-    assert profile["orbital_fallback"]["note_zh"] in partial["snapshot_text"]
+    assert profile["orbital_fallback"]["note_zh"]
     if zodiacal:
         methods = profile["sidereal_planetary_methods"]
         assert methods[failed_planet] == "ayanamsha_offset_approximation"

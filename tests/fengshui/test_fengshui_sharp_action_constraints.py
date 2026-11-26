@@ -4,7 +4,12 @@ from itertools import product
 
 import pytest
 
-from fatebridge.services.fengshui import assess
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.services.fengshui import assess as _assess
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 def request(*, relocate=None, add=None, basis="user_confirmed", observed=True):

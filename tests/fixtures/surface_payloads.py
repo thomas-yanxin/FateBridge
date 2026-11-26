@@ -59,7 +59,7 @@ def astro_payload(
     }
 
 
-def western_payload() -> dict:
+def western_base_payload() -> dict:
     return {
         "name": "Alice",
         "birth_year": 1990,
@@ -74,9 +74,21 @@ def western_payload() -> dict:
         "analysis_year": 2025,
         "analysis_month": 5,
         "analysis_day": 20,
+    }
+
+
+def western_pd_payload() -> dict:
+    return {
+        **western_base_payload(),
         "pd_method": "astroapp_alchabitius",
         "pd_time_key": "Naibod",
         "pd_aspects": [0, 90, 180],
+    }
+
+
+def western_payload() -> dict:
+    return {
+        **western_pd_payload(),
         "show_pd_bounds": True,
     }
 
@@ -128,7 +140,6 @@ def _metaphysics_payload() -> dict:
         "analysis_minute": 30,
         "analysis_timezone": "Asia/Shanghai",
         "analysis_longitude": 121.4737,
-        "selected_sections": ["起盘信息", "九宫方盘"],
         "use_true_solar_time": False,
     }
 
@@ -195,21 +206,6 @@ def _local_base() -> dict:
         "lat": "31n13",
         "lon": "121e28",
     }
-
-
-def _export_content() -> str:
-    return "\n".join(
-        [
-            "[起盘信息]",
-            "排盘参数",
-            "",
-            "[八宫详解]",
-            "这里是八宫详解内容",
-            "",
-            "[奇门演卦]",
-            "这里是奇门演卦内容",
-        ]
-    )
 
 
 REST_POST_CASES = {
@@ -283,21 +279,18 @@ REST_POST_CASES = {
         "analysis_hour": 21,
         "analysis_minute": 55,
         "analysis_age": 38,
-        "selected_sections": ["查询信息", "综合影响"],
     },
     "/api/bazi/timing/luck-cycles": lambda: {
         **_birth_payload(),
         "analysis_age": 38,
-        "selected_sections": ["查询信息", "大运信息"],
     },
     "/api/bazi/timing/yearly": lambda: {
         **_birth_payload(),
-        "target_year": 2028,
+        "analysis_year": 2028,
     },
     "/api/divination/gua": lambda: {
         "query": "111111",
         "lookup_mode": "hexagram",
-        "selected_sections": ["查询信息", "经文"],
     },
     "/api/calendar/solar-terms": lambda: {
         "year": 2028,
@@ -305,30 +298,18 @@ REST_POST_CASES = {
         "lat": "31n13",
         "lon": "121e28",
         "jieqis": ["春分", "冬至"],
-        "selected_sections": ["查询信息", "重点节气"],
     },
     "/api/calendar/lunar-time": lambda: {
         "date": "2028-04-01",
         "time": "09:00:00",
         "zone": "Asia/Shanghai",
         "lon": "121e28",
-        "selected_sections": ["农历上下文", "四柱上下文"],
     },
     "/api/divination/gua/meanings": lambda: {
         "name": ["111", "000"],
-        "selected_sections": ["查询概览", "批量结果"],
-    },
-    "/api/export/formats": lambda: {
-        "technique": "qimen",
-    },
-    "/api/export/parse": lambda: {
-        "technique": "qimen",
-        "content": _export_content(),
-        "selected_sections": ["起盘信息", "八宫详解", "奇门演卦"],
     },
     "/api/knowledge/catalog": lambda: {
         "domain": "astro",
-        "selected_sections": ["目录概览", "astro"],
     },
     "/api/knowledge/read": lambda: {
         "domain": "astro",
@@ -336,7 +317,6 @@ REST_POST_CASES = {
         "aspect_degree": 90,
         "object_a": "Sun",
         "object_b": "Jupiter",
-        "selected_sections": ["查询信息", "知识正文"],
     },
     "/api/divination/meihua/time-cast": lambda: {
         "analysis_year": 2028,
@@ -413,7 +393,6 @@ REST_POST_CASES = {
         "birth_month": 8,
         "birth_day": 23,
         "birth_hour": 14,
-        "selected_sections": ["起盘信息", "宫位总览"],
     },
     "/api/ziwei/timing": lambda: {
         **_birth_payload(name="张三", gender="男"),
@@ -421,19 +400,17 @@ REST_POST_CASES = {
         "birth_month": 8,
         "birth_day": 23,
         "birth_hour": 14,
-        "target_year": 2026,
-        "target_month": 6,
-        "target_day": 19,
-        "target_hour": 14,
+        "analysis_year": 2026,
+        "analysis_month": 6,
+        "analysis_day": 19,
+        "analysis_hour": 14,
     },
     "/api/ziwei/rules": lambda: {
         "year_stem": "甲",
-        "selected_sections": ["规则概览", "当前天干四化"],
     },
     "/api/liuren/chart": lambda: {
         **_metaphysics_payload(),
         "gender": "男",
-        "selected_sections": ["起盘信息", "三传"],
     },
     "/api/liuren/timing/yearly": lambda: {
         **_birth_payload(name="张三", gender="男"),
@@ -448,7 +425,6 @@ REST_POST_CASES = {
         "analysis_minute": 18,
         "analysis_timezone": "Asia/Shanghai",
         "analysis_longitude": 121.4737,
-        "selected_sections": ["起盘信息", "行年"],
     },
     "/api/qimen": lambda: {
         **_metaphysics_payload(),
@@ -457,13 +433,11 @@ REST_POST_CASES = {
     "/api/taiyi": lambda: {
         **_metaphysics_payload(),
         "gender": "男",
-        "selected_sections": ["起盘信息", "太乙"],
     },
     "/api/jinkou": lambda: {
         **_metaphysics_payload(),
         "gender": "男",
         "di_fen": "酉",
-        "selected_sections": ["起盘信息", "金口诀四位"],
     },
     "/api/astrology/chart": lambda: astro_payload(),
     "/api/astrology/thirteen-sector-chart": lambda: astro_payload(),
@@ -479,17 +453,17 @@ REST_POST_CASES = {
     "/api/astrology/hamburg-midpoint-chart": lambda: astro_payload(),
     "/api/astrology/relationship-chart": relationship_payload,
     "/api/astrology/timing": western_payload,
-    "/api/astrology/timing/solar-return": western_payload,
-    "/api/astrology/timing/lunar-return": western_payload,
-    "/api/astrology/timing/transit-chart": western_payload,
-    "/api/astrology/timing/solar-arc": western_payload,
-    "/api/astrology/timing/chart-for-year": western_payload,
-    "/api/astrology/timing/profection": western_payload,
-    "/api/astrology/timing/primary-directions": western_payload,
+    "/api/astrology/timing/solar-return": western_base_payload,
+    "/api/astrology/timing/lunar-return": western_base_payload,
+    "/api/astrology/timing/transit-chart": western_base_payload,
+    "/api/astrology/timing/solar-arc": western_base_payload,
+    "/api/astrology/timing/chart-for-year": western_base_payload,
+    "/api/astrology/timing/profection": western_base_payload,
+    "/api/astrology/timing/primary-directions": western_pd_payload,
     "/api/astrology/timing/primary-directions-chart": western_payload,
-    "/api/astrology/timing/zodiacal-releasing": western_payload,
-    "/api/astrology/timing/firdaria": western_payload,
-    "/api/astrology/timing/decennials": western_payload,
+    "/api/astrology/timing/zodiacal-releasing": western_base_payload,
+    "/api/astrology/timing/firdaria": western_base_payload,
+    "/api/astrology/timing/decennials": western_base_payload,
     "/api/astrology/harmonic-chart": astro_payload,
     "/api/astrology/timing/planetary-ages": astro_payload,
     "/api/astrology/timing/triplicity-ruler-periods": astro_payload,
@@ -512,7 +486,6 @@ REST_POST_CASES = {
         "analysis_year": 2028,
         "analysis_month": 4,
         "analysis_day": 1,
-        "selected_sections": ["查询信息", "流月信息"],
     },
     "/api/bazi/timing/daily": lambda: {
         **_birth_payload(),
@@ -521,7 +494,6 @@ REST_POST_CASES = {
         "analysis_day": 1,
         "analysis_hour": 9,
         "analysis_minute": 0,
-        "selected_sections": ["查询信息", "流日信息"],
     },
     "/api/bazi/timing/hourly": lambda: {
         **_birth_payload(),
@@ -530,12 +502,10 @@ REST_POST_CASES = {
         "analysis_day": 1,
         "analysis_hour": 21,
         "analysis_minute": 55,
-        "selected_sections": ["查询信息", "流时信息"],
     },
     "/api/calendar/solar-term-timeline": lambda: {
         **_birth_payload(),
-        "target_year": 2028,
-        "selected_sections": ["查询信息", "节点时间轴"],
+        "analysis_year": 2028,
     },
     "/api/psychometrics/ipip-big-five": lambda: {
         "action": "score",
@@ -611,7 +581,6 @@ MCP_CASES = {
             "analysis_hour": 21,
             "analysis_minute": 55,
             "analysis_age": 38,
-            "selected_sections": ["查询信息", "综合影响"],
         },
     ),
     "bazi_luck_cycles": (
@@ -619,12 +588,11 @@ MCP_CASES = {
         lambda: {
             **_birth_payload(),
             "analysis_age": 38,
-            "selected_sections": ["查询信息", "大运信息"],
         },
     ),
     "bazi_yearly_timing": (
         "bazi_yearly_timing",
-        lambda: {**_birth_payload(), "target_year": 2028},
+        lambda: {**_birth_payload(), "analysis_year": 2028},
     ),
     "bazi_monthly_timing": (
         "bazi_monthly_timing",
@@ -633,7 +601,6 @@ MCP_CASES = {
             "analysis_year": 2028,
             "analysis_month": 4,
             "analysis_day": 1,
-            "selected_sections": ["查询信息", "流月信息"],
         },
     ),
     "thirteen_sector_chart": ("thirteen_sector_chart", astro_payload),
@@ -661,18 +628,9 @@ MCP_CASES = {
         },
     ),
     "hamburg_midpoint_chart": ("hamburg_midpoint_chart", astro_payload),
-    "export_formats": ("export_formats", lambda: {"technique": "qimen"}),
-    "export_parse": (
-        "export_parse",
-        lambda: {
-            "technique": "qimen",
-            "content": _export_content(),
-            "selected_sections": ["起盘信息", "八宫详解", "奇门演卦"],
-        },
-    ),
     "knowledge_catalog": (
         "knowledge_catalog",
-        lambda: {"domain": "astro", "selected_sections": ["目录概览", "astro"]},
+        lambda: {"domain": "astro"},
     ),
     "knowledge_read": (
         "knowledge_read",
@@ -682,7 +640,6 @@ MCP_CASES = {
             "aspect_degree": 90,
             "object_a": "Sun",
             "object_b": "Jupiter",
-            "selected_sections": ["查询信息", "知识正文"],
         },
     ),
     "solar_terms_for_year": (
@@ -693,7 +650,6 @@ MCP_CASES = {
             "lat": "31n13",
             "lon": "121e28",
             "jieqis": ["春分", "冬至"],
-            "selected_sections": ["查询信息", "重点节气"],
         },
     ),
     "lunar_calendar_time": (
@@ -703,19 +659,17 @@ MCP_CASES = {
             "time": "09:00:00",
             "zone": "Asia/Shanghai",
             "lon": "121e28",
-            "selected_sections": ["农历上下文", "四柱上下文"],
         },
     ),
     "gua_meanings": (
         "gua_meanings",
-        lambda: {"name": ["111", "000"], "selected_sections": ["查询概览", "批量结果"]},
+        lambda: {"name": ["111", "000"]},
     ),
     "gua_lookup": (
         "gua_lookup",
         lambda: {
             "query": "111111",
             "lookup_mode": "hexagram",
-            "selected_sections": ["查询信息", "经文"],
         },
     ),
     "meihua_cast": (
@@ -817,7 +771,6 @@ MCP_CASES = {
             "birth_month": 8,
             "birth_day": 23,
             "birth_hour": 14,
-            "selected_sections": ["起盘信息", "宫位总览"],
         },
     ),
     "ziwei_timing": (
@@ -828,22 +781,21 @@ MCP_CASES = {
             "birth_month": 8,
             "birth_day": 23,
             "birth_hour": 14,
-            "target_year": 2026,
-            "target_month": 6,
-            "target_day": 19,
-            "target_hour": 14,
+            "analysis_year": 2026,
+            "analysis_month": 6,
+            "analysis_day": 19,
+            "analysis_hour": 14,
         },
     ),
     "ziwei_rules": (
         "ziwei_rules",
-        lambda: {"year_stem": "甲", "selected_sections": ["规则概览", "当前天干四化"]},
+        lambda: {"year_stem": "甲"},
     ),
     "liuren_chart": (
         "liuren_chart",
         lambda: {
             **_metaphysics_payload(),
             "gender": "男",
-            "selected_sections": ["起盘信息", "三传"],
         },
     ),
     "liuren_yearly_timing": (
@@ -861,7 +813,6 @@ MCP_CASES = {
             "analysis_minute": 18,
             "analysis_timezone": "Asia/Shanghai",
             "analysis_longitude": 121.4737,
-            "selected_sections": ["起盘信息", "行年"],
         },
     ),
     "qimen": (
@@ -873,7 +824,6 @@ MCP_CASES = {
         lambda: {
             **_metaphysics_payload(),
             "gender": "男",
-            "selected_sections": ["起盘信息", "太乙"],
         },
     ),
     "jinkou": (
@@ -882,7 +832,6 @@ MCP_CASES = {
             **_metaphysics_payload(),
             "gender": "男",
             "di_fen": "酉",
-            "selected_sections": ["起盘信息", "金口诀四位"],
         },
     ),
     "bazi_daily_timing": (
@@ -894,7 +843,6 @@ MCP_CASES = {
             "analysis_day": 1,
             "analysis_hour": 9,
             "analysis_minute": 0,
-            "selected_sections": ["查询信息", "流日信息"],
         },
     ),
     "bazi_hourly_timing": (
@@ -906,31 +854,29 @@ MCP_CASES = {
             "analysis_day": 1,
             "analysis_hour": 21,
             "analysis_minute": 55,
-            "selected_sections": ["查询信息", "流时信息"],
         },
     ),
     "solar_term_timeline": (
         "solar_term_timeline",
         lambda: {
             **_birth_payload(),
-            "target_year": 2028,
-            "selected_sections": ["查询信息", "节点时间轴"],
+            "analysis_year": 2028,
         },
     ),
     "astrology_chart": ("astrology_chart", astro_payload),
     "relationship_chart": ("relationship_chart", relationship_payload),
     "western_timing": ("western_timing", western_payload),
-    "solar_return": ("solar_return", western_payload),
-    "lunar_return": ("lunar_return", western_payload),
-    "transit_chart": ("transit_chart", western_payload),
-    "solar_arc": ("solar_arc", western_payload),
-    "chart_for_year": ("chart_for_year", western_payload),
-    "profection": ("profection", western_payload),
-    "primary_directions": ("primary_directions", western_payload),
+    "solar_return": ("solar_return", western_base_payload),
+    "lunar_return": ("lunar_return", western_base_payload),
+    "transit_chart": ("transit_chart", western_base_payload),
+    "solar_arc": ("solar_arc", western_base_payload),
+    "chart_for_year": ("chart_for_year", western_base_payload),
+    "profection": ("profection", western_base_payload),
+    "primary_directions": ("primary_directions", western_pd_payload),
     "primary_directions_chart": ("primary_directions_chart", western_payload),
-    "zodiacal_releasing": ("zodiacal_releasing", western_payload),
-    "firdaria": ("firdaria", western_payload),
-    "decennials": ("decennials", western_payload),
+    "zodiacal_releasing": ("zodiacal_releasing", western_base_payload),
+    "firdaria": ("firdaria", western_base_payload),
+    "decennials": ("decennials", western_base_payload),
     "harmonic_chart": ("harmonic_chart", astro_payload),
     "planetary_ages": ("planetary_ages", astro_payload),
     "triplicity_ruler_periods": ("triplicity_ruler_periods", astro_payload),

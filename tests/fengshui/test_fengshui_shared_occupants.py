@@ -13,9 +13,13 @@ from pydantic import ValidationError
 
 from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest, Placement
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import assess as _assess
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import call_calculation, rest_client
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 RESIDENTS = [
     {"subject_id": "a", "effective_birth_year": 1990, "gender_convention": "male"},
@@ -187,14 +191,14 @@ def test_shared_subset_has_the_same_scope_on_rest_mcp_cli(
         fields.append("layout_analysis.adjustment_options")
     else:
         pass
-    controls = {"fields": fields, "strict_fields": True, "include_snapshot_text": False}
+    controls = {"detail": "audit", "fields": fields}
 
     async def call():
         async with Client(create_mcp_app()) as client:
             return await call_calculation(
                 client,
                 "fengshui_" + name,
-                {**inputs, "response_char_limit": 0, **controls},
+                {**inputs, **controls},
             )
 
     rest = rest_client(monkeypatch).post(
@@ -209,10 +213,10 @@ def test_shared_subset_has_the_same_scope_on_rest_mcp_cli(
                 "fengshui_" + name,
                 "--request-file",
                 str(path),
+                "--detail",
+                "audit",
                 "--fields",
                 *fields,
-                "--strict-fields",
-                "--no-include-snapshot-text",
             ]
         )
         == 0

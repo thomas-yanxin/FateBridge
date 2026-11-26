@@ -10,7 +10,7 @@ from pydantic import BaseModel, create_model
 from pydantic.json_schema import JsonSchemaValue
 
 from fatebridge.application.description import describe_input_spec, describe_spec
-from fatebridge.application.execution import execute_tool
+from fatebridge.application.execution import execute_with_receipt
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.schema_cache import (
     clear_contract_caches,
@@ -115,7 +115,7 @@ def test_user_inputs_results_and_receipts_still_execute_per_call() -> None:
         return {"doubled": value * 2}
 
     spec = ToolSpec(
-        key="cache_regression",
+        name="cache_regression",
         bind=lambda request: (service, (request.value,), {}),
         request_model=Request,
         output_model=Output,
@@ -123,13 +123,12 @@ def test_user_inputs_results_and_receipts_still_execute_per_call() -> None:
         operation_label_zh="test",
         family="test",
     )
-    first = execute_tool(spec, Request(value=2))
-    second = execute_tool(spec, Request(value=3))
+    first = execute_with_receipt(spec, Request(value=2))
+    second = execute_with_receipt(spec, Request(value=3))
     assert seen == [2, 3]
     assert first["doubled"] == 4 and second["doubled"] == 6
     left, right = first["run_metadata"], second["run_metadata"]
-    for field in ("run_id", "trace_id"):
-        assert left[field] != right[field]
+    assert left["run_id"] != right["run_id"]
 
 
 def test_input_discovery_does_not_materialize_output_schema() -> None:
@@ -146,7 +145,7 @@ def test_input_discovery_does_not_materialize_output_schema() -> None:
             return super().model_json_schema()
 
     spec = ToolSpec(
-        key="review_probe",
+        name="review_probe",
         bind=lambda request: (lambda: {"value": request.value}, (), {}),
         request_model=Request,
         output_model=Output,

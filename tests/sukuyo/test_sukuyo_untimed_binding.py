@@ -9,7 +9,7 @@ from fatebridge.core.local_techniques.suzhan import build_suzhan_result
 from fatebridge.core.requests.divination import SuZhanRequest
 from fatebridge.services.tool_catalog import CATALOG
 
-SPEC = next(s for s in CATALOG if s.key == "suzhan")
+SPEC = next(s for s in CATALOG if s.name == "suzhan")
 
 
 @pytest.fixture(scope="module")

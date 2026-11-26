@@ -16,7 +16,7 @@ rest = _shared_rest
 
 @pytest.mark.parametrize("topic", TOPICS)
 def test_all_ten_year_schemas_match_internal_person_limits(topic) -> None:
-    spec = SPECS["bazi_" + topic]
+    spec = SPECS["bazi_birth_chart" if topic == "birth" else "bazi_" + topic]
     internal = PersonInfo.model_json_schema()["properties"]["birth_year"]
     public = spec.request_model.model_json_schema()["properties"]["birth_year"]
     assert (public["minimum"], public["maximum"]) == (1900, 2100)
@@ -88,7 +88,7 @@ def test_boundary_years_retain_bazi_and_explicit_lunar_sources(
 def test_invalid_year_is_rejected_before_computation_on_three_surfaces(
     topic, year: int, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    spec = SPECS["bazi_" + topic]
+    spec = SPECS["bazi_birth_chart" if topic == "birth" else "bazi_" + topic]
     args = {
         "birth_year": year,
         "birth_month": 6,

@@ -58,12 +58,12 @@ BIRTH = dict(
     use_true_solar_time=False,
 )
 TARGET = dict(
-    target_year=2027,
-    target_month=6,
-    target_day=15,
-    target_hour=12,
-    target_minute=37,
-    target_timezone="UTC",
+    analysis_year=2027,
+    analysis_month=6,
+    analysis_day=15,
+    analysis_hour=12,
+    analysis_minute=37,
+    analysis_timezone="UTC",
 )
 
 
@@ -173,12 +173,12 @@ def test_leap_month_and_late_zi_calendar_comparison(
     # the day pillar. Its exact configuration uses the solar month instead.
     result = calculate_ziwei_horoscope(
         create_person_info(**BIRTH),
-        target_year=2023,
-        target_month=4,
-        target_day=5,
-        target_hour=hour,
-        target_minute=37,
-        target_timezone="Asia/Shanghai",
+        analysis_year=2023,
+        analysis_month=4,
+        analysis_day=5,
+        analysis_hour=hour,
+        analysis_minute=37,
+        analysis_timezone="Asia/Shanghai",
         rule_profile=profile,
         day_divide=day_divide,
     )

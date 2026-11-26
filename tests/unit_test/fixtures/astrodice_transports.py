@@ -13,7 +13,7 @@ from fatebridge.core.astro.time_scales import fallback_julian_day_tt
 from fatebridge.core.local_techniques.chart import _build_birth_info
 from fatebridge.services.tool_catalog import CATALOG
 
-SPEC = next(spec for spec in CATALOG if spec.key == "otherbu")
+SPEC = next(spec for spec in CATALOG if spec.name == "interpret_astrology_dice")
 
 
 @pytest.fixture

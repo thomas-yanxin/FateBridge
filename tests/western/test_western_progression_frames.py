@@ -237,28 +237,23 @@ def test_vedic_native_offset_failure_never_succeeds_with_linear_approximation(
     assert "vedic_progression" not in result
 
 
-@pytest.mark.parametrize("tool", ["astro_vedicprog", "astro_jaynesprog"])
+@pytest.mark.parametrize("tool", ["sidereal_progressions", "declination_progressions"])
 def test_correct_progression_frames_reach_rest_mcp_cli(
     tool: str, surface_calls
 ) -> None:
     spec = SPECS[tool]
-    key = "vedic_progression" if tool == "astro_vedicprog" else "jaynes_declination"
+    key = "vedic_progression" if tool == "sidereal_progressions" else "jaynes_declination"
     fields = ["natal_reference", key, "analysis_context.zodiac_type"]
-    query = [("fields", field) for field in fields] + [
-        ("strict_fields", "true"),
-        ("include_snapshot_text", "false"),
-        ("response_char_limit", 0),
-    ]
+    query = [("fields", field) for field in fields] + [("detail", "audit")]
     http, protocol, code, cli = surface_calls(
         spec,
         BIRTH_INPUTS,
         params=query,
         options={
+            "detail": "audit",
             "fields": fields,
-            "strict_fields": True,
-            "include_snapshot_text": False,
         },
-        flags=["--fields", *fields],
+        flags=["--detail", "audit", "--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error
@@ -294,12 +289,11 @@ def test_planetary_arc_uses_independent_secondary_clock_on_all_surfaces(
     arc_source: str, planet: int, surface_calls
 ) -> None:
     response, protocol, code, cli = surface_calls(
-        SPECS["astro_planetaryarc"],
+        SPECS["planetary_arc_directions"],
         {**BIRTH_INPUTS, "arc_source": arc_source},
         projection={
             "fields": ["natal_reference.sun", "planetary_arc"],
-            "strict_fields": True,
-            "include_snapshot_text": False,
+            "detail": "audit",
         },
     )
     assert response.status_code == 200, response.text

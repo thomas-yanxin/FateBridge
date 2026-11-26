@@ -26,7 +26,7 @@ from tests.support.transports import (
 __all__ = ["rest", "surface_calls"]
 
 
-def invoke(tool, inputs, monkeypatch, capsys, *, detail="standard"):
+def invoke(tool, inputs, monkeypatch, capsys, *, detail="audit"):
     spec = resolve_spec(CATALOG, tool)
     assert spec is not None
     monkeypatch.setattr(
@@ -37,7 +37,7 @@ def invoke(tool, inputs, monkeypatch, capsys, *, detail="standard"):
     response = TestClient(api.app).post(
         spec.rest_path, json=inputs, params={"detail": detail}
     )
-    args = [tool, "--detail", detail, "--response-char-limit", "0"]
+    args = [tool, "--detail", detail]
     for key, value in inputs.items():
         if value is None:
             # CLI optional flags represent JSON null by omission.
@@ -63,7 +63,7 @@ def invoke(tool, inputs, monkeypatch, capsys, *, detail="standard"):
             return await call_calculation(
                 client,
                 tool,
-                {**inputs, "detail": detail, "response_char_limit": 0},
+                {**inputs, "detail": detail},
                 raise_on_error=False,
             )
 
@@ -257,7 +257,7 @@ def test_lunar_calendar_separates_civil_season_and_solar_day_across_surfaces(
 ) -> None:
     # At 60°E the solar clock is hours behind the civil time in UTC+8.
     response, protocol, code, cli = surface_calls(
-        SPECS["nongli_time"],
+        SPECS["lunar_calendar_time"],
         {
             "date": date,
             "time": clock,
@@ -274,8 +274,6 @@ def test_lunar_calendar_separates_civil_season_and_solar_day_across_surfaces(
                 "dayInt",
                 "analysis_context.corrected_datetime",
             ],
-            "strict_fields": True,
-            "response_char_limit": 0,
         },
         rest_as_of=AS_OF,
     )
@@ -300,9 +298,9 @@ def test_nongli_uses_selected_fold_for_seasonal_elapsed_time(surface_calls) -> N
     elapsed_days = []
     for offset in ("-04:00", "-05:00"):
         response, protocol, code, cli = surface_calls(
-            SPECS["nongli_time"],
+            SPECS["lunar_calendar_time"],
             {**inputs, "analysis_utc_offset": offset},
-            projection={"detail": "audit", "response_char_limit": 0},
+            projection={"detail": "audit"},
         )
         assert response.status_code == 200 and code == 0 and not protocol.is_error
         http = response.json()
@@ -385,9 +383,9 @@ def test_canonical_helper_results_agree_without_duplicate_fields(
 
 def test_compact_solar_term_year_preserves_requested_filter(surface_calls) -> None:
     response, protocol, code, cli = surface_calls(
-        SPECS["jieqi_year"],
+        SPECS["solar_terms_for_year"],
         {"year": 2028, "jieqis": ["春分", "未知节气", "冬至"]},
-        projection={"detail": "compact", "response_char_limit": 8192},
+        projection={"detail": "compact"},
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     http = response.json()

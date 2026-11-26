@@ -48,7 +48,7 @@ def test_heavy_shared_execution_is_bounded_across_callers(
         return {"value": 1}
 
     spec = ToolSpec(
-        key="review_budget",
+        name="review_budget",
         bind=lambda _: (service, (), {}),
         request_model=Value,
         output_model=Value,
@@ -60,7 +60,8 @@ def test_heavy_shared_execution_is_bounded_across_callers(
     )
     with ThreadPoolExecutor(max_workers=4) as pool:
         futures = [
-            pool.submit(execution.execute_spec, spec, Value(value=1)) for _ in range(4)
+            pool.submit(execution.invoke_validated_service, spec, Value(value=1))
+            for _ in range(4)
         ]
         assert occupied.wait(timeout=5)
         release.set()
@@ -72,7 +73,7 @@ def test_heavy_shared_execution_is_bounded_across_callers(
 
     failed = replace(spec, bind=lambda _: (broken, (), {}))
     with pytest.raises(RuntimeError, match="synthetic failure"):
-        execution.execute_spec(failed, Value(value=1))
+        execution.invoke_validated_service(failed, Value(value=1))
     assert semaphore.acquire(blocking=False)
     try:
         assert semaphore.acquire(blocking=False), "A failing service leaked its permit"
@@ -82,23 +83,23 @@ def test_heavy_shared_execution_is_bounded_across_callers(
 
 
 def test_expensive_astronomical_and_interval_tools_declare_the_budget() -> None:
-    specs = {spec.key: spec for spec in CATALOG}
+    specs = {spec.name: spec for spec in CATALOG}
     for key in [
         "human_design",
-        "astro_india",
-        "astro_germany",
-        "astro_chart",
-        "western_timing_analysis",
-        "pd",
-        "astro_horary",
-        "astro_election",
-        "astro_distributions",
+        "vedic_chart",
+        "hamburg_midpoint_chart",
+        "astrology_chart",
+        "western_timing",
+        "primary_directions",
+        "horary_chart",
+        "evaluate_election_time",
+        "bounds_directions",
         "taiyi",
         "qimen",
-        "ziwei_horoscope",
+        "ziwei_timing",
         "canping",
         "heluo",
-        "sanshiunited",
+        "sanshi_combined_chart",
     ]:
         assert specs[key].cpu_bound, key
     assert not specs["knowledge_read"].cpu_bound

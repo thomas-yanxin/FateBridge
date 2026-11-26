@@ -19,12 +19,12 @@ BIRTH = {
     "use_true_solar_time": False,
 }
 TARGET = {
-    "target_year": 2027,
-    "target_month": 6,
-    "target_day": 15,
-    "target_hour": 12,
-    "target_minute": 37,
-    "target_timezone": "UTC",
+    "analysis_year": 2027,
+    "analysis_month": 6,
+    "analysis_day": 15,
+    "analysis_hour": 12,
+    "analysis_minute": 37,
+    "analysis_timezone": "UTC",
 }
 
 
@@ -57,7 +57,7 @@ def test_annual_cycle_and_flowing_basis_match_three_surfaces(rest, tmp_path, cap
         "ziwei_horoscope.scopes",
     ]
     replies = projected_outputs(
-        SPECS["ziwei_horoscope"], BIRTH | TARGET, fields, rest, tmp_path, capsys
+        SPECS["ziwei_timing"], BIRTH | TARGET, fields, rest, tmp_path, capsys
     )
     timing = [reply["ziwei_horoscope"] for reply in replies]
     assert timing[0] == timing[1] == timing[2]

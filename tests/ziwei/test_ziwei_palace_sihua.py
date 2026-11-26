@@ -165,11 +165,11 @@ def test_reverse_groups_keep_every_occurrence_and_unlocated_assignment():
 def test_scope_mutagens_remain_layered_by_timing_stems():
     horoscope = calculate_ziwei_horoscope(
         create_person_info(**BIRTH),
-        target_year=2026,
-        target_month=10,
-        target_day=12,
-        target_hour=10,
-        target_timezone="Asia/Shanghai",
+        analysis_year=2026,
+        analysis_month=10,
+        analysis_day=12,
+        analysis_hour=10,
+        analysis_timezone="Asia/Shanghai",
     )["ziwei_horoscope"]
     assert EVIDENCE not in horoscope
     assert [(scope["scope"], scope["stem"]) for scope in horoscope["scopes"]] == [

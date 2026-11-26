@@ -57,13 +57,4 @@ def test_natal_chart_surfaces_antares_on_mercury(natal_stars) -> None:
     assert antares[0]["orb"] < 0.2
 
 
-def test_snapshot_renders_fixed_stars_section() -> None:
-    payload = calculate_core_chart_analysis(
-        chart_variant="hellen_chart", use_true_solar_time=True, **_NATAL
-    )
-    text = payload["snapshot_text"]
-    assert "[恒星]" in text
-    assert "心宿二" in text  # Antares' Chinese name
-
-
 # ── calibration: vendored table vs authoritative swisseph (local only) ────────

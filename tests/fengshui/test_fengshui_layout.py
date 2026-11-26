@@ -15,7 +15,9 @@ from fatebridge.core.fengshui.calendar import lichun
 from fatebridge.core.fengshui.layout import element_relationships
 from fatebridge.core.fengshui.models import AssessRequest, BazhaiRequest, MingguaRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
-from fatebridge.services.fengshui import assess, calculate_bazhai, calculate_minggua
+from fatebridge.services.fengshui import assess as _assess
+from fatebridge.services.fengshui import calculate_bazhai as _calculate_bazhai
+from fatebridge.services.fengshui import calculate_minggua as _calculate_minggua
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import payload
 from tests.support.mcp_result_assertions import (
@@ -26,6 +28,18 @@ from tests.support.transports import call_calculation, rest_client
 from tests.unit_test.fixtures.fengshui_layout import (
     facing_only,
 )
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
+
+
+def calculate_bazhai(**kwargs):
+    return _calculate_bazhai(BazhaiRequest.model_validate(kwargs))
+
+
+def calculate_minggua(**kwargs):
+    return _calculate_minggua(MingguaRequest.model_validate(kwargs))
 
 
 def test_nonboundary_date_needs_no_hour_and_preserves_minggua() -> None:
@@ -450,7 +464,6 @@ def test_opt_in_analysis_preserves_existing_calculation_values() -> None:
     assert extended["conflicts"] == base["conflicts"]
     assert "layout_analysis" not in base
     FengshuiOutput.model_validate(extended)
-    assert "布局计算" in extended["snapshot_text"]
 
 
 @pytest.mark.parametrize(
@@ -474,15 +487,17 @@ def test_extended_layout_matches_rest_mcp_cli(
             return await call_calculation(
                 client,
                 "fengshui_assess",
-                {"response_char_limit": 0, **inputs},
+                {"detail": "audit", **inputs},
                 raise_on_error=False,
             )
 
-    rest = rest_client(monkeypatch).post("/api/fengshui/assess", json=inputs)
+    rest = rest_client(monkeypatch).post(
+        "/api/fengshui/assess", json=inputs, params={"detail": "audit"}
+    )
     mcp = asyncio.run(call())
     request = tmp_path / "layout.json"
     request.write_text(json.dumps(inputs))
-    assert run(["fengshui_assess", "--request-file", str(request)]) == 0
+    assert run(["fengshui_assess", "--request-file", str(request), "--detail", "audit"]) == 0
     cli = json.loads(capsys.readouterr().out)
     assert rest.status_code == 200 and not mcp.is_error
     assert (
@@ -505,16 +520,15 @@ def test_strict_projected_analysis_works_on_real_mcp() -> None:
                 "fengshui_assess",
                 {
                     **facing_only(),
+                    "detail": "audit",
                     "fields": [
                         "layout_analysis.adjustment_options",
                         "layout_analysis.status",
                         "layout_analysis.unsupported_queries",
                     ],
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                 },
             )
-            return await same_run_projected_response(client, response)
+            return response.structured_content
 
     result = asyncio.run(call())
     assert set(result) == {"layout_analysis", "run_metadata"}
@@ -527,7 +541,7 @@ def test_strict_projected_analysis_works_on_real_mcp() -> None:
 
 
 def test_layout_uses_existing_tools_no_special_workspace_entry() -> None:
-    names = {s.key for s in CATALOG if s.family == "fengshui"}
+    names = {s.name for s in CATALOG if s.family == "fengshui"}
     assert names == {
         "fengshui_directions",
         "fengshui_minggua",
@@ -535,7 +549,7 @@ def test_layout_uses_existing_tools_no_special_workspace_entry() -> None:
         "fengshui_jinsuo",
         "fengshui_annual_stars",
         "fengshui_monthly_stars",
-        "fengshui_xuankong_natal",
+        "fengshui_xuankong_house_chart",
         "fengshui_assess",
     }
     assert "analyze_layout" in AssessRequest.model_fields

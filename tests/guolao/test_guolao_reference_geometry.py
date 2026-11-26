@@ -12,20 +12,17 @@ from fastapi.testclient import TestClient
 from fastmcp import Client
 
 import fatebridge.api as api
-from fatebridge.application import result_delivery as delivery
 from fatebridge.cli import run
 from fatebridge.core import astro_models
 from fatebridge.core.astro import earth_attitude, runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.guolao import guolao
-from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import astro_payload
-from tests.support.result_delivery import assert_same_run_receipt
 from tests.support.transports import cached_mcp_app, call_calculation
 
-SPEC = next(spec for spec in CATALOG if spec.key == "astro_guolao")
+SPEC = next(spec for spec in CATALOG if spec.name == "guolao_chart")
 
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
@@ -157,7 +154,6 @@ def test_real_polar_placidus_error_retains_core_and_independent_angles(
     assert geometry["house_method"] is None
     assert not geometry["substituted_house_system"]
     assert result["chart_profile"]["house_system"] == "placidus"
-    assert "未替换为其他宫制" in result["snapshot_text"]
 
 
 @pytest.mark.parametrize("latitude", [90.0, -90.0])
@@ -278,9 +274,7 @@ def test_partial_reference_geometry_across_native_mcp_rest_cli_and_projection(
     options = {
         "as_of": "2026-10-22T12:00:00+08:00",
         "fields": fields,
-        "strict_fields": True,
-        "include_snapshot_text": False,
-        "response_char_limit": 0,
+        "detail": "audit",
     }
     client = TestClient(api.app)
     response = client.post(
@@ -288,9 +282,7 @@ def test_partial_reference_geometry_across_native_mcp_rest_cli_and_projection(
         json=payload,
         params=[
             ("as_of", options["as_of"]),
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
+            ("detail", "audit"),
             *[("fields", f) for f in fields],
         ],
     )
@@ -298,21 +290,19 @@ def test_partial_reference_geometry_across_native_mcp_rest_cli_and_projection(
     async def native_call():
         async with Client(cached_mcp_app()) as mcp:
             return await call_calculation(
-                mcp, SPEC.tool_name, {**payload, **options}, raise_on_error=False
+                mcp, SPEC.name, {**payload, **options}, raise_on_error=False
             )
 
     native = asyncio.run(native_call())
     assert not native.is_error
-    args = [SPEC.tool_name]
+    args = [SPEC.name]
     for key, value in payload.items():
         args += ["--" + key.replace("_", "-"), str(value)]
     args += [
         "--as-of",
         options["as_of"],
-        "--strict-fields",
-        "--no-include-snapshot-text",
-        "--response-char-limit",
-        "0",
+        "--detail",
+        "audit",
         "--fields",
         *fields,
     ]
@@ -330,8 +320,6 @@ def test_partial_reference_geometry_across_native_mcp_rest_cli_and_projection(
         json=payload,
         params={
             "fields": "guolao.profile.reference_geometry.houses_status",
-            "strict_fields": True,
-            "include_snapshot_text": False,
         },
     )
     assert projection.status_code == 200, projection.text
@@ -369,59 +357,3 @@ def test_sidereal_only_house_error_preserves_selected_angles_and_core(
     assert actual["angles"] == expected["angles"]
     assert actual["houses"] == []
     assert actual["guolao"]["profile"]["reference_geometry"]["status"] == "partial"
-
-
-def test_partial_geometry_complete_delivery_reuses_the_same_run(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-
-    store = delivery.ResultStore(tmp_path / "results")
-    monkeypatch.setattr(delivery, "RESULT_STORE", store)
-    monkeypatch.setattr(api, "RESULT_STORE", store)
-    api._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
-    )
-    client = TestClient(api.app)
-    response = client.post(
-        SPEC.rest_path,
-        json=polar_payload(zodiacal=1),
-        params={"as_of": "2026-10-22T12:00:00+08:00", "response_char_limit": 8192},
-    )
-    assert response.status_code == 200, response.text
-    shaped = response.json()
-    ref = shaped["result_delivery"]
-
-    def no_recalculation(*args, **kwargs):
-        pytest.fail("Complete result delivery must reuse this partial-geometry run")
-
-    monkeypatch.setattr(guolao, "build_chart", no_recalculation)
-    chunks = []
-    offset = 0
-    while True:
-        page = client.get(
-            f"/api/results/{ref['result_id']}/pages", params={"offset": offset}
-        )
-        assert page.status_code == 200, page.text
-        body = page.json()
-        chunks.append(body["text"])
-        if body["next_offset"] is None:
-            break
-        else:
-            pass
-        offset = body["next_offset"]
-    raw = "".join(chunks)
-    assert len(raw) == ref["total_chars"]
-    full = json.loads(raw)
-    assert_same_run_receipt(store, shaped, full)
-    assert full["run_metadata"]["run_id"] == shaped["run_metadata"]["run_id"]
-    assert len(full["guolao"]["bodies"]) == 11
-    assert full["guolao"]["profile"]["reference_geometry"]["status"] == "partial"
-    assert full["houses"] == []
-    assert all(p["house"] is None for p in full["planets"])
-    assert (
-        full["guolao"]["profile"]["reference_geometry"]["substituted_house_system"]
-        is False
-    )

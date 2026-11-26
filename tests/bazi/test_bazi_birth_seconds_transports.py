@@ -12,7 +12,7 @@ from tests.unit_test.fixtures.bazi_birth_clock import BASE, SPECS, leaf, receipt
 rest = _shared_rest
 
 
-@pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)
+@pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.name)
 @pytest.mark.parametrize("project", [False, True])
 def test_seconds_and_component_receipt_on_every_actual_surface(
     spec,
@@ -26,11 +26,11 @@ def test_seconds_and_component_receipt_on_every_actual_surface(
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     payload = {**inputs(spec), **BASE, "birth_minute": 20, "birth_second": 59}
-    opts = {"include_snapshot_text": True, "response_char_limit": 0}
-    flags = ["--include-snapshot-text", "true", "--response-char-limit", "0"]
+    opts: dict[str, object] = {"detail": "audit"}
+    flags = ["--detail", "audit"]
     if project:
-        opts.update(fields=[receipt_path(spec)], strict_fields=True)
-        flags += ["--fields", receipt_path(spec), "--strict-fields", "true"]
+        opts["fields"] = [receipt_path(spec)]
+        flags += ["--fields", receipt_path(spec)]
     else:
         pass
     result = asyncio.run(native(spec, payload, **opts))
@@ -46,7 +46,7 @@ def test_seconds_and_component_receipt_on_every_actual_surface(
         observed.append(response.json())
         assert business(observed[0]) == business(observed[2])
     else:
-        assert spec.key == "analyze_destiny"
+        assert spec.name == "bazi_overview"
     for data in observed:
         receipt = leaf(data, receipt_path(spec))
         assert receipt["supplied_components"] == [
@@ -73,20 +73,15 @@ def test_seconds_and_component_receipt_on_every_actual_surface(
                     or "59秒" in person["birth_datetime"]
                 )
             else:
-                assert spec.family == "bazi" and spec.key not in {
-                    "bazi_birth",
-                    "analyze_destiny",
+                assert spec.family == "bazi" and spec.name not in {
+                    "bazi_birth_chart",
+                    "bazi_overview",
                 }
-            if data.get("snapshot_text"):
-                assert "1990-05-15T10:20:59+00:00" in data["snapshot_text"]
-                assert "不认证" in data["snapshot_text"]
-            else:
-                pass
         else:
             pass
 
 
-@pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)
+@pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.name)
 def test_invalid_second_reaches_no_complete_report_on_every_actual_surface(
     spec, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
