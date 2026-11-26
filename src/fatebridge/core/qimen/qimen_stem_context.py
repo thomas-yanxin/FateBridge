@@ -114,7 +114,6 @@ def build_stem_context(
         "sections": ["卷二·伏干格", "卷二·飞干格", "卷二·小隔并岁隔月隔日隔时隔"],
         "source_scan_pages": [29, 31],
         "day_jia_policy_automatically_selected": False,
-        "real_world_efficacy": "not_tested",
     }
     result: list[dict[str, Any]] = []
     for index, palace in enumerate(board["palaces"]):

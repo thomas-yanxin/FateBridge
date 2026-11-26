@@ -51,7 +51,6 @@ def describe_five_jia() -> dict[str, Any]:
         "all_five_names_computable": False,
         "full_name_is_overall_auspiciousness": False,
         "whole_section_reconciled": False,
-        "real_world_efficacy_validated": False,
     }
 
 

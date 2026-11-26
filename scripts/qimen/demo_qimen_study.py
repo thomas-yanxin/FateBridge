@@ -1,15 +1,5 @@
 """Run an explicitly synthetic, all-abstaining Qimen study workflow."""
 
-import sys as _sys
-from pathlib import Path as _Path
-
-_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
-if str(_VAL_REPO_ROOT) not in _sys.path:
-    _sys.path.insert(0, str(_VAL_REPO_ROOT))
-else:
-    pass
-
-
 import argparse
 import hashlib
 import json

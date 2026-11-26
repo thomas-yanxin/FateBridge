@@ -85,14 +85,15 @@ def gate_palace_relation(door: str, trigram: str) -> dict[str, Any]:
         or trigram == "中"
     ):
         raise ValueError("门宫关系须使用实际八门与外八宫，不给中宫补门")
-    d, p = DOOR_ELEMENTS[door], PALACE_ELEMENTS[trigram]
-    if d == p:
+    door_element = DOOR_ELEMENTS[door]
+    palace_element = PALACE_ELEMENTS[trigram]
+    if door_element == palace_element:
         relation = "same_element"
-    elif ELEMENT_CONTROLS[d] == p:
+    elif ELEMENT_CONTROLS[door_element] == palace_element:
         relation = "door_controls_palace"
-    elif ELEMENT_CONTROLS[p] == d:
+    elif ELEMENT_CONTROLS[palace_element] == door_element:
         relation = "palace_controls_door"
-    elif ELEMENT_GENERATES[d] == p:
+    elif ELEMENT_GENERATES[door_element] == palace_element:
         relation = "door_generates_palace"
     else:
         relation = "palace_generates_door"
@@ -115,8 +116,8 @@ def gate_palace_relation(door: str, trigram: str) -> dict[str, Any]:
         "profile_id": PROFILE_ID,
         "door": door,
         "trigram": trigram,
-        "door_element": d,
-        "palace_element": p,
+        "door_element": door_element,
+        "palace_element": palace_element,
         "relation": relation,
         "relation_text": RELATION_TEXT[relation],
         "verse_door_pressure": relation == "door_controls_palace",
