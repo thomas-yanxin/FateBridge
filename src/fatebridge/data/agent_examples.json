@@ -667,7 +667,7 @@
       "status", "su27_basis", "person1.name", "person1.natal_su27", "person2.name",
       "person2.natal_su27", "person1_to_person2", "person2_to_person1", "pair",
       "candidate_relation_analysis", "rulesets.calendar", "rulesets.relations",
-      "interpretation_contract", "validation"
+      "interpretation_contract"
     ],
     "otherbu": [
       "method_id", "planet", "sign", "house", "rulesets", "validation",
@@ -1374,7 +1374,6 @@
       "candidate_relation_analysis",
       "rulesets",
       "interpretation_contract",
-      "validation",
       "summary"
     ],
     "suzhan": [
@@ -6099,7 +6098,6 @@
           "candidate_relation_analysis",
           "rulesets",
           "interpretation_contract",
-          "validation",
           "summary"
         ]
       },
