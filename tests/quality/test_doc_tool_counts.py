@@ -152,7 +152,6 @@ def test_algorithm_family_counts_match_published_tools() -> None:
     assert documented == Counter(spec.family for spec in mcp_specs())
 
 
-
 def test_api_mcp_group_list_covers_each_published_tool_once() -> None:
     text = (REPO_ROOT / "docs/api-reference.md").read_text(encoding="utf-8")
     groups = text.split("### 6.2 MCP 工具分组", 1)[1].split(
