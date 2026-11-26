@@ -12,12 +12,12 @@ MIN_PERSON_BIRTH_YEAR = 1900
 MAX_PERSON_BIRTH_YEAR = 2100
 
 
-_MALE_GENDER_TOKENS = frozenset(
+MALE_GENDER_TOKENS = frozenset(
     {"男", "male", "m", "man", "boy", "1", "true", "阳", "乾"}
 )
 
 
-_FEMALE_GENDER_TOKENS = frozenset(
+FEMALE_GENDER_TOKENS = frozenset(
     {"女", "female", "f", "woman", "girl", "0", "false", "阴", "坤"}
 )
 
@@ -35,9 +35,9 @@ def normalize_gender(gender: object) -> Literal["男", "女", "未知"]:
     token = str(gender).strip().casefold()
     if not token:
         return "未知"
-    if token in _MALE_GENDER_TOKENS:
+    if token in MALE_GENDER_TOKENS:
         return "男"
-    if token in _FEMALE_GENDER_TOKENS:
+    if token in FEMALE_GENDER_TOKENS:
         return "女"
     return "未知"
 

@@ -13,7 +13,6 @@ from fatebridge.core.classical_stages import (
     life_stage_profile,
     twelve_life_stage,
 )
-from fatebridge.core.source_identity import ZIPING_ZHENQUAN_NLC_SCAN_URL
 from fatebridge.utils.data import BRANCH_CONFLICTS, BRANCH_HIDDEN_STEMS, STEM_ELEMENTS
 
 PillarMap = dict[str, tuple[str, str]]
@@ -25,10 +24,8 @@ class RootSource(TypedDict):
     author: str
     title: str
     edition: str
-    url: str
     pdf_pages: list[int]
     printed_pages: list[int]
-    source_sha256: str
 
 
 SOURCE: RootSource = {
@@ -36,10 +33,8 @@ SOURCE: RootSource = {
     "author": "沈孝瞻",
     "title": "秘本子平真诠·论十干得时不旺失时不弱",
     "edition": "国家图书馆藏本，上海世界图书馆发行",
-    "url": ZIPING_ZHENQUAN_NLC_SCAN_URL,
     "pdf_pages": [22, 23],
     "printed_pages": [13, 14],
-    "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
 }
 
 LABELS = {
@@ -54,9 +49,9 @@ LABELS = {
     "yin_growth_reference": "阴长生原典参考",
     "no_root_in_this_profile": "此规则未见根",
 }
-_STORAGE = {"木": "未", "火": "戌", "金": "丑", "水": "辰"}
-_RESIDUAL = {"木": "辰", "火": "未", "金": "戌", "水": "丑"}
-_POSITIONS = ("year", "month", "day", "hour")
+STORAGE = {"木": "未", "火": "戌", "金": "丑", "水": "辰"}
+RESIDUAL = {"木": "辰", "火": "未", "金": "戌", "水": "丑"}
+POSITIONS = ("year", "month", "day", "hour")
 
 
 class RootClassification(TypedDict):
@@ -87,9 +82,9 @@ def classify_classical_root(stem: str, branch: str) -> RootClassification:
         kind = "prosperity_root"
     elif is_yang and phase == "长生" and hidden:
         kind = "yang_growth_root"
-    elif branch == _STORAGE.get(element.value) and hidden:
+    elif branch == STORAGE.get(element.value) and hidden:
         kind = "storage_root"
-    elif branch == _RESIDUAL.get(element.value) and hidden:
+    elif branch == RESIDUAL.get(element.value) and hidden:
         kind = "residual_root"
     elif hidden and STEM_ELEMENTS[BRANCH_HIDDEN_STEMS[branch][0]][0] == element:
         kind = "principal_element_root"
@@ -132,7 +127,7 @@ def build_classical_root_profile(pillars: PillarMap) -> dict[str, Any]:
     """Retain physical root positions and the chosen text's distinct root views."""
     stem = pillars["day"][0]
     rows: list[dict[str, Any]] = []
-    for name in _POSITIONS:
+    for name in POSITIONS:
         branch = pillars[name][1]
         rows.append(
             {
@@ -140,7 +135,7 @@ def build_classical_root_profile(pillars: PillarMap) -> dict[str, Any]:
                 **classify_classical_root(stem, branch),
                 "clash_partners": [
                     other
-                    for other in _POSITIONS
+                    for other in POSITIONS
                     if other != name and BRANCH_CONFLICTS[branch] == pillars[other][1]
                 ],
             }

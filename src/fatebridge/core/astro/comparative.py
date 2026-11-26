@@ -23,8 +23,6 @@ SOURCE = {
     "id": "witte_1924_comparative_astrology",
     "author": "Alfred Witte",
     "title": "Vergleichende Astrologie, Astrologische Rundschau XVI/5, August1924, pp137-140",
-    "url": "https://www.astrax.de/pdf/42_Vergleichende%20Astrologie%201924%20AstrRundschau%20137-140.pdf",
-    "source_sha256": "58c6516caaf6eb9310abbbbf3b7378cccb22f16a49cfa5d3069a05aa48dd3832",
     "sections": [
         "p138: Uranus four-point reflection example",
         "p139: three printed rotations and two additional stated anchors",

@@ -6,7 +6,7 @@ Liu Ren's lessons and transmissions. Edition limits are part of the output.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from fatebridge.core.metaphysics.common import (
     ELEMENT_CONTROLS,
@@ -52,13 +52,12 @@ from fatebridge.core.metaphysics.jinkou_strength import internal_strength
 from fatebridge.core.metaphysics.ren_calendar import symbolic_calendar_policy
 from fatebridge.core.metaphysics.ren_diurnal import resolve_diurnal
 from fatebridge.core.metaphysics.ren_evidence import ruleset_metadata
-from fatebridge.core.metaphysics.ren_sources import JINKOU_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 # 十二贵神所属: inherent identities, never their occupied earth positions.
 
 
-def _jinkou_pick_use_position(rows: List[Dict[str, Any]]) -> Tuple[str, str, str]:
+def _jinkou_pick_use_position(rows: list[dict[str, Any]]) -> tuple[str, str, str]:
     """阴阳次第五用: 人元 stem plus the other three inherent branches."""
     count = sum(row["polarity"] == "阳" for row in rows)
     pattern = {0: "纯阴", 1: "三阴一阳", 2: "二阴二阳", 3: "三阳一阴", 4: "纯阳"}[count]
@@ -70,7 +69,7 @@ def _jinkou_pick_use_position(rows: List[Dict[str, Any]]) -> Tuple[str, str, str
     return label, f"{pattern}，依阴阳次第五用取{label}。", pattern
 
 
-def _motion_evidence(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _motion_evidence(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     by_label = {row["label"]: row for row in rows}
     definitions = [
         ("妻动", "人元", "地分", "克", "五动爻诵"),
@@ -115,14 +114,14 @@ def _motion_evidence(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
 def build_jinkou_board(
     seed: MetaphysicsSeed,
-    liureng_board: Dict[str, Any],
+    liureng_board: dict[str, Any],
     gender: str = "未知",
-    di_fen: Optional[str] = None,
-    runyear: Optional[Dict[str, Any]] = None,
-    is_diurnal_override: Optional[bool] = None,
-    natal_branch: Optional[str] = None,
-    natal_branch_source: Optional[str] = None,
-) -> Dict[str, Any]:
+    di_fen: str | None = None,
+    runyear: dict[str, Any] | None = None,
+    is_diurnal_override: bool | None = None,
+    natal_branch: str | None = None,
+    natal_branch_source: str | None = None,
+) -> dict[str, Any]:
     day_stem = seed.pillars["day"][0]
     hour_branch = seed.pillars["hour"][1]
     if di_fen is not None and di_fen not in EARTHLY_BRANCHES:
@@ -296,43 +295,36 @@ def build_jinkou_board(
             branch_stars_trace(stars),
             {
                 "rule_id": "jinkou.four_positions",
-                "source_url": JINKOU_SOURCE,
                 "source_section": "入式歌解 / 贵神起例 / 十二贵神所属 / 五子元遁起例",
                 "result": {r["label"]: r["content"] for r in rows},
             },
             {
                 "rule_id": "jinkou.polarity_use",
-                "source_url": JINKOU_SOURCE,
                 "source_section": "阴阳次第五用",
                 "result": {"pattern": pattern, "position": use_position},
             },
             {
                 "rule_id": "jinkou.internal_strength",
-                "source_url": JINKOU_SOURCE,
                 "source_section": "贵神休旺所主",
                 "result": strength,
             },
             {
                 "rule_id": "jinkou.structural_patterns",
-                "source_url": patterns["source_url"],
                 "source_section": patterns["source_section"],
                 "result": patterns,
             },
             {
                 "rule_id": "jinkou.use_conditions",
-                "source_url": JINKOU_SOURCE,
                 "source_section": "入式歌解 / 阴阳次第五用",
                 "result": use_conditions,
             },
             {
                 "rule_id": "jinkou.jingben_relations",
-                "source_url": relations["source_url"],
                 "source_section": relations["source_section"],
                 "result": relations,
             },
             {
                 "rule_id": "jinkou.empty",
-                "source_url": JINKOU_SOURCE,
                 "source_section": "旬中空亡 / 四大空亡",
                 "result": {
                     "xun_head": xun_head,
@@ -342,31 +334,26 @@ def build_jinkou_board(
             },
             {
                 "rule_id": "jinkou.trine_conditions",
-                "source_url": combinations["source_url"],
                 "source_section": combinations["source_section"],
                 "result": combinations,
             },
             {
                 "rule_id": "jinkou.month_day_qi",
-                "source_url": JINKOU_SOURCE,
                 "source_section": "月建旺相 / 月破休囚",
                 "result": qi_evidence,
             },
             {
                 "rule_id": "jinkou.position_interactions",
-                "source_url": interactions["source_url"],
                 "source_section": interactions["source_title"],
                 "result": interactions,
             },
             {
                 "rule_id": "jinkou.dun_stem_relations",
-                "source_url": stem_relations["source_url"],
                 "source_section": stem_relations["source_title"],
                 "result": stem_relations,
             },
             {
                 "rule_id": "jinkou.unresolved_definition_witnesses",
-                "source_url": definitions["witnesses"][1]["scan_url"],
                 "source_section": "湖社叢話第六冊p0057–p0059 / CNTS第二册PDF118–121",
                 "result": {
                     "unadjudicated_ids": [

@@ -35,7 +35,7 @@ def compare_candidate_palaces(matches: list[list[str]]) -> CandidateOutcome:
 
 
 def build_stem_context(
-    board: dict[str, Any], *, leader: QimenLeaders, source: str
+    board: dict[str, Any], *, leader: QimenLeaders
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
 
     day_ganzhi, hour_ganzhi = board["day_ganzhi"], board["time_ganzhi"]
@@ -110,7 +110,6 @@ def build_stem_context(
             ),
             "xun_head": leader["xun_head"],
         },
-        "source": source,
         "sections": ["卷二·伏干格", "卷二·飞干格", "卷二·小隔并岁隔月隔日隔时隔"],
         "source_scan_pages": [29, 31],
         "day_jia_policy_automatically_selected": False,
@@ -170,7 +169,6 @@ def build_stem_context(
                         "day_ganzhi": day_ganzhi,
                         "hour_ganzhi": hour_ganzhi,
                     },
-                    "source": source,
                     "section": section,
                     "source_scan_pages": pages,
                     "evidence_paths": [

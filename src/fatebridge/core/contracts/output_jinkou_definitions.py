@@ -31,7 +31,6 @@ class ChapterObservation(PartialOutput):
 
 class JinkouChapterInventory(PartialOutput):
     inventory_id: Literal["waseda_jinkou_chapter_v1"] | None = None
-    raw_inventory_sha256: str | None = None
     source_pdf_pages: int | None = Field(default=None, ge=1)
     reviewed_pdf_pages: list[int] | None = None
     chapter_heading: str | None = None
@@ -59,10 +58,8 @@ class DefinitionWitness(PartialOutput):
     catalog_id: str | None = None
     catalog_url: str | None = None
     scan_url: str | None = None
-    source_sha256: str | None = None
     chronology: str | None = None
     full_scan_url: str | None = None
-    full_scan_sha256: str | None = None
     chapter_inventory: JinkouChapterInventory | None = None
 
 

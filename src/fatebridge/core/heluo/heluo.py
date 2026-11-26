@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fatebridge.core.heluo.heluo_body import body_evidence
 from fatebridge.core.heluo.heluo_hexagrams import (
@@ -46,7 +46,7 @@ from fatebridge.utils.civil_time import ZonedCalendar
 
 # ── 八卦（自下而上三爻 bit：1阳 0阴）──
 # 洛书数 → 八卦（5 寄中宫，另行处理）
-LUOSHU_TRIGRAM: Dict[int, str] = {
+LUOSHU_TRIGRAM: dict[int, str] = {
     1: "坎",
     2: "坤",
     3: "震",
@@ -57,7 +57,7 @@ LUOSHU_TRIGRAM: Dict[int, str] = {
     9: "離",
 }
 # 天干 → 洛书纳甲数
-GAN_NUM: Dict[str, int] = {
+GAN_NUM: dict[str, int] = {
     "甲": 6,
     "乙": 2,
     "丙": 8,
@@ -70,7 +70,7 @@ GAN_NUM: Dict[str, int] = {
     "癸": 2,
 }
 # 地支 → 河图数对 [奇, 偶]
-ZHI_PAIR: Dict[str, List[int]] = {
+ZHI_PAIR: dict[str, list[int]] = {
     "子": [1, 6],
     "亥": [1, 6],
     "寅": [3, 8],
@@ -90,7 +90,7 @@ YANG_ZHI = frozenset({"子", "寅", "辰", "午", "申", "戌"})  # 阳支(年�
 ZHI_ZUN = frozenset({"坎為水", "水雷屯", "水山蹇"})
 
 # ── 命运篇：元气/反元气/化工 ──
-GAN_YUAN: Dict[str, str] = {
+GAN_YUAN: dict[str, str] = {
     "甲": "乾",
     "壬": "乾",
     "乙": "坤",
@@ -102,7 +102,7 @@ GAN_YUAN: Dict[str, str] = {
     "丙": "艮",
     "丁": "兌",
 }
-ZHI_YUAN: Dict[str, str] = {
+ZHI_YUAN: dict[str, str] = {
     "戌": "乾",
     "亥": "乾",
     "未": "坤",
@@ -116,7 +116,7 @@ ZHI_YUAN: Dict[str, str] = {
     "寅": "艮",
     "酉": "兌",
 }
-GAN_FAN: Dict[str, str] = {
+GAN_FAN: dict[str, str] = {
     "甲": "坤",
     "壬": "坤",
     "乙": "乾",
@@ -128,7 +128,7 @@ GAN_FAN: Dict[str, str] = {
     "丙": "兌",
     "丁": "艮",
 }
-ZHI_FAN: Dict[str, str] = {
+ZHI_FAN: dict[str, str] = {
     "戌": "坤",
     "亥": "坤",
     "未": "乾",
@@ -143,7 +143,7 @@ ZHI_FAN: Dict[str, str] = {
     "酉": "艮",
 }
 # 无节气信息时(单测)的月支近似回退
-MONTH_HG: Dict[str, List[str]] = {
+MONTH_HG: dict[str, list[str]] = {
     "卯": ["震"],
     "辰": ["震"],
     "午": ["離"],
@@ -157,7 +157,7 @@ MONTH_HG: Dict[str, List[str]] = {
     "申": ["坤", "艮"],
     "亥": ["坤", "艮"],
 }
-MONTH_FH: Dict[str, List[str]] = {
+MONTH_FH: dict[str, list[str]] = {
     "卯": ["巽"],
     "辰": ["巽"],
     "午": ["坎"],
@@ -172,7 +172,7 @@ MONTH_FH: Dict[str, List[str]] = {
     "亥": ["乾", "兌"],
 }
 # 八卦纳甲旧序表（上至初）；命中仅年干支成员关系。
-NAJIA: Dict[str, List[str]] = {
+NAJIA: dict[str, list[str]] = {
     "乾": ["壬戌", "壬申", "壬午", "甲辰", "甲寅", "甲子"],
     "坎": ["戊子", "戊戌", "戊申", "戊午", "戊辰", "戊寅"],
     "艮": ["丙寅", "丙子", "丙戌", "丙申", "丙午", "丙辰"],
@@ -183,7 +183,7 @@ NAJIA: Dict[str, List[str]] = {
     "兌": ["丁未", "丁酉", "丁亥", "丁丑", "丁卯", "丁巳"],
 }
 # 卦属月：四柱月支对应月号；原典农历/节气月界仍未确认。
-MONTH_GUA: Dict[str, List[str]] = {
+MONTH_GUA: dict[str, list[str]] = {
     "寅": ["大有", "同人", "泰", "既濟", "咸", "恆", "蠱", "漸"],
     "卯": ["大壯", "晉", "小過", "大過", "革", "訟", "睽", "井"],
     "辰": ["夬", "履", "渙"],
@@ -199,7 +199,7 @@ MONTH_GUA: Dict[str, List[str]] = {
 }
 
 
-def _san_cai(lines: List[int]) -> List[str]:
+def _san_cai(lines: list[int]) -> list[str]:
     return [
         _trigram_of([lines[i] for i in ix])
         for ix in ([0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5])
@@ -242,19 +242,19 @@ def _wu_ji_gong(minguo_year: int, yang_gan: bool, is_male: bool) -> str:
     return "離" if is_male else "兌"  # 下元
 
 
-def _flip_line(lines: List[int], pos: int) -> List[int]:
+def _flip_line(lines: list[int], pos: int) -> list[int]:
     out = lines[:]
     out[pos - 1] = 0 if out[pos - 1] else 1
     return out
 
 
-def _swap_trigrams(lines: List[int]) -> List[int]:
+def _swap_trigrams(lines: list[int]) -> list[int]:
     return [lines[3], lines[4], lines[5], lines[0], lines[1], lines[2]]
 
 
 def transform_houtian(
-    xian_name: str, xian_lines: List[int], yuan: int, yang_ling: bool
-) -> Dict[str, Any]:
+    xian_name: str, xian_lines: list[int], yuan: int, yang_ling: bool
+) -> dict[str, Any]:
     """翻元堂爻 → 后天卦（三至尊卦「变而不易」特例）。"""
     if type(yang_ling) is not bool:
         raise ValueError("阴阳令须为布尔值，不能以字符串或数字代替。")
@@ -288,7 +288,7 @@ def transform_houtian(
     }
 
 
-def four_pillar_number_totals(four_pillars: Dict[str, str]) -> Dict[str, Any]:
+def four_pillar_number_totals(four_pillars: dict[str, str]) -> dict[str, Any]:
     """Formal source-number arithmetic, without asserting a realizable birth chart.
 
     A printed arithmetic example can contain incompatible stem links. Keep its
@@ -322,13 +322,13 @@ def four_pillar_number_totals(four_pillars: Dict[str, str]) -> Dict[str, Any]:
 
 def calculate(
     *,
-    four_pillars: Dict[str, str],
+    four_pillars: dict[str, str],
     gender: str,
     hour_zhi: str,
     birth_year: int,
     month_zhi: str,
-    month_yang_ling: Optional[bool] = None,
-) -> Dict[str, Any]:
+    month_yang_ling: bool | None = None,
+) -> dict[str, Any]:
     """起命：天地数→卦→元堂→先天/后天。"""
     if not isinstance(gender, str) or normalize_gender(gender) not in {"男", "女"}:
         raise ValueError("河洛相荡、寄宫和元堂需要明确gender为男或女，不能默认性别。")
@@ -481,10 +481,10 @@ def _ying(p: int) -> int:
     return p + 3 if p <= 3 else p - 3
 
 
-def hexagram_najia(lines: List[int]) -> List[Dict[str, Any]]:
+def hexagram_najia(lines: list[int]) -> list[dict[str, Any]]:
     """实际六爻纳甲，自初至上；乾坤的甲壬、乙癸借用另列。
 
-    ``NAJIA`` 的旧表顺序为上至初。复卦只用内卦初二三、外卦四五上，
+    NAJIA 的旧表顺序为上至初。复卦只用内卦初二三、外卦四五上，
     不能把两个纯卦的十二个纳甲合并。八纯卦基础和具名复卦原页读数由
     heluo_najia 维护；judge 核对实际结果并另附直接条目／基础推演源据。
     """
@@ -506,13 +506,13 @@ def hexagram_najia(lines: List[int]) -> List[Dict[str, Any]]:
 
 
 def da_yun(
-    xian: Dict[str, Any], hou: Dict[str, Any], birth_year: int = 0
-) -> Dict[str, Any]:
+    xian: dict[str, Any], hou: dict[str, Any], birth_year: int = 0
+) -> dict[str, Any]:
     """大限：先天卦元堂起、自下往上绕行六爻、阳爻9阴爻6年；行完先天接后天。虚岁。"""
 
-    def seg_of(g: Dict[str, Any], start_age: int) -> Dict[str, Any]:
+    def seg_of(g: dict[str, Any], start_age: int) -> dict[str, Any]:
         age = start_age
-        segs: List[Dict[str, Any]] = []
+        segs: list[dict[str, Any]] = []
         for i in range(6):
             pos = ((g["yuan"] - 1 + i) % 6) + 1
             yang = g["lines"][pos - 1] == 1
@@ -544,20 +544,20 @@ def da_yun(
 
 
 def judge(
-    chart: Dict[str, Any],
-    four_pillars: Dict[str, str],
+    chart: dict[str, Any],
+    four_pillars: dict[str, str],
     month_zhi: str,
-    hg_override: Optional[Dict[str, Any]] = None,
+    hg_override: dict[str, Any] | None = None,
     *,
     month_assignment_method: MonthAssignmentMethod = DEFAULT_MONTH_ASSIGNMENT,
-    birth_datetime: Optional[datetime] = None,
-) -> Dict[str, Any]:
+    birth_datetime: datetime | None = None,
+) -> dict[str, Any]:
     """命运篇：元气/化工/得势得时得体/葉否/二数/元堂。"""
     year_g = four_pillars["year"][0]
     year_z = four_pillars["year"][1]
     tri_set = set(_san_cai(chart["xian"]["lines"]) + _san_cai(chart["hou"]["lines"]))
 
-    def mk(gua: str) -> Dict[str, Any]:
+    def mk(gua: str) -> dict[str, Any]:
         return {"gua": gua, "present": gua in tri_set}
 
     yuan = {"tian": mk(GAN_YUAN[year_g]), "di": mk(ZHI_YUAN[year_z])}

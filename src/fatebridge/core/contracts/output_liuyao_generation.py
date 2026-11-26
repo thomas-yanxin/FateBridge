@@ -53,7 +53,6 @@ class GenerationConditions(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     clauses: list[dict[str, OpenJsonValue]] | None = None
     textual_issues: list[dict[str, OpenJsonValue]] | None = None
     sources: list[GenerationSource] | None = None

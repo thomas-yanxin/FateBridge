@@ -75,6 +75,7 @@ from fatebridge.core.astro.time_scales import fallback_julian_day_tt
 from fatebridge.core.astro.utc_policy import utc_definition_evidence
 from fatebridge.core.astro.zodiac import native_lahiri_positions
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
+from fatebridge.core.guolao.guolao import build_chart
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.utils.timezones import format_local_time_or_utc
 
@@ -131,8 +132,6 @@ def _build_core_chart_payload(
             "guolao_seasonal_anchor_policy requires chart_variant=guolao_chart"
         )
     if chart_variant == "guolao_chart":
-        from fatebridge.core.guolao.guolao import build_chart
-
         return build_chart(
             birth_info,
             hsys=hsys,

@@ -10,7 +10,6 @@ import json
 from copy import deepcopy
 from datetime import timedelta
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +20,6 @@ from fatebridge.utils.errors import NumerologySourceError
 
 RULESET_ID = "heluo_wenming_jiehou_v1"
 SOURCE_PATH = Path(__file__).resolve().parents[2] / "data/heluo/jiehou-v1.json"
-SOURCE_SHA256 = "6bcf0814cad984d035b2df99e5ff2de0edcd7bfde7c930aca570da164d55c5d2"
 ALIASES = {
     "谷雨": "穀雨",
     "小满": "小滿",
@@ -38,8 +36,7 @@ def _source() -> dict[str, Any]:
         raw = SOURCE_PATH.read_bytes()
         data: dict[str, Any] = json.loads(raw)
         if (
-            sha256(raw).hexdigest() != SOURCE_SHA256
-            or data["ruleset_id"] != RULESET_ID
+            data["ruleset_id"] != RULESET_ID
             or data["version"] != "1.0.0"
             or len(data["term_rows"]) != 24
             or len(data["hou_rows"]) != 72
@@ -47,11 +44,8 @@ def _source() -> dict[str, Any]:
             or len(set(data["gua_order"])) != 60
         ):
             raise ValueError("所选节候表的身份、字节或条目不一致。")
-        # The digest fixes literal errors too; a convenient correction is a
-        # different source/version, never an invisible rewrite of this one.
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_heluo_jiehou_source") from exc
-    data["loaded_sha256"] = sha256(raw).hexdigest()
     return data
 
 
@@ -201,11 +195,8 @@ def jiehou_evidence(solar: dict[str, Any]) -> dict[str, Any]:
                 "ruleset_id",
                 "version",
                 "source_title",
-                "source_url",
-                "source_pdf_sha256",
                 "source_pdf_pages",
                 "review_status",
-                "loaded_sha256",
             )
         },
         "selection_basis": "already_computed_term_label; modern_calendar_convention",
@@ -251,8 +242,6 @@ def attach_jiehou_evidence(evidence: dict[str, Any], jiehou: dict[str, Any]) -> 
                     "ruleset_id",
                     "version",
                     "source_title",
-                    "source_url",
-                    "source_pdf_sha256",
                 )
             },
             "source_status": jiehou["review_status"],

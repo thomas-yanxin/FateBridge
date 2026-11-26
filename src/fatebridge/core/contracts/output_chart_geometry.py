@@ -98,13 +98,11 @@ class FixedStar(PartialOutput):
 
 class FixedStarProfile(PartialOutput):
     nature_ruleset_id: str | None = None
-    nature_rules_sha256: str | None = None
     swisseph_version: str | None = None
     orb_limit: float | None = Field(default=None, ge=0, le=180)
     model_id: str | None = None
     status: str | None = None
     catalogue_id: str | None = None
-    catalogue_sha256: str | None = None
     catalogue_size: int | None = None
     catalogue_epoch: str | None = None
     julian_day_tt: float | None = None

@@ -30,8 +30,6 @@ METHOD = "rao2000_unreduced_ashtakavarga_v1"
 SOURCE = {
     "id": "pvr_2000_ashtakavarga_1cafa828",
     "title": "P.V.R. Narasimha Rao, Vedic Astrology: An Integrated Approach (2000; 2010 update)",
-    "url": "https://www.vedicastrologer.org/articles/vedic_astro_textbook.pdf",
-    "sha256": "1cafa828f34764ed5e85816882df2e8f0bc014c5c57ccdb27169416e117fd4db",
     "sections": ["12.2-12.6; Tables19-27; printed146-156/PDF158-168"],
     "scope": "Unreduced PAV/BAV/SAV; the author's divisional application reading. Actual varga construction has its own declared source. Separate reduction_analysis has its own declared source and occupancy reading; no empirical forecast acceptance.",
 }

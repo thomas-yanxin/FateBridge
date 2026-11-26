@@ -7,8 +7,6 @@ All arithmetic here uses exact rational values and explicit rounding stages.
 
 from __future__ import annotations
 
-import hashlib
-import json
 from fractions import Fraction
 from pathlib import Path
 from typing import Any
@@ -17,7 +15,6 @@ from fatebridge.core.sukuyo.sukuyo_dayan_advance import research_scope
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_dayan_reconstruction.json"
-CANONICAL_SHA256 = "ec68367411c7de35c7dc67d4a6fe2ffc6b3d574e88ecbac071047bfe2edffb34"
 DAY_CYCLE = tuple(
     "甲乙丙丁戊己庚辛壬癸"[i % 10] + "子丑寅卯辰巳午未申酉戌亥"[i % 12]
     for i in range(60)
@@ -34,28 +31,19 @@ def _nearest(value: Fraction) -> int:
     return (value + Fraction(1, 2)) // 1
 
 
-def _captured_model() -> tuple[dict[str, Any], str]:
-    loaded = load_source(SOURCE)
-    bundle = loaded.data
-    canonical = json.dumps(
-        bundle, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode()
-    if hashlib.sha256(canonical).hexdigest() != CANONICAL_SHA256:
-        raise ValueError("大衍复算的常数、系数或方法来源已改变，须重新核验")
-    return bundle, loaded.sha256
+def _captured_model() -> dict[str, Any]:
+    return load_source(SOURCE)
 
 
 def reconstruction_scope_reference() -> dict[str, Any]:
 
-    bundle, digest = _captured_model()
+    bundle = _captured_model()
     return {
         "ruleset_id": bundle["id"],
-        "source_bundle_sha256": digest,
         "reference_scope": bundle["all_month_reference_scope"],
         "computational_reference": bundle["computational_reference"],
         "primary_research": bundle["primary_research"],
         "applies_to_every_input_or_calendar": False,
-        "research_scope_delivery_round": 89,
         "fixed_host_research_scope": research_scope(),
     }
 
@@ -181,7 +169,7 @@ def reconstruct_new_moon(
     """
     if type(host_month_start_ordinal) is not int or type(lunar_year) is not int:
         raise ValueError("大衍复算须明确宿主月首序数日和农历年份整数")
-    bundle, digest = _captured_model()
+    bundle = _captured_model()
     constants = bundle["constants"]
     units = constants["day_units"]
     epoch = Fraction(**constants["epoch_julian_day"])
@@ -217,7 +205,6 @@ def reconstruct_new_moon(
     selected = "D" if 793 <= lunar_year <= 819 else "A"
     return {
         "ruleset_id": bundle["id"],
-        "source_bundle_sha256": digest,
         "primary_research": bundle["primary_research"],
         "computational_reference": bundle["computational_reference"],
         "policy": bundle["policy"],

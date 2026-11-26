@@ -9,7 +9,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-_WEATHER_LABELS = {"thunder": "雷", "wind": "风", "rain": "雨", "clear": "晴"}
+WEATHER_LABELS = {"thunder": "雷", "wind": "风", "rain": "雨", "clear": "晴"}
 
 
 @lru_cache(maxsize=1)
@@ -178,7 +178,7 @@ def qualify_weather_rules(
             row["effective_status"] = "qualified_by_source_control"
             row["effective_reading"] += (
                 "；其中"
-                + "、".join(_WEATHER_LABELS[t] for t in sorted(controlled))
+                + "、".join(WEATHER_LABELS[t] for t in sorted(controlled))
                 + "象在本次明示阈值及所列计数候选下受制，不作未受制的独立判断"
             )
         if conditional - controlled:
@@ -187,8 +187,6 @@ def qualify_weather_rules(
                 row["effective_status"] = "conditional_on_unresolved_control"
             row["effective_reading"] += (
                 "；其中"
-                + "、".join(
-                    _WEATHER_LABELS[t] for t in sorted(conditional - controlled)
-                )
+                + "、".join(WEATHER_LABELS[t] for t in sorted(conditional - controlled))
                 + "象的制约阈值或计数范围尚未确定"
             )

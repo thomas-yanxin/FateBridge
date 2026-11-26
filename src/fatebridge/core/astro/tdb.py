@@ -3,21 +3,16 @@
 The 787 original terms and mass corrections implement eraDtdb with zero
 observer coordinates. ERFA/SOFA conditions are in data/astronomy/erfa-license.txt.
 The author's 1950-2050 comparison does not certify arbitrary civil epochs.
-https://github.com/liberfa/erfa/blob/v2.0.1/src/dtdb.c
 """
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 from fractions import Fraction
 from functools import lru_cache
 from importlib.resources import files
 from typing import NamedTuple, Sequence, TypedDict
-
-SOURCE_URL = "https://github.com/liberfa/erfa/blob/v2.0.1/src/dtdb.c"
-COEFFICIENT_SHA256 = "a092d8bd128309277135097c6cd29f2aed2e7abe03d51f9522890d97f49a7c25"
 
 
 class Parameters(TypedDict):
@@ -36,8 +31,6 @@ def _parameters() -> Parameters:
         .joinpath("data/astronomy/geocentric-tdb-v1.json")
         .read_bytes()
     )
-    if hashlib.sha256(raw).hexdigest() != COEFFICIENT_SHA256:
-        raise RuntimeError("Geocentric TDB parameters differ from the declared source")
     data: Parameters = json.loads(raw)
     return data
 

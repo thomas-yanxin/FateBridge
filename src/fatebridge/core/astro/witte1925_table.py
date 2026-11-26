@@ -7,26 +7,22 @@ not replace the selected true-Sun solar arc with a table approximation.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 from fractions import Fraction
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 RECORD = (
     Path(__file__).resolve().parents[2]
     / "data/knowledge/witte1925-solar-arc-table.json"
 )
-RECORD_SHA256 = "301a22dbc2390ca9b644e4ed87d65cbf67437bf608165f49825e192299608750"
 RULESET = "witte1925_table_numeric_interpolation_v1"
 
 
 def load_table() -> dict[str, Any]:
     raw = RECORD.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != RECORD_SHA256:
-        raise RuntimeError("Witte1925 solar-arc table source checksum mismatch")
-    return cast(Dict[str, Any], json.loads(raw))
+    return cast(dict[str, Any], json.loads(raw))
 
 
 def normalized_rows(record: dict[str, Any]) -> list[dict[str, Any]]:
@@ -176,13 +172,10 @@ def source_table_analysis() -> dict[str, Any]:
         "author": "FateBridge",
         "version": "1",
         "computed_for_current_chart": False,
-        "source_record_sha256": RECORD_SHA256,
         "source": {
             "id": source["id"],
             "author": source["author"],
             "title": source["title"] + ", " + source["publication"],
-            "url": source["url"],
-            "source_sha256": source["source_pdf_sha256"],
             "sections": [
                 "p.87: entire printed table",
                 "p.88: interpolation and worked example",

@@ -30,10 +30,7 @@ from fatebridge.core.jyotish.jyotish_vargas import (
 
 RAMAN_SOURCE = {
     "id": "raman_graha_bhava_balas_section30_preview",
-    "title": "B.V. Raman, Graha and Bhava Balas (fixed scan; selected sections)",
-    "url": "https://astrojyotish.info/pdf/graha-bhava-balas.pdf",
-    "sha256": "727c8063f64816a0c1c7f6bc577c249629854e980bf860bf4cfd8de16ec9bab2",
-    "legacy_id_note": "Stable source identifier predates the fixed scan; the preview suffix is not the current verification status.",
+    "title": "B.V. Raman, Graha and Bhava Balas (selected sections)",
     "sections": [
         "30: printed pp.22-24",
         "31-40: printed pp.25-29; PDF30-34; Drekkana page images PDF32-33",

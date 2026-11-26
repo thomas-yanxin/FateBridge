@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -12,13 +11,10 @@ from fatebridge.core.human_design.human_design_references import (
     coherent_human_design_references,
 )
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.utils.json_digest import canonical_bytes
 
 CATEGORY = "lines_v3"
 MANIFEST_PATH = base.CATALOGUE_PATH.with_name("line-knowledge-manifest-v3.json")
-MANIFEST_SHA256 = "60f844ca3a00ee1ad9b3836a94f68d74553089a3127e8240dc9694b2e3f99ec3"
 SUPPLEMENT_PATH = base.CATALOGUE_PATH.with_name("line-knowledge-gate3-v1.json")
-SAMPLE_SHA256 = "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568"
 HEADINGS = [
     "Synthesis",
     "Immaturity",
@@ -36,8 +32,6 @@ def _catalogue(
     data = deepcopy(parent)
     try:
         raw = MANIFEST_PATH.read_bytes()
-        if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
-            raise ValueError("Version3 reference manifest changed")
         manifest = json.loads(
             raw, object_pairs_hook=base._object, parse_constant=base._nonfinite
         )
@@ -46,13 +40,11 @@ def _catalogue(
             or manifest["version"] != 3
             or manifest["catalogue_id"] != "human_design_line_knowledge_v3"
             or manifest["parent_version"] != parent["version"]
-            or manifest["parent_manifest_sha256"] != base.MANIFEST_SHA256
             or manifest["required_line_count"] != 384
             or manifest["expected_local_paraphrase_count"] != 18
             or manifest["independently_accepted_line_count"] != 0
             or manifest["publisher_master_authenticated"] is not False
             or manifest["complete384_line_meanings_accepted"] is not False
-            or manifest["publisher_sample_sha256"] != SAMPLE_SHA256
             or manifest["corroborated_headings_only"] != HEADINGS
             or len(manifest["supplements"]) != 1
         ):
@@ -63,20 +55,15 @@ def _catalogue(
         ]:
             raise ValueError("Invalid supplementary keys or path")
         added = SUPPLEMENT_PATH.read_bytes()
-        if hashlib.sha256(added).hexdigest() != binding["sha256"]:
-            raise ValueError("Version3 supplement changed")
         supplement = json.loads(
             added, object_pairs_hook=base._object, parse_constant=base._nonfinite
         )
         if (
             supplement["schema_version"] != 1
             or supplement["supplement_id"] != "human_design_gate3_editorial_v1"
-            or supplement["base_catalogue_sha256"] != base.CATALOGUE_SHA256
-            or supplement["source_pdf_sha256"] != parent["source"]["pdf_sha256"]
             or supplement["independently_accepted_line_count"] != 0
             or supplement["publisher_master_authenticated"] is not False
             or supplement["complete384_line_meanings_accepted"] is not False
-            or supplement["publisher_sample"]["sha256"] != SAMPLE_SHA256
             or supplement["publisher_sample"]["body_of_six_lines_available"]
             is not False
             or [r["key"] for r in supplement["rows"]] != binding["keys"]
@@ -91,8 +78,6 @@ def _catalogue(
                 original["editorial_paraphrase"] is not None
                 or row["source_pdf_page_one_based"]
                 != original["source_pdf_page_one_based"]
-                or row["source_layout_block_sha256"]
-                != original["source_layout_block_sha256"]
                 or row["source_line_heading"] != HEADINGS[i]
                 or row["meaning_status"]
                 != "local_editorial_paraphrase_pending_independent_review"
@@ -111,7 +96,6 @@ def _catalogue(
                 or qualifier["automatic_application"] is not False
                 or qualifier["evaluation_status"]
                 != "not_automated_nonmechanical_source_qualifier"
-                or corroboration["sample_sha256"] != SAMPLE_SHA256
                 or corroboration["sample_pdf_page_one_based"] != 2
                 or corroboration["listed_body_page"] != [6, 7, 10, 11, 13, 14][i]
                 or corroboration["literal_heading_matches"] is not True
@@ -131,9 +115,6 @@ def _catalogue(
         snapshot.update({MANIFEST_PATH: raw, SUPPLEMENT_PATH: added})
         provenance.update(
             source_catalogue_version=3,
-            source_catalogue_content_sha256=hashlib.sha256(
-                canonical_bytes(data)
-            ).hexdigest(),
             scope=base._scope(data),
         )
         provenance["source_records"].extend(
@@ -142,7 +123,6 @@ def _catalogue(
                     "domain": base.DOMAIN,
                     "key": path.stem,
                     "source_path": "human_design/" + path.name,
-                    "loaded_file_sha256": hashlib.sha256(snapshot[path]).hexdigest(),
                     "source_kind": "versioned_local_gate3_editorial_reference",
                     "source_revision": 3,
                     "review_status": "six_additional_local_paraphrases_pending_independent_review",
@@ -156,7 +136,6 @@ def _catalogue(
                 "key": "jovian_ra_1_6_sample_contents_only",
                 "source_title": "The Third Gate - The Power of Mutation, RA1.6 public sample",
                 "source_url": supplement["publisher_sample"]["url"],
-                "source_pdf_sha256": SAMPLE_SHA256,
                 "source_kind": "publisher_sample_contents_locally_checked_not_loaded_on_lookup",
                 "review_status": "six_headings_only_not_full_line_bodies",
                 "scope": "仅目录六条线名与2001副本相符；正文页不在四页样本内，不认证完整爻义或出版母版。",

@@ -9,7 +9,7 @@ and textbook-style special-board cases (see the correctness audit).
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from fatebridge.core.metaphysics.common import (
     ELEMENT_CONTROLS,
@@ -30,16 +30,16 @@ def _controls(left: str, right: str) -> bool:
     return ELEMENT_CONTROLS[left] == right
 
 
-def _unique(lessons: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    by_upper: Dict[str, Dict[str, Any]] = {}
+def _unique(lessons: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_upper: dict[str, dict[str, Any]] = {}
     for lesson in lessons:
         by_upper.setdefault(lesson["upper_branch"], lesson)
     return list(by_upper.values())
 
 
 def harm_walk(
-    lesson: Dict[str, Any], day_stem: str, sky: Dict[str, str]
-) -> Dict[str, Any]:
+    lesson: dict[str, Any], day_stem: str, sky: dict[str, str]
+) -> dict[str, Any]:
     """Expose the existing 正五行/寄干 walk without adopting another endpoint.
 
     The terminal home is excluded by the current algorithm. Including its
@@ -55,10 +55,10 @@ def harm_walk(
         else branch_element_text(lesson["lower_branch"])
     )
     thief = _controls(lower_element, element)
-    steps: List[Dict[str, Any]] = []
+    steps: list[dict[str, Any]] = []
     position = earth[upper]
     while position != upper:
-        contributions: List[Dict[str, Any]] = [
+        contributions: list[dict[str, Any]] = [
             {
                 "kind": "branch",
                 "token": position,
@@ -94,11 +94,11 @@ def harm_walk(
 def select_transmissions(
     day_stem: str,
     day_branch: str,
-    sky: Dict[str, str],
-    lessons: List[Dict[str, Any]],
+    sky: dict[str, str],
+    lessons: list[dict[str, Any]],
     *,
-    trace: Optional[List[Dict[str, Any]]] = None,
-) -> Tuple[str, str, str, List[str], Optional[int]]:
+    trace: list[dict[str, Any]] | None = None,
+) -> tuple[str, str, str, list[str], int | None]:
     """Return styles, derivation, three gods, and the actual source lesson.
 
     The source index is None when the initial god is derived outside the
@@ -109,14 +109,14 @@ def select_transmissions(
     stem_element = stem_element_text(day_stem)
     gan_upper, _, zhi_upper, zhi_yin = (l["upper_branch"] for l in lessons)
 
-    def follow(initial: str) -> List[str]:
+    def follow(initial: str) -> list[str]:
         middle = sky[initial]
         return [initial, middle, sky[middle]]
 
-    def same_polarity(lesson: Dict[str, Any]) -> bool:
+    def same_polarity(lesson: dict[str, Any]) -> bool:
         return (EARTHLY_BRANCHES.index(lesson["upper_branch"]) % 2 == 0) == yang
 
-    def choose(candidates: List[Dict[str, Any]]) -> Tuple[Dict[str, Any], str]:
+    def choose(candidates: list[dict[str, Any]]) -> tuple[dict[str, Any], str]:
         candidates = _unique(candidates)
         if trace is not None:
             trace.append(

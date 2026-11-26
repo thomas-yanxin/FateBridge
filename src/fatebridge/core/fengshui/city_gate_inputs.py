@@ -33,7 +33,7 @@ Mountain = Literal[
     "壬",
 ]
 
-_FACTS = (
+CITY_GATE_FACT_FIELDS = (
     "water_present",
     "multiple_openings_present",
     "encircling_form_present",
@@ -48,7 +48,7 @@ class CityGateObservation(_DeferredModel):
         json_schema_extra={
             "anyOf": [
                 {"required": [key], "properties": {key: {"type": "boolean"}}}
-                for key in _FACTS
+                for key in CITY_GATE_FACT_FIELDS
             ],
             "allOf": [
                 {
@@ -88,7 +88,7 @@ class CityGateObservation(_DeferredModel):
 
     @model_validator(mode="after")
     def coherent_observation(self) -> "CityGateObservation":
-        if not any(getattr(self, key) is not None for key in _FACTS):
+        if not any(getattr(self, key) is not None for key in CITY_GATE_FACT_FIELDS):
             raise ValueError("城门观察须至少提供一项明确形势事实")
         if self.water_present is False and any(
             getattr(self, key) is True

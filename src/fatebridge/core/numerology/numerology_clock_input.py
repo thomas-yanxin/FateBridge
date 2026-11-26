@@ -16,7 +16,7 @@ CLOCK_INPUT_POLICY_ID = "numerology_clock_text_provenance_v1"
 CLOCK_INPUT_SCOPE = (
     "记录所给钟时分量与计算补位；文本格式不认证出生记录的实际精度，不据此推定误差区间。"
 )
-_DISPLAY_SCOPE = (
+DISPLAY_SCOPE = (
     "输出日期的小数或秒位不提升出生记录的实际精度；未据文本格式推定误差区间。"
 )
 
@@ -61,7 +61,7 @@ def birth_clock_input_record(birth_clock: ParsedBirthClock) -> dict[str, Any]:
         "uncertainty_interval": None,
         "observed_precision_certified": False,
         "scope": CLOCK_INPUT_SCOPE,
-        "statement": f"出生钟时输入：{birth_clock.supplied_text}，{detail}{_DISPLAY_SCOPE}",
+        "statement": f"出生钟时输入：{birth_clock.supplied_text}，{detail}{DISPLAY_SCOPE}",
     }
 
 

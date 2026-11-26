@@ -104,7 +104,7 @@ SYSTEM_BARYCENTER_BODIES: frozenset[str] = frozenset(
     {"Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"}
 )
 THEORETICAL_NODE_BODIES: frozenset[str] = frozenset({"North Node", "True Node"})
-_GOLDEN_RATIO_RECIPROCAL = (math.sqrt(5.0) - 1.0) / 2.0
+GOLDEN_RATIO_RECIPROCAL = (math.sqrt(5.0) - 1.0) / 2.0
 
 
 def build_ephemeris_source_identity(
@@ -413,8 +413,8 @@ def _longitude_crossings(
                 return direction * wrap, direction * longitude
 
             turn_score = (0, direction * turn_lon)
-            c = b - _GOLDEN_RATIO_RECIPROCAL * (b - a)
-            d = a + _GOLDEN_RATIO_RECIPROCAL * (b - a)
+            c = b - GOLDEN_RATIO_RECIPROCAL * (b - a)
+            d = a + GOLDEN_RATIO_RECIPROCAL * (b - a)
             fc, fd = altitude(c), altitude(d)
             best = max((turn_score, turn), (fc, c), (fd, d))
             for _ in range(96):
@@ -422,11 +422,11 @@ def _longitude_crossings(
                     break
                 if fc < fd:
                     a, c, fc = c, d, fd
-                    d = a + _GOLDEN_RATIO_RECIPROCAL * (b - a)
+                    d = a + GOLDEN_RATIO_RECIPROCAL * (b - a)
                     fd = altitude(d)
                 else:
                     b, d, fd = d, c, fc
-                    c = b - _GOLDEN_RATIO_RECIPROCAL * (b - a)
+                    c = b - GOLDEN_RATIO_RECIPROCAL * (b - a)
                     fc = altitude(c)
                 best = max(best, (fc, c), (fd, d))
             # Recheck the final bracket on the same binary64 axis as the native

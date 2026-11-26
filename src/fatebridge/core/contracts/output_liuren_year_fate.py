@@ -23,7 +23,6 @@ class LiurenYearFate(PartialOutput):
     ruleset_id: Literal["tanyuan_year_fate_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[int] | None = None
     birth_year_basis: str | None = None
     placement_basis: str | None = None

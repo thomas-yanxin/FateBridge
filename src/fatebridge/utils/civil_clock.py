@@ -11,7 +11,7 @@ from fatebridge.utils.timezones import (
     validate_local_clock,
 )
 
-_OFFSET = re.compile(r"^([+-])(\d{2}):(\d{2})(?::(\d{2}))?$")
+OFFSET = re.compile(r"^([+-])(\d{2}):(\d{2})(?::(\d{2}))?$")
 
 
 def utc_instant(moment: datetime) -> datetime:
@@ -73,7 +73,7 @@ def resolve_civil_clock(
         validate_local_clock(local)
         return local
     match = (
-        _OFFSET.fullmatch(explicit_offset.strip())
+        OFFSET.fullmatch(explicit_offset.strip())
         if type(explicit_offset) is str
         else None
     )

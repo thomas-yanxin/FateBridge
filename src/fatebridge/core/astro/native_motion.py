@@ -1,7 +1,7 @@
 """Require the requested native daily motion before interpreting its sign."""
 
 import math
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Sequence
 
 from fatebridge.core.astro.orbits import (
     FALLBACK_MODELS,
@@ -26,13 +26,13 @@ def require_longitude_speed(
 
 def context_motion(
     name: str,
-    rates: Dict[str, Optional[float]],
-    models: Dict[str, str],
+    rates: dict[str, float | None],
+    models: dict[str, str],
     reference_frame: str,
-    provenance: Optional[Dict[str, float]] = None,
+    provenance: dict[str, float] | None = None,
     *,
-    derivative_policy: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    derivative_policy: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Describe supplied display-frame rates without inventing derivatives."""
     if name == "Pars Fortuna":
         rate = None
@@ -77,7 +77,6 @@ def context_motion(
         result.update(
             method_id=source["method_id"],
             correction_status="approximate_model",
-            source_url=source["source_url"],
         )
         if provenance is not None:
             result["model_longitude_speed"] = provenance.get(

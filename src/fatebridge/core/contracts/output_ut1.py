@@ -8,10 +8,6 @@ from fatebridge.core.contracts.output_base import PartialOutput
 class C04UT1Evidence(PartialOutput):
     method_id: str | None = None
     source_series: str | None = None
-    source_sha256: str | None = None
-    asset_sha256: str | None = None
-    orientation_asset_sha256: str | None = None
-    tidal_asset_sha256: str | None = None
     tidal_model_id: str | None = None
     source_url: str | None = None
     mirror_url: str | None = None

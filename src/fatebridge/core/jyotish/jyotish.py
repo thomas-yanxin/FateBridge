@@ -4,13 +4,12 @@ from __future__ import annotations
 
 import math
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.astro.earth_attitude import earth_attitude
 from fatebridge.core.astro.geometry import combine_longitudes
-from fatebridge.core.astro.historical_utc import historical_utc_source
 from fatebridge.core.astro.jyotish_continuous_state import continuous_state_evidence
 from fatebridge.core.astro.jyotish_lunar_source_state import (
     source_derivative_state_evidence,
@@ -89,7 +88,7 @@ def positions(
     node_mode: str = "mean",
     ephemeris_policy: str = "auto",
     cheshta_model: str = "unadjudicated",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     require_recorded_instant(birth)
     if node_mode not in {"mean", "true"}:
         raise ValueError("node_mode 必须为 mean 或 true。")
@@ -111,14 +110,14 @@ def positions(
     if instant is not None and instant.utcoffset() is None:
         raise ValueError("印占计算时刻必须带时区。")
     models = set()
-    values: Dict[str, float] = {}
-    equatorial: Dict[str, Dict[str, Any]] = {}
+    values: dict[str, float] = {}
+    equatorial: dict[str, dict[str, Any]] = {}
     states = {}
     motion = {}
     body_models = {}
     node_flags = {}
     coordinate_contexts = {}
-    node_origin_metadata: Dict[str, Any] = {}
+    node_origin_metadata: dict[str, Any] = {}
     # set_sid_mode is global C state. Keep the shared runtime lock through ALL
     # dependent positions and houses, including parallel REST requests.
     with runtime.preserve_ephemeris_path():
@@ -342,16 +341,9 @@ def positions(
             and motion_true[p]["ephemeris_model"] not in {"swieph", "jpl"}
         )
     ]
-    historical_source = {}
     utc_year = None
     if instant is not None:
         utc_year = utc_calendar(instant).date_parts[0]
-        if 1960 <= utc_year < 1972:
-            source = historical_utc_source(instant)
-            historical_source = {
-                "historical_utc_source": source["source_url"],
-                "historical_utc_source_sha256": source["source_sha256"],
-            }
     return {
         "longitudes": values,
         "native_execution_context": context_evidence(),
@@ -414,11 +406,8 @@ def positions(
                 )
             ),
             "future_leap_seconds_assumed_unchanged": times.future_leap_seconds_assumed_unchanged,
-            "leap_table_source": leap_table()["source_url"],
-            "leap_table_sha256": leap_table()["source_sha256"],
             "leap_table_expires_at": leap_table()["expires_at"],
             "historical_input_convention": "1960 uses SOFA UTC rate/offset changes; 1961-1971 uses IERS; pre-1960 inputs are interpreted as UT1. Local clock realization is not authenticated",
-            **historical_source,
             "scope": (
                 rotation_policy["precision_scope"]
                 if rotation_policy["measured_eop_applied"]
@@ -433,15 +422,15 @@ def build_india(
     birth: AstroBirthInfo,
     *,
     node_mode: str = "mean",
-    divisions: Optional[List[int]] = None,
-    birth_time_uncertainty_minutes: Optional[float] = None,
+    divisions: list[int] | None = None,
+    birth_time_uncertainty_minutes: float | None = None,
     ephemeris_policy: str = "auto",
     saptavargaja_profile: str = "santhanam_27",
     drekkana_profile: str = "santhanam_27_6",
     cheshta_model: str = "unadjudicated",
     _sample_observer: PositionSampleObserver | None = None,
     _dasha_grid: DashaGridObserver | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     # The recorded UTC carrier identifies the selected fold branch.
     validate_local_clock(
         birth.local_datetime, clock_label="出生钟时", allow_ambiguous=True

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import math
 from importlib.metadata import version
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Sequence
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.native_coordinates import COORDINATE_FLAGS
@@ -24,8 +24,6 @@ from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.utils.errors import EphemerisSourceError
 
 METHOD_ID = "native_apparent_solar_disc_conventions_v2"
-SOURCE_URL = "https://www.astro.com/swisseph/swisseph.htm"
-NATIVE_SOURCE_URL = "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c#L3742"
 # SUN_RADIUS in the inspected source is an angular radius at one AU. This is
 # its physical model sphere, not a fitted radius or a measured solar limb.
 SOLAR_RADIUS_AU = math.radians(959.63 / 3600)
@@ -37,7 +35,7 @@ TARGETS = frozenset(
 
 def finite_solar_ray(
     ray: Sequence[float], earth_helio: Sequence[float]
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Classify an unbent geocentric ray against the source's model sphere."""
     if any(
         len(v) != 3 or not all(math.isfinite(x) for x in v) for v in (ray, earth_helio)
@@ -106,8 +104,8 @@ def finite_solar_ray(
 
 @runtime.preserve_ephemeris_path()
 def apparent_position_policy(
-    epoch: Optional[float], models: Dict[str, str], trace: PhysicalEphemerisTrace
-) -> Dict[str, Any]:
+    epoch: float | None, models: dict[str, str], trace: PhysicalEphemerisTrace
+) -> dict[str, Any]:
     """Nominal-epoch source convention and finite-ray geometry for planets.
 
     Unverified native versions/backends keep explicit unknown geometry.
@@ -135,8 +133,8 @@ def apparent_position_policy(
         if swe
         else 0
     )
-    contexts: Dict[str, Any] = {}
-    physical: Dict[str, tuple] = {}
+    contexts: dict[str, Any] = {}
+    physical: dict[str, tuple] = {}
 
     def state(body: int, flags: int, model: str, label: str) -> tuple:
         values, returned = runtime.ephemeris_call("calc", epoch, body, flags)
@@ -153,7 +151,7 @@ def apparent_position_policy(
         contexts[label] = trace.observe(label, model, record_factor=False)
         return tuple(float(x) for x in values[:3])
 
-    bodies: Dict[str, Any] = {}
+    bodies: dict[str, Any] = {}
     for planet, model in models.items():
         if planet not in TARGETS:
             continue
@@ -189,14 +187,11 @@ def apparent_position_policy(
         "solar_deflection_model": (
             "native_extended_solar_mass" if verified else "unverified_native_model"
         ),
-        "source_url": SOURCE_URL,
         "source_section": "Appendix A",
-        "native_source_url": NATIVE_SOURCE_URL,
         "native_model_solar_radius_au": SOLAR_RADIUS_AU,
         "source_model_regularity": (
             {
                 "profile": "native_eff_arr_linear_interpolation_v1",
-                "source_profile_sha256": "ad8dd7126d5e1a4b2e6cbcef6aa13d5a4bbc51778db0c037f430a3fac50e8b36",
                 "axis_continuity_certified": False,
                 "unique_rate_at_mass_knots_certified": False,
                 "scope": "Inspected source-formula mass profile only. Nonzero first-cell mass slope and unequal adjacent slopes do not certify global axis continuity or a unique knot-crossing derivative. No binary64, individual planetary rate or physical error bound follows.",

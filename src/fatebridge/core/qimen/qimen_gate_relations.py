@@ -3,9 +3,7 @@
 from typing import Any
 
 from fatebridge.core.metaphysics.common import ELEMENT_CONTROLS, ELEMENT_GENERATES
-from fatebridge.core.qimen.qimen_sources import YANYI_VOLUMES
 
-SOURCE = YANYI_VOLUMES[2]
 PROFILE_ID = "yanyi_vol2_gate_palace_relations_v1"
 PALACE_ELEMENTS = {
     "坎": "水",
@@ -63,7 +61,6 @@ def describe_gate_relations() -> dict[str, Any]:
     return {
         "id": PROFILE_ID,
         "title": "卷二门宫生克；歌诀门迫与正文关系名分别保留",
-        "source": SOURCE,
         "section": "卷二·门迫宫迫",
         "scan_pages": [34],
         "verse_door_pressure_relation": "door_controls_palace",
@@ -126,7 +123,6 @@ def gate_palace_relation(door: str, trigram: str) -> dict[str, Any]:
         "prose_label_is_outcome_judgment": False,
         "same_element_named_in_selected_paragraph": False,
         "printed_example": example,
-        "source": SOURCE,
         "source_scan_pages": [34],
         "interpretation_limit": "按实际生克方向读取。吉迫不表示吉利，门迫为否不排除正文凶迫；和、义不判断现实结果或人的品德。同五行本段未另命名，未补写为原文比和。",
         "outcome_inference_allowed": False,

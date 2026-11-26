@@ -13,7 +13,6 @@ from fatebridge.core.astro.astrology_tables import SIGNS
 from fatebridge.core.astro.geometry import angle_fraction
 
 METHOD_ID = "lilly1647_p108_109_directed_sign_tables_v1"
-SOURCE_URL = "https://wellcomecollection.org/works/s7z7c46y"
 
 # Literal p109 inconjunct column, in zodiac order. Do not complete this table
 # with every adjacent/quincunx sign, or infer positive relations from omissions.
@@ -102,7 +101,6 @@ def directed_sign_relationship(
             )
         ),
         "source_pages": [106, 108, 109],
-        "source_url": SOURCE_URL,
         "boundary_policy": "exact_supplied_longitudes_half_open_30_degree_signs",
         "direction_policy": "caster_to_receiver; opposition_column_undivided",
         "quantitative_bonus_added": False,

@@ -7,9 +7,6 @@ to choose after observing an outcome. Only the latter drives formal matches.
 
 from typing import Any
 
-from fatebridge.core.qimen.qimen_sources import YANYI_VOLUMES
-
-SOURCE = YANYI_VOLUMES[2]
 PROFILE_ID = "yanyi_vol2_wangzhang_tombs_v1"
 SELECTED_TOMBS = {"乙": "坤", "丙": "乾", "丁": "艮"}
 LITERAL_PROSE_CANDIDATE = {"乙": "乾", "丙": "乾", "丁": "乾"}
@@ -19,7 +16,6 @@ def describe_wonder_tombs() -> dict[str, Any]:
     return {
         "id": PROFILE_ID,
         "title": "卷二王璋三奇入墓明确列举",
-        "source": SOURCE,
         "section": "卷二·三奇入墓·王璋所列",
         "scan_pages": [33],
         "selected_stem_trigrams": dict(SELECTED_TOMBS),
@@ -63,7 +59,6 @@ def palace_wonder_tombs(trigram: str, heaven_stems: list[str]) -> dict[str, Any]
             s for s in observed if (s in selected) != (s in candidate)
         ],
         "source_priority_resolved": False,
-        "source": SOURCE,
         "source_scan_pages": [33],
         "scope": "heaven_wonder_stem_in_palace_including_hosted_stems_not_literal_hour_tomb",
         "interpretation_limit": "正式匹配仅据王璋所列；另句字面候选未采纳。本宫两法恰同不证明全书已统一，未按候选正式输出也不证明该候选结构不存在。",

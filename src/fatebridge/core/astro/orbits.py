@@ -19,20 +19,14 @@ from fatebridge.core.astro.analytic_observer import (
     LIGHT_TIME_METHOD,
     AnalyticObserver,
 )
-from fatebridge.core.astro.de441_source import FRAME_URL as SOURCE_FRAME_URL
-from fatebridge.core.astro.de441_source import PAPER_URL as PLANETARY_PAPER_URL
-from fatebridge.core.astro.de441_source import SOURCE_URL as PLANETARY_SOURCE_URL
 from fatebridge.core.astro.de441_source import (
     SOURCE_VERSION as PLANETARY_SOURCE_VERSION,
 )
 from fatebridge.core.astro.mean_node import MODEL_ID as MEAN_NODE_MODEL
-from fatebridge.core.astro.mean_node import SOURCE_CODE_URL as MEAN_NODE_SOURCE_CODE_URL
 from fatebridge.core.astro.mean_node import (
     SOURCE_NATIVE_VERSION as MEAN_NODE_SOURCE_VERSION,
 )
-from fatebridge.core.astro.mean_node import SOURCE_URL as MEAN_NODE_SOURCE_URL
 from fatebridge.core.astro.mean_node import mean_lunar_node
-from fatebridge.core.astro.nutation import SOURCE_URL as FRAME_SOURCE_URL
 from fatebridge.core.astro.nutation import nutation
 from fatebridge.core.astro.reference_frames import (
     ecliptic_rotation,
@@ -42,17 +36,13 @@ from fatebridge.core.astro.reference_frames import (
     pair,
     precession,
 )
-from fatebridge.core.astro.solar_deflection import FORMULA_URL as DEFLECTION_FORMULA_URL
 from fatebridge.core.astro.solar_deflection import MODEL_ID as DEFLECTION_MODEL
-from fatebridge.core.astro.solar_deflection import SOURCE_URL as DEFLECTION_SOURCE_URL
-from fatebridge.core.astro.tdb import SOURCE_URL as TDB_SOURCE_URL
 from fatebridge.core.astro.time_scales import fallback_julian_day_tt
 from fatebridge.core.astro.tt_epoch import TTInstant
 
 ORBITAL_MODEL = "bounded_de441_earth_moon_planetary_fallback_v9"
 FALLBACK_MODELS = frozenset({ORBITAL_MODEL, MEAN_NODE_MODEL})
 LIBRARY_VERSION = "2.1.19"
-SOURCE_URL = "https://github.com/cosinekitty/astronomy/tree/v2.1.19"
 MOTION_METHOD = (
     "analytic_local_TT_source_clock_implicit_light_cone_bending_Lorentz_and_display_v1"
 )
@@ -60,7 +50,6 @@ MOTION_METHOD = (
 
 class FallbackFactorSource(TypedDict):
     source_version: str
-    source_url: str
     method_id: str
 
 
@@ -68,7 +57,6 @@ def fallback_factor_source(planet: str) -> FallbackFactorSource:
     """One source/method definition for provider receipts and object motion."""
     if planet == "North Node":
         version = f"Swiss Ephemeris {MEAN_NODE_SOURCE_VERSION} numerical parameters"
-        url = MEAN_NODE_SOURCE_CODE_URL
         method = "analytic_mean_node_polynomial_secular_correction_and_nutation_TT"
     else:
         point = (
@@ -77,9 +65,8 @@ def fallback_factor_source(planet: str) -> FallbackFactorSource:
             else "Sun" if planet == "Sun" else f"{planet}-system barycenter"
         )
         version = f"{PLANETARY_SOURCE_VERSION} {point}; losslessly retained original binary64 coefficient words on the bounded source grid; same-source receiving Earth/Sun; geocentric ERFA 2.0.1 TDB-TT and derivative; fixed ERFA mean-J2000 frame bias; native-TDB polynomial p/v/a, right-hand source-cell derivatives except final endpoint; local TT chain, not a derivative of binary rounding"
-        url = PLANETARY_SOURCE_URL
         method = MOTION_METHOD
-    return {"source_version": version, "source_url": url, "method_id": method}
+    return {"source_version": version, "method_id": method}
 
 
 class FallbackProvenance(TypedDict):
@@ -89,13 +76,10 @@ class FallbackProvenance(TypedDict):
     julian_day_tt: float
     tt_source: str
     source_path: str
-    method_reference_url: str
     library: str
     library_version: str
     dependency_versions: dict[str, str]
     factor_source_versions: dict[str, str]
-    factor_source_urls: dict[str, str]
-    additional_source_urls: list[str]
     position_convention: str
     longitude_motion_method: str
     factor_longitude_motion_methods: dict[str, str]
@@ -177,35 +161,16 @@ class ApproximateEphemeris:
         """Keep every receipt with the actual shared source and optical method."""
         physical = [name for name in planets if name != "North Node"]
         factors = {name: fallback_factor_source(name) for name in planets}
-        additional = []
         dependencies = {}
         if physical:
-            additional.extend(
-                [
-                    FRAME_SOURCE_URL,
-                    "https://github.com/liberfa/erfa/blob/v2.0.1/src/gst06.c",
-                    "https://aa.usno.navy.mil/faq/alt_az",
-                    PLANETARY_SOURCE_URL,
-                    PLANETARY_PAPER_URL,
-                    SOURCE_FRAME_URL,
-                    TDB_SOURCE_URL,
-                    "https://dlmf.nist.gov/18.5.E1",
-                    "https://dlmf.nist.gov/18.9.E21",
-                    "https://github.com/liberfa/erfa/blob/v2.0.1/src/ab.c",
-                ]
-            )
             dependencies["JPL DE441 bounded source"] = PLANETARY_SOURCE_VERSION
             dependencies["geocentric ERFA TDB-TT coefficients"] = "2.0.1"
-        if any(name not in {"Sun", "Moon"} for name in physical):
-            additional.extend([DEFLECTION_SOURCE_URL, DEFLECTION_FORMULA_URL])
         if "North Node" in planets:
-            additional.append(MEAN_NODE_SOURCE_URL)
             dependencies["Swiss numerical mean-node parameters"] = (
                 MEAN_NODE_SOURCE_VERSION
             )
         if self.tt_source != "chart_tt":
             dependencies["astronomy-engine"] = LIBRARY_VERSION
-            additional.append(SOURCE_URL)
         return {
             "approximate_planets": list(planets),
             "time_argument": "TT",
@@ -220,19 +185,12 @@ class ApproximateEphemeris:
             "julian_day_tt": self.julian_day_tt,
             "tt_source": self.tt_source,
             "source_path": "src/fatebridge/core/astro/orbits.py",
-            "method_reference_url": (
-                PLANETARY_SOURCE_URL if physical else MEAN_NODE_SOURCE_URL
-            ),
             "library": "FateBridge analytic ephemeris",
             "library_version": ORBITAL_MODEL if physical else MEAN_NODE_MODEL,
             "dependency_versions": dependencies,
             "factor_source_versions": {
                 name: source["source_version"] for name, source in factors.items()
             },
-            "factor_source_urls": {
-                name: source["source_url"] for name, source in factors.items()
-            },
-            "additional_source_urls": additional,
             "position_convention": "geocentric_Vondrak_scalar_obliquity_77term_true_ecliptic_and_equator_of_date",
             "longitude_motion_method": "per_factor",
             "factor_longitude_motion_methods": {

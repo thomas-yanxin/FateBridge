@@ -215,7 +215,6 @@ def build_void_conditions(
         "ruleset_id": PROFILE["ruleset_id"],
         "ruleset_version": PROFILE["ruleset_version"],
         "source_url": source + "#page=93",
-        "source_sha256": PROFILE["source"]["sha256"],
         "lines": rows,
         "hidden": hidden_rows,
         "focus": deepcopy(focus_row),

@@ -30,7 +30,6 @@ class HiddenReception(PartialOutput):
     status: str | None = None
     source_path: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     clauses: list[dict[str, OpenJsonValue]] | None = None
     textual_issues: list[dict[str, OpenJsonValue]] | None = None
     flying_generation: FlyingGeneration | None = None

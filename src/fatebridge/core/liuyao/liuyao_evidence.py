@@ -12,9 +12,9 @@ from typing import Any
 
 from fatebridge.core.liuyao.liuyao_judgment import build_conditional_analysis
 from fatebridge.core.liuyao.liuyao_relations import (
-    _SOURCE_MANIFEST,
     ADVANCES,
     ELEMENTS,
+    SOURCE_MANIFEST,
     SOURCES,
     branch_facts,
     element_relation,
@@ -263,7 +263,6 @@ def build_liuyao_evidence(
                         if "application_source_url" in c
                     }
                 ),
-                source_sha256=moving_growth_contexts[0]["source_sha256"],
                 proof_paths=[c["source_path"] for c in moving_growth_contexts],
                 scope="分别核实际动土来源资格、排除被判断金爻的独立根与受方门槛；不由长生资格解除空破回头克或裁定现实成败。",
             )
@@ -280,7 +279,6 @@ def build_liuyao_evidence(
                 fact_path="liuyao_evidence.conditional_analysis.growth_conditions.lines",
                 inputs={"month_branch": month_branch, "day_ganzhi": day_ganzhi},
                 sources=sorted({c["source_url"] for c in moving_si_contexts}),
-                source_sha256=moving_si_contexts[0]["source_sha256"],
                 proof_paths=[c["source_path"] for c in moving_si_contexts],
                 scope="独立生扶、每一动巳来源及原克制许可分别核对；同版第85、97页合并效力未裁定，不以遇长生自动取消克制或断现实成败。",
             )
@@ -300,7 +298,6 @@ def build_liuyao_evidence(
                     {c["source_url"] for c in own_si_contexts}
                     | {c["admission_source_url"] for c in own_si_contexts}
                 ),
-                source_sha256=own_si_contexts[0]["source_sha256"],
                 proof_paths=[c["source_path"] for c in own_si_contexts],
                 scope="实际本位金化巳另核独立生扶与变支门槛；原生克关系保留，未核不写成已克或已生，不跨位使用变巳。",
             )
@@ -426,8 +423,8 @@ def build_liuyao_evidence(
                 [*SOURCES.values(), conditional["classical_scan"]["source"]["url"]]
             )
         ),
-        "source_revisions": deepcopy(_SOURCE_MANIFEST["sources_by_chapter"]),
-        "textual_corrections": list(_SOURCE_MANIFEST["corrections"]),
+        "source_revisions": deepcopy(SOURCE_MANIFEST["sources_by_chapter"]),
+        "textual_corrections": list(SOURCE_MANIFEST["corrections"]),
         "pattern_detection_scope": "六冲六合为静态卦表；fanfu分列底本明示卦体例、内外卦盘纳支与实际动爻的反伏。卦盘比较不使静爻成为变爻，未列卦体不视为已经排除反伏，效力须另审旺衰回头冲克",
         "pending_judgments": [
             "用神须结合所问对象及一事一问确认，不能只靠关键词强选",

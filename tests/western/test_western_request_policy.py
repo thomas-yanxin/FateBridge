@@ -3,9 +3,11 @@
 import copy
 import json
 import os
+import shutil
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 import pytest
 
@@ -23,7 +25,49 @@ from fatebridge.core.requests.western_policy import WesternEphemerisRequest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
-from tests.western.test_western_origin_preflight import directories, selected
+
+
+@pytest.fixture(scope="module")
+def directories(tmp_path_factory):
+    source = Path(runtime.default_ephe_dir() or "")
+    assert (source / "sepl_24.se1").is_file() and (
+        source / "semo_24.se1"
+    ).is_file(), (
+        "Install the pinned complete native fixture profile; no analytical substitution"
+    )
+    base = tmp_path_factory.mktemp("origin-native-data")
+    roots = {}
+    for name in ["full", "planet_only", "empty"]:
+        p = base / name
+        p.mkdir()
+        roots[name] = p
+        for f in source.glob("*.se1"):
+            if (
+                name == "empty"
+                or name == "planet_only"
+                and not f.name.startswith("sepl_")
+            ):
+                continue
+            else:
+                pass
+            shutil.copy2(f, p / f.name)
+    return roots
+
+
+@pytest.fixture
+def selected(directories, monkeypatch):
+    previous = runtime.configured_ephemeris_path()
+    with monkeypatch.context() as patch:
+
+        def select(name):
+            patch.setenv("SE_EPHE_PATH", str(directories[name]))
+            runtime.configure_ephemeris_path(str(directories[name]))
+            runtime.ephemeris_call("set_sid_mode", runtime.swe.SIDM_LAHIRI)
+            runtime.ephemeris_call("set_topo", 0.0, 0.0, 0.0)
+
+        yield select
+    runtime.configure_ephemeris_path(previous)
+
 
 SPECS = {s.key: s for s in CATALOG}
 WESTERN_KEYS = [

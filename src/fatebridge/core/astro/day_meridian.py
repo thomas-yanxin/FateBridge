@@ -11,7 +11,7 @@ from __future__ import annotations
 import math
 from datetime import datetime, timezone
 from fractions import Fraction
-from typing import Any, Dict, Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.day_meridian_inputs import (
@@ -47,8 +47,6 @@ SOURCE = {
     "id": "witte_1924_differentiation",
     "author": "Alfred Witte",
     "title": "Die Differenzierung der Radixsonne und die des unteren Geburtsmeridians, Astrologische Rundschau XVI/1, April 1924, pp.13-16",
-    "url": "https://www.astrax.de/pdf/34_35_Die%20Differenzierung%20der%20Radixsonne%20und%20die%20des%20unteren%20Geburtsme.pdf",
-    "source_sha256": "f1047ce86aca9eac341693b91bb957c3cffacd1897369ca0bf2dc2020190bde4",
     "sections": ["p.15: explicit lower-meridian equation and printed arithmetic"],
     "scope": "Selected ecliptic equation only; no gravitational theory, event interpretation, infallibility claim or full-book acceptance",
 }
@@ -56,14 +54,12 @@ SOURCE_1923 = {
     "id": "witte_1923_progressive_meridian",
     "author": "Alfred Witte",
     "title": "Der progressive Meridian waehrend eines Jahres, Astrologische Rundschau XV/2, 1923, pp.34-37",
-    "url": "https://www.astrax.de/pdf/26_Der%20progressive%20Meridian%20waehrend%20eines%20Jahres.pdf",
-    "source_sha256": "28b14ce9a3dbe9f35293bf9d055e5a83ab02efc3095c9655abdd4225fcf530e6",
     "sections": ["pp.35-36: printed solar phases, natal house cusps and arithmetic"],
     "scope": "Historical construction comparison only; the 1923 date-to-coordinate method is not applied to this chart",
 }
 
 
-def source_method_comparison() -> Dict[str, Any]:
+def source_method_comparison() -> dict[str, Any]:
     """Distinguish two printed constructions without changing current coordinates."""
     return {
         "status": "printed_arithmetic_difference_explained",
@@ -94,7 +90,7 @@ def day_meridian_coordinates(
     natal_tropical_sun: float,
     solar_arc: float | Fraction,
     target_tropical_sun: float,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """IC(day) = IC(natal) + solar arc - Sun(natal) + Sun(target).
 
     The meridians use the natal display frame. Both Suns must be tropical;
@@ -128,7 +124,7 @@ def target_sun_state(
     *,
     _batch: SolarEphemerisBatch | None = None,
     _scales: EphemerisTime | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Actual target Sun; an equal TT epoch reuses the batch observation."""
     if _batch is None:
         with SolarEphemerisBatch() as batch:
@@ -156,7 +152,7 @@ def target_sun_state(
 
 def sampled_day_meridian_spans(
     coordinates: Mapping[str, float], samples: Sequence[Mapping[str, Any]]
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Pure finite arithmetic; do not bridge unavailable/filtered sample gaps."""
     computed = [s for s in samples if s.get("status", "computed") == "computed"]
     spans = {}
@@ -178,7 +174,7 @@ def sampled_day_meridian_spans(
 
 def _qualified_coordinates(
     coordinates: Mapping[str, Any], definition: Mapping[str, Any] | None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     result = dict(coordinates)
     basis = reference_angle_basis(definition, "Midheaven")
     if basis is not None:
@@ -211,7 +207,7 @@ def build_day_meridian(
     nominal_clock: SpecialtySampleTime | None = None,
     nominal_birth_tt: TTInstant | None = None,
     analysis_tt: TTInstant | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     coherence = day_meridian_input_coherence(
         natal_upper_meridian=natal_upper_meridian,
         solar_state=solar_state,
@@ -239,7 +235,7 @@ def build_day_meridian(
     nominal_definition = native_profile.get("angle_definition")
     qualified = _qualified_coordinates(coordinates, nominal_definition)
     nominal_resolved = qualified.get("physical_reference_geometry_resolved", True)
-    sensitivity: Dict[str, Any] = {
+    sensitivity: dict[str, Any] = {
         "status": uncertainty["status"],
         "uncertainty_minutes": uncertainty["uncertainty_minutes"],
         "continuous_interval_proven": False,

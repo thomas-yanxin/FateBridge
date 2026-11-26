@@ -107,7 +107,6 @@ def own_si_context(
         ),
         source_path=path,
         source_url=PROFILE["source"]["url"] + "#page=97",
-        source_sha256=PROFILE["source"]["sha256"],
         admission_source_url=PROFILE["source"]["url"] + "#page=53",
         admission_interpretation="结合既有本位变爻空破门槛审当前效力；金化巳的长生条款与这一门槛分列，不冒充原文逐字描述本开发结构。",
         actual_total_effect_adjudicated=False,

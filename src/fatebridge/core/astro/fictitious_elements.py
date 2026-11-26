@@ -7,7 +7,6 @@ those two cases. Public facts omit server directory names.
 
 from __future__ import annotations
 
-import hashlib
 from typing import Any
 
 from fatebridge.core import ephemeris_runtime
@@ -20,29 +19,23 @@ def fictitious_element_source() -> dict[str, Any]:
         "scope": "Fictitious orbit elements only; not observed bodies or a JPL validation",
     }
     if search is None:
-        return {**common, "status": "unavailable", "filename": None, "sha256": None}
+        return {**common, "status": "unavailable", "filename": None}
     for index, directory in enumerate(ephemeris_search_directories(search)):
         candidate = directory / "seorbel.txt"
         try:
-            data = candidate.read_bytes()
-        except (
-            FileNotFoundError,
-            NotADirectoryError,
-            PermissionError,
-            IsADirectoryError,
-        ):
+            if not candidate.is_file():
+                continue
+        except OSError:
             continue
         return {
             **common,
             "status": "external_file",
             "filename": "seorbel.txt",
             "search_path_index": index,
-            "sha256": hashlib.sha256(data).hexdigest(),
         }
     return {
         **common,
         "status": "library_builtin",
         "filename": None,
         "search_path_index": None,
-        "sha256": None,
     }

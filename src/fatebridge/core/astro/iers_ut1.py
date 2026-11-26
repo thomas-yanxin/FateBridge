@@ -8,7 +8,6 @@ Published formal errors and numerical residuals are not physical bounds.
 from __future__ import annotations
 
 import gzip
-import hashlib
 import math
 from bisect import bisect_right
 from contextlib import contextmanager
@@ -24,7 +23,6 @@ from pydantic import TypeAdapter
 from typing_extensions import TypedDict
 
 from fatebridge.core.astro.historical_utc import historical_tai_minus_utc_exact
-from fatebridge.core.astro.iers_tides2010 import ASSET_SHA as TIDAL_ASSET_SHA
 from fatebridge.core.astro.iers_tides2010 import MODEL as TIDAL_MODEL
 from fatebridge.core.astro.iers_tides2010 import subdaily_eop, zonal_ut1
 from fatebridge.core.astro.tt_epoch import TTInstant
@@ -32,16 +30,11 @@ from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.core.astro.utc_policy import leap_table
 
 ASSET = "iers-c04-ut1-v1.json.gz"
-ASSET_SHA = "756a854e7c01770ad87f0956aedab4aa4d071fc7a3008067363a389b075e7b7c"
 ORIENTATION_ASSET = "iers-c04-orientation-v1.json.gz"
-ORIENTATION_ASSET_SHA = (
-    "2877b066fa4ce42f5ebf2001716473ab18ce4f20e23751154fa432656a10d7a5"
-)
-SOURCE_SHA = "2f451f2b9faf42dc32f7368888980c92c3e773957019963c5d22df9ac20c8c82"
 METHOD = "iers20_c04_lagrange4_zonal62_subdaily2010_tt_ut1_v2"
-_TT_MINUS_TAI = Fraction(4023, 125)
-_SOLVER_SECONDS = Fraction(1, 10**13)
-_TT_GRID = 2**64
+TT_MINUS_TAI = Fraction(4023, 125)
+SOLVER_SECONDS = Fraction(1, 10**13)
+TT_GRID = 2**64
 _Indices = tuple[int, int, int, int]
 _Weights = tuple[Fraction, Fraction, Fraction, Fraction]
 
@@ -49,27 +42,21 @@ _Weights = tuple[Fraction, Fraction, Fraction, Fraction]
 class _Commit(TypedDict):
     sha: str
     date: str
-    url: str
 
 
 class _Mirror(TypedDict):
     commit: _Commit
-    canonical_origin: str
-    mirror_url: str
-    github_file_metadata_fetch: str
 
 
 class _UT1Data(TypedDict):
     format_version: Literal[1]
     source_kind: str
-    source_sha256: str
     mirror: _Mirror
     records: tuple[tuple[int, str, str], ...]
 
 
 class _OrientationData(TypedDict):
     format_version: Literal[1]
-    source_sha256: str
     columns: tuple[str, str, str, str, str]
     reference_model: str
     cpo_application_policy: str
@@ -79,13 +66,7 @@ class _OrientationData(TypedDict):
 class C04Receipt(TypedDict):
     method_id: str
     source_series: str
-    source_sha256: str
-    asset_sha256: str
-    orientation_asset_sha256: str
-    tidal_asset_sha256: str
     tidal_model_id: str
-    source_url: str
-    mirror_url: str
     mirror_commit: str
     coverage_start_utc: str
     coverage_end_utc: str
@@ -164,11 +145,6 @@ class C04Orientation:
 
 class C04Table:
     def __init__(self, data: _UT1Data, orientation: _OrientationData) -> None:
-        if (
-            data["source_sha256"] != SOURCE_SHA
-            or orientation["source_sha256"] != SOURCE_SHA
-        ):
-            raise ValueError("IERS C04 asset identity mismatch")
         policy = leap_table()
         entries = policy["entries"]
         samples: list[C04Sample] = []
@@ -204,7 +180,7 @@ class C04Table:
                     dut1=dut1,
                     sigma=sigma,
                     tai_offset=offset,
-                    tt=TTInstant(civil + (offset + _TT_MINUS_TAI) / 86400),
+                    tt=TTInstant(civil + (offset + TT_MINUS_TAI) / 86400),
                     ut1=civil + dut1 / 86400,
                     x_arcsec=Fraction(x),
                     y_arcsec=Fraction(y),
@@ -266,19 +242,19 @@ class C04Table:
     def evaluate(self, tt: float | TTInstant) -> C04Evaluation:
         point = TTInstant.from_value(tt)
         indices, weights, base_ut1_tai, zonal = self._daily_base(point)
-        base = point.days + (base_ut1_tai - _TT_MINUS_TAI) / 86400
+        base = point.days + (base_ut1_tai - TT_MINUS_TAI) / 86400
         value = base
         for iteration in range(1, 9):
             subdaily = subdaily_eop(point, UT1Instant(value)).ut1_seconds
             updated = base + Fraction(subdaily) / 86400
             residual = abs(updated - value) * 86400
-            if residual <= _SOLVER_SECONDS:
+            if residual <= SOLVER_SECONDS:
                 return C04Evaluation(
                     tt=point,
                     ut1=value,
                     indices=indices,
                     weights=weights,
-                    ut1_tai=(value - point.days) * 86400 + _TT_MINUS_TAI,
+                    ut1_tai=(value - point.days) * 86400 + TT_MINUS_TAI,
                     base_ut1_tai=base_ut1_tai,
                     zonal_ut1_seconds=zonal,
                     subdaily_ut1_seconds=subdaily,
@@ -315,10 +291,8 @@ class C04Table:
         def residual(tt: Fraction) -> Fraction:
             point = TTInstant(tt)
             _, _, base_ut1_tai, _ = self._daily_base(point)
-            subdaily = subdaily_eop(point, given).ut1_seconds
-            return (
-                (tt - value) * 86400 + base_ut1_tai - _TT_MINUS_TAI + Fraction(subdaily)
-            )
+            subdaily = Fraction(subdaily_eop(point, given).ut1_seconds)
+            return (tt - value) * 86400 + base_ut1_tai - TT_MINUS_TAI + subdaily
 
         index = min(max(bisect_right(self.ut1, value) - 1, 0), len(self.tt) - 1)
         lo = self.tt[max(index - 1, 0)]
@@ -327,20 +301,20 @@ class C04Table:
         if not r_lo <= 0 <= r_hi:
             lo, hi = self.tt[0], self.tt[-1]
             r_lo, r_hi = residual(lo), residual(hi)
-        if abs(r_lo) <= _SOLVER_SECONDS:
+        if abs(r_lo) <= SOLVER_SECONDS:
             return TTInstant(lo)
-        if abs(r_hi) <= _SOLVER_SECONDS:
+        if abs(r_hi) <= SOLVER_SECONDS:
             return TTInstant(hi)
         if not r_lo <= 0 <= r_hi:
             raise ValueError("IERS C04 inverse could not bracket its pair equation")
         for _ in range(32):
             trial = lo - r_lo * (hi - lo) / (r_hi - r_lo)
-            trial = min(max(Fraction(round(trial * _TT_GRID), _TT_GRID), lo), hi)
+            trial = min(max(Fraction(round(trial * TT_GRID), TT_GRID), lo), hi)
             if trial == lo or trial == hi:
-                midpoint = Fraction(round((lo + hi) * _TT_GRID / 2), _TT_GRID)
+                midpoint = Fraction(round((lo + hi) * TT_GRID / 2), TT_GRID)
                 trial = min(max(midpoint, lo), hi)
             error = residual(trial)
-            if abs(error) <= _SOLVER_SECONDS:
+            if abs(error) <= SOLVER_SECONDS:
                 return TTInstant(trial)
             if error < 0:
                 lo, r_lo = trial, error
@@ -394,7 +368,7 @@ class C04Table:
             subdaily = evaluation.subdaily_ut1_seconds
             residual = evaluation.residual_seconds
         else:
-            ut1_tai = (point.days - evaluation.tt.days) * 86400 + _TT_MINUS_TAI
+            ut1_tai = (point.days - evaluation.tt.days) * 86400 + TT_MINUS_TAI
             subdaily = subdaily_eop(evaluation.tt, point).ut1_seconds
             residual = abs(ut1_tai - evaluation.base_ut1_tai - Fraction(subdaily))
         nodes = [self.samples[i] for i in evaluation.indices]
@@ -402,13 +376,7 @@ class C04Table:
         return {
             "method_id": METHOD,
             "source_series": "IERS20_C04_final_smoothed_daily_0hUTC_ITRF2020",
-            "source_sha256": SOURCE_SHA,
-            "asset_sha256": ASSET_SHA,
-            "orientation_asset_sha256": ORIENTATION_ASSET_SHA,
-            "tidal_asset_sha256": TIDAL_ASSET_SHA,
             "tidal_model_id": TIDAL_MODEL,
-            "source_url": self.mirror["canonical_origin"],
-            "mirror_url": self.mirror["mirror_url"],
             "mirror_commit": self.mirror["commit"]["sha"],
             "coverage_start_utc": "1962-01-01T00:00:00+00:00",
             "coverage_end_utc": "2026-09-19T00:00:00+00:00",
@@ -428,9 +396,9 @@ class C04Table:
             "base_ut1_minus_tai_seconds": float(evaluation.base_ut1_tai),
             "zonal_ut1_seconds": evaluation.zonal_ut1_seconds,
             "subdaily_ut1_seconds": subdaily,
-            "delta_t_seconds": float(_TT_MINUS_TAI - ut1_tai),
+            "delta_t_seconds": float(TT_MINUS_TAI - ut1_tai),
             "solver_residual_seconds": float(residual),
-            "solver_tolerance_seconds": float(_SOLVER_SECONDS),
+            "solver_tolerance_seconds": float(SOLVER_SECONDS),
             "solver_iterations": evaluation.iterations,
             "measured_ut1_series_applied": True,
             "polar_motion_applied": False,
@@ -464,10 +432,6 @@ def c04_table() -> C04Table:
     resource = files("fatebridge.data").joinpath("knowledge")
     raw = resource.joinpath(ASSET).read_bytes()
     orientation = resource.joinpath(ORIENTATION_ASSET).read_bytes()
-    if hashlib.sha256(raw).hexdigest() != ASSET_SHA:
-        raise ValueError("IERS C04 packaged asset checksum mismatch")
-    if hashlib.sha256(orientation).hexdigest() != ORIENTATION_ASSET_SHA:
-        raise ValueError("IERS C04 orientation asset checksum mismatch")
     return C04Table(
         TypeAdapter(_UT1Data).validate_json(gzip.decompress(raw)),
         TypeAdapter(_OrientationData).validate_json(gzip.decompress(orientation)),

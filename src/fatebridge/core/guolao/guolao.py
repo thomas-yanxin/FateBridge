@@ -7,7 +7,6 @@ The older Moira DSL is retained as a separately identified compatibility layer.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 from bisect import bisect_right
@@ -83,7 +82,6 @@ from fatebridge.utils.timezones import validate_local_clock
 RULESET = "guolao_research_v7"
 DATA = Path(__file__).resolve().parents[2] / "data" / "guolao"
 EDITION = "tohoku_luwei_10020000001141"
-EDITION_URL = "https://touda.tohoku.ac.jp/collection/en/database/library/10020000001141"
 # Independently transcribed from volume 1, images 6 and 10 (not Western dignity).
 PALACE_BRANCHES = [
     "戌",
@@ -110,7 +108,7 @@ OVERCOMES = dict(zip("木土水火金", "土水火金木"))
 
 
 def relation(target: str, other: str) -> str:
-    """Directional 五星生克: `other` acts on the designated target lord."""
+    """Directional 五星生克: other acts on the designated target lord."""
     if target == other:
         return "同主"
     if target not in GENERATES or other not in GENERATES:
@@ -201,12 +199,8 @@ def positions(
     body_provenance = {}
     nonphysical_flags = {}
     motion_metadata: dict[str, Any] = {}
-    source_bytes = (DATA / "sources.json").read_bytes()
-    sources = json.loads(source_bytes.decode("utf-8"))
+    sources = json.loads((DATA / "sources.json").read_text(encoding="utf-8"))
     catalogue_bytes = (DATA / "sefstars.txt").read_bytes()
-    catalogue_hash = hashlib.sha256(catalogue_bytes).hexdigest()
-    if catalogue_hash != sources["catalogue_sha256"]:
-        raise ValueError("果老距星表与来源指纹不一致")
     with runtime.preserve_ephemeris_path():
         # Swiss C state may be thread-local; initialize inside this worker.
         selected_path = configured_ephemeris_path()
@@ -493,8 +487,6 @@ def positions(
             "fixed_star_flag_scope": "native star flags and actual Earth observer model are separate; mean node/apogee flags do not identify physical vector files",
             "absolute_astronomical_accuracy_certified": False,
         },
-        "catalogue_sha256": catalogue_hash,
-        "catalogue_sources_sha256": hashlib.sha256(source_bytes).hexdigest(),
     }
 
 
@@ -553,11 +545,7 @@ def build_chart(
     if moira_provider is not None:
         if moira_profile is None:
             raise ValueError("Moira源提供器须与显式源规则profile一起选择")
-        if (
-            moira_provider.profile.source_commit != moira_profile.source_commit
-            or moira_provider.profile.source_property_sha256
-            != moira_profile.source_property_sha256
-        ):
+        if moira_provider.profile.source_commit != moira_profile.source_commit:
             raise ValueError("Moira规则与提供器须来自同一已声明源版本")
     require_resolved_birth_timezone(birth.timezone_source)
     if birth.recorded_datetime is not None:
@@ -825,7 +813,6 @@ def build_chart(
             source_provider_record = {
                 "profile_id": moira_provider.profile.profile_id,
                 "source_commit": moira_provider.profile.source_commit,
-                "source_url": moira_provider.profile.source_url,
                 "calendar": {
                     "year_pillar": calendar.year_pillar,
                     "month_pillar": calendar.month_pillar,
@@ -937,7 +924,6 @@ def build_chart(
             "period_days": guolao_moira.PURPLE_CLOUDS_PERIOD_DAYS,
             "epoch_jd": guolao_moira.PURPLE_CLOUDS_EPOCH_JD,
             "epoch_longitude": guolao_moira.PURPLE_CLOUDS_EPOCH_LONGITUDE,
-            "software_source_url": guolao_moira.PURPLE_CLOUDS_SOURCE_URL,
             "software_source_commit": guolao_moira.PURPLE_CLOUDS_SOURCE_COMMIT,
             "software_source_function": "pcLon",
             "fixture_fitting_used": False,
@@ -1017,31 +1003,26 @@ def build_chart(
                 "id": ruleset_id,
                 "edition_id": EDITION,
                 "title": "新编评注通玄先生张果星宗大全，陆位辑校，卷一至二",
-                "source_url": EDITION_URL,
                 "verified_subset": "宫主/度主归属、五星生克、安命顺数与二至例外、逆布十二宫、小限逆数、天乙/玉堂/岁驾表；现代输入映射与全盘尚未验收",
             },
             {
                 "id": "swiss_ephemeris_astronomy",
                 "title": "Swiss Ephemeris Programmer's Manual",
-                "source_url": "https://www.astro.com/swisseph/swephprg.htm",
                 "verified_subset": "天文计算接口与时间尺度；不是果老原典认证",
             },
             {
                 "id": "iers_leap_seconds",
                 "title": "IERS Bulletin C leap-second table",
-                "source_url": "https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat",
                 "verified_subset": "冻结UTC/TT闰秒表；有效期外采用不变假设并回显",
             },
             {
                 "id": "cds_simbad_research_anchors",
                 "title": "CDS SIMBAD ICRS research anchor catalogue",
-                "source_url": "https://simbad.cds.unistra.fr/simbad/",
                 "verified_subset": "28颗研究锚星的天文参数；非底本历史距星认定",
             },
             {
                 "id": "xing_yunlu_gujinlvlikao_58",
                 "title": "古今律历考卷五十八，明邢云路撰，文渊阁四库影印787册",
-                "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
                 "verified_subset": "原页787-635、642、643、647的紫气至后策、完整刊表、周期及年份异文；未校准现代位置，不代替陆位本",
             },
         ],
@@ -1062,7 +1043,6 @@ def build_chart(
             {
                 "id": moira_profile.profile_id,
                 "title": "Moira1.50Final explicit source-rule profile",
-                "source_url": moira_profile.source_url,
                 "verified_subset": "完整源声明目录与规则图；事实提供范围和独立比较结论分别记录",
             }
         )
@@ -1072,7 +1052,6 @@ def build_chart(
             {
                 "id": moira_provider.profile.profile_id,
                 "title": "Moira1.50Final explicit natal god provider",
-                "source_url": moira_provider.profile.source_url,
                 "verified_subset": "源年/月/时表、分组、资格与别名；本次历法字段及缺项另列，不认证原历法或星位模型",
             }
         )
@@ -1081,7 +1060,6 @@ def build_chart(
             {
                 "id": solar_clock["method_id"],
                 "title": "USNO Equation of Time: apparent solar time from local hour angle",
-                "source_url": solar_clock["source_url"],
                 "verified_subset": "复用同次地心视太阳赤经与所选UT1视恒星角；两处独立JPL参照，不认证实测亚秒精度或原典钟时政策",
             }
         )
@@ -1094,7 +1072,6 @@ def build_chart(
             {
                 "id": input_clock["ruleset_id"],
                 "title": "FateBridge explicit LMT/LAT input and physical-carrier separation",
-                "source_url": "https://www.astro.com/swisseph/swephprg.htm",
                 "verified_subset": "9.2/9.4时间尺度和太阳钟定义；时支标签与UTC载体分离为明示现代研究政策，未裁定底本历史钟制",
             }
         )

@@ -79,7 +79,6 @@ def moving_si_context(
         **({"moving_support": moving} if moving is not None else {}),
         source_path=path,
         source_url=PROFILE["source"]["url"] + "#page=97",
-        source_sha256=PROFILE["source"]["sha256"],
         actual_total_effect_adjudicated=False,
         scope="实际动巳的遇长生资格与普通克制许可分列；同版第85页仍有金得日扶而称巳克的明例，合并效力未裁定。独立生扶未核不等于无气，其他午火、日月、空破及受方门槛另审。",
     )

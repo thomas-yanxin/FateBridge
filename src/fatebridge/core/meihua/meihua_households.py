@@ -12,7 +12,7 @@ from fatebridge.core.meihua.meihua import meihua_stage_relations
 from fatebridge.core.meihua.meihua_roles import LABELS, ROLES
 
 HOUSEHOLD_TOPICS = ("household", "dwelling")
-_RELATIONS = {"体克用", "用克体", "体生用", "用生体", "体用比和"}
+RELATIONS = {"体克用", "用克体", "体生用", "用生体", "体用比和"}
 
 
 @lru_cache(maxsize=1)
@@ -29,7 +29,7 @@ def _profile() -> dict[str, Any]:
         or set(profile["topics"]) != set(HOUSEHOLD_TOPICS)
         or len(profile["rules"]) != 10
         or {(r["topic"], r["relation"]) for r in profile["rules"]}
-        != {(topic, relation) for topic in HOUSEHOLD_TOPICS for relation in _RELATIONS}
+        != {(topic, relation) for topic in HOUSEHOLD_TOPICS for relation in RELATIONS}
     ):
         raise ValueError("Unknown or incomplete selected household profile")
     for row in profile["rules"]:

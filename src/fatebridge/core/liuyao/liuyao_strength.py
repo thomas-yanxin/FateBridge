@@ -769,7 +769,6 @@ def build_classical_assessment(
         "ruleset_id": PROFILE["ruleset_id"],
         "ruleset_version": PROFILE["ruleset_version"],
         "source_url": source_url(99),
-        "source_sha256": PROFILE["source"]["sha256"],
         "lines": assessments,
         "focus": (
             deepcopy(assessments[selected["position"] - 1])

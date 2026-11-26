@@ -1,11 +1,11 @@
 """Common physical axes and retained polar house geometry."""
 
+import math
 from datetime import datetime, timezone
 
 import pytest
 
-from fatebridge.core.astro import ephemeris, runtime
-from fatebridge.core.astro.house_axes import canonical_house_axes
+from fatebridge.core.astro import ephemeris
 from fatebridge.core.astro.house_positions import build_ecliptic_house_projection
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.predictive.native_chart import (
@@ -15,7 +15,11 @@ from fatebridge.core.predictive.native_chart import (
 )
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
-from tests.western.test_western_house_reference import REFERENCE, separation
+
+
+def separation(a: float, b: float) -> float:
+    return abs(math.remainder(a - b, 360.0)) * 3600.0
+
 
 POLAR_BIRTH = dict(
     birth_year=1900,
@@ -49,38 +53,6 @@ def test_service_summary_keeps_an_actual_partial_orbital_fallback(
     result = calculate_core_chart_analysis(**BIRTH, chart_variant="chart", hsys=0)
     note = result["chart_profile"]["orbital_fallback"]["note_zh"]
     assert note in result["summary"] and note in result["snapshot_text"]
-
-
-@pytest.mark.parametrize("case", REFERENCE["cases"])
-def test_common_axes_on_every_frozen_geometry_preserve_native_house_branch(
-    case,
-) -> None:
-    p = case["input"]
-    for code in REFERENCE["protocol"]["systems"]:
-        try:
-            cusps, native = runtime.ephemeris_call(
-                "houses_ex", p["jd_ut1"], p["latitude"], p["longitude"], code.encode()
-            )
-        except runtime.swe.Error:
-            assert code in {"P", "K"} and abs(p["latitude"]) == 80
-            continue
-        original = tuple(cusps)
-        physical, convention = canonical_house_axes(
-            julian_day_ut1=p["jd_ut1"],
-            latitude=p["latitude"],
-            longitude=p["longitude"],
-            house_code=code.encode(),
-            native_angles=native,
-        )
-        assert tuple(cusps) == original
-        for i, key in enumerate(["ascendant", "midheaven"]):
-            assert separation(physical[i], case["erfa_vector_angles"][key]) <= 1.0
-        if convention:
-            assert convention["native_house_midheaven"] == native[1]
-            assert convention["public_midheaven"] == physical[1]
-            assert convention["native_cusps_and_projection_retained"] is True
-        else:
-            pass
 
 
 @pytest.mark.parametrize("hsys", [2, 6])

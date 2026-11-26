@@ -14,7 +14,7 @@ from fatebridge.core.hexagram_relations import relationship_by_role
 from fatebridge.core.meihua.meihua import meihua_stage_relations
 from fatebridge.core.requests.meihua_day_qi import MeihuaDayQiContext
 
-_RELATION_LABELS = {
+RELATION_LABELS = {
     "体用比和": "日气与原体比和",
     "体生用": "原体生日气",
     "体克用": "原体克日气",
@@ -239,7 +239,7 @@ def _reading(
                     "fact_path": fact_prefix + ".body_trigram",
                 },
                 "day_qi_relation_to_original_body": relation,
-                "day_relation_label": _RELATION_LABELS[relation],
+                "day_relation_label": RELATION_LABELS[relation],
                 "selected_day_clause_preference": preference,
                 "day_clause_subject_scope": "Selected reading of卦against本日所屬卦氣; no unique complete interpretation claim",
                 "roles": roles,

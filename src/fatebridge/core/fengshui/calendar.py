@@ -34,7 +34,7 @@ from fatebridge.utils.timezones import (
 )
 
 MOSHIER_BOUNDARY_GUARD_SECONDS = 5.0
-_MODEL_GUARD_NAMES = {
+MODEL_GUARD_NAMES = {
     "moshier": "moshier",
     DE441_SOLAR_MODEL: "de441_solar",
     AA1996_SOLAR_MODEL: "aa1996_solar",
@@ -56,7 +56,7 @@ def boundary_model_policy(
     model = resolution.get("ephemeris_model")
     if not isinstance(model, str) or resolution.get("approximate") is True:
         return None
-    name = _MODEL_GUARD_NAMES.get(model)
+    name = MODEL_GUARD_NAMES.get(model)
     if name is None:
         return None
     guard_name = "moshier_numeric" if model == "moshier" else name

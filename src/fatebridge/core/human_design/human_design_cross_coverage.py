@@ -6,19 +6,12 @@ from copy import deepcopy
 from typing import Any
 
 from fatebridge.core.human_design.human_design_depth import depth_reference
-from fatebridge.core.human_design.human_design_references import (
-    reference_data,
-    reference_sha256,
-)
+from fatebridge.core.human_design.human_design_references import reference_data
 from fatebridge.core.human_design.human_design_source_variants import compare_name
 
 
 def cross_coverage_reference() -> dict[str, Any]:
     return reference_data("cross-coverage-2026-reference.json")
-
-
-def cross_coverage_sha256() -> str:
-    return reference_sha256("cross-coverage-2026-reference.json")
 
 
 def expanded_cross_audit() -> dict[str, Any]:
@@ -39,8 +32,6 @@ def expanded_cross_audit() -> dict[str, Any]:
     }
     return {
         "method_id": ref["method_id"],
-        "catalog_sha256": cross_coverage_sha256(),
-        "cohort_sha256": ref["cohort_sha256"],
         "observations_checked": len(rows),
         "gate_angle_strata_checked": len(strata),
         "all_192_gate_angle_strata_observed": strata == wanted,
@@ -75,11 +66,7 @@ def expanded_cross_evidence(chart: dict[str, Any]) -> dict[str, Any]:
         "observed_labels": [compare_name(cross["name"], name) for name in labels],
         "observations": deepcopy(matching),
         "course_list_disagreement": deepcopy(course) if affected else None,
-        "catalog_sha256": cross_coverage_sha256(),
-        "source_url": ref["source"]["url"],
         "source_publisher": ref["source"]["publisher"],
-        "observations_fixture_sha256": ref["source"]["observation_fixture_sha256"],
-        "plan_sha256": ref["source"]["plan_sha256"],
         "full_source_acceptance_passed": False,
         "scope": "仅报告新增193盘的同四门、同角度观察；保留2001名、拒绝别名及事件预言。覆盖192门角组合不认证全部生时、角色细节或星历口径。",
     }

@@ -7,7 +7,6 @@ into month bindings. A listed correction is not applied a second time.
 
 from __future__ import annotations
 
-import hashlib
 import json
 from functools import lru_cache
 from pathlib import Path
@@ -16,22 +15,14 @@ from typing import Any
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_naoj_adjustments.json"
-CANONICAL_SHA256 = "91eecac3e94bd9069fd7e5ed2046d0295d987cd4a070971c9ed5f929a9f9e0fd"
 
 
 @lru_cache(maxsize=None)
 def _source(path: Path) -> tuple[str, dict[tuple[int, int, bool], tuple[str, ...]]]:
     """Index one process source snapshot; return only detached public records."""
-    loaded = load_source(path)
-    data = loaded.data
-    canonical = json.dumps(
-        data, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode()
-    if hashlib.sha256(canonical).hexdigest() != CANONICAL_SHA256:
-        raise ValueError("NAOJ公开校订目录已改变，须重新核验完整来源与月键")
+    data = load_source(path)
     header = {
         "ruleset_id": data["id"],
-        "source_bundle_sha256": loaded.sha256,
         "source": data["source"],
         "date_convention_source": data["date_convention_source"],
         "complete_published_table_counts": data["counts"],

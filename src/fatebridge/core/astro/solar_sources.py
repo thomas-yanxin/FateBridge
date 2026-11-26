@@ -29,7 +29,7 @@ class SunSourceCohort:
         self.sources: list[dict[str, Any]] = []
         self._model: str | None = None
         self._editions: dict[int, set[int]] = {}
-        self._hashes: dict[tuple[int, str], str] = {}
+        self._sizes: dict[tuple[int, str], int] = {}
 
     def add(self, source: dict[str, Any]) -> int:
         model = source["by_factor"]["equatorial_Sun"]["model"]
@@ -40,9 +40,9 @@ class SunSourceCohort:
         for file in source["files"]:
             editions.setdefault(file["slot"], set()).add(file["de_number"])
             key = (file["slot"], file["filename"])
-            if key in self._hashes and self._hashes[key] != file["sha256"]:
+            if key in self._sizes and self._sizes[key] != file["bytes"]:
                 raise EphemerisSourceError("changed_across")
-            self._hashes[key] = file["sha256"]
+            self._sizes[key] = file["bytes"]
         for slot, values in editions.items():
             if slot in self._editions and self._editions[slot] != values:
                 raise EphemerisSourceError("edition_changed")

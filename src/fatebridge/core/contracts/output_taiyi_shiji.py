@@ -10,7 +10,6 @@ class TaiyiShijiRuleset(PartialOutput):
     classical_author: str | None = None
     source: str | None = None
     corroboration: str | None = None
-    source_manifest_sha256: str | None = None
 
 
 class TaiyiShijiPair(PartialOutput):

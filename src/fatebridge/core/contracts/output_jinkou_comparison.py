@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-TEXT_FIELDS = frozenset({"basis", "scope", "note", "source_url", "source_section"})
+TEXT_FIELDS = frozenset({"basis", "scope", "note", "source_section"})
 
 
 def compare_present(actual: Any, expected: Any, path: str = "") -> None:

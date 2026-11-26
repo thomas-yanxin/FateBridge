@@ -47,7 +47,6 @@ class TaiyiCountReadingRuleset(PartialOutput):
     version: str | None = None
     author: str | None = None
     primary_sources: list[str] | None = None
-    catalog_sha256: str | None = None
 
 
 class TaiyiCountReadingSource(PartialOutput):

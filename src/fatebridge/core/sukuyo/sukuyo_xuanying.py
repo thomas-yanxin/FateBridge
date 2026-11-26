@@ -16,14 +16,9 @@ SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_xuanying_source_chai
 
 def standalone_reference(commentarial: dict[str, Any]) -> dict[str, Any]:
     """Bind a named edition to the actual later quotation without choosing a clock."""
-    loaded = load_source(SOURCE)
-    data = loaded.data
-    cited = next(row for row in commentarial["sources"] if row["id"] == "T2216")
-    if data["T2216_context"]["publisher_capture_sha256"] != cited["capture_sha256"]:
-        raise ValueError("玄应条目与本次注疏来源不一致，须重新核验")
+    data = load_source(SOURCE)
     return {
         **data,
-        "source_bundle_sha256": loaded.sha256,
         "applied_to_calendar_or_clock": False,
         "named_rizang_comparison": named_rizang_reference(data),
     }

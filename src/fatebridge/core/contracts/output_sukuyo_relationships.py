@@ -50,7 +50,6 @@ class SukuyoPalaceReference(PartialOutput):
     pada_numbering_basis: str | None = None
     pada_ordinals_explicit_in_source: bool | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     locator: str | None = None
     applied_to_calendar_mansion: bool | None = None
     applied_to_sanjiu: bool | None = None
@@ -73,8 +72,6 @@ class SukuyoSanjiuDayEvidence(PartialOutput):
     ruleset_id: str | None = None
     relation: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
-    source_bundle_sha256: str | None = None
     witnesses: list[SukuyoSanjiuDayWitness] | None = None
     upper_day_entry_individually_listed: bool | None = None
     priority_clause: SukuyoSanjiuDayWitness | None = None
@@ -111,8 +108,6 @@ class SukuyoSixPalaceReference(PartialOutput):
     members: list[SukuyoSixPalaceMember] | None = None
     counting_basis: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
-    source_bundle_sha256: str | None = None
     locator: str | None = None
     counting_excerpt: str | None = None
     joint_reading_requirement: SukuyoJointReadingRequirement | None = None
@@ -148,8 +143,6 @@ class SukuyoTaibaiReference(PartialOutput):
     title_literal: str | None = None
     table_apparatus: list[dict[str, OpenJsonValue]] | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
-    source_bundle_sha256: str | None = None
     locator: str | None = None
     publisher_primary: dict[str, OpenJsonValue] | None = None
     doctrine: dict[str, OpenJsonValue] | None = None
@@ -204,8 +197,6 @@ class SukuyoClothingReference(PartialOutput):
     historical_clock_mapping_evaluated: bool | None = None
     real_world_event_prediction_evaluated: bool | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
-    source_bundle_sha256: str | None = None
     locator: str | None = None
     unmapped_clothing_predicates: list[dict[str, OpenJsonValue]] | None = None
     scope: str | None = None

@@ -5,6 +5,9 @@ from typing import Literal
 from pydantic import Field, model_validator
 
 from fatebridge.core.human_design.human_design_birth_clock import resolve_birth_clock
+from fatebridge.core.human_design.human_design_cycle_input import (
+    validate_cycle_reference,
+)
 from fatebridge.core.requests.base import _DeferredModel
 
 
@@ -65,10 +68,6 @@ class HumanDesignRequest(_DeferredModel):
             birth_timezone=self.birth_timezone,
         )
         if self.cycle_reference_datetime is not None:
-            from fatebridge.core.human_design.human_design_cycle_input import (
-                validate_cycle_reference,
-            )
-
             validate_cycle_reference(
                 **self.model_dump(
                     include={

@@ -10,6 +10,11 @@ from fatebridge.application.domain_validators import (
     validate_chart_variant_roots,
 )
 from fatebridge.application.tool_spec import EvidenceViews, ServiceResult, ToolSpec
+from fatebridge.core.astro.reference import (
+    RELATIVE_MODE_EXACT_ALIASES,
+    RELATIVE_MODE_FALLBACK_ALIASES,
+    RELATIVE_MODE_NUMERIC_MAP,
+)
 from fatebridge.core.contracts.output_human_design import HumanDesignOutput
 from fatebridge.core.requests.astrology import (
     AstroChartPolyRequest,
@@ -33,7 +38,7 @@ from fatebridge.services.catalog.astro_bindings import (
     calculate_germany_chart_analysis,
 )
 
-_RELATIONSHIP_PRIMARY_FIELDS = {
+RELATIONSHIP_PRIMARY_FIELDS = {
     "directional_synastry": {
         "synastry_aspects",
         "in_to_out_aspects",
@@ -49,7 +54,7 @@ _RELATIONSHIP_PRIMARY_FIELDS = {
 def _compact_relationship(result: ServiceResult) -> ServiceResult:
     primary_layer = result["relationship_profile"]["primary_layer"]
     fields = {"relationship_profile", "summary", "run_metadata", "snapshot_text"}
-    fields.update(_RELATIONSHIP_PRIMARY_FIELDS[primary_layer])
+    fields.update(RELATIONSHIP_PRIMARY_FIELDS[primary_layer])
     view = {key: value for key, value in result.items() if key in fields}
     planet_fields = {"id", "longitude", "latitude", "sign", "sign_zh", "house"}
 
@@ -79,12 +84,6 @@ def _relative_evidence_views(
 ) -> EvidenceViews | None:
     if views is None:
         return None
-    from fatebridge.core.astro.reference import (
-        RELATIVE_MODE_EXACT_ALIASES,
-        RELATIVE_MODE_FALLBACK_ALIASES,
-        RELATIVE_MODE_NUMERIC_MAP,
-    )
-
     aliases: dict[str | int, str] = dict(
         chain(
             RELATIVE_MODE_FALLBACK_ALIASES.items(),

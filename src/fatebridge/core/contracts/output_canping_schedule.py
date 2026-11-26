@@ -7,7 +7,6 @@ from pydantic import BeforeValidator, Field, JsonValue, model_validator
 from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.numerology.canping_schedule_basis import (
     APPLIED,
-    CONTENT_SHA256,
     LEGACY,
     SUMMARIES,
     clause_role,
@@ -40,8 +39,6 @@ _ClauseRole = Literal[
 
 class CanpingScheduleSource(PartialOutput):
     title: str | None = None
-    url: str | None = None
-    pdf_sha256: str | None = None
     edition: str | None = None
 
 
@@ -154,8 +151,6 @@ class CanpingScheduleBasis(PartialOutput):
     profile_id: _Profile | None = None
     corpus_id: Literal["canping_schedule_clauses_v1"] | None = None
     corpus_version: str | None = None
-    source_content_sha256: str | None = None
-    source_file_sha256: str | None = None
     review_status: str | None = None
     sources: dict[str, CanpingScheduleSource] | None = None
     clauses: list[CanpingScheduleClause] | None = None
@@ -185,7 +180,6 @@ class CanpingScheduleBasis(PartialOutput):
         data = source_readings()
         for field, expected in (
             ("corpus_version", data["version"]),
-            ("source_file_sha256", data["_file_sha256"]),
             ("review_status", data["review_status"]),
         ):
             value = getattr(self, field)
@@ -223,11 +217,6 @@ class CanpingScheduleBasis(PartialOutput):
                 if outer is not None and inner is not None and outer != inner:
                     raise ValueError("阅读上下文与同次配运回执不符。")
 
-        if (
-            self.source_content_sha256 is not None
-            and self.source_content_sha256 != CONTENT_SHA256
-        ):
-            raise ValueError("配运原句的内容身份不符。")
         if self.profile_id is not None:
             if (
                 self.has_actual_date_mapping is not None

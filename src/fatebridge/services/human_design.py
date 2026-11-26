@@ -1,6 +1,6 @@
 """Shared Human Design orchestration for REST, MCP and CLI."""
 
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.source_session import coherent_ephemeris_sources
@@ -62,14 +62,14 @@ def calculate_human_design(
     birth_minute: int,
     birth_timezone: str,
     birth_second: int = 0,
-    name: Optional[str] = None,
+    name: str | None = None,
     node_mode: str = "true",
     require_swiss_files: bool = False,
     birth_time_uncertainty_minutes: int = 0,
-    cycle_reference_datetime: Optional[str] = None,
+    cycle_reference_datetime: str | None = None,
     compare_cycle_origins: bool = False,
     compare_apparent_models: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     clock = resolve_birth_clock(
         birth_year=birth_year,
         birth_month=birth_month,
@@ -90,9 +90,9 @@ def calculate_human_design(
 
     def natal_chart(
         mode: str,
-        observer: Optional[Callable[[str, float, Dict[str, Any]], None]] = None,
-        design_observer: Optional[Callable[[str, float, Dict[str, Any]], None]] = None,
-    ) -> Dict[str, Any]:
+        observer: Callable[[str, float, dict[str, Any]], None] | None = None,
+        design_observer: Callable[[str, float, dict[str, Any]], None] | None = None,
+    ) -> dict[str, Any]:
         if clock.leap_second:
             assert clock.jd_tt is not None
             return chart_at_tt(

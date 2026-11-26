@@ -1,4 +1,4 @@
-"""Explicit, file-backed JPL SPK solar longitude; optional ``jpl`` extra.
+"""Explicit, file-backed JPL SPK solar longitude; optional jpl extra.
 
 Only raw type2 barycentric vectors are read, never reference event tables.
 Geocentric ERFA dtdb, source-derived annual aberration and IAU2006/2000B
@@ -7,7 +7,6 @@ date-frame conversion are separate from the native Swiss solar backend.
 
 from __future__ import annotations
 
-import hashlib
 import math
 import os
 import weakref
@@ -22,14 +21,13 @@ from fatebridge.core.analytic_solar import (
     C_AU_DAY,
     aberration,
     apparent_ecliptic,
-    loaded_sha256,
 )
 from fatebridge.utils.errors import EphemerisSourceError
 
 MODEL_ID = "fatebridge_jpl_spk_solar_v1"
 FILE_ENV = "FATEBRIDGE_SOLAR_SPK_FILE"
 AU_KM = 149597870.7
-_LOCK = RLock()
+LOCK = RLock()
 
 
 def _signature(path: Path) -> tuple[int, ...]:
@@ -69,11 +67,6 @@ class _KernelSun:
         }
         self.kernel: Any = None
         try:
-            kernel_digest = hashlib.sha256()
-            with path.open("rb") as kernel_file:
-                while kernel_chunk := kernel_file.read(1024 * 1024):
-                    kernel_digest.update(kernel_chunk)
-            self.sha256 = kernel_digest.hexdigest()
             self.kernel = SPK.open(str(path))
             self.segments = {
                 pair: [s for s in self.kernel.segments if (s.center, s.target) == pair]
@@ -89,7 +82,7 @@ class _KernelSun:
                 for (a, b), group in self.segments.items()
             }
             self.check_unchanged()
-        except Exception as error:
+        except (OSError, ValueError, TypeError, EphemerisSourceError) as error:
             if self.kernel is not None:
                 self.kernel.close()
             if isinstance(error, EphemerisSourceError):
@@ -150,7 +143,6 @@ class _KernelSun:
         return {
             "model_id": MODEL_ID,
             "kernel_filename": self.path.name,
-            "kernel_sha256": self.sha256,
             "kernel_type": "DAF/SPK_type2",
             "spk_frame_id": 1,
             "segment_coverage_tdb_jd": {
@@ -158,11 +150,8 @@ class _KernelSun:
             },
             "time_argument": "TDB from TT via geocentric ERFA dtdb",
             "position_frame": "BCRS then IAU2006/P03 and IAU2000B true ecliptic of date",
-            "frame_coefficient_sha256": loaded_sha256(),
             "light_time_iterations": 3,
             "dependencies": dict(self.dependencies),
-            "source_url": "https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/spk.html",
-            "time_source_url": "https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/time.html",
             "native_moshier_relabelled": False,
             "accuracy_certified": False,
         }
@@ -182,18 +171,13 @@ def _selected() -> _KernelSun:
 
 
 def cache_key() -> tuple[Any, ...]:
-    with _LOCK:
+    with LOCK:
         source = _selected()
-        return (
-            str(source.path),
-            source.signature,
-            source.sha256,
-            loaded_sha256(),
-        )
+        return (str(source.path), source.signature, MODEL_ID)
 
 
 def source_receipt() -> dict[str, Any]:
-    with _LOCK:
+    with LOCK:
         return _selected().receipt()
 
 
@@ -203,7 +187,7 @@ def solar_longitudes_tt(jd_tts: list[float]) -> dict[str, Any]:
         type(value) in (int, float) and math.isfinite(value) for value in jd_tts
     ):
         raise ValueError("SPK observations require finite numeric TT points")
-    with _LOCK:
+    with LOCK:
         source = _selected()
         selected_key = cache_key()
         before = source.receipt()
@@ -223,15 +207,10 @@ def longitude_crossing_tt(
 ) -> dict[str, Any]:
     if not all(math.isfinite(x) for x in (target, low, high)) or low >= high:
         raise ValueError("SPK crossing requires a finite increasing TT bracket")
-    with _LOCK:
+    with LOCK:
         source = _selected()
 
-        actual_key = (
-            str(source.path),
-            source.signature,
-            source.sha256,
-            loaded_sha256(),
-        )
+        actual_key = (str(source.path), source.signature, MODEL_ID)
         if expected_source_key is not None and actual_key != expected_source_key:
             raise EphemerisSourceError("solar_configuration_changed")
 

@@ -19,7 +19,7 @@ from fatebridge.utils.timezones import parse_timezone_name
 LEAP_REFERENCE = re.compile(
     r"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):60(?:\.(\d{1,6}))?(Z|[+-]\d{2}:\d{2})"
 )
-_REDUCED_FRACTION = re.compile(
+REDUCED_FRACTION_PATTERN = re.compile(
     r"(?P<date>[0-9]{4}(?:-[0-9]{2}-[0-9]{2}|[0-9]{4}|-W[0-9]{2}(?:-[0-9])?|W[0-9]{2}[0-9]?))"
     r"[\s\S](?P<clock>[0-9]{2}(?::?[0-9]{2})?)[.,](?P<fraction>[0-9]{1,6})"
     r"(?P<offset>Z|[+-][0-9]{2}(?::?[0-9]{2})?(?::?[0-9]{2})?(?:[.,][0-9]{1,6})?)?"
@@ -71,7 +71,7 @@ def _portable_base(match: re.Match) -> datetime:
 def reference_datetime(value: str) -> datetime:
     """Keep naive input naive and require the normal parser's valid grammar."""
     validate_reference_precision(value)
-    match = _REDUCED_FRACTION.fullmatch(value)
+    match = REDUCED_FRACTION_PATTERN.fullmatch(value)
     try:
         parsed = datetime_fromisoformat_preserving_offset(value.replace("Z", "+00:00"))
     except ValueError:

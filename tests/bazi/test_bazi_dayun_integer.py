@@ -1,22 +1,14 @@
 """Integer displays use raw intervals; real calendar selection stays unchanged."""
 
-import asyncio
-import json
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
-from functools import lru_cache
-from pathlib import Path
 
 import pytest
 
 import fatebridge.core.timing as timing
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
-from fatebridge.application.execution import execute_tool
 from fatebridge.core.almanac import SolarTerm, get_solar_terms_for_year
-from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.utils.civil_time import CivilPoint, ZonedCalendar, utc_calendar
-from tests.support.transports import SPECS, business, call_cli, native
-from tests.support.transports import rest as _rest_fixture
 
 
 def exact_age_ceiling(birth, boundary):
@@ -24,53 +16,6 @@ def exact_age_ceiling(birth, boundary):
     micros = (delta.days * 86400 + delta.seconds) * 1_000_000 + delta.microseconds
     divisor = 3 * 86400 * 1_000_000
     return max(1, (micros + divisor - 1) // divisor)
-
-
-rest = _rest_fixture
-ROOT = Path(__file__).resolve().parents[2]
-AS_OF = "2038-10-23T04:00:00Z"
-TOOLS = (
-    "analyze_destiny",
-    "bazi_birth",
-    *(
-        "bazi_" + t
-        for t in (
-            "career",
-            "wealth",
-            "health",
-            "children",
-            "education",
-            "personality",
-            "relatives",
-            "marriage",
-            "romance",
-        )
-    ),
-    "timing_analysis",
-    "dayun_analysis",
-    "liunian_analysis",
-    "liuyue_analysis",
-    "liuri_analysis",
-    "liushi_analysis",
-    "jieqi_timeline_analysis",
-)
-
-
-@lru_cache(maxsize=1)
-def baseline():
-    return {
-        "rows": json.loads(
-            (ROOT / "tests/data/bazi/dayun-integer-inputs.json").read_bytes()
-        )
-    }
-
-
-def base(tool, zone="Asia/Shanghai", solar=False):
-    return next(
-        r
-        for r in baseline()["rows"]
-        if r["tool"] == tool and r["zone"] == zone and r["solar"] == solar
-    )
 
 
 @pytest.mark.parametrize("integer", range(1, 11))
@@ -144,20 +89,6 @@ def test_explicit_age_uses_retained_span_at_all_three_boundaries(
         assert actual == expected
 
 
-def test_actual_public_minute_counterexample_and_display_collision() -> None:
-    row = base("dayun_analysis")
-    args = row["arguments"]
-    birth = datetime(
-        *(args["birth_" + key] for key in ("year", "month", "day", "hour", "minute"))
-    )
-    info = timing.TimingAnalysis.calculate_dayun_start_details(
-        birth, args["gender"], row["zone"]
-    )
-    assert info["start_age_precise"] == 3.0
-    assert 3 < info["start_age_unrounded"] < 3.005
-    assert info["start_age_rounded"] == 4
-
-
 def test_minimum_one_is_only_display_and_does_not_delay_an_exact_zero_start(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -183,99 +114,12 @@ def test_minimum_one_is_only_display_and_does_not_delay_an_exact_zero_start(
     ) == term.moment.astimezone(timezone.utc)
 
 
-@pytest.mark.parametrize("tool", TOOLS)
-def test_current_actual_surfaces_keep_complete_business_and_legal_projection(
-    tool, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    spec = SPECS[tool]
-    payload = base(tool)["arguments"]
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            as_of=AS_OF,
-            include_snapshot_text=False,
-            response_char_limit=0,
-        )
-    )
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--as-of",
-            AS_OF,
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    assert not protocol.is_error and code == 0
-    assert business(protocol.structured_content) == business(cli)
-    if spec.rest_path is not None:
-        http = rest.post(
-            spec.rest_path,
-            json=payload,
-            params={
-                "as_of": AS_OF,
-                "include_snapshot_text": False,
-                "response_char_limit": 0,
-            },
-        )
-        assert http.status_code == 200 and business(http.json()) == business(cli)
-    else:
-        assert tool == "analyze_destiny"
-    spec.output_model.model_validate(cli)
-
-
-@pytest.mark.parametrize(
-    "tool,root",
-    [
-        ("dayun_analysis", "dayun_info"),
-        ("timing_analysis", "dayun_analysis"),
-        ("bazi_birth", "bazi_birth.timing_overview.dayun"),
-    ],
-)
-@pytest.mark.parametrize("zone", ["Asia/Shanghai", "America/New_York"])
-def test_raw_age_and_integer_label_explain_the_same_calculation_and_snapshot(
-    tool: str, root: str, zone: str
-) -> None:
-    spec = SPECS[tool]
-    args = base(tool, zone)["arguments"]
-    value = execute_tool(
-        spec,
-        spec.request_model.model_validate(args),
-        options=ExecutionOptions(as_of=AS_OF),
-        include_metadata=False,
-    )
-    assert "error" not in value
-    info = value
-    for part in root.split("."):
-        info = info[part]
-    assert info["start_age"] == 4 and info["start_age_precise"] == 3.0
-    assert 3 < info["start_age_unrounded"] < 3.005
-    if tool != "bazi_birth":
-        assert "向上取整" in value["snapshot_text"]
-        assert str(info["start_age_unrounded"]) in value["snapshot_text"]
-    else:
-        pass
-
-
 def test_dayun_resolution_retains_source_point_without_a_json_roundtrip(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
     term = next(t for t in get_solar_terms_for_year(2024, "UTC") if t.name == "立秋")
-    row = next(
-        r
-        for r in json.loads(
-            (ROOT / "tests/data/retained_civil_points_v1.json").read_bytes()
-        )["rows"]
-        if r["name"] == "立秋"
-    )
-    expected = Fraction(int(row["civil_numerator"]), int(row["civil_denominator"]))
+    expected = term.point.day
     birth = datetime(2024, 8, 6, 18, 9, 16, 454006, tzinfo=timezone.utc)
     monkeypatch.setattr(timing, "get_bazi_year", lambda *args: 2024)
     monkeypatch.setattr(

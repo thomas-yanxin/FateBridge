@@ -24,7 +24,7 @@ from fatebridge.core.astro.house_positions import (
 from fatebridge.core.astro.house_projection_precision import RC_PLANE_PROJECTION_METHOD
 from fatebridge.core.astro.native_motion import context_motion
 from fatebridge.core.astro.parts import _build_houses
-from fatebridge.core.astro.ptolemy import FORTUNE_SOURCE_URL, fortune_working_longitude
+from fatebridge.core.astro.ptolemy import fortune_working_longitude
 from fatebridge.core.astro.reference_points import ephemeris_reference_points
 from fatebridge.core.astro.topocentric_precision import TOPOCENTRIC_PROJECTION_METHOD
 from fatebridge.core.classical_western import LOTS, lot_longitude
@@ -92,7 +92,6 @@ def build_context_geometry(
             "sect_applied": None,
             "author": "Claudius Ptolemy; tr. F. E. Robbins",
             "edition": "Tetrabiblos; Loeb Classical Library; 1940; III.10 main text",
-            "source_url": FORTUNE_SOURCE_URL,
             "source_kind": "primary_text_translation",
             "scope": "Fortune formula only; no full-chart or dice-method conformity claim",
         }
@@ -237,7 +236,6 @@ def build_context_geometry(
             "reference_frame": motion_frame,
             "unit": "degree_per_day",
             "sign_policy": "unrounded_rate_sign; zero_is_not_a_located_station_event",
-            "source_url": "https://www.astro.com/swisseph/swephprg.htm",
             "source_sections": "3.3.3, 3.4, 12.2",
             "scope": "Instantaneous sky longitude motion only; does not alter dice conditions or establish event timing, observational accuracy or divination validity.",
         }

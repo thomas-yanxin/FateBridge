@@ -10,8 +10,13 @@ from __future__ import annotations
 
 import math
 from fractions import Fraction
-from importlib.util import find_spec
-from typing import Sequence
+from typing import Any, Sequence
+
+erfa: Any = None
+try:
+    import erfa  # type: ignore[import-untyped,no-redef]
+except ImportError:
+    pass
 
 from pydantic import JsonValue
 
@@ -76,9 +81,8 @@ def opaque_solar_positions(
     Input vectors are native geometric barycentric ICRS states in AU/AU per
     day. Their native flags never describe the final derived apparent places.
     """
-    if find_spec("erfa") is None:
+    if erfa is None:
         raise ModuleNotFoundError("opaque_solar requires the jpl extra (pyerfa)")
-    import erfa  # type: ignore[import-untyped]
 
     swe = runtime.swe
     if swe is None:

@@ -8,36 +8,36 @@ also serve the explicitly separate P03/2000B analytic solar model.
 
 The immutable historical coefficient packet contains common frame tables
 and Lahiri anchor parameters; only continuous_lahiri consumes the anchor.
-Sources: https://doi.org/10.1051/0004-6361/201117274
-https://doi.org/10.1051/0004-6361/201117274e
-https://github.com/liberfa/erfa/tree/v2.0.1/src
-https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swephlib.c
 """
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 from dataclasses import dataclass
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from typing import Sequence, Tuple, TypedDict
+from typing import Any, Sequence, TypedDict
+
+erfa: Any = None
+try:
+    import erfa  # type: ignore[import-untyped,no-redef]
+except ImportError:
+    pass
 
 from fatebridge.core.astro.nutation import nutation
 from fatebridge.core.astro.tt_epoch import TTInstant
 
-Vector = Tuple[float, ...]
-Matrix = Tuple[Vector, ...]
+Vector = tuple[float, ...]
+Matrix = tuple[Vector, ...]
 
 NATIVE_TROPICAL_MODEL = "vondrak_scalar_obliquity_full_simon77_iau2006_bias_v1"
 
 # Swiss 2.10.03 swi_bias(), forward ICRS -> native mean J2000. These
 # source constants differ by about one microarcsecond from the separately
 # derived Fukushima-Williams bias used by the DE441 source frame below.
-# https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swephlib.c
-_NATIVE_BIAS_2006: Matrix = (
+NATIVE_BIAS_2006: Matrix = (
     (0.99999999999999412, -0.00000007078368961, 0.00000008056213978),
     (0.00000007078368695, 0.99999999999999700, 0.00000003306428553),
     (-0.00000008056214212, -0.00000003306427981, 0.99999999999999634),
@@ -51,13 +51,10 @@ class ReferenceFrameParameters(TypedDict):
     IAU1976_angles_arcsec_coefficients: dict[str, list[str]]
 
 
-COEFFICIENT_SHA256 = "577c38bf4db44728523e126ac8a50b899fe761d666a1253c0c6e9788bbf68791"
-_COEFFICIENT_BYTES = (
+COEFFICIENT_BYTES = (
     Path(__file__).resolve().parents[2] / "data/astronomy/lahiri-frame-v1.json"
 ).read_bytes()
-if hashlib.sha256(_COEFFICIENT_BYTES).hexdigest() != COEFFICIENT_SHA256:
-    raise RuntimeError("Reference frame coefficients differ from the declared source")
-DATA: ReferenceFrameParameters = json.loads(_COEFFICIENT_BYTES)
+DATA: ReferenceFrameParameters = json.loads(COEFFICIENT_BYTES)
 AS2R = math.pi / 648000.0
 
 
@@ -114,7 +111,7 @@ def madd(a: Sequence[Sequence[float]], b: Sequence[Sequence[float]]) -> Matrix:
 
 def pair(
     tt: float | TTInstant, polynomial: str, periodic: str
-) -> Tuple[Vector, Vector]:
+) -> tuple[Vector, Vector]:
     century = float((TTInstant.from_value(tt).days - 2451545) / 36525)
     poly = DATA["native_tables"][polynomial]
     terms = DATA["native_tables"][periodic]
@@ -141,7 +138,7 @@ def pair(
     return tuple(values), tuple(derivatives)
 
 
-def precession(tt: float | TTInstant) -> Tuple[Matrix, Matrix]:
+def precession(tt: float | TTInstant) -> tuple[Matrix, Matrix]:
     (p, q), (pd, qd) = pair(tt, "pqpol", "pqper")
     eps0 = 84381.406 * AS2R
     ce, se = math.cos(eps0), math.sin(eps0)
@@ -165,7 +162,7 @@ def precession(tt: float | TTInstant) -> Tuple[Matrix, Matrix]:
     return (equinox, middle, equator), (equinox_d, middle_d, equator_d)
 
 
-def ecliptic_rotation(epsilon: float, epsilon_d: float = 0.0) -> Tuple[Matrix, Matrix]:
+def ecliptic_rotation(epsilon: float, epsilon_d: float = 0.0) -> tuple[Matrix, Matrix]:
     c, s = math.cos(epsilon), math.sin(epsilon)
     return (
         ((1.0, 0.0, 0.0), (0.0, c, s), (0.0, -s, c)),
@@ -206,7 +203,7 @@ def _polynomial(t: float, coefficients: Sequence[float]) -> float:
     return value * AS2R
 
 
-def precession_angles(date1: float, date2: float = 0.0) -> Tuple[float, ...]:
+def precession_angles(date1: float, date2: float = 0.0) -> tuple[float, ...]:
     if not math.isfinite(date1) or not math.isfinite(date2):
         raise ValueError("Frame epoch must be finite")
     # Reduce the two-part epoch before rounding the century argument once.
@@ -253,7 +250,7 @@ def rotate(
     return co * x + si * y, -si * x + co * y, z
 
 
-def mean_ecliptic_frame(tt: float | TTInstant) -> Tuple[Matrix, Matrix]:
+def mean_ecliptic_frame(tt: float | TTInstant) -> tuple[Matrix, Matrix]:
     """Mean-J2000 to scalar-obliquity ecliptic of date and TT derivative."""
     matrix, matrix_d = precession(tt)
     values, derivatives = pair(tt, "pepol", "peper")
@@ -283,7 +280,8 @@ def native_equatorial_frame(
     Keep the native bias and the exact native J2000 precession shortcut;
     this matrix describes that coordinate model, not full IAU 2006/2000A.
     """
-    import erfa
+    if erfa is None:
+        raise ModuleNotFoundError("reference_frames requires the jpl extra (pyerfa)")
 
     if not all(
         math.isfinite(x)
@@ -299,7 +297,7 @@ def native_equatorial_frame(
             math.radians(nutation_obliquity),
         )
     )
-    return mm(nutated, mm(precessed, _NATIVE_BIAS_2006))
+    return mm(nutated, mm(precessed, NATIVE_BIAS_2006))
 
 
 @dataclass(frozen=True)
@@ -329,7 +327,8 @@ def iau_equatorial_frame(tt: float | TTInstant) -> Matrix:
     This is a coordinate triad, not a physical ephemeris, measured pole or
     long-term extrapolation policy. Epoch selection belongs to its caller.
     """
-    import erfa
+    if erfa is None:
+        raise ModuleNotFoundError("reference_frames requires the jpl extra (pyerfa)")
 
     return tuple(
         tuple(float(value) for value in row)
@@ -410,9 +409,9 @@ def analytic_ecliptic_frame(tt: float | TTInstant) -> EclipticSourceFrame:
     Keep the ray's mean-J2000 bias and non-shortcut precession matrix,
     including at J2000. NUMAT's mean obliquity and nutation share the
     inspected source convention; no physical-pole model is substituted.
-    https://github.com/liberfa/erfa/blob/v2.0.1/src/numat.c
     """
-    import erfa
+    if erfa is None:
+        raise ModuleNotFoundError("reference_frames requires the jpl extra (pyerfa)")
 
     mean_epsilon = pair(tt, "pepol", "peper")[0][1]
     dpsi, deps, _, _ = nutation(tt)

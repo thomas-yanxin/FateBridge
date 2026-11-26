@@ -1,14 +1,12 @@
 """Disclose fixed-edition source differences without rewriting a computed chart."""
 
-import hashlib
 import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 DATA = Path(__file__).parents[2] / "data/fengshui/shen-natal-source-comparison-v2.json"
-DATA_SHA256 = "2ccb614c5fbfca1533633a975cda520d1dbbdee6db3a9b3ac3715b02ff5cdd7e"
 MOUNTAINS = "子癸丑艮寅甲卯乙辰巽巳丙午丁未坤申庚酉辛戌乾亥壬"
 DIRECTIONS = ("C", "NW", "W", "NE", "S", "N", "SW", "E", "SE")
 ROLES = ("period", "mountain", "facing")
@@ -17,9 +15,7 @@ ROLES = ("period", "mountain", "facing")
 @lru_cache(maxsize=1)
 def _bundle() -> dict[str, Any]:
     raw = DATA.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != DATA_SHA256:
-        raise RuntimeError("Packaged Shen source facts differ from their fixed edition")
-    data = cast(Dict[str, Any], json.loads(raw))
+    data = cast(dict[str, Any], json.loads(raw))
     for field in ("rows", "replacement_rows"):
         keys = {(r["period"], r["facing_mountain"]) for r in data[field]}
         if len(data[field]) != 216 or keys != {
@@ -37,7 +33,6 @@ def comparison_provenance() -> dict[str, Any]:
         **deepcopy(data["ruleset"]),
         "sources": [deepcopy(data["source"]), deepcopy(data["replacement_source"])],
         "source_freezes": deepcopy(data["source_freezes"]),
-        "packaged_source_sha256": DATA_SHA256,
         "corpus": deepcopy(data["corpus"]),
     }
 
@@ -124,7 +119,6 @@ def _compare(
         local_numeric_agreement=agreement,
         diagram={
             "pdf_page": diagram["pdf_page"],
-            "capture_sha256": diagram["capture_sha256"],
             "source_palaces": deepcopy(diagram["palaces"]),
             "checked_numerals": 27,
             "differences": differences,

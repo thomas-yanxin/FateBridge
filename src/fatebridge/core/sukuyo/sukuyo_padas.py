@@ -24,12 +24,12 @@ class PadaReferenceCell(TypedDict):
 
 
 def source_bundle() -> dict[str, Any]:
-    return load_source(SOURCE).data
+    return load_source(SOURCE)
 
 
 @lru_cache(maxsize=1)
 def _cells(source_path: Path) -> tuple[PadaReferenceCell, ...]:
-    palaces = load_source(source_path).data["palaces"]
+    palaces = load_source(source_path)["palaces"]
     if [p["ordinal"] for p in palaces] != list(range(1, 13)):
         raise ValueError("原典分足表必须保留师子起算的十二宫序")
     counts: Counter[str] = Counter()
@@ -143,7 +143,6 @@ def palace_reference(
         "pada_numbering_basis": bundle["pada_numbering_basis"],
         "pada_ordinals_explicit_in_source": bundle["pada_ordinals_explicit_in_source"],
         "source_url": bundle["source_url"],
-        "source_sha256": bundle["source_sha256"],
         "locator": bundle["locator"],
         "applied_to_calendar_mansion": False,
         "applied_to_sanjiu": False,

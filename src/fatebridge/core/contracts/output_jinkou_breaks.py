@@ -75,7 +75,6 @@ class JinkouBranchBreaks(PartialOutput):
     ruleset_id: Literal["jinkou_jingben_printed_break_pairs_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_page: StrictInt | None = None
     written_pairs: list[list[Branch]] | None = None
     transcription_url: str | None = None

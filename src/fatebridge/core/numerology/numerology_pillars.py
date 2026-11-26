@@ -3,7 +3,6 @@
 import json
 from copy import deepcopy
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -44,8 +43,6 @@ def _source() -> dict[str, Any]:
         for key in (
             "version",
             "source_title",
-            "source_url",
-            "source_pdf_sha256",
             "review_status",
             "authorship_status",
             "scope",
@@ -56,7 +53,6 @@ def _source() -> dict[str, Any]:
             raise ValueError("卷七原页不一致。")
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_pillar_link_source_data") from exc
-    data["loaded_sha256"] = sha256(raw).hexdigest()
     return data
 
 
@@ -94,12 +90,9 @@ def pillar_link_evidence(pillars: dict[str, str]) -> dict[str, Any]:
         "ruleset_id": RULESET_ID,
         "version": source["version"],
         "source_title": source["source_title"],
-        "source_url": source["source_url"],
-        "source_pdf_sha256": source["source_pdf_sha256"],
         "source_pdf_pages": source["source_pdf_pages"][:],
         "review_status": source["review_status"],
         "authorship_status": source["authorship_status"],
-        "collation_sha256": source["loaded_sha256"],
         "pillars": dict(pillars),
         "links": rows,
         "all_links_match": all(r["matches"] for r in rows),
@@ -138,8 +131,6 @@ def attach_pillar_links(evidence: dict[str, Any], links: dict[str, Any]) -> None
                 "ruleset_id",
                 "version",
                 "source_title",
-                "source_url",
-                "source_pdf_sha256",
                 "authorship_status",
             )
         }

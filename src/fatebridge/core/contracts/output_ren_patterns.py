@@ -189,7 +189,6 @@ def _distinct_ids(items: list[Any], label: str) -> set[str]:
 class JinkouPatterns(PartialOutput):
     ruleset_id: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     source_section: str | None = None
     catalog_count: int | None = Field(default=None, ge=64, le=64)
     evaluated_rule_count: int | None = Field(default=None, ge=0, le=64)

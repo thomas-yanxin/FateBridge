@@ -147,31 +147,10 @@ ROWS += (
     ),
 )
 
-IMAGE_SHA256 = {
-    31: "607fd0d481f334108858b1b7261c1b68cc47012111ebaef2e3bf69b426535cff",
-    21: "2ed9dcaeeec3545c7d4ac9cb7f87d7b52d950de19d345aebc3302cb46c2d90eb",
-    13: "e8954151e2f0fbd6352d4012cd877e29dfbba3ffe9e46a89da27ac7b369496de",
-    12: "3875052e23e1b30398ce99f5cc4385cfa3c1432fabb2ad9dcc286c74b262d768",
-    8: "1ea2a88e5fde5a4309662143c46e743b12efcfbc76434b36c6485dbea8aa3d06",
-    7: "88f05501e1346b32e1ed631bf8bba1f065e43a4e7eb061d39605e3ae9216098a",
-    17: "dec593b89d9db04cfacfd1cb608bbbc10e0ec0b7a30aeb57c54c6494cc95bff9",
-    18: "aec00d7e293da4d005735733d581f069051f25de347e24ef258820251fba582a",
-    20: "036bfda5d9c30f5d87e0adba2134da19561070ff7499e9d28ce2ba0fa9468c62",
-}
-
-
-YANG_IMAGE_SHA256 = {
-    28: "2b976b625aa303a1825ae2f93cf915823ae78c1529d84534dd88f97d30ecf0de",
-    45: "32779ea6d1492da00984f2f372e00d7b07192f8c37f90a4c52c5a1ebc9c36454",
-    50: "cc11d5080f4720417984c3698d1feb935f7e246c782f861a362bf1e977aae483",
-}
-
 
 class EditionImage(TypedDict):
     book_number: int
     image_number: int
-    url: str
-    sha256: str
 
 
 class EditionObservation(TypedDict):
@@ -191,12 +170,8 @@ class EditionComparison(TypedDict):
     classical_author: str
     provider: str
     catalog_identity: str
-    catalog_url: str
-    catalog_sha256: str
     edition: str
     bibliographic_note: str
-    chapter_image_url: str
-    chapter_image_sha256: str
     location: str
     review_status: str
     count_conflict_status: str
@@ -248,28 +223,12 @@ def edition_comparisons(
             "classical_author": "宋 曾公亮、丁度等奉敕撰（馆方目录）",
             "provider": "市立米沢図書館",
             "catalog_identity": "米沢善本40 / AA040001 / 20冊",
-            "catalog_url": "https://www.library.yonezawa.yamagata.jp/dg/AA040.html",
-            "catalog_sha256": "bb7471ba20ee2c74437aa2199984b61543358fcbf30f394f6c1f3bc93c9d29b3",
             "edition": "万暦27年（1599）跋重刻本",
             "bibliographic_note": "馆方目录记载：据南宋绍定4年本的正统4年本重刻。此处不据目录推断两书文本谱系独立。",
-            "chapter_image_url": (
-                "https://www.library.yonezawa.yamagata.jp/dg/data/AA040/019/AA040019_002.jpg"
-                if yin
-                else "https://www.library.yonezawa.yamagata.jp/dg/data/AA040/018/AA040018_028.jpg"
-            ),
-            "chapter_image_sha256": (
-                "cbed0e7776aa63ba6ca2e808edeb6db77fd9464947d6733e9479929d794751fb"
-                if yin
-                else YANG_IMAGE_SHA256[28]
-            ),
             "images": [
                 {
                     "book_number": row.book_number,
                     "image_number": number,
-                    "url": f"https://www.library.yonezawa.yamagata.jp/dg/data/AA040/{row.book_number:03d}/AA040{row.book_number:03d}_{number:03d}.jpg",
-                    "sha256": (
-                        IMAGE_SHA256[number] if yin else YANG_IMAGE_SHA256[number]
-                    ),
                 }
                 for number in row.image_numbers
             ],

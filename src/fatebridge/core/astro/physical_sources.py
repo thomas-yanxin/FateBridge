@@ -3,16 +3,15 @@
 Swiss's returned model identifies the top-level branch, not every internal
 dependency. Managed geocentric physical calls separately require the observed
 planet/Moon contexts. File slots describe contexts after calc(), not a complete
-atomic read set. File hashes and DE headers do not certify positional accuracy.
+atomic read set. File sizes and DE headers do not certify positional accuracy.
 """
 
 from __future__ import annotations
 
-import hashlib
 import math
 from importlib.metadata import version
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.ephemeris_integrity import _packaged_manifest
@@ -26,13 +25,9 @@ from fatebridge.utils.errors import EphemerisSourceError
 RULESET = "fatebridge.physical_ephemeris_sources.v1"
 
 
-def _file_digest(path: Path) -> str:
-    # Raw DE441 is over 2 GiB; do not load it into process memory for tracing.
-    digest = hashlib.sha256()
-    with path.open("rb") as source:
-        for chunk in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+def _file_stat(path: Path) -> tuple[int, int, int, int]:
+    stat = path.stat()
+    return stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns
 
 
 def assert_physical_configuration(selected: str | None) -> None:
@@ -44,16 +39,17 @@ class PhysicalEphemerisTrace:
     """One native calculation, with private paths kept out of results."""
 
     def __init__(self) -> None:
-        self._paths: Dict[Path, str] = {}
-        self._files: Dict[str, Dict[str, Any]] = {}
-        self._factors: Dict[str, Dict[str, Any]] = {}
+        self._paths: dict[Path, str] = {}
+        self._path_stats: dict[Path, tuple[int, int, int, int]] = {}
+        self._files: dict[str, dict[str, Any]] = {}
+        self._factors: dict[str, dict[str, Any]] = {}
         self._manifest = _packaged_manifest()["files"]
         self._jpl_name = configured_jpl_file()
 
     def observe(
         self, factor: str, model: str, *, record_factor: bool = True
-    ) -> Dict[str, Any]:
-        """Identify/hash a state context, optionally registering a chart factor.
+    ) -> dict[str, Any]:
+        """Identify a state context, optionally registering a chart factor.
 
         Auxiliary derivative states use the same verified file set but keep
         their context in the method's own provenance. They are not additional
@@ -88,8 +84,8 @@ class PhysicalEphemerisTrace:
                     raise EphemerisSourceError("invalid_range")
                 if path not in self._paths:
                     try:
-                        size = path.stat().st_size
-                        digest = _file_digest(path)
+                        stat = _file_stat(path)
+                        size = stat[2]
                     except OSError as error:
                         if model == "jpl":
                             raise EphemerisSourceError("unavailable_during") from error
@@ -104,7 +100,6 @@ class PhysicalEphemerisTrace:
                         "id": identity,
                         "slot": slot,
                         "filename": path.name,
-                        "sha256": digest,
                         "bytes": size,
                         "range_time_scale": "TDB" if model == "jpl" else "TT",
                         (
@@ -119,12 +114,11 @@ class PhysicalEphemerisTrace:
                         ): float(end),
                         "de_number": int(de_number),
                         "matches_packaged_manifest": bool(
-                            expected
-                            and expected["sha256"] == digest
-                            and expected["bytes"] == size
+                            expected and expected["bytes"] == size
                         ),
                     }
                     self._paths[path] = identity
+                    self._path_stats[path] = stat
                 identity = self._paths[path]
                 if self._files[identity]["slot"] != slot:
                     raise EphemerisSourceError("slot_changed")
@@ -148,20 +142,20 @@ class PhysicalEphemerisTrace:
             self._factors[factor] = context
         return context
 
-    def finish(self) -> Dict[str, Any]:
+    def finish(self) -> dict[str, Any]:
         if configured_jpl_file() != self._jpl_name:
             raise EphemerisSourceError("physical_configuration_changed")
-        for path, identity in self._paths.items():
+        for path, initial_stat in self._path_stats.items():
             try:
-                digest = _file_digest(path)
+                stat = _file_stat(path)
             except OSError as error:
                 raise EphemerisSourceError("unavailable_during") from error
-            if digest != self._files[identity]["sha256"]:
+            if stat != initial_stat:
                 raise EphemerisSourceError("changed_during")
         return self.snapshot()
 
-    def snapshot(self) -> Dict[str, Any]:
-        """Observed contexts so far; only finish() verifies endpoint hashes."""
+    def snapshot(self) -> dict[str, Any]:
+        """Observed contexts so far; only finish() verifies endpoint file state."""
         result = {
             "ruleset_id": RULESET,
             "by_factor": self._factors,
@@ -185,7 +179,7 @@ class PhysicalEphemerisTrace:
         return result
 
 
-def jpl_time_scale_policy() -> Dict[str, Any]:
+def jpl_time_scale_policy() -> dict[str, Any]:
     """Describe the inspected native approximation; do not change an epoch."""
     native = str(getattr(runtime.swe, "version", "unavailable"))
     binding = binding_distribution_version(runtime.swe, version)
@@ -200,8 +194,6 @@ def jpl_time_scale_policy() -> Dict[str, Any]:
         "tt_tdb_conversion_applied": False if inspected else None,
         "source_documented_maximum_difference_seconds": 0.002 if inspected else None,
         "source_function": "pyswisseph2.10.3.2/libswe/sweph.c:jplplan",
-        "source_url": "https://ssd.jpl.nasa.gov/doc/de440_de441.html",
-        "native_source_url": "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c",
         "scope": "Native source documents Teph approximately TDB approximately TT. The .002 second value is its documented estimate, not a new observational bound or an implemented time conversion. Numerical positions and rates are unchanged.",
     }
 
@@ -210,14 +202,14 @@ class PhysicalSourceCohort:
     """Do not conflate a changing model with birth-clock sensitivity."""
 
     def __init__(self) -> None:
-        self.sources: List[Dict[str, Any]] = []
-        self._models: Dict[str, str] = {}
-        self._editions: Dict[int, List[int]] = {}
-        self._file_hashes: Dict[tuple[int, str], str] = {}
+        self.sources: list[dict[str, Any]] = []
+        self._models: dict[str, str] = {}
+        self._editions: dict[int, list[int]] = {}
+        self._file_sizes: dict[tuple[int, str], int] = {}
 
-    def add(self, source: Dict[str, Any]) -> int:
+    def add(self, source: dict[str, Any]) -> int:
         models = {key: row["model"] for key, row in source["by_factor"].items()}
-        editions: Dict[int, List[int]] = {}
+        editions: dict[int, list[int]] = {}
         for file in source["files"]:
             editions.setdefault(file["slot"], []).append(file["de_number"])
         editions = {key: sorted(set(value)) for key, value in editions.items()}
@@ -227,25 +219,25 @@ class PhysicalSourceCohort:
             raise EphemerisSourceError("edition_changed")
         for file in source["files"]:
             key = (file["slot"], file["filename"])
-            if key in self._file_hashes and self._file_hashes[key] != file["sha256"]:
+            if key in self._file_sizes and self._file_sizes[key] != file["bytes"]:
                 raise EphemerisSourceError("changed_across")
-            self._file_hashes[key] = file["sha256"]
+            self._file_sizes[key] = file["bytes"]
         self._models, self._editions = models, editions
         if source not in self.sources:
             self.sources.append(source)
         return self.sources.index(source)
 
 
-_ABS_PATHS: Dict[str, Path] = {}
+ABS_PATHS: dict[str, Path] = {}
 
 
 def _absolute_path(filename: str) -> Path:
     if filename.startswith("/") or (
         len(filename) > 2 and filename[1] == ":" and filename[2] in "\\/"
     ):
-        cached = _ABS_PATHS.get(filename)
+        cached = ABS_PATHS.get(filename)
         if cached is None:
             cached = Path(filename).absolute()
-            _ABS_PATHS[filename] = cached
+            ABS_PATHS[filename] = cached
         return cached
     return Path(filename).absolute()

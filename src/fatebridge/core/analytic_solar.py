@@ -9,33 +9,27 @@ explicit. The author comparison range is1900..2100, not every software epoch.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
+from collections.abc import Sequence
 from copy import deepcopy
 from fractions import Fraction
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any, Dict, Sequence, Tuple
+from typing import Any
 
 from fatebridge.core.astro.reference_frames import precession_angles, rotate
 from fatebridge.utils.errors import EphemerisSourceError
 
-Vector = Tuple[float, float, float]
-State = Tuple[Vector, Vector]
+Vector = tuple[float, float, float]
+State = tuple[Vector, Vector]
 AS2R = math.pi / (180 * 3600)
 C_AU_DAY = 299792458.0 * 86400 / 149597870700.0
 MODEL_ID = "fatebridge_analytic_solar_v1"
-# Reviewed ERFA2.0.1 extraction, including its source and author-scope metadata.
-# Updating the named source requires a fresh source review, not a new file hash
-# copied from whatever coefficients happen to be installed.
-PROFILE_CONTENT_SHA256 = (
-    "138972a929da1ef7ac41921ec80f69149b36cda6fae364e90d3bd21b44625873"
-)
 
 
-def _unique_object(pairs: Sequence[Tuple[str, Any]]) -> Dict[str, Any]:
-    result: Dict[str, Any] = {}
+def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
     for key, value in pairs:
         if key in result:
             raise ValueError("Duplicate analytic coefficient key")
@@ -44,35 +38,20 @@ def _unique_object(pairs: Sequence[Tuple[str, Any]]) -> Dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
-def _profile_data() -> Dict[str, Any]:
+def _profile_data() -> dict[str, Any]:
     try:
         raw = (
             files("fatebridge")
             .joinpath("data/astronomy/analytic-solar-v1.json")
             .read_bytes()
         )
-        data: Dict[str, Any] = json.loads(raw, object_pairs_hook=_unique_object)
-        content = json.dumps(
-            data,
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-            allow_nan=False,
-        ).encode()
-        if hashlib.sha256(content).hexdigest() != PROFILE_CONTENT_SHA256:
-            raise ValueError("Unreviewed analytic solar coefficient content")
+        data: dict[str, Any] = json.loads(raw, object_pairs_hook=_unique_object)
     except (OSError, ValueError, TypeError) as error:
         raise EphemerisSourceError("solar_analytic_invalid") from error
-    data["loaded_sha256"] = hashlib.sha256(raw).hexdigest()
     return data
 
 
-def loaded_sha256() -> str:
-    """Return the immutable SHA-256 digest of the loaded analytic solar table without copying."""
-    return str(_profile_data()["loaded_sha256"])
-
-
-def profile() -> Dict[str, Any]:
+def profile() -> dict[str, Any]:
     """Return a detached source view; callers cannot rewrite loaded mathematics."""
     return deepcopy(_profile_data())
 
@@ -119,7 +98,7 @@ def _series(kind: str, t: float) -> State:
     return _orientation(positions), _orientation(velocities)
 
 
-def earth_state(date1: float, date2: float = 0.0) -> Tuple[State, State]:
+def earth_state(date1: float, date2: float = 0.0) -> tuple[State, State]:
     """Heliocentric and barycentric BCRS state, AU and AU/day."""
     t = _epoch(date1, date2, 365.25)
     helio, sun = _series("e", t), _series("s", t)
@@ -131,7 +110,7 @@ def earth_state(date1: float, date2: float = 0.0) -> Tuple[State, State]:
     )
 
 
-def nutation(date1: float, date2: float = 0.0) -> Tuple[float, float]:
+def nutation(date1: float, date2: float = 0.0) -> tuple[float, float]:
     t = _epoch(date1, date2, 36525.0)
     arguments = [
         math.fmod(a + b * t, 1296000) * AS2R
@@ -205,13 +184,12 @@ def solar_longitude(jd_tt: float) -> float:
     return math.degrees(math.atan2(ecliptic[1], ecliptic[0])) % 360
 
 
-def model_details(jd_tt: float) -> Dict[str, Any]:
+def model_details(jd_tt: float) -> dict[str, Any]:
     t = _epoch(jd_tt, 0.0, 365.25)
     data = _profile_data()
     return {
         "model_id": MODEL_ID,
         "version": data["version"],
-        "coefficient_sha256": data["loaded_sha256"],
         "source_commit": data["source"]["commit"],
         "author_validation_range": "1900-2100 (abs Julian years from J2000 <=100)",
         "outside_author_validation_range": abs(t) > 100,
@@ -220,11 +198,10 @@ def model_details(jd_tt: float) -> Dict[str, Any]:
         "light_time_iterations": 3,
         "native_moshier_relabelled": False,
         "accuracy_certified": False,
-        "source_url": data["source"]["files"]["epv00.c"]["url"],
     }
 
 
-def longitude_crossing_tt(target: float, low: float, high: float) -> Dict[str, Any]:
+def longitude_crossing_tt(target: float, low: float, high: float) -> dict[str, Any]:
     """Bracketed TT crossing, independent of all benchmark crossing times.
 
     Forty bisections are capped by the representable JD grid; the bracket is

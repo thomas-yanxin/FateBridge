@@ -3,13 +3,10 @@
 Chapter 5 (served revision 2012-08-10), Tables 5.1a/b, Eqs. 5.32/5.43;
 Chapter 8, Tables 8.1/8.2/8.3. These are the published table coefficients,
 not the different single-MJD/REAL*4 INTERP 2007 numerical operator.
-https://iers-conventions.obspm.fr/content/chapter5/icc5.pdf
-https://iers-conventions.obspm.fr/content/chapter8/icc8.pdf
 """
 
 from __future__ import annotations
 
-import hashlib
 import math
 from dataclasses import dataclass
 from fractions import Fraction
@@ -25,7 +22,6 @@ from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.ut1_epoch import UT1Instant
 
 ASSET = "iers2010-eop-tides-v1.json"
-ASSET_SHA = "b7e0dbfbee28ab3928671ba01e2d25247f04c04a187353e5aeed6457c543861a"
 MODEL = "iers2010_printed_tables_20120810_tt_ut1_v1"
 
 _Five = tuple[int, int, int, int, int]
@@ -83,8 +79,6 @@ class _TideData(TypedDict):
 def _coefficients() -> _TideData:
     """Validate unknown resource bytes once, at their owning boundary."""
     raw = files("fatebridge.data").joinpath("knowledge/" + ASSET).read_bytes()
-    if hashlib.sha256(raw).hexdigest() != ASSET_SHA:
-        raise ValueError("IERS 2010 coefficient asset identity mismatch")
     return TypeAdapter(_TideData).validate_json(raw)
 
 

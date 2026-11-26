@@ -9,9 +9,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.metaphysics.taiyi_eye_relations import ANNOTATIONS, PROFILE, SCOPE
+from fatebridge.core.metaphysics.taiyi_eye_relations import PROFILE, SCOPE
 
-SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷04#推五將發不發"
 CLAUSES = (
     ("shiji_clear", "始击无掩击", {"始击"}, {"掩", "击"}),
     ("wenchang_clear", "文昌无囚迫", {"文昌"}, {"囚", "迫"}),
@@ -130,10 +129,8 @@ def five_general_conditions(
             "version": "1.2.0",
             "author": "FateBridge contributors",
             "classical_author": "唐·王希明",
-            "source": SOURCE,
             "conformance": "three_source_scoped_clauses_with_explicit_unknowns",
             "relation_profile": PROFILE,
-            "relation_sources": list(ANNOTATIONS),
             "relation_scope": SCOPE,
             "coverage_policy": "same_core_co_location_checked_unknown_is_not_absence_v1",
         },

@@ -11,7 +11,6 @@ from typing import Any
 
 from fatebridge.core.metaphysics.liureng_transmissions import PUNISHMENT
 from fatebridge.core.metaphysics.ren_evidence import liuren_annotation_note
-from fatebridge.core.metaphysics.ren_gods import TANYUAN_TRANSCRIPTION
 
 
 def classify_transmission_pattern(
@@ -92,7 +91,6 @@ def classify_transmission_pattern(
         reason += f" 影印表注{note['annotation']}；{note['explanation']}"
     return {
         "ruleset_id": "tanyuan_jiuzong_names_v1",
-        "source_url": TANYUAN_TRANSCRIPTION,
         "source_section": "推演篇·三传 / 九宗门总说",
         "labels": labels,
         "detail": final_detail,

@@ -38,7 +38,7 @@ def _validation_error_payload(error: ToolValidationError) -> dict[str, JsonValue
     }
 
 
-_QUERY_LABELS = {
+QUERY_LABELS = {
     "key": "归一化主键",
     "object_a": "对象 A",
     "object_b": "对象 B",
@@ -109,7 +109,7 @@ def _build_knowledge_snapshot_text(entry: dict[str, Any]) -> str:
     ]
     if entry.get("title"):
         query_lines.append(f"标题：{entry['title']}")
-    for field, label in _QUERY_LABELS.items():
+    for field, label in QUERY_LABELS.items():
         value = query_normalized.get(field)
         if value in {None, ""}:
             continue
@@ -155,7 +155,6 @@ def _build_knowledge_snapshot_text(entry: dict[str, Any]) -> str:
             source_lines.append(
                 f"原典：{reference.get('author')}《{reference.get('title')}》；{reference.get('edition')}；{locator}"
             )
-            source_lines.append(f"原典网址：{reference.get('source_url')}")
             source_lines.append(f"归属范围：{reference.get('support_scope')}")
         for reference in curation.get("implementation_refs") or []:
             source_lines.append(f"实现：{reference.get('source_path')}")
@@ -169,8 +168,6 @@ def _build_knowledge_snapshot_text(entry: dict[str, Any]) -> str:
                 f"来源对象：{record.get('key')}；{record.get('source_title') or '继承或具名来源对象'}；"
                 f"修订：{record.get('source_revision') if record.get('source_revision') is not None else '未提供'}；状态：{record.get('review_status')}"
             )
-            if record.get("source_url"):
-                source_lines.append(f"来源网址：{record['source_url']}")
 
     if provenance.get("reference_policy_id") == "human_design_line_reference_v1":
         source_lines.append(f"参考范围：{provenance.get('scope')}")
@@ -178,8 +175,6 @@ def _build_knowledge_snapshot_text(entry: dict[str, Any]) -> str:
             source_lines.append(
                 f"来源对象：{record.get('key')}；状态：{record.get('review_status')}"
             )
-            if record.get("source_url"):
-                source_lines.append(f"来源网址：{record['source_url']}")
 
     return render_snapshot_lines(
         [

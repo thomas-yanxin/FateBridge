@@ -160,7 +160,6 @@ def prove_moving_earth_sources(
         ruleset_id=profile["ruleset_id"],
         ruleset_version=profile["ruleset_version"],
         source_url=profile["source"]["url"] + "#page=97",
-        source_sha256=profile["source"]["sha256"],
         source_path=source_path,
         condition_match=any(r["condition_match"] for r in published),
         excluded_target_position=subject_position,

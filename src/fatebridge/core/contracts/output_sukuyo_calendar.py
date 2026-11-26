@@ -42,7 +42,6 @@ class SukuyoVerseResolution(PartialOutput):
     id: str | None = None
     locator: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     source_excerpt: str | None = None
     xml_kind: str | None = None
     literal_expression: str | None = None
@@ -55,7 +54,6 @@ class SukuyoVerseResolution(PartialOutput):
 
 class SukuyoComparativeTimeReference(PartialOutput):
     id: str | None = None
-    source_bundle_sha256: str | None = None
     witnesses: list[dict[str, OpenJsonValue]] | None = None
     applied_to_runtime_clock: bool | None = None
     t1299_day_eight_night_eight_replaced: bool | None = None
@@ -72,7 +70,6 @@ class SukuyoClockDoctrine(PartialOutput):
     historical_clock_arithmetic: dict[str, OpenJsonValue] | None = None
     id: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     locator: str | None = None
     source_excerpt: str | None = None
     day_parts: int | None = None
@@ -149,15 +146,12 @@ class SukuyoFullmoonCalculation(PartialOutput):
     shortcut_mansion: str | None = None
     methods_agree: bool | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
-    source_bundle_sha256: str | None = None
     direct_locator: str | None = None
     shortcut_locator: str | None = None
     scope: str | None = None
 
 
 class SukuyoCalendarProfile(PartialOutput):
-    source_bundle_sha256: str | None = None
     calendar_profile: str | None = None
     mansion_method_id: str | None = None
     host_calculation: SukuyoFullmoonCalculation | None = None
@@ -180,7 +174,6 @@ class SukuyoDayCycleAnchor(PartialOutput):
     civil_ordinal: int | None = None
     day_ganzhi: str | None = None
     source_lunar_year_query: int | None = None
-    source_response_sha256: str | None = None
 
 
 class SukuyoHistoricalDayReference(PartialOutput):
@@ -200,9 +193,6 @@ class SukuyoCalendarReference(PartialOutput):
     provider_calendar_id: str | None = None
     source_url: str | None = None
     calendar_metadata_url: str | None = None
-    source_archive_sha256: str | None = None
-    source_bundle_sha256: str | None = None
-    source_response_sha256: str | None = None
     source_month_start_ordinal: int | None = None
     source_month_length_days: int | None = None
     day_cycle_anchor: SukuyoDayCycleAnchor | None = None

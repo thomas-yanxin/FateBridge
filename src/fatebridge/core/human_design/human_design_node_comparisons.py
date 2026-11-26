@@ -22,7 +22,6 @@ from fatebridge.core.human_design.human_design_variables import (
 )
 
 CONVENTION_SCOPE = "显式展示交点约定影响；不以更符合自我描述为由选择口径。"
-NODE_SOURCE = "https://www.astro.com/swisseph/swisseph.htm"
 
 
 def node_reference_witness(chart: dict[str, Any]) -> dict[str, Any]:

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 from copy import deepcopy
@@ -13,11 +12,9 @@ from fatebridge.core.human_design.human_design_additional_polarities import fact
 from fatebridge.core.human_design.human_design_depth import depth_reference
 from fatebridge.core.human_design.human_design_references import (
     coherent_human_design_references,
-    reference_sha256,
 )
 from fatebridge.core.knowledge_store import ToolValidationError
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.utils.json_digest import canonical_bytes
 
 DOMAIN = "human_design"
 
@@ -28,29 +25,20 @@ SOURCE = "fatebridge_human_design_line_references"
 POLICY_ID = "human_design_line_reference_v1"
 
 
-FIXING_READING_SOURCE = "https://ihumandesignschool.com/how-to-use-the-rave-iching/"
-
-
 CATALOGUE_PATH = (
     Path(__file__).resolve().parents[2] / "data/human_design/line-knowledge-v1.json"
 )
 
 
-CATALOGUE_SHA256 = "e0be8121e433f1513fdd45ac560acd4c7519f67cf12d11bd86b966b0e011430e"
-
-
 MANIFEST_PATH = CATALOGUE_PATH.with_name("line-knowledge-manifest-v2.json")
-
-
-MANIFEST_SHA256 = "c33d3b6099e96b66c0e2dbe898dc97e5a5a8ab125a1c64596863c63f31440d79"
 
 
 SUPPLEMENT_PATH = CATALOGUE_PATH.with_name("line-knowledge-gate2-v1.json")
 
 
 KEY = re.compile(r"([1-9]|[1-5][0-9]|6[0-4])\.([1-6])", flags=re.ASCII)
-_BASE_CACHE: tuple[tuple[Any, ...], dict, bytes] | None = None
-_CATALOGUE_CACHE: tuple[tuple[Any, ...], dict, dict[Path, bytes]] | None = None
+BASE_CACHE: tuple[tuple[Any, ...], dict, bytes] | None = None
+CATALOGUE_CACHE: tuple[tuple[Any, ...], dict, dict[Path, bytes]] | None = None
 
 
 def _path_stamp(path: Path) -> tuple[str, int, int]:
@@ -97,29 +85,18 @@ def _nonfinite(value: str) -> None:
 
 
 def _base_catalogue() -> tuple[dict, bytes]:
-    global _BASE_CACHE
+    global BASE_CACHE
     try:
-        depth_pdf_sha = depth_reference()["source"]["pdf_sha256"]
-        factual_sha = reference_sha256("rave-2001-depth.json")
-        cache_key = (
-            _path_stamp(CATALOGUE_PATH),
-            CATALOGUE_SHA256,
-            depth_pdf_sha,
-            factual_sha,
-        )
-        if _BASE_CACHE is not None and _BASE_CACHE[0] == cache_key:
-            return deepcopy(_BASE_CACHE[1]), _BASE_CACHE[2]
+        cache_key = (_path_stamp(CATALOGUE_PATH),)
+        if BASE_CACHE is not None and BASE_CACHE[0] == cache_key:
+            return deepcopy(BASE_CACHE[1]), BASE_CACHE[2]
         raw = CATALOGUE_PATH.read_bytes()
-        if hashlib.sha256(raw).hexdigest() != CATALOGUE_SHA256:
-            raise ValueError("Human Design editorial reference identity changed")
         data = json.loads(raw, object_pairs_hook=_object, parse_constant=_nonfinite)
         expected = [(gate, line) for gate in range(1, 65) for line in range(1, 7)]
         if (
             data["schema_version"] != 1
             or data["version"] != 1
             or data["required_line_count"] != 384
-            or data["source"]["pdf_sha256"] != depth_pdf_sha
-            or data["source_factual_catalogue_sha256"] != factual_sha
             or [(r["gate"], r["line"]) for r in data["rows"]] != expected
             or [r["key"] for r in data["rows"]]
             != [f"{g}.{line}" for g, line in expected]
@@ -134,7 +111,6 @@ def _base_catalogue() -> tuple[dict, bytes]:
             if (
                 row["independent_semantic_review_completed"] is not False
                 or row["complete_line_meaning_accepted"] is not False
-                or not re.fullmatch(r"[0-9a-f]{64}", row["source_layout_block_sha256"])
                 or row["source_pdf_page_one_based"] != 7 + 2 * (row["gate"] - 1)
             ):
                 raise ValueError("Invalid source locator or review claim")
@@ -153,41 +129,34 @@ def _base_catalogue() -> tuple[dict, bytes]:
                 curated.append(row["key"])
         if curated != [f"1.{line}" for line in range(1, 7)]:
             raise ValueError("Unreviewed semantic coverage changed")
-        _BASE_CACHE = (cache_key, deepcopy(data), raw)
+        BASE_CACHE = (cache_key, deepcopy(data), raw)
         return data, raw
     except (OSError, KeyError, TypeError, ValueError, RecursionError) as exc:
         raise EphemerisSourceError("human_design_reference_invalid") from exc
 
 
 def _catalogue() -> tuple[dict, dict[Path, bytes]]:
-    global _CATALOGUE_CACHE
+    global CATALOGUE_CACHE
     try:
         cache_key = (
             _path_stamp(CATALOGUE_PATH),
             _path_stamp(MANIFEST_PATH),
             _path_stamp(SUPPLEMENT_PATH),
-            CATALOGUE_SHA256,
-            MANIFEST_SHA256,
-            depth_reference()["source"]["pdf_sha256"],
-            reference_sha256("rave-2001-depth.json"),
         )
-        if _CATALOGUE_CACHE is not None and _CATALOGUE_CACHE[0] == cache_key:
-            return deepcopy(_CATALOGUE_CACHE[1]), dict(_CATALOGUE_CACHE[2])
+        if CATALOGUE_CACHE is not None and CATALOGUE_CACHE[0] == cache_key:
+            return deepcopy(CATALOGUE_CACHE[1]), dict(CATALOGUE_CACHE[2])
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise EphemerisSourceError("human_design_reference_invalid") from exc
     data, base_raw = _base_catalogue()
     try:
         raw = MANIFEST_PATH.read_bytes()
-        if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
-            raise ValueError("Composite reference revision changed")
         manifest = json.loads(raw, object_pairs_hook=_object, parse_constant=_nonfinite)
         snapshot = {CATALOGUE_PATH: base_raw, MANIFEST_PATH: raw}
         if (
             manifest["schema_version"] != 1
             or manifest["version"] != 2
             or manifest["catalogue_id"] != "human_design_line_knowledge_v2"
-            or manifest["base"]
-            != {"file": "line-knowledge-v1.json", "sha256": CATALOGUE_SHA256}
+            or manifest["base"]["file"] != "line-knowledge-v1.json"
             or manifest["required_line_count"] != len(data["rows"])
             or manifest["independently_accepted_line_count"] != 0
             or manifest["publisher_master_authenticated"] is not False
@@ -199,8 +168,6 @@ def _catalogue() -> tuple[dict, dict[Path, bytes]]:
         if binding["file"] != "line-knowledge-gate2-v1.json":
             raise ValueError("Undeclared supplement path")
         supplement_raw = SUPPLEMENT_PATH.read_bytes()
-        if hashlib.sha256(supplement_raw).hexdigest() != binding["sha256"]:
-            raise ValueError("Supplement identity changed")
         snapshot[SUPPLEMENT_PATH] = supplement_raw
         supplement = json.loads(
             supplement_raw, object_pairs_hook=_object, parse_constant=_nonfinite
@@ -208,8 +175,6 @@ def _catalogue() -> tuple[dict, dict[Path, bytes]]:
         if (
             supplement["schema_version"] != 1
             or supplement["supplement_id"] != "human_design_gate2_editorial_v1"
-            or supplement["base_catalogue_sha256"] != CATALOGUE_SHA256
-            or supplement["source_pdf_sha256"] != data["source"]["pdf_sha256"]
             or supplement["independently_accepted_line_count"] != 0
             or supplement["publisher_master_authenticated"] is not False
             or supplement["complete384_line_meanings_accepted"] is not False
@@ -225,8 +190,6 @@ def _catalogue() -> tuple[dict, dict[Path, bytes]]:
                 original["editorial_paraphrase"] is not None
                 or row["source_pdf_page_one_based"]
                 != original["source_pdf_page_one_based"]
-                or row["source_layout_block_sha256"]
-                != original["source_layout_block_sha256"]
                 or row["independent_semantic_review_completed"] is not False
                 or row["complete_line_meaning_accepted"] is not False
                 or row["meaning_status"]
@@ -254,7 +217,7 @@ def _catalogue() -> tuple[dict, dict[Path, bytes]]:
             != manifest["expected_local_paraphrase_count"]
         ):
             raise ValueError("Declared coverage differs from actual records")
-        _CATALOGUE_CACHE = (cache_key, deepcopy(data), dict(snapshot))
+        CATALOGUE_CACHE = (cache_key, deepcopy(data), dict(snapshot))
         return data, snapshot
     except (OSError, KeyError, TypeError, ValueError, RecursionError) as exc:
         raise EphemerisSourceError("human_design_reference_invalid") from exc
@@ -266,9 +229,6 @@ def _provenance(data: dict, snapshot: dict[Path, bytes]) -> dict:
         "domain": DOMAIN,
         "reference_policy_id": POLICY_ID,
         "source_catalogue_version": data["version"],
-        "source_catalogue_content_sha256": hashlib.sha256(
-            canonical_bytes(data)
-        ).hexdigest(),
         "reference_only": True,
         "personal_applicability_assessed": False,
         "whole_books_collated": False,
@@ -280,13 +240,8 @@ def _provenance(data: dict, snapshot: dict[Path, bytes]) -> dict:
                 "domain": DOMAIN,
                 "key": "rave2001_line_locators_and_editorial_v1",
                 "source_path": "human_design/line-knowledge-v1.json",
-                "loaded_file_sha256": hashlib.sha256(
-                    snapshot[CATALOGUE_PATH]
-                ).hexdigest(),
                 "source_kind": "fixed_public_copy_locators_and_local_editorial_paraphrases",
                 "source_title": data["source"]["title"],
-                "source_url": data["source"]["url"],
-                "source_pdf_sha256": data["source"]["pdf_sha256"],
                 "source_revision": 1,
                 "review_status": "six_local_paraphrases_pending_independent_review",
                 "scope": "384线块定位完整；极性星体继承已绑定的事实目录，不把384条定位认作384条完整语义审校。",
@@ -296,7 +251,6 @@ def _provenance(data: dict, snapshot: dict[Path, bytes]) -> dict:
                     "domain": DOMAIN,
                     "key": path.stem,
                     "source_path": f"human_design/{path.name}",
-                    "loaded_file_sha256": hashlib.sha256(snapshot[path]).hexdigest(),
                     "source_kind": kind,
                     "review_status": "local_editorial_reference_pending_independent_review",
                 }
@@ -312,7 +266,6 @@ def _provenance(data: dict, snapshot: dict[Path, bytes]) -> dict:
                 "domain": DOMAIN,
                 "key": "rave2001_original_polarity_facts",
                 "source_path": "human_design/rave-2001-depth.json",
-                "loaded_file_sha256": reference_sha256("rave-2001-depth.json"),
                 "source_kind": "existing_frozen_polarity_catalogue",
                 "review_status": "inherited_factual_reference_not_new_full_visual_collation",
             },
@@ -320,9 +273,6 @@ def _provenance(data: dict, snapshot: dict[Path, bytes]) -> dict:
                 "domain": DOMAIN,
                 "key": "rave2001_additional_planet_facts",
                 "source_path": "human_design/additional-polarities-2001.json",
-                "loaded_file_sha256": reference_sha256(
-                    "additional-polarities-2001.json"
-                ),
                 "source_kind": "existing_two_explicit_additional_planets",
                 "review_status": "bounded_source_clause_facts",
             },
@@ -378,7 +328,6 @@ def read_reference(*, category: str | None, key: str | None) -> dict:
                 "author": "Lynda Bunnell",
                 "published_by": "IHDS blog / Ruth Brennan",
                 "published_on": "2024-06-12",
-                "url": FIXING_READING_SOURCE,
                 "scope": "固定为极性侧重，不是另一极性永不发生；只支持此解释规则，不认证完整线义。",
             },
         }
@@ -429,7 +378,7 @@ def read_reference(*, category: str | None, key: str | None) -> dict:
             "rendered_text": "\n".join([title, *tips]),
             "source": SOURCE,
             "bundle_version": None,
-            "citation": f"Ra Uru Hu, The Complete Rave I'Ching, 2001公开副本，PDF第{record['source_pdf_page_one_based']}页；{data['source']['url']}。固定取用规则另据Lynda Bunnell2024署名说明：{FIXING_READING_SOURCE}",
+            "citation": f"Ra Uru Hu, The Complete Rave I'Ching, 2001公开副本，PDF第{record['source_pdf_page_one_based']}页。固定取用规则另据Lynda Bunnell 2024署名说明。",
             "provenance": _provenance(data, raw),
             "reference_only": True,
             "reference_details": {

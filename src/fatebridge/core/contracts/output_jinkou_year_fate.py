@@ -36,7 +36,6 @@ class JinkouYearFate(PartialOutput):
     birth_year_calendar_boundary_verified: Literal[False] | None = None
     comprehensive_year_fate_adjudicated: Literal[False] | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     source_section: str | None = None
     original_pdf_pages: list[int] | None = None
     relation_adjudication: Literal["unresolved_course_stem_reference"] | None = None
@@ -118,7 +117,6 @@ class JinkouNatalCourse(PartialOutput):
     birth_year_calendar_boundary_verified: Literal[False] | None = None
     comprehensive_judgement: None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     source_section: str | None = None
     original_pdf_pages: list[int] | None = None
     basis: str | None = None

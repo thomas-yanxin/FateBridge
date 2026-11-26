@@ -19,8 +19,8 @@ from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.transports.flags import RESPONSE_LIMIT_DESC
 
-_BOOL_TRUE_TOKENS = {"true", "1", "yes", "y", "on"}
-_BOOL_FALSE_TOKENS = {"false", "0", "no", "n", "off"}
+BOOL_TRUE_TOKENS = {"true", "1", "yes", "y", "on"}
+BOOL_FALSE_TOKENS = {"false", "0", "no", "n", "off"}
 
 
 def emit_error(payload: ServiceResult, code: int) -> int:
@@ -99,9 +99,9 @@ class _BooleanFlagAction(argparse.Action):
             result = True
         else:
             token = str(values).strip().lower()
-            if token in _BOOL_TRUE_TOKENS:
+            if token in BOOL_TRUE_TOKENS:
                 result = True
-            elif token in _BOOL_FALSE_TOKENS:
+            elif token in BOOL_FALSE_TOKENS:
                 result = False
             else:
                 parser.error(

@@ -41,8 +41,6 @@ class MoiraGodPlacement:
 class MoiraProviderProfile:
     profile_id: str
     source_commit: str
-    source_property_sha256: str
-    source_url: str
     full_zodiac: tuple[str, ...]
     zodiac: tuple[str, ...]
     twelve_signs: tuple[str, ...]
@@ -137,7 +135,7 @@ def load_provider_profile(path: Path) -> MoiraProviderProfile:
     if not isinstance(document, dict):
         raise ValueError("Moira provider profile must be an object")
     identity: dict[str, str] = {}
-    for key in ("profile_id", "source_commit", "source_property_sha256", "source_url"):
+    for key in ("profile_id", "source_commit"):
         value = document.get(key)
         if not isinstance(value, str):
             raise ValueError(f"Moira provider profile requires string {key}")
@@ -297,8 +295,6 @@ def load_provider_profile(path: Path) -> MoiraProviderProfile:
     return MoiraProviderProfile(
         profile_id=identity["profile_id"],
         source_commit=identity["source_commit"],
-        source_property_sha256=identity["source_property_sha256"],
-        source_url=identity["source_url"],
         full_zodiac=full_zodiac,
         zodiac=zodiac,
         twelve_signs=twelve_signs,
@@ -344,9 +340,9 @@ def resolve_source_provider_facts(
 ) -> MoiraProviderResolution:
     """Resolve the owned source namespaces from independently optional facts.
 
-    ``known_absent`` contains full god namespace keys known to be disabled or
+    known_absent contains full god namespace keys known to be disabled or
     without a source position. Missing prerequisites instead appear only in
-    ``facts.unavailable``. This result never overwrites a caller's LuWei table.
+    facts.unavailable. This result never overwrites a caller's LuWei table.
     """
     palaces: dict[str, str] = {}
     mansions: dict[str, str] = {}

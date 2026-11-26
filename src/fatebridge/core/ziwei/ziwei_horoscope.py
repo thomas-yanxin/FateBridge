@@ -194,7 +194,7 @@ def build_ziwei_horoscope(
 ) -> dict[str, Any]:
     """Six scopes using lunar-year ages and the natal-month/hour Dou Jun.
 
-    Scope ``branch`` identifies the natal palace occupied by the active Ming.
+    Scope branch identifies the natal palace occupied by the active Ming.
     The scope calendar stem and branch govern its own flowing stars.
     Flowing scopes retain the target clock. Age ordinals use one civil clock
     for both physical endpoints. A chart alone cannot supply its birth instant.

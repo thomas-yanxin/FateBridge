@@ -33,6 +33,7 @@ from fatebridge.core.execution_context import (
     correlate_error,
     safe_correlation,
 )
+from fatebridge.diagnostics import diagnose
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import (
     ParameterError,
@@ -198,9 +199,6 @@ def run(argv: list[str] | None = None) -> int:
         return _run_describe(args.tool, args.detail)
 
     if args.command == "doctor":
-        # note (startup): Ordinary tool calls do not need installation diagnostics.
-        from fatebridge.diagnostics import diagnose
-
         result = diagnose(
             mcp=args.mcp,
             family=args.family,

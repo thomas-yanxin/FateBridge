@@ -7,6 +7,7 @@ policy is explicit. No score or lack of a caution becomes a safe-to-judge proof.
 
 from __future__ import annotations
 
+from math import isfinite
 from typing import Any
 
 from fatebridge.core.astro.geometry import Angle, angle_fraction, longitude_float
@@ -14,7 +15,6 @@ from fatebridge.core.astro.lilly import (
     DOMICILES,
     PLANETS,
     SIGNS,
-    SOURCE_URL,
     TRIPLICITIES,
     dignity_at,
 )
@@ -217,8 +217,6 @@ def evaluate_radicality(
         speed = seventh_state["speed"]
         if not isinstance(speed, (int, float)):
             raise ValueError("Longitude speed must be finite")
-        from math import isfinite
-
         if not isfinite(speed):
             raise ValueError("Longitude speed must be finite")
         retro = speed < 0
@@ -456,7 +454,6 @@ def evaluate_radicality(
     ]
     return {
         "method_id": "lilly1647_p121_123_consideration_review_v1",
-        "source_url": SOURCE_URL,
         "source_pages": [33, 104, 121, 122, 123],
         "clause_count": len(rows),
         "clauses": rows,

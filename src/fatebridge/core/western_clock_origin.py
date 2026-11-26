@@ -17,7 +17,6 @@ from fatebridge.core.civil_calendar import (
 )
 
 METHOD = "fatebridge.western_hour_origin.v1"
-SOURCE = "https://wellcomecollection.org/works/s7z7c46y"
 
 
 def event_wall_datetime(
@@ -98,7 +97,6 @@ def event_wall_datetime(
                 if noon
                 else "API midnight-based 24-hour clock convention"
             ),
-            "rule_source_url": SOURCE if noon else None,
             "source_pages": [30, 31] if noon else [],
             "scope": "Selected ephemeris-table hour convention only, not every printed chart. Calendar day-label arithmetic and nominal day carry precede final Gregorian range validation; civil/LMT/LAT and timezone resolution follow. Not physical elapsed duration, a Julian-date epoch offset, regional reform, March25 year conversion, clock-accuracy or original-chart certification.",
         },

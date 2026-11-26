@@ -286,10 +286,10 @@ class QimenAnalysisRequest(_DeferredModel):
 class TaiyiAnalysisRequest(_DeferredModel):
     """Request model for Taiyi analysis.
 
-    太乙 does NOT take 奇门's ``qimen_options`` (layout/palaceShift) — it used to
-    inherit ``QimenAnalysisRequest`` purely to reuse the date/time fields, which
-    leaked ``qimen_options`` onto the 太乙 schema where it is meaningless. The
-    fields below are exactly what ``calculate_taiyi_analysis`` consumes.
+    太乙 does NOT take 奇门's qimen_options (layout/palaceShift) — it used to
+    inherit QimenAnalysisRequest purely to reuse the date/time fields, which
+    leaked qimen_options onto the 太乙 schema where it is meaningless. The
+    fields below are exactly what calculate_taiyi_analysis consumes.
     """
 
     analysis_year: int = Field(

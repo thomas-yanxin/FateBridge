@@ -69,7 +69,7 @@ CHART_VARIANT_TOOL_KEYS: dict[str, str] = {
 
 def output_model_for(key: str, *, western_data_policy: bool = False) -> type[BaseModel]:
     """Build each catalog's public schema from explicit root-field contracts."""
-    if key not in _TOOL_FIELDS:
+    if key not in TOOL_FIELDS:
         raise KeyError(f"Missing output contract for tool {key}")
     fields: dict[str, Any] = {
         "run_metadata": (RunMetadata | None, None),
@@ -111,12 +111,12 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
         "birth_time_sensitivity": BirthTimeSensitivity,
         **tool_fields,
     }
-    root_fields = dict.fromkeys([*_TOOL_FIELDS[key].split(), *tool_fields])
+    root_fields = dict.fromkeys([*TOOL_FIELDS[key].split(), *tool_fields])
     if key == "astro_chart":
         for variant_key in CHART_VARIANT_TOOL_KEYS.values():
-            root_fields.update(dict.fromkeys(_TOOL_FIELDS[variant_key].split()))
+            root_fields.update(dict.fromkeys(TOOL_FIELDS[variant_key].split()))
     for field in root_fields:
-        annotation = overrides.get(field, _FIELD_TYPES.get(field, Object))
+        annotation = overrides.get(field, FIELD_TYPES.get(field, Object))
         metadata: dict[str, JsonValue] = {}
         if field == "planets":
             metadata.update(
@@ -168,10 +168,10 @@ def required_output_fields_for(key: str) -> tuple[str, ...]:
     silently unprotected. Required objects must contain a fact or explicit
     status; empty lists can still be legitimate domain results.
     """
-    return tuple(_REQUIRED_OUTPUT_FIELDS[key].split())
+    return tuple(REQUIRED_OUTPUT_FIELDS[key].split())
 
 
-_FIELD_TYPES: dict[str, Any] = {
+FIELD_TYPES: dict[str, Any] = {
     "analysis_type": str,
     "aspects": list[JsonValue],
     "balance_basis": str,
@@ -261,7 +261,7 @@ _FIELD_TYPES: dict[str, Any] = {
 }
 
 
-_TOOL_FIELDS = {
+TOOL_FIELDS = {
     "bazi_source_compare": "analysis_type four_pillars input_context current_calculation source_comparison summary",
     "analyze_destiny": "calendar_context day_master element_distribution element_distribution_basis element_seasonal_phase favorable_elements four_pillars patterns person_info structure_profile ten_gods",
     "bazi_birth": "analysis_type bazi_birth",
@@ -347,7 +347,7 @@ _TOOL_FIELDS = {
 }
 
 
-_REQUIRED_OUTPUT_FIELDS = {
+REQUIRED_OUTPUT_FIELDS = {
     "bazi_source_compare": "four_pillars input_context current_calculation source_comparison summary",
     "analyze_destiny": "four_pillars day_master",
     "bazi_birth": "bazi_birth",

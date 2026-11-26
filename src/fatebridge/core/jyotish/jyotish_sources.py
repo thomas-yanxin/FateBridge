@@ -20,26 +20,26 @@ from fatebridge.core.jyotish.jyotish_clock import check_clock_sources
 from fatebridge.utils.errors import EphemerisSourceError
 
 PLANETS = ("Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn")
-_P = ParamSpec("_P")
-_R = TypeVar("_R")
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
-_POINT: ContextVar[dict[str, Any] | None] = ContextVar(
+POINT: ContextVar[dict[str, Any] | None] = ContextVar(
     "jyotish_source_point", default=None
 )
 
 
-def coherent_sources(function: Callable[_P, _R]) -> Callable[_P, _R]:
+def coherent_sources(function: Callable[P, R]) -> Callable[P, R]:
     """One fresh native context for the complete outer India operation."""
     local = coherent_ephemeris_sources(function)
 
     @wraps(function)
-    def wrapped(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+    def wrapped(*args: P.args, **kwargs: P.kwargs) -> R:
         if native_execution.in_native_worker():
             return local(*args, **kwargs)
         with source_session():
             return cast(
-                _R,
+                R,
                 native_execution.calculate(
                     function.__module__ + "." + function.__name__, args, kwargs
                 ),
@@ -48,12 +48,12 @@ def coherent_sources(function: Callable[_P, _R]) -> Callable[_P, _R]:
     return wrapped
 
 
-def coherent_india_call(function: Callable[_P, _R]) -> Callable[_P, _R]:
+def coherent_india_call(function: Callable[P, R]) -> Callable[P, R]:
     """Enclose only the India route, including its birth-clock construction."""
     coherent = coherent_sources(function)
 
     @wraps(function)
-    def wrapped(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+    def wrapped(*args: P.args, **kwargs: P.kwargs) -> R:
         if kwargs.get("chart_variant") == "india_chart":
             return coherent(*args, **kwargs)
         return function(*args, **kwargs)
@@ -63,7 +63,7 @@ def coherent_india_call(function: Callable[_P, _R]) -> Callable[_P, _R]:
 
 def observe_physical(factor: str, model: str) -> None:
     """Observe immediately after the physical calc(), never for analytical nodes."""
-    session, point = current_source_session(), _POINT.get()
+    session, point = current_source_session(), POINT.get()
     if session is not None and point is not None:
         session.check()
         point[factor] = session.trace.observe(factor, model)
@@ -93,7 +93,7 @@ def traced_positions(calculate_positions: PositionCalculation) -> PositionCalcul
         if session is None:
             raise RuntimeError("Position tracing requires a source session")
         point: dict[str, Any] = {}
-        token = _POINT.set(point)
+        token = POINT.set(point)
         try:
             result = calculate_positions(
                 birth, moment, node_mode, ephemeris_policy, cheshta_model
@@ -118,7 +118,7 @@ def traced_positions(calculate_positions: PositionCalculation) -> PositionCalcul
                 result["clock_source_comparison"] = clock_sources
             return result
         finally:
-            _POINT.reset(token)
+            POINT.reset(token)
 
     return wrapped
 

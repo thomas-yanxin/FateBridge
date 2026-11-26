@@ -290,11 +290,11 @@ def _cycle_stem(stem: str, steps: int) -> str:
 
 
 def _palace_stem(year_stem: str, position: int) -> str:
-    """五虎遁: 给定年干, 取第 ``position`` 宫 (寅=1 … 丑=12) 的天干。
+    """五虎遁: 给定年干, 取第 position 宫 (寅=1 … 丑=12) 的天干。
 
     命宫 / 身宫 的天干随宫位由年干起五虎遁定 (寅宫起干 = (年干序+1)*2),
     而非由月柱「相对位移」推导——后者把地支 mod-12 的位移直接喂给天干
-    mod-10 的循环, 在宫位环绕到月支之前时会漏掉 ``12 mod 10 = 2`` 而偏 +2。
+    mod-10 的循环, 在宫位环绕到月支之前时会漏掉 12 mod 10 = 2 而偏 +2。
     """
     year_gan_index = HEAVENLY_STEMS.index(year_stem)
     gan_index = (year_gan_index + 1) * 2 + position

@@ -16,8 +16,7 @@ def daily_annotation_reference(
 ) -> dict[str, Any] | None:
     if year != 1346 or leap or (month, day) not in {(6, 20), (6, 21), (8, 3), (8, 5)}:
         return None
-    source = load_source(SOURCE)
-    bundle = deepcopy(source.data)
+    bundle = deepcopy(load_source(SOURCE))
     records = []
     for row in bundle["records"]:
         if row["month"] != month:
@@ -30,7 +29,6 @@ def daily_annotation_reference(
         records.append({**row, "current_date_role": role})
     return {
         **bundle,
-        "source_bundle_sha256": source.sha256,
         "records": records,
         "current_lunar_fields": [year, month, day, leap],
         "source_is_study_author_transcription": True,

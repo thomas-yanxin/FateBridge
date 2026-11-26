@@ -1,7 +1,7 @@
 """Source-scoped interior relationships, independent of compass or birth data.
 
-``pillar_corner`` explicitly identifies a solid projecting pillar corner, not
-every furniture corner. ``toilet_wall`` identifies the shared wall at the toilet
+pillar_corner explicitly identifies a solid projecting pillar corner, not
+every furniture corner. toilet_wall identifies the shared wall at the toilet
 fixture's side, not any partition adjoining a bathroom.
 """
 

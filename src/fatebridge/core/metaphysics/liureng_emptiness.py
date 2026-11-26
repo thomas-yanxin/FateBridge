@@ -15,7 +15,6 @@ from fatebridge.core.metaphysics.common import (
     xun_head_for_ganzhi,
 )
 from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 
@@ -59,8 +58,6 @@ def emptiness_evidence(
     )
     evidence = dict(
         ruleset_id="liuren_tanyuan_empty_scope_v3",
-        source_url=TANYUAN_SOURCE,
-        source_sha256=TANYUAN_SCAN_SHA256,
         source_title="大六壬探原·卷下论空亡（所选条件）",
         original_pdf_pages=[84, 85],
         year_fate_placement_pdf_pages=[70, 71, 72, 73],

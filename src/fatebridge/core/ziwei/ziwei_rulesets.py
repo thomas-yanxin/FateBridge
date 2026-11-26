@@ -11,7 +11,7 @@ DEFAULT_ZIWEI_PROFILE: ZiweiRuleProfile = "iztro_2_5_8"
 ZiweiNatalLeapMonthPolicy = Literal[
     "split_at_day_15", "all_current_month", "all_next_month"
 ]
-_NATAL_LEAP_MONTH_DEFAULTS: dict[ZiweiRuleProfile, ZiweiNatalLeapMonthPolicy] = {
+NATAL_LEAP_MONTH_DEFAULTS: dict[ZiweiRuleProfile, ZiweiNatalLeapMonthPolicy] = {
     "iztro_2_5_8": "split_at_day_15",
     "quanshu_v2_excerpt": "all_next_month",
 }
@@ -23,11 +23,9 @@ ZIWEI_NATAL_LEAP_MONTH_LABELS: dict[ZiweiNatalLeapMonthPolicy, str] = {
 ZiweiSihuaSource = Literal["rule_profile", "naj_ming_v1"]
 ZiweiDayDivide = Literal["current", "forward"]
 DEFAULT_ZIWEI_DAY_DIVIDE: ZiweiDayDivide = "current"
-QUANSHU_SOURCE = (
-    "https://zh.wikisource.org/w/index.php?title=紫微斗數全書/卷二&oldid=1963110"
-)
-IZTRO_SOURCE = "https://github.com/SylarLong/iztro/tree/2.5.8"
-NAJ_MING_SOURCE = "https://www.digital.archives.go.jp/item/4468520"
+QUANSHU_SOURCE = "紫微斗数全书·卷二"
+IZTRO_SOURCE = "iztro 2.5.8"
+NAJ_MING_SOURCE = "内阁文库明刻本紫微斗数全书"
 QUANSHU_BRIGHTNESS_CONFLICT = "太阴寅表旺、同卷散文庙；取选表，不裁冲突或认证全卷"
 
 
@@ -72,7 +70,7 @@ def validate_rule_profile(profile: str) -> ZiweiRuleProfile:
 def natal_leap_month_policy_for(
     profile: ZiweiRuleProfile, requested: ZiweiNatalLeapMonthPolicy | None
 ) -> ZiweiNatalLeapMonthPolicy:
-    return _NATAL_LEAP_MONTH_DEFAULTS[profile] if requested is None else requested
+    return NATAL_LEAP_MONTH_DEFAULTS[profile] if requested is None else requested
 
 
 def effective_lunar_month(

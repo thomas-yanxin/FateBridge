@@ -97,24 +97,22 @@ def decode_clock(text: str, *, model: str) -> dict[str, Any]:
     """Decode only an explicitly selected model, never infer it from a date."""
     if model != MODEL:
         raise ValueError("必须明确选择所选NAOJ2019五十刻模型")
-    source = load_source(SOURCE)
     return {
-        **_clock(text, source.data),
+        **_clock(text, load_source(SOURCE)),
         "model": model,
-        "source_bundle_sha256": source.sha256,
     }
 
 
 def quantity_fun(text: str, *, model: str) -> dict[str, int]:
     if model != MODEL:
         raise ValueError("必须明确选择所选NAOJ2019五十刻模型")
-    bundle = load_source(SOURCE).data
+    bundle = load_source(SOURCE)
     return _ratio(_quantity(text, _units(bundle)[2]))
 
 
 def seasonal_ordinal(label: str) -> int:
     """Count the study's nominal seasonal labels, excluding 没日, not dates."""
-    bundle = load_source(SOURCE).data
+    bundle = load_source(SOURCE)
     if not isinstance(label, str):
         raise ValueError("须提供平气节气日标签，不能用民用日期替代")
     match = re.fullmatch(r"(.+?)(\d+)日", label)
@@ -131,7 +129,7 @@ def _assess(bundle: dict[str, Any], *, include_all_rows: bool) -> dict[str, Any]
     rows, exceptional_groups, errors = [], set(), []
     groups = bundle["record_groups"]
     for index, group in enumerate(groups):
-        # Use this same captured bundle for labels, units, readings and digest.
+        # Use this same captured bundle for labels, units, and readings.
         label_match = re.fullmatch(r"(.+?)(\d+)日", group["season_label"])
         names = bundle["seasonal_axis"]["term_order_from_winter_solstice"]
         if not label_match or label_match[1] not in names:
@@ -202,13 +200,11 @@ def _assess(bundle: dict[str, Any], *, include_all_rows: bool) -> dict[str, Any]
 
 
 def clock_arithmetic_reference(*, include_all_rows: bool = False) -> dict[str, Any]:
-    source = load_source(SOURCE)
-    bundle = source.data
+    bundle = load_source(SOURCE)
     hours, koku, fun = _units(bundle)
     senmyo = bundle["comparative_units"]["senmyoreki_clock_definition"]
     result = {key: value for key, value in bundle.items() if key != "record_groups"}
     result.update(
-        source_bundle_sha256=source.sha256,
         exact_unit_relations={
             "fun_per_double_hour": _ratio(Fraction(koku * fun, hours)),
             "fun_at_shizheng": _ratio(Fraction(koku * fun, hours * 2)),

@@ -13,20 +13,21 @@ from queue import Queue
 from threading import Thread
 from typing import Any
 
+from pydantic import JsonValue
+
+from fatebridge.core.astro import native_execution as execution
+from fatebridge.core.astro.iers_ut1 import use_ut1_source
+from fatebridge.core.compressed_ephemeris import audit_compressed_endpoints
+from fatebridge.core.ephemeris_runtime import configure_ephemeris_path
+from fatebridge.core.execution_context import call_clock
+from fatebridge.core.physical_ephemeris_policy import data_file_policy
+from fatebridge.utils.errors import EphemerisSourceError, JyotishCalculationError
+
 logger = logging.getLogger(__name__)
 
 
 def main() -> None:
     """Serve one request after resolving the isolated executable's package path."""
-    from pydantic import JsonValue
-
-    from fatebridge.core.astro import native_execution as execution
-    from fatebridge.core.astro.iers_ut1 import use_ut1_source
-    from fatebridge.core.compressed_ephemeris import audit_compressed_endpoints
-    from fatebridge.core.execution_context import call_clock
-    from fatebridge.core.physical_ephemeris_policy import data_file_policy
-    from fatebridge.utils.errors import EphemerisSourceError, JyotishCalculationError
-
     output = sys.stdout.buffer
 
     def send(message: dict[str, Any]) -> None:
@@ -70,14 +71,12 @@ def main() -> None:
     with contextlib.redirect_stdout(sys.stderr), call_clock(request["clock"]) as clock:
         try:
             auxiliary = execution.AuxiliaryInputs(request["auxiliary_path"])
-            if auxiliary.initial != request["auxiliary_fingerprints"]:
+            if auxiliary.initial != request["auxiliary_states"]:
                 raise EphemerisSourceError("auxiliary_changed_during")
             execution._AUXILIARY_EVIDENCE = {
                 **auxiliary.evidence(),
                 **execution.context_for_entry(request["entry"]),
             }
-            from fatebridge.core.ephemeris_runtime import configure_ephemeris_path
-
             configure_ephemeris_path(selected or "")
             arguments = execution.decode(request["args"])
             options = execution.decode(request["kwargs"])

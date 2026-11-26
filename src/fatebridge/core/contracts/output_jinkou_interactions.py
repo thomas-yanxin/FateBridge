@@ -86,7 +86,6 @@ class JinkouPositionInteractions(PartialOutput):
     ruleset_id: Literal["jinkou_jingben_position_interactions_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[int] | None = None
     position_order: list[Position] | None = None
     pairs: list[JinkouPositionPair] | None = Field(

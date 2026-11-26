@@ -20,7 +20,6 @@ class MonthUseSource(PartialOutput):
     title: Annotated[str | None, FULL_FACT] = None
     edition: Annotated[str | None, FULL_FACT] = None
     url: Annotated[str | None, FULL_FACT] = None
-    source_sha256: Annotated[str | None, FULL_FACT] = None
     claims: Annotated[dict[str, MonthUseClaim] | None, FULL_FACT] = None
 
 

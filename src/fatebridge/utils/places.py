@@ -33,16 +33,16 @@ from fatebridge.utils.place_catalog import (
 DEFAULT_BIRTH_TIMEZONE = "Asia/Shanghai"
 # UPU United Kingdom addressing guide (11/2011), p. 2: Square and Walk
 # occur as thoroughfare fields before the post town.
-_UK_STREET_ENDING = re.compile(
+UK_STREET_ENDING = re.compile(
     r"\S\s+(?:road|street|way|avenue|drive|lane|close|square|walk)\.?$"
 )
 # Royal Mail PAF Programmer's Guide, ed. 7 v. 6: PO Box is a separate
 # delivery field, with a number that may include letters.
-_UK_PO_BOX = re.compile(r"p\.?o\.?\s+box\s+(?=[a-z0-9]*[0-9])[a-z0-9]{1,6}")
+UK_PO_BOX = re.compile(r"p\.?o\.?\s+box\s+(?=[a-z0-9]*[0-9])[a-z0-9]{1,6}")
 # UPU United Kingdom addressing guide (11/2011), pp. 1 and 3–4. A postal
 # area can identify a jurisdiction, but does not validate a delivery point.
-_UK_POSTCODE = re.compile(r"([a-z]{1,2})[0-9][0-9a-z]?\s+[0-9][a-z]{2}|gir\s+0aa")
-_GB_POSTCODE_AREAS = frozenset(
+UK_POSTCODE = re.compile(r"([a-z]{1,2})[0-9][0-9a-z]?\s+[0-9][a-z]{2}|gir\s+0aa")
+GB_POSTCODE_AREAS = frozenset(
     (
         "ab al b ba bb bd bh bl bn br bs bt ca cb cf ch cm co cr ct cv cw da dd "
         "de dg dh dl dn dt dy e ec eh en ex fk fy g gl gu ha hd hg hp hr hs hu hx "
@@ -51,7 +51,7 @@ _GB_POSTCODE_AREAS = frozenset(
         "st sw sy ta td tf tn tq tr ts tw ub w wa wc wd wf wn wr ws wv yo ze"
     ).split()
 )
-_CROWN_DEPENDENCY_POSTCODE_AREAS = {"gy": "GG", "im": "IM", "je": "JE"}
+CROWN_DEPENDENCY_POSTCODE_AREAS = {"gy": "GG", "im": "IM", "je": "JE"}
 
 
 @dataclass(frozen=True)
@@ -77,7 +77,7 @@ class _Match:
         return self.start < other.end and other.start < self.end
 
 
-_EMPTY = BirthPlaceResolution(None, None, None, None, None, None)
+EMPTY = BirthPlaceResolution(None, None, None, None, None, None)
 
 
 def _is_place_word_char(character: str) -> bool:
@@ -91,13 +91,11 @@ def _uk_postal_address_matches(
 ) -> tuple[list[_Match], list[_Match]] | None:
     """Scope aliases to complete fields in a recognized UPU UK postal address."""
     street = next(
-        (span for span, text in components.items() if _UK_STREET_ENDING.search(text)),
+        (span for span, text in components.items() if UK_STREET_ENDING.search(text)),
         None,
     )
     if street is None:
-        boxes = [
-            span for span, text in components.items() if _UK_PO_BOX.fullmatch(text)
-        ]
+        boxes = [span for span, text in components.items() if UK_PO_BOX.fullmatch(text)]
         if len(boxes) != 1:
             return None
         address_end = boxes[0][1]
@@ -108,20 +106,20 @@ def _uk_postal_address_matches(
     for span, text in components.items():
         if span[0] < address_end:
             continue
-        match = _UK_POSTCODE.fullmatch(text)
+        match = UK_POSTCODE.fullmatch(text)
         if match is None:
             continue
         area = match[1]
-        if area is None or area in _GB_POSTCODE_AREAS:
+        if area is None or area in GB_POSTCODE_AREAS:
             postal_country = "GB"
         else:
-            postal_country = _CROWN_DEPENDENCY_POSTCODE_AREAS.get(area)
+            postal_country = CROWN_DEPENDENCY_POSTCODE_AREAS.get(area)
         if postal_country is not None:
             postcode = span
             break
     if street is None:
         if postcode is None or any(
-            span != postcode and _UK_POSTCODE.fullmatch(text)
+            span != postcode and UK_POSTCODE.fullmatch(text)
             for span, text in components.items()
         ):
             return None
@@ -306,7 +304,7 @@ def _resolve(match: _Match) -> BirthPlaceResolution:
 def resolve_birth_place_context(birth_place: str | None) -> BirthPlaceResolution:
     """Resolve a name/address locally; do not guess among unrelated namesakes."""
     if not birth_place or birth_place == "未提供":
-        return _EMPTY
+        return EMPTY
     return _resolve_birth_place_context_cached(birth_place.strip())
 
 
@@ -470,4 +468,4 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
             return _resolve(winners[preferred])
         if len(winners) == 1:
             return _resolve(next(iter(winners.values())))
-    return _EMPTY
+    return EMPTY

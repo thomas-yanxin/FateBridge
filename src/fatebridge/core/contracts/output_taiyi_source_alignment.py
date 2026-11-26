@@ -12,11 +12,6 @@ class TaiyiSourceAlignmentRuleset(PartialOutput):
     facsimile_source: str | None = None
     source: str | None = None
     count_rule_source: str | None = None
-    source_manifest_sha256: str | None = None
-    transcription_collation_manifest_sha256: str | None = None
-    facsimile_collation_manifest_sha256: str | None = None
-    facsimile_correction_manifest_sha256: str | None = None
-    catalog_sha256: str | None = None
 
 
 class TaiyiSourcePosition(PartialOutput):
@@ -87,7 +82,6 @@ class TaiyiEditionImage(PartialOutput):
     book_number: int | None = None
     image_number: int | None = None
     url: str | None = None
-    sha256: str | None = None
 
 
 class TaiyiEditionObservation(PartialOutput):
@@ -108,11 +102,9 @@ class TaiyiEditionComparison(PartialOutput):
     provider: str | None = None
     catalog_identity: str | None = None
     catalog_url: str | None = None
-    catalog_sha256: str | None = None
     edition: str | None = None
     bibliographic_note: str | None = None
     chapter_image_url: str | None = None
-    chapter_image_sha256: str | None = None
     images: list[TaiyiEditionImage] | None = None
     location: str | None = None
     yin_dun: bool | None = None

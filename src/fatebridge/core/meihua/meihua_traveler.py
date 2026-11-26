@@ -15,7 +15,7 @@ from fatebridge.core.meihua.meihua_qualified_motion import build_qualified_motio
 from fatebridge.core.meihua.meihua_roles import LABELS, ROLES
 
 TRAVELER_TOPIC = "traveler"
-_TARGET_RELATIONS = {
+TARGET_RELATIONS = {
     "体用比和": "same_element",
     "体生用": "target_generates_actor",
     "体克用": "target_controls_actor",
@@ -35,7 +35,7 @@ def _profile() -> dict[str, Any]:
         profile["id"] != "meihua_traveler_nlc1925_v1"
         or profile["version"] != "1.0.0"
         or len(profile["rules"]) != 5
-        or {r["relation"] for r in profile["rules"]} != set(_TARGET_RELATIONS)
+        or {r["relation"] for r in profile["rules"]} != set(TARGET_RELATIONS)
         or len(profile["supplement_rules"]) != 6
         or profile["selection_policy"]["target_role"] != "use"
     ):
@@ -80,7 +80,7 @@ def traveler_qualifications(
     actors = [
         {
             **deepcopy(n),
-            "relation_to_initial_use": _TARGET_RELATIONS[
+            "relation_to_initial_use": TARGET_RELATIONS[
                 relationship_by_role(target["element"], n["element"])
             ],
             "target_role": "use",

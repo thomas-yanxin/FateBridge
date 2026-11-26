@@ -11,7 +11,7 @@ from copy import deepcopy
 from datetime import date, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence, cast
+from typing import Any, Sequence, cast
 
 from lunardate import LunarDate
 
@@ -73,7 +73,6 @@ from fatebridge.core.sukuyo.sukuyo_profiles import (
 from fatebridge.core.sukuyo.sukuyo_profiles import source_bundle as profile_sources
 from fatebridge.core.sukuyo.sukuyo_relations import (
     SU27_ORDER,
-    TEXT_URL,
     relation_between_su27,
 )
 from fatebridge.core.sukuyo.sukuyo_sanjiu_days import source_bundle as sanjiu_sources
@@ -93,13 +92,12 @@ from fatebridge.utils.timezones import (
 )
 
 MONTH_STARTS = list("室奎胃毕参鬼张角氐心斗虚")
-NAOJ_URL = "https://eco.mtk.nao.ac.jp/koyomi/wiki/C6F3BDBDC8ACBDC9.html"
 
 
 @lru_cache(maxsize=1)
-def _calendar_corrections() -> Dict[str, Any]:
+def _calendar_corrections() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             (
                 Path(__file__).resolve().parents[2]
@@ -112,7 +110,7 @@ def _calendar_corrections() -> Dict[str, Any]:
 def rulesets(
     calendar_profile: str = DEFAULT_PROFILE,
     calendar_basis: str = DEFAULT_CALENDAR_BASIS,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     offset = basis_parameters(calendar_basis)[0]
     source = profile_sources()
 
@@ -126,7 +124,7 @@ def rulesets(
     sanjiu = sanjiu_sources()
     six = six_palace_reference(None)
     taibai = taibai_sources()
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "calendar": {
             "id": (
                 source["hinoo_addendum"]["id"]
@@ -134,10 +132,8 @@ def rulesets(
                 else source["id"]
             ),
             "author": "不空译；T1299下卷望日逆顺法",
-            "source": TEXT_URL,
             "locator": "T21n1299_p0394c20-0395a04; p0395b01-08",
             "calendar_profile": calendar_profile,
-            "corroborating_source": NAOJ_URL,
             "hinoo_addendum": (
                 deepcopy(source["hinoo_addendum"])
                 if calendar_profile == HINOO_PROFILE
@@ -148,7 +144,6 @@ def rulesets(
         "relations": {
             "id": "t1299_sanjiu_v1",
             "author": "不空译；上卷杨景风修注",
-            "source": TEXT_URL,
             "locator": "T21n1299_p0391b06-18; p0397c01-19",
             "scope": "三九顺序及双向结交规则；六类配对名仅为界面归类。",
         },
@@ -156,7 +151,6 @@ def rulesets(
             "id": sanjiu["id"],
             "author": sanjiu["author"],
             "source": sanjiu["source_url"],
-            "source_sha256": sanjiu["source_sha256"],
             "locator": "T21n1299_p0391b19-25; p0397c25-0398a17",
             "scope": sanjiu["scope"],
         },
@@ -164,14 +158,12 @@ def rulesets(
             "id": six["ruleset_id"],
             "author": "不空译；上卷杨景风修注",
             "source": six["source_url"],
-            "source_sha256": six["source_sha256"],
             "locator": six["locator"],
             "scope": six["scope"],
         },
         "calendar_day": {
             "id": days["id"],
             "author": "不空译；上卷杨景风修注",
-            "source": TEXT_URL,
             "locator": "T21n1299_p0392c29-0393c06; p0393c18-0394c16",
             "scope": "黑白月日名、一般日类及昼夜条文；保留字面差异，按下卷夹注释一夜为十一夜，钟时映射未完成。",
         },
@@ -179,7 +171,6 @@ def rulesets(
             "id": taibai["id"],
             "author": taibai["author"],
             "source": taibai["source_url"],
-            "source_sha256": taibai["source_sha256"],
             "locator": taibai["locator"],
             "scope": taibai["scope"],
         },
@@ -187,7 +178,6 @@ def rulesets(
             "id": clothing["id"],
             "author": clothing["author"],
             "source": clothing["source_url"],
-            "source_sha256": clothing["source_sha256"],
             "locator": clothing["locator"],
             "scope": clothing["scope"],
         },
@@ -290,14 +280,14 @@ def _lunar_fields(
 
 def calendar_mansion(
     date_text: str,
-    time_text: Optional[str] = None,
-    zone: Optional[str] = None,
+    time_text: str | None = None,
+    zone: str | None = None,
     *,
     leap_month_policy: str = "unresolved",
     calendar_profile: str = DEFAULT_PROFILE,
-    calendar_day_part: Optional[str] = None,
+    calendar_day_part: str | None = None,
     calendar_basis: str = DEFAULT_CALENDAR_BASIS,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Use the explicit host calendar and reference zone, never guessed hours."""
     offset, first_date, last_date, calendar_label = basis_parameters(calendar_basis)
     calendar_system, calendar_backend = basis_identifiers(calendar_basis)
@@ -406,7 +396,7 @@ def calendar_mansion(
         resolved and mansion == host["direct_mansion"],
     )
 
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "status": "computed" if resolved else "partial",
         "input_date": civil_date.isoformat(),
         "input_datetime": input_moment,
@@ -419,11 +409,6 @@ def calendar_mansion(
         "calendar_backend": calendar_backend,
         "calendar_correction": (
             "sukuyo_hko_corrections_v1" if correction is not None else None
-        ),
-        "calendar_source": (
-            "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2069c.txt"
-            if calendar_date == date(2069, 12, 30)
-            else f"https://www.hko.gov.hk/en/gts/time/calendar/text/files/T{calendar_date.year}e.txt"
         ),
         "lunar_year": year,
         "lunar_month": month,
@@ -447,7 +432,6 @@ def calendar_mansion(
         "rule_trace": [
             {
                 "rule_id": "t1299_lower_fullmoon27_two_methods",
-                "source": TEXT_URL,
                 "locator": "T21n1299_p0394c20-0395a04; p0395b01-08",
                 "inputs": {
                     "month": month,
@@ -533,12 +517,9 @@ def calendar_mansion(
         )
         result["calendar_basis"] = calendar_basis
         result["calendar_reference"] = reference
-        result["calendar_source"] = reference["date_source_uri"]
         result["rule_trace"].append(
             {
                 "rule_id": reference["id"],
-                "source": reference["date_source_uri"],
-                "source_bundle_sha256": reference["source_bundle_sha256"],
                 "calendar_basis": calendar_basis,
                 "calendar_timezone": timezone_label,
                 "output": {"year": year, "month": month, "day": day, "leap": leap},
@@ -551,13 +532,13 @@ def calendar_mansion(
 def _date_uncertain_calendar(
     civil_date: date,
     zone: str,
-    support: Dict[str, Any],
+    support: dict[str, Any],
     *,
     leap_month_policy: str,
     calendar_profile: str,
-    calendar_day_part: Optional[str],
+    calendar_day_part: str | None,
     calendar_basis: str = DEFAULT_CALENDAR_BASIS,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     offset, first_date, last_date, calendar_label = basis_parameters(calendar_basis)
     calendar_system, calendar_backend = basis_identifiers(calendar_basis)
     candidates = []
@@ -681,8 +662,8 @@ def _date_uncertain_calendar(
 
 
 def candidate_relation_analysis(
-    first: Dict[str, Any], second: Dict[str, Any]
-) -> Dict[str, Any]:
+    first: dict[str, Any], second: dict[str, Any]
+) -> dict[str, Any]:
     resolved = first["natal_su27"] is not None and second["natal_su27"] is not None
     choices = [
         (
@@ -698,7 +679,7 @@ def candidate_relation_analysis(
         ]
         for c in (first, second)
     )
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "status": "not_needed" if resolved else "candidate_only",
         "candidate_set_complete_within_profile": complete,
         "rows": (
@@ -736,12 +717,12 @@ def candidate_relation_analysis(
 
 
 def day_evidence(
-    context: Dict[str, Any],
-    natal_mansion: Optional[str] = None,
-    activity: Optional[str] = None,
-    activity_details: Optional[Sequence[str]] = None,
-    textual_pada: Optional[int] = None,
-) -> Dict[str, Any]:
+    context: dict[str, Any],
+    natal_mansion: str | None = None,
+    activity: str | None = None,
+    activity_details: Sequence[str] | None = None,
+    textual_pada: int | None = None,
+) -> dict[str, Any]:
     """T1299 day evidence, retaining separate upper and lower witnesses."""
 
     if context.get("calendar_candidates"):
@@ -753,7 +734,7 @@ def day_evidence(
         # Identical complete facts may survive, but never infer a common fact
         # when a possible date lies outside the validated calendar range.
         complete_dates = not context["out_of_range_calendar_dates"]
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             k: (
                 deepcopy(v)
                 if complete_dates and all(a.get(k) == v for a in alternatives)
@@ -843,7 +824,6 @@ def day_evidence(
         "special_day_labels": special_matches,
         "special_day_evidence": special_evidence,
         "special_day_source": {
-            "source": TEXT_URL,
             "locator": "T21n1299_p0392c17-28",
             "scope": "上卷七曜与宿组合；不将标签当事件概率。",
             "ruleset_id": special_evidence["ruleset_id"],
@@ -854,7 +834,6 @@ def day_evidence(
                 "rule_id": "t1299_upper_seven_natures",
                 "input": mansion,
                 "output": nature,
-                "source": TEXT_URL,
                 "locator": "T21n1299_p0390c16-p0391a26",
             }
         ],

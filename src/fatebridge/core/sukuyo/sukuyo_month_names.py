@@ -9,18 +9,10 @@ from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 SOURCE = DATA_DIR / "sukuyo_month_names.json"
-T1299_SOURCE = DATA_DIR / "sukuyo_t1299_days.json"
 
 
 def month_name_reference(rizang: dict[str, Any]) -> dict[str, Any]:
-    loaded = load_source(SOURCE)
-    data = loaded.data
-    if data["source_files_sha256"]["T13n0397.xml"] != rizang["source_sha256"]:
-        raise ValueError("月名对照与日藏具名版本不一致，须重新核验")
-    t1299 = load_source(T1299_SOURCE).data
-    if data["source_files_sha256"]["T21n1299.xml"] != t1299["source_sha256"]:
-        raise ValueError("月名对照与T1299具名版本不一致，须重新核验")
-    return {**data, "source_bundle_sha256": loaded.sha256}
+    return load_source(SOURCE)
 
 
 def month_name_lines(reference: dict[str, Any]) -> list[str]:

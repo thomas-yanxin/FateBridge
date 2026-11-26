@@ -12,7 +12,6 @@ from fatebridge.utils.civil_time import ZonedCalendar
 
 class RenPublishedDateReference(PartialOutput):
     reference_id: Literal["hko_published_term_dates_v1"] | None = None
-    catalogue_sha256: str | None = None
     term_name: str | None = None
     hko_year: StrictInt | None = None
     comparison_clock: Literal["fixed_UTC+08:00"] | None = None
@@ -24,7 +23,6 @@ class RenPublishedDateReference(PartialOutput):
         None
     )
     source_url: str | None = None
-    source_sha256: str | None = None
     comparison_scope: Literal["published_day_only_not_crossing_instant"] | None = None
     instant_accuracy_certified: Literal[False] | None = None
 

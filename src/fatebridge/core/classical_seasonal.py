@@ -16,7 +16,7 @@ from typing import Any, Mapping
 
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS
 
-_SOURCE_PROFILES = {
+SOURCE_PROFILES = {
     "甲": ("jia", "selected_jia_passages_not_full_acceptance"),
     "丙": ("bing", "bing_unit_developer_collation_not_full_acceptance"),
     "丁": ("ding", "selected_ding_spring_passages_not_full_acceptance"),
@@ -26,9 +26,9 @@ _SOURCE_PROFILES = {
 }
 
 
-@lru_cache(maxsize=len(_SOURCE_PROFILES))
+@lru_cache(maxsize=len(SOURCE_PROFILES))
 def _source_profile(day_stem: str) -> dict[str, Any]:
-    name, _ = _SOURCE_PROFILES[day_stem]
+    name, _ = SOURCE_PROFILES[day_stem]
     profile: dict[str, Any] = json.loads(
         files("fatebridge.data")
         .joinpath(f"bazi_seasonal_qiongtong_{name}_v1.json")
@@ -70,7 +70,7 @@ def seasonal_reference_layers(
         "source_review_status": "source_not_collated",
     }
     candidates = {lookup["primary"], *lookup["secondary"]} - {None}
-    profile = _source_profile(day_stem) if day_stem in _SOURCE_PROFILES else None
+    profile = _source_profile(day_stem) if day_stem in SOURCE_PROFILES else None
     if profile is not None and month_branch in profile["months"]:
         layers = deepcopy(profile["months"][month_branch])
         if "general_fire_context" in profile:
@@ -88,7 +88,7 @@ def seasonal_reference_layers(
         source_context = profile.get("month_sources", {}).get(month_branch, profile)
         result.update(
             source_review_status=source_context.get(
-                "source_review_status", _SOURCE_PROFILES[day_stem][1]
+                "source_review_status", SOURCE_PROFILES[day_stem][1]
             ),
             source_ref=deepcopy(source_context["source"]),
             source_layers=layers,

@@ -30,8 +30,8 @@ from fatebridge.utils.civil_time import utc_ordering_key
 from fatebridge.utils.errors import EphemerisSourceError
 
 RULE_ID = "guolao.explicit_solar_input.v1"
-_P = ParamSpec("_P")
-_R = TypeVar("_R")
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
 def solar_input_basis(birth: AstroBirthInfo) -> str | None:
@@ -49,9 +49,9 @@ def apparent_clock_required(birth: AstroBirthInfo) -> bool:
     )
 
 
-def coherent_guolao_solar_call(function: Callable[_P, _R]) -> Callable[_P, _R]:
+def coherent_guolao_solar_call(function: Callable[P, R]) -> Callable[P, R]:
     @wraps(function)
-    def wrapped(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+    def wrapped(*args: P.args, **kwargs: P.kwargs) -> R:
         if (
             kwargs.get("chart_variant") == "guolao_chart"
             and kwargs.get("birth_clock_basis", "civil") != "civil"

@@ -13,10 +13,6 @@ from typing import Any
 from fatebridge.core.astro.astrology_tables import EGYPTIAN_BOUNDS_BY_SIGN, SIGNS
 from fatebridge.core.astro.geometry import normalize_angle
 
-SCAN_URL = (
-    "https://commons.wikimedia.org/wiki/File:Loeb_435_-_Ptolemy_-_"
-    "Tetrabiblos_by_Robbins_(1940).pdf"
-)
 TERM_POLICY = (
     "Robbins 1940 printed main tables pp.96-97,106-107 and I.21 Chaldaean "
     "sequence; degrees counted from 0; intervals [start,end); Chaldaean "
@@ -32,7 +28,7 @@ TRANSCRIPTION_NOTE = (
 
 # Successive lengths, not cumulative endpoints. Egyptian lengths/order in
 # astrology_tables match Robbins pp.96-97 and retain the eclectic layer's API.
-_PTOLEMAIC_LENGTHS = (
+PTOLEMAIC_LENGTHS = (
     (("Jupiter", 6), ("Venus", 8), ("Mercury", 7), ("Mars", 5), ("Saturn", 4)),
     (("Venus", 8), ("Mercury", 7), ("Jupiter", 7), ("Saturn", 2), ("Mars", 6)),
     (("Mercury", 7), ("Jupiter", 6), ("Venus", 7), ("Mars", 6), ("Saturn", 4)),
@@ -74,7 +70,7 @@ def terms_at(longitude: float, chart_sect: str) -> dict[str, dict[str, Any]]:
             "I.20; printed pp.96-97",
         ),
         "chaldaean": (chaldaean, "I.21; printed pp.98-101"),
-        "ptolemaic": (_PTOLEMAIC_LENGTHS[index], "I.21; printed pp.106-107"),
+        "ptolemaic": (PTOLEMAIC_LENGTHS[index], "I.21; printed pp.106-107"),
     }
     result = {}
     for system, (segments, chapter) in tables.items():

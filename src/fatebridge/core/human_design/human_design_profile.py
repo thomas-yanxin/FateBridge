@@ -6,10 +6,7 @@ from copy import deepcopy
 from typing import Any
 
 from fatebridge.core.human_design.human_design_mechanics import RULESET_VERSION
-from fatebridge.core.human_design.human_design_references import (
-    reference_data,
-    reference_sha256,
-)
+from fatebridge.core.human_design.human_design_references import reference_data
 
 GEOMETRIES = {
     "right": {"label": "右角／个人历程", "source_term": "Personal Destiny"},
@@ -23,18 +20,11 @@ def profile_reference() -> dict[str, Any]:
     return reference_data("profile-2026-reference.json")
 
 
-def profile_reference_sha256() -> str:
-    return reference_sha256("profile-2026-reference.json")
-
-
 def profile_evidence(chart: dict[str, Any]) -> dict[str, Any]:
     """Never invent a line, invert P/D order or infer geometry from trigram."""
     reference = profile_reference()
-    sources = [s["url"] for s in reference["sources"].values()]
     base = {
         "profile": chart.get("profile"),
-        "source_catalog_sha256": profile_reference_sha256(),
-        "source_urls": sources,
         "scope": SCOPE,
         "ruleset": {
             "id": "human_design_profile_structure_v1",

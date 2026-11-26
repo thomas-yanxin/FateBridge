@@ -7,12 +7,6 @@ from typing import Any
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.jinkou import build_jinkou_board
 from fatebridge.core.metaphysics.jinkou_year_fate import confirmed_natal_branch
-from fatebridge.core.metaphysics.ren_sources import (
-    JINKOU_RELATIONS_SCAN_SHA256 as SOURCE_SHA256,
-)
-from fatebridge.core.metaphysics.ren_sources import (
-    JINKOU_RELATIONS_SOURCE as SOURCE_URL,
-)
 
 
 def natal_course_metadata(
@@ -46,8 +40,6 @@ def natal_course_metadata(
         course_ground_is_observed=False,
         birth_year_calendar_boundary_verified=False,
         comprehensive_judgement=None,
-        source_url=SOURCE_URL,
-        source_sha256=SOURCE_SHA256,
         source_section="卷上·次客法",
         original_pdf_pages=[168, 169],
         basis="京本次客法提出以来人本命或行年上作课；本层采用已确认本命支作另课地分，复用本次占日、占时、月将及昼夜选择。",
@@ -86,7 +78,6 @@ def build_natal_course(
 def natal_course_trace(value: dict[str, Any]) -> dict[str, Any]:
     return dict(
         rule_id="jinkou.natal_branch_course",
-        source_url=SOURCE_URL,
         source_section="卷上·次客法·本命另课",
         result={k: v for k, v in value.items() if k != "course"},
     )

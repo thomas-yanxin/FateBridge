@@ -11,7 +11,7 @@ import math
 from datetime import datetime
 from fractions import Fraction
 from itertools import combinations
-from typing import Any, Dict, Mapping
+from typing import Any, Mapping
 
 from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.astro.day_meridian import RULESET as DAY_MERIDIAN_RULESET
@@ -60,7 +60,6 @@ SOURCES = [
         "id": "bonert_2007_true_solar_arc",
         "author": "Klaus Bonert",
         "title": "Sonnenbogen-Direktionen im Lebenslauf, Chiron 2007, author excerpt",
-        "url": "https://www.astro.com/astrologie/in_sonnenbogen_g.htm",
         "sections": ["Der wahre Sonnenbogen", "Die Sonne und der Sonnenbogen"],
         "scope": "Progressed-Sun displacement rotates natal factors; empirical claims and event delineations are not adopted",
     },
@@ -68,9 +67,7 @@ SOURCES = [
         "id": "witte_al319_static_biwheel",
         "author": "Witte-Verlag Hamburg",
         "title": "AstrologicPC Installation, Registrierung und Hinweise, PDF created 2023-01-19",
-        "url": "https://witte-verlag.com/pdf/source/AL319_HINWEISE.pdf",
         "sections": ["p.7: static natal/8-degree solar-arc example"],
-        "source_sha256": "f319a3590d2214347af1d99bdb5d2d5634133cfb3c0cbc89f16c822f97851692",
         "scope": "Publisher-authored numerical rotation example, not a date-to-arc oracle or Witte's complete original rulebook",
     },
 ]
@@ -90,7 +87,7 @@ def solar_arc_state(
     analysis_datetime: datetime,
     *,
     _batch: SolarEphemerisBatch | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Calculate actual tropical solar displacement, with no one-degree shortcut."""
     if _batch is None:
         with SolarEphemerisBatch() as batch:
@@ -110,7 +107,7 @@ def solar_arc_state(
 
 def rotate_factors(
     longitudes: Mapping[str, float], arc: float | Fraction
-) -> Dict[str, float]:
+) -> dict[str, float]:
     if not isinstance(arc, Fraction) and not math.isfinite(arc):
         raise ValueError("Solar arc must be finite")
     result = {}
@@ -126,7 +123,7 @@ def biwheel_geometry(
     arc_degrees: float | Fraction,
     *,
     orb_degrees: float = 1.0,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Two/three/four labelled factor references, with full untruncated hit lists.
 
     Each midpoint has two different factor names. The same named factor at
@@ -155,7 +152,7 @@ def biwheel_geometry(
         names: tuple[str, ...],
         identity: bool,
         **refs: Any,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         return {
             "rule_id": "hamburg.solar_arc.biwheel_geometry.v1",
             "equation": equation,
@@ -242,7 +239,7 @@ def biwheel_geometry(
     return {"dials": dials, "contact_counts": counts}
 
 
-def _reading(values: Mapping[str, float], arc: Fraction) -> Dict[str, Any] | None:
+def _reading(values: Mapping[str, float], arc: Fraction) -> dict[str, Any] | None:
     factors = {k: Fraction(v) for k, v in values.items()}
     factors["Midheaven"] = (factors["Midheaven"] + Fraction(arc)) % 360
     return original_example_reading(
@@ -251,7 +248,7 @@ def _reading(values: Mapping[str, float], arc: Fraction) -> Dict[str, Any] | Non
 
 
 def enrich_solar_arc(
-    payload: Dict[str, Any],
+    payload: dict[str, Any],
     birth: AstroBirthInfo,
     analysis_datetime: datetime | None,
     *,
@@ -358,7 +355,7 @@ def enrich_solar_arc(
                 for cohort, index in zip(cohorts, indices):
                     cohort.add(batch.source(index))
                 sample_states.append(computed_state)
-    profile: Dict[str, Any] = dict(nominal_state.to_record())
+    profile: dict[str, Any] = dict(nominal_state.to_record())
     profile["sun_ephemeris_source"] = batch.result
     profile["key_source_comparison"] = progression_key_source_comparison()
     values = {f["id"]: f["longitude"] for f in layer["factors"]}
@@ -409,7 +406,7 @@ def enrich_solar_arc(
         },
     }
     if uncertainty["status"] == "sampled":
-        assessments: list[Dict[str, Any] | None] = []
+        assessments: list[dict[str, Any] | None] = []
         samples = []
         unavailable = sum(
             isinstance(state, SolarArcSampleUnavailable) for state in sample_states

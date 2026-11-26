@@ -9,7 +9,7 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 from fatebridge.core.fengshui.host_guest import analyze as analyze_host_guest
 from fatebridge.core.fengshui.host_guest import validate as validate_host_guest
@@ -32,7 +32,7 @@ def _bundle() -> dict[str, Any]:
     path = (
         Path(__file__).parents[2] / "data" / "fengshui" / "natal-interpretation-v1.json"
     )
-    return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
 def interpretation_provenance() -> dict[str, Any]:
@@ -44,11 +44,11 @@ def interpretation_provenance() -> dict[str, Any]:
         for key in result["source_ids"]
     ]
     result["bundle_version"] = bundle["bundle_version"]
-    return cast(Dict[str, Any], result)
+    return cast(dict[str, Any], result)
 
 
 def _rule(key: str) -> dict[str, Any]:
-    return cast(Dict[str, Any], deepcopy(_bundle()["rules"][key]))
+    return cast(dict[str, Any], deepcopy(_bundle()["rules"][key]))
 
 
 def _ordered_relationship(mountain: str, facing: str) -> str:

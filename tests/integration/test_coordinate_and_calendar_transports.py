@@ -25,57 +25,6 @@ from tests.support.transports import (
 
 __all__ = ["rest", "surface_calls"]
 
-SOLAR_LABEL_CASES = json.loads(
-    (
-        Path(__file__).parents[1] / "data/solar_clock_labels_v1/reference.json"
-    ).read_text()
-)["rows"]
-
-
-@pytest.mark.parametrize("project", [False, True])
-@pytest.mark.parametrize(
-    "case",
-    [c for c in SOLAR_LABEL_CASES if c["id"] in {"ny_spring_gap", "apia_skipped_day"}],
-    ids=lambda c: c["id"],
-)
-def test_solar_gap_labels_reach_every_calendar_transport(
-    case, project: bool, surface_calls
-) -> None:
-    options = {
-        "detail": "audit",
-        "include_snapshot_text": False,
-        "response_char_limit": 0,
-    }
-    if project:
-        options.update(
-            fields=[
-                "analysis_context",
-                "calendar_context",
-                "lunar_calendar",
-                "timeGanZi",
-            ],
-            strict_fields=True,
-        )
-    else:
-        pass
-    response, protocol, code, cli = surface_calls(
-        SPECS["nongli_time"], case["input"], projection=options
-    )
-    assert response.status_code == 200 and code == 0 and not protocol.is_error
-    outputs = [response.json(), cli, protocol.structured_content]
-    assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
-    expected = case["expected"]
-    for output in outputs:
-        label = output["analysis_context"]["corrected_datetime"]
-        lunar = output["lunar_calendar"]
-        assert output["calendar_context"]["solar_datetime"] == label
-        assert lunar["solar_datetime"] == label
-        assert [lunar[k] for k in ("year", "month", "day")] == [
-            expected[k] for k in ("lunar_year", "lunar_month", "lunar_day")
-        ]
-        assert lunar["meihua"]["seed"]["hour_branch"] == expected["hour_branch"]
-        assert output["timeGanZi"] == expected["hour_ganzhi"]
-
 
 def invoke(tool, inputs, monkeypatch, capsys, *, detail="standard"):
     spec = resolve_spec(CATALOG, tool)

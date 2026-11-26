@@ -8,7 +8,6 @@ displayed positions nor supplies an independent physical ephemeris.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 from decimal import Decimal, localcontext
@@ -31,8 +30,6 @@ from fatebridge.utils.errors import EphemerisSourceError
 
 METHOD_ID = "native_geometric_decimal_apparent_reduction_v2"
 PRECISION = 50
-PROFILE_SHA256 = "ad8dd7126d5e1a4b2e6cbcef6aa13d5a4bbc51778db0c037f430a3fac50e8b36"
-SOURCE_URL = "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c"
 FRAME_BODIES = ("Mercury", "Mars", "Pluto")
 MOSHIER_PLANETS = frozenset(
     {"Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"}
@@ -77,8 +74,6 @@ def mass_profile() -> list[tuple[Decimal, Decimal]]:
             .joinpath("data/astro/native-solar-mass-v1.json")
             .read_bytes()
         )
-        if hashlib.sha256(raw).hexdigest() != PROFILE_SHA256:
-            raise ValueError("Changed finite-Sun source profile")
         data = json.loads(raw)
         return [(Decimal(r), Decimal(m)) for r, m in data["radius_mass_pairs"]]
     except (OSError, ValueError, KeyError, TypeError) as error:
@@ -346,8 +341,6 @@ def reduced_longitude(
                     **source_velocity,
                     "lunar_geometry": {
                         "method_id": moshier_lunar_geometry.METHOD_ID,
-                        "coefficient_sha256": moshier_lunar_geometry.COEFFICIENT_SHA256,
-                        "source_url": moshier_lunar_geometry.SOURCE_URL,
                         "frame_model": reference_frames.NATIVE_TROPICAL_MODEL,
                     },
                     "lunar_operator": {

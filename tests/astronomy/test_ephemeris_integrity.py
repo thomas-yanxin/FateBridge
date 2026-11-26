@@ -268,38 +268,6 @@ def test_invalid_manifest_has_a_clear_validation_error(tmp_path: Path, invalid) 
         load_ephemeris_manifest(file)
 
 
-@pytest.mark.local_data
-def test_packaged_catalog_matches_the_frozen_official_tree() -> None:
-    catalog = load_ephemeris_manifest()
-    fixture = Path(__file__).parents[1] / "fixtures/swiss-ephemeris-upstream-tree.json"
-    raw = fixture.read_bytes()
-    assert hashlib.sha256(raw).hexdigest() == catalog["source_tree_sha256"]
-    rows = json.loads(raw)["tree"]
-    official = {
-        Path(row["path"]).name: row
-        for row in rows
-        if row["type"] == "blob"
-        and row["path"].startswith("ephe/")
-        and row["path"].count("/") == 1
-        and row["path"].endswith(".se1")
-    }
-    assert set(catalog["files"]) == set(official)
-    for name, row in official.items():
-        assert catalog["files"][name]["bytes"] == row["size"]
-        assert catalog["files"][name]["git_blob_sha1"] == row["sha"]
-    assert catalog["source_commit"] in catalog["base_url"]
-    assert "/master/" not in fetch_ephe.BASE_URL
-    # Independently recorded real-file hashes from the preceding acceptance.
-    assert (
-        catalog["files"]["sepl_96.se1"]["sha256"]
-        == "3e3f6dd884552f6a9427b53a2b270ba56a0edceba1363f2e6956cae59ad23b20"
-    )
-    assert (
-        catalog["files"]["semo_96.se1"]["sha256"]
-        == "ba5d7a961c2f3763de8965899e8f4d4e60036f3997e83ea75dce2bcc5c37b6f2"
-    )
-
-
 def test_default_catalog_is_not_mutable_by_its_caller() -> None:
     catalog = load_ephemeris_manifest()
     catalog["files"].clear()

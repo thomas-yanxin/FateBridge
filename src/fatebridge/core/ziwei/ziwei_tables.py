@@ -147,7 +147,7 @@ def _brightness_table(table_id: str) -> ZiweiBrightnessTable:
         rows = ZIWEI_STAR_BRIGHTNESS
         branches = list(ZIWEI_BRANCH_SEQUENCE)
         source_kind = "software_implementation"
-        source_url = f"{IZTRO_SOURCE.replace('/tree/', '/blob/')}/src/data/stars.ts"
+        source_url = f"{IZTRO_SOURCE} stars.ts"
         version = "2.5.8"
         aliases = {"qingyangMin": "擎羊"}
     elif table_id == "quanshu_v2_selected_table":

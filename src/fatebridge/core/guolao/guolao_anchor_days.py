@@ -36,7 +36,7 @@ POLICIES = (
 )
 DAY_RULESET = "guolao_research_v8"
 METHOD_ID = "guolao_same_sky_apparent_solar_day_anchor_v1"
-_RESOLUTION_DAYS = F(1, 86_400_000)  # 0.001 second of the modeled UT1 axis.
+RESOLUTION_DAYS = F(1, 86_400_000)  # 0.001 second of the modeled UT1 axis.
 
 
 def anchor_from_day_longitudes(start: F, end: F, *, include_winter_day: bool) -> str:
@@ -108,7 +108,7 @@ def _day_brackets(
         if len(candidates) != 1:
             raise ValueError("固定窗口无唯一真太阳日界，不扩大窗口凑结果")
         low, high = candidates[0]
-        while high - low > _RESOLUTION_DAYS:
+        while high - low > RESOLUTION_DAYS:
             mid = (low + high) / 2
             if F(evaluate(mid)["apparent_solar_label_serial_exact"]) < target:
                 low = mid

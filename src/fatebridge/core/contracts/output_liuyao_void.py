@@ -35,7 +35,6 @@ class VoidConditions(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     lines: list[VoidLine] | None = None
     hidden: list[VoidLine] | None = None
     focus: VoidLine | None = None

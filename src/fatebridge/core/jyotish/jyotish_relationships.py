@@ -11,10 +11,7 @@ SOURCE_ID = "brihat_jataka_aiyar_1905"
 SOURCE = {
     "id": SOURCE_ID,
     "title": "Varahamihira, Brihat Jataka, translated by N. Chidambaram Aiyar, second edition, 1905",
-    "url": "https://archive.org/details/brihatjataka00varaiala",
     "sections": ["II.16-18, printed pp.21-22"],
-    "text_witness_url": "https://archive.org/download/brihatjataka00varaiala/brihatjataka00varaiala_djvu.txt",
-    "text_witness_sha256": "bf1afe4510937e04157ba06f2c3a6d849c262ea3fffa1b922662973172bc0152",
     "scope": "Satyacharya enumerated relationship table and primary temporary rule only; not whole-text conformity",
 }
 NATURAL = {

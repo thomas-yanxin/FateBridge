@@ -50,26 +50,22 @@ repos:
             (?:src/fatebridge|scripts|tests)/.*\.pyi?|
             \.github/workflows/.*\.ya?ml|\.pre-commit-config\.yaml|pyproject\.toml
           )$
-        exclude: &reference_files ^tests/(fixtures|data)/
       - id: end-of-file-fixer
         name: Normalize final newline in source and configuration
         entry: uv run --locked --extra dev end-of-file-fixer --
         language: system
         files: *maintained_text
-        exclude: *reference_files
       - id: isort
         name: Check Python import order
         entry: uv run --locked --extra dev isort --check-only --
         language: system
         files: &python_sources ^(?:src/fatebridge|scripts|tests)/.*\.pyi?$
-        exclude: *reference_files
         require_serial: true
       - id: black
         name: Check Python formatting
         entry: uv run --locked --extra dev black --check --
         language: system
         files: *python_sources
-        exclude: *reference_files
         require_serial: true
       - id: mypy
         name: Check FateBridge types

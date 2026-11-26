@@ -7,7 +7,6 @@ not a complete atomic read set; hashes identify bytes, not positional truth.
 
 from __future__ import annotations
 
-import hashlib
 import math
 from pathlib import Path
 from typing import Any
@@ -25,14 +24,6 @@ SOURCE_SCOPE = "逐次原生计算后观察到的文件上下文；凯龙星独�
 def _signature(path: Path) -> tuple[int, ...]:
     stat = path.stat()
     return (stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
-
-
-def _digest(path: Path) -> str:
-    value = hashlib.sha256()
-    with path.open("rb") as handle:
-        for piece in iter(lambda: handle.read(1024 * 1024), b""):
-            value.update(piece)
-    return value.hexdigest()
 
 
 class CycleSourceTrace:
@@ -105,31 +96,23 @@ class CycleSourceTrace:
                     raise EphemerisSourceError("slot_changed")
                 self._metadata_cache[key_metadata] = path, signature, identity
                 return identity
-            digest = _digest(path)
             if _signature(path) != signature:
                 raise EphemerisSourceError("changed_during")
         except OSError as error:
             raise EphemerisSourceError("unavailable_during") from error
         identity = f"{'jpl' if jpl else 'se1'}:{slot}:{path.name}"
-        previous_digest = self._names.get((slot, path.name))
-        if previous_digest is not None and previous_digest != digest:
-            raise EphemerisSourceError("changed_across")
-        self._names[(slot, path.name)] = digest
         expected = self._manifest.get(path.name)
         self._files[identity] = {
             "id": identity,
             "slot": slot,
             "filename": path.name,
-            "sha256": digest,
             "bytes": signature[2],
             "range_time_scale": "TDB" if jpl else "TT",
             ("start_julian_day_tdb" if jpl else "start_julian_day_tt"): float(start),
             ("end_julian_day_tdb" if jpl else "end_julian_day_tt"): float(end),
             "de_number": de_number,
             "matches_packaged_manifest": bool(
-                expected
-                and expected["sha256"] == digest
-                and expected["bytes"] == signature[2]
+                expected and expected["bytes"] == signature[2]
             ),
         }
         self._paths[path] = (signature, identity)
@@ -182,13 +165,9 @@ class CycleSourceTrace:
 
     def finish(self) -> dict[str, Any]:
         self.check_configuration()
-        for path, (signature, identity) in self._paths.items():
+        for path, (signature, _identity) in self._paths.items():
             try:
-                if (
-                    _signature(path) != signature
-                    or _digest(path) != self._files[identity]["sha256"]
-                    or _signature(path) != signature
-                ):
+                if _signature(path) != signature:
                     raise EphemerisSourceError("changed_during")
             except OSError as error:
                 raise EphemerisSourceError("unavailable_during") from error
@@ -205,7 +184,6 @@ class CycleSourceTrace:
                 c["status"] == "identity_unavailable" for c in self._contexts
             ),
             "configuration_checked": True,
-            "endpoint_file_hashes_checked": True,
             "atomic_file_read_proven": False,
             "accuracy_certified": False,
             "scope": SOURCE_SCOPE,

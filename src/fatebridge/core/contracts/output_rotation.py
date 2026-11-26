@@ -25,7 +25,6 @@ class TerrestrialOrientation(PartialOutput):
     cio_locator_policy: str | None = None
     origin_policy: str | None = None
     local_frame_policy: str | None = None
-    orientation_asset_sha256: str | None = None
     tidal_model_id: str | None = None
     cpo_application_policy: str | None = None
     station_velocity_scope: str | None = None

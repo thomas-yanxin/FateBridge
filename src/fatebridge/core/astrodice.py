@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from fractions import Fraction
-from typing import Any, Dict, List, Literal
+from typing import Any, Literal
 
 from fatebridge.core.astro.astrology_tables import (
     DOMICILE_RULERS,
@@ -19,7 +19,6 @@ from fatebridge.core.astro.astrology_tables import (
     SIGN_LABELS_ZH,
     SIGNS,
 )
-from fatebridge.core.astro.ptolemy import SOURCE_URL as TRIPLICITY_SOURCE
 from fatebridge.core.astro.ptolemy import triplicity_assigned_rulers, triplicity_rulers
 from fatebridge.core.classical_western import planet_sect
 from fatebridge.utils.coordinates import parse_geo_coordinate
@@ -28,13 +27,6 @@ METHOD_ID = "astrodice_symbolic_v7"
 SIGN_RULESET = "ptolemy_ashmand_1822_signs"
 EDITORIAL_RULESET = "fatebridge_astrodice_editorial_v7"
 DETRIMENT_RULESET = "houlding_opposite_domicile_definition_v1"
-DETRIMENT_SOURCE = "https://www.skyscript.co.uk/dig2.html"
-FACE_SOURCE = (
-    "https://418ascendant.com/wp-content/uploads/2012/01/What-are-Astro-Dice.pdf"
-)
-DOMICILE_SOURCE = "https://sacred-texts.com/astro/ptb/ptb23.htm"
-EXALTATION_SOURCE = "https://sacred-texts.com/astro/ptb/ptb25.htm"
-HOUSE_SOURCE = "https://www.skyscript.co.uk/lilly_houses.html"
 HOUSE_RULESET = "lilly_1647_house_joys_v1"
 TRIPLICITY_RULESET = "ptolemy_robbins_1940_symbolic_triangles_v2"
 PLANET_SECT_RULESET = "ptolemy_robbins_1940_planet_sect_v1"
@@ -188,7 +180,7 @@ def validate_context(
         raise ValueError("time须为本地HH:MM[:SS[.微秒]]，时区单独通过zone传入")
 
 
-def sign_condition(planet: str, sign: str) -> Dict[str, Any]:
+def sign_condition(planet: str, sign: str) -> dict[str, Any]:
     """Only sign-level facts: no degrees, sect, terms, faces or total score."""
     supported = planet in DOMICILE_RULERS
     domiciles = list(DOMICILE_RULERS[planet]) if supported else []
@@ -198,28 +190,24 @@ def sign_condition(planet: str, sign: str) -> Dict[str, Any]:
             "domicile",
             domiciles,
             SIGN_RULESET,
-            DOMICILE_SOURCE,
             "direct_sign_assignment",
         ),
         (
             "exaltation",
             exaltations,
             SIGN_RULESET,
-            EXALTATION_SOURCE,
             "direct_sign_assignment",
         ),
         (
             "detriment",
             [SIGNS[(SIGNS.index(s) + 6) % 12] for s in domiciles],
             DETRIMENT_RULESET,
-            DETRIMENT_SOURCE,
             "opposite_domicile_definition",
         ),
         (
             "fall",
             [SIGNS[(SIGNS.index(s) + 6) % 12] for s in exaltations],
             SIGN_RULESET,
-            EXALTATION_SOURCE,
             "opposite_exaltation_explicit_in_source",
         ),
     ]
@@ -229,13 +217,12 @@ def sign_condition(planet: str, sign: str) -> Dict[str, Any]:
             "matched": sign in signs if supported else None,
             "basis_signs": signs if supported else None,
             "ruleset_id": ruleset,
-            "source_url": source,
             "derivation": derivation,
             "status": (
                 "evaluated_sign_only" if supported else "outside_seven_planet_scope"
             ),
         }
-        for name, signs, ruleset, source, derivation in definitions
+        for name, signs, ruleset, derivation in definitions
     ]
     return {
         "status": "evaluated_sign_only" if supported else "outside_seven_planet_scope",
@@ -258,7 +245,7 @@ def sign_condition(planet: str, sign: str) -> Dict[str, Any]:
     }
 
 
-def house_condition(planet: str, house: int) -> Dict[str, Any]:
+def house_condition(planet: str, house: int) -> dict[str, Any]:
     joy = JOY_HOUSES.get(planet)
     return {
         "status": (
@@ -273,13 +260,13 @@ def house_condition(planet: str, house: int) -> Dict[str, Any]:
     }
 
 
-def triplicity_condition(planet: str, sign: str) -> Dict[str, Any]:
+def triplicity_condition(planet: str, sign: str) -> dict[str, Any]:
     """Keep both conditional relationships; the roll has no astronomical sect."""
     rulers = {sect: triplicity_rulers(sign, sect) for sect in ("day", "night")}
     assigned = triplicity_assigned_rulers(sign)
     supported = planet in DOMICILE_RULERS
 
-    def conditional_role(rule: Dict[str, Any]) -> str:
+    def conditional_role(rule: dict[str, Any]) -> str:
         if not supported:
             return "outside_seven_planet_scope"
         if planet == rule["primary"]:
@@ -310,7 +297,7 @@ def triplicity_condition(planet: str, sign: str) -> Dict[str, Any]:
     }
 
 
-def planet_sect_condition(planet: str) -> Dict[str, Any]:
+def planet_sect_condition(planet: str) -> dict[str, Any]:
     """I.7 natural assignment is not the unobserved chart's day/night sect.
 
     Mercury requires a solar phase absent from the dice. Neither its house
@@ -344,11 +331,11 @@ def planet_sect_condition(planet: str) -> Dict[str, Any]:
     }
 
 
-def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any]:
+def build_symbolic_evidence(planet: str, sign: str, house: int) -> dict[str, Any]:
     condition = sign_condition(planet, sign)
     house_number = house + 1
     start = (SIGNS.index(sign) - house) % 12
-    ring: List[Dict[str, Any]] = [
+    ring: list[dict[str, Any]] = [
         {
             "house_number": i + 1,
             "sign": SIGNS[(start + i) % 12],
@@ -356,7 +343,7 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any
         }
         for i in range(12)
     ]
-    details: Dict[str, Any] = {
+    details: dict[str, Any] = {
         "house_number": house_number,
         "planet_kind": (
             "lunar_node"
@@ -379,12 +366,11 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any
             row["house_number"] for row in ring if row["domicile_ruler"] == planet
         ],
     }
-    rulesets: List[Dict[str, Any]] = [
+    rulesets: list[dict[str, Any]] = [
         {
             "id": "duvendack_2013_faces",
             "author": "Rev Bill Duvendack",
             "version": "2013",
-            "source_url": FACE_SOURCE,
             "source_kind": "author_primary_explanation",
             "scope": "十二种骰面与星体/星座/宫位组合；不采用作者另述的出生盘扩展法。",
         },
@@ -392,8 +378,6 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any
             "id": SIGN_RULESET,
             "author": "Claudius Ptolemy; tr. J. M. Ashmand",
             "version": "Tetrabiblos, 1822, Book I, chapters XX and XXII",
-            "source_url": DOMICILE_SOURCE,
-            "additional_urls": [EXALTATION_SOURCE],
             "source_kind": "primary_text_translation",
             "scope": "七曜入庙、擢升与落陷；失势定义另有来源，不归给本章；不声称原典含星骰法。",
         },
@@ -409,7 +393,6 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any
             "id": HOUSE_RULESET,
             "author": "William Lilly",
             "version": "Christian Astrology, 1647, pp.51-56; Skyscript transcription",
-            "source_url": HOUSE_SOURCE,
             "source_kind": "primary_text_transcription",
             "scope": "七曜喜乐宫关系；不将原文的临床、生死或灾祸判断用于咨询，不以喜乐判定事件吉凶。",
         },
@@ -417,7 +400,6 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any
             "id": TRIPLICITY_RULESET,
             "author": "Claudius Ptolemy; tr. F. E. Robbins",
             "version": "Tetrabiblos, Loeb Classical Library, 1940, I.18",
-            "source_url": TRIPLICITY_SOURCE,
             "source_kind": "primary_text_translation",
             "scope": "分别保留三角总体分派与昼夜首要/明确共管角色；水象为火星与昼金星/夜月亮共管；不混入Dorotheus第三主星或从天象选定骰面昼夜。",
         },
@@ -425,7 +407,6 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any
             "id": DETRIMENT_RULESET,
             "author": "Deborah Houlding",
             "version": "Understanding Planetary Dignity and Debility, part 2; undated",
-            "source_url": DETRIMENT_SOURCE,
             "source_kind": "author_primary_explanation",
             "scope": "仅采用作者对失势为守护星座对宫的明确说明；不当作托勒密XX章原文或采用文中其他尊贵表。",
         },
@@ -433,7 +414,6 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any
             "id": PLANET_SECT_RULESET,
             "author": "Claudius Ptolemy; tr. F. E. Robbins",
             "version": "Tetrabiblos, Loeb Classical Library, 1940, I.7",
-            "source_url": TRIPLICITY_SOURCE + "#7",
             "source_kind": "primary_text_translation",
             "scope": "七曜昼夜分派；水星保留晨星昼曜与昏星夜曜两条件。星体分派不等于实际盘的昼夜；不由骰面宫号或附加天象补条件。",
         },

@@ -51,7 +51,6 @@ METHOD_ID = "natal_timing_relations_v2"
 STEM_COMBINATIONS = {
     frozenset(pair) for pair in ("甲己", "乙庚", "丙辛", "丁壬", "戊癸")
 }
-SOURCE_URL = "https://zh.wikisource.org/zh-hant/三命通會/卷二"
 
 
 class TimingInteractionNode(TypedDict):
@@ -347,7 +346,6 @@ def analyze_timing_interactions(
             {
                 "id": METHOD_ID,
                 "source_title": "三命通会·卷二·论十干合、支元六合、支元三合、六害、三刑、冲击、太岁、总论岁运",
-                "source_url": SOURCE_URL,
             },
             dict(CARRIER_SOURCE),
         ],

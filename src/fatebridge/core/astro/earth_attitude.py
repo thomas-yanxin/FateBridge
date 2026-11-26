@@ -172,7 +172,6 @@ def analytic_earth_attitude(
     J2000 matrix. This establishes source-frame consistency, not full IAU
     2006/2000A attitude, measured EOP or remote-epoch physical accuracy.
 
-    https://github.com/liberfa/erfa/blob/v2.0.1/src/gst06.c (Note 3)
     Source frame/obliquity references are owned by reference_frames.py and
     nutation.py; no independent pole or coefficient set is substituted here.
     """

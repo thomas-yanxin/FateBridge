@@ -18,8 +18,6 @@ SOURCE = {
     "id": "witte1925_directions_planetary_pictures",
     "author": "Alfred Witte",
     "title": "Direktionen und Planetenbilder, Astrologische Rundschau XVII/2, May1925, pp52-55",
-    "url": "https://www.astrax.de/pdf/44_Direktionen%20und%20Planetenbilder.pdf",
-    "source_sha256": "d16cb178a8ad9f4f4d804426f0ab77711cc596f02adcb8af50dc669f151f2357",
     "sections": ["p53: sum symmetry; p54: mixed radix and directed factors"],
     "scope": "Motivation for named mixed-layer algebra only; no original clock key, complete method or event assertions accepted",
 }

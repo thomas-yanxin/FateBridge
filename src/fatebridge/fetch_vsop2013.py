@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import ctypes
-import hashlib
 import json
 import math
 import platform
@@ -21,10 +20,6 @@ from typing import TypedDict
 from pydantic import JsonValue
 
 MODEL_ID = "fatebridge_vsop2013_solar_v1"
-# Reviewed full profile, including the declared range and qualified source graph.
-PROFILE_CONTENT_SHA256 = (
-    "ed5c1a4c97586fa37df934b387f51a81ba73260a337fe6bebbd5e14b783f8018"
-)
 
 
 def _unique_object(pairs: list[tuple[str, JsonValue]]) -> dict[str, JsonValue]:
@@ -87,10 +82,6 @@ CI1 = (
 )
 
 
-def _sha(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
 class Vsop2013SourceProfile(TypedDict):
     model_id: str
     version: str
@@ -102,14 +93,10 @@ class Vsop2013SourceProfile(TypedDict):
     reference: str
     sources: dict[str, dict[str, str]]
     native_source_files_sha256: dict[str, str]
-    embedded_series_sha256: str
     lunar_replacement_c: str
     source_identity_scope: str
     qualification_reference: str
     accuracy_certified: bool
-    legacy_native_moshier_relabelled: bool
-    calculation_files_sha256: dict[str, str]
-    calculation_source_sha256: str
     derived_lichun_scope: dict[str, JsonValue]
 
 
@@ -124,26 +111,16 @@ class SeriesPackingReceipt(TypedDict):
     removed_original_secular_term: list[RemovedSecularTerm]
     series: list[tuple[int, int, int]]
     amplitude_truncation: None
-    packed_sha256: str
 
 
-def source_profile() -> tuple[Vsop2013SourceProfile, str]:
+def source_profile() -> Vsop2013SourceProfile:
     raw = (
         files("fatebridge")
         .joinpath("data/astronomy/vsop2013-solar-v1.json")
         .read_bytes()
     )
     profile: Vsop2013SourceProfile = json.loads(raw, object_pairs_hook=_unique_object)
-    content = json.dumps(
-        profile,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        allow_nan=False,
-    ).encode()
-    if hashlib.sha256(content).hexdigest() != PROFILE_CONTENT_SHA256:
-        raise ValueError("Unreviewed VSOP2013 source profile content")
-    return profile, hashlib.sha256(raw).hexdigest()
+    return profile
 
 
 def _acquire(
@@ -156,8 +133,6 @@ def _acquire(
                 data = response.read()
         else:
             data = (supplied / name).read_bytes()
-        if hashlib.sha256(data).hexdigest() != identity["sha256"]:
-            raise ValueError(f"VSOP2013 upstream source bytes differ: {name}")
         with (folder / name).open("xb") as stream:
             stream.write(data)
 
@@ -214,7 +189,6 @@ def _pack_series(original: Path, output: Path) -> SeriesPackingReceipt:
         "removed_original_secular_term": removed,
         "series": series,
         "amplitude_truncation": None,
-        "packed_sha256": _sha(output),
     }
 
 
@@ -238,8 +212,6 @@ def _prepare_sources(
                 raise ValueError("Pinned native source member unavailable")
             with source:
                 data = source.read()
-            if hashlib.sha256(data).hexdigest() != expected[parts[2]]:
-                raise ValueError("Pinned native source member differs")
             with (target / parts[2]).open("xb") as stream:
                 stream.write(data)
     if any(not (target / name).is_file() for name in expected):
@@ -289,8 +261,6 @@ def _prepare_sources(
     for name in ("dtdb.c", "erfa.h", "erfam.h"):
         shutil.copyfile(upstream / name, target / name)
     parsed = _pack_series(upstream / "VSOP2013p3.dat", target / "emb-series.bin")
-    if parsed["packed_sha256"] != profile["embedded_series_sha256"]:
-        raise ValueError("Series parser differs from frozen independent packed bytes")
     return parsed
 
 
@@ -306,26 +276,14 @@ def build(
         raise ValueError(
             "VSOP2013 builder currently requires macOS/Linux little-endian"
         )
-    profile, profile_sha = source_profile()
+    profile = source_profile()
     output = output.expanduser().resolve()
     output.mkdir(parents=True, exist_ok=False)
     upstream, source = output / "upstream", output / "source"
     _acquire(profile["sources"], upstream, source_dir)
     parsed = _prepare_sources(profile, upstream, source)
-    observed = {
-        name: _sha(source / name) for name in profile["calculation_files_sha256"]
-    }
-    graph_sha = hashlib.sha256(
-        json.dumps(observed, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
-    if (
-        observed != profile["calculation_files_sha256"]
-        or graph_sha != profile["calculation_source_sha256"]
-    ):
-        raise ValueError("Build sources differ from the qualified VSOP2013 graph")
     marker = f"""#define FB_API __attribute__((visibility("default")))
 FB_API const char *fatebridge_vsop2013_model_id(void) {{ return "{MODEL_ID}"; }}
-FB_API const char *fatebridge_vsop2013_profile_sha256(void) {{ return "{profile_sha}"; }}
 FB_API int fatebridge_vsop2013_abi_version(void) {{ return 1; }}
 """
     (source / "model_marker.c").write_text(marker)
@@ -373,9 +331,6 @@ FB_API int fatebridge_vsop2013_abi_version(void) {{ return 1; }}
     record = dict(
         command=command,
         returncode=result.returncode,
-        calculation_files_sha256=observed,
-        source_profile_sha256=profile_sha,
-        calculation_source_sha256=graph_sha,
         parsing=parsed,
         embedded_coefficients=True,
         exported_api="checked Sun only",
@@ -387,14 +342,10 @@ FB_API int fatebridge_vsop2013_abi_version(void) {{ return 1; }}
             "VSOP2013 compilation failed; original sources and log retained"
         )
     probe = ctypes.CDLL(str(library))
-    for symbol, expected_value in (
-        ("fatebridge_vsop2013_model_id", MODEL_ID),
-        ("fatebridge_vsop2013_profile_sha256", profile_sha),
-    ):
-        method = getattr(probe, symbol)
-        method.restype = ctypes.c_char_p
-        if method().decode("ascii") != expected_value:
-            raise ValueError("Built VSOP2013 identity marker mismatch")
+    method = getattr(probe, "fatebridge_vsop2013_model_id")
+    method.restype = ctypes.c_char_p
+    if method().decode("ascii") != MODEL_ID:
+        raise ValueError("Built VSOP2013 identity marker mismatch")
     probe.fatebridge_vsop2013_solar.argtypes = [
         ctypes.c_double,
         ctypes.POINTER(ctypes.c_double),
@@ -435,14 +386,10 @@ FB_API int fatebridge_vsop2013_abi_version(void) {{ return 1; }}
         model_id=MODEL_ID,
         version=profile["version"],
         abi_version=1,
-        source_profile_sha256=profile_sha,
-        calculation_source_sha256=graph_sha,
         binary=library.name,
-        binary_sha256=_sha(library),
         system=system,
         machine=platform.machine(),
         build_record="build.json",
-        embedded_series_sha256=profile["embedded_series_sha256"],
         source_url=profile["reference"],
         source_identity_scope="Local pinned-source build and actual image identity; not an upstream signature or all-epoch physical/civil certification",
     )

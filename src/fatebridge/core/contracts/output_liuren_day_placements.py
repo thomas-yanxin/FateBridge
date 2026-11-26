@@ -57,7 +57,6 @@ class LiurenDayPlacements(PartialOutput):
     ruleset_id: Literal["tanyuan_day_placements_v2"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[StrictInt] | None = None
     day_ganzhi: str | None = None
     day_stem_house: Branch | None = None

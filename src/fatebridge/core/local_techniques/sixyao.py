@@ -404,7 +404,6 @@ def build_sixyao_result(
             "ruleset_id": "meihua_lunar_time_v1",
             "year_boundary": "lunar_new_year",
             "seed": context["lunar"]["meihua"]["seed"],
-            "source_url": "https://zh.wikisource.org/wiki/梅花易數/卷一",
         }
     return {
         "analysis_type": "六爻 / 易卦",

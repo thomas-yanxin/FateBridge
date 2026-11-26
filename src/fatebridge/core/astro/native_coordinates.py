@@ -1,7 +1,7 @@
 """Validate coordinate frame and reference point before consuming native values."""
 
 import math
-from typing import Any, Sequence, Tuple
+from typing import Any, Sequence
 
 from fatebridge.utils.errors import EphemerisSourceError
 
@@ -32,7 +32,7 @@ def require_spherical_coordinates(
     native: Any,
     equatorial: bool = False,
     sidereal: bool = False,
-) -> Tuple[float, float, float]:
+) -> tuple[float, float, float]:
     """Geocentric apparent spherical degrees, of date, in the requested frame.
 
     Native sidereal computation automatically sets NONUT. The standard consumer

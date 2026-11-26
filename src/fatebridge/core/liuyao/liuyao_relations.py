@@ -24,14 +24,14 @@ ADVANCES = {
     "辰": "未",
     "未": "戌",
 }
-_SOURCE_MANIFEST = json.loads(
+SOURCE_MANIFEST = json.loads(
     files("fatebridge.data")
     .joinpath("classical/liuyao-sources.json")
     .read_text(encoding="utf-8")
 )
 SOURCES = {
     int(n): record["source_url"]
-    for n, record in _SOURCE_MANIFEST["sources_by_chapter"].items()
+    for n, record in SOURCE_MANIFEST["sources_by_chapter"].items()
 }
 
 

@@ -354,7 +354,7 @@ def utc_point_from_tt(
     """Invert atomic offsets without a second large-JD rounding.
 
     The established scalar convention preserves nominal leap-boundary labels
-    encoded as a rounded double JD. ``exact_epoch=True`` explicitly interprets
+    encoded as a rounded double JD. exact_epoch=True explicitly interprets
     the supplied IEEE value as an exact point instead. These interpretations
     differ at transition aliases; neither proves physical clock precision.
     TTInstant retains an explicit exact point (including two-part TT or a

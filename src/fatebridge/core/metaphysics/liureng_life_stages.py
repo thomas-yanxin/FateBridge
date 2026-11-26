@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 STAGES = (
@@ -73,8 +72,6 @@ def build_life_stages(day_stem: str, sky_by_earth: dict[str, str]) -> dict[str, 
     return {
         "ruleset_id": "tanyuan_ten_stem_life_stages_v1",
         "source_title": "大六壬探原·卷下论断篇·论墓（长生沐浴等附）",
-        "source_url": TANYUAN_SOURCE,
-        "source_sha256": TANYUAN_SCAN_SHA256,
         "original_pdf_pages": [93, 94],
         "day_stem": day_stem,
         "direction": "顺" if day_stem in "甲丙戊庚壬" else "逆",

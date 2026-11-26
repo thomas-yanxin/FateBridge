@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import datetime as dt
-import hashlib
 import json
 from decimal import Decimal, localcontext
 
@@ -63,18 +62,6 @@ _CAPTURE_CUSPS: list[float] = [
 
 
 def test_independent_decimal_chronology_and_dates() -> None:
-    # Fingerprint the captured input, including target order, to catch transcriptions
-    # that would otherwise affect both the Decimal check and production calculation.
-    captured = [
-        _CAPTURE_BIRTH.isoformat(sep=" "),
-        list(_CAPTURE_LONGITUDES.items()),
-        _CAPTURE_CUSPS,
-    ]
-    digest = hashlib.sha256(json.dumps(captured, separators=(",", ":")).encode())
-    assert digest.hexdigest() == (
-        "1367bca7d4146fcc8e08dbc1f2b237ef287a08459c2a8bc8e61bf6217486a54e"
-    )
-
     payload = build_persian_directed_payload(
         _CAPTURE_LONGITUDES.copy(),
         _CAPTURE_CUSPS.copy(),

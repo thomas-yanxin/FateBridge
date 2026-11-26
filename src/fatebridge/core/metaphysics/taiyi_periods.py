@@ -10,12 +10,11 @@ from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.taiyi_board import assemble_board, calendar_summary
 from fatebridge.core.metaphysics.taiyi_clock import SOLAR_ANCHOR_SCOPE
 from fatebridge.core.metaphysics.taiyi_gates import attach_gate_board
-from fatebridge.core.metaphysics.taiyi_geometry import BRANCHES, SOURCES
+from fatebridge.core.metaphysics.taiyi_geometry import BRANCHES
 from fatebridge.core.metaphysics.taiyi_historical import source_date_reference
 from fatebridge.core.metaphysics.taiyi_hour import (
     DEFAULT_HOUR_PROFILE,
     KEY_HOUR_PROFILE,
-    KEY_SOURCE,
     double_hour_slot,
 )
 from fatebridge.core.metaphysics.taiyi_month import (
@@ -94,8 +93,6 @@ def build_period_board(
         "heshen_branch_basis": (
             "solar_month_branch" if mode == "month" else "day_pillar_branch"
         ),
-        "counter_rule_source": SOURCES["1"]
-        + ("#推六紀月建法" if mode == "month" else "#推冬夏二至以後太乙所在法"),
         "anchor_precision": "以保留民用主点选锚并计算距锚秒数；独立年历按分钟验收",
         "seconds_from_anchor": elapsed_seconds_between(term.point, instant),
     }
@@ -118,7 +115,6 @@ def build_period_board(
                 input_calendar="proleptic_gregorian",
                 month_profile=KEY_MONTH_PROFILE,
                 month_origin=origin,
-                counter_rule_source=KEY_SOURCE,
                 counter_formula="(10155478 + nominal_year - 1561 - 1) * 12 + 2 + nominal_month",
                 modern_conventions="天地二正积月规则按现代节月月序适配；寅月换名义年，闰朔月不额外增数，不是原书古历月界复原。",
             )
@@ -127,7 +123,6 @@ def build_period_board(
                 input_calendar="proleptic_gregorian",
                 month_profile=DEFAULT_MONTH_PROFILE,
                 month_origin=frame["month_origin"],
-                counter_rule_source=SOURCES["1"],
                 modern_conventions=frame["month_origin"]["year_label_policy"]
                 + frame["month_origin"]["scope"],
             )
@@ -158,7 +153,6 @@ def build_period_board(
                 input_calendar="proleptic_gregorian",
                 hour_origin=frame["hour_origin"],
                 heshen_branch_basis="selected_clock_hour_branch",
-                counter_rule_source=KEY_SOURCE,
                 counter_formula="(day_number_from_winter_previous_Jiazi - 1) * 12 + hour_number",
                 initial_interval="积时从冬至前甲子日子初连续计算；二至仅换遁，夏至不把积时归一",
                 modern_conventions="冬至前甲子日计数取所选现代钟面，23时子初换日；不等同原书古历夜半或完整唐历时实",
@@ -193,15 +187,6 @@ def build_period_board(
                 "classical_author": "唐·王希明",
                 "source_title": "太乙金镜式经（四库全书本）",
                 "source_kind": "classical_transcription_and_selected_facsimile_with_explicit_modern_calendar_adapter",
-                "sources": (
-                    {
-                        **SOURCES,
-                        "month_nominal_year_wujing": "https://zh.wikisource.org/wiki/武經總要_(四庫全書本)/後集卷18",
-                        "month_nominal_year_key_appendix": "https://upload.wikimedia.org/wikipedia/commons/1/19/NLC892-411999021066-66022_%E5%A4%AA%E4%B9%99%E9%87%91%E9%91%B0%E5%8C%99.pdf#page=47",
-                    }
-                    if mode == "month" and not is_key_month
-                    else SOURCES
-                ),
                 "time_granularity": "solar_month" if mode == "month" else "double_hour",
                 "classical_conformance": "partial_with_unresolved_table_and_calendar_adaptation_questions",
                 "classical_acceptance_passed": False,
@@ -231,11 +216,6 @@ def build_period_board(
         board["ruleset"].update(
             classical_author="《太乙金钥匙续集》底本题署，续集作者未独立考定",
             source_title="太乙金钥匙续集·月计（NLC892-411999021066-66022）",
-            sources={
-                "key": KEY_SOURCE,
-                "shared_count_rules": SOURCES["2"],
-                "shared_relation_rules": SOURCES["3"],
-            },
             unresolved=[
                 "天地二正积月起元与金镜六纪节月起元分开；边界仍用现代节月，不能认作完整古历或原例朔月范围全符。",
                 "原例前段截数695，门段684、余184、死门第4月互不相合，双方保留，不按有利门值选择。",
@@ -249,12 +229,6 @@ def build_period_board(
         board["ruleset"].update(
             classical_author="《太乙金钥匙续集》底本题署，作者未独立考定",
             source_title="太乙金钥匙续集（NLC892-411999021066-66022）",
-            sources={
-                "key": KEY_SOURCE,
-                "shared_count_rules": SOURCES["2"],
-                "shared_relation_rules": SOURCES["3"],
-                "shared_five_general_clauses": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷04",
-            },
             unresolved=[
                 "现代冬至、时钟和23时子初为明示适配；本书古历年月日、子正夜半及岁差常数未完整复原。",
                 "本例47为只求行宫的捷数；文昌沿用完整积时所得23局，不拿47冒充完整积时。",

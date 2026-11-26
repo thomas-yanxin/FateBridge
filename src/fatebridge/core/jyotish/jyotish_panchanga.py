@@ -9,13 +9,13 @@ from __future__ import annotations
 import math
 from datetime import datetime
 from fractions import Fraction
-from typing import Any, Dict, Optional
+from typing import Any
 
 from fatebridge.core.jyotish.jyotish_dasha_levels import NakshatraPlacement
 from fatebridge.core.jyotish.jyotish_vargas import longitude_ratio
 
 # 30 Tithis (1-15 Shukla Paksha, 16-30 Krishna Paksha)
-_TITHI_BASE = (
+TITHI_BASE = (
     ("Pratipada", "一"),
     ("Dwitiya", "二"),
     ("Tritiya", "三"),
@@ -33,7 +33,7 @@ _TITHI_BASE = (
 )
 
 # Classical Tithi lords cycle every 8 tithis (BPHS / Muhurta Chintamani)
-_TITHI_LORDS = (
+TITHI_LORDS = (
     "Sun",
     "Moon",
     "Mars",
@@ -45,7 +45,7 @@ _TITHI_LORDS = (
 )
 
 # 27 Luni-Solar Yogas (each 13°20' = 40/3 deg of (Sun + Moon) % 360)
-_YOGAS = (
+YOGAS = (
     ("Vishkambha", "障碍"),
     ("Priti", "喜悦"),
     ("Ayushman", "长寿"),
@@ -75,7 +75,7 @@ _YOGAS = (
     ("Vaidhriti", "危持"),
 )
 
-_MOVABLE_KARANAS = (
+MOVABLE_KARANAS = (
     ("Bava", "巴瓦"),
     ("Balava", "巴拉瓦"),
     ("Kaulava", "考拉瓦"),
@@ -85,7 +85,7 @@ _MOVABLE_KARANAS = (
     ("Vishti", "维什提/跋陀罗"),
 )
 
-_VARA_NAMES = (
+VARA_NAMES = (
     ("Ravivara", "Sunday", "日曜日", "Sun"),
     ("Somavara", "Monday", "月曜日", "Moon"),
     ("Mangalavara", "Tuesday", "火曜日", "Mars"),
@@ -123,9 +123,9 @@ def compute_panchanga(
     moon_longitude: float | Fraction,
     moon_nakshatra: NakshatraPlacement,
     *,
-    local_datetime: Optional[datetime] = None,
-    solar_context: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    local_datetime: datetime | None = None,
+    solar_context: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Compute all five classical Panchanga limbs with exact rational boundaries."""
     sun = _exact_angle(sun_longitude)
     moon = _exact_angle(moon_longitude)
@@ -145,9 +145,9 @@ def compute_panchanga(
         tithi_lord = "Rahu"
     else:
         pos = (tithi_number - 1) % 15
-        tithi_name, num_zh = _TITHI_BASE[pos]
+        tithi_name, num_zh = TITHI_BASE[pos]
         tithi_zh = f"{'白分' if paksha == 'Shukla' else '黑分'}{num_zh}"
-        tithi_lord = _TITHI_LORDS[pos % 8]
+        tithi_lord = TITHI_LORDS[pos % 8]
 
     # 2. Yoga (13°20' = 40/3° increments of (Sun + Moon) mod 360)
     lunisolar_sum = (sun + moon) % 360
@@ -155,7 +155,7 @@ def compute_panchanga(
     yoga_zero = int(lunisolar_sum // yoga_span)
     yoga_start = yoga_zero * yoga_span
     yoga_elapsed = (lunisolar_sum - yoga_start) / yoga_span
-    yoga_name, yoga_zh = _YOGAS[yoga_zero]
+    yoga_name, yoga_zh = YOGAS[yoga_zero]
 
     # 3. Karana (half-tithi = 6° increments of (Moon - Sun) mod 360; 0..59)
     half_idx = int(elongation // 6)
@@ -170,28 +170,28 @@ def compute_panchanga(
     elif half_idx == 59:
         karana_name, karana_zh, karana_kind = "Naga", "那伽", "fixed"
     else:
-        karana_name, karana_zh = _MOVABLE_KARANAS[(half_idx - 1) % 7]
+        karana_name, karana_zh = MOVABLE_KARANAS[(half_idx - 1) % 7]
         karana_kind = "movable"
 
     # 4. Vara (Vedic weekday anchored to local sunrise -> next sunrise)
-    vara_info: Dict[str, Any]
-    opening_date: Optional[str] = None
-    opening_sunrise_jd_ut1: Optional[float] = None
-    before_sunrise: Optional[bool] = None
-    weekday_sun0: Optional[int] = None
-    _LORD_TO_SUN0 = {row[3]: idx for idx, row in enumerate(_VARA_NAMES)}
+    vara_info: dict[str, Any]
+    opening_date: str | None = None
+    opening_sunrise_jd_ut1: float | None = None
+    before_sunrise: bool | None = None
+    weekday_sun0: int | None = None
+    lord_to_sun0 = {row[3]: idx for idx, row in enumerate(VARA_NAMES)}
     if isinstance(solar_context, dict):
         day_lord = solar_context.get("day_lord")
         opening_date = solar_context.get("opening_local_mean_date")
         opening_sunrise_jd_ut1 = solar_context.get("opening_sunrise_jd_ut1")
-        if isinstance(day_lord, str) and day_lord in _LORD_TO_SUN0:
-            weekday_sun0 = _LORD_TO_SUN0[day_lord]
+        if isinstance(day_lord, str) and day_lord in lord_to_sun0:
+            weekday_sun0 = lord_to_sun0[day_lord]
             before_sunrise = solar_context.get("before_local_sunrise")
     if weekday_sun0 is None and local_datetime is not None:
         weekday_sun0 = (local_datetime.weekday() + 1) % 7
 
     if weekday_sun0 is not None:
-        sanskrit, english, zh, lord = _VARA_NAMES[weekday_sun0]
+        sanskrit, english, zh, lord = VARA_NAMES[weekday_sun0]
         vara_info = {
             "index": weekday_sun0,
             "name": sanskrit,

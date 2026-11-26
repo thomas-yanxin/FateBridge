@@ -27,11 +27,11 @@ from fatebridge.utils.timezones import format_local_time_or_utc, parse_timezone_
 def monthly_profection_segment(
     year_start: datetime, year_end: datetime, month_offset: int
 ) -> tuple[datetime, datetime]:
-    """Return the [start, end) of the ``month_offset``-th equal twelfth.
+    """Return the [start, end) of the month_offset-th equal twelfth.
 
     Divide elapsed UTC time into twelfths, then display in the starting zone.
     Derive each boundary from the full interval so microsecond rounding never
-    accumulates and the last boundary remains exactly ``year_end``.
+    accumulates and the last boundary remains exactly year_end.
     """
     year = ZonedCalendar.from_datetime(year_start)
     span = utc_calendar(year_end).elapsed_since(year.utc)
@@ -46,7 +46,7 @@ def monthly_profection_segment(
 def monthly_profection_index(
     year_start: datetime, year_end: datetime, moment: datetime
 ) -> int:
-    """Index (0–11) of the equal-twelfth segment that contains ``moment``."""
+    """Index (0–11) of the equal-twelfth segment that contains moment."""
     instant = utc_calendar(moment)
     for index in range(11, 0, -1):
         start, _ = monthly_profection_segment(year_start, year_end, index)

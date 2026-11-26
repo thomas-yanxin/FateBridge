@@ -13,7 +13,6 @@ from fatebridge.core.metaphysics.common import (
 )
 from fatebridge.core.metaphysics.liureng_day_placements_convention import CONVENTION
 from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 RULES = (
@@ -36,8 +35,6 @@ def placement_metadata() -> dict[str, Any]:
     return dict(
         ruleset_id="tanyuan_day_placements_v2",
         source_title="大六壬探原·论日干日枝、课体纲要",
-        source_url=TANYUAN_SOURCE,
-        source_sha256=TANYUAN_SCAN_SHA256,
         original_pdf_pages=[77, 78, 110],
         evaluations=[
             dict(
@@ -122,7 +119,6 @@ def day_placement_patterns(
 def day_placements_trace(evidence: dict[str, Any]) -> dict[str, Any]:
     return dict(
         rule_id="liuren.day_placement_patterns",
-        source_url=evidence["source_url"],
         source_section=evidence["source_title"],
         result=evidence,
     )

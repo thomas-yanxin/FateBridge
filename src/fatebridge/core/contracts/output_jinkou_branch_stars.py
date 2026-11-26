@@ -91,11 +91,6 @@ class JinkouBranchStarCheck(BaseModel):
 
 class JinkouBranchStars(PartialOutput):
     ruleset_id: Literal["jinkou_jingben_branch_stars_v1"] | None = None
-    source_url: str | None = None
-    source_sha256: (
-        Literal["dfa4b039f30100eb75a8fe21904256bc4e47c04538c8602d08aec9e7f7646364"]
-        | None
-    ) = None
     original_pdf_pages: list[int] | None = None
     year_branch: Branch | None = None
     month_building_branch: Branch | None = None

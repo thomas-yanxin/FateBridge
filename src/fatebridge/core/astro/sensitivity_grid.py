@@ -14,8 +14,8 @@ from fatebridge.core.astro.time_scales import utc_clock, utc_point_from_tt
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.utils.civil_time import CivilPoint, UTCCalendar, utc_calendar
 
-_SECOND = Fraction(1, 86400)
-_CADENCE = 30 * _SECOND
+SECOND = Fraction(1, 86400)
+CADENCE = 30 * SECOND
 
 
 @dataclass(frozen=True)
@@ -129,7 +129,7 @@ def recorded_birth_grid(
         )
     points = {start: lower, stop: upper, center: nominal}
     anchor = lower.epoch.utc_datetime
-    for index in range(1, math.ceil((stop - start) / _CADENCE)):
+    for index in range(1, math.ceil((stop - start) / CADENCE)):
         if anchor is not None and anchor.year >= 1972:
             ordinary = anchor + timedelta(seconds=30 * index)
             ordinary_tt = utc_clock(ordinary).tt
@@ -140,7 +140,7 @@ def recorded_birth_grid(
             ):
                 points[ordinary_tt.days] = civil_recorded_sample(ordinary)
         else:
-            point = start + index * _CADENCE
+            point = start + index * CADENCE
             if point != center:
                 points[point] = RecordedBirthSample(
                     PhysicalEpoch.from_tt(TTInstant(point))
@@ -151,12 +151,12 @@ def recorded_birth_grid(
     # avoid requiring a :60 sample solely to satisfy the cadence cap.
     ordered = sorted(points)
     for left, right in zip(ordered, ordered[1:]):
-        if right - left <= _CADENCE:
+        if right - left <= CADENCE:
             continue
         middle = (left + right) / 2
         sample = RecordedBirthSample(PhysicalEpoch.from_tt(TTInstant(middle)))
         if sample.epoch.utc_is_leap_second:
-            middle -= _SECOND
+            middle -= SECOND
             sample = RecordedBirthSample(PhysicalEpoch.from_tt(TTInstant(middle)))
         points[middle] = sample
     ordered = sorted(points)

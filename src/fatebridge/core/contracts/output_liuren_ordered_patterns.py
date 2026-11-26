@@ -26,7 +26,6 @@ class LiurenOrderedPatterns(PartialOutput):
     ruleset_id: Literal["tanyuan_ordered_transmission_patterns_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[StrictInt] | None = None
     branches: list[Branch] | None = Field(default=None, min_length=3, max_length=3)
     evaluations: list[OrderedPatternEvaluation] | None = Field(

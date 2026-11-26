@@ -14,9 +14,6 @@ RULE = "jyotish.aiyar1905_commentary_reductions.v1"
 SOURCE = {
     "id": "brihat_jataka_aiyar_1905_ashtakavarga_notes",
     "title": "Brihat Jataka, N. Chidambaram Aiyar English translation, second edition, 1905",
-    "url": "https://archive.org/details/brihatjataka00varaiala",
-    "scan_sha256": "ceafc2fe3e385fb834b94fa4f464406da3ba42ab01b3a2ac42a2749abda9f1d9",
-    "text_witness_sha256": "bf1afe4510937e04157ba06f2c3a6d849c262ea3fffa1b922662973172bc0152",
     "source_kind": "english_translation_commentary",
     "section": "Chapter IX extended N.B. notes; printed101-104, PDF145-148",
     "scope": "Selected English commentary arithmetic, not attribution to a numbered Sanskrit verse or whole-text acceptance. Occupancy is a declared classical-graha reading. No Pinda weighting or empirical event prediction.",

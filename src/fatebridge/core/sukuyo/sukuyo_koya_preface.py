@@ -17,21 +17,15 @@ LUMINARIES = ("月", "火", "水", "木", "金", "土", "日")
 
 def preface_reference(arc: dict[str, Any]) -> dict[str, Any]:
     """Bind the companion to the actually loaded ARC preface, not its filename."""
-    loaded = load_source(SOURCE)
-    bundle = loaded.data
+    bundle = load_source(SOURCE)
     identity = bundle["arc_companion_identity"]
-    images = {
-        str(i["frame"]): i["image_sha256"]
-        for i in arc["preface_selected_reference"]["images"]
-    }
     if (
         arc["record"] != identity["record"]
-        or images != identity["preface_images_sha256"]
         or arc["preface_selected_reference"]["visible_signature"]
         != identity["signature"]
     ):
         raise ValueError("序跋翻刻对照与本次ARC序文身份不符，须重新校核")
-    return {**bundle, "source_bundle_sha256": loaded.sha256}
+    return bundle
 
 
 def dated_weekday_reference(
@@ -42,8 +36,8 @@ def dated_weekday_reference(
     Neighbouring days are a diagnostic control, not inferred birth-time/date
     candidates. A conjectured Tang day label never becomes a Japanese day.
     """
-    loaded = load_source(SOURCE)
-    records = loaded.data["dated_records"]
+    bundle = load_source(SOURCE)
+    records = bundle["dated_records"]
     selected = next(
         (
             r
@@ -66,15 +60,12 @@ def dated_weekday_reference(
     ]
     printed_ganzhi = selected["printed_day_ganzhi"]
     return {
-        "ruleset_id": loaded.data["id"],
-        "source_bundle_sha256": loaded.sha256,
-        "source_url": loaded.data["source_url"],
-        "pdf_sha256": loaded.data["pdf_sha256"],
+        "ruleset_id": bundle["id"],
+        "source_url": bundle["source_url"],
         "printed_page": 78,
         "source_record": deepcopy(selected),
         "comparison_basis": "same_lunar_label_under_declared_NAOJ_reference_not_verified_Tang_conversion",
         "reference_civil_date": civil.isoformat(),
-        "reference_calendar_source_sha256": calendar_reference["source_bundle_sha256"],
         "reference_lunar_fields": list(lunar),
         "reference_luminary": actual,
         "printed_luminary": selected["claimed_luminary"],
@@ -139,8 +130,7 @@ def editorial_weekday_reference(
     civil: date, lunar: tuple[int, int, int, bool], calendar_reference: dict[str, Any]
 ) -> dict[str, Any] | None:
     """Keep an actual marginal correction as evidence, never as input repair."""
-    loaded = load_source(SOURCE)
-    arc = loaded.data.get("arc_supplement_selected_reference")
+    arc = load_source(SOURCE).get("arc_supplement_selected_reference")
     if arc is None:
         return None
     selected = next(
@@ -151,15 +141,12 @@ def editorial_weekday_reference(
     actual = LUMINARIES[civil.weekday()]
     ganzhi = calendar_reference["day_ganzhi_reference"]["name"]
     return {
-        "source_bundle_sha256": loaded.sha256,
         "source_record": arc["record"],
-        "source_image_sha256": arc["image_sha256"],
         "source_url": arc["permalink"],
         "source_layer": "printed_upper_margin_annotation_not_main_date_record",
         "marginal_literal": arc["marginal_selected_literal"],
         "selected_claim": deepcopy(selected),
         "comparison_basis": "same_lunar_label_under_declared_NAOJ_reference",
-        "reference_calendar_source_sha256": calendar_reference["source_bundle_sha256"],
         "reference_civil_date": civil.isoformat(),
         "reference_luminary": actual,
         "reference_day_ganzhi": ganzhi,

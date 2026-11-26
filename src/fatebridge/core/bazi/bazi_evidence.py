@@ -52,7 +52,6 @@ from fatebridge.core.hidden_carriers import (
 from fatebridge.core.month_duty_reference import build_month_duty_reference
 from fatebridge.core.month_use import match_month_uses
 from fatebridge.core.passage_relations import build_passage_relation_context
-from fatebridge.core.source_identity import ZIPING_ZHENQUAN_NLC_SCAN_URL
 from fatebridge.core.star_occurrences import build_star_occurrences
 from fatebridge.core.timing_carriers import SCOPE as CARRIER_SCOPE
 from fatebridge.core.timing_carriers import SOURCE as CARRIER_SOURCE
@@ -77,13 +76,10 @@ from fatebridge.utils.data import (
 
 Pillars = Mapping[str, tuple[str, str]]
 ORDER = ("year", "month", "day", "hour")
-SOURCE_URL = ZIPING_ZHENQUAN_NLC_SCAN_URL
 RULESETS = [
     {
         "id": "ziping_prerequisites_v1",
         "title": "沈孝瞻《秘本子平真诠》正文（上海世界图书馆发行，国图藏本）",
-        "source_url": SOURCE_URL,
-        "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
         "locators": {
             "storage_clash": "论墓库刑冲之说 PDF43–45",
             "roots": "论十干得时不旺失时不弱，PDF22–23／印刷13–14",

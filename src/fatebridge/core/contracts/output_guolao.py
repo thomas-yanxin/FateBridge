@@ -240,7 +240,6 @@ class GuolaoMoiraAlias(PartialOutput):
 class GuolaoMoiraEvaluation(PartialOutput):
     profile_id: str | None = None
     source_commit: str | None = None
-    source_property_sha256: str | None = None
     scope: str | None = None
     fact_provenance: dict[str, str] | None = None
     counts: GuolaoMoiraCounts | None = None
@@ -401,8 +400,6 @@ class GuolaoMonthLimit(PartialOutput):
     source_id: str | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_data_sha256: str | None = None
-    source_image_sha256: str | None = None
     locator: str | None = None
     month_basis: str | None = None
     method: str | None = None

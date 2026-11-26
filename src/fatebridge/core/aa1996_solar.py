@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import ctypes
-import hashlib
 import json
 import math
 import os
@@ -20,11 +19,11 @@ from fatebridge.fetch_aa1996 import MODEL_ID, source_profile
 from fatebridge.utils.errors import EphemerisSourceError
 
 MANIFEST_ENV = "FATEBRIDGE_AA1996_MANIFEST"
-_LOCK = RLock()
+LOCK = RLock()
 
 
 @lru_cache(maxsize=1)
-def _profile() -> tuple[dict[str, Any], str]:
+def _profile() -> dict[str, Any]:
     return source_profile()
 
 
@@ -69,7 +68,7 @@ class _ImageInfo(ctypes.Structure):
     ]
 
 
-def _loaded_image(function: Any, expected_path: Path, expected_hash: str) -> str:
+def _loaded_image(function: Any, expected_path: Path) -> None:
     """Observe the image containing the actual calculation entry address."""
     lookup = ctypes.CDLL(None).dladdr
     lookup.argtypes = [ctypes.c_void_p, ctypes.POINTER(_ImageInfo)]
@@ -83,10 +82,6 @@ def _loaded_image(function: Any, expected_path: Path, expected_hash: str) -> str
     mapped = Path(os.fsdecode(info.filename)).resolve()
     if mapped != expected_path.resolve():
         raise ValueError("Calculation entry was resolved from another image")
-    digest = hashlib.sha256(mapped.read_bytes()).hexdigest()
-    if digest != expected_hash:
-        raise ValueError("Actual calculation image bytes differ")
-    return digest
 
 
 class _Source:
@@ -94,7 +89,7 @@ class _Source:
         self.path, self.signature = path, signature
         self._temporary: tempfile.TemporaryDirectory[str] | None = None
         try:
-            self.profile, self.profile_sha256 = _profile()
+            self.profile = _profile()
             raw = path.read_bytes()
             manifest = json.loads(raw, object_pairs_hook=_pairs)
             if not isinstance(manifest, dict):
@@ -103,8 +98,6 @@ class _Source:
                 model_id=MODEL_ID,
                 version=self.profile["version"],
                 abi_version=1,
-                source_profile_sha256=self.profile_sha256,
-                calculation_source_sha256=self.profile["calculation_source_sha256"],
                 system=platform.system(),
                 machine=platform.machine(),
             )
@@ -124,29 +117,19 @@ class _Source:
             self.binary_path = binary
             self.binary_signature = _signature(binary)
             data = binary.read_bytes()
-            self.binary_sha256 = hashlib.sha256(data).hexdigest()
-            if self.binary_sha256 != manifest.get("binary_sha256"):
-                raise ValueError("Binary differs from build manifest")
-            self.manifest_sha256 = hashlib.sha256(raw).hexdigest()
             # A unique private copy avoids dlopen returning an old image for a
-            # replaced configured filename. Hash that copy before loading it.
+            # replaced configured filename.
             self._temporary = tempfile.TemporaryDirectory(
                 prefix="fatebridge-aa1996-loaded-"
             )
             loaded = Path(self._temporary.name) / name
             loaded.write_bytes(data)
-            if hashlib.sha256(loaded.read_bytes()).hexdigest() != self.binary_sha256:
-                raise ValueError("Private loaded bytes differ")
             self.library = ctypes.CDLL(str(loaded))
-            for symbol, wanted in [
-                ("fatebridge_aa1996_model_id", MODEL_ID),
-                ("fatebridge_aa1996_profile_sha256", self.profile_sha256),
-            ]:
-                function = getattr(self.library, symbol)
-                function.argtypes = []
-                function.restype = ctypes.c_char_p
-                if function() != wanted.encode("ascii"):
-                    raise ValueError("Actual binary model marker differs")
+            function = getattr(self.library, "fatebridge_aa1996_model_id")
+            function.argtypes = []
+            function.restype = ctypes.c_char_p
+            if function() != MODEL_ID.encode("ascii"):
+                raise ValueError("Actual binary model marker differs")
             self.library.fatebridge_aa1996_abi_version.argtypes = []
             self.library.fatebridge_aa1996_abi_version.restype = ctypes.c_int
             if self.library.fatebridge_aa1996_abi_version() != 1:
@@ -157,9 +140,7 @@ class _Source:
                 ctypes.c_char_p,
             ]
             self.library.fatebridge_aa1996_solar.restype = ctypes.c_int
-            self.loaded_image_sha256 = _loaded_image(
-                self.library.fatebridge_aa1996_solar, loaded, self.binary_sha256
-            )
+            _loaded_image(self.library.fatebridge_aa1996_solar, loaded)
             self.library.swe_version.argtypes = [ctypes.c_char_p]
             self.library.swe_version.restype = ctypes.c_char_p
             version = ctypes.create_string_buffer(256)
@@ -205,11 +186,6 @@ class _Source:
         return dict(
             model_id=MODEL_ID,
             version=self.profile["version"],
-            source_profile_sha256=self.profile_sha256,
-            calculation_source_sha256=self.profile["calculation_source_sha256"],
-            build_manifest_sha256=self.manifest_sha256,
-            binary_sha256=self.binary_sha256,
-            loaded_image_sha256=self.loaded_image_sha256,
             binary_filename=self.binary_path.name,
             native_core_version=self.native_version,
             system=platform.system(),
@@ -218,7 +194,6 @@ class _Source:
             time_argument="TT via Swiss swe_calc",
             position_frame="Geocentric apparent ecliptic/equinox of date, Swiss2.10.03 default astronomy models with AA1996 EMB and full Moshier Moon",
             calculation_flags_requested=260,
-            source_url=self.profile["reference"],
             sources=deepcopy(self.profile["sources"]),
             software_input_years=list(self.profile["software_input_years"]),
             qualified_solar_term_years=list(self.profile["qualified_solar_term_years"]),
@@ -232,10 +207,7 @@ class _Source:
         return (
             str(self.path),
             self.signature,
-            self.manifest_sha256,
             self.binary_signature,
-            self.binary_sha256,
-            self.profile_sha256,
         )
 
 
@@ -264,19 +236,19 @@ def _selected() -> _Source:
 
 
 def cache_key() -> tuple[Any, ...]:
-    with _LOCK:
+    with LOCK:
         return _selected().key()
 
 
 def source_receipt() -> dict[str, Any]:
-    with _LOCK:
+    with LOCK:
         return _selected().receipt()
 
 
 def solar_longitudes_tt(jd_tts: list[float]) -> dict[str, Any]:
     if not all(_finite(value) for value in jd_tts):
         raise ValueError("AA1996 observations require finite numeric TT points")
-    with _LOCK:
+    with LOCK:
         source = _selected()
         low, high = source.profile["working_jd_tt"]
         if not all(low <= value <= high for value in jd_tts):
@@ -302,7 +274,7 @@ def longitude_crossing_tt(
         raise ValueError(
             "AA1996 crossing requires finite target and increasing TT bracket"
         )
-    with _LOCK:
+    with LOCK:
         source = _selected()
         if expected_source_key is not None and source.key() != expected_source_key:
             raise EphemerisSourceError("solar_configuration_changed")

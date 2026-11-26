@@ -108,7 +108,6 @@ class EvaluationCounts(TypedDict):
 class EvaluationRecord(TypedDict):
     profile_id: str
     source_commit: str
-    source_property_sha256: str
     scope: str
     fact_provenance: dict[str, str]
     counts: EvaluationCounts
@@ -133,7 +132,6 @@ class PatternEvidence(TypedDict):
 class PatternRecord(TypedDict):
     name: str
     level: Polarity
-    source: str
     dsl: str
     detail: str
     rule_id: str
@@ -169,7 +167,6 @@ class MoiraEvaluation:
         return {
             "profile_id": self.profile.profile_id,
             "source_commit": self.profile.source_commit,
-            "source_property_sha256": self.profile.source_property_sha256,
             "scope": "complete_source_catalogue_with_fact_specific_unknowns_not_classical_acceptance",
             "fact_provenance": dict(self.fact_provenance),
             "counts": {
@@ -644,7 +641,6 @@ def pattern_records(evaluation: MoiraEvaluation) -> list[PatternRecord]:
             {
                 "name": pattern.name,
                 "level": rule.polarity,
-                "source": evaluation.profile.source_url,
                 "dsl": rule.condition_text,
                 "detail": "具名Moira软件条件成立，并通过本次来源覆盖图；原典格局未验收。",
                 "rule_id": rule.rule_id,

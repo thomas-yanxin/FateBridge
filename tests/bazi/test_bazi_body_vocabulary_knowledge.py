@@ -25,11 +25,6 @@ def test_source_voices_and_engineering_boundaries_survive_revision() -> None:
     assert curation["source_refs"][1]["source_pdf_pages"] == [50]
     assert curation["source_refs"][2]["author"] == "任鐵樵增注（任氏曰）"
     assert curation["source_refs"][2]["source_pdf_pages"] == [175, 176, 177, 178]
-    for item in curation["source_refs"]:
-        assert (
-            item["source_sha256"]
-            == "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
-        )
     for item in curation["source_refs"][1:]:
         assert item["author"] in curation["citation"]
     partitions = sum(

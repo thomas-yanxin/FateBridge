@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, kongwang_for_ganzhi
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 SCOPE = (
@@ -51,8 +50,6 @@ def transmission_progression(day_ganzhi: str, branches: list[str]) -> dict[str, 
     return dict(
         ruleset_id="tanyuan_transmission_progression_v1",
         source_title="袁树珊《大六壬探原》卷下集说篇·课体纲要·三传连茹",
-        source_url=TANYUAN_SOURCE,
-        source_sha256=TANYUAN_SCAN_SHA256,
         original_pdf_pages=[110, 111],
         day_ganzhi=day_ganzhi,
         branches=list(branches),
@@ -75,7 +72,6 @@ def transmission_progression(day_ganzhi: str, branches: list[str]) -> dict[str, 
 def progression_trace(evidence: dict[str, Any]) -> dict[str, Any]:
     return dict(
         rule_id="liuren.transmission_progression",
-        source_url=evidence["source_url"],
         source_section=evidence["source_title"],
         result={
             k: evidence[k]

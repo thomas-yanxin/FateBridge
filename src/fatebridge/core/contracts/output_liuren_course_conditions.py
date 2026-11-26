@@ -44,7 +44,6 @@ class CourseLayoutWitness(PartialOutput):
     source_title: str | None = None
     edition: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[StrictInt] | None = None
 
 
@@ -59,7 +58,6 @@ class CourseLayoutBasis(PartialOutput):
     unresolved_authorial_intent_ids: list[Literal["S05"]] | None = None
     authorial_intent_adjudicated: None = None
     original_conditions_rewritten: StrictBool | None = None
-    source_reference_sha256: str | None = None
     witnesses: list[CourseLayoutWitness] | None = None
     scope: str | None = None
 
@@ -83,7 +81,6 @@ class LiurenCourseConditions(PartialOutput):
     ruleset_id: Literal["tanyuan_course_conditions_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[StrictInt] | None = None
     stage_basis_pdf_pages: list[StrictInt] | None = None
     day_ganzhi: str | None = None

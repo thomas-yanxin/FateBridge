@@ -3,7 +3,6 @@
 import json
 from copy import deepcopy
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -31,7 +30,6 @@ def _source() -> dict[str, Any]:
             raise ValueError("河洛爻位规则来源身份或所选有援读法不一致。")
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_line_condition_source_data") from exc
-    data["loaded_sha256"] = sha256(raw).hexdigest()
     return data
 
 
@@ -111,9 +109,6 @@ def line_conditions(chart: dict[str, Any]) -> dict[str, Any]:
     return {
         "ruleset_id": RULESET_ID,
         "version": source["version"],
-        "source_url": source["source_url"],
-        "source_pdf_sha256": source["source_pdf_sha256"],
-        "collation_sha256": source["loaded_sha256"],
         "source_pdf_pages": source["source_pdf_pages"][:],
         "review_status": source["review_status"],
         "literal_clauses": deepcopy(source["clauses"]),

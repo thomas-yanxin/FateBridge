@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Dict, Optional, Tuple
-
 from fatebridge.core.metaphysics.common import (
     GUI_REN_SEQUENCE,
     LIURENG_GUIREN_DAY,
@@ -35,8 +33,8 @@ GUISHEN_IDENTITIES = dict(
 
 
 def _build_guishen_mapping(
-    day_stem: str, hour_branch: str, is_diurnal_override: Optional[bool] = None
-) -> Tuple[str, Dict[str, str]]:
+    day_stem: str, hour_branch: str, is_diurnal_override: bool | None = None
+) -> tuple[str, dict[str, str]]:
     is_day = resolve_diurnal(hour_branch, is_diurnal_override)["is_diurnal"]
     start = (LIURENG_GUIREN_DAY if is_day else LIURENG_GUIREN_NIGHT)[day_stem]
     # Place 贵 on the day/night start, count directly to 地分, not via 天盘.

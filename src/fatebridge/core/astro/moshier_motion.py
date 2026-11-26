@@ -84,16 +84,6 @@ def complete_moshier_longitude_rate(
         "candidate_steps_days": list(STEPS_DAYS),
         "convergence_line_arcsec_per_day": CONVERGENCE_LINE_ARCSEC_PER_DAY,
         "selection_policy": "two_source_steps_full_stencil_or_range_qualified_homogeneous_sides",
-        "source_url": (
-            "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c"
-            if planet == "Sun"
-            else (
-                "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swemmoon.c"
-                if planet == "Moon"
-                else "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swemplan.c"
-            )
-        ),
-        "position_reduction_source_url": "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c",
         "scope": "Derivative of the selected continuous Moshier apparent-position source model. Eight planets use stable geometric evaluation of the original short backward source-speed operator, with two checked source steps, one linearized light-time iteration and the same finite-Sun/aberration/date-frame reduction. The Sun uses negative geometric Earth, no solar light-time iteration or self-deflection, and the same stable Earth-source-speed aberration. The Moon uses its original forward-biased three-point lunar source-speed operator, backward Earth source speed, geocentric linear light time and no solar deflection, with the Earth terms cancelled before numerical reduction. Displayed native positions and analytical theory remain unchanged. Step agreement does not certify the exact rounded binary64 map, physical-model error, station time or prediction.",
     }
     if planet not in TARGETS:
@@ -258,11 +248,6 @@ def complete_moshier_longitude_rate(
             "geometric_padding_days": padding,
             "parent_reach_in_steps": parent_reach,
             "geometric_source_radius_days": source_radius,
-            "source_url": (
-                policy["source_url"]
-                if planet == "Moon"
-                else "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swemplan.c"
-            ),
         }
         center_source = trace.observe(
             "moshier_geometric_source", "moshier", record_factor=False

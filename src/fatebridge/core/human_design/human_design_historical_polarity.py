@@ -10,7 +10,6 @@ from typing import Any
 from fatebridge.core.human_design.human_design_depth import line_fixings
 
 METHOD = "human_design_historical_polarity_v1"
-NOTICE = "https://www.humandesignsystem.com/archive/newsletters/0904.pdf"
 SCOPE = "仅对名义盘58.5比较2001字面星体表与2002通知的条件假设，沿用本盘双侧同门／谐振门固定机制。通知适用版次未定，现有两张官方盘标记与其冲突；不改默认、不改完整线义，也不外推其他联合见证或现实事件。"
 
 
@@ -18,8 +17,6 @@ def source_records() -> list[dict[str, Any]]:
     return [
         {
             "id": "zc_design_2002_notice",
-            "url": NOTICE,
-            "pdf_sha256": "50997eddd5ddfea0b413f3a2a885baa1e0e538c1d0adca726319b2ed4c6f9c9f",
             "page_one_based": 1,
             "printed_date": "2002-03-17",
             "heading": "Rave I'Ching Error Alert",
@@ -30,27 +27,13 @@ def source_records() -> list[dict[str, Any]]:
         *[
             {
                 "id": ident,
-                "url": "https://jovianarchive.com/pages/get-your-human-design-chart",
-                "archive_path": "tests/data/human_design/source-charts/"
-                + ident
-                + ".pdf",
-                "pdf_sha256": sha,
                 "page_one_based": 1,
                 "observed_target": "personality.Sun58.5",
                 "observed_marker": "downward_triangle",
                 "marker_meaning": "detriment",
                 "method": "visual review of both preselected existing original768cohort cases; no new chart sample",
             }
-            for ident, sha in (
-                (
-                    "profile-58-5-1",
-                    "cd4ddc0a77b9141cdebb32243d703eaab9f7df929401ea644b6a14bd4c46e22c",
-                ),
-                (
-                    "profile-58-5-2",
-                    "c288a8db57b4f9afe896d90a35ccba8c8aee59a0607d4c0b250a6b51d00bee77",
-                ),
-            )
+            for ident in ("profile-58-5-1", "profile-58-5-2")
         ],
     ]
 
@@ -61,7 +44,6 @@ def ruleset() -> dict[str, Any]:
         "version": "1.0.0",
         "author": "FateBridge conditional comparison of conflicting source observations",
         "source_kind": "historical_third_party_notice_and_existing_official_chart_markers",
-        "sources": {s["id"]: s["url"] for s in source_records()},
         "source_records": source_records(),
         "scope": SCOPE,
     }
@@ -158,7 +140,6 @@ def context_reading(report: dict[str, Any]) -> dict[str, Any]:
                 "source_conflict_resolved",
             )
         ],
-        "source_urls": [NOTICE, source_records()[1]["url"]],
     }
 
 
@@ -179,7 +160,6 @@ def add_historical_polarity_evidence(
                 "context_path": "historical_polarity_context",
                 "default_changed": False,
             },
-            "source_url": NOTICE,
         }
     )
     return evidence

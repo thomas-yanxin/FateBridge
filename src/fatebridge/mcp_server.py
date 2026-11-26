@@ -57,7 +57,7 @@ __all__ = ["app", "create_mcp_app", "main"]
 app: FastMCP
 
 
-_MCP_INSTRUCTIONS = (
+MCP_INSTRUCTIONS = (
     "FateBridge 提供本地计算，助手按当前问题选择工具并解释实际结果。"
     "计算前排除生死寿命、灾祸断言、临床诊断治疗和医疗择时。"
     "只用已确认资料，不猜生时、不套默认或示例；必要缺项简短追问，未知后继续已有可答部分。"
@@ -290,7 +290,7 @@ def create_mcp_app(families: str | None = None) -> FastMCP:
         raise ValueError("未找到所选分类的公开工具")
     server = FastMCP(
         name="fatebridge",
-        instructions=_MCP_INSTRUCTIONS,
+        instructions=MCP_INSTRUCTIONS,
         version=APP_VERSION,
         dereference_schemas=False,
     )

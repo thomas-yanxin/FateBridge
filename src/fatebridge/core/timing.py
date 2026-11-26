@@ -4,7 +4,7 @@ from copy import deepcopy
 from datetime import date, datetime, timedelta, timezone
 from fractions import Fraction
 from functools import lru_cache
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.core.almanac import (
     BAZI_MONTH_START_TERMS,
@@ -47,7 +47,7 @@ from fatebridge.utils.timezones import (
 )
 
 
-def _copy_timing_info(info: Dict) -> Dict:
+def _copy_timing_info(info: dict[str, Any]) -> dict[str, Any]:
     """Copy cached fields and detach nested solar-term metadata before delivery."""
     result = info.copy()
     if "solar_term_window" in info:
@@ -60,7 +60,7 @@ def _calculate_liuyue_cached(
     target_clock: ZonedCalendar,
     timezone_name: str,
     _solar_environment: tuple[Any, ...] = (),
-) -> Dict:
+) -> dict[str, Any]:
     """Cache deterministic liuyue calculations for repeated timing analysis."""
     local_target_date = target_clock.require_datetime()
     bazi_year = get_bazi_year(local_target_date, timezone_name)
@@ -96,7 +96,7 @@ def _calculate_liuyue_cached(
 def _calculate_liushi_cached(
     civil_date: date,
     civil_hour: int,
-) -> Dict:
+) -> dict[str, Any]:
     """Cache the civil date/hour rule without constructing a nominal instant."""
     liushi_stem, liushi_branch = BaZiCalendar.calculate_hour_pillar(
         civil_date.year,
@@ -126,7 +126,7 @@ def _calculate_liuri_cached(
     target_clock: ZonedCalendar,
     timezone_name: str,
     _solar_environment: tuple[Any, ...] = (),
-) -> Dict:
+) -> dict[str, Any]:
     """Cache daily timing with the day pillar rolled over at 23:00."""
     local_target_date = target_clock.require_datetime()
     liuri_stem, liuri_branch = BaZiCalendar.calculate_day_pillar(
@@ -304,7 +304,6 @@ class TimingAnalysis:
             "reference_policy": "next_jie_strict_for_forward_previous_jie_inclusive_for_reverse",
             "source": {
                 "title": "三命通会·卷二·论大运",
-                "url": "https://zh.wikisource.org/zh-hant/三命通會/卷二#論大運",
             },
             "scope": "三日一年及十年一运为传统规则；公历加法、秒级延拓和DST处理是工程约定。边界精度受出生时间和节气精度限制，覆盖期数不是寿命估计。",
             "periods": sequence,
@@ -316,7 +315,7 @@ class TimingAnalysis:
         *,
         moment: datetime | None = None,
         timezone_name: str = DEFAULT_TIMEZONE,
-    ) -> Dict:
+    ) -> dict[str, Any]:
         """Return the Li Chun year pillar when a moment is supplied, or the requested year pillar."""
         if moment is not None:
             resolved_year = get_bazi_year(moment, timezone_name)
@@ -341,7 +340,7 @@ class TimingAnalysis:
         target_day: int = 1,
         timezone_name: str = DEFAULT_TIMEZONE,
         target_date: datetime | None = None,
-    ) -> Dict:
+    ) -> dict[str, Any]:
         """Calculate the solar-term month pillar at the supplied or constructed analysis instant."""
         local_target_date = localize_datetime(
             target_date or datetime(target_year, target_month, target_day),
@@ -407,7 +406,7 @@ class TimingAnalysis:
     def calculate_liuyue_timeline(
         target_year: int,
         timezone_name: str = DEFAULT_TIMEZONE,
-    ) -> list[Dict]:
+    ) -> list[dict[str, Any]]:
         """
         生成目标年份的 12 个节令月时间轴。
         """
@@ -423,7 +422,7 @@ class TimingAnalysis:
             term_index=0,
         )
 
-        timeline: list[Dict] = []
+        timeline: list[dict[str, Any]] = []
 
         for index, start_term in enumerate(current_year_terms):
             next_term = (
@@ -473,7 +472,7 @@ class TimingAnalysis:
     def calculate_liuri(
         target_date: datetime,
         timezone_name: str = DEFAULT_TIMEZONE,
-    ) -> Dict:
+    ) -> dict[str, Any]:
         """
         计算指定时点的流日干支。
         """
@@ -490,7 +489,7 @@ class TimingAnalysis:
     def calculate_liushi(
         target_datetime: datetime,
         timezone_name: str = DEFAULT_TIMEZONE,
-    ) -> Dict:
+    ) -> dict[str, Any]:
         """
         计算指定时刻的流时干支。
 
@@ -507,12 +506,12 @@ class TimingAnalysis:
 
     @staticmethod
     def analyze_liushi_detailed(
-        birth_pillars: Dict,
+        birth_pillars: dict[str, Any],
         target_datetime: datetime,
         day_stem: str | None = None,
         timezone_name: str = DEFAULT_TIMEZONE,
-        liushi_info: Dict | None = None,
-    ) -> Dict:
+        liushi_info: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         流时详细分析，包括十神关系与冲合。
         """
@@ -543,9 +542,9 @@ class TimingAnalysis:
 
     @staticmethod
     def _generate_liushi_summary(
-        liushi_info: Dict,
+        liushi_info: dict[str, Any],
         stem_shishen: str,
-        branch_relations: list[Dict],
+        branch_relations: list[dict[str, Any]],
     ) -> str:
         """生成流时分析总结。"""
         dt_label = (
@@ -570,7 +569,7 @@ class TimingAnalysis:
     def calculate_jieqi_transition_timeline(
         target_year: int,
         timezone_name: str = DEFAULT_TIMEZONE,
-    ) -> list[Dict]:
+    ) -> list[dict[str, Any]]:
         """
         生成目标年份 24 节气切换节点的时运时间轴。
         """
@@ -581,7 +580,7 @@ class TimingAnalysis:
             _solar_term_source_year(target_year + 1, target_year),
             term_index=0,
         )
-        timeline: list[Dict] = []
+        timeline: list[dict[str, Any]] = []
         for index, (term, next_term) in enumerate(zip(terms, terms[1:] + following)):
             require_calculated_solar_term(term)
             require_calculated_solar_term(next_term)
@@ -609,9 +608,9 @@ class TimingAnalysis:
     @staticmethod
     def _collect_branch_relations(
         target_branch: str,
-        birth_pillars: Dict,
+        birth_pillars: dict[str, Any],
         label: str,
-    ) -> list[Dict]:
+    ) -> list[dict[str, Any]]:
         """收集目标支与命局四支的冲合关系。"""
         branch_relations = []
         for pillar_name, pillar_data in birth_pillars.items():
@@ -641,15 +640,15 @@ class TimingAnalysis:
 
     @staticmethod
     def analyze_liuyue_detailed(
-        birth_pillars: Dict,
+        birth_pillars: dict[str, Any],
         target_year: int,
         target_month: int,
         day_stem: str | None = None,
         target_day: int = 1,
         timezone_name: str = DEFAULT_TIMEZONE,
         target_date: datetime | None = None,
-        liuyue_info: Dict | None = None,
-    ) -> Dict:
+        liuyue_info: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Describe ten-god and branch relationships for the monthly pillar."""
         if liuyue_info is None:
             liuyue_info = TimingAnalysis.calculate_liuyue(
@@ -683,12 +682,12 @@ class TimingAnalysis:
 
     @staticmethod
     def analyze_liuri_detailed(
-        birth_pillars: Dict,
+        birth_pillars: dict[str, Any],
         target_date: datetime,
         day_stem: str | None = None,
         timezone_name: str = DEFAULT_TIMEZONE,
-        liuri_info: Dict | None = None,
-    ) -> Dict:
+        liuri_info: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         流日详细分析，包括十神关系与冲合。
         """
@@ -719,9 +718,9 @@ class TimingAnalysis:
 
     @staticmethod
     def _generate_liuyue_summary(
-        liuyue_info: Dict,
+        liuyue_info: dict[str, Any],
         stem_shishen: str,
-        branch_relations: list[Dict],
+        branch_relations: list[dict[str, Any]],
     ) -> str:
         """Summarize monthly stem and branch relationships."""
         year_month = f"{liuyue_info['year']}年{liuyue_info['month']}月"
@@ -741,9 +740,9 @@ class TimingAnalysis:
 
     @staticmethod
     def _generate_liuri_summary(
-        liuri_info: Dict,
+        liuri_info: dict[str, Any],
         stem_shishen: str,
-        branch_relations: list[Dict],
+        branch_relations: list[dict[str, Any]],
     ) -> str:
         """生成流日分析总结。"""
         year_month_day = (

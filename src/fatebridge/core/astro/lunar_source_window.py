@@ -11,7 +11,7 @@ from __future__ import annotations
 import math
 from importlib.metadata import version
 from pathlib import Path
-from typing import Any, Dict, Sequence
+from typing import Any, Sequence
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
@@ -33,7 +33,7 @@ from fatebridge.utils.errors import EphemerisSourceError
 METHOD_ID = "fatebridge_lunar_light_path_source_window_v2"
 
 
-def selected_windows(julian_day_tt: float, retarded_tt: float) -> list[Dict[str, Any]]:
+def selected_windows(julian_day_tt: float, retarded_tt: float) -> list[dict[str, Any]]:
     """Observed file intervals, not a proof of every internal native read."""
     windows = []
     for slot in (0, 1):
@@ -58,17 +58,16 @@ def selected_windows(julian_day_tt: float, retarded_tt: float) -> list[Dict[str,
 
 def prime_lunar_source_window(
     julian_day_tt: float, model: str, trace: PhysicalEphemerisTrace
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     swe = runtime.swe
     native = str(getattr(swe, "version", "unavailable"))
     binding = binding_distribution_version(swe, version)
-    policy: Dict[str, Any] = {
+    policy: dict[str, Any] = {
         "method_id": METHOD_ID,
         "epoch_jd_tt": julian_day_tt,
         "ephemeris_model": model,
         "native_version": native,
         "binding_version": binding,
-        "source_url": "https://www.astro.com/swisseph/swephprg.htm",
         "source_function": "pyswisseph2.10.3.2/libswe/sweph.c:sweplan,sweph,app_pos_etc_moon",
         "scope": "Retarded-state priming followed by a required apparent recomputation. Selected file intervals must cover the whole reception light path; not an atomic native read-set or accuracy certification.",
     }
@@ -176,7 +175,7 @@ def prime_lunar_source_window(
 
 
 def finish_lunar_source_window(
-    policy: Dict[str, Any], initial: Sequence[float], refreshed: Sequence[float]
+    policy: dict[str, Any], initial: Sequence[float], refreshed: Sequence[float]
 ) -> None:
     if policy["status"] != "primed":
         return
@@ -201,7 +200,7 @@ def coherent_lunar_native_state(
     *,
     initial: Any = None,
     initial_flags: Any = None,
-) -> tuple[Any, int, Dict[str, Any]]:
+) -> tuple[Any, int, dict[str, Any]]:
     """The same physical source window for every requested apparent frame.
 
     Call under the managed runtime lock. A surrounding third-party path

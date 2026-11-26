@@ -73,7 +73,6 @@ class Witte1925SourceTable(PartialOutput):
     author: str | None = None
     version: str | None = None
     computed_for_current_chart: bool | None = None
-    source_record_sha256: str | None = None
     source: GeometrySource | None = None
     coverage: SourceTableCoverage | None = None
     age_columns_years: list[int] | None = None

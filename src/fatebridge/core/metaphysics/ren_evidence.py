@@ -1,41 +1,31 @@
 """Named source scopes; excerpt conformance never certifies efficacy."""
 
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE, SEXAGENARY_INDEX
-from fatebridge.core.metaphysics.liureng_course_conditions_convention import (
-    CONVENTION,
-)
 from fatebridge.core.metaphysics.liureng_cross_harmony_convention import (
     CONVENTION as CROSS_HARMONY_CONVENTION,
 )
 from fatebridge.core.metaphysics.liureng_day_placements_convention import (
     CONVENTION as DAY_PLACEMENT_CONVENTION,
 )
-from fatebridge.core.metaphysics.ren_gods import TANYUAN_TRANSCRIPTION
-from fatebridge.core.metaphysics.ren_sources import (
-    JINGWEI_SOURCE,
-    JINKOU_RELATIONS_SOURCE,
-    JINKOU_SCAN_URL,
-    JINKOU_SOURCE,
-    LIUREN_SOURCE,
-    TANYUAN_SCAN_SHA256,
-    TANYUAN_SOURCE,
-    ZHINAN_SOURCE,
+
+COURSE_CONDITIONS_CONVENTION = (
+    "按探原课体纲要原页核对十二运配初传天将十二条、初传天将配名十二条及斩关、一体、始终三条；"
+    "采用本书十干十二运与日旬首尾，保留题名异文，不以名称导出寿命、临床、灾祸或现实结局"
 )
 
 
 def ruleset_metadata(
     technique: str, *, guiren_profile: str = "liuren_common_v1"
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     jinkou = technique == "jinkou"
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "id": "jinkou_guben_excerpt_v1" if jinkou else "liuren_jiuzong_v1",
         "version": "1.16.0",
         "source_title": (
             "六壬神课金口诀古本·卷之上" if jinkou else "六壬大全·卷一 / 六壬指南·卷一"
         ),
-        "source_urls": [JINKOU_SOURCE] if jinkou else [LIUREN_SOURCE, ZHINAN_SOURCE],
         "source_kind": "online_transcription_not_collated_edition",
         "classical_conformance": "partial_excerpt",
         "classical_acceptance_passed": False,
@@ -74,14 +64,9 @@ def ruleset_metadata(
         result["conventions"][
             "position_interactions"
         ] = "按京本五比同类、四位相生、四位相克及四爻生克颂识别十四条结构；完整六对保留方向，连续相生或合局不取消隔位相克，不代替完整旺衰与综合取用"
-        result["source_urls"].append(JINKOU_SCAN_URL)
         result["conventions"][
             "year_fate"
         ] = "京本按明确出生年干支所属六甲旬取男女起点，男顺女逆；只用指定一岁起算岁序，另课采用行年支作地分的所选释读，不表示已观测来人方位；不借用大六壬通用行年起点。"
-        result["source_urls"].append(JINKOU_RELATIONS_SOURCE)
-        result["source_urls"].append(
-            "https://archive.wul.waseda.ac.jp/kosho/ro14/ro14_02466/ro14_02466_0006/ro14_02466_0006.html"
-        )
         result["conventions"][
             "unresolved_definition_evidence"
         ] = "六条疑义增列CNTS与早稻田抄本所选书影异文；隔生配对、昼夜候选、地支环距离与起丁路径分列条件事实，均不据此裁定课式；未鉴定版本先后或独立传承"
@@ -114,7 +99,6 @@ def ruleset_metadata(
         result["conventions"][
             "subtype_names"
         ] = "按探原九宗门总说，从实际四课贼克、比用、伏吟刑冲及返吟有无贼克推导；逐课表注另行核对"
-        result["source_urls"].extend([TANYUAN_TRANSCRIPTION, TANYUAN_SOURCE])
         result["source_title"] = "六壬大全/指南九宗门 / 大六壬探原·细课名"
         result["conventions"][
             "life_stages"
@@ -133,7 +117,6 @@ def ruleset_metadata(
                 "guiren_scope"
             ] = "仅采用探原日贵人歌、夜贵人歌及贵人旋转；非整书配置"
         else:
-            result["source_urls"].append(JINGWEI_SOURCE)
             result["source_title"] = "六壬经纬·贵神 / " + result["source_title"]
             result["conventions"][
                 "guiren_scope"
@@ -153,7 +136,7 @@ def ruleset_metadata(
             "按声明的十干十二运及两贵人表穷举昼夜、顺逆的八种配将必要配置；"
             "区分本课字面命中与配将可实现，不保证九宗取传或现实结果，崇位原意未裁"
         )
-        result["conventions"]["course_conditions"] = CONVENTION
+        result["conventions"]["course_conditions"] = COURSE_CONDITIONS_CONVENTION
         result["source_title"] += "、干支加临课体"
         result["conventions"]["day_placement_patterns"] = DAY_PLACEMENT_CONVENTION
 
@@ -188,14 +171,14 @@ def ruleset_metadata(
     return result
 
 
-def xun_dun_stems(day_ganzhi: str) -> Dict[str, str]:
+def xun_dun_stems(day_ganzhi: str) -> dict[str, str]:
     """The ten actual xun stems; the two empty branches have no stem."""
 
     head = SEXAGENARY_INDEX[day_ganzhi] // 10 * 10
     return {pair[1]: pair[0] for pair in SEXAGENARY_CYCLE[head : head + 10]}
 
 
-def liuren_annotation_note(day_ganzhi: str, gan_upper: str) -> Dict[str, Any] | None:
+def liuren_annotation_note(day_ganzhi: str, gan_upper: str) -> dict[str, Any] | None:
     """Critical apparatus only; never an input to selection or label derivation.
 
     Locators refer to the identified scan file, PDF pages counted from 1.
@@ -229,8 +212,6 @@ def liuren_annotation_note(day_ganzhi: str, gan_upper: str) -> Dict[str, Any] | 
     return {
         "annotation": annotation,
         "original_pdf_page": page,
-        "source_url": TANYUAN_SOURCE,
-        "source_sha256": TANYUAN_SCAN_SHA256,
         "kind": kind,
         "explanation": explanation,
         "scope": "只限制细课名的原典注释认证；不据此改写已算出的四课或三传",

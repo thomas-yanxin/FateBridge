@@ -6,7 +6,7 @@ offsets, reject malformed components and reject nonzero submicrosecond loss.
 Short-component fractions retain the existing 3.12 C spelling convention as
 fractional seconds; this is not a claim of universal ISO or physical precision.
 
-CPython source: https://github.com/python/cpython/blob/v3.12.13/Lib/_pydatetime.py
+CPython source: Python 3.12.13 Lib/_pydatetime.py
 Copyright (c) 2001-2026 Python Software Foundation. All Rights Reserved.
 Full upstream license is retained at the end of this module.
 Changes: use stdlib date.fromisocalendar, add lexical/range/precision checks,
@@ -15,12 +15,11 @@ and construct stdlib datetimes without invoking version-specific ISO C parsers.
 
 import re
 from datetime import date, datetime, timedelta, timezone
-from typing import Optional
 
-_DATE = re.compile(
+DATE_PATTERN = re.compile(
     r"(?:[0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8}|[0-9]{4}-W[0-9]{2}(?:-[1-7])?|[0-9]{4}W[0-9]{2}[1-7]?)"
 )
-_TIME = re.compile(
+TIME_PATTERN = re.compile(
     r"([0-9]{2})(?:(:)([0-9]{2})(?::([0-9]{2}))?|([0-9]{2})([0-9]{2})?)?(?:[.,]([0-9]+))?"
 )
 
@@ -58,9 +57,7 @@ def _find_isoformat_datetime_separator(dtstr: str) -> int:
                     #
                     # We'll assume it's a hyphen at 8 because it's way more
                     # likely that someone will use a hyphen as a separator than
-                    # a number, but at this point it's really best effort
-                    # because this is an extension of the spec anyway.
-                    # TODO(pganssle): Document this
+                    # a number, because this is an extension of the spec.
                     return 8
                 return 10
             else:
@@ -128,7 +125,7 @@ def _parse_isoformat_date(dtstr: str) -> list[int]:
 
 
 def _clock_time_parts(text: str) -> tuple[int, int, int, int]:
-    match = _TIME.fullmatch(text)
+    match = TIME_PATTERN.fullmatch(text)
     if match is None:
         raise ValueError("Invalid clock or offset component spelling")
     hour, colon, minute, second, basic_minute, basic_second, fraction = match.groups()
@@ -150,7 +147,7 @@ def _clock_time_parts(text: str) -> tuple[int, int, int, int]:
 
 def _clock_time_and_offset(
     text: str,
-) -> tuple[tuple[int, int, int, int], Optional[timezone]]:
+) -> tuple[tuple[int, int, int, int], timezone | None]:
     marker = re.search(r"[+Z-]", text)
     if marker is None:
         return _clock_time_parts(text), None
@@ -182,7 +179,7 @@ def parse_meihua_clock_label(value: str) -> datetime:
     try:
         separator = _find_isoformat_datetime_separator(value)
         date_text = value[:separator]
-        if _DATE.fullmatch(date_text) is None:
+        if DATE_PATTERN.fullmatch(date_text) is None:
             raise ValueError("Invalid Gregorian or ISO week date spelling")
         year, month, day = _parse_isoformat_date(date_text)
         if separator == len(value):

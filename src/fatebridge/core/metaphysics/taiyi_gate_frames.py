@@ -6,7 +6,6 @@ from fatebridge.core.metaphysics.taiyi_geometry import PALACE_ORDER, PALACES, RI
 
 DOORS = tuple("开休生伤杜景死惊")
 GOOD = {"开", "休", "生"}
-TONGZONG = "https://www.shidianguji.com/zh/book/CADAL02055529/chapter/1l5erjww44w8a"
 # Four cardinal positions stand alone; each corner includes its two branches.
 # Vol. 2 explicitly puts 戌亥 in 乾一 and 辰巳 in 巽九. This is a directional
 # projection, not a change to the sixteen-spirit counting values.
@@ -24,7 +23,6 @@ SECTORS = {
     )
     for spirit in spirits
 }
-SECTOR_SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷02"
 
 
 def key_hour_gate_cycle(accumulation: int, yin: bool) -> dict[str, Any]:
@@ -147,5 +145,4 @@ def check_three_gates(
         "conditions_satisfied": not any(c["obstructs"] for c in checks),
         "checks": checks,
         "frame_source_path": path,
-        "source": TONGZONG,
     }

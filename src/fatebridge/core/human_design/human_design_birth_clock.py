@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import hashlib
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from importlib.resources import files
 from typing import Any
 
 from fatebridge.core.astro.tt_epoch import TTInstant
@@ -93,11 +91,6 @@ def resolve_birth_clock(
     tt = leap.tt.as_float()
     local_label = local.isoformat()[:17] + "60" + local.isoformat()[19:]
     utc_label = leap.utc_label
-    table_sha = hashlib.sha256(
-        files("fatebridge.data")
-        .joinpath("knowledge/western-leap-seconds.json")
-        .read_bytes()
-    ).hexdigest()
     evidence = {
         "method_id": "human_design_confirmed_birth_leap_second_v1",
         "input": {
@@ -115,9 +108,6 @@ def resolve_birth_clock(
         "following_utc_midnight": leap.effective.replace(microsecond=0).isoformat(),
         "tai_minus_utc_during_leap_seconds": leap.offset_before,
         "tai_minus_utc_after_leap_seconds": leap.offset_after,
-        "source_url": leap_table()["source_url"],
-        "source_document_sha256": leap_table()["source_sha256"],
-        "source_table_sha256": table_sha,
         "source_table_expires_at": leap_table()["expires_at"],
         "birth_record_authenticated": False,
         "scope": "只确认所填民用标签属于冻结IERS的正闰秒，并转换为连续TT；不认证出生记录、实测UT1或星历精度。二进制TT儒略日保留原有浮点分辨率。",

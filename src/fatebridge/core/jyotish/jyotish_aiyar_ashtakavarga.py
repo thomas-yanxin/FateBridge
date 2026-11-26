@@ -20,9 +20,6 @@ METHOD = "aiyar1905_seven_bav_and_commentary_reductions_v1"
 SOURCE = {
     "id": "brihat_jataka_aiyar_1905_seven_bav",
     "title": "Brihat Jataka, N. Chidambaram Aiyar English translation, second edition, 1905",
-    "url": "https://archive.org/details/brihatjataka00varaiala",
-    "scan_sha256": "ceafc2fe3e385fb834b94fa4f464406da3ba42ab01b3a2ac42a2749abda9f1d9",
-    "text_witness_sha256": "bf1afe4510937e04157ba06f2c3a6d849c262ea3fffa1b922662973172bc0152",
     "sections": [
         "IX.1-7, printed97-99/PDF141-143; benefic-dot notation in notes printed100-101"
     ],

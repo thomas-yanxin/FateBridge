@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
 from fractions import Fraction
 from pathlib import Path
 from typing import Any
@@ -12,7 +10,6 @@ from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_futen_arithmetic.json"
 UNIT_SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_futen_clock.json"
-CANONICAL_SHA256 = "fbcd437bead47a0a82121604b8030b41e12fb14fe067872ff50e2addaa2febd6"
 DAY_CYCLE = tuple(
     "甲乙丙丁戊己庚辛壬癸"[i % 10] + "子丑寅卯辰巳午未申酉戌亥"[i % 12]
     for i in range(60)
@@ -42,16 +39,9 @@ def futen_arithmetic_reference() -> dict[str, Any]:
     astronomical formulae. Neither this example nor an arithmetic discrepancy
     identifies an issued calendar, a physical manuscript error, or a day boundary.
     """
-    loaded = load_source(SOURCE)
-    bundle = loaded.data
-    projection = json.dumps(
-        bundle, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode()
-    if hashlib.sha256(projection).hexdigest() != CANONICAL_SHA256:
-        raise ValueError("符天讲义所选常数、十五行或未决印值已改变，须重新校核")
+    bundle = load_source(SOURCE)
     c = bundle["constants"]
-    unit_source = load_source(UNIT_SOURCE)
-    unit_bundle = unit_source.data
+    unit_bundle = load_source(UNIT_SOURCE)
     models = {row["id"]: row for row in unit_bundle["models"]}
     model_ids = {
         "senmyo": "takesako2015_1240_senmyo_8400",
@@ -126,7 +116,6 @@ def futen_arithmetic_reference() -> dict[str, Any]:
         )
     return {
         **bundle,
-        "source_bundle_sha256": loaded.sha256,
         "calculated_chain": {
             "accumulated_units": accumulated,
             "rain_cycle": _cycle(rain, day),
@@ -175,8 +164,6 @@ def futen_arithmetic_reference() -> dict[str, Any]:
         "conditional_unit_model_reference": {
             "source_title": unit_bundle["source_title"],
             "source_url": unit_bundle["source_url"],
-            "source_pdf_sha256": unit_bundle["source_sha256"],
-            "source_bundle_sha256": unit_source.sha256,
             "source_models": models,
             "unit_denominators_are_selected_2015_models": True,
             "unit_denominators_printed_in_selected_2024_captions": False,

@@ -61,9 +61,8 @@ def validate_pattern_anchors(board: dict[str, Any]) -> None:
     for trace in traces:
         if trace.get("result") is not None:
             JinkouPatterns.model_validate(trace["result"])
-        for key in ("source_url", "source_section"):
-            if key in trace:
-                compare_present(trace[key], metadata[key])
+        if "source_section" in trace:
+            compare_present(trace["source_section"], metadata["source_section"])
     expected = expected_patterns(board)
     if expected is None:
         return
@@ -72,9 +71,8 @@ def validate_pattern_anchors(board: dict[str, Any]) -> None:
     for trace in traces:
         if "result" in trace:
             compare_present(trace["result"], expected)
-        for key in ("source_url", "source_section"):
-            if key in trace:
-                compare_present(trace[key], expected[key])
+        if "source_section" in trace:
+            compare_present(trace["source_section"], expected["source_section"])
 
 
 def require_complete(actual: Any, expected: Any) -> None:
@@ -112,5 +110,4 @@ def require_complete_pattern_anchors(board: dict[str, Any]) -> None:
     if len(traces) != 1:
         raise ValueError("完整金口诀须保留唯一的六十四课钤规则轨迹")
     require_complete(traces[0].get("result"), expected)
-    for key in ("source_url", "source_section"):
-        compare_present(traces[0].get(key), expected[key])
+    compare_present(traces[0].get("source_section"), expected["source_section"])

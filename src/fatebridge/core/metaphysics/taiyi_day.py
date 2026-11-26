@@ -17,9 +17,8 @@ from fatebridge.core.metaphysics.taiyi_clock import (
     validate_seed_civil_clock,
 )
 from fatebridge.core.metaphysics.taiyi_gates import attach_gate_board
-from fatebridge.core.metaphysics.taiyi_geometry import BRANCHES, SOURCES
+from fatebridge.core.metaphysics.taiyi_geometry import BRANCHES
 from fatebridge.core.metaphysics.taiyi_historical import source_date_reference
-from fatebridge.core.metaphysics.taiyi_hour import KEY_SOURCE
 from fatebridge.core.metaphysics.taiyi_origin_selection import winter_origin_selection
 from fatebridge.core.metaphysics.taiyi_period_frame import previous_solar_term
 from fatebridge.core.metaphysics.taiyi_ten_jing import attach_ten_jing
@@ -41,7 +40,6 @@ def key_day_origin(
     if count < 1:
         raise ValueError("日计日期早于冬至前甲子")
     return {
-        "source": KEY_SOURCE,
         "winter_clock": winter_clock.isoformat(),
         "winter_day_ganzhi": winter_ganzhi,
         "origin_effective_date": origin.date_isoformat(),
@@ -91,14 +89,12 @@ def key_day_numeric_board(
                 "source_value": 32,
                 "rule_derived_value": core["main_count"],
                 "scope": "图43课式，正文图40作33；阳局相位参照；是否匹配原例日期另见calendar_rules.historical_date_reference，完整古历时实未复原。",
-                "source": KEY_SOURCE,
             },
             {
                 "field": "heshen",
                 "source_value": "艮",
                 "rule_derived_value": core["heshen"],
                 "scope": "图43课式写三宫，正文图41以日支未合午；同相位参照，历史日期对照另列。",
-                "source": KEY_SOURCE,
             },
         ]
     return board
@@ -155,7 +151,6 @@ def build_key_day_board(
             "ruler_branch_basis": "selected_clock_midnight_day_ganzhi",
             "heshen_branch_basis": "selected_clock_midnight_day_ganzhi",
             "pillars_role": "共用四柱依其原有边界；本日计日支独立取day_origin所示零时所属日，不把共用日柱代换入本盘。",
-            "counter_rule_source": KEY_SOURCE,
             "counter_formula": "target_selected_date_ordinal - winter_previous_Jiazi_date_ordinal + 1",
             "modern_conventions": "现代定气实刻换遁，所选钟面零时换日；同日甲子纳入起点，非完整古历复原，日数不乘十二。",
         },
@@ -166,11 +161,6 @@ def build_key_day_board(
             "classical_author": "《太乙金钥匙续集》底本题署，作者未独立考定",
             "source_title": "太乙金钥匙续集·日计（NLC892-411999021066-66022）",
             "source_kind": "facsimile_with_explicit_modern_calendar_adapter",
-            "sources": {
-                "key": KEY_SOURCE,
-                "shared_count_rules": SOURCES["2"],
-                "shared_relation_rules": SOURCES["3"],
-            },
             "time_granularity": "selected_clock_day",
             "classical_conformance": "partial_with_source_and_calendar_questions",
             "classical_acceptance_passed": False,

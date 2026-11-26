@@ -5,14 +5,34 @@ import math
 
 import pytest
 
+from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.jyotish import jyotish
 from fatebridge.core.jyotish.jyotish_balas import (
     PLANETS,
     aspect_strength,
     verify_drik_evidence,
 )
+from fatebridge.core.jyotish.jyotish_mean import MODEL
 from fatebridge.utils.errors import JyotishCalculationError
-from tests.jyotish.test_jyotish_ruler_provenance import computed  # noqa: F401
+
+
+@pytest.fixture(scope="module")
+def computed():
+    return jyotish.build_india(
+        build_astro_birth_info(
+            birth_year=2000,
+            birth_month=1,
+            birth_day=1,
+            birth_hour=0,
+            birth_timezone="UTC",
+            birth_longitude=0.0,
+            birth_latitude=0.0,
+            preserve_instant=True,
+        ),
+        divisions=[],
+        cheshta_model=MODEL,
+    )
+
 
 FAULTS = [
     "matrix",

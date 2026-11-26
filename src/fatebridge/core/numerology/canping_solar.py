@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -161,7 +159,7 @@ def _source_key(mode: str, profile: str) -> tuple:
     if mode == "aa1996":
         return aa1996_solar.cache_key()
     if mode == "analytic":
-        return (analytic_solar.loaded_sha256(),)
+        return ("analytic",)
     return de440_solar.cache_key(profile)
 
 
@@ -320,13 +318,6 @@ def boundary_context(
     birth: datetime, zone: str, origin: int, horizon: int, boundaries: list[dict]
 ) -> dict[str, Any]:
     birth_clock = ZonedCalendar(utc_calendar(birth), parse_timezone_name(zone))
-    receipts = json.dumps(
-        boundaries,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        allow_nan=False,
-    ).encode()
     extended = any(
         b["record"].get("solar_model_details", {}).get("selection_policy")
         == EXTENDED_POLICY_ID
@@ -354,7 +345,6 @@ def boundary_context(
         "timezone": zone,
         "horizon_years": horizon,
         "boundary_count": len(boundaries),
-        "boundary_receipts_sha256": hashlib.sha256(receipts).hexdigest(),
         "observed_models": sorted({b["record"]["ephemeris_model"] for b in boundaries}),
         "derived_event_years": [
             b["year"]

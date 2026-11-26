@@ -6,6 +6,7 @@ from typing import Any, Literal
 
 from pydantic import JsonValue
 
+from fatebridge.core.astro import runtime
 from fatebridge.core.astro.astrology_events import (
     CARDINAL_INGRESS_LABELS,
     CARDINAL_INGRESSES,
@@ -34,7 +35,7 @@ from fatebridge.services.snapshot_builders import (
     render_snapshot_text as _render_snapshot_text,
 )
 from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
-from fatebridge.utils.errors import handle_calculation_error
+from fatebridge.utils.errors import EphemerisSourceError, handle_calculation_error
 from fatebridge.utils.house_systems import house_system_fields, normalize_house_system
 from fatebridge.utils.timezones import is_unspecified_local_time, parse_timezone_name
 
@@ -174,6 +175,11 @@ def calculate_extrareturns(
 
         returns: list[JsonValue] = []
         return_summaries: list[str] = []
+        chiron_errors: tuple[type[BaseException], ...] = (
+            EphemerisSourceError,
+            ValueError,
+            RuntimeError,
+        ) + runtime.native_ephemeris_errors()
         for body_name, spec in RETURN_BODIES.items():
             planet_id = int(spec["planet_id"])  # type: ignore[call-overload]
             try:
@@ -193,7 +199,7 @@ def calculate_extrareturns(
                     sidereal=sidereal,
                     natal_motion=natal_motion,
                 )
-            except Exception as body_err:
+            except chiron_errors as body_err:
                 if body_name == "Chiron":
                     returns.append(
                         {

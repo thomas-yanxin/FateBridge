@@ -7,7 +7,6 @@ early revisit of the natal degree is not mistaken for a completed revolution.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 from datetime import timezone
@@ -55,12 +54,6 @@ REFERENCE_CONTACT_METHOD = "source_defined_reference_TT_vs_binary64_contact_brac
 REFERENCE_CONTACT_SCOPE = "按已声明时标的精确有理TT，将参考民用钟与已报告的闭合二进制TT数值括区比较，避免微秒标签先舍入到单个JD后混入括区。只说明参考输入与数值区间的先后，不认证真实物理交会、未来闰秒、连续根数量、首末触传统优先或第六线当前阶段。"
 ARITHMETIC_SCOPE = "展开角与残差由实际返回黄经的精确二进制有理数求差，不逐段累加舍入后的浮点角差；这不提高原星历或出生钟精度，交会数值区间不认证物理时刻误差，也不裁定传统多次交会的取舍。"
 BODIES = {"Saturn": (6, 360.0), "Uranus": (7, 180.0), "Chiron": (15, 360.0)}
-SOURCE_URLS = [
-    "https://jovianarchive.com/pages/human-design-dictionary",
-    "https://jovianarchive.com/blogs/chart-interpretations-components/the-six-lines-of-the-hexagram",
-    "https://jovianarchive.com/pages/cycle-analysis-in-human-design",
-    "https://www.astro.com/swisseph/swephprg.htm",
-]
 SCOPE = "人格出生黄经起算；65儒略年内以2日TT网格、已观测速度变号及区间内有限坐标极值探查，细查首轮360°回归/180°对冲。连续已观察零端点合为一候选，原生速度符号与搜索段相位方向分别保留。65年仅为搜索上限，非寿命/阶段年龄；采样不认证连续穷尽。天王星出生原点有公开明文；土星/凯龙起点及各项首末触优先未定，不指定唯一传统阶段。"
 PHASE_SCOPE = "仅列原有第六线教学顺序；不由年龄、交会日期或人格/设计起点约定分配当前阶段，不将教学转成现实成熟度、健康、寿命或事件预测。"
 Row = list[float | int]
@@ -75,7 +68,6 @@ def cycle_ruleset() -> dict[str, Any]:
         "version": ("1.6.0"),
         "author": "FateBridge computational implementation",
         "source_author": reference["author"],
-        "source_catalog_sha256": (hashlib.sha256(raw).hexdigest()),
     }
 
 
@@ -91,7 +83,6 @@ def origin_source_evidence(body: str) -> dict[str, Any]:
         "body": body,
         **fact,
         "source": reference["sources"][source_key] if source_key is not None else None,
-        "source_catalog_sha256": hashlib.sha256(raw).hexdigest(),
         "scope": "逐天体来源口径；出生原点明文及其人格侧映射分别列出，不外推到其他回归、逆行首末触优先性或唯一传统阶段。",
     }
 
@@ -642,7 +633,6 @@ def _cycle_summary_facts(context: dict[str, Any], profile: str) -> dict[str, Any
             "scope": PHASE_SCOPE,
         },
         "scope": scope,
-        "source_urls": SOURCE_URLS,
         "timing_accuracy_certified": False,
         "source_evidence": cycle_source_summary(context["source_evidence"]),
     }
@@ -827,7 +817,6 @@ def calculate_cycle_context(
         "continuous_completeness_certified": False,
         "timing_accuracy_certified": False,
         "require_swiss_files": require_swiss_files,
-        "source_urls": SOURCE_URLS,
         "ruleset": dict(cycle_ruleset()),
         "scope": SCOPE,
         "bodies": bodies,

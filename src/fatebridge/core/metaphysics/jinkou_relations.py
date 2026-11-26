@@ -5,13 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.common import SIX_CLASH_BRANCHES
-from fatebridge.core.metaphysics.ren_sources import (
-    JINKOU_RELATIONS_SCAN_SHA256 as SOURCE_SHA256,
-)
-from fatebridge.core.metaphysics.ren_sources import (
-    JINKOU_RELATIONS_SOURCE as SOURCE_URL,
-)
-from fatebridge.core.metaphysics.ren_sources import JINKOU_SOURCE
 
 # PDF109 reads 午亥火绝 / 子巳水绝. The web table labels the opposite phases;
 # identity of the transcription's physical base edition is unverified.
@@ -192,9 +185,6 @@ def structural_relations(
     ]
     return {
         "ruleset_id": "jinkou_jingben_relations_v1",
-        "source_url": SOURCE_URL,
-        "transcription_url": JINKOU_SOURCE,
-        "source_sha256": SOURCE_SHA256,
         "source_section": "卷上·四绝/四败/岁君建破/论岁神",
         "si_jue": {
             "checks": jue,

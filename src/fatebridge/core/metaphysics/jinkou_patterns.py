@@ -17,10 +17,6 @@ from fatebridge.core.metaphysics.common import (
     xun_head_for_ganzhi,
 )
 from fatebridge.core.metaphysics.jinkou_pattern_proofs import condition_evidence
-from fatebridge.core.metaphysics.jinkou_pattern_tables import (
-    JINKOU_SCAN_SHA256,
-    JINKOU_SCAN_URL,
-)
 from fatebridge.core.metaphysics.jinkou_sources import use_sources
 from fatebridge.core.metaphysics.jinkou_stems import wuzidun_stem
 from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
@@ -165,8 +161,6 @@ def pattern_metadata() -> dict[str, Any]:
     """Identity and limits of this selected excerpt, independent of a course."""
     return {
         "ruleset_id": "jinkou_64_structures_excerpt_v1",
-        "source_url": JINKOU_SCAN_URL,
-        "source_sha256": JINKOU_SCAN_SHA256,
         "source_section": "卷中·六十四课钤",
         "catalog_count": len(CATALOG),
         "condition_logic": "any_of_all_v1",
@@ -296,8 +290,6 @@ def structural_patterns(
     metadata = pattern_metadata()
     return {
         "ruleset_id": metadata["ruleset_id"],
-        "source_url": metadata["source_url"],
-        "source_sha256": metadata["source_sha256"],
         "source_section": metadata["source_section"],
         "catalog_count": metadata["catalog_count"],
         "evaluated_rule_count": sum(v is not None for v in values.values()),

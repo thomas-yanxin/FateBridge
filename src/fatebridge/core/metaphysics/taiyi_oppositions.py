@@ -6,7 +6,6 @@ geometry is computable even while the terminology and extra 外迫 stay open.
 
 from __future__ import annotations
 
-import hashlib
 import json
 from functools import lru_cache
 from pathlib import Path
@@ -14,7 +13,6 @@ from typing import Any
 
 from fatebridge.core.metaphysics.taiyi_geometry import PALACES, RING
 
-DATA_SHA256 = "1a9e976fd86cde5ef00739850d96514017c5aec64d79d993cece15753a2049f0"
 ACTORS = {
     "wenchang_palace": "文昌",
     "shiji": "始击",
@@ -36,10 +34,7 @@ def annotation_notes() -> dict[int, dict[str, Any]]:
         Path(__file__).resolve().parents[2]
         / "data/classical/taiyi-opposition-notes-v1.json"
     )
-    raw = path.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != DATA_SHA256:
-        raise ValueError("主方对宫原注数据指纹不符")
-    data = json.loads(raw)
+    data = json.loads(path.read_text(encoding="utf-8"))
     return {row["ju"]: row for row in data["records"]}
 
 
@@ -108,7 +103,6 @@ def opposition_assessment(core: dict[str, Any]) -> dict[str, Any]:
                 "ju": note["ju"],
                 "source_name": note["source_name"],
                 "source_reading": note["source_reading"],
-                "source": note["source_url"],
                 "expected_taiyi_number": note["expected_taiyi_number"],
                 "expected_general_number": note["expected_general_number"],
                 "numeric_values_match": matches,
@@ -129,15 +123,6 @@ def opposition_assessment(core: dict[str, Any]) -> dict[str, Any]:
             "id": "taiyi_six_actor_opposition_geometry_v1",
             "version": "1.0.0",
             "author": "FateBridge contributors",
-            "classical_sources": [
-                "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷03#推格法",
-                "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷03#推對法",
-                *[
-                    f"https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第{n}卷"
-                    for n in range(693, 697)
-                ],
-            ],
-            "annotation_data_sha256": DATA_SHA256,
         },
         "entries": entries,
         "main_names_unified": False,

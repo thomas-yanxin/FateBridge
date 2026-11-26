@@ -19,8 +19,8 @@ def lookup_printed_hour(
     same matrix. In particular, the night does not continue at matrix row 2.
     No branch, day ruler, or half is inferred from a civil timestamp.
     """
-    loaded = load_source(SOURCE)
-    table = loaded.data["clock_selected"]
+    bundle = load_source(SOURCE)
+    table = bundle["clock_selected"]
     if day_luminary not in table["day_columns"]:
         raise ValueError("印本直日曜须为日月火水木金土之一")
     if night_part not in {None, "upper", "lower"}:
@@ -52,8 +52,7 @@ def lookup_printed_hour(
         for index in indices
     ]
     return {
-        "ruleset_id": loaded.data["id"],
-        "source_bundle_sha256": loaded.sha256,
+        "ruleset_id": bundle["id"],
         "condition_day_luminary": day_luminary,
         "condition_branch": branch,
         "condition_night_part": night_part,
@@ -67,11 +66,9 @@ def lookup_printed_hour(
 
 def printed_clock_reference(day_luminary: str, weekday_basis: str) -> dict[str, Any]:
     """Publish every branch conditional on the returned civil weekday label."""
-    loaded = load_source(SOURCE)
-    result = loaded.data
+    result = load_source(SOURCE)
     table = result["clock_selected"]
     result.update(
-        source_bundle_sha256=loaded.sha256,
         condition_day_luminary=day_luminary,
         condition_weekday_basis=weekday_basis,
         conditional_branch_readings=[

@@ -5,11 +5,11 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
-TRIGRAM_BITS: Dict[str, List[int]] = {
+TRIGRAM_BITS: dict[str, list[int]] = {
     "乾": [1, 1, 1],
     "兌": [1, 1, 0],
     "離": [1, 0, 1],
@@ -27,7 +27,7 @@ GAN = HEAVENLY_STEMS
 ZHI = EARTHLY_BRANCHES
 
 
-NATURAL: Dict[str, str] = {
+NATURAL: dict[str, str] = {
     "天": "乾",
     "地": "坤",
     "水": "坎",
@@ -39,24 +39,22 @@ NATURAL: Dict[str, str] = {
 }
 
 
-_DATA_PATH = (
-    Path(__file__).resolve().parents[2] / "data" / "heluo" / "heluoTiaowen.json"
-)
+DATA_PATH = Path(__file__).resolve().parents[2] / "data" / "heluo" / "heluoTiaowen.json"
 
 
 @lru_cache(maxsize=1)
-def _tiaowen() -> Dict[str, Any]:
-    with _DATA_PATH.open(encoding="utf-8") as handle:
-        data: Dict[str, Any] = json.load(handle)
+def _tiaowen() -> dict[str, Any]:
+    with DATA_PATH.open(encoding="utf-8") as handle:
+        data: dict[str, Any] = json.load(handle)
     return data
 
 
 @lru_cache(maxsize=1)
-def _gua_tables() -> Tuple[Dict[str, Dict[str, str]], Dict[str, str], Dict[str, int]]:
+def _gua_tables() -> tuple[dict[str, dict[str, str]], dict[str, str], dict[str, int]]:
     """由条文 64 卦名解析 (上卦,下卦) ↔ 卦名 ↔ 王弗序。"""
-    name_to_tri: Dict[str, Dict[str, str]] = {}
-    tri_to_name: Dict[str, str] = {}
-    name_index: Dict[str, int] = {}
+    name_to_tri: dict[str, dict[str, str]] = {}
+    tri_to_name: dict[str, str] = {}
+    name_index: dict[str, int] = {}
     for name, payload in _tiaowen().items():
         if name[1] == "為":  # 纯卦 乾為天
             up = low = name[0]
@@ -74,12 +72,12 @@ def _gua_name(up: str, low: str) -> str:
     return _gua_tables()[1].get(f"{up}|{low}", "")
 
 
-def gua_lines(up: str, low: str) -> List[int]:
+def gua_lines(up: str, low: str) -> list[int]:
     """六爻 bit（自下而上 1-6）= 下卦三爻 + 上卦三爻。"""
     return [*TRIGRAM_BITS[low], *TRIGRAM_BITS[up]]
 
 
-def lines_to_gua(lines: List[int]) -> Dict[str, str]:
+def lines_to_gua(lines: list[int]) -> dict[str, str]:
     low = next(
         (t for t, b in TRIGRAM_BITS.items() if all(b[i] == lines[i] for i in range(3))),
         "",
@@ -95,7 +93,7 @@ def lines_to_gua(lines: List[int]) -> Dict[str, str]:
     return {"up": up, "low": low, "name": _gua_name(up, low)}
 
 
-def _trigram_of(bits: List[int]) -> str:
+def _trigram_of(bits: list[int]) -> str:
     return next(
         (t for t, b in TRIGRAM_BITS.items() if all(b[i] == bits[i] for i in range(3))),
         "",

@@ -10,13 +10,9 @@ from typing import Any, Literal, TypedDict, cast
 from fatebridge.utils.birth_input import normalize_gender
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
-_YEAR_CYCLE_SOURCE = (
-    "https://github.com/SylarLong/iztro/blob/2.5.8/src/star/decorativeStar.ts#L188-L275"
-)
-_SUIQIAN = tuple("岁建 晦气 丧门 贯索 官符 小耗 大耗 龙德 白虎 天德 吊客 病符".split())
-_JIANGQIAN = tuple(
-    "将星 攀鞍 岁驿 息神 华盖 劫煞 灾煞 天煞 指背 咸池 月煞 亡神".split()
-)
+YEAR_CYCLE_SOURCE = "iztro 2.5.8 decorativeStar"
+SUIQIAN = tuple("岁建 晦气 丧门 贯索 官符 小耗 大耗 龙德 白虎 天德 吊客 病符".split())
+JIANGQIAN = tuple("将星 攀鞍 岁驿 息神 华盖 劫煞 灾煞 天煞 指背 咸池 月煞 亡神".split())
 
 _YearBranchBasis = Literal["natal_lunar_year_branch", "target_lunar_year_branch"]
 
@@ -63,9 +59,9 @@ def year_branch_cycles(
         "anchor_basis": anchor_basis,
         "year_branch": year_branch,
         "direction": "forward",
-        "source": _YEAR_CYCLE_SOURCE,
-        "suiqian": rotate(year_index, _SUIQIAN, "iztro_2_5_8_suiqian_default"),
-        "jiangqian": rotate(jiangxing_index, _JIANGQIAN, "iztro_2_5_8_jiangqian"),
+        "source": YEAR_CYCLE_SOURCE,
+        "suiqian": rotate(year_index, SUIQIAN, "iztro_2_5_8_suiqian_default"),
+        "jiangqian": rotate(jiangxing_index, JIANGQIAN, "iztro_2_5_8_jiangqian"),
     }
 
 

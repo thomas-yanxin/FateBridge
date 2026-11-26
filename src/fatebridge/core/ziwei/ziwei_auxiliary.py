@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import Any, Dict, List, Literal, TypedDict
+from typing import Any, Literal, TypedDict
 
 from typing_extensions import NotRequired
 
@@ -16,7 +16,7 @@ from fatebridge.utils.birth_input import normalize_gender
 from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 ZIWEI_LUCUN_BY_STEM = dict(zip(HEAVENLY_STEMS, "寅卯巳午巳午申酉亥子"))
-_CHANGSHENG = (
+CHANGSHENG = (
     "长生",
     "沐浴",
     "冠带",
@@ -30,7 +30,7 @@ _CHANGSHENG = (
     "胎",
     "养",
 )
-_BOSHI = (
+BOSHI = (
     "博士",
     "力士",
     "青龙",
@@ -44,8 +44,8 @@ _BOSHI = (
     "伏兵",
     "官府",
 )
-_CHANGSHENG_START = {"水": "申", "木": "亥", "金": "巳", "土": "申", "火": "寅"}
-_LIFE_MASTER = dict(
+CHANGSHENG_START = {"水": "申", "木": "亥", "金": "巳", "土": "申", "火": "寅"}
+LIFE_MASTER = dict(
     zip(
         EARTHLY_BRANCHES,
         (
@@ -64,7 +64,7 @@ _LIFE_MASTER = dict(
         ),
     )
 )
-_BODY_MASTER = dict(
+BODY_MASTER = dict(
     zip(
         EARTHLY_BRANCHES,
         (
@@ -86,13 +86,13 @@ _BODY_MASTER = dict(
 
 
 def attach_natal_cycles(
-    palaces: List[Dict[str, Any]],
+    palaces: list[dict[str, Any]],
     *,
     element: str,
     year_stem: str,
     gender: str,
     rule_profile: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     canonical = normalize_gender(gender)
     known = canonical in {"男", "女"}
     yang = HEAVENLY_STEMS.index(year_stem) % 2 == 0
@@ -104,31 +104,31 @@ def attach_natal_cycles(
         if rule_profile == "quanshu_v2_excerpt"
         else yang_gender_forward
     )
-    cs_start = _CHANGSHENG_START[element]
+    cs_start = CHANGSHENG_START[element]
     bs_start = ZIWEI_LUCUN_BY_STEM[year_stem]
     for palace in palaces:
         index = EARTHLY_BRANCHES.index(palace["ganzhi"][1])
         cs_offset = index - EARTHLY_BRANCHES.index(cs_start)
         bs_offset = index - EARTHLY_BRANCHES.index(bs_start)
         palace["changsheng12"] = (
-            _CHANGSHENG[(cs_offset if cs_forward else -cs_offset) % 12]
+            CHANGSHENG[(cs_offset if cs_forward else -cs_offset) % 12]
             if known
             else (
-                _CHANGSHENG[cs_offset % 12]
-                if _CHANGSHENG[cs_offset % 12] == _CHANGSHENG[-cs_offset % 12]
+                CHANGSHENG[cs_offset % 12]
+                if CHANGSHENG[cs_offset % 12] == CHANGSHENG[-cs_offset % 12]
                 else None
             )
         )
         palace["boshi12"] = (
-            _BOSHI[(bs_offset if yang_gender_forward else -bs_offset) % 12]
+            BOSHI[(bs_offset if yang_gender_forward else -bs_offset) % 12]
             if known
             else (
-                _BOSHI[bs_offset % 12]
-                if _BOSHI[bs_offset % 12] == _BOSHI[-bs_offset % 12]
+                BOSHI[bs_offset % 12]
+                if BOSHI[bs_offset % 12] == BOSHI[-bs_offset % 12]
                 else None
             )
         )
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "status": "computed" if known else "partial_missing_gender",
         "changsheng_start": cs_start,
         "changsheng_direction": ("顺行" if cs_forward else "逆行") if known else None,
@@ -161,13 +161,13 @@ def attach_natal_cycles(
 
 
 def chart_masters(
-    palaces: List[Dict[str, Any]],
+    palaces: list[dict[str, Any]],
     *,
     ming_branch: str,
     year_branch: str,
     rule_profile: str,
-) -> Dict[str, Any]:
-    def record(star: str, basis: str, branch: str) -> Dict[str, Any]:
+) -> dict[str, Any]:
+    def record(star: str, basis: str, branch: str) -> dict[str, Any]:
         palace = next(
             p for p in palaces if any(s["name"] == star for s in p["stars_detail"])
         )
@@ -195,13 +195,13 @@ def chart_masters(
         }
 
     return {
-        "life": record(_LIFE_MASTER[ming_branch], "ming_palace_branch", ming_branch),
-        "body": record(_BODY_MASTER[year_branch], "natal_year_branch", year_branch),
+        "life": record(LIFE_MASTER[ming_branch], "ming_palace_branch", ming_branch),
+        "body": record(BODY_MASTER[year_branch], "natal_year_branch", year_branch),
     }
 
 
 # iztro 2.5.8, src/star/location.ts. Stem columns follow 甲 through 癸.
-_FLOWING_STEM_TABLE = {
+FLOWING_STEM_TABLE = {
     "天魁": "丑子亥亥丑子丑午卯卯",
     "天钺": "未申酉酉未申未寅巳巳",
     "文昌": "巳午申酉申酉亥子寅卯",
@@ -243,10 +243,10 @@ def flowing_horoscope_stars(
         ("禄存", branches[lu], lu_rule),
         ("擎羊", branches[(lu + 1) % 12], lu_rule),
         ("陀罗", branches[(lu - 1) % 12], lu_rule),
-        ("天魁", _FLOWING_STEM_TABLE["天魁"][stem_index], "kui_yue_by_stem"),
-        ("天钺", _FLOWING_STEM_TABLE["天钺"][stem_index], "kui_yue_by_stem"),
-        ("文昌", _FLOWING_STEM_TABLE["文昌"][stem_index], "flowing_chang_qu_by_stem"),
-        ("文曲", _FLOWING_STEM_TABLE["文曲"][stem_index], "flowing_chang_qu_by_stem"),
+        ("天魁", FLOWING_STEM_TABLE["天魁"][stem_index], "kui_yue_by_stem"),
+        ("天钺", FLOWING_STEM_TABLE["天钺"][stem_index], "kui_yue_by_stem"),
+        ("文昌", FLOWING_STEM_TABLE["文昌"][stem_index], "flowing_chang_qu_by_stem"),
+        ("文曲", FLOWING_STEM_TABLE["文曲"][stem_index], "flowing_chang_qu_by_stem"),
         ("天马", "寅亥申巳"[branch_index % 4], "tianma_by_branch"),
         ("红鸾", branches[(3 - branch_index) % 12], "luan_xi_by_branch"),
         ("天喜", branches[(9 - branch_index) % 12], "luan_xi_by_branch"),

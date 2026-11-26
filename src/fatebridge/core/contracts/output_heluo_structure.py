@@ -130,8 +130,6 @@ class HeluoLineConditions(PartialOutput):
     ruleset_id: str | None = None
     version: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
-    collation_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     review_status: str | None = None
     literal_clauses: dict[str, dict[str, JsonValue]] | None = None
@@ -308,10 +306,8 @@ class HeluoBodyStructure(PartialOutput):
     ruleset_id: Literal["heluo_wenming_jian_structure_v1"] | None = None
     version: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     calculation_source_pdf_pages: list[int] | None = None
-    collation_sha256: str | None = None
     review_status: str | None = None
     wording_variants: list[dict[str, str]] | None = None
     phases: list[HeluoStructurePhase] | None = None

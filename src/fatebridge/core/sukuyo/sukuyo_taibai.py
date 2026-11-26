@@ -11,7 +11,7 @@ SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_t1299_taibai.json"
 
 
 def source_bundle() -> dict[str, Any]:
-    return load_source(SOURCE).data
+    return load_source(SOURCE)
 
 
 def taibai_direction_reference(lunar_day: int) -> dict[str, Any]:
@@ -19,8 +19,7 @@ def taibai_direction_reference(lunar_day: int) -> dict[str, Any]:
         raise ValueError(
             "太白月日方位表只接受实际入月日1至30，不以公历日或补配宿序代替"
         )
-    record = load_source(SOURCE)
-    source = record.data
+    source = load_source(SOURCE)
     matches = [row for row in source["rows"] if lunar_day in row["lunar_days"]]
     if len(matches) != 1:
         raise ValueError("太白原文日序必须在所选主表中恰有一行")
@@ -62,8 +61,6 @@ def taibai_direction_reference(lunar_day: int) -> dict[str, Any]:
         "witnesses": witnesses,
         "witnesses_agree_for_selected_day": row["ming_row_present"],
         "source_url": source["source_url"],
-        "source_sha256": source["source_sha256"],
-        "source_bundle_sha256": record.sha256,
         "locator": source["locator"],
         "title_literal": source["title_literal"],
         "table_apparatus": source["apparatus"],

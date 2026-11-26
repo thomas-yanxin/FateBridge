@@ -8,8 +8,16 @@ nominal solar disk is mathematical, not an observable unobscured position.
 from __future__ import annotations
 
 import math
-from importlib.util import find_spec
+from types import ModuleType
 from typing import Literal, TypedDict
+
+erfa: ModuleType | None
+try:
+    import erfa as _erfa  # type: ignore[import-untyped]  # optional C extension has no stubs
+
+    erfa = _erfa
+except ModuleNotFoundError:
+    erfa = None
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.reference import PHYSICAL_BODIES
@@ -77,13 +85,12 @@ def point_mass_positions(
     The caller supplies TT and uses the ordinary managed native source session.
     All raw state flags describe input vectors, not derived apparent places.
     """
-    if find_spec("erfa") is None:
+    if erfa is None:
         return {
             "method_id": METHOD_ID,
             "status": "unavailable",
             "reason": "install_jpl_extra",
         }
-    import erfa  # type: ignore[import-untyped]  # optional C extension has no stubs
 
     flags = (
         runtime.swe.FLG_SWIEPH

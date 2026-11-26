@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import math
 from contextlib import contextmanager
 from contextvars import ContextVar
@@ -18,15 +17,12 @@ from fatebridge.utils.errors import EphemerisSourceError
 RULESET = "fatebridge.observed_physical_data_policy.v1"
 
 
-def _digest(path: Path) -> str:
-    digest = hashlib.sha256()
+def _file_stat(path: Path) -> tuple[int, int, int, int]:
     try:
-        with path.open("rb") as source:
-            for chunk in iter(lambda: source.read(1024 * 1024), b""):
-                digest.update(chunk)
+        stat = path.stat()
     except OSError as error:
         raise EphemerisSourceError("required_data_files_unavailable") from error
-    return digest.hexdigest()
+    return stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns
 
 
 @dataclass
@@ -36,7 +32,7 @@ class DataFilePolicy:
     nonphysical_calls: int = 0
     reference_zero_calls: int = 0
     event_endpoint_probes: int = 0
-    files: dict[Path, str] = field(default_factory=dict)
+    files: dict[Path, tuple[int, int, int, int]] = field(default_factory=dict)
     worker_reports: list[dict[str, Any]] = field(default_factory=list)
 
     def fail(self, reason: str) -> NoReturn:
@@ -45,13 +41,13 @@ class DataFilePolicy:
 
     def observe_file(self, path: Path) -> None:
         if path not in self.files:
-            self.files[path] = _digest(path)
+            self.files[path] = _file_stat(path)
 
     def finish(self) -> None:
         if self.failure:
             raise EphemerisSourceError(self.failure)
-        for path, digest in self.files.items():
-            if _digest(path) != digest:
+        for path, initial_stat in self.files.items():
+            if _file_stat(path) != initial_stat:
                 self.fail("changed_during")
 
     def receipt(self) -> dict[str, Any]:
@@ -64,9 +60,9 @@ class DataFilePolicy:
             "event_endpoint_probes": self.event_endpoint_probes,
             "observed_file_path_count": len(self.files),
             "observed_files": [
-                {"filename": filename, "sha256": digest}
-                for filename, digest in sorted(
-                    {(path.name, digest) for path, digest in self.files.items()}
+                {"filename": filename, "bytes": size}
+                for filename, size in sorted(
+                    {(path.name, stat[2]) for path, stat in self.files.items()}
                 )
             ],
             "private_worker_reports": list(self.worker_reports),

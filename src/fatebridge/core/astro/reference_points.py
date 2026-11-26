@@ -7,9 +7,8 @@ reconstructs the Moon center from EMB, geocentric Moon and EMRAT. Knowing
 these identities does not certify the source representation or optical model.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
-from fatebridge.core.astro.de441_source import SOURCE_URL as DE441_SOURCE_URL
 from fatebridge.core.astro.orbits import FALLBACK_MODELS, MEAN_NODE_MODEL, ORBITAL_MODEL
 from fatebridge.core.astro.profiles import ANALYTICAL_MEAN_NODE_MODEL
 
@@ -21,9 +20,9 @@ NATIVE_MODELS = frozenset({"swieph", "moshier", "jpl"})
 
 
 def ephemeris_reference_points(
-    planetary_models: Dict[str, str], derived_points: List[str]
-) -> Dict[str, Any]:
-    groups: Dict[str, List[str]] = {
+    planetary_models: dict[str, str], derived_points: list[str]
+) -> dict[str, Any]:
+    groups: dict[str, list[str]] = {
         "body_centers": [],
         "system_barycenters": [],
         "theoretical_points": [],
@@ -73,16 +72,7 @@ def ephemeris_reference_points(
         **groups,
         "derived_points": list(derived_points),
         "center_body_correction_applied": False,
-        "source_url": "https://www.astro.com/swisseph/swisseph.htm",
         "source_section": "2.4",
-        "additional_source_urls": (
-            [
-                "https://ssd.jpl.nasa.gov/ftp/eph/planets/ascii/ascii_format.txt",
-                DE441_SOURCE_URL,
-            ]
-            if ORBITAL_MODEL in planetary_models.values()
-            else []
-        ),
         "note_zh": "".join(notes),
         "scope": "Geocentric reference-point identity; not absolute accuracy certification. Derived points inherit their source-coordinate limitations.",
     }

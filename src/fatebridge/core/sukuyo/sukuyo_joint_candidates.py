@@ -33,13 +33,11 @@ def _identity(context: dict[str, Any]) -> dict[str, Any] | None:
         signature = {
             "calendar_profile": leaf["calendar_profile"],
             "mansion_method_id": leaf["mansion_method_id"],
-            "source_bundle_sha256": profile.get("source_bundle_sha256"),
+            "ruleset_id": profile.get("ruleset_id"),
             "calendar_system": leaf["calendar_system"],
             "calendar_backend": leaf["calendar_backend"],
             "calendar_timezone": leaf["calendar_timezone"],
         }
-        if not signature["source_bundle_sha256"]:
-            return None
         signatures.append(signature)
     return signatures[0] if all(s == signatures[0] for s in signatures) else None
 
@@ -69,11 +67,6 @@ def _states(context: dict[str, Any], model: str) -> tuple[list[dict[str, Any]], 
                 ("second_half", "second_half_calculation"),
             ):
                 calculation = record[key]
-                if calculation["source_bundle_sha256"] != profile.get(
-                    "source_bundle_sha256"
-                ):
-                    covered = False
-                    continue
                 if selected is None or selected == half:
                     alternatives.append((half, calculation["direct_mansion"], model))
         elif assignment:

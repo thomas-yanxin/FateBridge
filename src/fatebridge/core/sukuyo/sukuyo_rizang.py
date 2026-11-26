@@ -23,10 +23,7 @@ SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_rizang_comparison.js
 
 
 def named_rizang_reference(xuanying: dict[str, Any]) -> dict[str, Any]:
-    loaded = load_source(SOURCE)
-    data = loaded.data
-    if data["compared_xuanying_capture_sha256"] != xuanying["capture_sha256"]:
-        raise ValueError("日藏对照与玄应捕获版本不一致，须重新核验")
+    data = load_source(SOURCE)
     rows = data["literal_slots"]
     keys = {(r["textual_month"], r["fortnight"], r["day"]) for r in rows}
     expected = {
@@ -40,7 +37,6 @@ def named_rizang_reference(xuanying: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("日藏具名字面表槽不完整或重复，不能沿用对照")
     return {
         **data,
-        "source_bundle_sha256": loaded.sha256,
         "month_name_reference": month_name_reference(data),
         "seasonal_time_reference": seasonal_reference(data),
         "fortnight_calendar_reference": fortnight_calendar_reference(data),

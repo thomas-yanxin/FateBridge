@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Literal, Optional, Sequence, cast
+from typing import Any, Literal, Sequence, cast
 
 from fatebridge.core.sukuyo.sukuyo_documentary import with_text_layers
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
@@ -159,7 +159,7 @@ def activity_detail_closure(details: Sequence[str]) -> tuple[list[str], list[dic
     return effective, inferences
 
 
-def validate_activity_details(activity: Optional[str], details: Sequence[str]) -> None:
+def validate_activity_details(activity: str | None, details: Sequence[str]) -> None:
     if isinstance(details, (str, bytes)):
         raise ValueError("activity_details必须为明确条件的列表")
     for detail in details:
@@ -170,14 +170,10 @@ def validate_activity_details(activity: Optional[str], details: Sequence[str]) -
 
 
 def source_bundle() -> dict[str, Any]:
-    return load_source(SOURCE).data
+    return load_source(SOURCE)
 
 
-def source_digest() -> str:
-    return load_source(SOURCE).sha256
-
-
-def lower_mansion_evidence(mansion: Optional[str]) -> dict[str, Any]:
+def lower_mansion_evidence(mansion: str | None) -> dict[str, Any]:
     bundle = source_bundle()
     record = next((r for r in bundle["records"] if r["mansion"] == mansion), None)
     if mansion is not None and record is None:
@@ -187,7 +183,6 @@ def lower_mansion_evidence(mansion: Optional[str]) -> dict[str, Any]:
         "mansion": mansion,
         "ruleset_id": bundle["id"],
         "source_url": bundle["source_url"],
-        "source_sha256": bundle["source_sha256"],
         "locator": record["locator"] if record else None,
         "topic_rules": (
             [
@@ -205,7 +200,7 @@ def lower_mansion_evidence(mansion: Optional[str]) -> dict[str, Any]:
 
 
 def conjunction_doctrine(
-    mansion: Optional[str], candidates: Sequence[str] = ()
+    mansion: str | None, candidates: Sequence[str] = ()
 ) -> dict[str, Any]:
     bundle = source_bundle()
     doctrine = bundle["conjunction_doctrine"]
@@ -231,7 +226,6 @@ def conjunction_doctrine(
         ),
         "basis": "textual_classification_of_calendrical_mansion_name",
         "source_url": bundle["source_url"],
-        "source_sha256": bundle["source_sha256"],
         "locator": doctrine["locator"],
         "angular_offset_degrees": None,
         "physical_evaluation_status": "not_computed_no_declared_angular_model",

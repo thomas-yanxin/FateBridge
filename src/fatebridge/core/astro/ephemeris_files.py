@@ -7,10 +7,10 @@ plan does not certify file integrity, loaded model or astronomical accuracy.
 
 from __future__ import annotations
 
-from typing import Sequence, Tuple
+from typing import Sequence
 
 
-def ephemeris_files_for_years(years: Sequence[int]) -> Tuple[str, ...]:
+def ephemeris_files_for_years(years: Sequence[int]) -> tuple[str, ...]:
     if not years:
         raise ValueError("At least one CE year is required")
     segments: set[int] = set()

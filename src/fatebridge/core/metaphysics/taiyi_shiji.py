@@ -39,9 +39,6 @@ class ShijiRotation(TypedDict):
     derived_shiji: str
 
 
-SOURCE_MANIFEST_SHA256 = (
-    "9d8298d054398da8353b4af3fb69c3c26a0652d9e200014e88b64c78b97a16d5"
-)
 TaiyiShijiProfile = Literal[
     "jinjing_vol2_rotation_v1",
     "jinjing_vol3_table_v1",
@@ -170,9 +167,6 @@ RULESET = {
     "version": "1.0.0",
     "author": "FateBridge contributors",
     "classical_author": "王希明编录；图书集成所录太乙规则补证",
-    "source": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷02#推太乙運式法",
-    "corroboration": "https://zh.wikisource.org/wiki/Page:Gujin_Tushu_Jicheng,_Volume_477_(1700-1725).djvu/68",
-    "source_manifest_sha256": SOURCE_MANIFEST_SHA256,
 }
 
 

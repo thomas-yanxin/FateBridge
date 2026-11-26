@@ -62,7 +62,6 @@ class SeasonalClimateReference(PartialOutput):
             if self.source_ref is not None:
                 expected = {
                     "id": "qiongtong_xu_qianqian_bing_v1",
-                    "source_sha256": "b7f17fc7fcb7d8faa991efa74d0db391c5066a3793b3fc6787d2612bc6b350a8",
                 }
                 for key, value in expected.items():
                     if key in self.source_ref and self.source_ref[key] != value:

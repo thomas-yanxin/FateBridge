@@ -12,7 +12,6 @@ from typing import Any, Iterable
 from fatebridge.core.astro.geometry import Angle, angle_fraction, longitude_float
 
 RULESET = "lilly_christian_astrology_1647_p104_112_v1"
-SOURCE_URL = "https://wellcomecollection.org/works/s7z7c46y"
 SIGNS = (
     "Aries",
     "Taurus",

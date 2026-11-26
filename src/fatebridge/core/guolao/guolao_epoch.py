@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
 import re
 from collections.abc import Mapping
 from datetime import date, datetime, timedelta, timezone
@@ -85,7 +83,7 @@ def year_context_for_epoch(
     }
 
 
-_UTC = re.compile(
+UTC_LABEL_PATTERN = re.compile(
     r"^([+-]?\d{4,})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,6}))?\+00:00$"
 )
 
@@ -110,7 +108,7 @@ def native_utc8_clock(epoch: PhysicalEpoch) -> tuple[str | None, datetime | None
     """An actual UTC+08 label and a date-only lookup anchor, never a new epoch."""
     if epoch.utc_label is None:
         return None, None
-    match = _UTC.fullmatch(epoch.utc_label)
+    match = UTC_LABEL_PATTERN.fullmatch(epoch.utc_label)
     if match is None:
         raise ValueError("Native UTC label cannot be parsed without changing it")
     y, m, d, hour, minute, second = map(int, match.groups()[:6])
@@ -168,11 +166,8 @@ def _historical_utc8_date(
 
     def source_record(table: Mapping[str, object]) -> dict[str, object]:
         return {
-            "source_url": table["source_url"],
-            "declared_source_sha256": table["source_sha256"],
-            "loaded_table_sha256": hashlib.sha256(
-                json.dumps(table, sort_keys=True, separators=(",", ":")).encode()
-            ).hexdigest(),
+            "source_id": table["source_id"],
+            "title": table["title"],
         }
 
     def midnight_boundary(

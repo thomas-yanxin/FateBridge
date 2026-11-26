@@ -163,7 +163,6 @@ class JinkouStemRelations(PartialOutput):
     ruleset_id: Literal["jinkou_jingben_dun_stem_relations_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[int] | None = None
     day_stem: Stem | None = None
     dun_cycle_policy: Literal["single_cycle_zi_to_hai"] | None = None

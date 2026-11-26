@@ -298,7 +298,6 @@ def require_ren_calendar(
             "equinox": "true_of_date",
             "astronomical_model": "Swiss_Ephemeris_default_IERS2010_Astronomical_Almanac",
             "horizons_frame_equivalence_certified": False,
-            "source_url": "https://www.astro.com/swisseph/swephprg.htm",
             "source_section": "3.3.5: True or mean equinox of date; JPL Horizons positions",
             "scope": "当前交气求解请求Swiss默认地心视黄经；JPL Horizons的IAU76/80与EOP参考系不同，不能将跨参考系残差直接等同于同一定义下的误差",
         },

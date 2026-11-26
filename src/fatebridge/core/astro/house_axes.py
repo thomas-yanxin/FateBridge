@@ -126,7 +126,6 @@ def _precision_geometry(
         "model_longitude_origin": attitude.reduction.house_longitude_origin,
         "input_precision_scope": "exact_supplied_binary64_native_house_angle_parameters",
         "maximum_physical_error_arcseconds": None,
-        "source_url": "https://aa.usno.navy.mil/faq/alt_az",
         "source_scope": "scalar altitude and eastern-direction equations; numerical model consistency only",
     }
 
@@ -207,7 +206,6 @@ def _canonical_house_axes(
         "meridian_branch_separation_degrees": separation,
         "ascendant_branch_separation_degrees": ascendant_separation,
         "native_cusps_and_projection_retained": True,
-        "source_url": "https://www.astro.com/swisseph/swisseph.htm",
         "source_section": "6.4; swehouse.c polar branches",
         "note_zh": (
             f"公开四轴采用统一天球交点；此宫制在极区使用的{exchanged}制宫分支与公开天球轴相反。原宫头及落宫投影保留，两种轴须分别读取。"

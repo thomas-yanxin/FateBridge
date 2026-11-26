@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
@@ -12,13 +12,13 @@ SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_t1299_lower_methods.
 
 
 def source_bundle() -> dict[str, Any]:
-    return load_source(SOURCE).data
+    return load_source(SOURCE)
 
 
 def lower_methods_evidence(
-    mansion: Optional[str],
+    mansion: str | None,
     luminary: str,
-    upper_nature: Optional[str],
+    upper_nature: str | None,
     *,
     weekday_basis: str = "modern_utc_plus08_civil_midnight",
 ) -> dict[str, Any]:
@@ -43,8 +43,6 @@ def lower_methods_evidence(
     return {
         "ruleset_id": bundle["id"],
         "source_url": bundle["source_url"],
-        "source_sha256": bundle["source_sha256"],
-        "source_bundle_sha256": load_source(SOURCE).sha256,
         "selected_text": bundle["selected_text"],
         "nature": {
             "status": "enumerated_membership_reference" if group else "not_evaluated",

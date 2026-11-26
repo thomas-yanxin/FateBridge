@@ -3,7 +3,6 @@
 import json
 from copy import deepcopy
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -53,8 +52,6 @@ def _source() -> dict[str, Any]:
             raise ValueError("卦体原例来源身份不一致。")
         for key in (
             "version",
-            "source_url",
-            "source_pdf_sha256",
             "review_status",
             "scope",
         ):
@@ -66,7 +63,6 @@ def _source() -> dict[str, Any]:
             raise ValueError("卦体原例原页范围不一致。")
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_body_structure_source_data") from exc
-    data["loaded_sha256"] = sha256(raw).hexdigest()
     return data
 
 
@@ -134,11 +130,8 @@ def body_structure(chart: dict[str, Any]) -> dict[str, Any]:
     return {
         "ruleset_id": RULESET_ID,
         "version": source["version"],
-        "source_url": source["source_url"],
-        "source_pdf_sha256": source["source_pdf_sha256"],
         "source_pdf_pages": source["source_pdf_pages"][:],
         "calculation_source_pdf_pages": source["calculation_source_pdf_pages"][:],
-        "collation_sha256": source["loaded_sha256"],
         "review_status": source["review_status"],
         "wording_variants": deepcopy(source["wording_variants"]),
         "phases": phases,

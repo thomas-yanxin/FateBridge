@@ -9,7 +9,7 @@ from __future__ import annotations
 import math
 import sys
 from types import TracebackType
-from typing import Any, Dict, Literal
+from typing import Any, Literal
 
 from fatebridge.core import ephemeris_runtime as ephemeris
 from fatebridge.core.astro import runtime
@@ -19,7 +19,7 @@ from fatebridge.core.astro.physical_sources import (
 from fatebridge.utils.errors import EphemerisSourceError
 
 
-def sun_source(source: Dict[str, Any]) -> Dict[str, Any]:
+def sun_source(source: dict[str, Any]) -> dict[str, Any]:
     """Keep all Sun-call contexts, including the lunar Earth/EMB dependency.
 
     Swiss 2.10.03 sweplan can internally fall back to an analytical Moon while
@@ -38,9 +38,9 @@ class SolarEphemerisBatch:
     """Use as a context manager; result is available after successful exit."""
 
     def __init__(self) -> None:
-        self.observations: list[Dict[str, Any]] = []
-        self._indices: Dict[float, int] = {}
-        self.result: Dict[str, Any] | None = None
+        self.observations: list[dict[str, Any]] = []
+        self._indices: dict[float, int] = {}
+        self.result: dict[str, Any] | None = None
         self._active = False
         self._entered = False
 
@@ -65,7 +65,7 @@ class SolarEphemerisBatch:
         if ephemeris.configured_ephemeris_path() != self._path:
             raise EphemerisSourceError("solar_configuration_changed")
 
-    def sun(self, jd_tt: float) -> Dict[str, Any]:
+    def sun(self, jd_tt: float) -> dict[str, Any]:
         if not self._active:
             raise RuntimeError("Sun observations require an active ephemeris batch")
         if not math.isfinite(jd_tt):
@@ -93,7 +93,7 @@ class SolarEphemerisBatch:
         self.observations.append(observation)
         return observation
 
-    def source(self, index: int) -> Dict[str, Any]:
+    def source(self, index: int) -> dict[str, Any]:
         row = self.observations[index]
         return sun_source(
             {
@@ -102,7 +102,7 @@ class SolarEphemerisBatch:
             }
         )
 
-    def check_native(self, source: Dict[str, Any], natal_index: int) -> None:
+    def check_native(self, source: dict[str, Any], natal_index: int) -> None:
         # Same TT epoch: require the same observed data identities, not
         # merely the same DE edition (adjacent files may overlap in time).
         native = sun_source(source)["by_factor"]["Sun"]

@@ -23,6 +23,9 @@ from fatebridge.core.human_design.human_design_mechanics import (
 from fatebridge.core.human_design.human_design_native_positions import (
     decode_native_positions,
 )
+from fatebridge.core.human_design.human_design_solar_root_validation import (
+    verify_solar_root_context,
+)
 from fatebridge.core.human_design.human_design_variables import (
     variables_from_activations,
 )
@@ -238,10 +241,6 @@ def unpack_sample_witnesses(
                 **cross_identifier(quartet[0], angle),
             },
         }
-        from fatebridge.core.human_design.human_design_solar_root_validation import (
-            verify_solar_root_context,
-        )
-
         if verify_solar_root_context(
             {
                 **charts[birth],

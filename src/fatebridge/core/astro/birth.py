@@ -4,9 +4,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Literal
 
+from fatebridge.core.astro.birth_clock import resolve_solar_epoch
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch
+from fatebridge.core.astro.solar_rebase import (
+    rebase_solar_datetime,
+    solar_rebase_adjustment,
+)
 from fatebridge.core.astro.time_scales import EphemerisTime, ephemeris_time
 from fatebridge.utils.civil_time import UTCCalendar, utc_calendar
 from fatebridge.utils.places import resolve_birth_place_context
@@ -34,17 +39,17 @@ class AstroBirthInfo:
     longitude: float
     latitude: float
     local_datetime: datetime
-    utc_datetime: Optional[datetime]
+    utc_datetime: datetime | None
     applied_true_solar: bool = False
     solar_correction_minutes: float = 0.0
-    solar_datetime: Optional[datetime] = None
-    recorded_datetime: Optional[datetime] = None
-    clock_conversion: Optional[Dict[str, Any]] = None
-    solar_time_reference: Optional[Dict[str, Any]] = None
+    solar_datetime: datetime | None = None
+    recorded_datetime: datetime | None = None
+    clock_conversion: dict[str, Any] | None = None
+    solar_time_reference: dict[str, Any] | None = None
     timezone_source: Literal[
         "birth_timezone", "birth_place", "default_utc", "solar_clock_conversion"
     ] = "birth_timezone"
-    native_epoch: Optional[PhysicalEpoch] = None
+    native_epoch: PhysicalEpoch | None = None
 
     @property
     def time_scales(self) -> EphemerisTime:
@@ -128,11 +133,11 @@ def build_astro_birth_info(
     birth_second: int = 0,
     birth_microsecond: int = 0,
     birth_clock_basis: str = "civil",
-    birth_timezone: Optional[str] = None,
-    birth_longitude: Optional[float] = None,
-    birth_latitude: Optional[float] = None,
-    name: Optional[str] = None,
-    birth_place: Optional[str] = None,
+    birth_timezone: str | None = None,
+    birth_longitude: float | None = None,
+    birth_latitude: float | None = None,
+    name: str | None = None,
+    birth_place: str | None = None,
     use_true_solar_time: bool = False,
     preserve_instant: bool = False,
     solar_clock_ephemeris_policy: str = "auto",
@@ -159,8 +164,6 @@ def build_astro_birth_info(
             "核心星盘需要 birth_longitude / birth_latitude，或提供 FateBridge 支持的 birth_place 以自动补全坐标。"
         )
     if birth_clock_basis != "civil":
-        from fatebridge.core.astro.birth_clock import resolve_solar_epoch
-
         if birth_timezone is not None or use_true_solar_time:
             raise ValueError(
                 "Local solar birth clocks require birth_timezone omitted and use_true_solar_time=false"
@@ -229,11 +232,6 @@ def build_astro_birth_info(
     solar_time_reference = None
     if use_true_solar_time:
         if not preserve_instant:
-            from fatebridge.core.astro.solar_rebase import (
-                rebase_solar_datetime,
-                solar_rebase_adjustment,
-            )
-
             adjustment, solar_time_reference = solar_rebase_adjustment(
                 local_datetime, timezone_name, effective_longitude
             )

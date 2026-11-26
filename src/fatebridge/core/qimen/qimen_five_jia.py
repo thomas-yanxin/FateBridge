@@ -2,10 +2,8 @@
 
 from typing import Any
 
-from fatebridge.core.qimen.qimen_sources import YANYI_VOLUMES
 from fatebridge.core.qimen.qimen_three_deceptions import GODS
 
-SOURCE = YANYI_VOLUMES[2]
 PROFILE_ID = "yanyi_vol2_five_jia_four_triples_human_unresolved_v1"
 DEFINITIONS = [
     ("heaven_jia", "天假", "景门", "乙丙丁", "九天"),
@@ -19,7 +17,6 @@ def describe_five_jia() -> dict[str, Any]:
     return {
         "id": PROFILE_ID,
         "title": "卷二五假：四条完整组合；人假六合身份未决",
-        "source": SOURCE,
         "section": "卷二·三诈五假·五假",
         "scan_pages": [26],
         "definitions": [
@@ -118,7 +115,6 @@ def five_jia_context(
         },
         "heaven_stem_replaced_by_hour_or_earth_stem": False,
         "outcome_inference_allowed": False,
-        "source": SOURCE,
         "source_scan_pages": [26],
     }
 
@@ -152,7 +148,6 @@ def build_five_jia(
                         f"{path}.evidence.five_jia",
                         "qimen.rule_profiles.five_jia",
                     ],
-                    "source": SOURCE,
                     "section": "卷二·三诈五假·五假",
                     "source_scan_pages": [26],
                     "layer": "traditional_rule_match",

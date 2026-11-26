@@ -93,7 +93,7 @@ def _force(value: Any) -> None:
         value,
         "method_id source components source_root_observations engineering_composition classical_adjudication scope limitations",
     )
-    _keys(f["source"], "id title url")
+    _keys(f["source"], "id title")
     composition = _keys(
         f["engineering_composition"],
         "status ratio_basis strength_method_id strength_level support_share body_within_support_share body_seal_energy_relation quantity_kind",
@@ -132,7 +132,7 @@ def _passage(value: Any) -> None:
         value,
         "method_id source nodes visible_paths principal_hidden_paths all_hidden_paths mixed_paths summary scope",
     )
-    _keys(p["source"], "id title url source_sha256")
+    _keys(p["source"], "id title")
     planes: dict[str, set[str]] = {"stem": set(), "hidden": set()}
     for node in _rows(p["nodes"]):
         row = _keys(

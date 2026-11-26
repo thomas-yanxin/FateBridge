@@ -11,11 +11,6 @@ from typing import Any
 from fatebridge.core.metaphysics.taiyi_geometry import PALACES
 
 PROFILE = "wenchang_general_guan_shiji_general_yan_exact_palace_v1"
-SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷03"
-ANNOTATIONS = (
-    "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第693卷",
-    "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第694卷",
-)
 SCOPE = (
     "将目同宫补证读法：文昌与四将为关，始击与四将为掩；只核精确同宫，"
     "间神不并入正宫。明钞关条未明列将目，版本范围不同；"
@@ -48,8 +43,6 @@ def eye_general_relations(core: dict[str, Any]) -> list[dict[str, Any]]:
                         {"field": "wenchang_palace", "value": palace},
                     ],
                     "traditional_meaning": f"{label}{palace}与文昌{palace}同宫，命中将目关的空间条件",
-                    "source": SOURCE + "#推闗法",
-                    "supplementary_sources": list(ANNOTATIONS),
                     "relation_profile": PROFILE,
                     "scope": SCOPE,
                 }
@@ -65,8 +58,6 @@ def eye_general_relations(core: dict[str, Any]) -> list[dict[str, Any]]:
                         general,
                     ],
                     "traditional_meaning": f"始击{palace}与{label}{palace}同宫，命中始击掩将的空间条件",
-                    "source": SOURCE + "#推掩法",
-                    "supplementary_sources": list(ANNOTATIONS),
                     "relation_profile": PROFILE,
                     "scope": SCOPE,
                 }

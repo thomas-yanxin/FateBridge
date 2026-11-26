@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
 from fatebridge.core.sukuyo.sukuyo_documentary import with_text_layers
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
@@ -20,15 +20,11 @@ MANSIONS = frozenset("角亢氐房心尾箕斗女虚危室壁奎娄胃昴毕觜�
 
 
 def source_bundle() -> dict[str, Any]:
-    return load_source(SOURCE).data
-
-
-def source_digest() -> str:
-    return load_source(SOURCE).sha256
+    return load_source(SOURCE)
 
 
 def travel_direction_evidence(
-    mansion: Optional[str], candidates: Sequence[str] = ()
+    mansion: str | None, candidates: Sequence[str] = ()
 ) -> dict[str, Any]:
     if (mansion is not None and mansion not in MANSIONS) or any(
         name not in MANSIONS for name in candidates
@@ -58,8 +54,6 @@ def travel_direction_evidence(
         ),
         "basis": "explicit_named_day_selectors_in_travel_chapter",
         "source_url": bundle["source_url"],
-        "source_sha256": bundle["source_sha256"],
-        "source_bundle_sha256": source_digest(),
         "locator": bundle["locator"],
         "selected_text": bundle["selected_text"],
         "textual_issues": deepcopy(bundle["textual_issues"]),

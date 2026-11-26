@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fatebridge.core.jyotish.jyotish_ashtakavarga import (
     topic_factor as ashtakavarga_topic_factor,
@@ -23,11 +23,11 @@ from fatebridge.core.jyotish.jyotish_war import SOURCE as WAR_SOURCE
 
 
 def topic_evidence(
-    charts: Dict[str, Any],
-    sthana: Optional[Dict[str, Any]] = None,
-    additional_balas: Optional[Dict[str, Any]] = None,
-    ashtakavarga: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    charts: dict[str, Any],
+    sthana: dict[str, Any] | None = None,
+    additional_balas: dict[str, Any] | None = None,
+    ashtakavarga: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     if "D1" in charts and additional_balas is not None:
         verify_drik_evidence(additional_balas["drik_bala"], charts["D1"])
     topics = {}
@@ -37,7 +37,7 @@ def topic_evidence(
         ("relationship", [("D1", 7), ("D9", 7)]),
     ]:
         facts = []
-        factors: List[Dict[str, Any]] = []
+        factors: list[dict[str, Any]] = []
         for name, house in scopes:
             if name in charts:
                 fact = charts[name]["houses"][house - 1]

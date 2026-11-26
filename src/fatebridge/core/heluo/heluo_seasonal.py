@@ -7,7 +7,7 @@ overlap: neither chronological priority nor a favorable rule may erase another.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from fatebridge.core.almanac import (
     _term_window,
@@ -20,8 +20,6 @@ from fatebridge.utils.errors import NumerologySourceError
 from fatebridge.utils.timezones import parse_timezone_name
 
 RULESET_ID = "heluo_wenming_number_conditions_v1"
-SOURCE_URL = "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf"
-SOURCE_SHA256 = "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c"
 
 # PDF p67 (卷一五五). The two overlaps are in the text, not a table error.
 SEASON_WINDOWS = (
@@ -118,7 +116,7 @@ def _number_fact(
     reference: int,
     weak: tuple[int, int],
     high: int,
-    high_upper: Optional[int] = None,
+    high_upper: int | None = None,
 ) -> dict:
     high_match = value >= high and (high_upper is None or value <= high_upper)
     weak_match = weak[0] <= value <= weak[1]
@@ -164,8 +162,6 @@ def seasonal_number_evidence(
     result: dict[str, Any] = {
         "ruleset_id": RULESET_ID,
         "version": "1.0.0",
-        "source_url": SOURCE_URL + "#page=64",
-        "source_pdf_sha256": SOURCE_SHA256,
         "source_pdf_pages": list(range(64, 75)),
         "assessment_status": "literal_conditions_only",
         "numbers": {

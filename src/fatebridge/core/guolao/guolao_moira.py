@@ -6,20 +6,16 @@ from collections.abc import Mapping
 from typing import Any
 
 PATTERN_MODEL_ID = "moira_conditions_with_seasonal_moon_v3"
-MOIRA_MOON_RULES_SOURCE = (
-    "https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/"
-    "blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/moira_s.prop"
-)
 
 # LIST_SIGNS index (0=Aries … 11=Pisces) → 地支（七政四余 戌将盘；SZConst.SignZi）。
-_SIGN_ZI = ["戌", "酉", "申", "未", "午", "巳", "辰", "卯", "寅", "丑", "子", "亥"]
+SIGN_ZI = ["戌", "酉", "申", "未", "午", "巳", "辰", "卯", "寅", "丑", "子", "亥"]
 
 # 行星中文 → 喜用名（guolaoMoira MOIRA_PLANET_CN_TO_ID 的中文键）。
 # 在本端口中 facts["planet_signidx"] 直接以中文键给出星座序号。
-_MOIRA_PLANET_ORDER = ["日", "月", "金", "木", "水", "火", "土", "计", "罗", "炁", "孛"]
+MOIRA_PLANET_ORDER = ["日", "月", "金", "木", "水", "火", "土", "计", "罗", "炁", "孛"]
 
 # MOIRA_RULER_BY_SIGN：星座序号 → 庙主行星中文（Aries…Pisces）。
-_RULER_BY_SIGN_IDX = [
+RULER_BY_SIGN_IDX = [
     "火",
     "金",
     "水",
@@ -36,7 +32,7 @@ _RULER_BY_SIGN_IDX = [
 
 # MOIRA_OVERCOMING：兼容软件的失垣查表，不是五星相克表。
 # 本底本的方向性五星生克单独维护在 core.guolao.relation。
-_OVERCOMING = {
+OVERCOMING = {
     "日": "月",
     "月": "日",
     "金": "火",
@@ -53,10 +49,6 @@ _OVERCOMING = {
 # Horosa flatlib/ephem/tools.py::pcLon at this frozen revision. This is a
 # software-defined mean point; no fit to output fixtures or classical epoch.
 PURPLE_CLOUDS_SOURCE_COMMIT = "10fb75de980bb0a6e0d1f50c7ee93cc97a88d7de"
-PURPLE_CLOUDS_SOURCE_URL = (
-    "https://github.com/Horace-Maxwell/Horosa-Web-App-comprehensively-improved-MacOS/"
-    f"blob/{PURPLE_CLOUDS_SOURCE_COMMIT}/Horosa-Web/flatlib-ctrad2/flatlib/ephem/tools.py"
-)
 PURPLE_CLOUDS_MODEL_ID = "horosa_mean_purple_clouds_10fb75de_v1"
 PURPLE_CLOUDS_EPOCH_JD = 2451543.5
 PURPLE_CLOUDS_EPOCH_LONGITUDE = 188.6849
@@ -74,7 +66,7 @@ def purple_clouds_longitude(julian_day: float) -> float:
 
 
 # 命宫起十二宫的次序偏移（localMoiraHouseSign）。
-_HOUSE_OFFSET = {
+HOUSE_OFFSET = {
     "命": 0,
     "命宫": 0,
     "财": 1,
@@ -104,7 +96,7 @@ _HOUSE_OFFSET = {
 def _sign_zi(sign_idx: int) -> str:
     if sign_idx < 0:
         return ""
-    return _SIGN_ZI[(sign_idx + 12) % 12]
+    return SIGN_ZI[(sign_idx + 12) % 12]
 
 
 def _same(a: int, b: int) -> bool:
@@ -162,8 +154,8 @@ class _Resolver:
         self._gods = god_signidx
 
     def __call__(self, name: str) -> int:
-        if name in _HOUSE_OFFSET:
-            return _offset_palace_index(self._life, _HOUSE_OFFSET[name])
+        if name in HOUSE_OFFSET:
+            return _offset_palace_index(self._life, HOUSE_OFFSET[name])
         if name == "身":
             return self._self
         if name in self._gods and self._gods[name] >= 0:
@@ -171,7 +163,7 @@ class _Resolver:
         if name in self._planets:
             return self._planets[name]
         try:
-            return _SIGN_ZI.index(name)
+            return SIGN_ZI.index(name)
         except ValueError:
             return -1
 
@@ -181,12 +173,12 @@ def _lost_rulership(signof: _Resolver, subject: str) -> bool:
     sign_idx = signof(subject)
     if sign_idx < 0:
         return False
-    ruler_cn = _RULER_BY_SIGN_IDX[sign_idx]
+    ruler_cn = RULER_BY_SIGN_IDX[sign_idx]
     ruler_sign = signof(ruler_cn)
     if ruler_sign < 0:
         return False
-    ruler_of_ruler = _RULER_BY_SIGN_IDX[ruler_sign]
-    return ruler_of_ruler == _OVERCOMING.get(ruler_cn)
+    ruler_of_ruler = RULER_BY_SIGN_IDX[ruler_sign]
+    return ruler_of_ruler == OVERCOMING.get(ruler_cn)
 
 
 def _indices(value: object, label: str, allowed: set[str]) -> dict[str, int]:
@@ -209,21 +201,21 @@ def _indices(value: object, label: str, allowed: set[str]) -> dict[str, int]:
 def _rulership_inputs(signof: _Resolver, subject: str) -> dict[str, Any]:
     """Operands of an already satisfied compatibility lost-rulership rule."""
     index = signof(subject)
-    ruler = _RULER_BY_SIGN_IDX[index]
+    ruler = RULER_BY_SIGN_IDX[index]
     ruler_index = signof(ruler)
     return {
         "palace_index": index,
         "palace_ruler": ruler,
         "ruler_palace_index": ruler_index,
-        "ruler_of_ruler_palace": _RULER_BY_SIGN_IDX[ruler_index],
-        "compatibility_opposing_ruler": _OVERCOMING[ruler],
+        "ruler_of_ruler_palace": RULER_BY_SIGN_IDX[ruler_index],
+        "compatibility_opposing_ruler": OVERCOMING[ruler],
     }
 
 
 def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
     """Evaluate patterns, leaving facts with missing positions or seasons unresolved."""
     planet_signidx = _indices(
-        facts.get("planet_signidx"), "planet_signidx", set(_MOIRA_PLANET_ORDER)
+        facts.get("planet_signidx"), "planet_signidx", set(MOIRA_PLANET_ORDER)
     )
     god_signidx = _indices(
         facts.get("god_signidx"), "god_signidx", {"天贵", "玉贵", "岁驾"}
@@ -256,7 +248,7 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
 
     # 八杀朝天（喜）：疾厄宫主入命，且命临戌亥。
     if life_sign_idx >= 0 and life_zi and life_zi in "戌亥":
-        disease_ruler_cn = _RULER_BY_SIGN_IDX[signof("疾")]
+        disease_ruler_cn = RULER_BY_SIGN_IDX[signof("疾")]
         if _same(signof(disease_ruler_cn), life_sign_idx):
             _add(
                 patterns,
@@ -278,10 +270,10 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
     # Select the effective seasonal rule, rather than emitting both verdicts.
     if moon >= 0:
         same_moon = sum(
-            1 for cn in _MOIRA_PLANET_ORDER if planet_signidx.get(cn, -1) == moon
+            1 for cn in MOIRA_PLANET_ORDER if planet_signidx.get(cn, -1) == moon
         )
         complete = all(
-            0 <= planet_signidx.get(cn, -1) < 12 for cn in _MOIRA_PLANET_ORDER
+            0 <= planet_signidx.get(cn, -1) < 12 for cn in MOIRA_PLANET_ORDER
         )
         if (
             complete
@@ -321,11 +313,10 @@ def calculate(facts: Mapping[str, object]) -> list[dict[str, Any]]:
                     "is_winter": is_winter,
                     "moon_palace_index": moon,
                     "eleven_positions": {
-                        cn: planet_signidx[cn] for cn in _MOIRA_PLANET_ORDER
+                        cn: planet_signidx[cn] for cn in MOIRA_PLANET_ORDER
                     },
                     "same_palace_count": same_moon,
                 },
-                source=MOIRA_MOON_RULES_SOURCE,
             )
 
     # 日月拱官（喜）：日月分拱官禄。

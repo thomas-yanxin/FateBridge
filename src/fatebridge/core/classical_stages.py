@@ -1,10 +1,7 @@
 """Shared deterministic stage and seat tables, independent of chart assembly."""
 
-import hashlib
-import json
 from typing import Any
 
-from fatebridge.core.source_identity import ZIPING_ZHENQUAN_NLC_SCAN_URL
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 TWELVE_STAGES: tuple[str, ...] = (
@@ -51,15 +48,9 @@ def life_stage_profile() -> dict[str, Any]:
             for stem, (branch, direction) in _CHANGSHENG_START.items()
         },
     }
-    digest = hashlib.sha256(
-        json.dumps(
-            lookup, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        ).encode()
-    ).hexdigest()
     return {
         "profile_id": STAGE_PROFILE_ID,
         **lookup,
-        "lookup_sha256": digest,
         "soil_convention": "戊随丙寅生、己随丁酉生；未选择戊申己卯等其他口径。",
         "source_basis": "implementation_lookup_with_selected_text_crosscheck",
         "sources": [
@@ -67,8 +58,6 @@ def life_stage_profile() -> dict[str, Any]:
                 "title": "三命通會·卷二·論天干陰陽生死",
                 "author": "明·萬民英",
                 "edition": "欽定四庫全書本，浙江大学图书馆／CADAL06066038",
-                "url": "https://archive.org/details/06066038.cn",
-                "source_pdf_sha256": "af4a8ca65cc4dfdf63d6294adc7925a868214563d0d52664c7ba779b833db14a",
                 "anchor_pdf_pages": {
                     "甲": [10],
                     "乙": [12],
@@ -88,8 +77,6 @@ def life_stage_profile() -> dict[str, Any]:
                 "title": "秘本子平真诠·论阴阳生死",
                 "author": "沈孝瞻",
                 "edition": "国家图书馆藏本，上海世界图书馆发行",
-                "url": ZIPING_ZHENQUAN_NLC_SCAN_URL,
-                "source_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
                 "pdf_pages": [15, 16, 17],
                 "source_role": "阴阳顺逆与阶段含义；不把阶段名等同实体藏干或有效根力。",
             },

@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, cast
+from typing import Any, Iterable, cast
 
 from fatebridge.core.fengshui.context_inputs import EnvironmentalContext
 
@@ -12,7 +12,7 @@ from fatebridge.core.fengshui.context_inputs import EnvironmentalContext
 @lru_cache(maxsize=1)
 def _bundle() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data" / "fengshui" / "expert-policy-v1.json"
-    return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
 def expert_context_provenance() -> dict[str, Any]:
@@ -23,11 +23,11 @@ def expert_context_provenance() -> dict[str, Any]:
         for source_id in result["source_ids"]
     ]
     result["bundle_version"] = data["bundle_version"]
-    return cast(Dict[str, Any], result)
+    return cast(dict[str, Any], result)
 
 
 def _rule(key: str) -> dict[str, Any]:
-    return cast(Dict[str, Any], deepcopy(_bundle()["rules"][key]))
+    return cast(dict[str, Any], deepcopy(_bundle()["rules"][key]))
 
 
 def _association_scope(methods: Iterable[str], household_scope: str) -> dict[str, Any]:
@@ -73,7 +73,7 @@ def analyze_environmental_context(
 ) -> dict[str, Any]:
     """Review confirmed context without recalculating or grading any chart.
 
-    ``confirmed_suitable`` is an explicit supplied assessment with evidence,
+    confirmed_suitable is an explicit supplied assessment with evidence,
     never an engine-derived verdict. A local concern is not assigned to a user
     of another suitable floor only under the complete, confirmed conditions.
     """

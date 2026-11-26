@@ -3,11 +3,9 @@
 import json
 from copy import deepcopy
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.heluo.heluo_seasonal import SOURCE_SHA256
 from fatebridge.utils.data import get_nayin
 from fatebridge.utils.errors import NumerologySourceError
 
@@ -24,7 +22,6 @@ def _load_source() -> dict[str, Any]:
     anchors = data["hexagram_entries"]
     if (
         data["ruleset_id"] != RULESET_ID
-        or data["source_pdf_sha256"] != SOURCE_SHA256
         or len(pure) != 8
         or len({p["trigram"] for p in pure}) != 8
         or len({tuple(p["bits"]) for p in pure}) != 8
@@ -75,7 +72,6 @@ def _load_source() -> dict[str, Any]:
                 raise ValueError(
                     "河洛所核复卦条目与纯卦内外位置读数冲突，不能自动取舍。"
                 )
-    data["loaded_sha256"] = sha256(raw).hexdigest()
     return data
 
 
@@ -93,9 +89,6 @@ def collation_summary() -> dict[str, Any]:
     return {
         "ruleset_id": RULESET_ID,
         "version": data["version"],
-        "sha256": data["loaded_sha256"],
-        "source_url": data["source_url"],
-        "source_pdf_sha256": data["source_pdf_sha256"],
         "review_status": data["review_status"],
         "pure_trigram_tables": len(pure),
         "pure_table_assignment_slots": sum(len(p["direct"]) for p in pure),

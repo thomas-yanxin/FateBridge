@@ -20,7 +20,6 @@ from fatebridge.core.astro.native_identity import binding_distribution_version
 from fatebridge.utils.errors import EphemerisSourceError
 
 POLICY_ID = "compressed_file_endpoint_context_v5"
-SOURCE_URL = "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c#L2163-L2179"
 _FileWindows = tuple[tuple[str, float, float, int], ...]
 _AUDIT: ContextVar[dict[str, Any] | None] = ContextVar(
     "compressed_endpoint_audit", default=None
@@ -168,7 +167,6 @@ def endpoint_context_evidence() -> dict[str, Any]:
         "native_states_changed_so_far": audit["changed"] if audit else None,
         "records": list(audit["records"].values()) if audit else [],
         "unrecorded_calls_at_record_limit": audit["omitted"] if audit else 0,
-        "source_url": SOURCE_URL,
         "scope": "Within the owned private operation, reset computed native state using the same path and preselect with a same-reception-epoch geometric Sun. For supported geocentric apparent Sun/Moon/planet requests, establish the checked reception/retarded light-path context before the exact original coordinate call. Native owned default model/tidal settings are reapplied; sidereal/topocentric parameters and fixed Delta-T survive set_ephe_path. Outside that operation, supported Swiss geocentric apparent Sun calls rebuild reception dependencies in their checked common source windows without resetting caller configuration; other calls retain the post-call endpoint guard. Correction counts describe preflight or requested native subcalls, not independent samples or proof that an unevaluated original target changed. No atomic read-set or physical accuracy certificate.",
     }
 
@@ -528,7 +526,6 @@ def _solar_light_path(
     policy: dict[str, Any] = {
         "method_id": "owned_geocentric_solar_light_path_v1",
         "source_function": "sweph.c:app_pos_etc_sun",
-        "source_url": "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c#L3901",
         "reception_jd_tt": epoch,
         "requested_coordinate_flags": flags,
         "states": {},
@@ -724,7 +721,6 @@ def _planet_light_path(
     policy: dict[str, Any] = {
         "method_id": "owned_geocentric_planet_light_path_v1",
         "source_function": "sweph.c:app_pos_etc_plan",
-        "source_url": "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c",
         "body_id": body,
         "reception_jd_tt": epoch,
         "requested_coordinate_flags": flags,
@@ -1246,12 +1242,12 @@ def compressed_endpoint_call(
     return result
 
 
-_PATH_NAMES: dict[str, str] = {}
+PATH_NAMES: dict[str, str] = {}
 
 
 def _path_name(name: str) -> str:
-    cached = _PATH_NAMES.get(name)
+    cached = PATH_NAMES.get(name)
     if cached is None:
         cached = Path(name).name
-        _PATH_NAMES[name] = cached
+        PATH_NAMES[name] = cached
     return cached
