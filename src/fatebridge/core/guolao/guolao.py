@@ -996,7 +996,6 @@ def build_chart(
             **({"apparent_solar_clock": solar_clock} if solar_clock else {}),
             "solar_clock_changes_instant": False,
             **({"input_clock": input_clock} if input_clock else {}),
-            "catalogue_sha256": raw["catalogue_sha256"],
             "ephemeris_models": raw["models"],
             "ephemeris_provenance": raw["ephemeris_provenance"],
             "longitude_motion": raw["longitude_motion"],

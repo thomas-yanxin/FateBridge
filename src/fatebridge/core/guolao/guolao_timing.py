@@ -185,7 +185,6 @@ def enrich_guolao_timing(
             "ephemeris_models": raw["models"],
             "ephemeris_provenance": raw["ephemeris_provenance"],
             "longitude_motion": raw["longitude_motion"],
-            "catalogue_sha256": raw["catalogue_sha256"],
             "ayanamsha": raw["ayanamsha"],
             "zodiac": raw["zodiac_info"]["zodiac"],
             "position_basis": "geocentric_apparent_target_sky_not_symbolic_direction",

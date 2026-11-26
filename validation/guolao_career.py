@@ -8,6 +8,7 @@ consent, timestamp, source, blinding declaration or an independent sample.
 
 from __future__ import annotations
 
+import hashlib
 import math
 import random
 from bisect import bisect_right
@@ -44,8 +45,6 @@ CONFIDENCE = 0.95
 
 def analysis_code_fingerprint() -> str:
     """Commit these two implementation files; not an external time attestation."""
-    import hashlib
-
     here = Path(__file__).resolve().parent
     return digest(
         {
