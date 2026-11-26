@@ -44,7 +44,6 @@ def nutation_obliquity_rate(
         "native_version": native_version,
         "binding_version": binding_version,
         "source_function": "pyswisseph2.10.3.2/libswe/sweph.c:app_pos_rest,swi_nutate",
-        "source_url": "https://www.astro.com/swisseph/swephprg.htm",
         "step_days": NUTATION_STEP_DAYS,
         "scope": "Nutation-in-obliquity part of the final ecliptic rotation derivative. Native NONUT/sidereal rates do not receive this term. Not a complete precession or apparent-speed certification.",
     }

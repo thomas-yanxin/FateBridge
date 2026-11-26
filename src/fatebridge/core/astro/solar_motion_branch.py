@@ -24,7 +24,6 @@ from fatebridge.core.compressed_ephemeris import preserve_native_dependency_cont
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.utils.errors import EphemerisSourceError
 
-SOURCE_URL = "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c#L3742"
 METHOD_ID = "native_solar_mass_interpolation_cell_geometry_v1"
 
 
@@ -108,7 +107,6 @@ def solar_interpolation_branch(
             "method_id": METHOD_ID,
             "status": "boundary_ambiguous",
             "cell": None,
-            "source_url": SOURCE_URL,
         }
     impact = math.sqrt(square) / radius
     cross = (
@@ -126,7 +124,6 @@ def solar_interpolation_branch(
     interior = lower > cell / 100 and (cell == 100 or upper < (cell + 1) / 100)
     return {
         "method_id": METHOD_ID,
-        "source_url": SOURCE_URL,
         "status": "interior_sampled_cell" if interior else "boundary_ambiguous",
         "cell": cell if interior else None,
         "impact_solar_radius_fraction": impact,

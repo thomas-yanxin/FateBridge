@@ -132,7 +132,6 @@ def match_calendar_stems(
     contexts: dict[str, Any],
     *,
     leader: QimenLeaders,
-    source: str,
 ) -> list[dict[str, Any]]:
     """Match literal stems on the actual sky/earth layers, including hosting."""
 
@@ -217,7 +216,6 @@ def match_calendar_stems(
                         "anchor_ganzhi": context["ganzhi"],
                         "anchor_date": context.get("anchor_date"),
                     },
-                    "source": source,
                     "section": f"卷二·小隔并岁隔月隔日隔时隔·{name}",
                     "source_scan_pages": [29],
                     "evidence_paths": [

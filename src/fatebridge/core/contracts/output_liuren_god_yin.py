@@ -40,7 +40,6 @@ class LiurenGodYin(PartialOutput):
     ruleset_id: Literal["tanyuan_category_spirit_yin_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[int] | None = None
     day_ganzhi: str | None = None
     month_branch: Branch | None = None

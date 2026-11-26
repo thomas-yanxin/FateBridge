@@ -7,7 +7,6 @@ It matches source position only: optical calculations must use the physical
 velocity, rather than inherit the source's velocity from a virtual location.
 
 Source interface: original sweph.c swi_get_observer, v2.10.03.
-https://github.com/aloistr/swisseph/blob/175e1fcb3108bcd5c0d146c803f51dcf23508012/sweph.c
 """
 
 from __future__ import annotations

@@ -1,3 +1,2 @@
 recursive-include typings *.pyi
 exclude src/fatebridge/data/astronomy/de441-planetary-*-part-*.bin.gz
-prune src/fatebridge/validation

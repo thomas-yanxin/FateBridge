@@ -16,8 +16,6 @@ class LeapSecondEntry(TypedDict):
 
 
 class LeapTable(TypedDict):
-    source_url: str
-    source_sha256: str
     bulletin: str
     expires_at: str
     entries: list[LeapSecondEntry]
@@ -28,11 +26,8 @@ class UTCDefinitionSource(TypedDict):
     authority: str
     title: str
     version: str
-    url: str
     locator: str
     capture_kind: Literal["saved_web_extraction", "http_response_body"]
-    capture_sha256: str
-    hash_scope: str
 
 
 class UTCDefinitionRecord(TypedDict):

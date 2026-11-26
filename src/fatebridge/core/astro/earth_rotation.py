@@ -19,10 +19,10 @@ from fatebridge.core.iers2010_series import EECT_TERMS
 MODERN_REFERENCE_JD_TT = 2451545
 
 
-_ERA_ORIGIN = Fraction("0.7790572732640")
+ERA_ORIGIN = Fraction("0.7790572732640")
 
 
-_ERA_RATE = Fraction("1.00273781191135448")
+ERA_RATE = Fraction("1.00273781191135448")
 
 
 MODERN_HALF_WINDOW_DAYS = 2 * 36525.0
@@ -35,7 +35,7 @@ def selected_sidereal_model(julian_day_tt: float | TTInstant) -> int:
     )
 
 
-_LUNAR = (
+LUNAR = (
     (485868.249036, 1717915923.2178, 31.8792, 0.051635, -0.00024470),
     (1287104.793048, 129596581.0481, -0.5532, 0.000136, -0.00001149),
     (335779.526232, 1739527262.8478, -12.7512, -0.001037, 0.00000417),
@@ -46,7 +46,7 @@ _LUNAR = (
 
 def _fundamental_arguments(t: float) -> tuple[float, ...]:
     values = []
-    for coefficients in _LUNAR:
+    for coefficients in LUNAR:
         value = 0.0
         for coefficient in reversed(coefficients):
             value = value * t + coefficient
@@ -63,7 +63,7 @@ def _fundamental_arguments(t: float) -> tuple[float, ...]:
 
 def _era_turn(jd_ut1: float | UT1Instant) -> Fraction:
     point = UT1Instant.from_value(jd_ut1)
-    return (_ERA_ORIGIN + _ERA_RATE * (point.days - 2451545)) % 1
+    return (ERA_ORIGIN + ERA_RATE * (point.days - 2451545)) % 1
 
 
 def iers2010_gast(

@@ -14,7 +14,6 @@ class GeometrySource(PartialOutput):
     url: str | None = None
     scope: str | None = None
     sections: list[str] | None = None
-    source_sha256: str | None = None
 
 
 class ReferenceAngleGeometry(PartialOutput):
@@ -148,7 +147,6 @@ class FictitiousElementSource(PartialOutput):
     filename: str | None = None
     status: str | None = None
     search_path_index: int | None = None
-    sha256: str | None = None
     scope: str | None = None
 
 
@@ -156,7 +154,6 @@ class PhysicalEphemerisFile(PartialOutput):
     id: str | None = None
     slot: int | None = None
     filename: str | None = None
-    sha256: str | None = None
     bytes: int | None = None
     range_time_scale: Literal["TT", "TDB"] | None = None
     start_julian_day_tt: float | None = Field(

@@ -30,7 +30,7 @@ from fatebridge.core.astro.ut1_epoch import UT1Instant
 # diagnostics, not bounds on observation, clock, location or model errors.
 INTERSECTION_CONDITION_THRESHOLD = math.sqrt(sys.float_info.epsilon)
 INTERSECTION_RESOLUTION_GUARD = 64 * sys.float_info.epsilon
-_UNRESOLVED_ASCENDANT_STATUSES = frozenset(
+UNRESOLVED_ASCENDANT_STATUSES = frozenset(
     {
         "ecliptic_horizon_numerically_unresolved",
         "underdetermined_ascendant",
@@ -46,7 +46,7 @@ def is_ascendant_resolved(source: object) -> bool:
     if isinstance(source, Mapping):
         if "geometric_ascendant_resolved" in source:
             return source.get("geometric_ascendant_resolved") is not False
-        if source.get("status") in _UNRESOLVED_ASCENDANT_STATUSES:
+        if source.get("status") in UNRESOLVED_ASCENDANT_STATUSES:
             return False
         for key in ("angle_definition", "calculation_basis", "chart_profile"):
             nested = source.get(key)
@@ -142,10 +142,6 @@ def ecliptic_horizon_angle_definition(
                 "仅保留为后端数值约定。MC与不依赖ASC的星体位置不受这项退化直接限制。"
             )
         ),
-        "source_urls": [
-            "https://aa.usno.navy.mil/faq/alt_az",
-            "https://www.astro.com/swisseph/swisseph.htm",
-        ],
         "source_scope": "Conditioning derived from altitude equation; backend conventions are separate from primary-text rules",
     }
 
@@ -222,10 +218,6 @@ def geographic_pole_angle_definition(
             "ASC为相对输入经度所定子午线的黄道／地平交点约定。"
             "天顶、宫位与依赖ASC的福点须连同此约定读取，不能视为物理升起时刻。"
         ),
-        "source_urls": [
-            "https://www.astro.com/swisseph/swisseph.htm",
-            "https://aa.usno.navy.mil/faq/alt_az",
-        ],
     }
     if frame is not None:
         _, rotation_latitude = frame.equatorial_site()

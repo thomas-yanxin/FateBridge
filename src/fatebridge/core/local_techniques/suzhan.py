@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fatebridge.core.local_techniques.chart import (
     _build_birth_info,
@@ -21,7 +21,7 @@ from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
 
 def _build_suzhan_snapshot_text(
-    input_normalized: Dict[str, Any], response: Dict[str, Any]
+    input_normalized: dict[str, Any], response: dict[str, Any]
 ) -> str:
     chart = response.get("chart") or {}
     houses = chart.get("houses") or []
@@ -78,7 +78,7 @@ def _build_suzhan_snapshot_text(
     unassigned = [item for item in objects if item.get("house") is None]
     if unassigned:
         house_groups.append(("参考宫位未定；以下星曜未分配落宫", unassigned))
-    house_lines: List[str] = []
+    house_lines: list[str] = []
     for heading, in_house in house_groups:
         house_lines.append(heading)
         if not in_house:
@@ -164,12 +164,12 @@ def _build_suzhan_snapshot_text(
 def build_suzhan_result(
     *,
     date: str,
-    time: Optional[str] = None,
-    zone: Optional[str] = None,
+    time: str | None = None,
+    zone: str | None = None,
     lat: Any = None,
     lon: Any = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
     szchart: int = 0,
     szshape: int = 0,
     house_start_mode: int = 1,
@@ -177,15 +177,15 @@ def build_suzhan_result(
     hsys: int = 8,
     zodiacal: int = 0,
     leap_month_policy: str = "unresolved",
-    natal_mansion: Optional[str] = None,
-    activity: Optional[str] = None,
-    activity_details: Optional[List[str]] = None,
+    natal_mansion: str | None = None,
+    activity: str | None = None,
+    activity_details: list[str] | None = None,
     calendar_profile: str = "t1299_fullmoon27",
-    calendar_day_part: Optional[str] = None,
-    textual_pada: Optional[int] = None,
+    calendar_day_part: str | None = None,
+    textual_pada: int | None = None,
     calendar_basis: str = "chinese_hko_utc08",
     chart_requested: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     if time is not None and not time.strip():
         raise ValueError("钟时须为已知时间；未知请省略或用null，空字符串不能代替未知。")
     coordinates_supplied = any(

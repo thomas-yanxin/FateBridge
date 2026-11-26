@@ -19,10 +19,6 @@ from fatebridge.core.astro.physical_epoch import PhysicalEpoch
 from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.utils.timezones import parse_timezone_name
 
-DAVISON_SOURCE = "https://www.astro.com/cgi/h.cgi?f=gch&h=gch64&lang=e"
-COMPOSITE_SOURCE = "https://www.astro.com/faq/fq_fh_compo_e.htm"
-MARKS_SOURCE = "https://astroer.com/htmls/bob/bobmar/markschart28.0.htm"
-
 DavisonVariant = Literal["uncorrected", "corrected", "spherical"]
 DAVISON_VARIANTS: frozenset[DavisonVariant] = frozenset(
     {"uncorrected", "corrected", "spherical"}
@@ -52,7 +48,6 @@ class DavisonCorrectionFacts(TypedDict, total=False):
 class DavisonPolicy(DavisonCorrectionFacts):
     method_id: str
     variant: str
-    source_url: str
     source_kind: str
     positions_from_single_instant: bool
     time_policy: str
@@ -301,7 +296,6 @@ def davison_birth(
     return birth, {
         "method_id": "davison_geometry_v2",
         "variant": variant,
-        "source_url": DAVISON_SOURCE,
         "source_kind": "first_party_implementation_documentation",
         "positions_from_single_instant": True,
         "time_policy": "arithmetic mean of selected UT1 Julian days; retain solved UT1/TT and format frozen-policy civil display",
@@ -332,7 +326,6 @@ def marks_birth(
     return replace(birth, name=f"{person.name} 马克斯盘"), {
         **policy,
         "method_id": "marks_natal_davison_v1",
-        "source_url": MARKS_SOURCE,
         "source_kind": "author_lesson_mirror_original_site_unavailable",
         "recipe": "Davison between this person's natal data and the couple's Davison data",
         "base_davison_variant": variant,

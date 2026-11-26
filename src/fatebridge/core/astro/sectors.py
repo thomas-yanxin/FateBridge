@@ -62,7 +62,6 @@ def sector_profile(ascendant: float) -> dict[str, Any]:
             {
                 "id": "iau_constellations",
                 "author": "International Astronomical Union",
-                "url": "https://iauarchive.eso.org/public/faq/",
                 "scope": "Constellation boundaries have unequal widths; this custom partition does not implement them",
             }
         ],

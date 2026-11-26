@@ -2,7 +2,7 @@
 
 Dignities combine Egyptian bounds, Dorothean triplicity, Chaldean faces and
 Lilly weights. This selected combination does not reproduce every rule of one
-author. Shared zodiac tables live in :mod:`fatebridge.core.astro.astrology_tables`;
+author. Shared zodiac tables live in fatebridge.core.astro.astrology_tables;
 physical fixed-star positions have their own owner and source receipts.
 """
 
@@ -107,12 +107,12 @@ LIGHT_WEIGHT_ORDER = ("Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "M
 # Lilly 1647 p.113 definitions: cazimi 17', same-sign combustion 8.5°, beams 17°.
 # The page's Sun18/planet28 example contradicts its 8.5° definition and remains
 # an explicit textual discrepancy; we do not change the radius to fit it.
-_COMBUST_CAZIMI = Fraction(17, 60)
-_COMBUST_LIMIT = 8.5
-_UNDER_BEAMS_LIMIT = 17.0
+COMBUST_CAZIMI = Fraction(17, 60)
+COMBUST_LIMIT = 8.5
+UNDER_BEAMS_LIMIT = 17.0
 # Max separation for enclosure/besiegement by body — flanking bodies must be
 # within this orb on each side, else nearest-neighbour over-reports.
-_ENCLOSURE_ORB = 15.0
+ENCLOSURE_ORB = 15.0
 # Ideal ecliptic obliquity cone, not a measured annual solar-declination maximum.
 
 
@@ -156,7 +156,7 @@ def essential_dignities(
 
     Returns the dignities held (rulership/exaltation/triplicity/bound/face) and
     debilities (detriment/fall), a Lilly score, and the bound/triplicity/face
-    lords of the placement. ``None`` for non-traditional bodies (outers/nodes).
+    lords of the placement. None for non-traditional bodies (outers/nodes).
     """
     if planet not in TRADITIONAL_PLANETS:
         return None
@@ -227,14 +227,14 @@ def combustion_state(planet_lon: Angle, sun_lon: Angle | None) -> str | None:
     if sun_lon is None:
         return None
     distance = _angular_distance(planet_lon, sun_lon)
-    if distance <= _COMBUST_CAZIMI:
+    if distance <= COMBUST_CAZIMI:
         return "cazimi"
     same_sign = (angle_fraction(planet_lon) % 360) // 30 == (
         angle_fraction(sun_lon) % 360
     ) // 30
-    if distance < _COMBUST_LIMIT and same_sign:
+    if distance < COMBUST_LIMIT and same_sign:
         return "combust"
-    if distance < _UNDER_BEAMS_LIMIT:
+    if distance < UNDER_BEAMS_LIMIT:
         return "under_beams"
     return None
 
@@ -243,7 +243,6 @@ def solar_condition_policy() -> dict[str, Any]:
     return {
         "rule_id": "lilly1647_p113_solar_definitions_v1",
         "source_edition": "William Lilly, Christian Astrology, London 1647",
-        "source_url": "https://wellcomecollection.org/works/s7z7c46y",
         "printed_page": 113,
         "cazimi_limit_exact_degrees": "17/60",
         "combust_limit_degrees": 8.5,
@@ -337,7 +336,7 @@ def planetary_joy(planet: str, house: int | None) -> bool:
 def is_retrograde(longitude_speed: float | None) -> bool | None:
     """Retrograde when ecliptic longitude speed is negative.
 
-    ``None`` when the speed is unknown — the offline approximate orbital model
+    None when the speed is unknown — the offline approximate orbital model
     supplies no per-planet speed, so we report "unknown" rather than fabricate a
     direction the engine never computed.
     """
@@ -368,7 +367,6 @@ def ecliptic_out_of_bounds(longitude: float, latitude: float, obliquity: float) 
     Compare it directly with sin(epsilon), avoiding an asin/degree round trip
     that can put even an in-plane ray outside its own bound. Supplied degree
     inputs are retained at 96 digits; no body-name shortcut or deadband.
-    https://github.com/liberfa/erfa/blob/v2.0.1/src/numat.c
     """
     ctx = mp.clone()
     ctx.dps = 96
@@ -388,7 +386,7 @@ EXALT_RULER_BY_SIGN: dict[str, str] = {
 }
 
 # Five essential-dignity weights used to score an almuten (Lilly / Ibn Ezra).
-_ALMUTEN_WEIGHTS = {
+ALMUTEN_WEIGHTS = {
     "domicile": DIGNITY_SCORE["rulership"],
     "exaltation": DIGNITY_SCORE["exaltation"],
     "triplicity": DIGNITY_SCORE["triplicity"],
@@ -411,7 +409,7 @@ def dignity_lords_at(
 
 
 # Chaldean (slowest-first) order — the deterministic tie-break for any almuten.
-_CHALDEAN_ORDER = ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon"]
+CHALDEAN_ORDER = ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon"]
 
 
 def _almuten_winner(totals: dict[str, int]) -> str | None:
@@ -427,7 +425,7 @@ def _almuten_winner(totals: dict[str, int]) -> str | None:
         totals,
         key=lambda p: (
             totals[p],
-            -_CHALDEAN_ORDER.index(p) if p in _CHALDEAN_ORDER else 0,
+            -CHALDEAN_ORDER.index(p) if p in CHALDEAN_ORDER else 0,
         ),
     )
 
@@ -441,7 +439,7 @@ def almuten_of(sign: str, degree_in_sign: Angle, is_day: bool) -> dict[str, Any]
     """
     lords = dignity_lords_at(sign, degree_in_sign, is_day)
     totals: dict[str, int] = {}
-    for dignity, weight in _ALMUTEN_WEIGHTS.items():
+    for dignity, weight in ALMUTEN_WEIGHTS.items():
         lord = lords[dignity]
         if lord:
             totals[lord] = totals.get(lord, 0) + weight
@@ -451,18 +449,18 @@ def almuten_of(sign: str, degree_in_sign: Angle, is_day: bool) -> dict[str, Any]
 def planetary_hour_sequence(day_ruler: str) -> list[str]:
     """The 24 planetary-hour rulers of one sunrise-to-sunrise day.
 
-    Hour 1 (the first after sunrise) is ruled by ``day_ruler`` — the planet of
+    Hour 1 (the first after sunrise) is ruled by day_ruler — the planet of
     the weekday — and each subsequent hour steps through the Chaldean
     (slowest-first) order. Indices 0–11 are the twelve day hours; 12–23 the
-    twelve night hours. Returns ``[]`` for a non-traditional ``day_ruler``.
+    twelve night hours. Returns [] for a non-traditional day_ruler.
 
     Cycling 24 hours lands the next day's first hour on the next weekday's
     planet — this is exactly why the days of the week run in their order.
     """
-    if day_ruler not in _CHALDEAN_ORDER:
+    if day_ruler not in CHALDEAN_ORDER:
         return []
-    start = _CHALDEAN_ORDER.index(day_ruler)
-    return [_CHALDEAN_ORDER[(start + offset) % 7] for offset in range(24)]
+    start = CHALDEAN_ORDER.index(day_ruler)
+    return [CHALDEAN_ORDER[(start + offset) % 7] for offset in range(24)]
 
 
 # Selected essential-dignity tally over five hylegic points. This mixed-table
@@ -479,10 +477,10 @@ def build_almuten_figuris(
 ) -> dict[str, Any]:
     """Selected essential-dignity tally over the available hylegic points.
 
-    ``points`` maps each point id (see :data:`ALMUTEN_FIGURIS_POINTS`) to a
-    ``{"sign", "degree_in_sign"}`` placement; only the points the engine could
+    points maps each point id (see ALMUTEN_FIGURIS_POINTS) to a
+    {"sign", "degree_in_sign"} placement; only the points the engine could
     supply are passed. Each point contributes the weighted essential-dignity
-    tally of :func:`almuten_of`; summing those tallies across every point names
+    tally of almuten_of; summing those tallies across every point names
     the selected tally's winner. The fixed Chaldean tie-break is shared with
     the per-degree almuten, not an instantaneous angular-speed comparison.
     """
@@ -522,13 +520,13 @@ def build_almuten_figuris(
             "method_id": "available_hylegic_points_essential_tally_v1",
             "source_profile": "mixed_dorothean_egyptian_lilly",
             "scope": "available_point_essential_dignities_only",
-            "dignity_weights": dict(_ALMUTEN_WEIGHTS),
+            "dignity_weights": dict(ALMUTEN_WEIGHTS),
             "triplicity_policy": "one_sect_primary_dorothean_ruler",
             "is_day": is_day,
             "bounds_policy": "egyptian",
             "face_policy": "chaldean",
             "tie_break_policy": "highest_total_then_fixed_chaldean_order",
-            "tie_break_order": list(_CHALDEAN_ORDER),
+            "tie_break_order": list(CHALDEAN_ORDER),
             "expected_points": list(ALMUTEN_FIGURIS_POINTS),
             "included_points": list(per_point),
             "missing_points": [
@@ -542,7 +540,6 @@ def build_almuten_figuris(
                     "title": "Abraham Ibn Ezra on Nativities and Continuous Horoscopy",
                     "author": "Abraham Ibn Ezra; edited and translated by Shlomo Sela",
                     "edition": "Brill 2014, Astrological Writings 4 / EJM 59",
-                    "url": "https://www.degruyterbrill.com/document/isbn/9789004258525/html",
                     "section": "Sefer ha-Moladot III.i.3(2–3), printed p.101",
                     "scope": (
                         "Five-place and 5/4/3/2/1 ingredients only; does not uniquely "
@@ -553,7 +550,6 @@ def build_almuten_figuris(
                     "title": "Solar Fire 9 User Guide",
                     "author": "Esoteric Technologies Pty Ltd",
                     "edition": "2014",
-                    "url": "https://alabe.com/ProgramDocs/SolarFire_v9.pdf#page=449",
                     "section": "10.12.2, printed p.449",
                     "scope": (
                         "Configurable selected-point dignity-summation software family; "
@@ -571,9 +567,9 @@ def domicile_ruler(sign: str) -> str | None:
 
 
 def dispositor_chain(planet: str, placements: dict[str, str]) -> dict[str, Any]:
-    """Follow the domicile-dispositor chain from ``planet``.
+    """Follow the domicile-dispositor chain from planet.
 
-    ``placements`` maps planet → the sign it occupies. Each planet is disposited
+    placements maps planet → the sign it occupies. Each planet is disposited
     by the ruler of its sign; the chain walks rulers until it reaches a planet in
     its own domicile (final dispositor) or revisits a planet (mutual-reception /
     longer loop). Returns the visited chain + terminal info.
@@ -715,12 +711,12 @@ MALEFICS = frozenset({"Mars", "Saturn"})
 # Of-sect benefic/malefic: by day Jupiter/Saturn are the diurnal pair, by night
 # Venus/Mars the nocturnal pair (the of-sect benefic helps most, of-sect malefic
 # harms least).
-_SECT_BENEFIC = {"day": "Jupiter", "night": "Venus"}
-_SECT_MALEFIC = {"day": "Saturn", "night": "Mars"}
+SECT_BENEFIC = {"day": "Jupiter", "night": "Venus"}
+SECT_MALEFIC = {"day": "Saturn", "night": "Mars"}
 
-_SIGN_INDEX = {sign: index for index, sign in enumerate(SIGNS)}
+SIGN_INDEX = {sign: index for index, sign in enumerate(SIGNS)}
 # Whole-sign aspect by sign distance (both directions fold to the same aspect).
-_WHOLE_SIGN_ASPECT = {
+WHOLE_SIGN_ASPECT = {
     0: "conjunction",
     2: "sextile",
     10: "sextile",
@@ -734,21 +730,21 @@ _WHOLE_SIGN_ASPECT = {
 
 def whole_sign_aspect(sign_a: str, sign_b: str) -> str | None:
     """Classical whole-sign aspect between two signs (None = aversion)."""
-    if sign_a not in _SIGN_INDEX or sign_b not in _SIGN_INDEX:
+    if sign_a not in SIGN_INDEX or sign_b not in SIGN_INDEX:
         return None
-    distance = (_SIGN_INDEX[sign_b] - _SIGN_INDEX[sign_a]) % 12
-    return _WHOLE_SIGN_ASPECT.get(distance)
+    distance = (SIGN_INDEX[sign_b] - SIGN_INDEX[sign_a]) % 12
+    return WHOLE_SIGN_ASPECT.get(distance)
 
 
 def overcomes(sign_a: str, sign_b: str) -> bool:
     """True if A overcomes B — A in the 10th sign from B (superior dexter square)."""
-    if sign_a not in _SIGN_INDEX or sign_b not in _SIGN_INDEX:
+    if sign_a not in SIGN_INDEX or sign_b not in SIGN_INDEX:
         return False
-    return (_SIGN_INDEX[sign_a] - _SIGN_INDEX[sign_b]) % 12 == 9
+    return (SIGN_INDEX[sign_a] - SIGN_INDEX[sign_b]) % 12 == 9
 
 
 # Exact Ptolemaic aspect angles, keyed by the aspect names ``_build_aspects`` emits.
-_ASPECT_ANGLES = {
+ASPECT_ANGLES = {
     "conjunction": 0.0,
     "sextile": 60.0,
     "square": 90.0,
@@ -833,7 +829,6 @@ def ptolemy_latitude_condition(
         "status": status,
         "latitude_a": first,
         "latitude_b": second,
-        "source_url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#24",
         "policy": "closed_ecliptic_hemispheres; separate_from_longitude_motion_and_full_application",
     }
 
@@ -847,12 +842,12 @@ def build_classical_patterns(
     latitudes: dict[str, float] | None = None,
     node_longitude: float | None = None,
 ) -> dict[str, Any]:
-    """``[古典格局]`` relational layer over the seven traditional planets.
+    """[古典格局] relational layer over the seven traditional planets.
 
     Aversion, overcoming (superior square), besiegement/enclosure by body,
     bonification/maltreatment, translation/collection of light and nodal bending.
-    Applying/separating checks need ephemeris ``speeds`` and nodal bending needs
-    ``node_longitude``; their blocks stay empty when the inputs are absent.
+    Applying/separating checks need ephemeris speeds and nodal bending needs
+    node_longitude; their blocks stay empty when the inputs are absent.
 
     Only structural configurations are emitted — *which* planets, *what* relation.
     Interpretation belongs to the assistant; the engine reports structure.
@@ -887,10 +882,9 @@ def build_classical_patterns(
         prev_p = ordered[(index - 1) % n]
         next_p = ordered[(index + 1) % n]
         within_orb = (
-            _angular_distance(planet["longitude"], prev_p["longitude"])
-            <= _ENCLOSURE_ORB
+            _angular_distance(planet["longitude"], prev_p["longitude"]) <= ENCLOSURE_ORB
             and _angular_distance(planet["longitude"], next_p["longitude"])
-            <= _ENCLOSURE_ORB
+            <= ENCLOSURE_ORB
         )
         if not within_orb:
             continue
@@ -920,7 +914,7 @@ def build_classical_patterns(
     aspect_motion: list[dict[str, Any]] = []
     for aspect in aspects:
         a, b = aspect.get("planet_a"), aspect.get("planet_b")
-        angle = _ASPECT_ANGLES.get(str(aspect.get("aspect") or ""))
+        angle = ASPECT_ANGLES.get(str(aspect.get("aspect") or ""))
         if (
             isinstance(a, str)
             and isinstance(b, str)
@@ -958,7 +952,7 @@ def build_classical_patterns(
             )
 
     def faster(p: str, q: str) -> bool:
-        """``p`` outpaces ``q`` in longitude (by absolute speed)."""
+        """p outpaces q in longitude (by absolute speed)."""
         vp, vq = speeds.get(p), speeds.get(q)
         return vp is not None and vq is not None and abs(vp) > abs(vq)
 
@@ -1045,8 +1039,8 @@ def build_classical_patterns(
                     )
 
     return {
-        "sect_benefic": _SECT_BENEFIC.get(chart_sect or ""),
-        "sect_malefic": _SECT_MALEFIC.get(chart_sect or ""),
+        "sect_benefic": SECT_BENEFIC.get(chart_sect or ""),
+        "sect_malefic": SECT_MALEFIC.get(chart_sect or ""),
         "aversions": aversions,
         "overcoming": overcoming,
         "besiegement": besiegement,
@@ -1055,7 +1049,6 @@ def build_classical_patterns(
         "light_configuration_policy": {
             "rule_id": "lilly1647_ponderosity_structural_candidates_v1",
             "source_edition": "William Lilly, Christian Astrology, London 1647",
-            "source_url": "https://wellcomecollection.org/works/s7z7c46y",
             "translation_definition_page": 111,
             "collection_judgement_page": 126,
             "weight_order": list(LIGHT_WEIGHT_ORDER),
@@ -1075,7 +1068,6 @@ def build_classical_patterns(
             "method": "one_sided_derivative_of_longitude_aspect_gap",
             "speed_unit": "degrees_per_day",
             "scope": "longitude_only_not_future_perfection_or_complete_original_text_conditions",
-            "source_url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#24",
         },
         "bonification": {
             k: v
@@ -1228,7 +1220,7 @@ PLANET_QUALITIES: dict[str, list[str]] = {
     "Saturn": ["cold", "dry"],
 }
 # Humor by dominant (thermal, hygral) quality pair.
-_HUMORS = {
+HUMORS = {
     ("hot", "moist"): {"humor": "sanguine", "cn": "多血质（风）"},
     ("hot", "dry"): {"humor": "choleric", "cn": "胆汁质（火）"},
     ("cold", "dry"): {"humor": "melancholic", "cn": "忧郁质（土）"},
@@ -1237,19 +1229,19 @@ _HUMORS = {
 
 
 def dodekatemorion(sign: str, degree_in_sign: float) -> str | None:
-    """12分度: the sign reached by advancing ``floor(degree / 2.5)`` signs from
+    """12分度: the sign reached by advancing floor(degree / 2.5) signs from
     the planet's own sign (each 30° sign carries all 12 in 2.5° steps)."""
-    if sign not in _SIGN_INDEX:
+    if sign not in SIGN_INDEX:
         return None
     step = int((degree_in_sign % 30.0) // 2.5)
-    return SIGNS[(_SIGN_INDEX[sign] + step) % 12]
+    return SIGNS[(SIGN_INDEX[sign] + step) % 12]
 
 
 # Ninth-part (九分部 / navamsa) opening sign by triplicity — the cardinal sign of
 # the placement's own element. Fire→Aries, Earth→Capricorn, Air→Libra, Water→
 # Cancer (the dominant Parashari convention, equivalent to the Hellenistic
 # ninth-part's triplicity reset). Pure geometry; no degree-ruler doctrine.
-_NINTH_PART_START = {
+NINTH_PART_START = {
     "Fire": "Aries",
     "Earth": "Capricorn",
     "Air": "Libra",
@@ -1262,17 +1254,17 @@ def ninth_part(sign: str, degree_in_sign: float) -> str | None:
 
     Each sign splits into nine 3°20′ parts; the first opens on the cardinal sign
     of the placement's triplicity and successive parts advance one sign
-    zodiacally. ``None`` for a non-zodiacal sign.
+    zodiacally. None for a non-zodiacal sign.
 
     This is the mapping in Rao (2000), section 6.2.9, not a certification of
     Hellenistic usage. Compare the supplied angle exactly: float division by
     30/9 can put 10° and 20° in the preceding part.
     """
-    start = _NINTH_PART_START.get(ELEMENT_BY_SIGN.get(sign, ""))
+    start = NINTH_PART_START.get(ELEMENT_BY_SIGN.get(sign, ""))
     if start is None:
         return None
     step = int((angle_fraction(degree_in_sign) % 30) * 9 // 30)
-    return SIGNS[(_SIGN_INDEX[start] + step) % 12]
+    return SIGNS[(SIGN_INDEX[start] + step) % 12]
 
 
 def _degree_position(degree_in_sign: float) -> str:
@@ -1336,7 +1328,7 @@ def build_temperament(
         }
     thermal = "hot" if tally["hot"] >= tally["cold"] else "cold"
     hygral = "moist" if tally["moist"] >= tally["dry"] else "dry"
-    humor = _HUMORS[(thermal, hygral)]
+    humor = HUMORS[(thermal, hygral)]
     return {"tally": tally, "thermal": thermal, "hygral": hygral, **humor}
 
 
@@ -1355,10 +1347,10 @@ def build_planet_classical(
     obliquity: float | None = None,
     source_ecliptic_coordinates: tuple[float, float] | None = None,
 ) -> dict[str, Any]:
-    """The per-planet ``classical`` entry surfaced on the chart payload.
+    """The per-planet classical entry surfaced on the chart payload.
 
-    Ecliptic longitude speed drives ``retrograde``; equatorial declination and
-    the same-frame obliquity drive ``out_of_bounds``. When an original tropical
+    Ecliptic longitude speed drives retrograde; equatorial declination and
+    the same-frame obliquity drive out_of_bounds. When an original tropical
     ecliptic ray is supplied, its cone decision precedes rounded declination.
     Missing inputs remain unknown rather than becoming zero.
     """

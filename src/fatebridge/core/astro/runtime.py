@@ -26,17 +26,15 @@ def native_ephemeris_errors() -> tuple[type[BaseException], ...]:
 # Log the first swisseph runtime failure so operators notice a broken ephemeris
 # install instead of silently degrading to the approximation engine. Further
 # failures are suppressed to avoid flooding the logs.
-_SWE_RUNTIME_FAILURE_LOGGED = False
+SWE_RUNTIME_FAILURE_LOGGED = False
 
 
 def _log_swe_runtime_failure(call: str, error: BaseException) -> None:
-    global _SWE_RUNTIME_FAILURE_LOGGED
-    if _SWE_RUNTIME_FAILURE_LOGGED:
+    global SWE_RUNTIME_FAILURE_LOGGED
+    if SWE_RUNTIME_FAILURE_LOGGED:
         return
-    _SWE_RUNTIME_FAILURE_LOGGED = True
+    SWE_RUNTIME_FAILURE_LOGGED = True
     logger.warning(
-        "Swiss Ephemeris %s raised %s; inspect calculation provenance "
-        "or error for the outcome. Subsequent failures will be suppressed.",
-        call,
-        type(error).__name__,
+        f"Swiss Ephemeris {call} raised {type(error).__name__}; inspect calculation provenance "
+        "or error for the outcome. Subsequent failures will be suppressed."
     )

@@ -261,12 +261,6 @@ class ZiweiConditionAnnotationRevision(PartialOutput):
 
 class ZiweiConditionSourceRevision(PartialOutput):
     id: str | None = None
-    source_manifest_sha256: str | None = None
-    first_reading_sha256: str | None = None
-    primary_review_sha256: str | None = None
-    peer_review_sha256: str | None = None
-    prior_collation_sha256: str | None = None
-    prior_compiled_sha256: str | None = None
     changed_clause_ids: list[str] | None = None
     isolated_model_readers: int | None = None
     external_human_experts: Literal[0] | None = None

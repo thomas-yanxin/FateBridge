@@ -37,7 +37,6 @@ class FanfuEvidence(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     regions: list[FanfuRegion] | None = None
     moving_line_relations: list[FanfuLine] | None = None
     explicit_body_example: FanfuBodyExample | None = None

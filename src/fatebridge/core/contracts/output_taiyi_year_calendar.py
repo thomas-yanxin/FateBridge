@@ -30,7 +30,6 @@ class TaiyiHistoricalYearCalendar(PartialOutput):
     calendar_authors: str | None = None
     calendar_edition: str | None = None
     source_url: str | None = None
-    source_data_sha256: str | None = None
     calendar_tradition: str | None = None
     supported_start: str | None = None
     supported_end_exclusive: str | None = None

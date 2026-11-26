@@ -92,7 +92,6 @@ def earth_rotation_policy(
                 "native_longterm_variation_retained": True,
                 "absolute_accuracy_certified": False,
                 "derivative_continuity_certified": False,
-                "source_url": "https://www.astro.com/swisseph/swisseph.htm",
                 "source_section": "6.1",
                 "attribution": "FateBridge window placement and computed constants; Swiss documents the constant-offset continuity method",
             }
@@ -123,10 +122,6 @@ def earth_rotation_policy(
         "scope": "Managed sidereal time, houses, horizons and the two published solar-event definitions",
         "measured_eop_applied": False,
         "precision_scope": "Finite model/frame/observer/root agreement; no measured polar motion, remote absolute accuracy, derivative or all-input certification",
-        "source_url": "https://iers-conventions.obspm.fr/content/chapter5/icc5.pdf",
-        "origin_source_url": "https://github.com/liberfa/erfa/blob/v2.0.1/src/gst06.c",
-        "frame_source_url": "https://www.iausofa.org/2023-10-11c",
-        "native_frame_source_url": "https://github.com/aloistr/swisseph/blob/175e1fcb3108bcd5c0d146c803f51dcf23508012/swephlib.c",
     }
     reference = ut1_reference(tt, julian_day_ut1)
     if reference is not None and tt is not None and julian_day_ut1 is not None:
@@ -186,7 +181,6 @@ def earth_rotation_policy(
                         else "IAU2006_2000A_model_equinox"
                     ),
                     "local_frame_policy": "same_polar_motion_and_GAST_for_receiver_and_geodetic_ENU",
-                    "orientation_asset_sha256": reference["orientation_asset_sha256"],
                     "tidal_model_id": reference["tidal_model_id"],
                     "cpo_application_policy": (
                         "Source-year1984 onwards, with four qualified TT nodes; "

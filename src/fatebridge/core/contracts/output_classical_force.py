@@ -24,7 +24,6 @@ class ForceSource(PartialOutput):
     url: str | None = None
     pdf_pages: list[int] | None = None
     printed_pages: list[int] | None = None
-    source_sha256: str | None = None
 
 
 class ForceRoot(PartialOutput):

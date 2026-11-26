@@ -10,8 +10,8 @@ POLICY_ID = "consultation_boundaries_v1"
 BLOCKED_HORARY_CATEGORIES = frozenset({"death", "health", "pregnancy"})
 BLOCKED_ELECTION_TOPICS = frozenset({"surgery"})
 
-_INTENT_FIELDS = frozenset({"question", "query", "topic", "intent"})
-_PATTERNS = tuple(
+INTENT_FIELDS = frozenset({"question", "query", "topic", "intent"})
+PATTERNS = tuple(
     re.compile(pattern)
     for pattern in (
         r"寿命|寿元|死期|死亡|离世|去世|生死|阳寿|阴寿|致命|绝症|大限将至|寿终|夭折|短寿|延寿|续命",
@@ -56,9 +56,9 @@ def restricted_intent_path(data: Mapping[str, object]) -> str | None:
     elif isinstance(topic, str) and _normalize(topic) in BLOCKED_ELECTION_TOPICS:
         return "topic_id"
     for field_name, submitted_value in data.items():
-        if field_name in _INTENT_FIELDS and isinstance(submitted_value, str):
+        if field_name in INTENT_FIELDS and isinstance(submitted_value, str):
             normalized_intent = _normalize(submitted_value)
-            if any(pattern.search(normalized_intent) for pattern in _PATTERNS):
+            if any(pattern.search(normalized_intent) for pattern in PATTERNS):
                 return field_name
         elif isinstance(submitted_value, Mapping):
             nested_path = restricted_intent_path(submitted_value)

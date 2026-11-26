@@ -288,7 +288,6 @@ def build_jinkou_snapshot_text(
                         f"规则来源：{jinkou['ruleset']['source_title']}；"
                         f"{jinkou['ruleset']['id']} / {jinkou['ruleset']['version']}"
                     ),
-                    *jinkou["ruleset"]["source_urls"],
                     "局部转录规则，未完成全书验收；现实预测效度未经验证。",
                 ]
             ),

@@ -106,7 +106,6 @@ class CanpingSolarContext(PartialOutput):
     timezone: str | None = None
     horizon_years: int | None = None
     boundary_count: int | None = None
-    boundary_receipts_sha256: str | None = None
     observed_models: list[str] | None = None
     derived_event_years: list[int] | None = None
     de440_projection_profile_used: bool | None = None

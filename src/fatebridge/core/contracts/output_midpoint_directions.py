@@ -86,7 +86,6 @@ class ProgressionKeySourceComparison(PartialOutput):
     selected_key_from_compared_source: bool | None = None
     computed_for_current_chart: bool | None = None
     comparison_unit: str | None = None
-    source_record_sha256: str | None = None
     source: GeometrySource | None = None
     operations: list[PrintedTimeOperation] | None = None
     printed_arithmetic_consistent: bool | None = None

@@ -15,6 +15,7 @@ from fatebridge.application.domain_validators import (
 from fatebridge.application.meihua_clock_binding import meihua_time_invoke
 from fatebridge.application.tool_spec import EvidenceViews, ServiceInput, ToolSpec
 from fatebridge.core.contracts.output_meihua_cast import MeihuaCastOutput
+from fatebridge.core.liuyao.liuyao_casting import needs_random_coin_cast
 from fatebridge.core.requests.compatibility import SukuyoCompatibilityRequest
 from fatebridge.core.requests.divination import (
     CanpingRequest,
@@ -31,7 +32,7 @@ from fatebridge.core.requests.divination import (
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.catalog.detail_views import traditional_detail_view
 
-_MEIHUA_DETAIL_VIEW = partial(traditional_detail_view, keep_lunar_meihua=True)
+MEIHUA_DETAIL_VIEW = partial(traditional_detail_view, keep_lunar_meihua=True)
 
 calculate_canping_analysis = lazy_service(
     "fatebridge.services.divination", "calculate_canping_analysis"
@@ -92,8 +93,6 @@ calculate_tongshefa_analysis = lazy_service(
 
 
 def _sixyao_needs_seed(data: dict[str, ServiceInput]) -> bool:
-    from fatebridge.core.liuyao.liuyao_casting import needs_random_coin_cast
-
     return needs_random_coin_cast(data)
 
 
@@ -164,7 +163,7 @@ SPECS: list[ToolSpec] = [
         cli_request_file=True,
         evidence_views_builder=_meihua_analysis_views,
         output_validators=(validate_meihua_clock,),
-        detail_view=_MEIHUA_DETAIL_VIEW,
+        detail_view=MEIHUA_DETAIL_VIEW,
     ),
     ToolSpec(
         key="meihua_cast",
@@ -191,7 +190,7 @@ SPECS: list[ToolSpec] = [
         mcp_name="meihua_cast",
         cli_request_file=True,
         evidence_views_builder=_meihua_cast_views,
-        detail_view=_MEIHUA_DETAIL_VIEW,
+        detail_view=MEIHUA_DETAIL_VIEW,
     ),
     ToolSpec(
         key="tongshefa",

@@ -13,30 +13,15 @@ from fatebridge.core.astro.analytic_observer import (
     LIGHT_TIME_METHOD,
     AnalyticObserver,
 )
-from fatebridge.core.astro.de441_source import MANIFEST_SHA256, source_details
-from fatebridge.core.astro.nutation import (
-    COEFFICIENT_SHA256 as NUTATION_COEFFICIENT_SHA256,
-)
-from fatebridge.core.astro.reference_frames import (
-    COEFFICIENT_SHA256 as FRAME_COEFFICIENT_SHA256,
-)
+from fatebridge.core.astro.de441_source import source_details
 from fatebridge.core.astro.reference_frames import (
     NATIVE_TROPICAL_MODEL,
     mean_j2000_apparent_ecliptic,
 )
-from fatebridge.core.astro.tdb import COEFFICIENT_SHA256 as TDB_COEFFICIENT_SHA256
 
 MODEL_ID = "fatebridge_de441_solar_v1"
 PROVIDER = "jpl_de441"
-# Static identity can describe a possible fallback before any data are needed.
-# Calculated positions and provenance still verify the selected source bytes.
-CACHE_IDENTITY = (
-    MODEL_ID,
-    MANIFEST_SHA256,
-    FRAME_COEFFICIENT_SHA256,
-    NUTATION_COEFFICIENT_SHA256,
-    TDB_COEFFICIENT_SHA256,
-)
+CACHE_IDENTITY = (MODEL_ID, NATIVE_TROPICAL_MODEL)
 
 
 def solar_longitude(jd_tt: float) -> float:
@@ -53,9 +38,6 @@ def model_details() -> dict[str, object]:
         **source_details(),
         "model_id": MODEL_ID,
         "frame_model": NATIVE_TROPICAL_MODEL,
-        "frame_coefficient_sha256": FRAME_COEFFICIENT_SHA256,
-        "nutation_coefficient_sha256": NUTATION_COEFFICIENT_SHA256,
-        "tdb_coefficient_sha256": TDB_COEFFICIENT_SHA256,
         "time_argument": "TT reception; full geocentric ERFA Fairhead TDB for source states",
         "light_time_method": LIGHT_TIME_METHOD,
         "observer_aberration_method": ABERRATION_METHOD,

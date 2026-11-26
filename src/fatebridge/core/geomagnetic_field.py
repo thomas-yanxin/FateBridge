@@ -4,9 +4,6 @@ The Schmidt recurrence follows DLMF14.10.3 after normalization; its latitude
 derivative is propagated analytically. For every positive order we carry P/cos
 instead of dividing at the poles. The NOAA model, coefficients and surface
 uncertainties are separate from floating-point evaluation accuracy.
-
-https://doi.org/10.25923/prbc-s316 (equations3,5,7-12,17,19)
-https://dlmf.nist.gov/14.10.E3
 """
 
 from __future__ import annotations

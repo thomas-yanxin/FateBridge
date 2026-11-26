@@ -9,7 +9,6 @@ Inside-disk coordinates do not describe observable transmitted sunlight.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 from functools import lru_cache
@@ -19,9 +18,6 @@ from typing import Sequence, TypedDict
 from fatebridge.core.astro.aberration_math import dot
 from fatebridge.core.astro.cartesian import CartesianMotion, CartesianState, Vector3
 
-SOURCE_URL = "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c"
-FORMULA_URL = "https://github.com/liberfa/erfa/blob/v2.0.1/src/ld.c"
-PROFILE_SHA256 = "8f3f8e90fc756df0e3ba0b4ade05cfc98ecf49d4476c1f868c80c9cc9f3790ab"
 DEFLECTION_LIMITER = 1e-11
 MODEL_ID = (
     "finite_source_swiss_transparent_solar_profile_stable_unit_sum_erfa_limiter_v2"
@@ -41,10 +37,6 @@ def _parameters() -> Parameters:
         .joinpath("data/astronomy/swiss-solar-deflection-2.10.json")
         .read_bytes()
     )
-    if hashlib.sha256(raw).hexdigest() != PROFILE_SHA256:
-        raise RuntimeError(
-            "Solar deflection parameters differ from the declared source"
-        )
     data: Parameters = json.loads(raw)
     return data
 

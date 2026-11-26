@@ -42,7 +42,6 @@ RAYS = {
 BODIES = ("Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn")
 SampledPlanetMotion = dict[str, float]
 TtRootBracket = tuple[float, float]
-SOURCE_URL = "https://wellcomecollection.org/works/s7z7c46y"
 
 
 class PlanetMotionSampler(Protocol):
@@ -274,7 +273,6 @@ def solve_lunar_contacts(
         "scan_step_days": 1 / 48,
         "scan_guard_days": 7,
         "monotonicity_evidence": "Positive velocities and bounded unwrapped increments at scan endpoints; continuous-interval proof is not established",
-        "source_url": SOURCE_URL,
         "source_scope": "Lilly 1647 p.112 temporal/sign criterion operationalized as future exact longitude contact before ingress; interpretation of apply/orbs and full judgement not certified",
     }
 

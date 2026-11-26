@@ -174,7 +174,6 @@ class CanpingTiming(PartialOutput):
     ruleset_version: str | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     source_status: str | None = None
     calendar_scope: str | None = None

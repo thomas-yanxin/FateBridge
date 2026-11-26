@@ -16,8 +16,6 @@ from fatebridge.application.tool_spec import (
 from fatebridge.core.method_contracts import MethodContract
 from fatebridge.core.psychometrics.ipip_big_five import (
     METHOD_ID,
-    SCALE_URL,
-    SCORING_URL,
     IpipBigFiveOutput,
     IpipBigFiveRequest,
 )
@@ -112,7 +110,7 @@ SPECS: list[ToolSpec] = [
                     "src/fatebridge/core/psychometrics/ipip_big_five.py",
                     "src/fatebridge/services/psychometrics.py",
                 ),
-                source_refs=(SCALE_URL, SCORING_URL),
+                source_refs=("docs/algorithm-coverage.md",),
                 selector_fields=("action", "domain", "include_item_breakdown"),
                 error_sources=(),
                 validation_status="deterministic_arithmetic_verified",

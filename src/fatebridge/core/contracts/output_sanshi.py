@@ -82,7 +82,6 @@ class NobleSourceComparison(PartialOutput):
     source_edition: str | None = None
     source_url: str | None = None
     facsimile_page: int | None = None
-    facsimile_sha256: str | None = None
     source_branch: str | None = None
     matches: bool | None = None
 
@@ -92,7 +91,6 @@ class NobleSourceAssessment(PartialOutput):
     reason: str | None = None
     ruleset_id: str | None = None
     ruleset_version: str | None = None
-    source_freeze_sha256: str | None = None
     scope: str | None = None
     taiyi_mode: str | None = None
     applicability: str | None = None

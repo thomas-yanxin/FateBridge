@@ -41,7 +41,6 @@ class ClashConditions(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     clauses: list[ClashClause] | None = None
     textual_issues: list[dict[str, OpenJsonValue]] | None = None
     lines: list[LineClash] | None = None

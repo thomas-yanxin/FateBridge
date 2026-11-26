@@ -9,14 +9,10 @@ from __future__ import annotations
 
 import math
 from importlib.metadata import version
-from typing import Any, Dict, Sequence
+from typing import Any, Sequence
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.astro.continuous_lahiri import (
-    COEFFICIENT_SHA256,
-    METHOD_ID,
-    project_state,
-)
+from fatebridge.core.astro.continuous_lahiri import METHOD_ID, project_state
 from fatebridge.core.astro.lunar_motion import SOURCE_VERSION
 from fatebridge.core.astro.motion_source_window import observed_windows
 from fatebridge.core.astro.native_identity import binding_distribution_version
@@ -57,15 +53,14 @@ def continuous_state_evidence(
     model: str,
     *,
     source_trace: PhysicalEphemerisTrace,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Compute the continuous alternative while preserving the native center.
 
     Managed callers own traditional SIDM_LAHIRI. No path restoration or
     sidereal-mode mutation is introduced by this auxiliary transaction.
     """
-    policy: Dict[str, Any] = {
+    policy: dict[str, Any] = {
         "model_id": METHOD_ID,
-        "coefficient_sha256": COEFFICIENT_SHA256,
         "epoch_jd_tt": julian_day_tt,
         "ephemeris_model": model,
         "reference_frame": "continuous_scalar_obliquity_lahiri_ecliptic_of_date",

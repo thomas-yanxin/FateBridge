@@ -14,7 +14,6 @@ class JinkouStrengthWitness(PartialOutput):
     catalog_id: str | None = None
     catalog_url: str | None = None
     scan_url: str | None = None
-    source_sha256: str | None = None
     source_bytes: int | None = None
     source_pdf_pages: int | None = None
     original_pdf_pages: list[int] | None = None
@@ -52,7 +51,6 @@ class JinkouStrengthSource(PartialOutput):
     source_url: str | None = None
     source_section: str | None = None
     scan_source_url: str | None = None
-    scan_source_sha256: str | None = None
     scan_pdf_pages: list[int] | None = None
     scan_collation_status: Literal["unresolved_diagram_prose_difference"] | None = None
     daily_five_states_adjudicated: Literal[False] | None = None
@@ -71,7 +69,6 @@ class JinkouStrengthSource(PartialOutput):
 
 class JinkouUseSource(PartialOutput):
     scan_source_url: str | None = None
-    scan_source_sha256: str | None = None
     no_control_pdf_page: int | None = None
     no_control_footer_page: int | None = None
     polarity_pdf_pages: list[int] | None = None

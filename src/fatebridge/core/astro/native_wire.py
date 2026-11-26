@@ -10,6 +10,9 @@ from typing import Any, TypeGuard
 
 from pydantic import JsonValue
 
+from fatebridge.core.astro.birth import AstroBirthInfo, NativeSolarBirthInfo
+from fatebridge.core.astro.physical_epoch import PhysicalEpoch
+from fatebridge.core.astro.time_scales import EphemerisTime
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.utils.civil_time import (
@@ -67,9 +70,6 @@ def decode_result(value: object) -> Any:
 
 def encode(value: object) -> JsonValue:
     """Typed JSON only; maps cannot impersonate protocol type envelopes."""
-    from fatebridge.core.astro.birth import AstroBirthInfo, NativeSolarBirthInfo
-    from fatebridge.core.astro.physical_epoch import PhysicalEpoch
-
     if value is None or isinstance(value, (str, bool, int)):
         return value
     if isinstance(value, float):
@@ -154,16 +154,11 @@ def decode(value: Any) -> Any:
             moment = named
         return moment.replace(fold=value[3])
     if tag in {"birth", "native_solar_birth"} and len(value) == 2:
-        from fatebridge.core.astro.birth import AstroBirthInfo, NativeSolarBirthInfo
-
         birth_type = (
             NativeSolarBirthInfo if tag == "native_solar_birth" else AstroBirthInfo
         )
         return birth_type(**decode(value[1]))
     if tag == "physical_epoch" and len(value) in (5, 6):
-        from fatebridge.core.astro.physical_epoch import PhysicalEpoch
-        from fatebridge.core.astro.time_scales import EphemerisTime
-
         source = None
         if len(value) == 6:
             point = value[5]

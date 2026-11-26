@@ -10,7 +10,6 @@ class CalendarPrecisionSource(PartialOutput):
     publisher: str | None = None
     title: str | None = None
     url: str | None = None
-    raw_sha256: str | None = None
     retrieved_on: str | None = None
 
 
@@ -78,7 +77,6 @@ class MeihuaSolarDateEvent(PartialOutput):
 class MeihuaSolarDateReference(PartialOutput):
     profile_id: str | None = None
     version: str | None = None
-    loaded_profile_sha256: str | None = None
     comparison_offset: str | None = None
     source_scope: dict[str, JsonValue] | None = None
     time_basis_source: CalendarPrecisionSource | None = None

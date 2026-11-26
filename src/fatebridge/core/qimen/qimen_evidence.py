@@ -31,11 +31,6 @@ from fatebridge.core.qimen.qimen_profiles import (
     star_season_state,
 )
 from fatebridge.core.qimen.qimen_punishment import palace_punishment
-from fatebridge.core.qimen.qimen_sources import (
-    SCAN_SOURCE,
-    YANYI_FULL_VIEW,
-    YANYI_VOLUMES,
-)
 from fatebridge.core.qimen.qimen_stem_context import build_stem_context
 from fatebridge.core.qimen.qimen_three_deceptions import build_three_deceptions
 from fatebridge.core.qimen.qimen_time_conditions import build_hour_branch_tomb
@@ -43,7 +38,6 @@ from fatebridge.core.qimen.qimen_tombs import palace_wonder_tombs
 from fatebridge.utils.data import STEM_ELEMENTS
 from fatebridge.utils.timezones import timezone_rules_metadata
 
-SOURCE = YANYI_VOLUMES[2]
 RULESET_ID = "qimen_rotating_kun2_v2"
 STAR_ELEMENTS = {
     "天蓬": "水",
@@ -137,7 +131,6 @@ def _source_disagreements(
                     {
                         "case_id": case_id,
                         "field": "raw_door_gong",
-                        "source": SCAN_SOURCE,
                         "source_section": "卷四·直使加时宫数表",
                         "source_scan_page": page,
                         "source_value": printed_gua,
@@ -156,7 +149,6 @@ def _source_disagreements(
                 {
                     "case_id": "de-shi-yin3-renchen",
                     "field": "door",
-                    "source": SCAN_SOURCE,
                     "source_section": "卷二·三奇得使",
                     "source_scan_page": 19,
                     "source_value": "杜门",
@@ -183,7 +175,6 @@ def _source_disagreements(
                 {
                     "case_id": "vol2-yang5-renshen-geng-palace",
                     "field": "heaven_geng_palace",
-                    "source": SCAN_SOURCE,
                     "source_section": "卷二·伏干格",
                     "source_scan_page": 31,
                     "source_value": "离",
@@ -191,7 +182,6 @@ def _source_disagreements(
                     "status": "unresolved_scan_rule_disagreement",
                     "supporting_source": {
                         "title": "古今图书集成·艺术典第705卷·释天乙伏干格",
-                        "source": "https://zh.wikisource.org/w/index.php?title=Page:Gujin_Tushu_Jicheng,_Volume_478_(1700-1725).djvu/127&oldid=1899797",
                         "source_value": "坤",
                         "scope": "另一引文写二宫；不能消除所选遁甲演义影印写九宫的差异，日甲身份另待核",
                     },
@@ -217,15 +207,9 @@ def enrich_qimen_evidence(
             "title": "时家转盘，天禽及中干寄坤二",
             "author": "FateBridge contributors",
             "classical_author": "明·程道生",
-            "source": YANYI_FULL_VIEW,
             "source_revision_scope": "individual_volume_revisions",
-            "volume_sources": [
-                {"volume": volume, "source": source}
-                for volume, source in YANYI_VOLUMES.items()
-            ],
             "source_kind": "online_transcription_with_selected_scan_comparison",
             "scan_collation": {
-                "source": SCAN_SOURCE,
                 "pages": [
                     7,
                     13,
@@ -361,7 +345,6 @@ def enrich_qimen_evidence(
     trace: list[dict[str, object]] = [
         {
             "rule_id": "leaders",
-            "source": YANYI_VOLUMES[1],
             "section": "卷一·时家奇门／烟波钓叟赋",
             "inputs": {
                 "day_ganzhi": board["day_ganzhi"],
@@ -374,7 +357,6 @@ def enrich_qimen_evidence(
     trace.append(
         {
             "rule_id": "solar_time_adjustment",
-            "source": "https://www.astro.com/swisseph/swephprg.htm",
             "section": "现代均时差与钟表标签修正，非原典历法认证",
             "outputs": dict(board["calendar_policy"]["solar_time_adjustment"]),
             "evidence_paths": ["qimen.calendar_policy.solar_time_adjustment"],
@@ -383,7 +365,6 @@ def enrich_qimen_evidence(
     trace.append(
         {
             "rule_id": "ju_resolution",
-            "source": YANYI_VOLUMES[1],
             "section": (
                 "卷一·超接引例（四库影印第13页）"
                 if board["ju_method"] == "zhirun"
@@ -401,7 +382,6 @@ def enrich_qimen_evidence(
         trace.append(
             {
                 "rule_id": "ju_table",
-                "source": SCAN_SOURCE,
                 "section": "卷四·阴阳二遁十八局图题",
                 "source_scan_pages": list(range(63, 72)),
                 "inputs": {"ju_term": board["ju_term"], "yuan": board["yuan"]},
@@ -415,10 +395,6 @@ def enrich_qimen_evidence(
     trace.append(
         {
             "rule_id": "chapter_profiles",
-            "source": YANYI_FULL_VIEW,
-            "sources": list(
-                dict.fromkeys(profile["source"] for profile in profiles.values())
-            ),
             "section": f"{profiles['god']['section']}；{profiles['season']['section']}；{profiles['wonder_tomb']['section']}；{profiles['six_instrument_punishment']['section']}；{profiles['door_palace_relation']['section']}",
             "inputs": {
                 "god_profile": board["god_profile"],
@@ -475,7 +451,6 @@ def enrich_qimen_evidence(
             ),
             "star_season_profile": board["season_profile"],
             "star_season_source_section": profiles["season"]["section"],
-            "star_season_source": profiles["season"]["source"],
             "star_season_relation": star_season_relation(
                 STAR_ELEMENTS[palace["star"]], month_element
             ),
@@ -487,17 +462,6 @@ def enrich_qimen_evidence(
         trace.append(
             {
                 "rule_id": "palace_relations",
-                "source": YANYI_FULL_VIEW,
-                "sources": list(
-                    dict.fromkeys(
-                        [
-                            YANYI_VOLUMES[1],
-                            YANYI_VOLUMES[2],
-                            profiles["season"]["source"],
-                            evidence["god_interpretation"]["source"],
-                        ]
-                    )
-                ),
                 "section": f"门宫关系：卷一·烟波钓叟赋及卷二·门迫宫迫；九星旺衰：{profiles['season']['section']}；神义：{evidence['god_interpretation']['section']}；六仪击刑：{profiles['six_instrument_punishment']['section']}",
                 "evidence_paths": [
                     path + ".door",
@@ -522,7 +486,6 @@ def enrich_qimen_evidence(
                     "evidence_paths": [path],
                     "facts": facts,
                     "traditional_meaning": meaning,
-                    "source": SOURCE,
                     "section": "卷二·"
                     + {
                         "door_pressure": "门迫宫迫",
@@ -625,7 +588,7 @@ def enrich_qimen_evidence(
                         meaning,
                     )
     outer = [palace for palace in board["palaces"] if palace["trigram"] != "中"]
-    hour_branch_tomb = build_hour_branch_tomb(board["time_ganzhi"], source=SOURCE)
+    hour_branch_tomb = build_hour_branch_tomb(board["time_ganzhi"])
     board["structure"] = {
         "hour_branch_tomb": hour_branch_tomb["matched"],
         "stars_fuyin": all(p["heaven_origin_trigram"] == p["trigram"] for p in outer),
@@ -648,7 +611,6 @@ def enrich_qimen_evidence(
     trace.append(
         {
             "rule_id": "structure",
-            "source": SOURCE,
             "section": "卷二·五不遇／伏吟格／反吟格",
             "inputs": {"day_stem": day, "hour_stem": hour},
             "outputs": dict(board["structure"]),
@@ -664,13 +626,9 @@ def enrich_qimen_evidence(
             pattern["qualification"]["source_disagreements"] = list(
                 board["source_disagreements"]
             )
-    day_hour_context, stem_patterns = build_stem_context(
-        board, leader=leader, source=SOURCE
-    )
+    day_hour_context, stem_patterns = build_stem_context(board, leader=leader)
     calendar_stems = resolve_calendar_stems(seed)
-    calendar_patterns = match_calendar_stems(
-        board, calendar_stems, leader=leader, source=SOURCE
-    )
+    calendar_patterns = match_calendar_stems(board, calendar_stems, leader=leader)
     stem_context = {
         **day_hour_context,
         **calendar_stems,
@@ -681,7 +639,6 @@ def enrich_qimen_evidence(
     trace.append(
         {
             "rule_id": "hour_branch_tomb",
-            "source": SOURCE,
             "section": hour_branch_tomb["source_section"],
             "inputs": {"literal_hour_ganzhi": board["time_ganzhi"]},
             "outputs": hour_branch_tomb,
@@ -696,7 +653,6 @@ def enrich_qimen_evidence(
     trace.append(
         {
             "rule_id": "day_hour_stem_identity",
-            "source": SOURCE,
             "section": "卷二·伏干格／飞干格／小隔并岁隔月隔日隔时隔",
             "inputs": {
                 "day_ganzhi": board["day_ganzhi"],
@@ -709,7 +665,6 @@ def enrich_qimen_evidence(
     trace.append(
         {
             "rule_id": "calendar_stem_anchors",
-            "source": SOURCE,
             "section": "卷二·小隔并岁隔月隔日隔时隔·岁格／月格",
             "inputs": {
                 "civil_datetime": seed.input_isoformat(),
@@ -725,16 +680,13 @@ def enrich_qimen_evidence(
     trace.extend(
         {
             "rule_id": p["rule_id"],
-            "source": p["source"],
             "section": p["section"],
             "evidence_paths": p["evidence_paths"],
             "outputs": {"facts": p["facts"], "qualification": p["qualification"]},
         }
         for p in [*stem_patterns, *calendar_patterns]
     )
-    combinations = build_combinations(
-        board, leader=leader, source=SOURCE, existing_patterns=patterns
-    )
+    combinations = build_combinations(board, leader=leader, existing_patterns=patterns)
     patterns.extend(combinations)
     three_deceptions = build_three_deceptions(board, patterns)
     patterns.extend(three_deceptions)
@@ -743,7 +695,6 @@ def enrich_qimen_evidence(
     trace.append(
         {
             "rule_id": "five_jia_contexts",
-            "source": SOURCE,
             "section": "卷二·三诈五假·五假",
             "inputs": {
                 "profile_id": profiles["five_jia"]["id"],
@@ -769,7 +720,6 @@ def enrich_qimen_evidence(
     trace.append(
         {
             "rule_id": "three_deceptions_contexts",
-            "source": SOURCE,
             "section": "卷二·三诈五假·三诈",
             "inputs": {
                 "profile_id": profiles["three_deceptions"]["id"],
@@ -802,7 +752,6 @@ def enrich_qimen_evidence(
     trace.extend(
         {
             "rule_id": p["rule_id"],
-            "source": p["source"],
             "section": p["section"],
             "evidence_paths": p["evidence_paths"],
             "outputs": {"facts": p["facts"], "qualification": p["qualification"]},

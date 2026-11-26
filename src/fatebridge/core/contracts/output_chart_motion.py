@@ -232,7 +232,6 @@ class DecimalApparentReduction(PartialOutput):
     ephemeris_model: Literal["swieph", "jpl"] | None = None
     center_interpolation_branch: SolarBranchGeometry | None = None
     precision_decimal_digits: Literal[50] | None = None
-    solar_mass_profile_sha256: str | None = None
     frame_basis_bodies: list[str] | None = None
     sample_count: int | None = None
     maximum_frame_orthogonality_error: float | None = None

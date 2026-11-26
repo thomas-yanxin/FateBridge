@@ -21,7 +21,6 @@ from fatebridge.core import de440_solar
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.cartesian import CartesianState, Vector3
 from fatebridge.core.astro.de441_source import MODEL_ID as DE441_MODEL_ID
-from fatebridge.core.astro.de441_source import SOURCE_URL as DE441_SOURCE_URL
 from fatebridge.core.astro.de441_source import SOURCE_VERSION as DE441_SOURCE_VERSION
 from fatebridge.core.astro.de441_source import barycentric_state
 from fatebridge.core.astro.jpl_kinematics import source_kinematics
@@ -32,8 +31,8 @@ from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.core.solar_source_types import SolarSourceReference
 
 SOLAR_SOURCE_POLICY = "fatebridge.solar_horizon_source_selection.v2"
-_DE440_START_TT = date(1700, 1, 1).toordinal() + 1721424.5
-_DE440_END_TT = date(2301, 1, 1).toordinal() + 1721424.5
+DE440_START_TT = date(1700, 1, 1).toordinal() + 1721424.5
+DE440_END_TT = date(2301, 1, 1).toordinal() + 1721424.5
 
 
 @dataclass(frozen=True)
@@ -86,7 +85,7 @@ def select_solar_source(
         return FileSolarSource(Path(module.get_current_file_data(0)[0]))
     if require_data_files:
         return NativeSolarSource(2)  # SEFLG_SWIEPH; callers reject a native fallback.
-    if _DE440_START_TT <= start_tt <= end_tt < _DE440_END_TT:
+    if DE440_START_TT <= start_tt <= end_tt < DE440_END_TT:
         return PackagedSolarSource.DE440
     return PackagedSolarSource.DE441
 
@@ -165,12 +164,11 @@ def precise_solar_direction(
 
 
 def solar_source_reference(model_id: str, native_version: str) -> SolarSourceReference:
-    """Published source identity, separate from private coefficient digests."""
+    """Published source identity."""
     if model_id == PackagedSolarSource.DE440.value:
         return {
             "author": "NASA/JPL; Park, Folkner, Williams and Boggs",
             "source_version": "DE440 (2020; published 2021)",
-            "source_url": "https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de440.bsp",
             "calculation_library": "FateBridge original-record reader; SOFA/ERFA optics",
             "time_argument": "TDB from declared TT via geocentric Fairhead model",
             "coefficient_representation": "original type2 coefficient records, lossless storage",
@@ -180,7 +178,6 @@ def solar_source_reference(model_id: str, native_version: str) -> SolarSourceRef
         return {
             "author": "NASA/JPL; Park, Folkner, Williams and Boggs",
             "source_version": DE441_SOURCE_VERSION,
-            "source_url": DE441_SOURCE_URL,
             "calculation_library": "FateBridge original-word bounded-span reader; SOFA/ERFA optics",
             "time_argument": "TDB from declared TT via geocentric Fairhead model",
             "coefficient_representation": "selected original binary64 source words with lossless storage",
@@ -190,7 +187,6 @@ def solar_source_reference(model_id: str, native_version: str) -> SolarSourceRef
         return {
             "author": "NASA/JPL; Park, Folkner, Williams and Boggs",
             "source_version": DE441_SOURCE_VERSION,
-            "source_url": DE441_SOURCE_URL,
             "calculation_library": "FateBridge selected-file reader; SOFA/ERFA optics",
             "time_argument": "TDB from declared TT via geocentric Fairhead model",
             "coefficient_representation": "original selected-file records; exact split source epoch",
@@ -209,7 +205,6 @@ def solar_source_reference(model_id: str, native_version: str) -> SolarSourceRef
                 else None
             )
         ),
-        "source_url": "https://www.astro.com/swisseph/swephprg.htm",
         "calculation_library": "Swiss Ephemeris " + native_version,
         "time_argument": "Declared TT at the native calc entry",
         "coefficient_representation": (

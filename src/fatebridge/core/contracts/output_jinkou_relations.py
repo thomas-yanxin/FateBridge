@@ -14,8 +14,6 @@ from fatebridge.core.metaphysics.jinkou_relations import (
     JUE_CONTEXTS,
     SI_BAI,
     SI_JUE,
-    SOURCE_SHA256,
-    SOURCE_URL,
     absolute_check,
     calendar_check,
     calendar_target,
@@ -224,9 +222,6 @@ def relation_anchors(value: dict[str, Any]) -> dict[str, Any]:
 def validate_relations(value: dict[str, Any]) -> None:
     for key, expected in dict(
         ruleset_id="jinkou_jingben_relations_v1",
-        source_url=SOURCE_URL,
-        source_sha256=SOURCE_SHA256,
-        transcription_url="https://divinehere.com/classic/0905011.html",
         source_section=SECTION,
         complete_classical_conformance=False,
     ).items():
@@ -268,7 +263,6 @@ def validate_relation_anchors(board: dict[str, Any], *, complete: bool = False) 
         raise ValueError("京本结构关系须保留唯一同次规则轨迹")
     nodes = [primary] if isinstance(primary, dict) else []
     for trace in traces:
-        same(trace, "source_url", SOURCE_URL)
         same(trace, "source_section", SECTION)
         if isinstance(trace.get("result"), dict):
             nodes.append(trace["result"])

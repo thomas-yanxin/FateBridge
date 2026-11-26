@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import hashlib
 import math
 from datetime import date
-from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable
 
@@ -16,7 +14,6 @@ from .ephemeris_runtime import lock_ephemeris_configuration
 POLICY_ID = (
     "same_epoch_moshier_preflight_then_requested_swiss_before_fixed_source_bisection_v1"
 )
-SOURCE_URL = "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c#L348-L380"
 SWISS_SOLAR_CONTEXT_TT_INTERVAL = (
     date(1799, 1, 1).toordinal() + 1721424.5,
     date(2202, 1, 1).toordinal() + 1721424.5,
@@ -39,17 +36,6 @@ def _signature(path: Path) -> tuple[int, ...]:
     return stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns
 
 
-@lru_cache(maxsize=64)
-def _digest(path: Path, signature: tuple[int, ...]) -> str:
-    result = hashlib.sha256()
-    with path.open("rb") as source:
-        for block in iter(lambda: source.read(1024 * 1024), b""):
-            result.update(block)
-    if _signature(path) != signature:
-        raise EphemerisSourceError("solar_configuration_changed")
-    return result.hexdigest()
-
-
 def native_solar_file_context(native: Any) -> dict[str, Any] | None:
     """Observed slots, not a complete atomic read set or an accuracy proof."""
     getter = getattr(native, "get_current_file_data", None)
@@ -67,14 +53,12 @@ def native_solar_file_context(native: Any) -> dict[str, Any] | None:
         path = Path(filename).absolute()
         try:
             signature = _signature(path)
-            digest = _digest(path, signature)
         except OSError as exc:
             raise EphemerisSourceError("solar_native_context_unavailable") from exc
         windows.append(
             dict(
                 slot=slot,
                 filename=path.name,
-                sha256=digest,
                 bytes=signature[2],
                 start_jd_tt=float(start),
                 end_jd_tt=float(end),
@@ -88,8 +72,7 @@ def native_solar_file_context(native: Any) -> dict[str, Any] | None:
         physical_target_epoch_shifted=False,
         preflight_state_returned_as_target=False,
         physical_accuracy_certified=False,
-        source_url=SOURCE_URL,
-        scope="Observed final-refinement Sun file contexts and metadata-keyed file digests; not atomic reads, complete dependency sets or independent physical accuracy",
+        scope="Observed final-refinement Sun file contexts; not atomic reads, complete dependency sets or independent physical accuracy",
     )
 
 

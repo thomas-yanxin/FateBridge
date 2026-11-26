@@ -11,11 +11,10 @@ import math
 from decimal import Decimal as N
 from decimal import localcontext
 from fractions import Fraction
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Sequence
 
 from fatebridge.core.astro.jpl_records import SourceRecords
 from fatebridge.core.astro.solar_decimal import (
-    PROFILE_SHA256,
     mass_profile,
     stable_interpolation_cell,
 )
@@ -89,15 +88,15 @@ def dot(a: Vector, b: Vector) -> Dual:
     return sum((x * y for x, y in zip(a, b)), Dual(0))
 
 
-def add(a: Vector, b: Vector) -> List[Dual]:
+def add(a: Vector, b: Vector) -> list[Dual]:
     return [x + y for x, y in zip(a, b)]
 
 
-def sub(a: Vector, b: Vector) -> List[Dual]:
+def sub(a: Vector, b: Vector) -> list[Dual]:
     return [x - y for x, y in zip(a, b)]
 
 
-def scale(a: Vector, c: Any) -> List[Dual]:
+def scale(a: Vector, c: Any) -> list[Dual]:
     return [x * c for x in a]
 
 
@@ -106,11 +105,11 @@ def norm(a: Vector) -> Dual:
     return Dual(0) if squared.v == 0 and all(x.d == 0 for x in a) else squared.sqrt()
 
 
-def unit(a: Vector) -> List[Dual]:
+def unit(a: Vector) -> list[Dual]:
     return scale(a, 1 / norm(a))
 
 
-def cross(a: Vector, b: Vector) -> List[Dual]:
+def cross(a: Vector, b: Vector) -> list[Dual]:
     return [
         a[1] * b[2] - a[2] * b[1],
         a[2] * b[0] - a[0] * b[2],
@@ -118,7 +117,7 @@ def cross(a: Vector, b: Vector) -> List[Dual]:
     ]
 
 
-def chebyshev(coefficients: Sequence[float], x: Dual) -> Tuple[Dual, Dual]:
+def chebyshev(coefficients: Sequence[float], x: Dual) -> tuple[Dual, Dual]:
     b1 = b2 = g1 = g2 = Dual(0)
     for coefficient in reversed(coefficients[1:]):
         b = coefficient + 2 * x * b1 - b2
@@ -127,7 +126,7 @@ def chebyshev(coefficients: Sequence[float], x: Dual) -> Tuple[Dual, Dual]:
     return coefficients[0] + x * b1 - b2, b1 + x * g1 - g2
 
 
-def group(reader: SourceRecords, epoch: Dual, index: int) -> List[Dual]:
+def group(reader: SourceRecords, epoch: Dual, index: int) -> list[Dual]:
     values = reader.record(Fraction(epoch.v))
     offset, count, parts = reader.pointer(index)
     start, end = N.from_float(values[0]), N.from_float(values[1])
@@ -149,14 +148,14 @@ def group(reader: SourceRecords, epoch: Dual, index: int) -> List[Dual]:
     return positions + velocities
 
 
-def state(reader: SourceRecords, epoch: Dual, body: str) -> List[Dual]:
+def state(reader: SourceRecords, epoch: Dual, body: str) -> list[Dual]:
     if body == "Earth":
         emb, moon = group(reader, epoch, 2), group(reader, epoch, 9)
         return sub(emb, scale(moon, 1 / (Dual(reader.emrat) + 1)))
     return group(reader, epoch, {"Mercury": 0, "Venus": 1, "Sun": 10}[body])
 
 
-def apparent_source(reader: SourceRecords, body: str, epoch: float) -> Dict[str, Any]:
+def apparent_source(reader: SourceRecords, body: str, epoch: float) -> dict[str, Any]:
     if body not in {"Mercury", "Venus"}:
         raise SourceDerivativeUnavailable("unsupported_source_body")
     with localcontext() as context:
@@ -221,7 +220,6 @@ def apparent_source(reader: SourceRecords, body: str, epoch: float) -> Dict[str,
             "light_time_history": history,
             "retarded_argument": str((t - delay).v),
             "solar_interpolation_branch": branch,
-            "solar_mass_profile_sha256": PROFILE_SHA256,
             "source_records": reader.evidence(),
             "precision": PRECISION,
             "unrounded_retarded_argument": True,

@@ -6,7 +6,6 @@ The data files are separately licensed by Astrodienst under AGPL-3.0 or commerci
 from __future__ import annotations
 
 import argparse
-import hashlib
 import logging
 import os
 import sys
@@ -43,33 +42,8 @@ BASE_URL = load_ephemeris_manifest()["base_url"]
 # note (coverage): These planet, Moon and asteroid segments cover CE 1800–2399.
 DEFAULT_FILES = ("sepl_18.se1", "semo_18.se1", "seas_18.se1")
 
-_TIMEOUT_SECONDS = 60
+TIMEOUT_SECONDS = 60
 logger = logging.getLogger(__name__)
-
-
-def _preserve_previous(target: Path, previous_bytes: bytes) -> Path:
-    digest = hashlib.sha256(previous_bytes).hexdigest()
-    backup = target.parent / ".fatebridge-ephemeris-backups" / digest / target.name
-    if backup.exists():
-        if backup.read_bytes() != previous_bytes:
-            raise ValueError(
-                f"{target.name}: existing backup differs; leaving target unchanged"
-            )
-        return backup
-    backup.parent.mkdir(parents=True, exist_ok=True)
-    descriptor, staging_name = tempfile.mkstemp(
-        prefix=f".{backup.name}.", dir=backup.parent
-    )
-    pending = Path(staging_name)
-    try:
-        with os.fdopen(descriptor, "wb") as handle:
-            handle.write(previous_bytes)
-            handle.flush()
-            os.fsync(handle.fileno())
-        pending.replace(backup)
-    finally:
-        pending.unlink(missing_ok=True)
-    return backup
 
 
 def default_dest() -> Path:
@@ -77,7 +51,7 @@ def default_dest() -> Path:
     return Path(__file__).resolve().parents[2] / "ephe"
 
 
-def _download(url: str, timeout: int = _TIMEOUT_SECONDS) -> bytes:
+def _download(url: str, timeout: int = TIMEOUT_SECONDS) -> bytes:
     with urllib.request.urlopen(url, timeout=timeout) as response:
         response_bytes: bytes = response.read()
     return response_bytes
@@ -91,11 +65,11 @@ def fetch_one(
     force: bool = False,
     manifest: dict[str, Any] | None = None,
 ) -> Path:
-    """Install one verified file and retain a backup if replacing other bytes."""
+    """Install one verified ephemeris file."""
     catalog = manifest if manifest is not None else load_ephemeris_manifest()
     validate_file_name(name)
     if name not in catalog["files"]:
-        raise ValueError(f"{name}: no fingerprint in the selected manifest")
+        raise ValueError(f"{name}: not listed in the selected manifest")
     target = dest / name
     previous = target.read_bytes() if target.exists() else None
     if previous is not None and not force:
@@ -125,9 +99,6 @@ def fetch_one(
             raise ValueError(
                 f"{name}: destination changed during download; left unchanged"
             )
-        if previous is not None and previous != downloaded_bytes:
-            backup = _preserve_previous(target, previous)
-            logger.warning(f"Preserved previous {target} at {backup}")
         pending.replace(target)
     finally:
         pending.unlink(missing_ok=True)
@@ -194,7 +165,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--manifest",
         type=Path,
-        help="explicit fingerprint manifest for a different or custom data edition",
+        help="explicit manifest for a different or custom data edition",
     )
     policy = parser.add_mutually_exclusive_group()
     policy.add_argument(

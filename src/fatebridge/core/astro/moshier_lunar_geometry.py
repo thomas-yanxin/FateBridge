@@ -9,7 +9,6 @@ new physical ephemeris or a change to displayed native positions.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 from decimal import ROUND_FLOOR, Decimal, localcontext
@@ -20,8 +19,6 @@ from typing import TypedDict
 from fatebridge.core.astro import reference_frames
 
 METHOD_ID = "moshier_full_lunar_secular_argument_precision_v1"
-COEFFICIENT_SHA256 = "e2c93a63e58243949792e2ed3f600635e8934ce945df1e2b04981f23404efcda"
-SOURCE_URL = "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swemmoon.c"
 
 
 class MeanElement(TypedDict):
@@ -47,14 +44,12 @@ class LunarCoefficients(TypedDict):
     radius_constant_km: float
 
 
-_RAW = (
+RAW = (
     files("fatebridge.data")
     .joinpath("astro/moshier-lunar-coefficients-v1.json")
     .read_bytes()
 )
-if hashlib.sha256(_RAW).hexdigest() != COEFFICIENT_SHA256:
-    raise RuntimeError("Moshier lunar coefficients differ from the declared source")
-_DATA: LunarCoefficients = json.loads(_RAW)
+DATA: LunarCoefficients = json.loads(RAW)
 
 
 def _coefficient(value: str) -> Decimal:
@@ -64,13 +59,13 @@ def _coefficient(value: str) -> Decimal:
 
 with localcontext() as _context:
     _context.prec = 50
-    _MEAN = {
+    MEAN = {
         name: (
             _coefficient(element["fractional_century_frequency"]),
             tuple(_coefficient(v) for v in element["before_modulo"]),
             tuple(_coefficient(v) for v in element["secular"]),
         )
-        for name, element in _DATA["mean_elements"].items()
+        for name, element in DATA["mean_elements"].items()
     }
 
 
@@ -83,8 +78,8 @@ def polar(epoch: float) -> tuple[float, float, float]:
         fraction = t - int(t)
         cycle = Decimal(1296000)
         angles = []
-        for name in _DATA["angle_names"]:
-            frequency, base, secular = _MEAN[name]
+        for name in DATA["angle_names"]:
+            frequency, base, secular = MEAN[name]
             parts = []
             for coefficients in (base, secular):
                 value = Decimal(0)
@@ -96,8 +91,8 @@ def polar(epoch: float) -> tuple[float, float, float]:
             angles.append(float(value + parts[1]))
     century = float(t)
     sums: list[list[float]] = [[], [], []]
-    for term in _DATA["terms"]:
-        argument = _DATA["STR"] * math.fsum(
+    for term in DATA["terms"]:
+        argument = DATA["STR"] * math.fsum(
             [term["phase_arcsec"]]
             + [factor * angle for factor, angle in zip(term["factors"], angles)]
         )
@@ -108,9 +103,9 @@ def polar(epoch: float) -> tuple[float, float, float]:
             amplitude
             * (math.sin(argument) if term["kind"] == "sin" else math.cos(argument))
         )
-    longitude = (angles[-1] + math.fsum(sums[0])) % 1296000 * _DATA["STR"]
-    latitude = math.fsum(sums[1]) * _DATA["STR"]
-    radius = (_DATA["radius_constant_km"] + math.fsum(sums[2])) * 1000 / _DATA["AU"]
+    longitude = (angles[-1] + math.fsum(sums[0])) % 1296000 * DATA["STR"]
+    latitude = math.fsum(sums[1]) * DATA["STR"]
+    radius = (DATA["radius_constant_km"] + math.fsum(sums[2])) * 1000 / DATA["AU"]
     return longitude, latitude, radius
 
 

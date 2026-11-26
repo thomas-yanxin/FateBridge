@@ -10,41 +10,39 @@ equivalence, a derivative of binary rounding, or an observational certificate.
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from importlib.metadata import version
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any
 
 from fatebridge.core.astro import reference_frames, runtime
 from fatebridge.core.astro.native_identity import binding_distribution_version
-from fatebridge.core.astro.nutation import COEFFICIENT_SHA256, SOURCE_URL, nutation
+from fatebridge.core.astro.nutation import nutation
 from fatebridge.utils.errors import EphemerisSourceError
 
 METHOD_ID = "fatebridge_lunar_analytic_tropical_frame_v1"
 MODEL_POSITION_LINE_ARCSEC = 1e-7
-_DEG = 180.0 / math.pi
+DEG = 180.0 / math.pi
 
 
 def complete_lunar_tropical_rate(
     epoch: float,
     coordinates: Sequence[float],
     model: str,
-    fixed: Optional[Dict[str, Any]],
+    fixed: dict[str, Any] | None,
     legacy_rate: float,
-) -> Tuple[Optional[float], Dict[str, Any]]:
-    policy: Dict[str, Any] = {
+) -> tuple[float | None, dict[str, Any]]:
+    policy: dict[str, Any] = {
         "method_id": METHOD_ID,
         "epoch_jd_tt": epoch,
         "ephemeris_model": model,
         "frame_model": "native_Vondrak_scalar_obliquity_plus_77term_full_Simon_nutation",
-        "frame_coefficient_sha256": reference_frames.COEFFICIENT_SHA256,
-        "nutation_coefficient_sha256": COEFFICIENT_SHA256,
-        "source_url": SOURCE_URL,
         "positions_unchanged": True,
         "physical_TT_equivalence_certified": False,
         "native_binary_function_derivative_certified": False,
         "scope": "Analytic date-frame derivative added to the checked fixed-reception source velocity; native numerical argument retained. Source accuracy and physical TT/TDB conversion require separate evidence.",
     }
 
-    def unavailable(reason: str) -> Tuple[None, Dict[str, Any]]:
+    def unavailable(reason: str) -> tuple[None, dict[str, Any]]:
         return None, {**policy, "status": "not_applied", "reason": reason}
 
     if runtime.swe is None or (
@@ -80,7 +78,7 @@ def complete_lunar_tropical_rate(
     if rho2 <= 0:
         raise EphemerisSourceError("coordinate_motion_unavailable")
     psi, deps, psi_d, _ = nutation(epoch)
-    mean_epsilon = reference_frames.pair(epoch, "pepol", "peper")[0][1] * _DEG
+    mean_epsilon = reference_frames.pair(epoch, "pepol", "peper")[0][1] * DEG
     with runtime.preserve_ephemeris_path():
         native, flags = runtime.ephemeris_call(
             "calc", epoch, runtime.swe.ECL_NUT, runtime.swe.FLG_SWIEPH
@@ -90,8 +88,8 @@ def complete_lunar_tropical_rate(
     model_errors = [
         abs(a - b) * 3600 for a, b in zip((mean_epsilon, psi, deps), native[1:4])
     ]
-    lon = (math.atan2(p[1], p[0]) * _DEG + psi) % 360
-    lat = math.atan2(p[2], math.sqrt(rho2)) * _DEG
+    lon = (math.atan2(p[1], p[0]) * DEG + psi) % 360
+    lat = math.atan2(p[2], math.sqrt(rho2)) * DEG
     position_errors = [
         abs(math.remainder(lon - float(coordinates[0]), 360)) * 3600,
         abs(lat - float(coordinates[1])) * 3600,
@@ -107,8 +105,8 @@ def complete_lunar_tropical_rate(
     moving = reference_frames.mv(
         reference_frames.mm(derivative, reference_frames.transpose(mean)), p
     )
-    source_rate = (p[0] * v[1] - p[1] * v[0]) / rho2 * _DEG
-    frame_rate = (p[0] * moving[1] - p[1] * moving[0]) / rho2 * _DEG
+    source_rate = (p[0] * v[1] - p[1] * v[0]) / rho2 * DEG
+    frame_rate = (p[0] * moving[1] - p[1] * moving[0]) / rho2 * DEG
     complete = math.fsum((source_rate, frame_rate, psi_d))
     if not math.isfinite(complete):
         raise EphemerisSourceError("coordinate_motion_unavailable")

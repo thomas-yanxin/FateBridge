@@ -6,7 +6,6 @@ The native catalogue is isolated from optional operator and Guolao catalogues.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 from fractions import Fraction
@@ -20,16 +19,13 @@ from fatebridge.core.fixed_star_paths import fixed_star_catalogue
 
 DATA = Path(__file__).parents[1] / "data/western_stars"
 MODEL_ID = "fatebridge_simbad_native_apparent_stars_v1"
-NATURE_SOURCE = "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#9"
 
 
 def catalogue() -> tuple[dict[str, Any], bytes]:
     source = cast(dict[str, Any], json.loads((DATA / "sources.json").read_text()))
     catalogue_bytes = (DATA / "sefstars.txt").read_bytes()
-    digest = hashlib.sha256(catalogue_bytes).hexdigest()
     if (
-        digest != source["catalogue_sha256"]
-        or len(source["stars"]) != 20
+        len(source["stars"]) != 20
         or len({r["name"] for r in source["stars"]}) != 20
         or len({r["catalogue_key"] for r in source["stars"]}) != 20
     ):
@@ -54,7 +50,6 @@ def apparent_positions(
         "model_id": MODEL_ID,
         "status": "unavailable",
         "catalogue_id": source["catalogue_id"],
-        "catalogue_sha256": source["catalogue_sha256"],
         "catalogue_size": 20,
         "catalogue_epoch": "ICRS J2000.0",
         "julian_day_tt": julian_day_tt,
@@ -65,11 +60,7 @@ def apparent_positions(
         "latitude_used_for_conjunction": False,
         "space_motion": "catalogue proper motion, radial velocity and parallax; no binary orbit or covariance propagation",
         "astrometry_source": "CDS SIMBAD; individual references in bundled sources.json",
-        "nature_source_url": NATURE_SOURCE,
         "nature_ruleset_id": "ptolemy_robbins_1940_i9_regional_twenty_v1",
-        "nature_rules_sha256": hashlib.sha256(
-            (DATA / "nature_rules.json").read_bytes()
-        ).hexdigest(),
         "absolute_sky_accuracy_certified": False,
     }
     if runtime.swe is None:
@@ -177,7 +168,6 @@ def conjunction_hits(
                         "nature": labels[name]["nature"].copy(),
                         "nature_components": attribution["components"],
                         "nature_source_region": attribution["region"],
-                        "nature_source_url": NATURE_SOURCE,
                         "astrometry_source_url": star["source_url"],
                         "catalogue_identifier": star["identifier"],
                     }

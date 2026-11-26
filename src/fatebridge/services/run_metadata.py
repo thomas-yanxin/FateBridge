@@ -18,7 +18,7 @@ class RuntimeInspection:
     has_downgraded_model: bool
 
 
-_DOWNGRADED_EPHEMERIS_MODELS = frozenset(
+DOWNGRADED_EPHEMERIS_MODELS = frozenset(
     {
         "moshier",
         "mixed",
@@ -74,7 +74,7 @@ def _inspect_runtime(
                 model = current.get("ephemeris_model")
                 has_downgraded_model = (
                     isinstance(model, str)
-                    and model.lower() in _DOWNGRADED_EPHEMERIS_MODELS
+                    and model.lower() in DOWNGRADED_EPHEMERIS_MODELS
                 ) or (approximate_record is not None and approximate_record(current))
             if engine is not None and has_downgraded_model:
                 return RuntimeInspection(engine=engine, has_downgraded_model=True)

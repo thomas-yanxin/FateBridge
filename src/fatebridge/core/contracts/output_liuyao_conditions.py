@@ -21,7 +21,6 @@ class DivinationSource(PartialOutput):
     title: str | None = None
     revision: int | None = None
     source_url: str | None = None
-    wikitext_sha256: str | None = None
 
 
 class MonthlyStrength(PartialOutput):
@@ -68,7 +67,6 @@ class ProgressConditions(PartialOutput):
     ruleset_version: str | None = None
     adjudication: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     textual_issues: list[dict[str, OpenJsonValue]] | None = None
     scope: str | None = None
 
@@ -296,7 +294,6 @@ class ScanSource(PartialOutput):
     institution: str | None = None
     catalog_id: str | None = None
     file: str | None = None
-    sha256: str | None = None
     page_count: int | None = None
     url: str | None = None
     description_url: str | None = None
@@ -377,7 +374,6 @@ class RoleEffects(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     status: str | None = None
     lines: list[RoleEffectLine] | None = None
     chains: list[RoleChain] | None = None
@@ -456,7 +452,6 @@ class ClassicalAssessment(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     lines: list[ClassicalLineAssessment] | None = None
     focus: ClassicalLineAssessment | None = None
     resolution_notes: list[str] | None = None

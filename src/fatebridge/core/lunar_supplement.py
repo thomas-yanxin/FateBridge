@@ -61,8 +61,6 @@ def _load() -> _Supplement:
             "method_id": raw["method_id"],
             "publisher": source["publisher"],
             "title": source["title"],
-            "url": source["url"],
-            "raw_sha256": source["raw_sha256"],
             "retrieved_on": source["retrieved_on"],
             "calendar_convention": "HKO UTC+08 civil-date mapping applied to the supplied local calendar date; not an independent astronomical validation of every timezone or solar-time correction.",
         },

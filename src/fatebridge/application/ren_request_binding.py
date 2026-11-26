@@ -10,7 +10,18 @@ from pydantic import BaseModel
 from fatebridge.application.bindings import _build_person
 from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.core.almanac import localize_datetime
+from fatebridge.core.local_techniques.chart import (
+    _normalize_date_text,
+    _normalize_time_text,
+    _resolve_coordinates,
+    parse_local_datetime,
+)
 from fatebridge.core.metaphysics.jinkou_year_fate import confirmed_natal_branch
+from fatebridge.core.metaphysics.liureng import _liureng_month_general_for_term
+from fatebridge.core.metaphysics.ren_calendar import (
+    resolve_runyear_birth_clock,
+    resolve_runyear_birth_zone,
+)
 from fatebridge.core.metaphysics.ren_diurnal import resolve_diurnal
 from fatebridge.core.requests.divination import SanShiUnitedRequest
 from fatebridge.core.requests.metaphysics import (
@@ -63,19 +74,6 @@ def require_request_binding(
     """Check request facts against the same run's recorded operands."""
     if key not in TOOLS:
         return
-    # note (catalog): These engine helpers load only when validating a Ren result.
-    from fatebridge.core.local_techniques.chart import (
-        _normalize_date_text,
-        _normalize_time_text,
-        _resolve_coordinates,
-        parse_local_datetime,
-    )
-    from fatebridge.core.metaphysics.liureng import _liureng_month_general_for_term
-    from fatebridge.core.metaphysics.ren_calendar import (
-        resolve_runyear_birth_clock,
-        resolve_runyear_birth_zone,
-    )
-
     gender: str | None
     if key == "sanshiunited":
         assert isinstance(request, SanShiUnitedRequest)

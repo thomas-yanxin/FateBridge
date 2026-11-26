@@ -9,7 +9,7 @@ independent apparent-motion accuracy certificate.
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, Sequence, Tuple
+from typing import Any, Sequence
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
@@ -24,12 +24,11 @@ from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.utils.errors import EphemerisSourceError
 
 METHOD_ID = "native_retarded_epoch_remainder_linearization_v1"
-SOURCE_URL = "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c"
 AU_METRES = 149597870700.0
 LIGHT_METRES_PER_SECOND = 299792458.0
 
 
-def epoch_subtraction_remainder(epoch: float, delay: float) -> Tuple[float, float]:
+def epoch_subtraction_remainder(epoch: float, delay: float) -> tuple[float, float]:
     if not math.isfinite(epoch) or not math.isfinite(delay) or delay < 0:
         raise EphemerisSourceError("coordinate_values_unavailable")
     rounded = epoch - delay
@@ -45,9 +44,9 @@ def stabilized_longitude_sample(
     *,
     sidereal: bool,
     source_trace: PhysicalEphemerisTrace,
-    contexts: Dict[str, Any],
+    contexts: dict[str, Any],
     factor_prefix: str,
-) -> Tuple[float, Dict[str, Any]]:
+) -> tuple[float, dict[str, Any]]:
     """Linearize only the lost retarded-epoch fraction, using physical states.
 
     The two rough light-time iterations follow app_pos_etc_plan, before the
@@ -64,7 +63,7 @@ def stabilized_longitude_sample(
     for name in COORDINATE_FLAGS:
         mask |= getattr(swe, name)
 
-    def state(epoch: float, body: int, flags: int, suffix: str) -> Tuple[float, ...]:
+    def state(epoch: float, body: int, flags: int, suffix: str) -> tuple[float, ...]:
         values, returned = runtime.ephemeris_call("calc", epoch, body, flags)
         assert_physical_configuration(selected)
         expected = flags
@@ -147,6 +146,5 @@ def stabilized_longitude_sample(
             "retarded_epoch_jd_tt": retarded,
             "epoch_remainder_days": remainder,
             "sampling_longitude_shift_arcseconds": shift * 3600,
-            "source_url": SOURCE_URL,
             "displayed_native_position_changed": False,
         }

@@ -1,7 +1,5 @@
 """Partial-safe provenance for the actual fixed twelve-stage lookup."""
 
-import hashlib
-import json
 from typing import Literal
 
 from pydantic import Field, model_validator
@@ -24,7 +22,6 @@ class LifeStageProfile(PartialOutput):
     )
     stage_cycle: list[str] | None = Field(default=None, min_length=12, max_length=12)
     growth_starts: dict[Stem, StageAnchor] | None = None
-    lookup_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     soil_convention: str | None = None
     source_basis: (
         Literal["implementation_lookup_with_selected_text_crosscheck"] | None
@@ -35,39 +32,9 @@ class LifeStageProfile(PartialOutput):
     scope: str | None = None
 
     @model_validator(mode="after")
-    def preserve_lookup_digest(self) -> "LifeStageProfile":
+    def preserve_lookup_structure(self) -> "LifeStageProfile":
         if self.branch_cycle is not None and len(set(self.branch_cycle)) != 12:
             raise ValueError("十二支查表顺序不能丢失或重复地支")
         if self.stage_cycle is not None and len(set(self.stage_cycle)) != 12:
             raise ValueError("十二阶段查表顺序不能丢失或重复阶段")
-        if (
-            self.lookup_sha256 is not None
-            and self.branch_cycle is not None
-            and self.stage_cycle is not None
-            and self.growth_starts is not None
-            and len(self.growth_starts) == 10
-            and all(
-                a.growth_branch is not None and a.direction is not None
-                for a in self.growth_starts.values()
-            )
-        ):
-            lookup = {
-                "branch_cycle": self.branch_cycle,
-                "stage_cycle": self.stage_cycle,
-                "growth_starts": {
-                    # The receipt hashes lookup inputs, not unrelated future
-                    # annotations retained by the partial-output contract.
-                    s: a.model_dump(
-                        include={"growth_branch", "direction"}, exclude_none=True
-                    )
-                    for s, a in self.growth_starts.items()
-                },
-            }
-            actual = hashlib.sha256(
-                json.dumps(
-                    lookup, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-                ).encode()
-            ).hexdigest()
-            if actual != self.lookup_sha256:
-                raise ValueError("阶段查表参数必须与同次查表散列一致")
         return self

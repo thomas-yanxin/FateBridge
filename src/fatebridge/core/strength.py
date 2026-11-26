@@ -36,7 +36,6 @@ from fatebridge.core.punishment_resolution import (
     zi_month_officer_clash_alternative,
 )
 from fatebridge.core.root_budget import initial_hidden_budgets
-from fatebridge.core.source_identity import DITIAN_SUI_CHANWEI_SCAN_URL
 from fatebridge.core.stem_effects import evaluate_stem_effects
 from fatebridge.core.stem_order_review import build_stem_order_review
 from fatebridge.core.storage_movement import SOURCE as STORAGE_SOURCE
@@ -104,37 +103,29 @@ SOURCES: list[dict[str, Any]] = [
     {
         "id": "ditian_ordered_four_branch_passage_v1",
         "title": "任注滴天髓闡微·通關（1947年李雨田校訂本PDF199）",
-        "url": DITIAN_SUI_CHANWEI_SCAN_URL,
-        "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
         "pdf_pages": [199],
         "scope": "仅在四支依次财生官杀、官杀生印、印生身，天干年杀月印、时比劫归禄旺且无竞争会合时采用。不得推广到任意见印、隔支或残缺通关。",
     },
     {
         "id": "ditian_rooted_body_before_season_proxy_v1",
         "title": "任注滴天髓闡微·官殺、地支、月令的重根与印比条件",
-        "url": DITIAN_SUI_CHANWEI_SCAN_URL,
-        "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
         "pdf_pages": [91, 172, 173, 203, 205],
         "scope": "多处合格实际根配合有根印比，以及两处本气强根，不再要求三干全部印比；资格仍沿用既有未舍入根预算和保留门槛。不是有根即强或全书定理。",
     },
     {
         "id": "ditian_winter_rootless_wood_v1",
         "title": "任注滴天髓闡微·假化（1947年李雨田校訂本PDF386）",
-        "url": DITIAN_SUI_CHANWEI_SCAN_URL,
-        "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
         "pdf_pages": [386],
         "scope": "冬水当令而木无任何实际同五行藏根时，不将旺印相加为日主强。此有限规则不裁定化气格或从格。",
     },
     {
         "id": "sanming_seasonal_phases",
         "title": "三命通會·論五行旺相休囚死並寄生十二宫",
-        "url": "https://www.shidianguji.com/zh/book/SK1610/chapter/1kf5v6ol1tqg5",
         "scope": "季相名称的生克对应：克当令者囚、当令所克者死；数值系数仍是工程约定。电子转录不等同书影校勘。",
     },
     {
         "id": "ditian_complete_same_element_bureau_capacity_v1",
         "title": "任注滴天髓闡微·眾寡（1947年李雨田校訂本PDF268）",
-        "url": DITIAN_SUI_CHANWEI_SCAN_URL,
         "edition": "上海大東書局，1947年4月初版",
         "pdf_pages": [268],
         "scope": "完整同類會局及合格重根的結構規則；條件是工程編碼，不是完全成化或全書定理。",
@@ -151,27 +142,22 @@ SOURCES: list[dict[str, Any]] = [
     {
         "id": "ditian_zhonghe",
         "title": "滴天髓阐微·中和（财杀重而旺中变弱例）",
-        "url": "https://www.shicihui.com/zh-tw/book/ditiansuichanwei/16288",
     },
     {
         "id": "ziping_6",
         "title": "子平真诠·论十干得时不旺失时不弱",
-        "url": "https://www.donglishuzhai.net/chapter/3719.html",
     },
     {
         "id": "ziping_7",
         "title": "子平真诠·论刑冲会合解法",
-        "url": "https://www.donglishuzhai.net/chapter/3720.html",
     },
     {
         "id": "ziping_5",
         "title": "子平真诠·论十干合而不合",
-        "url": "https://www.donglishuzhai.net/chapter/3718.html",
     },
     {
         "id": "ditian_branch",
         "title": "滴天髓·地支论",
-        "url": "https://zh.wikisource.org/zh-hant/滴天髓/03",
     },
 ]
 

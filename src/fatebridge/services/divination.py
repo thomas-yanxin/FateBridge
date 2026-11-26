@@ -130,7 +130,7 @@ def _build_gua_lookup_snapshot_text(
                         ],
                     ],
                 ),
-                ("来源", [classical["source_url"], classical["edition_status"]]),
+                ("来源", [classical["edition_status"]]),
             ]
         )
     return _render_snapshot_text(sections)
@@ -153,7 +153,6 @@ def _build_gua_meiyi_snapshot_text(
         result_lines.append(f"{query} -> {item['name']}（{item['code']}）")
         if classical := item.get("classical"):
             result_lines.append(f"《周易》卦辞：{classical['guaci']}")
-            result_lines.append(f"来源：{classical['source_url']}")
     return _render_snapshot_text(
         [
             ("查询概览", overview_lines),
@@ -292,7 +291,6 @@ def calculate_meihua_analysis(
             "year_boundary": "lunar_new_year",
             "leap_month_rule": "use_lunar_month_number_without_increment",
             "mutual_rule": "qian_kun_use_changed_hexagram_otherwise_base",
-            "source_url": "https://zh.wikisource.org/wiki/梅花易數/卷一",
         }
     )
     for key in (

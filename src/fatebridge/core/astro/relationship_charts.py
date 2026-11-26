@@ -22,7 +22,6 @@ from fatebridge.core.astro.profiles import (
 )
 from fatebridge.core.astro.reference import BALANCE_BASIS, PLANET_SEQUENCE
 from fatebridge.core.astro.relationship_geometry import (
-    COMPOSITE_SOURCE,
     davison_birth,
     marks_birth,
     unique_midpoint,
@@ -135,7 +134,6 @@ def _composite_chart(
         **engine_profile,
         "derivation_policy": {
             "method_id": "composite_corresponding_midpoints_v2",
-            "source_url": COMPOSITE_SOURCE,
             "source_kind": "first_party_implementation_documentation",
             "positions_from_single_instant": False,
             "longitude_policy": "unique shorter arc; exact diametric inputs are ambiguous",

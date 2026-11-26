@@ -3,9 +3,24 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Dict, Tuple
+from typing import Any
 
-from fatebridge.core.analytic_solar import MODEL_ID, loaded_sha256
+from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_MODEL_ID
+from fatebridge.core.aa1996_solar import cache_key as aa1996_cache_key
+from fatebridge.core.aa1996_solar import source_receipt as aa1996_source_receipt
+from fatebridge.core.analytic_solar import MODEL_ID
+from fatebridge.core.de440_solar import EXTENDED_MODEL_ID
+from fatebridge.core.de440_solar import MODEL_ID as DE440_MODEL_ID
+from fatebridge.core.de440_solar import cache_key as de440_cache_key
+from fatebridge.core.de440_solar import source_receipt as de440_source_receipt
+from fatebridge.core.de441_solar import CACHE_IDENTITY
+from fatebridge.core.jpl_ephemeris import configured_jpl_file
+from fatebridge.core.spk_solar import MODEL_ID as SPK_MODEL_ID
+from fatebridge.core.spk_solar import cache_key as spk_cache_key
+from fatebridge.core.spk_solar import source_receipt as spk_source_receipt
+from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_MODEL_ID
+from fatebridge.core.vsop2013_solar import cache_key as vsop2013_cache_key
+from fatebridge.core.vsop2013_solar import source_receipt as vsop2013_source_receipt
 
 ENVIRONMENT_NAME = "FATEBRIDGE_SOLAR_TERM_MODEL"
 MODES = frozenset(
@@ -26,8 +41,6 @@ def solar_model_policy() -> str:
 
 
 def de440_selected(year: int) -> bool:
-    from .jpl_ephemeris import configured_jpl_file
-
     mode = solar_model_policy()
     inside = DE440_SOFTWARE_YEARS[0] <= year <= DE440_SOFTWARE_YEARS[1]
     if mode == "de440" and not inside:
@@ -41,9 +54,6 @@ def de440_selected(year: int) -> bool:
 
 def de440_profile_for_year(year: int | None = None) -> str:
     """Select a year-grid profile without resolving any coefficient bytes."""
-    from .de440_solar import EXTENDED_MODEL_ID
-    from .de440_solar import MODEL_ID as DE440_MODEL_ID
-
     if (
         year is None
         or VALIDATED_SOFTWARE_YEARS[0] <= year <= VALIDATED_SOFTWARE_YEARS[1]
@@ -76,7 +86,7 @@ def solar_context_input_years(year: int) -> tuple[int, int]:
     return VALIDATED_SOFTWARE_YEARS
 
 
-def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
+def solar_model_cache_key(*, year: int | None = None) -> tuple[Any, ...]:
     # Keys bind immutable packaged source identities or configured native data.
     # The selected calculation verifies the bytes it uses.
     mode = solar_model_policy()
@@ -95,23 +105,14 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
             raise ValueError("Explicit Swiss solar mode currently covers1800..2200")
         if mode == "swiss":
             return mode, "native_swiss_runtime"
-        from .jpl_ephemeris import configured_jpl_file
-
         if configured_jpl_file() is not None:
             return mode, "native_strict_jpl"
-        from .de441_solar import CACHE_IDENTITY
-
         return mode, "native_swiss_runtime", *CACHE_IDENTITY
-    if mode == "auto":
-        from .jpl_ephemeris import configured_jpl_file
-
-        if configured_jpl_file() is not None:
-            return mode, "native_strict_jpl"
+    if mode == "auto" and configured_jpl_file() is not None:
+        return mode, "native_strict_jpl"
     if year is not None and mode in {"auto", "de440"} and not de440_selected(year):
         # Use the native source policy outside the packaged year grid.
         # Explicit de440 has already rejected an out-of-range year above.
-        from .de441_solar import CACHE_IDENTITY
-
         return mode, "native_outside_packaged_years", *CACHE_IDENTITY
     if mode == "vsop2013":
         if (
@@ -119,9 +120,6 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
             and not VSOP2013_SOFTWARE_YEARS[0] <= year <= VSOP2013_SOFTWARE_YEARS[1]
         ):
             raise ValueError("Explicit VSOP2013 solar mode currently covers1700..2300")
-        from .vsop2013_solar import MODEL_ID as VSOP2013_MODEL_ID
-        from .vsop2013_solar import cache_key as vsop2013_cache_key
-
         return mode, VSOP2013_MODEL_ID, vsop2013_cache_key()
     if mode == "aa1996":
         if (
@@ -129,18 +127,10 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
             and not VALIDATED_SOFTWARE_YEARS[0] <= year <= VALIDATED_SOFTWARE_YEARS[1]
         ):
             raise ValueError("Explicit AA1996 solar mode currently covers1800..2200")
-        from .aa1996_solar import MODEL_ID as AA1996_MODEL_ID
-        from .aa1996_solar import cache_key as aa1996_cache_key
-
         return mode, AA1996_MODEL_ID, aa1996_cache_key()
     if mode == "spk":
-        from .spk_solar import MODEL_ID as SPK_MODEL_ID
-        from .spk_solar import cache_key
-
-        return mode, SPK_MODEL_ID, cache_key()
+        return mode, SPK_MODEL_ID, spk_cache_key()
     if mode in {"auto", "de440"}:
-        from .de440_solar import cache_key as de440_cache_key
-
         selected = de440_profile_for_year(year)
         return (
             mode,
@@ -151,14 +141,12 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
                 else de440_cache_key(selected)
             ),
         )
-    return mode, MODEL_ID, loaded_sha256()
+    return mode, MODEL_ID
 
 
 def solar_model_environment_receipt(
     *, resolve_source: bool = True, observed_de440_models: list[str] | None = None
-) -> Dict[str, Any]:
-    from .jpl_ephemeris import configured_jpl_file
-
+) -> dict[str, Any]:
     # A successful text-only lookup must not start an unused file-backed Sun
     # calculation merely to describe its configuration. Consuming calculations
     # have already validated the mode and still request the strict source.
@@ -174,10 +162,6 @@ def solar_model_environment_receipt(
                 "scope": "Configuration only; no independent solar source was resolved for this receipt. Actual consumed models are reported separately in provenance.",
             }
     if observed_de440_models is not None:
-        from .de440_solar import EXTENDED_MODEL_ID
-        from .de440_solar import MODEL_ID as DE440_MODEL_ID
-        from .de440_solar import source_receipt as de440_source_receipt
-
         mode = solar_model_policy()
         models = sorted(set(observed_de440_models))
         if (
@@ -230,8 +214,6 @@ def solar_model_environment_receipt(
             "scope": "Strict native JPL overrides the packaged default. Actual availability and consumption are validated by the native calculation and reported in its boundaries.",
         }
     if key[1] == "fatebridge_de440_solar_v1":
-        from .de440_solar import source_receipt as de440_source_receipt
-
         return {
             "mode": key[0],
             **de440_source_receipt(),
@@ -240,24 +222,18 @@ def solar_model_environment_receipt(
             "scope": "Packaged default candidate; actual model use is reported by each consumed boundary. Strict native JPL overrides auto and years outside the declared software range use native policy.",
         }
     if key[0] == "spk":
-        from .spk_solar import source_receipt
-
         return {
             "mode": "spk",
-            **source_receipt(),
+            **spk_source_receipt(),
             "scope": "Explicit solar SPK policy; actual consumed boundaries report their own source identity",
         }
     if key[0] == "vsop2013":
-        from .vsop2013_solar import source_receipt as vsop2013_source_receipt
-
         return {
             "mode": "vsop2013",
             **vsop2013_source_receipt(),
             "scope": "Explicit named VSOP2013/full-Moshier-Moon solar library; actual consumed boundaries retain binary/profile identity. TT qualification is not civil UTC or whole-domain certification.",
         }
     if key[0] == "aa1996":
-        from .aa1996_solar import source_receipt as aa1996_source_receipt
-
         return {
             "mode": "aa1996",
             **aa1996_source_receipt(),
@@ -266,7 +242,6 @@ def solar_model_environment_receipt(
     return {
         "mode": key[0],
         "model_id": key[1],
-        "loaded_coefficient_sha256": key[2],
         "auto_software_years": list(DE440_SOFTWARE_YEARS),
         "scope": "Configured policy; actual model use is reported by each result, not inferred from this configuration",
     }

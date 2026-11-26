@@ -198,7 +198,7 @@ class AstroAgePointRequest(AstroLifespanRequest):
     """Request model for the 年龄推进点 (Age Point / Huber) tool.
 
     Huber's Age Point is defined on Koch houses, so the tool always casts Koch
-    regardless of ``house_system``; the inherited field is accepted but ignored.
+    regardless of house_system; the inherited field is accepted but ignored.
     """
 
     max_age_years: float = Field(
@@ -213,7 +213,7 @@ class AstroVedicProgRequest(AstroLifespanRequest):
     """Request model for the 恒星推运 (Vedic sidereal secondary progression) tool.
 
     The technique is read sidereally, so the tool always casts Sidereal regardless
-    of ``zodiac_type``; the inherited field is accepted but ignored.
+    of zodiac_type; the inherited field is accepted but ignored.
     """
 
     orb: float = Field(

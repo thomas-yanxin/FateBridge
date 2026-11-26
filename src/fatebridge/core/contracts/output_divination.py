@@ -27,7 +27,6 @@ class ClassicalHexagram(PartialOutput):
     special: ClassicalLine | None = None
     source_url: str | None = None
     source_revision: int | None = None
-    source_wikitext_sha256: str | None = None
 
 
 class ClassicalTextEvidence(PartialOutput):

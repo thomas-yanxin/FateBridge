@@ -89,7 +89,6 @@ class SolarPositionBody(PartialOutput):
 
 class SolarModelRegularity(PartialOutput):
     profile: str | None = None
-    source_profile_sha256: str | None = None
     axis_continuity_certified: bool | None = None
     unique_rate_at_mass_knots_certified: bool | None = None
     scope: str | None = None

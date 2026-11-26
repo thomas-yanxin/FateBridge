@@ -371,7 +371,6 @@ def _zr_calculation_basis(fortune_sign: str | None) -> dict[str, Any]:
         "source_authors": ["Chris Brennan", "Leisa Schaim"],
         "source_title": "Zodiacal Releasing: An Ancient Timing Technique, episode192",
         "source_date": "2019-02-11",
-        "source_url": "https://theastrologypodcast.com/2019/02/11/zodiacal-releasing-an-ancient-timing-technique/",
         "year_basis": "egyptian_360_day",
         "year_days": ZR_LEVEL_UNIT_DAYS[1],
         "interval_time_basis": "elapsed_utc_days",
@@ -408,8 +407,7 @@ def build_zodiacal_releasing_payload(
     display_timezone = parse_timezone_name(birth_info.timezone)
     lots = build_lot_payloads(natal_subject)
     # Selected reconstruction: Brennan/Schaim, episode192 (2019-02-11),
-    # "Calculating Zodiacal Releasing Periods" and "Peak Periods":
-    # https://theastrologypodcast.com/2019/02/11/zodiacal-releasing-an-ancient-timing-technique/
+    # "Calculating Zodiacal Releasing Periods" and "Peak Periods".
     # The origin advances only for coincident Spirit/Fortune signs. Natal lot
     # longitudes stay unchanged; every track's angular reference is Fortune.
     fortune_sign = lots["lot_of_fortune"]["sign"]

@@ -44,7 +44,6 @@ class LiurenAuxiliaryStars(PartialOutput):
     ruleset_id: Literal["tanyuan_auxiliary_stars_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[int] | None = None
     day_ganzhi: str | None = None
     month_building_branch: Branch | None = None

@@ -262,10 +262,7 @@ def _build_guolao_snapshot_sections(payload: dict[str, Any]) -> list[tuple[str, 
                         if validation["classical_acceptance_passed"]
                         else "尚未通过原典验收。"
                     ),
-                    *[
-                        r["title"] + "：" + r["source_url"]
-                        for r in guolao.get("rulesets", [])
-                    ],
+                    *[r["title"] for r in guolao.get("rulesets", [])],
                     *validation["limitations"],
                 ]
             ),

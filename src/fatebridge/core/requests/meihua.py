@@ -1,6 +1,6 @@
 """Explicit Mei Hua casting inputs; no inferred sounds, tones or observations."""
 
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 
 from pydantic import Field, StrictBool, StrictInt, model_validator
 
@@ -277,20 +277,18 @@ class LunarTimeAddedCount(_DeferredModel):
 
 
 MeihuaCasting = Annotated[
-    Union[
-        SoundGroups,
-        ObjectCount,
-        ObservedTrigrams,
-        ObservedCategories,
-        ZhangChi,
-        ChiCun,
-        TextTones,
-        TextStrokes,
-        SingleCharacter,
-        TextCount,
-        ExistingCast,
-        LunarTimeAddedCount,
-    ],
+    SoundGroups
+    | ObjectCount
+    | ObservedTrigrams
+    | ObservedCategories
+    | ZhangChi
+    | ChiCun
+    | TextTones
+    | TextStrokes
+    | SingleCharacter
+    | TextCount
+    | ExistingCast
+    | LunarTimeAddedCount,
     Field(discriminator="method"),
 ]
 

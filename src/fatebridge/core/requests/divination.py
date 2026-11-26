@@ -13,6 +13,7 @@ from pydantic import (
     model_validator,
 )
 
+from fatebridge.core.astrodice import normalize_planet, normalize_sign, validate_context
 from fatebridge.core.heluo.heluo_months import (
     DEFAULT_MONTH_ASSIGNMENT,
     MonthAssignmentMethod,
@@ -611,21 +612,15 @@ class OtherBuRequest(AstroHouseValidatorMixin, _DeferredModel):
     @field_validator("sign")
     @classmethod
     def actual_sign(cls, value: str) -> str:
-        from fatebridge.core.astrodice import normalize_sign
-
         return normalize_sign(value)
 
     @field_validator("planet")
     @classmethod
     def actual_planet(cls, value: str) -> str:
-        from fatebridge.core.astrodice import normalize_planet
-
         return normalize_planet(value)
 
     @model_validator(mode="after")
     def explicit_sky_context(self) -> "OtherBuRequest":
-        from fatebridge.core.astrodice import validate_context
-
         validate_context(
             date=self.date,
             time=self.time,

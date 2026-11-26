@@ -56,7 +56,6 @@ class LiurenBranchRelations(PartialOutput):
     ruleset_id: Literal["tanyuan_branch_relations_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[int] | None = None
     day_ganzhi: str | None = None
     calendar_branches: dict[Literal["year", "month", "day", "hour"], Branch] | None = (
@@ -205,7 +204,6 @@ def require_complete_branch_relations(board: dict[str, Any]) -> None:
     ]
     expected_trace = {
         "rule_id": "liuren.branch_relations",
-        "source_url": evidence["source_url"],
         "source_section": evidence["source_title"],
         "result": {
             "row_count": 47,

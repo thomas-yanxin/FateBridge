@@ -156,7 +156,6 @@ class LiurenSourceNote(PartialOutput):
     annotation: str | None = None
     original_pdf_page: int | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     kind: str | None = None
     explanation: str | None = None
     scope: str | None = None

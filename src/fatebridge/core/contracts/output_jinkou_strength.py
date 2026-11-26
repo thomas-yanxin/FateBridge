@@ -215,7 +215,6 @@ def require_complete_strength_evidence(board: dict[str, Any]) -> None:
             if (
                 board[key].get("source_evidence") != source
                 or traces[0]["result"].get("source_evidence") != source
-                or traces[0].get("source_url") != source["source_url"]
                 or traces[0].get("source_section") != source["source_section"]
             ):
                 raise ValueError("完整旺衰须保留相同且真实的原书来源与异文")

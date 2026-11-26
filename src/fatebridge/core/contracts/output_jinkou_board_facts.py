@@ -236,7 +236,6 @@ class JinkouRelations(PartialOutput):
     ruleset_id: str | None = None
     source_url: str | None = None
     transcription_url: str | None = None
-    source_sha256: str | None = None
     source_section: str | None = None
     si_jue: JinkouJue | None = None
     si_bai: JinkouBai | None = None
@@ -311,7 +310,6 @@ class JinkouTrineVariant(PartialOutput):
 class JinkouCombinations(PartialOutput):
     ruleset_id: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     source_section: str | None = None
     day_branch: str | None = None
     month_branch: str | None = None

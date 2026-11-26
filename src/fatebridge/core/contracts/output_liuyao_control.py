@@ -59,7 +59,6 @@ class DirectedControl(PartialOutput):
 class VoidFillQualification(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
-    source_sha256: str | None = None
     source_urls: list[str] | None = None
     clauses: list[dict[str, OpenJsonValue]] | None = None
     precedence: str | None = None
@@ -74,7 +73,6 @@ class ControlConditions(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     clauses: list[ControlClause] | None = None
     textual_issues: list[dict[str, OpenJsonValue]] | None = None
     controls: list[DirectedControl] | None = None

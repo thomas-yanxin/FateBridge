@@ -76,7 +76,6 @@ class ZiweiDateReference(PartialOutput):
     publisher: str | None = None
     title: str | None = None
     url: str | None = None
-    raw_sha256: str | None = None
     date_scope: list[str] | None = None
     role: str | None = None
 

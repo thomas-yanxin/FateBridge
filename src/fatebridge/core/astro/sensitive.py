@@ -5,8 +5,6 @@ equation is reduced modulo P, its sum equation is reduced modulo 2P.
 Failing to double the period or the orb changes the mathematical claim.
 """
 
-import hashlib
-import json
 import math
 from fractions import Fraction
 from typing import Any, Mapping
@@ -15,9 +13,7 @@ SOURCE: dict[str, Any] = {
     "id": "udo_rudolph_1996_abc_excerpt",
     "author": "Udo Rudolph",
     "title": "ABC fuer Planetenbilder, first German edition 1996, ISBN 3-00-000881-0",
-    "url": "https://witte-verlag.com/component/djcatalog2/?fid=12&format=raw&task=download",
-    "sections": ["printed p.14; publisher excerpt PDF p.6"],
-    "source_sha256": "fd05ac9597cfc955b0f32c377a69dfe170b282616812c802b386b6b7172ccfd7",
+    "sections": ["printed p.14"],
     "scope": "Published symbolic sensitive-point example; excerpt, not the complete book or an empirical outcome study",
 }
 
@@ -89,13 +85,14 @@ def original_example_reading(
     direct = _delta(point, values["Midheaven"], 360)
     if abs(direct) > axis_orb * 2:
         return None
-    basis = [
-        [name, values[name].numerator, values[name].denominator]
-        for name in ("Mars", "Jupiter", "Zeus", "Midheaven")
-    ]
-    claim_id = hashlib.sha256(
-        json.dumps([basis, str(axis_orb)], separators=(",", ":")).encode()
-    ).hexdigest()
+    claim_id = (
+        "hamburg.udo1996.Mars+Jupiter-Zeus=Midheaven:"
+        + ":".join(
+            f"{values[name].numerator}/{values[name].denominator}"
+            for name in ("Mars", "Jupiter", "Zeus", "Midheaven")
+        )
+        + f":{axis_orb}"
+    )
     return {
         "claim_id": claim_id,
         "factor_longitudes": {

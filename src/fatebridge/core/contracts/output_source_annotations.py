@@ -36,13 +36,10 @@ class SourceReference(PartialOutput):
     source_id: str | None = None
     pdf_pages: list[int] | None = None
     locator: str | None = None
-    whole_pdf_sha256: str | None = None
 
 
 class SourceInputReadingEvidence(PartialOutput):
     reason: str | None = None
-    old_image_sha256: str | None = None
-    additional_image_sha256: str | None = None
     original_pdf_page: int | None = None
     additional_scan_leaf: int | None = None
     source_strength_label_assigned: Literal[False] | None = None
@@ -66,7 +63,6 @@ class SourceStrengthConstraint(PartialOutput):
 class SourceEditorialAnnotationProvenance(PartialOutput):
     content_kind: Literal["registered_editorial_annotation"] | None = None
     case_id: str | None = None
-    annotation_sha256: str | None = None
     is_verbatim_original_text: Literal[False] | None = None
     strength_label_assigned_or_regraded: Literal[False] | None = None
     new_independent_validation_credit: Literal[0] | None = None
@@ -75,7 +71,6 @@ class SourceEditorialAnnotationProvenance(PartialOutput):
 class SourceNameCorrection(PartialOutput):
     name_as_printed: str | None = None
     source_pdf_page: Literal[73] | None = None
-    source_image_sha256: str | None = None
     historical_person_identity_asserted: Literal[False] | None = None
 
     @field_validator(
@@ -93,7 +88,6 @@ class SourceIdentityRevision(PartialOutput):
     revision_id: Literal["ziping_witness_identity_v1"] | None = None
     publisher_as_printed: str | None = None
     source_pdf_page: Literal[1] | None = None
-    source_image_sha256: str | None = None
     source_strength_label_assigned_or_regraded: Literal[False] | None = None
     independent_expert_review: Literal["not_completed"] | None = None
     new_independent_validation_credit: Literal[0] | None = None
@@ -188,11 +182,9 @@ class SourceIndexContext(PartialOutput):
     source_condition_review_method_id: (
         Literal["registered_source_conditions_v1"] | None
     ) = None
-    source_condition_review_sha256: str | None = None
     total_registered_source_condition_reviews: int | None = None
     total_records_with_source_condition_review: int | None = None
     method_id: Literal["registered_literal_source_annotations_v1"] | None = None
-    index_sha256: str | None = None
     total_registered_records: int | None = None
     total_registered_literal_inputs: int | None = None
     total_registered_strength_constraints: int | None = None

@@ -1,6 +1,6 @@
 """BaZi flow analyses from the annual to the hourly layer."""
 
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.almanac import build_calendar_context, get_jieqi_year_grid
@@ -29,7 +29,7 @@ def calculate_liunian_analysis(
     person: PersonInfo,
     target_year: int,
     selected_sections: list[str] | None = None,
-) -> Dict:
+) -> dict[str, Any]:
     """
     流年分析工具 - 专门分析指定年份的流年影响
     """
@@ -106,7 +106,7 @@ def calculate_liuyue_analysis(
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
     selected_sections: list[str] | None = None,
-) -> Dict:
+) -> dict[str, Any]:
     """
     流月分析工具 - 专门分析指定日期所在节令月的影响
     """
@@ -255,7 +255,7 @@ def calculate_liuri_analysis(
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
     selected_sections: list[str] | None = None,
-) -> Dict:
+) -> dict[str, Any]:
     """
     流日分析工具 - 专门分析指定日期的流日影响
     """
@@ -361,7 +361,7 @@ def calculate_liushi_analysis(
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
     selected_sections: list[str] | None = None,
-) -> Dict:
+) -> dict[str, Any]:
     """
     流时分析工具 - 专门分析指定时刻的流时影响
     """

@@ -8,6 +8,7 @@ from typing import Any, Literal
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.astrology_tables import RULER_BY_SIGN as RULER_BY_SIGN
+from fatebridge.core.astro.birth_clock import solar_wall_clock
 from fatebridge.core.astro.geometry import (
     _degree_in_sign,
     _sign_name,
@@ -259,7 +260,7 @@ def _resolve_planetary_hour(
     The day runs sunrise→sunset (12 unequal *day* hours) and sunset→next sunrise
     (12 *night* hours). Hour 1 is ruled by the weekday's planet — fixed by the
     sunrise that opened the current planetary day — and rulers step through the
-    Chaldean order from there (see :func:`planetary_hour_sequence`).
+    Chaldean order from there (see planetary_hour_sequence).
 
     Preserve the specific case where the opening sunrise exists and has
     no defined civil weekday in the selected zone.
@@ -363,8 +364,6 @@ def _resolve_planetary_hour(
         if is_unspecified_local_time(sunrise_label):
             return "opening_sunrise_civil_weekday_undefined"
     else:
-        from fatebridge.core.astro.birth_clock import solar_wall_clock
-
         sunrise_label = solar_wall_clock(opening_epoch, longitude, weekday_clock_basis)
         weekday_receipt = {
             "weekday_clock_basis": weekday_clock_basis,
@@ -407,7 +406,6 @@ def _resolve_planetary_hour(
         "equatorial_frame": "selected_physical_equator_and_equinox_of_date",
         "time_scale": "UT1_arcs_TT_to_frozen_civil_UTC",
         "sequence_source": "Cassius Dio, Roman History 37.19, Loeb 1914",
-        "sequence_source_url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Cassius_Dio/37%2A.html#19",
         "source_scope": "Planet order and 24-hour weekday succession only; horizon and unequal-hour geometry are separate declared policies",
         **weekday_receipt,
     }
@@ -566,7 +564,7 @@ def _build_fixed_stars(
     julian_day_tt: float | TTInstant | None = None,
     sidereal: bool = False,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """``fixed_stars`` block — catalogue stars conjunct planets / Asc / MC.
+    """fixed_stars block — catalogue stars conjunct planets / Asc / MC.
 
     The catalogue is bundled. Missing native positions are explicitly marked
     unavailable, separately from a computed empty conjunction list.
@@ -594,8 +592,8 @@ def _build_classical_patterns(
     *,
     chart_sect: str,
 ) -> dict[str, Any]:
-    """The chart's ``classical_patterns`` block — [古典格局] relational layer
-    ``states`` carries per-planet speed for translation/
+    """The chart's classical_patterns block — [古典格局] relational layer
+    states carries per-planet speed for translation/
     collection of light; the North Node longitude drives nodal bending. Classical rules
     share tables through astrology_tables."""
     states = states or {}

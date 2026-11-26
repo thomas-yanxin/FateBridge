@@ -32,7 +32,6 @@ class HiddenStageConditions(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     source_path: str | None = None
     hidden_tomb_cessation: StageGroup | None = None
     flying_tomb_cessation: StageGroup | None = None
@@ -57,7 +56,6 @@ class StageKnowledge(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     literal_ruleset_version: str | None = None
     literal_source_stages: dict[str, dict[str, str]] | None = None
     fire_cycle_derivation: FireStageCycle | None = None

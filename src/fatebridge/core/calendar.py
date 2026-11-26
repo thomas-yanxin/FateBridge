@@ -135,10 +135,10 @@ class BaZiCalendar:
     ) -> tuple[str, str]:
         """Calculate the hour pillar (时柱) for a given datetime.
 
-        当 ``apply_late_zi_rollover`` 为 True (默认) 且 ``hour`` 为 23 时，
+        当 apply_late_zi_rollover 为 True (默认) 且 hour 为 23 时，
         时柱所依赖的日柱会翻至次日（晚子时/夜子时 翻日规则）。
-        该默认与 ``get_four_pillars`` 保持一致；如果调用方自行维护了
-        翻日逻辑，可显式传入 ``apply_late_zi_rollover=False``。
+        该默认与 get_four_pillars 保持一致；如果调用方自行维护了
+        翻日逻辑，可显式传入 apply_late_zi_rollover=False。
         """
         hour_branch = get_hour_branch(hour)
 
@@ -233,8 +233,8 @@ class BaZiCalendar:
         """
         Calculate all four pillars (四柱) for a given birth datetime.
 
-        ``birth_datetime`` is the day/hour clock (possibly solar-corrected).
-        Pass the original ``civil_datetime`` when corrected: year/month solar
+        birth_datetime is the day/hour clock (possibly solar-corrected).
+        Pass the original civil_datetime when corrected: year/month solar
         term boundaries are physical instants, not solar-clock readings.
 
         Returns:

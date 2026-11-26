@@ -26,9 +26,7 @@ class HexagramChapter(TypedDict):
     daxiang: str
     yaoci: list[LineVerse]
     special: SpecialVerse | None
-    source_url: str
     source_revision: int
-    source_wikitext_sha256: str
 
 
 class CorpusProvenance(TypedDict):
@@ -91,7 +89,5 @@ def moving_text_evidence(current_code: str, changed_code: str) -> MovingTextEvid
             verse for verse in base["yaoci"] if verse["position"] in positions
         ],
         "all_moving_special": base["special"] if len(positions) == 6 else None,
-        "base_source_url": base["source_url"],
-        "changed_source_url": changed["source_url"],
         "scope": "按实际动爻列原文供参照；纳甲六爻不以通用爻位模板替代爻辞，未自动套用其他流派的多爻变占法。",
     }

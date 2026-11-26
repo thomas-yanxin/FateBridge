@@ -26,8 +26,6 @@ LikertScore = Annotated[StrictInt, Field(ge=1, le=5)]
 
 SCALE_ID = "ipip_big_five_50"
 METHOD_ID = "fatebridge.ipip_big_five_50.contract_v1"
-SCALE_URL = "https://ipip.ori.org/new_ipip-50-item-scale.htm"
-SCORING_URL = "https://ipip.ori.org/newScoringInstructions.htm"
 ITEMS_PER_DOMAIN = 10
 MIN_ANSWERED_PER_DOMAIN = 8
 TOTAL_ITEMS = 50
@@ -247,8 +245,6 @@ def scale_provenance() -> dict[str, JsonValue]:
         "scale_name_zh": "IPIP 50题大五人格因子标记量表",
         "author": "Lewis R. Goldberg (1992)",
         "license": "Public Domain",
-        "scale_url": SCALE_URL,
-        "scoring_url": SCORING_URL,
         "domains": {
             domain: {
                 "factor": DOMAIN_METADATA[domain][0],

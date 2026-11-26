@@ -18,7 +18,6 @@ class SukuyoDetailMatch(PartialOutput):
 
 class SukuyoActivityRule(PartialOutput):
     source_passages: list[dict[str, OpenJsonValue]] | None = None
-    source_layer_bundle_sha256: str | None = None
     rule_id: str | None = None
     layer: str | None = None
     selectors: list[OpenJsonValue] | None = None
@@ -60,7 +59,6 @@ class SukuyoActivityLayer(PartialOutput):
 
 
 class SukuyoActivityAssessment(PartialOutput):
-    clothing_source_bundle_sha256: str | None = None
     activity: str | None = None
     activity_details: list[str] | None = None
     effective_activity_details: list[str] | None = None
@@ -71,9 +69,6 @@ class SukuyoActivityAssessment(PartialOutput):
     conditional_rules: list[SukuyoActivityRule] | None = None
     conditional_rules_applied_to_aggregate: bool | None = None
     textual_issues: list[dict[str, OpenJsonValue]] | None = None
-    travel_direction_source_bundle_sha256: str | None = None
-    special_day_source_bundle_sha256: str | None = None
-    sanjiu_day_source_bundle_sha256: str | None = None
     unresolved_source_rules_present: bool | None = None
 
 
@@ -125,8 +120,6 @@ class SukuyoSpecialDays(PartialOutput):
     direct_printed_comparisons: list[SukuyoSpecialWitness] | None = None
     candidate_primary: list[SukuyoSpecialCandidate] | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
-    source_bundle_sha256: str | None = None
     selected_primary: str | None = None
     selected_lower_activity_witness: str | None = None
     weekday_basis: str | None = None
@@ -149,8 +142,6 @@ class SukuyoDirectionalTravel(PartialOutput):
     candidate_records: list[SukuyoDirectionCandidate] | None = None
     basis: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
-    source_bundle_sha256: str | None = None
     locator: str | None = None
     selected_text: str | None = None
     textual_issues: list[dict[str, OpenJsonValue]] | None = None
@@ -189,8 +180,6 @@ class SukuyoLowerWeekday(PartialOutput):
 class SukuyoLowerMethods(PartialOutput):
     ruleset_id: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
-    source_bundle_sha256: str | None = None
     selected_text: str | None = None
     nature: SukuyoLowerNature | None = None
     weekday: SukuyoLowerWeekday | None = None
@@ -202,7 +191,6 @@ class SukuyoLowerMansion(PartialOutput):
     mansion: str | None = None
     ruleset_id: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     locator: str | None = None
     topic_rules: list[SukuyoActivityRule] | None = None
     textual_issues: list[dict[str, OpenJsonValue]] | None = None
@@ -233,7 +221,6 @@ class SukuyoConjunctionDoctrine(PartialOutput):
     candidate_groups: list[SukuyoConjunctionCandidate] | None = None
     basis: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     locator: str | None = None
     angular_offset_degrees: float | None = None
     physical_evaluation_status: str | None = None

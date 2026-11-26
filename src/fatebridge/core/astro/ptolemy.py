@@ -25,7 +25,6 @@ from fatebridge.core.astro.geometry import (
     normalize_angle,
 )
 from fatebridge.core.astro.ptolemy_terms import (
-    SCAN_URL,
     TERM_POLICY,
     TRANSCRIPTION_NOTE,
     terms_at,
@@ -36,24 +35,20 @@ from fatebridge.core.classical_western import (
     planet_sect,
 )
 
-SOURCE_URL = (
-    "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html"
-)
-FORTUNE_SOURCE_URL = "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/3B%2A.html#10"
 RULESET_ID = "ptolemy_tetrabiblos_robbins_1940_bounded_v4"
-_TRIANGLES = {
+TRIANGLES = {
     "Fire": {"day": "Sun", "night": "Jupiter"},
     "Earth": {"day": "Venus", "night": "Moon"},
     "Air": {"day": "Saturn", "night": "Mercury"},
 }
-_TRIANGLE_ASSIGNMENTS = {
+TRIANGLE_ASSIGNMENTS = {
     "Fire": ("Sun", "Jupiter"),
     "Earth": ("Moon", "Venus"),
     "Air": ("Saturn", "Mercury"),
     "Water": ("Mars", "Moon", "Venus"),
 }
 
-_SIGN_ASPECTS = {
+SIGN_ASPECTS = {
     2: ("sextile", "harmonious"),
     3: ("square", "disharmonious"),
     4: ("trine", "harmonious"),
@@ -70,7 +65,7 @@ def sign_relationship(sign_a: str, sign_b: str) -> dict[str, Any]:
     """
     a, b = SIGNS.index(sign_a), SIGNS.index(sign_b)
     distance = min((a - b) % 12, (b - a) % 12)
-    aspect, quality = _SIGN_ASPECTS.get(distance, (None, None))
+    aspect, quality = SIGN_ASPECTS.get(distance, (None, None))
     commanding = (a + b) % 12 == 11
     beholding = (a + b) % 12 == 5
     summer_sign = sign_a if a < 6 else sign_b
@@ -96,7 +91,7 @@ def triplicity_assigned_rulers(sign: str) -> list[str]:
     A listed planet's general familiarity is not a claim that it holds the
     selected primary/explicit co-ruler role in both conditions, or a score.
     """
-    return list(_TRIANGLE_ASSIGNMENTS[ELEMENT_BY_SIGN[sign]])
+    return list(TRIANGLE_ASSIGNMENTS[ELEMENT_BY_SIGN[sign]])
 
 
 def triplicity_rulers(sign: str, chart_sect: str) -> dict[str, str | None]:
@@ -110,7 +105,7 @@ def triplicity_rulers(sign: str, chart_sect: str) -> dict[str, str | None]:
         raise ValueError("Triplicity requires an explicit day or night condition")
     element = ELEMENT_BY_SIGN[sign]
     return {
-        "primary": "Mars" if element == "Water" else _TRIANGLES[element][chart_sect],
+        "primary": "Mars" if element == "Water" else TRIANGLES[element][chart_sect],
         "co_ruler": (
             ("Venus" if chart_sect == "day" else "Moon") if element == "Water" else None
         ),
@@ -138,7 +133,6 @@ def build_ptolemy_layer(
         "ruleset_id": RULESET_ID,
         "author": "Claudius Ptolemy",
         "edition": "Tetrabiblos; F. E. Robbins; Loeb Classical Library; 1940",
-        "source_url": SOURCE_URL,
         "chapters": {
             "planet_sect": "I.7",
             "sign_relationships": "I.13-16",
@@ -151,7 +145,6 @@ def build_ptolemy_layer(
         "status": "computed_subset" if tropical else "unsupported_zodiac",
         "scope": "Tropical signs; seven planets; sect, sign relationships, domicile, triangle, exaltation, depression, three reported term systems and the III.10 Fortune formula only",
         "term_policy": TERM_POLICY,
-        "term_source_url": SCAN_URL,
         "term_transcription_note": TRANSCRIPTION_NOTE,
         "planets": {},
         "lot_of_fortune": None,
@@ -168,7 +161,6 @@ def build_ptolemy_layer(
             "longitude": fortune,
             "sign": SIGNS[int(fortune // 30)],
             "degree_in_sign": fortune % 30,
-            "source_url": FORTUNE_SOURCE_URL,
         }
     for planet in EXALTATION_SIGNS:
         if planet not in longitudes:

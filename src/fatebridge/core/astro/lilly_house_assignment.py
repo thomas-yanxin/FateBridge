@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any, Sequence
 
 from fatebridge.core.astro.geometry import Angle, angle_fraction, longitude_float
-from fatebridge.core.astro.lilly import SOURCE_URL
 from fatebridge.core.astro.lilly_houses import house_condition
 
 HOUSE_ATTRIBUTES = tuple(
@@ -58,7 +57,6 @@ def assign_cusp_virtue(
         raise ValueError("Occupied house must be1..12 or unknown")
     result: dict[str, Any] = {
         "rule_id": "lilly_1647_p33_nearest_cusp_virtue_v1",
-        "source_url": SOURCE_URL,
         "source_pages": [33, 154, 180, 552],
         "status": "unavailable",
         "unavailable_reason": "missing_longitude_house_or_adjacent_cusps",

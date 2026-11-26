@@ -1,7 +1,7 @@
 """Analyze the effect of timed pillars on a natal BaZi chart."""
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.analysis.timing_element_shares import (
     TimingElementEffects,
@@ -41,7 +41,7 @@ class TimingEffectsAnalysis:
         *,
         analysis_moment: datetime | None = None,
         allow_missing_gender: bool = False,
-    ) -> Dict:
+    ) -> dict[str, Any]:
         """Select an active Dayun by exact instant or elapsed age, and describe its effects."""
         if allow_missing_gender and normalize_gender(gender) not in {"男", "女"}:
             return {
@@ -163,10 +163,10 @@ class TimingEffectsAnalysis:
         *,
         moment: datetime | None = None,
         timezone_name: str | None = None,
-    ) -> Dict:
+    ) -> dict[str, Any]:
         """Describe annual effects using the Li Chun year when an analysis instant is supplied."""
         # 获取流年信息；传入 moment 使 calculate_liunian 以立春为边界。
-        liunian_kwargs: Dict = {}
+        liunian_kwargs: dict[str, Any] = {}
         if moment is not None:
             liunian_kwargs["moment"] = moment
             if timezone_name is not None:
@@ -198,9 +198,9 @@ class TimingEffectsAnalysis:
         target_day: int = 1,
         timezone_name: str = DEFAULT_TIMEZONE,
         target_date: datetime | None = None,
-        liuyue_info: Dict | None = None,
+        liuyue_info: dict[str, Any] | None = None,
         original_element_counts: dict[Element, float] | None = None,
-    ) -> Dict:
+    ) -> dict[str, Any]:
         """Describe the effects of the solar-term month pillar."""
         if liuyue_info is None:
             liuyue_info = TimingAnalysis.calculate_liuyue(
@@ -245,9 +245,9 @@ class TimingEffectsAnalysis:
         birth_pillars: dict[str, tuple[str, str]],
         target_date: datetime,
         timezone_name: str = DEFAULT_TIMEZONE,
-        liuri_info: Dict | None = None,
+        liuri_info: dict[str, Any] | None = None,
         original_element_counts: dict[Element, float] | None = None,
-    ) -> Dict:
+    ) -> dict[str, Any]:
         """
         分析流日影响。
         """
@@ -285,9 +285,9 @@ class TimingEffectsAnalysis:
         birth_pillars: dict[str, tuple[str, str]],
         target_datetime: datetime,
         timezone_name: str = DEFAULT_TIMEZONE,
-        liushi_info: Dict | None = None,
+        liushi_info: dict[str, Any] | None = None,
         original_element_counts: dict[Element, float] | None = None,
-    ) -> Dict:
+    ) -> dict[str, Any]:
         """
         分析流时影响。
         """
@@ -329,10 +329,10 @@ class TimingEffectsAnalysis:
         target_day: int = 1,
         timezone_name: str = DEFAULT_TIMEZONE,
         target_date: datetime | None = None,
-        liuyue_info: Dict | None = None,
-        liunian_analysis: Dict | None = None,
+        liuyue_info: dict[str, Any] | None = None,
+        liunian_analysis: dict[str, Any] | None = None,
         original_element_counts: dict[Element, float] | None = None,
-    ) -> Dict:
+    ) -> dict[str, Any]:
         """Describe the month and its optional branch relationship with the annual pillar."""
         # 基础流月分析
         liuyue_analysis = TimingEffectsAnalysis.analyze_liuyue_effects(
@@ -383,7 +383,7 @@ class TimingEffectsAnalysis:
     @staticmethod
     def _analyze_branch_combination(
         branch1: str, branch2: str, type1: str, type2: str
-    ) -> Dict:
+    ) -> dict[str, Any]:
         """Report structural pair relations for the two labeled branches."""
         relations: list[dict[str, Any]] = []
 
@@ -423,7 +423,7 @@ class TimingEffectsAnalysis:
         }
 
     @staticmethod
-    def _generate_comprehensive_liuyue_summary(analysis_result: Dict) -> str:
+    def _generate_comprehensive_liuyue_summary(analysis_result: dict[str, Any]) -> str:
         """Summarize the monthly pillar, ten god, and branch relationships."""
         summary_parts = []
 
@@ -451,12 +451,12 @@ class TimingEffectsAnalysis:
 
     @staticmethod
     def _generate_comprehensive_summary(
-        dayun_analysis: Dict,
-        liunian_analysis: Dict,
-        liuyue_analysis: Dict,
-        liuri_analysis: Dict,
+        dayun_analysis: dict[str, Any],
+        liunian_analysis: dict[str, Any],
+        liuyue_analysis: dict[str, Any],
+        liuri_analysis: dict[str, Any],
         combined_effects: TimingElementEffects,
-        liushi_analysis: Dict | None = None,
+        liushi_analysis: dict[str, Any] | None = None,
     ) -> str:
         """生成综合时运分析总结"""
         summary_parts = []

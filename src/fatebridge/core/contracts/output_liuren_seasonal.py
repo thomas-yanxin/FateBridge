@@ -76,7 +76,6 @@ class LiurenSeasonalEvidence(PartialOutput):
     ruleset_id: Literal["tanyuan_seasonal_month_conditions_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[StrictInt] | None = None
     month_partition_profile: Literal["declared_seasonal_month_branches_v1"] | None = (
         None

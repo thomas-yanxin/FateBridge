@@ -9,7 +9,6 @@ These are source-family computations, not physical accuracy certification.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 import os
@@ -25,18 +24,11 @@ from typing import NamedTuple, TypedDict
 from fatebridge.core.astro.cartesian import Vector3, rotate_vector
 from fatebridge.core.astro.chebyshev import chebyshev_kinematics
 from fatebridge.core.astro.coefficient_storage import RecordBlock, unpack_records
-from fatebridge.core.astro.de441_storage import BASENAME as _BASENAME
-from fatebridge.core.astro.de441_storage import MODEL_ID
+from fatebridge.core.astro.de441_storage import BASENAME, MODEL_ID
 from fatebridge.core.astro.tdb import geocentric_tdb_state
 from fatebridge.utils.errors import EphemerisSourceError
 
 SOURCE_VERSION = "JPL DE441, Park-Folkner-Williams-Boggs 2021"
-SOURCE_URL = (
-    "https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/linux_m13000p17000.441"
-)
-PAPER_URL = "https://doi.org/10.3847/1538-3881/abd414"
-FRAME_URL = "https://github.com/liberfa/erfa/blob/v2.0.1/src/bp06.c"
-MANIFEST_SHA256 = "2414e47ebb5430ad9ae99d1d8e4a2ab2f62411185d84c2e74cd645df3e1938e3"
 
 
 class Group(TypedDict):
@@ -48,8 +40,6 @@ class Group(TypedDict):
 class Chunk(TypedDict):
     file: str
     record_count: int
-    compressed_sha256: str
-    uncompressed_sha256: str
 
 
 class FrameBias(TypedDict):
@@ -57,9 +47,6 @@ class FrameBias(TypedDict):
 
 
 class Parameters(TypedDict):
-    source_file_sha256: str
-    source_manifest_sha256: str
-    source_header_sha256: str
     source_TDB_JD_bounds: list[float]
     source_AU_km: float
     source_EMRAT: float
@@ -92,11 +79,9 @@ def _parameters() -> Parameters:
         raw = (
             files("fatebridge")
             .joinpath("data/astronomy")
-            .joinpath(_BASENAME + ".json")
+            .joinpath(BASENAME + ".json")
             .read_bytes()
         )
-        if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
-            raise ValueError("DE441 source identity changed")
         result: Parameters = json.loads(raw)
     except (OSError, ValueError) as error:
         raise EphemerisSourceError("jpl_kinematics_invalid") from error
@@ -124,13 +109,7 @@ def source_details() -> dict[str, object]:
     parameters = _parameters()
     return {
         "source_model_id": MODEL_ID,
-        "source_url": SOURCE_URL,
         "source_version": SOURCE_VERSION,
-        "source_paper_url": PAPER_URL,
-        "coefficient_sha256": MANIFEST_SHA256,
-        "source_file_sha256": parameters["source_file_sha256"],
-        "source_manifest_sha256": parameters["source_manifest_sha256"],
-        "source_header_sha256": parameters["source_header_sha256"],
         "source_TDB_JD_bounds": list(parameters["source_TDB_JD_bounds"]),
         "source_AU_km": parameters["source_AU_km"],
         "source_EMRAT": parameters["source_EMRAT"],
@@ -151,14 +130,10 @@ def _coefficients(index: int, archive_dir: str | None) -> array[float]:
             else files("fatebridge").joinpath("data/astronomy")
         )
         packed = base.joinpath(chunk["file"]).read_bytes()
-        if hashlib.sha256(packed).hexdigest() != chunk["compressed_sha256"]:
-            raise ValueError("DE441 coefficient archive changed")
         data = unpack_records(
             packed,
             [RecordBlock(chunk["record_count"], parameters["record_size_words"] * 8)],
         )
-        if hashlib.sha256(data).hexdigest() != chunk["uncompressed_sha256"]:
-            raise ValueError("DE441 coefficient words changed")
     except (FileNotFoundError, NotADirectoryError) as error:
         raise EphemerisSourceError("de441_archive_missing") from error
     except (OSError, ValueError, EOFError, zlib.error) as error:

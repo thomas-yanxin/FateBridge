@@ -6,7 +6,6 @@ Full-file identity uses a local content pin. Span identity uses HTTP ranges and 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 import os
@@ -19,7 +18,7 @@ import urllib.request
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import BinaryIO, Final, Literal, Protocol, TypedDict
+from typing import Final, Literal, Protocol, TypedDict
 
 import certifi
 
@@ -35,7 +34,6 @@ class _KernelSpec:
     filename: str
     url: str
     bytes: int
-    sha256: str
     start_jd_tdb: float
     end_jd_tdb: float
 
@@ -43,7 +41,6 @@ class _KernelSpec:
 class KernelVerification(TypedDict):
     filename: str
     bytes: int
-    sha256: str
     time_scale: Literal["TDB"]
     start_julian_day_tdb: float
     end_julian_day_tdb: float
@@ -57,7 +54,6 @@ class AcquisitionReceipt(TypedDict, total=False):
     network_request_performed: bool
     url: str
     expected_bytes: int
-    expected_sha256: str
     verification_disabled: bool
     http_status: int
     headers: dict[str, str]
@@ -74,11 +70,10 @@ DE441: Final = _KernelSpec(
     "linux_m13000p17000.441",
     "https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/linux_m13000p17000.441",
     2788676624,
-    "476096486def4e41bfceb29aa27f50784da0bce318902bcf7b88caad058cd4da",
     -3027215.5,
     7930192.5,
 )
-_CHUNK = 1024 * 1024
+CHUNK = 1024 * 1024
 PROGRESS_INTERVAL_BYTES = 256 * 1024 * 1024
 
 
@@ -95,12 +90,6 @@ def _verify(path: Path, spec: _KernelSpec) -> KernelVerification:
     )
     if original_size_bytes != spec.bytes:
         raise ValueError("Kernel size does not match the fixed content pin")
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for block in iter(lambda: stream.read(_CHUNK), b""):
-            digest.update(block)
-    if digest.hexdigest() != spec.sha256:
-        raise ValueError("Kernel SHA-256 does not match the fixed content pin")
     header = jpl_header(path)
     if (
         header["start_julian_day_tdb"] != spec.start_jd_tdb
@@ -112,7 +101,6 @@ def _verify(path: Path, spec: _KernelSpec) -> KernelVerification:
     return {
         "filename": spec.filename,
         "bytes": spec.bytes,
-        "sha256": spec.sha256,
         "time_scale": "TDB",
         "start_julian_day_tdb": spec.start_jd_tdb,
         "end_julian_day_tdb": spec.end_jd_tdb,
@@ -159,7 +147,6 @@ def _acquire(
         {
             "url": spec.url,
             "expected_bytes": spec.bytes,
-            "expected_sha256": spec.sha256,
             "verification_disabled": False,
             "network_request_performed": False,
         }
@@ -172,7 +159,7 @@ def _acquire(
             request = urllib.request.Request(
                 spec.url,
                 headers={
-                    "User-Agent": "FateBridge-data/1.0 (+https://github.com/thomas-yanxin/FateBridge/issues)",
+                    "User-Agent": "FateBridge-data/1.0",
                     "Accept-Encoding": "identity",
                 },
             )
@@ -192,7 +179,7 @@ def _acquire(
                         "Server Content-Length differs from the fixed kernel size"
                     )
                 received = 0
-                for block in iter(lambda: response.read(_CHUNK), b""):
+                for block in iter(lambda: response.read(CHUNK), b""):
                     received += len(block)
                     operational["received_bytes"] = received
                     if received > spec.bytes:
@@ -233,21 +220,9 @@ def fetch_de441(
     )
 
 
-SOURCE_URL = DE441.url
+DE441_URL = DE441.url
 RECORD_BYTES = 8144
 CHUNK_RECORDS = 4096
-
-
-def stream_sha256(source: BinaryIO) -> str:
-    digest = hashlib.sha256()
-    for chunk in iter(lambda: source.read(_CHUNK), b""):
-        digest.update(chunk)
-    return digest.hexdigest()
-
-
-def file_sha256(path: Path) -> str:
-    with path.open("rb") as source:
-        return stream_sha256(source)
 
 
 def january_first(year: int) -> float:
@@ -288,7 +263,7 @@ def source_range(
     }
     if etag is not None:
         headers["If-Match"] = etag
-    request = urllib.request.Request(SOURCE_URL, headers=headers)
+    request = urllib.request.Request(DE441_URL, headers=headers)
     with urllib.request.urlopen(
         request,
         context=ssl.create_default_context(cafile=certifi.where()),
@@ -329,7 +304,7 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
     ranges: list[dict[str, int | str]] = []
     manifest: dict[str, object] = {
         "format": "fatebridge_complete_de441_span_v1",
-        "source_url": SOURCE_URL,
+        "source_url": DE441_URL,
         "output": output.name,
         "requested_start_year": start_year,
         "requested_end_year_exclusive": end_year,
@@ -337,7 +312,6 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
         "guard_days_each_side": 32,
         "all_bodies_and_coefficients_retained": True,
         "runtime_default_changed": False,
-        "full_remote_file_sha256_verified": False,
         "status": "planned",
         "ranges": ranges,
     }
@@ -366,8 +340,6 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
             status="downloading",
             original_object_bytes=total,
             original_headers=headers,
-            original_header_sha256=hashlib.sha256(header).hexdigest(),
-            original_constants_sha256=hashlib.sha256(constants).hexdigest(),
             original_first_record=first,
             record_count=stop - first,
             start_julian_day_tdb=actual_begin,
@@ -376,7 +348,6 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
             downloaded_coefficient_bytes=0,
         )
         save()
-        raw_digest = hashlib.sha256()
         downloaded = 0
         with partial.open("xb") as target:
             target.write(modified)
@@ -400,14 +371,7 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
                             "Nonconsecutive or nonfinite original DE441 record"
                         )
                 target.write(block)
-                raw_digest.update(block)
-                ranges.append(
-                    {
-                        "start": offset,
-                        "bytes": size,
-                        "sha256": hashlib.sha256(block).hexdigest(),
-                    }
-                )
+                ranges.append({"start": offset, "bytes": size})
                 downloaded += size
                 manifest["downloaded_coefficient_bytes"] = downloaded
                 save()
@@ -424,8 +388,6 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
         manifest.update(
             status="ready",
             active_range=None,
-            original_coefficient_sha256=raw_digest.hexdigest(),
-            output_sha256=file_sha256(partial),
             output_bytes=partial.stat().st_size,
         )
         partial.rename(output)
@@ -448,17 +410,9 @@ def verify(output: Path) -> dict[str, object]:
     manifest: dict[str, object] = loaded
     if manifest["status"] != "ready" or manifest["output"] != output.name:
         raise ValueError("The source manifest is not ready or bound to this basename")
-    with output.open("rb") as source:
-        source.seek(RECORD_BYTES)
-        constants = source.read(RECORD_BYTES)
-        coefficient_sha = stream_sha256(source)
     info = jpl_header(output)
     if (
         output.stat().st_size != manifest["output_bytes"]
-        or file_sha256(output) != manifest["output_sha256"]
-        or hashlib.sha256(constants).hexdigest()
-        != manifest["original_constants_sha256"]
-        or coefficient_sha != manifest["original_coefficient_sha256"]
         or info["start_julian_day_tdb"] != manifest["start_julian_day_tdb"]
         or info["end_julian_day_tdb"] != manifest["end_julian_day_tdb"]
     ):

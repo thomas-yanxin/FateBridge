@@ -29,12 +29,10 @@ class MovingEarthCandidate(PartialOutput):
 
 class MetalMovingSupport(PartialOutput):
     application_source_url: str | None = None
-    application_source_sha256: str | None = None
     application_interpretation: str | None = None
     ruleset_id: str | None = None
     ruleset_version: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     source_path: str | None = None
     condition_match: bool | None = Field(
         default=None,
@@ -76,7 +74,6 @@ class OwnSiGrowth(PartialOutput):
     status: str | None = None
     source_path: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     admission_source_url: str | None = None
     admission_interpretation: str | None = None
     actual_total_effect_adjudicated: bool | None = None
@@ -115,7 +112,6 @@ class MovingSiGrowth(PartialOutput):
     sources: list[MovingSiSource] | None = None
     source_path: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     actual_total_effect_adjudicated: bool | None = None
     scope: str | None = None
 
@@ -152,7 +148,6 @@ class GrowthConditions(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     clauses: list[dict[str, OpenJsonValue]] | None = None
     lines: list[GrowthLine] | None = None
     focus: GrowthLine | None = None
