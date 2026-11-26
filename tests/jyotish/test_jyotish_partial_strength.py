@@ -4,14 +4,20 @@ Raman76-77's magnitude formula is independent of which planet receives it.
 Cheshta controls here are mathematical operands, not observed natal positions.
 """
 
+import asyncio
 import copy
+import json
 import math
 from fractions import Fraction
 from itertools import combinations
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
+from fastmcp import Client
 
+import fatebridge.api as api
+from fatebridge.cli import run
 from fatebridge.core.jyotish import jyotish_mean
 from fatebridge.core.jyotish.jyotish_balas import PLANETS, moon_nature_readings
 from fatebridge.core.jyotish.jyotish_evidence import cheshta_ruler_provenance
@@ -19,8 +25,80 @@ from fatebridge.core.jyotish.jyotish_motion import cheshta_arc
 from fatebridge.core.jyotish.jyotish_sthana import drekkana
 from fatebridge.core.jyotish.jyotish_strength import SOURCE_ID
 from fatebridge.core.jyotish.jyotish_war import STARS, THROUGH_HORA, war_bala
-from tests.jyotish.test_jyotish_transports import call_surfaces
-from tests.support.transports import AS_OF, SPECS, three_surfaces
+from fatebridge.services.tool_catalog import CATALOG
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    cached_mcp_app,
+    call_calculation,
+    three_surfaces,
+)
+
+
+def call_surfaces(monkeypatch, capsys, key, payload, fields):
+    spec = SPECS[key]
+    api._reset_runtime_state_for_tests()
+    monkeypatch.setattr(
+        api,
+        "API_KEY_AUTHENTICATOR",
+        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
+    )
+    options = {
+        "as_of": AS_OF,
+        "fields": fields,
+        "strict_fields": True,
+        "include_snapshot_text": False,
+        "response_char_limit": 0,
+    }
+    response = TestClient(api.app).post(
+        spec.rest_path,
+        json=payload,
+        params=[
+            ("as_of", AS_OF),
+            ("strict_fields", "true"),
+            ("include_snapshot_text", "false"),
+            ("response_char_limit", "0"),
+            *[("fields", f) for f in fields],
+        ],
+    )
+
+    async def protocol():
+        async with Client(cached_mcp_app()) as client:
+            return await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
+            )
+
+    protocol_result = asyncio.run(protocol())
+    native = protocol_result.structured_content
+    args = [spec.tool_name]
+    for name, value in payload.items():
+        args += [
+            "--" + name.replace("_", "-"),
+            *([str(x) for x in value] if isinstance(value, list) else [str(value)]),
+        ]
+    args += [
+        "--as-of",
+        AS_OF,
+        "--strict-fields",
+        "--no-include-snapshot-text",
+        "--response-char-limit",
+        "0",
+        "--fields",
+        *fields,
+    ]
+    capsys.readouterr()
+    code = run(args)
+    cli = json.loads(capsys.readouterr().out)
+    assert response.status_code == 200, response.text
+    assert not protocol_result.is_error, native
+    assert code == 0, cli
+    bodies = [
+        {k: v for k, v in body.items() if k != "run_metadata"}
+        for body in [response.json(), native, cli]
+    ]
+    assert bodies[0] == bodies[1] == bodies[2]
+    return response.json()
+
 
 DISCS = {
     "Mars": "9.4",
@@ -222,7 +300,6 @@ def test_actual_1977_origin_pair_magnitude_reaches_three_surfaces_without_a_verd
 ) -> None:
     from fatebridge.application.execution import execute_tool
     from fatebridge.core.execution_context import ExecutionOptions
-    from tests.jyotish.test_jyotish_transports import AS_OF, SPECS
 
     payload = dict(
         birth_year=1977,

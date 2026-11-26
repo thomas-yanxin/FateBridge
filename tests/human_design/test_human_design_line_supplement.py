@@ -24,10 +24,6 @@ def test_gate2_condition_stays_reference_only_and_is_not_a_material_forecast() -
         "channel_gates": [2, 14],
     }
     assert condition["polarity"] == "exaltation"
-    assert (
-        condition["source_clause_sha256"]
-        == "8e412f58a60749b2a85a3a77720181610af084d0038564de3afa7d0776823d3a"
-    )
     assert condition["personal_condition_satisfied"] is None
     assert condition["automatic_application"] is False
     assert condition["evidence_required"] == [

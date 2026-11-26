@@ -1,18 +1,4 @@
-"""Full-service civil endpoints; only finite date facts have independent targets.
-
-The targets were sealed before AFTER observations in R32's
-qimen-priority-discovery/after-acceptance-preparation/
-independent-day-policy-targets.json (SHA256 bb4d0e09e117661eacaabc9c6e8a9f12e5
-cbdcbf4446d24111c24b071c2d37a7). They continue the frozen HKO 2026-01-01
-乙亥, 01-20 甲午 and 01-31 乙巳 anchors over proleptic Gregorian day ordinals,
-with the declared 23:00 day rollover. Fu-head/yuan use the selected 卷一
-625938 conditions. This is not an ancient-calendar or solar-position oracle;
-the nine retained traditional source obligations remain unresolved.
-
-Execution needs the installed project/dev dependencies and bundled astronomy
-assets. Auto selection may use native files or the bundled DE441 fallback;
-the test does not pin a provider or assert astronomical/whole-board accuracy.
-"""
+"""Full-service civil endpoints over proleptic Gregorian day ordinals."""
 
 import pytest
 

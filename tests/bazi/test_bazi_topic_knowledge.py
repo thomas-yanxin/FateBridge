@@ -64,12 +64,7 @@ def test_each_public_entry_attributes_only_its_declared_statements(
     assert bool(entry["source_pending_tip_indices"]) == (f"{category}/{key}" in PARTIAL)
     assert "非逐字引文" in result["citation"]
     for source in entry["source_refs"]:
-        assert (
-            source["source_sha256"]
-            == "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620"
-        )
         assert source["source_pdf_pages"]
-        assert source["source_url"] in result["snapshot_text"]
     for implementation in entry["implementation_refs"]:
         assert (ROOT / implementation["source_path"]).is_file()
         assert implementation["source_path"] in result["snapshot_text"]

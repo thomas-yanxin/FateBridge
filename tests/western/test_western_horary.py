@@ -122,7 +122,6 @@ def test_horary_saturn_station_identity_and_event_order_reach_three_surfaces(
     surface_calls,
 ):
     # JPL Horizons target 6 (system barycenter), IAU2006/2000A true ecliptic.
-    # Response SHA256: 21a988c0b0798ed4271d9ef110bbbe8d2d0ea5461740d4e0ef2151adf7d6ecc6.
     reference_tt = 2459875.672683134
     fields = [
         "horary.perfection.event_history",

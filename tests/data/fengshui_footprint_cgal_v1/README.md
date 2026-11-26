@@ -1,9 +1,0 @@
-# Convex footprint and coordinate-error direction support
-
-The 3,777 fixed arguments and comparison criteria were recorded before product edits: one discovered north-side thin rectangle, 3,072 unselected convex footprints, 192 closed origin/error-boundary controls, and 512 points. The first half of the unselected footprints are axis-aligned rectangles; the rest use supplied rounded rational rotations. These private geometry arguments do not add public nonrectangular furniture support or certify pose reconstruction.
-
-Unmodified CGAL 6.2.1 supplies `Polygon_2`, intersection and squared-distance operations. Its `Sqrt_extension` over Boost `cpp_rational` keeps the 22.5-degree sector rays exactly in Q(sqrt(2)). The independent driver compares the actual convex footprint with sectors expanded by the declared compass error and a closed translating coordinate-error disc. It does not use Shapely, FateBridge or a production answer. Release archive, actual compiler dependencies, driver, inputs and raw output identities are retained in the external `spatial-ownership-and-candidate-audit-v1` phase.
-
-Every binary64 coordinate is interpreted as its exact rational value. Nonzero angular extents use closed sectors; a point without uncertainty retains the existing half-open cell convention. When the coordinate-error region reaches the reference origin, polygons retain all directions and point locations remain unbound. Those origin controls validate that explicit project policy, rather than proving an exact physical directional extent.
-
-The portable file contains only original arguments and independent answers. Its SHA-256 covers the decompressed JSON. Full arbitrary-angle boundaries, continuous geometry, measured site fidelity, traditional interpretation and real-world effects remain unqualified. Existing visibility, shadow, ray, phase and source-reference fixtures and gates remain unchanged.

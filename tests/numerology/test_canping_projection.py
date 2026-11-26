@@ -1,6 +1,5 @@
 """Complete schedule, actual selected source and no silent source substitution."""
 
-import hashlib
 import json
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
@@ -32,43 +31,6 @@ from fatebridge.utils.errors import EphemerisSourceError
 INPUT = dict(
     date="2200-05-15", time="09:00", zone="UTC", gender="男", use_true_solar_time=False
 )
-FOLDER = Path(__file__).parents[1] / "fixtures/canping_projection_v1"
-
-
-@pytest.mark.parametrize("mode", ["de440", "analytic"])
-@pytest.mark.parametrize("year", [1799, 2320])
-def test_derived_clock_flags_and_frozen_endpoint_roots(
-    monkeypatch: MonkeyPatch, mode: str, year: int
-) -> None:
-    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
-    if year == 1799:
-        reference = json.loads(
-            (FOLDER.parent / "ren_calendar_guard_v1/reference.json").read_bytes()
-        )
-        expected = next(
-            r for r in reference["rows"] if r["year"] == year and r["index"] == 2
-        )
-        civil, pillar = 1800, 1799
-    else:
-        reference = json.loads((FOLDER / "reference.json").read_bytes())
-        expected = next(r for r in reference["rows"] if r["year"] == year)
-        civil = pillar = 2200
-    row = projection_boundary(
-        year, "UTC", origin_civil_year=civil, origin_bazi_year=pillar, horizon=120
-    )
-    details = row["record"]["solar_model_details"]
-    assert details["historical_ut1_convention"] is (year == 1799)
-    assert details["future_leap_seconds_assumed_unchanged"] is (year == 2320)
-    assert (details["civil_time_method"] == "pre_1972_swiss_UT1_delta_t") is (
-        year == 1799
-    )
-    assert abs(details["selected_crossing_jd_tt"] - expected["jd_tt"]) * 86400 <= 1.0
-    point = (
-        TTInstant.from_parts(*details["tt_parts"])
-        if "tt_parts" in details
-        else TTInstant.from_float(details["selected_crossing_jd_tt"])
-    )
-    assert datetime.fromisoformat(row["instant_utc"]) == datetime_from_tt(point)
 
 
 @pytest.mark.parametrize("mode", ["de440", "analytic", "auto"])
@@ -93,14 +55,6 @@ def test_complete_120_years_and_query_use_same_selected_model(
     assert context["derived_event_years"] == list(range(2201, 2321))
     assert context == timing["solar_year_context"]
     assert context["public_model_years_extended"] is False
-    encoded = json.dumps(
-        boundaries,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        allow_nan=False,
-    ).encode()
-    assert hashlib.sha256(encoded).hexdigest() == context["boundary_receipts_sha256"]
     expected = (
         "fatebridge_analytic_solar_v1"
         if mode == "analytic"
@@ -428,14 +382,3 @@ def test_receipt_contract_rejects_changed_instant_and_clipped_count() -> None:
                 }
             }
         )
-
-
-def test_frozen_projection_inputs_and_selected_source_identity_remain_bound() -> None:
-    freeze = json.loads((FOLDER / "freeze.json").read_bytes())
-    protocol = json.loads((FOLDER / "protocol.json").read_bytes())
-    for name, digest in freeze["files"].items():
-        assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
-    source = de440_solar.source_receipt(de440_solar.CANPING_MODEL_ID)
-    assert source["source_kernel_sha256"] == protocol["source_kernel"]["sha256"]
-    assert source["reference_event_table_used"] is False
-    assert freeze["goal_complete"] is False

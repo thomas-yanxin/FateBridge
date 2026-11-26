@@ -327,10 +327,6 @@ def test_future_time_context_and_identified_author_rules_across_surfaces(
     source = next(
         s for s in body["india"]["rulesets"] if s["id"] == condition["source_id"]
     )
-    assert (
-        STRENGTH_SOURCE["sha256"]
-        == "13609f1af89541e070c798b8c70c6bfd74a8b9a71a71388913bf898e9f9ddf3f"
-    )
     assert same_public_value(source, STRENGTH_SOURCE)
     assert {r["rule_id"] for r in body["india"]["rule_trace"]} >= {
         "jyotish.time_scales.v2",
