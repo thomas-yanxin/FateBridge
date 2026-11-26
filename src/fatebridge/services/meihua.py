@@ -3,11 +3,11 @@
 from pydantic import JsonValue
 
 from fatebridge.core.divination import build_meihua_interpretation
-from fatebridge.core.meihua.casting import (
-    cast_explicit_meihua,
+from fatebridge.core.meihua.casting import cast_explicit_meihua
+from fatebridge.core.meihua.relations import (
+    build_meihua_evidence,
     ensure_observation_method_context,
 )
-from fatebridge.core.meihua.relations import build_meihua_evidence
 from fatebridge.core.meihua.texts import explicit_ruleset
 from fatebridge.core.meihua.topics import (
     apply_day_qi,

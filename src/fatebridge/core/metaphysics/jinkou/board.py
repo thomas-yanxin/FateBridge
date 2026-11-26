@@ -332,6 +332,14 @@ def _resolve_month_general(
                 "name": mg["name"],
                 "basis": "supplied_board",
             }
+        overview = liureng_or_month_general.get("overview")
+        if isinstance(overview, dict) and "month_general" in overview:
+            mg = overview["month_general"]
+            return {
+                "branch": mg["branch"],
+                "name": mg["name"],
+                "basis": "supplied_jinkou_board",
+            }
         if "branch" in liureng_or_month_general and "name" in liureng_or_month_general:
             return dict(liureng_or_month_general)
     raise ValueError("无法从输入解析月将")

@@ -88,9 +88,11 @@ def build_qimen_board(
         zhishi_door = QIMEN_DOOR_DISPLAY[leaders["door"]]
 
     fushi_hexagram = build_hexagram(
-        upper_name=leaders["lodged_gong"]
-        if zhifu_palace["trigram"] == "中"
-        else zhifu_palace["trigram"],
+        upper_name=(
+            leaders["lodged_gong"]
+            if zhifu_palace["trigram"] == "中"
+            else zhifu_palace["trigram"]
+        ),
         lower_name=QIMEN_DOOR_TO_TRIGRAM[zhishi_door],
     )
 
@@ -163,7 +165,9 @@ def build_qimen_with_options(
             raise ValueError("palaceShift仅允许0")
     method = normalized.get("ju_method", "zhirun")
     if method not in ("zhirun", "chaibu", "maoshan"):
-        raise ValueError("ju_method仅支持zhirun（置闰）、chaibu（拆补）或maoshan（茅山）")
+        raise ValueError(
+            "ju_method仅支持zhirun（置闰）、chaibu（拆补）或maoshan（茅山）"
+        )
     lodging_policy = normalized.get("lodging_policy", DEFAULT_LODGING_POLICY)
     if lodging_policy not in ("kun2", "gen8", "yin_gen_yang_kun"):
         raise ValueError(

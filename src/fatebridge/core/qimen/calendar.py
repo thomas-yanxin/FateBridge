@@ -227,7 +227,9 @@ def build_continuous_zhirun_schedule(
                 and mangzhong_ord - term_start >= QIMEN_ZHIRUN_MIN_LEAD_DAYS
             ):
                 emit_term("芒种")
-            elif term == "大雪" and daxue_ord - term_start >= QIMEN_ZHIRUN_MIN_LEAD_DAYS:
+            elif (
+                term == "大雪" and daxue_ord - term_start >= QIMEN_ZHIRUN_MIN_LEAD_DAYS
+            ):
                 emit_term("大雪")
             if term == "立春" and cur_ord > daxue_ord:
                 term = next_term(term)

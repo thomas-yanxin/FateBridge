@@ -6,6 +6,10 @@ from typing import Literal
 
 from pydantic import Field, StrictInt, model_validator
 
+from fatebridge.core.metaphysics.liureng import ShehaiMethod
+from fatebridge.core.metaphysics.ren_calendar import MonthGeneralMode
+from fatebridge.core.metaphysics.ren_diurnal import DiurnalMode
+from fatebridge.core.metaphysics.taiyi import TaiyiDayProfile, TaiyiTablePolicy
 from fatebridge.core.requests.base import (
     FateBridgeBaseRequest,
     RequiredAnalysisClockFields,
@@ -58,9 +62,9 @@ class QimenOptions(FateBridgeBaseRequest):
 class TaiyiOptions(FateBridgeBaseRequest):
     """Typed Taiyi Shenshu calculation mode and edition-profile options."""
 
-    calculation_mode: Literal["year", "month", "day", "hour"] = Field(
+    calculation_mode: Literal["year", "month", "day", "hour", "minute", "fate"] = Field(
         default="year",
-        description="year年计附金镜年度十神；month按十二节月；day采用金钥匙冬至前甲子积日；hour按所选时计。",
+        description="year年计；month按十二节月；day按日计（金镜/金钥匙）；hour按所选时计；minute刻家太乙；fate太乙命法十二宫。",
     )
     hour_profile: TaiyiHourProfile | None = Field(
         default=None,
@@ -74,6 +78,10 @@ class TaiyiOptions(FateBridgeBaseRequest):
         default=None,
         description="仅year：省略或jinjing_year_lunar_civil_v1用通用现代农历岁首；jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表。",
     )
+    day_profile: TaiyiDayProfile | None = Field(
+        default=None,
+        description="仅day日计：jinjing_day_v1（默认）或 key_day_winter_jiazi_v1（金钥匙冬至前甲子积日十精异数）。",
+    )
     shiji_profile: TaiyiShijiProfile | None = Field(
         default=None,
         description=(
@@ -82,6 +90,10 @@ class TaiyiOptions(FateBridgeBaseRequest):
             "jinjing_vol3_table_literal_v1 对这三局采用卷三表列始击和客算。"
         ),
     )
+    table_policy: TaiyiTablePolicy = Field(
+        default="computed",
+        description="局表口径：computed（默认依算法推算）或 printed_table（采印本刊本表列异数）。",
+    )
 
     @model_validator(mode="after")
     def _validate_mode_profiles(self) -> "TaiyiOptions":
@@ -89,8 +101,12 @@ class TaiyiOptions(FateBridgeBaseRequest):
             raise ValueError("year_profile仅用于year年计")
         if self.month_profile is not None and self.calculation_mode != "month":
             raise ValueError("month_profile仅用于month月计")
+        if self.day_profile is not None and self.calculation_mode != "day":
+            raise ValueError("day_profile仅用于day日计")
         if self.hour_profile is not None and self.calculation_mode != "hour":
-            raise ValueError("hour_profile仅用于hour时计，不能用于年计、月计或日计")
+            raise ValueError(
+                "hour_profile仅用于hour时计，不能用于年计、月计、日计、刻计或命法"
+            )
         return self
 
 
@@ -103,7 +119,29 @@ class LiuRengGodsRequest(RequiredAnalysisClockFields, FateBridgeBaseRequest):
     )
     is_diurnal: bool | None = Field(
         default=None,
-        description="显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。",
+        description="显式昼贵/夜贵：true 昼、false 夜；省略按 diurnal_mode（默认卯至申昼、酉至寅夜）。",
+    )
+    diurnal_mode: DiurnalMode = Field(
+        default="clock",
+        description="昼夜贵人分界：clock（默认卯至申昼）或 sunrise_sunset（需经纬度按日出日没定昼夜）。",
+    )
+    month_general_mode: MonthGeneralMode = Field(
+        default="solar_term",
+        description="月将换将规则：solar_term（默认中气换将）或 true_solar_longitude（太阳真黄经30度过宫）。",
+    )
+    analysis_latitude: float | None = Field(
+        default=None,
+        ge=-90,
+        le=90,
+        description="起课纬度（与 analysis_longitude 合用供 sunrise_sunset 昼夜界定）",
+    )
+    shehai_method: ShehaiMethod = Field(
+        default="depth_first",
+        description="涉害取传法：depth_first（默认深浅度法）或 meng_zhong_first（孟仲季法）。",
+    )
+    harm_include_terminal: bool = Field(
+        default=False,
+        description="涉害计数是否包含地支本位终点（默认 false）。",
     )
     gender: str | None = Field(
         default="未知",
@@ -135,6 +173,32 @@ class LiuRengRunyearRequest(RequiredAnalysisClockFields, FateBridgeRequest):
     )
     is_diurnal: bool | None = Field(
         default=None, description="分析时刻是否按昼贵起课；省略按时支区分昼夜。"
+    )
+    diurnal_mode: DiurnalMode = Field(
+        default="clock",
+        description="昼夜贵人分界：clock（默认卯至申昼）或 sunrise_sunset（需经纬度按日出日没定昼夜）。",
+    )
+    month_general_mode: MonthGeneralMode = Field(
+        default="solar_term",
+        description="月将换将规则：solar_term（默认中气换将）或 true_solar_longitude（太阳真黄经过宫）。",
+    )
+    analysis_latitude: float | None = Field(
+        default=None,
+        ge=-90,
+        le=90,
+        description="起课纬度（与 analysis_longitude 合用供 sunrise_sunset 昼夜界定）",
+    )
+    shehai_method: ShehaiMethod = Field(
+        default="depth_first",
+        description="涉害取传法：depth_first（默认）或 meng_zhong_first。",
+    )
+    harm_include_terminal: bool = Field(
+        default=False,
+        description="涉害计数是否包含地支本位终点（默认 false）。",
+    )
+    use_true_solar_time: bool = Field(
+        default=False,
+        description="行年默认按钟表历时起算（false）；设 true 并给经度则改用真太阳时。",
     )
 
 
@@ -170,9 +234,42 @@ class TaiyiAnalysisRequest(RequiredAnalysisClockFields, TaiyiOptions):
     )
 
 
-class JinkouAnalysisRequest(LiuRengGodsRequest):
+class JinkouAnalysisRequest(RequiredAnalysisClockFields, FateBridgeBaseRequest):
     """Request model for Jin Kou analysis."""
 
+    guiren_profile: GuirenProfile = Field(
+        default=DEFAULT_GUIREN_PROFILE,
+        description="贵神本位表：liuren_common_v1 为既有表；tanyuan_xieji_v1 按探原表。",
+    )
+    is_diurnal: bool | None = Field(
+        default=None,
+        description="显式昼贵/夜贵：true 昼、false 夜；省略按 diurnal_mode（默认卯至申昼、酉至寅夜）。",
+    )
+    diurnal_mode: DiurnalMode = Field(
+        default="clock",
+        description="昼夜贵人分界：clock（默认卯至申昼）或 sunrise_sunset（需经纬度按日出日没定昼夜）。",
+    )
+    month_general_mode: MonthGeneralMode = Field(
+        default="solar_term",
+        description="月将换将规则：solar_term（默认中气换将）或 true_solar_longitude（太阳真黄经过宫）。",
+    )
+    analysis_latitude: float | None = Field(
+        default=None,
+        ge=-90,
+        le=90,
+        description="起课纬度（与 analysis_longitude 合用供 sunrise_sunset 昼夜界定）",
+    )
+    gender: str | None = Field(
+        default="未知",
+        description=(
+            "性别（可选）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；"
+            "省略默认 未知。"
+        ),
+    )
+    use_true_solar_time: bool = Field(
+        default=True,
+        description="Enable true solar time correction (default on — 式占 keys off the apparent-solar 时辰)",
+    )
     di_fen: (
         Literal["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
         | None
@@ -202,7 +299,9 @@ class JinkouAnalysisRequest(LiuRengGodsRequest):
 
     @model_validator(mode="after")
     def consistent_jinkou_natal_facts(self) -> "JinkouAnalysisRequest":
-        from fatebridge.core.metaphysics.jinkou_year_fate import confirmed_natal_branch
+        from fatebridge.core.metaphysics.jinkou.year_fate import (
+            confirmed_natal_branch,
+        )
 
         confirmed_natal_branch(
             self.birth_year_ganzhi, self.natal_branch, self.year_fate_age

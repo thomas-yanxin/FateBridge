@@ -14,17 +14,24 @@ from fatebridge.core.metaphysics.common import (
     stem_element_text,
     xun_head_for_ganzhi,
 )
-from fatebridge.core.metaphysics.jinkou.patterns import STEM_COMBINES, wuzidun_stem
+from fatebridge.core.metaphysics.jinkou.board import STEM_PAIRS
+from fatebridge.core.metaphysics.jinkou.patterns import wuzidun_stem
 from fatebridge.utils.data import STEM_ELEMENTS
+
+_STEM_COMBINE_MAP = {
+    frozenset(pair): (list(pair), element) for pair, element in STEM_PAIRS
+}
 
 
 def ganzhi_pair_facts(left: str, right: str) -> dict[str, object]:
-    el = STEM_COMBINES.get(frozenset((left[0], right[0])))
+    pair_match = _STEM_COMBINE_MAP.get(frozenset((left[0], right[0])))
+    canonical_pair, el = pair_match if pair_match is not None else (None, None)
     lx, rx = xun_head_for_ganzhi(left), xun_head_for_ganzhi(right)
     return {
         "left_ganzhi": left,
         "right_ganzhi": right,
         "stem_harmony_matched": el is not None,
+        "canonical_stem_pair": canonical_pair,
         "candidate_element": el,
         "branch_harmony_matched": SIX_HARMONY_BRANCHES[left[1]] == right[1],
         "both_harmonies_matched": el is not None

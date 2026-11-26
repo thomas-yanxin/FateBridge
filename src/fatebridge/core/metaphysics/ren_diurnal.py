@@ -83,12 +83,11 @@ def resolve_diurnal(
         selected = explicit
         source = "explicit_parameter"
         basis = f"显式选择{'昼贵' if selected else '夜贵'}（is_diurnal={'true' if selected else 'false'}），占时时支{hour_branch}。"
-    elif (
-        diurnal_mode == "sunrise_sunset"
-        and instant is not None
-        and latitude is not None
-        and longitude is not None
-    ):
+    elif diurnal_mode == "sunrise_sunset":
+        if instant is None or latitude is None or longitude is None:
+            raise ValueError(
+                "diurnal_mode='sunrise_sunset' 需要提供瞬间时刻、纬度(latitude)与经度(longitude)"
+            )
         astro = _sunrise_sunset_diurnal(instant, float(latitude), float(longitude))
         if astro is not None:
             selected, rise_jd, set_jd = astro
@@ -101,11 +100,7 @@ def resolve_diurnal(
             basis = f"极昼/极夜无法求得日出日落，回退按时支{hour_branch}取{'昼贵' if selected else '夜贵'}。"
     else:
         selected = hour_branch in DAY_BRANCHES
-        source = (
-            "hour_branch_convention_fallback"
-            if diurnal_mode == "sunrise_sunset"
-            else "hour_branch_convention"
-        )
+        source = "hour_branch_convention"
         basis = f"按占时时支{hour_branch}（卯至申昼、酉至寅夜）选择{'昼贵' if selected else '夜贵'}。"
 
     result: dict[str, Any] = {

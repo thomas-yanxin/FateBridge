@@ -4,13 +4,14 @@ FateBridge divination services.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Literal
 
 from fatebridge.core.almanac import (
     LUNAR_SUPPORTED_SOLAR_END,
     LUNAR_SUPPORTED_SOLAR_START,
     build_calendar_context,
+    get_day_ganzhi,
 )
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.divination import build_meihua_interpretation, lookup_gua
@@ -50,17 +51,16 @@ from fatebridge.core.meihua.topics import (
     apply_situational_responses,
     apply_stage_emphasis,
     apply_trigram_relation_symbols,
-    civil_day_qi_context,
 )
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
+from fatebridge.core.sukuyo.calendar import _basis_parameters as basis_parameters
 from fatebridge.core.sukuyo.calendar import calendar_mansion, rulesets
 from fatebridge.core.sukuyo.sanjiu import (
     DistanceRule,
     candidate_relation_analysis,
     relation_between_su27,
 )
-from fatebridge.core.sukuyo.sukuyo_calendar_basis import basis_parameters
 from fatebridge.core.sukuyo.texts import (
     joint_reconstruction_contract,
     palace_reference,
@@ -69,6 +69,36 @@ from fatebridge.core.zhouyi import classical_hexagram
 from fatebridge.utils.errors import ParameterError, calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
+
+
+def _civil_day_qi_context(moment: datetime, *, bazi_day_ganzhi: str) -> dict[str, Any]:
+    """Build civil midnight vs. 23:00 zi-hour day-ganzhi candidates for Meihua."""
+    civil = moment.date()
+    selected = get_day_ganzhi(civil.year, civil.month, civil.day)
+    zi_date = civil + timedelta(days=int(moment.hour == 23))
+    zi = get_day_ganzhi(zi_date.year, zi_date.month, zi_date.day)
+    candidates = [
+        {
+            "id": "local_midnight",
+            "date": civil.isoformat(),
+            "ganzhi": selected,
+            "day_branch": selected[1],
+        }
+    ]
+    if moment.hour == 23:
+        candidates.append(
+            {
+                "id": "zi_start",
+                "date": zi_date.isoformat(),
+                "ganzhi": zi,
+                "day_branch": zi[1],
+            }
+        )
+    return {
+        "selected_candidate_id": "local_midnight",
+        "candidates": candidates,
+        "bazi_day_ganzhi": bazi_day_ganzhi,
+    }
 
 
 @calculation_guard("梅花时卦分析")
@@ -324,7 +354,7 @@ def calculate_meihua_analysis(
         meihua,
         interpretation,
         (
-            civil_day_qi_context(
+            _civil_day_qi_context(
                 analysis_datetime, bazi_day_ganzhi=str(lunar_calendar["day_ganzhi"])
             )
             if interpretation_topic != "weather"
@@ -705,7 +735,9 @@ def calculate_sukuyo_compatibility(
             f"为{forward['pair']}{dist}：正{forward['relation']}、反{reverse['relation']}。"
         )
     elif any(c.get("calendar_candidates") for c in contexts):
-        summary = f"所选{calendar_label}历日存在候选，双向关系见candidate_relation_analysis。"
+        summary = (
+            f"所选{calendar_label}历日存在候选，双向关系见candidate_relation_analysis。"
+        )
     else:
         summary = "闰月/半日或规则次序未定，候选关系见candidate_relation_analysis。"
 
@@ -785,7 +817,9 @@ def calculate_sanshiunited_analysis(
     liureng_is_diurnal: bool | None = None,
     liureng_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
     use_true_solar_time: bool = True,
-    corner_lodging: Literal["unassessed", "first_branch", "second_branch", "both"] = "both",
+    corner_lodging: Literal[
+        "unassessed", "first_branch", "second_branch", "both"
+    ] = "both",
 ) -> dict[str, Any]:
     """三式合一本地聚合工具。"""
     return build_sanshiunited_result(

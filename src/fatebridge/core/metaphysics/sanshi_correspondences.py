@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from fatebridge.core.metaphysics.taiyi_geometry import PALACES
+from fatebridge.core.metaphysics.taiyi import PALACES
 
 CornerLodging = Literal["unassessed", "first_branch", "second_branch", "both"]
 
@@ -127,9 +127,7 @@ def palace_correspondences(
             "god": qp["god"],
             "hosted_stars": qp.get("hosted_stars", []),
         }
-        lrow = liuren_at_taiyi_palace(
-            number, liureng, corner_lodging=corner_lodging
-        )
+        lrow = liuren_at_taiyi_palace(number, liureng, corner_lodging=corner_lodging)
         entries.append(
             {
                 "marker": label,

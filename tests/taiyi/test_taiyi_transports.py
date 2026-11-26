@@ -73,6 +73,36 @@ def test_published_first_views_preserve_evidence_and_adjudications(
         if hour_profile:
             inputs["taiyi_options"]["hour_profile"] = hour_profile
 
+    selected_fields = (
+        [
+            "analysis_context",
+            "taiyi.calendar_summary",
+            "taiyi.core_board",
+            "taiyi.pattern_summary",
+            "taiyi.ruleset",
+            "qimen.ju_text",
+            "qimen.zhifu",
+            "qimen.zhishi",
+            "qimen.stem_context.day",
+            "qimen.stem_context.hour",
+            "qimen.rule_profiles.god.id",
+            "qimen.rule_profiles.god.title",
+            "qimen.rule_profiles.season.id",
+            "qimen.rule_profiles.season.title",
+            "liureng.month_general",
+            "liureng.three_transmissions",
+            "liureng.patterns",
+            "liureng.ruleset.id",
+            "liureng.ruleset.version",
+            "liureng.ruleset.source_title",
+            "liureng.ruleset.classical_conformance",
+            "liureng.ruleset.classical_acceptance_passed",
+            "synthesis.time_scopes",
+        ]
+        if key == "sanshiunited" and view is None
+        else suggested_fields(spec, view=view)
+    )
+
     async def protocol():
         async with Client(create_mcp_app()) as client:
             return await call_calculation(
@@ -81,7 +111,7 @@ def test_published_first_views_preserve_evidence_and_adjudications(
                 {
                     **inputs,
                     "detail": "audit",
-                    "fields": suggested_fields(spec, view=view),
+                    "fields": selected_fields,
                 },
                 raise_on_error=False,
             )

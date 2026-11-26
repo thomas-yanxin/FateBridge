@@ -10,9 +10,11 @@ from fastmcp.client.transports import FastMCPTransport
 
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.seed import build_analysis_seed
-from fatebridge.core.metaphysics.taiyi_board import assemble_board
-from fatebridge.core.metaphysics.taiyi_year import cyclic_core
-from fatebridge.core.metaphysics.taiyi_year_calendar import HISTORICAL_YEAR_PROFILE
+from fatebridge.core.metaphysics.taiyi import (
+    HISTORICAL_YEAR_PROFILE,
+    assemble_board,
+    cyclic_core,
+)
 
 
 def seed_at(

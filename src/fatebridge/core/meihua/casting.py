@@ -42,7 +42,6 @@ CODENUMBERS = {
     "000": 8,
 }
 COMPONENTS = ("year", "month", "day", "hour", "minute", "second")
-CONTEXT_FIELDS = ("quiet_room", "nothing_heard", "nothing_seen")
 
 DATE_PATTERN = re.compile(
     r"(?:[0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8}|[0-9]{4}-W[0-9]{2}(?:-[1-7])?|[0-9]{4}W[0-9]{2}[1-7]?)"
@@ -400,22 +399,6 @@ def resolve_meihua_clock(
             "original_text_uniquely_prescribes_seconds": False,
         }
     return ResolvedMeihuaClock(resolved_clock, evidence)
-
-
-def ensure_observation_method_context(
-    method: JsonValue, context: dict[str, Any] | None
-) -> None:
-    """Reject explicitly conflicting observation declarations for the same cast."""
-    if context is None:
-        return
-    if method == "sound_groups" and context.get("nothing_heard") is True:
-        raise ValueError("sound_groups声明实际听闻，不能同时声明同次起卦无所闻")
-    if method in {"observed_trigrams", "observed_categories"} and all(
-        context.get(key) is True for key in CONTEXT_FIELDS
-    ):
-        raise ValueError(
-            "观物起卦声明外部物象，不能同时套用同次静室无所闻见的无外卦条件"
-        )
 
 
 def _resolve_reported_observation(

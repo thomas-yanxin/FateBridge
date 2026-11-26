@@ -106,12 +106,11 @@ def test_diurnal_mode_sunrise_sunset_and_solar_longitude_general() -> None:
         diurnal_mode="sunrise_sunset",
         month_general_mode="true_solar_longitude",
         latitude=39.9042,
-        longitude=116.4074,
     )
     assert board_noon["meta"]["is_diurnal"] is True
     assert (
-        board_noon["meta"]["diurnal_evidence"]["method_id"]
-        == "sunrise_sunset_solar_elevation_v1"
+        board_noon["meta"]["diurnal_evidence"]["selection_source"]
+        == "sunrise_sunset_ephemeris"
     )
     assert board_noon["month_general"]["branch"] == "酉"
     Liuren.model_validate(board_noon)
@@ -128,7 +127,7 @@ def test_diurnal_mode_sunrise_sunset_and_solar_longitude_general() -> None:
         analysis_longitude=116.4074,
     )
     board_night = build_liureng_board(
-        seed_night, diurnal_mode="sunrise_sunset", latitude=39.9042, longitude=116.4074
+        seed_night, diurnal_mode="sunrise_sunset", latitude=39.9042
     )
     assert board_night["meta"]["is_diurnal"] is False
 

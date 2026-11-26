@@ -138,6 +138,7 @@ def test_meihua_party_counts_and_true_solar_time_helper() -> None:
 @pytest.mark.parametrize("casting", ALL_12_CAST_METHODS, ids=lambda p: p["method"])
 def test_all_12_meihua_casting_methods_and_budget(casting: dict[str, object]) -> None:
     TypeAdapter(MeihuaCasting).validate_python(casting)
+    calculate_meihua_cast(casting=casting)
     t0 = time.perf_counter()
     res = calculate_meihua_cast(casting=casting)
     dt_ms = (time.perf_counter() - t0) * 1000

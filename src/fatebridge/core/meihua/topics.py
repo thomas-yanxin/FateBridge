@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any
 
 from fatebridge.core.hexagram_relations import relationship_by_role
@@ -672,37 +672,6 @@ def normalize_day_qi_context(
     from fatebridge.core.requests.meihua_day_qi import MeihuaDayQiContext
 
     return MeihuaDayQiContext.model_validate(context).model_dump(mode="json")
-
-
-def civil_day_qi_context(moment: datetime, *, bazi_day_ganzhi: str) -> dict[str, Any]:
-    from fatebridge.core.almanac import get_day_ganzhi
-
-    civil = moment.date()
-    selected = get_day_ganzhi(civil.year, civil.month, civil.day)
-    zi_date = civil + timedelta(days=int(moment.hour == 23))
-    zi = get_day_ganzhi(zi_date.year, zi_date.month, zi_date.day)
-    candidates = [
-        {
-            "id": "local_midnight",
-            "date": civil.isoformat(),
-            "ganzhi": selected,
-            "day_branch": selected[1],
-        }
-    ]
-    if moment.hour == 23:
-        candidates.append(
-            {
-                "id": "zi_start",
-                "date": zi_date.isoformat(),
-                "ganzhi": zi,
-                "day_branch": zi[1],
-            }
-        )
-    return {
-        "selected_candidate_id": "local_midnight",
-        "candidates": candidates,
-        "bazi_day_ganzhi": bazi_day_ganzhi,
-    }
 
 
 def reported_day_qi_context(context: dict[str, Any]) -> dict[str, Any]:

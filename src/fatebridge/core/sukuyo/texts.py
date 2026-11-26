@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, Literal, Sequence
 
 SU27_ORDER = "角亢氐房心尾箕斗女虚危室壁奎娄胃昴毕觜参井鬼柳星张翼轸"
 ALIASES = str.maketrans("虛婁畢參張軫", "虚娄毕参张轸")
@@ -34,6 +34,154 @@ ACTIVITIES = (
     "study",
     "clothing",
 )
+SukuyoActivityDetail = Literal[
+    "tailoring_garments",
+    "making_garments",
+    "repairing_garments",
+    "wearing_garments",
+    "wearing_new_garments",
+    "royal_wearer",
+    "sale",
+    "borrowing",
+    "lending",
+    "long_distance_journey",
+    "journey_abroad",
+    "personal_departure",
+    "private_journey",
+    "royal_or_official_traveler",
+    "long_distance_traveler_entering_residence",
+    "southbound_journey",
+    "northbound_journey",
+    "eastbound_journey",
+    "westbound_journey",
+    "skill_learning",
+    "earning_money",
+    "sale_lactating_livestock",
+    "sale_livestock",
+    "spending_property",
+    "receiving_property",
+    "returning_property",
+    "wealth_competition",
+    "founding_school",
+    "beginning_study",
+    "learning_with_teacher",
+    "purchase",
+    "business_operation",
+    "collecting_debt",
+    "repaying_debt",
+    "religious_learning",
+    "monastic_dharma_request",
+    "teaching_classics",
+    "riding_training",
+    "water_journey",
+    "diplomatic_mission",
+    "purchase_precious_goods",
+    "purchase_livestock",
+    "land_purchase",
+    "land_sale",
+    "social_gathering",
+    "forming_friendship",
+    "classical_text_study",
+    "debate_learning",
+]
+DETAIL_TOPICS = {
+    **dict.fromkeys(
+        [
+            "tailoring_garments",
+            "making_garments",
+            "repairing_garments",
+            "wearing_garments",
+            "wearing_new_garments",
+            "royal_wearer",
+        ],
+        "clothing",
+    ),
+    **dict.fromkeys(
+        [
+            "sale",
+            "borrowing",
+            "lending",
+            "earning_money",
+            "sale_lactating_livestock",
+            "sale_livestock",
+            "spending_property",
+            "receiving_property",
+            "returning_property",
+            "wealth_competition",
+            "purchase",
+            "business_operation",
+            "collecting_debt",
+            "repaying_debt",
+            "purchase_precious_goods",
+            "purchase_livestock",
+            "land_purchase",
+            "land_sale",
+        ],
+        "commerce",
+    ),
+    **dict.fromkeys(
+        [
+            "long_distance_journey",
+            "journey_abroad",
+            "personal_departure",
+            "private_journey",
+            "royal_or_official_traveler",
+            "long_distance_traveler_entering_residence",
+            "southbound_journey",
+            "northbound_journey",
+            "eastbound_journey",
+            "westbound_journey",
+            "water_journey",
+            "diplomatic_mission",
+        ],
+        "travel",
+    ),
+    "skill_learning": "study",
+    "founding_school": "study",
+    "beginning_study": "study",
+    "learning_with_teacher": "study",
+    "religious_learning": "study",
+    "monastic_dharma_request": "study",
+    "teaching_classics": "study",
+    "riding_training": "study",
+    "social_gathering": "social",
+    "forming_friendship": "social",
+    "classical_text_study": "study",
+    "debate_learning": "study",
+}
+DETAIL_PARENTS = {
+    "tailoring_garments": ("making_garments",),
+    "wearing_new_garments": ("wearing_garments",),
+    "purchase_precious_goods": ("purchase",),
+    "purchase_livestock": ("purchase",),
+    "land_purchase": ("purchase",),
+    "land_sale": ("sale",),
+    "sale_lactating_livestock": ("sale_livestock",),
+    "sale_livestock": ("sale",),
+    "riding_training": ("skill_learning",),
+    "monastic_dharma_request": ("religious_learning",),
+}
+
+
+def activity_detail_closure(details: Sequence[str]) -> tuple[list[str], list[dict]]:
+    effective = list(dict.fromkeys(details))
+    inferences = []
+    for child in effective:
+        for parent in DETAIL_PARENTS.get(child, ()):
+            if parent not in effective:
+                effective.append(parent)
+                inferences.append({"from_detail": child, "implied_detail": parent})
+    return effective, inferences
+
+
+def validate_activity_details(activity: str | None, details: Sequence[str]) -> None:
+    if isinstance(details, (str, bytes)):
+        raise ValueError("activity_details必须为明确条件的列表")
+    for detail in details:
+        if not isinstance(detail, str) or detail not in DETAIL_TOPICS:
+            raise ValueError("未知的宿占事项细节")
+        if activity != DETAIL_TOPICS[detail]:
+            raise ValueError(f"事项细节{detail}只适用于{DETAIL_TOPICS[detail]}")
 
 
 @lru_cache(maxsize=64)
@@ -445,10 +593,6 @@ def assess_activity(
         raise ValueError(
             "activity仅支持social/marriage/travel/relocation/commerce/study/clothing"
         )
-    from fatebridge.core.sukuyo.sukuyo_lower import (
-        activity_detail_closure,
-        validate_activity_details,
-    )
 
     validate_activity_details(activity, activity_details or [])
     details = list(dict.fromkeys(activity_details or []))

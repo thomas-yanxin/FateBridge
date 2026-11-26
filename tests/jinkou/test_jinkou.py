@@ -109,18 +109,32 @@ def test_jinkou_full_contract_with_natal_and_year_fate_and_sunrise_mode() -> Non
         None,
         di_fen="申",
         gender="男",
+        natal_branch="午",
+        natal_branch_source="explicit_birth_year_ganzhi",
         diurnal_mode="sunrise_sunset",
         month_general_mode="true_solar_longitude",
         latitude=39.9042,
-        longitude=116.4074,
     )
     assert board["overview"]["is_diurnal"] is True
     assert board["overview"]["month_general"]["branch"] == "酉"
     natal_course = build_natal_course(
-        seed, board, birth_year_ganzhi="庚午", gender="男"
+        seed,
+        None,
+        birth_year_ganzhi="庚午",
+        gender="男",
+        diurnal_mode="sunrise_sunset",
+        month_general_mode="true_solar_longitude",
+        latitude=39.9042,
     )
     year_fate = build_jinkou_year_fate(
-        seed, board, birth_year_ganzhi="庚午", age=35, gender="男"
+        seed,
+        None,
+        birth_year_ganzhi="庚午",
+        age=35,
+        gender="男",
+        diurnal_mode="sunrise_sunset",
+        month_general_mode="true_solar_longitude",
+        latitude=39.9042,
     )
     full = {**board, "natal_course": natal_course, "year_fate": year_fate}
     Jinkou.model_validate(full)

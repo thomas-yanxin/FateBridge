@@ -22,7 +22,7 @@ RULE = "jinkou.jingben_branch_breaks"
 
 
 def pair_facts(a: str, b: str) -> dict[str, Any]:
-    matched = [a, b] in WRITTEN_PAIRS or [b, a] in WRITTEN_PAIRS
+    matched = f"{a}{b}" in WRITTEN_PAIRS or f"{b}{a}" in WRITTEN_PAIRS
     return {"left_branch": a, "right_branch": b, "source_pair_present": matched}
 
 

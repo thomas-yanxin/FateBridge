@@ -19,8 +19,7 @@ from fatebridge.core.metaphysics.sanshi_correspondences import (
     CornerLodging,
     palace_correspondences,
 )
-from fatebridge.core.metaphysics.taiyi import build_taiyi_board
-from fatebridge.core.metaphysics.taiyi_dangshi import noble_source_assessment
+from fatebridge.core.metaphysics.taiyi import build_taiyi_board, noble_source_assessment
 from fatebridge.core.qimen import build_qimen_with_options
 from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.formatting import create_pillar_dict
@@ -51,7 +50,9 @@ def _build_taiyi_with_options(
         "minute",
         "fate",
     }:
-        raise ValueError("太乙calculation_mode仅支持year、month、day、hour、minute、fate")
+        raise ValueError(
+            "太乙calculation_mode仅支持year、month、day、hour、minute、fate"
+        )
     kwargs: dict[str, Any] = {
         "gender": "未知",
         "calculation_mode": mode,

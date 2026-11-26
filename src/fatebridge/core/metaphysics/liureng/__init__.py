@@ -40,6 +40,7 @@ from fatebridge.core.metaphysics.liureng.stars import (
 from fatebridge.core.metaphysics.liureng.transmissions import (
     PUNISHMENT,
     STEM_HOUSES,
+    ShehaiMethod,
     classify_transmission_pattern,
     course_conditions,
     harm_walk,
@@ -59,6 +60,7 @@ __all__ = [
     "POWERS",
     "PUNISHMENT",
     "STEM_HOUSES",
+    "ShehaiMethod",
     "TwelveGodLayout",
     "_liureng_month_general_for_term",
     "_liureng_month_general_on_hour",

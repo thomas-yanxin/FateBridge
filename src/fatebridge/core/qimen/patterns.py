@@ -8,8 +8,8 @@ from fatebridge.core.metaphysics.common import (
     BRANCH_ELEMENTS,
     ELEMENT_CONTROLS,
     ELEMENT_GENERATES,
-    MetaphysicsSeed,
     SEXAGENARY_INDEX,
+    MetaphysicsSeed,
     xun_head_for_ganzhi,
 )
 from fatebridge.core.qimen.board import (
@@ -253,7 +253,11 @@ def validate_profiles(god_profile: str, season_profile: str) -> None:
 def god_evidence(god: str) -> dict[str, Any]:
     return {
         "god": god,
-        "section": "卷三·天乙直符吉凶神说" if god not in {"勾陈", "朱雀"} else "卷四·阴阳二遁圆图",
+        "section": (
+            "卷三·天乙直符吉凶神说"
+            if god not in {"勾陈", "朱雀"}
+            else "卷四·阴阳二遁圆图"
+        ),
         "traditional_role": GOD_ROLES.get(god, god),
     }
 
@@ -503,7 +507,10 @@ def enrich_qimen_evidence(
                 "rule_id": "five_not_meet",
                 "name": "五不遇时",
                 "palace": "全局",
-                "facts": {"day_ganzhi": board["day_ganzhi"], "time_ganzhi": board["time_ganzhi"]},
+                "facts": {
+                    "day_ganzhi": board["day_ganzhi"],
+                    "time_ganzhi": board["time_ganzhi"],
+                },
             }
         )
     if tian_xian:
@@ -512,7 +519,10 @@ def enrich_qimen_evidence(
                 "rule_id": "tian_xian_time",
                 "name": "天显时格",
                 "palace": "全局",
-                "facts": {"day_ganzhi": board["day_ganzhi"], "time_ganzhi": board["time_ganzhi"]},
+                "facts": {
+                    "day_ganzhi": board["day_ganzhi"],
+                    "time_ganzhi": board["time_ganzhi"],
+                },
             }
         )
 
@@ -526,9 +536,9 @@ def enrich_qimen_evidence(
         "hour": {
             "ganzhi": board["time_ganzhi"],
             "literal_stem": hour_stem,
-            "effective_stem": leader["zhifu_heaven_stem"]
-            if hour_stem == "甲"
-            else hour_stem,
+            "effective_stem": (
+                leader["zhifu_heaven_stem"] if hour_stem == "甲" else hour_stem
+            ),
             "xun_head": leader["xun_head"],
         },
     }
@@ -567,7 +577,10 @@ def enrich_qimen_evidence(
     board["rule_trace"] = [
         {
             "rule_id": "ju_resolution",
-            "inputs": {"day_ganzhi": board["day_ganzhi"], "ju_method": board["ju_method"]},
+            "inputs": {
+                "day_ganzhi": board["day_ganzhi"],
+                "ju_method": board["ju_method"],
+            },
             "outputs": {
                 "ju_term": board["ju_term"],
                 "dun_type": board["dun_type"],
@@ -613,7 +626,9 @@ def _append_palace_patterns(
     pname = palace["name"]
     hidden_head = leader["zhifu_heaven_stem"]
     native_host = (
-        leader["lodged_gong"] if leader["source_gong"] == "中" else leader["source_gong"]
+        leader["lodged_gong"]
+        if leader["source_gong"] == "中"
+        else leader["source_gong"]
     )
     day_stem = day_ganzhi[0]
     hour_stem = hidden_head if time_ganzhi[0] == "甲" else time_ganzhi[0]
@@ -675,20 +690,40 @@ def _append_palace_patterns(
                 )
             if sky == "丙" and earth == "丁" and door == "生门":
                 patterns.append(
-                    {"rule_id": "heaven_dun", "name": "天遁", "palace": pname, "facts": facts}
+                    {
+                        "rule_id": "heaven_dun",
+                        "name": "天遁",
+                        "palace": pname,
+                        "facts": facts,
+                    }
                 )
             if sky == "乙" and earth == "己" and door == "开门":
                 patterns.append(
-                    {"rule_id": "earth_dun", "name": "地遁", "palace": pname, "facts": facts}
+                    {
+                        "rule_id": "earth_dun",
+                        "name": "地遁",
+                        "palace": pname,
+                        "facts": facts,
+                    }
                 )
             if sky == "乙" and earth in {"辛", "己"} and door in GOOD_DOORS:
                 if sky == "乙" and earth == "辛":
                     patterns.append(
-                        {"rule_id": "cloud_dun", "name": "云遁", "palace": pname, "facts": facts}
+                        {
+                            "rule_id": "cloud_dun",
+                            "name": "云遁",
+                            "palace": pname,
+                            "facts": facts,
+                        }
                     )
             if sky == "乙" and earth == "癸" and door == "休门":
                 patterns.append(
-                    {"rule_id": "dragon_dun", "name": "龙遁", "palace": pname, "facts": facts}
+                    {
+                        "rule_id": "dragon_dun",
+                        "name": "龙遁",
+                        "palace": pname,
+                        "facts": facts,
+                    }
                 )
             if day_stem != "甲":
                 if sky == "庚" and earth == day_stem:
@@ -765,9 +800,8 @@ def _append_palace_patterns(
                     "facts": {"heaven_stem": "乙", "door": door, "trigram": trigram},
                 }
             )
-        if (
-            (sky == "乙" and door in {"休门", "生门"} and trigram == "艮")
-            or (sky == "庚" and door == "开门" and trigram == "兑")
+        if (sky == "乙" and door in {"休门", "生门"} and trigram == "艮") or (
+            sky == "庚" and door == "开门" and trigram == "兑"
         ):
             patterns.append(
                 {

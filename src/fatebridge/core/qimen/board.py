@@ -35,8 +35,28 @@ GOD_PROFILES: dict[str, dict[str, Any]] = {
 }
 
 FEI_GOD_PROFILES: dict[str, list[str]] = {
-    "yanyi_text": ["值符", "螣蛇", "太阴", "六合", "白虎", "玄武", "九地", "九天", "太常"],
-    "yanyi_diagrams": ["值符", "螣蛇", "太阴", "六合", "勾陈", "朱雀", "九地", "九天", "太常"],
+    "yanyi_text": [
+        "值符",
+        "螣蛇",
+        "太阴",
+        "六合",
+        "白虎",
+        "玄武",
+        "九地",
+        "九天",
+        "太常",
+    ],
+    "yanyi_diagrams": [
+        "值符",
+        "螣蛇",
+        "太阴",
+        "六合",
+        "勾陈",
+        "朱雀",
+        "九地",
+        "九天",
+        "太常",
+    ],
 }
 
 
@@ -97,9 +117,7 @@ QIMEN_PALACES: list[PalacePosition] = [
     {"index": 9, "label": "离九宫", "trigram": "离"},
 ]
 
-PALACE_BY_TRIGRAM: dict[str, PalacePosition] = {
-    p["trigram"]: p for p in QIMEN_PALACES
-}
+PALACE_BY_TRIGRAM: dict[str, PalacePosition] = {p["trigram"]: p for p in QIMEN_PALACES}
 
 QIMEN_CN_NUMBERS = tuple("一二三四五六七八九")
 QIMEN_GUA_SEQUENCE = ("坎", "坤", "震", "巽", "中", "乾", "兑", "艮", "离")
@@ -259,7 +277,9 @@ def compute_hidden_stems(
     leader: QimenLeaders,
 ) -> dict[str, str]:
     """Compute 暗干 (hidden stems) starting from hour stem at 值使门 palace."""
-    hour_stem = leader["zhifu_heaven_stem"] if time_ganzhi[0] == "甲" else time_ganzhi[0]
+    hour_stem = (
+        leader["zhifu_heaven_stem"] if time_ganzhi[0] == "甲" else time_ganzhi[0]
+    )
     start_palace = leader["door_gong"]
     start_palace_idx = QIMEN_GUA_SEQUENCE.index(start_palace)
     start_stem_idx = QIMEN_EARTH_PLATE_YANG.index(hour_stem)

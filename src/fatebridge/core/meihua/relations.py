@@ -303,3 +303,22 @@ def build_meihua_evidence(
             ],
         },
     }
+
+
+_CONTEXT_FIELDS = ("quiet_room", "nothing_heard", "nothing_seen")
+
+
+def ensure_observation_method_context(
+    method: object, context: dict[str, Any] | None
+) -> None:
+    """Reject explicitly conflicting observation declarations for the same cast."""
+    if context is None:
+        return
+    if method == "sound_groups" and context.get("nothing_heard") is True:
+        raise ValueError("sound_groups声明实际听闻，不能同时声明同次起卦无所闻")
+    if method in {"observed_trigrams", "observed_categories"} and all(
+        context.get(key) is True for key in _CONTEXT_FIELDS
+    ):
+        raise ValueError(
+            "观物起卦声明外部物象，不能同时套用同次静室无所闻见的无外卦条件"
+        )
