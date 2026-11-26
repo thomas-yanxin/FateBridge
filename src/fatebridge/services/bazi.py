@@ -26,31 +26,18 @@ from fatebridge.core.bazi.bazi_star_tables import (
     WEN_CHANG_TARGETS,
 )
 from fatebridge.core.calendar import BaZiCalendar
-from fatebridge.core.clash_comparison import clash_comparison_snapshot_lines
-from fatebridge.core.classical import (
-    build_classical_overview,
-    classical_snapshot_lines,
-)
-from fatebridge.core.classical_from_child import from_child_snapshot_lines
-from fatebridge.core.complete_bureaus import complete_bureau_snapshot_lines
-from fatebridge.core.export_parser import parse_export_content
-from fatebridge.core.hidden_carriers import hidden_carrier_snapshot_lines
+from fatebridge.core.classical import build_classical_overview
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, kongwang_for_ganzhi
-from fatebridge.core.root_qualification import root_qualification_snapshot_lines
-from fatebridge.core.stem_effects import stem_energy_snapshot_lines
-from fatebridge.core.storage_movement import storage_movement_snapshot_lines
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.birth_context import (
     BirthComputationContext,
     build_birth_computation_context,
 )
 from fatebridge.services.birth_payload import build_destiny_payload
-from fatebridge.services.structured_snapshot import render_structured_snapshot_text
 from fatebridge.services.timing_state import (
     build_current_timing_state,
     calculate_analysis_age,
 )
-from fatebridge.utils.birth_clock import birth_clock_snapshot_lines
 from fatebridge.utils.birth_input import PersonInfo, normalize_gender
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
@@ -64,7 +51,6 @@ from fatebridge.utils.errors import (
     calculation_guard,
     handle_calculation_error,
 )
-from fatebridge.utils.formatting import format_birth_datetime_display
 
 PILLAR_LABELS = {
     "year": "年柱",
@@ -645,169 +631,6 @@ def _build_timing_overview(
     }
 
 
-def _format_pillar_line(label: str, stem: str, branch: str, day_stem: str) -> str:
-    hidden_stems = "、".join(BRANCH_HIDDEN_STEMS.get(branch, [])) or "无"
-    return (
-        f"{label}：{stem}{branch}；"
-        f"纳音：{get_nayin(stem, branch)}；"
-        f"十神：{get_ten_god(day_stem, stem).value}；"
-        f"藏干：{hidden_stems}"
-    )
-
-
-def _format_origin_line(origin: dict[str, Any]) -> str:
-    hidden_stems = "、".join(origin.get("hidden_stems") or []) or "无"
-    return (
-        f"{origin['label']}：{origin['pillar']}；"
-        f"纳音：{origin['nayin']}；"
-        f"十神：{origin['ten_god']}；"
-        f"藏干：{hidden_stems}"
-    )
-
-
-def _build_snapshot_text(
-    *,
-    person: PersonInfo,
-    normalized_birth_datetime: datetime,
-    input_birth_datetime: datetime,
-    timezone_name: str,
-    longitude: float | None,
-    applied_true_solar: bool,
-    calendar_context: dict[str, Any],
-    pillars: dict[str, tuple[str, str]],
-    three_origins: dict[str, dict[str, Any]],
-    shensha_entries: list[dict[str, str]],
-    timing_overview: dict[str, Any],
-    classical_overview: dict[str, Any],
-    strength_assessment: dict[str, Any] | None = None,
-    structure_profile: dict[str, Any] | None = None,
-    analysis_calendar_context: dict[str, Any] | None = None,
-) -> str:
-    include_minutes = (
-        person.birth_minute != 0
-        or applied_true_solar
-        or input_birth_datetime.minute != 0
-        or normalized_birth_datetime.minute != 0
-    )
-    day_stem = pillars["day"][0]
-    lunar_calendar = calendar_context.get("lunar_calendar") or {}
-
-    acc_solar_term = (
-        (analysis_calendar_context or {}).get("current_solar_term", {}).get("name")
-    )
-    acc_next_term = (
-        (analysis_calendar_context or {}).get("next_solar_term", {}).get("name")
-    )
-
-    birth_context_lines = [
-        f"姓名：{person.name or '未提供'}",
-        f"性别：{person.gender or '未知'}",
-        f"出生时间：{format_birth_datetime_display(input_birth_datetime, include_minutes=include_minutes, include_seconds=person.birth_second is not None)}",
-        f"校正时间：{format_birth_datetime_display(normalized_birth_datetime, include_minutes=True, include_seconds=person.birth_second is not None or bool(normalized_birth_datetime.second or normalized_birth_datetime.microsecond))}",
-        f"出生地：{person.birth_place or '未提供'}",
-        f"时区：{timezone_name}",
-        f"经度：{longitude if longitude is not None else '未提供'}",
-        f"时间算法：{'真太阳时' if applied_true_solar else '直接时间'}",
-        f"农历：{lunar_calendar.get('display', '未知')}",
-        f"出生节气：{calendar_context['current_solar_term']['name']}",
-        f"出生后节气：{calendar_context['next_solar_term']['name']}",
-    ]
-    birth_context_lines.extend(
-        birth_clock_snapshot_lines(calendar_context["birth_time_input"])
-    )
-    if acc_solar_term and acc_next_term:
-        birth_context_lines.append(
-            f"当下节气：{acc_solar_term}，后续节气：{acc_next_term}"
-        )
-    sections = [
-        (
-            "起盘信息",
-            "\n".join(birth_context_lines).strip(),
-        ),
-        (
-            "四柱与三元",
-            "\n".join(
-                [
-                    _format_pillar_line("年柱", *pillars["year"], day_stem),
-                    _format_pillar_line("月柱", *pillars["month"], day_stem),
-                    _format_pillar_line("日柱", *pillars["day"], day_stem),
-                    _format_pillar_line("时柱", *pillars["hour"], day_stem),
-                    _format_origin_line(three_origins["taiyuan"]),
-                    _format_origin_line(three_origins["minggong"]),
-                    _format_origin_line(three_origins["shengong"]),
-                ]
-            ).strip(),
-        ),
-        (
-            "格局调候",
-            "\n".join(
-                classical_snapshot_lines(classical_overview)
-                + [
-                    f"原典力量与全局喜忌状态：{(structure_profile or {}).get('assessment_status', 'not_supplied')}；"
-                    "工程政策档另列，未裁定时不由工程分类补成原典结论。"
-                ]
-                + complete_bureau_snapshot_lines(strength_assessment or {})
-                + root_qualification_snapshot_lines(strength_assessment or {})
-                + stem_energy_snapshot_lines(strength_assessment or {})
-                + clash_comparison_snapshot_lines(strength_assessment or {})
-                + storage_movement_snapshot_lines(strength_assessment or {})
-                + from_child_snapshot_lines(structure_profile or {})
-                + hidden_carrier_snapshot_lines(
-                    (structure_profile or {})
-                    .get("evidence_chain", {})
-                    .get("natal_hidden_carriers", {})
-                )
-            ).strip(),
-        ),
-        (
-            "流年行运概略",
-            "\n".join(
-                [
-                    f"分析日期：{timing_overview['analysis_date']}",
-                    (
-                        "当前大运："
-                        f"{timing_overview['dayun']['pillar'] or '未进入稳定大运'}；"
-                        f"{timing_overview['dayun']['summary']}"
-                    ),
-                    f"流年：{timing_overview['liunian']['pillar']}；{timing_overview['liunian']['summary']}",
-                    (
-                        f"流月：{timing_overview['liuyue']['pillar']}；"
-                        f"节气窗口：{timing_overview['liuyue']['start_term']}→{timing_overview['liuyue']['end_term']}；"
-                        f"{timing_overview['liuyue']['summary']}"
-                    ),
-                    (
-                        f"流日：{timing_overview['liuri']['pillar']}；"
-                        f"星期：{timing_overview['liuri']['weekday']}；"
-                        f"{timing_overview['liuri']['summary']}"
-                    ),
-                    (
-                        f"流时：{timing_overview['liushi']['pillar']}；"
-                        f"{timing_overview['liushi']['hour']}时 / "
-                        f"{timing_overview['liushi']['shichen']}时；"
-                        f"{timing_overview['liushi']['summary']}"
-                    ),
-                    f"当下节气：{timing_overview['current_solar_term_name']}（月令：{timing_overview['current_jieqi']}）",
-                    f"后续节气：{timing_overview['next_solar_term_name']}（月令：{timing_overview['next_jieqi']}）",
-                ]
-            ).strip(),
-        ),
-        (
-            "神煞（四柱与三元）",
-            "\n".join(
-                f"{item['label']}：{item['value']}" for item in shensha_entries
-            ).strip(),
-        ),
-    ]
-
-    blocks: list[str] = []
-    for title, body in sections:
-        blocks.append(f"[{title}]")
-        if body:
-            blocks.append(body)
-        blocks.append("")
-    return "\n".join(blocks).strip()
-
-
 @calculation_guard("八字命盘")
 def calculate_bazi_birth(
     person: PersonInfo,
@@ -815,8 +638,6 @@ def calculate_bazi_birth(
     analysis_year: int | None = None,
     analysis_month: int | None = None,
     analysis_day: int | None = None,
-    selected_sections: list[str] | None = None,
-    render_snapshot: bool = True,
 ) -> dict[str, Any]:
     birth_context = build_birth_computation_context(person)
     normalized = birth_context.normalized_birth_time
@@ -847,7 +668,7 @@ def calculate_bazi_birth(
         analysis_date=analysis_date,
         analysis_calendar_context=analysis_calendar_context,
     )
-    result: dict[str, Any] = {
+    return {
         "analysis_type": "八字命盘",
         "bazi_birth": {
             "engine": "fatebridge-offline",
@@ -873,29 +694,6 @@ def calculate_bazi_birth(
             "classical": classical_overview,
         },
     }
-    if render_snapshot:
-        snapshot_text = _build_snapshot_text(
-            person=person,
-            normalized_birth_datetime=normalized.corrected_datetime,
-            input_birth_datetime=normalized.input_datetime,
-            timezone_name=normalized.timezone,
-            longitude=normalized.longitude,
-            applied_true_solar=normalized.applied,
-            calendar_context=birth_context.birth_calendar_context,
-            pillars=birth_context.birth_pillars,
-            three_origins=three_origins,
-            shensha_entries=shensha_entries,
-            timing_overview=timing_overview,
-            classical_overview=classical_overview,
-            strength_assessment=base_analysis["day_master"]["assessment"],
-            structure_profile=base_analysis["structure_profile"],
-            analysis_calendar_context=analysis_calendar_context,
-        )
-        result["snapshot_text"] = snapshot_text
-        result["snapshot_export"] = parse_export_content(
-            technique="bazi", content=snapshot_text, selected_sections=selected_sections
-        )
-    return result
 
 
 # 八字专项分析服务（财运 / 健康 / 子女 / 学业）
@@ -1002,7 +800,6 @@ def _run_bazi_dimension_analysis(
     analysis_day: int | None = None,
     dayun_pillar: str | None = None,
     liunian_pillar: str | None = None,
-    render_snapshot: bool = True,
 ) -> dict[str, Any]:
     """通用八字专项分析执行器。
 
@@ -1085,43 +882,7 @@ def _run_bazi_dimension_analysis(
             liunian,
         )
         analysis["evidence_chain"] = evidence
-        result = {"analysis_type": analysis_type, f"{topic}_analysis": analysis}
-        if not render_snapshot:
-            return result
-        snapshot_text = render_structured_snapshot_text(
-            {
-                "four_pillars": {
-                    name: "".join(pillar) for name, pillar in pillars.items()
-                },
-                "timing_context": timing_context,
-                "topic_evidence": evidence["topic"]["first_view"],
-            },
-            title=analysis_type,
-        )
-        snapshot_text += "\n\n[出生钟时输入]\n" + "\n".join(
-            birth_clock_snapshot_lines(
-                birth_context.birth_calendar_context["birth_time_input"]
-            )
-        )
-        checks = evidence["structure_checks"]
-        statuses = {
-            "not_applicable": "相关星未齐，不进入本路审查",
-            "prerequisite_not_met": "有明确前提未满足",
-            "pending_adjudication": "已查部分前提，成格待裁定",
-        }
-        snapshot_text += "\n\n[星位与格局条件]\n" + "\n".join(
-            [f"{c['label']}：{statuses[c['status']]}。" for c in checks]
-            + [
-                "逐星透藏、根气、财印位置及大运流年触点见 evidence_chain；不由共现认证成格。",
-                "来源：《秘本子平真诠》正文限域前提审查；位置及专题选择为 FateBridge v1 约定。",
-            ]
-        )
-        snapshot_export = parse_export_content(
-            technique="generic", content=snapshot_text
-        )
-        result["snapshot_text"] = snapshot_text
-        result["snapshot_export"] = snapshot_export
-        return result
+        return {"analysis_type": analysis_type, f"{topic}_analysis": analysis}
     except ParameterError as exc:
         return exc.as_result()
     except Exception as exc:
@@ -1140,7 +901,6 @@ def _make_bazi_dimension_service(
         analysis_day: int | None = None,
         dayun_pillar: str | None = None,
         liunian_pillar: str | None = None,
-        render_snapshot: bool = True,
     ) -> dict[str, Any]:
         return _run_bazi_dimension_analysis(
             person,
@@ -1151,7 +911,6 @@ def _make_bazi_dimension_service(
             analysis_day=analysis_day,
             dayun_pillar=dayun_pillar,
             liunian_pillar=liunian_pillar,
-            render_snapshot=render_snapshot,
         )
 
     return service

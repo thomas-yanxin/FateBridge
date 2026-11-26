@@ -6,18 +6,7 @@ from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.almanac import build_calendar_context, get_jieqi_year_grid
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.birth_context import build_birth_computation_context
-from fatebridge.services.snapshot_builders import (
-    build_snapshot_export as _build_snapshot_export,
-)
 from fatebridge.services.timing_clock import resolve_analysis_moment
-from fatebridge.services.timing_snapshots import (
-    _build_liunian_snapshot_text,
-    _build_liuri_snapshot_text,
-    _build_liushi_snapshot_text,
-    _build_liuyue_snapshot_text,
-    with_analysis_reference,
-    with_birth_clock_reference,
-)
 from fatebridge.services.timing_state import serialize_element_effects
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.errors import calculation_guard
@@ -27,8 +16,7 @@ from fatebridge.utils.formatting import format_clock_datetime
 @calculation_guard("流年分析计算")
 def calculate_liunian_analysis(
     person: PersonInfo,
-    target_year: int,
-    selected_sections: list[str] | None = None,
+    analysis_year: int,
 ) -> dict[str, Any]:
     """
     流年分析工具 - 专门分析指定年份的流年影响
@@ -39,34 +27,19 @@ def calculate_liunian_analysis(
 
     liunian_result = TimingEffectsAnalysis.analyze_liunian_effects(
         birth_context.birth_pillars,
-        target_year,
+        analysis_year,
         original_element_counts=birth_context.original_element_counts,
     )
 
     liunian_info = liunian_result["liunian_info"]
     element_effects = liunian_result["element_effects"]
     summary = liunian_result["summary"]
-    snapshot_text = _build_liunian_snapshot_text(
-        person_name=person.name,
-        birth_datetime=normalized_birth_time.input_datetime,
-        normalized_birth_datetime=birth_date,
-        timezone_name=normalized_birth_time.timezone,
-        target_year=target_year,
-        liunian_info=liunian_info,
-        element_effects=element_effects,
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="liunian_analysis",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
 
-    result: dict[str, Any] = {
+    return {
         "analysis_type": "流年专项分析",
         "personal_info": {
             "name": person.name,
-            "target_year": target_year,
+            "target_year": analysis_year,
             "birth_datetime": format_clock_datetime(
                 normalized_birth_time.input_datetime,
                 include_seconds=person.birth_second is not None,
@@ -78,7 +51,7 @@ def calculate_liunian_analysis(
         },
         "calendar_context": birth_context.birth_calendar_context,
         "target_year_jieqi": get_jieqi_year_grid(
-            target_year, normalized_birth_time.timezone
+            analysis_year, normalized_birth_time.timezone
         ),
         "liunian_info": {
             "pillar": liunian_info["pillar"],
@@ -87,14 +60,8 @@ def calculate_liunian_analysis(
             "element": liunian_info["element"],
         },
         "element_effects": serialize_element_effects(element_effects),
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
+        "summary": summary,
     }
-
-    result["summary"] = summary
-    return with_birth_clock_reference(
-        result, technique="liunian_analysis", selected_sections=selected_sections
-    )
 
 
 @calculation_guard("流月分析计算")
@@ -105,7 +72,6 @@ def calculate_liuyue_analysis(
     analysis_day: int | None = None,
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
-    selected_sections: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     流月分析工具 - 专门分析指定日期所在节令月的影响
@@ -169,25 +135,6 @@ def calculate_liuyue_analysis(
     if liunian_analysis:
         liunian_info = liunian_analysis["liunian_info"]
     summary = liuyue_result["comprehensive_summary"]
-    snapshot_text = _build_liuyue_snapshot_text(
-        person_name=person.name,
-        birth_datetime=normalized_birth_time.input_datetime,
-        normalized_birth_datetime=birth_date,
-        timezone_name=normalized_birth_time.timezone,
-        analysis_date=analysis_date,
-        analysis_calendar_context=analysis_calendar_context,
-        liuyue_info=liuyue_info,
-        liunian_info=liunian_info,
-        detailed_analysis=detailed_analysis,
-        element_effects=element_effects,
-        combination_effects=liuyue_result.get("combination_effects", {}),
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="liuyue_analysis",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
 
     result: dict[str, Any] = {
         "analysis_type": "流月专项分析",
@@ -225,8 +172,6 @@ def calculate_liuyue_analysis(
         },
         "element_effects": serialize_element_effects(element_effects),
         "combination_effects": liuyue_result.get("combination_effects", {}),
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
 
     if liunian_info is not None:
@@ -238,12 +183,8 @@ def calculate_liuyue_analysis(
         }
 
     result["summary"] = summary
-    return with_analysis_reference(
-        result,
-        resolution.reference,
-        technique="liuyue_analysis",
-        selected_sections=selected_sections,
-    )
+    result["analysis_reference"] = resolution.reference
+    return result
 
 
 @calculation_guard("流日分析计算")
@@ -254,7 +195,6 @@ def calculate_liuri_analysis(
     analysis_day: int | None = None,
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
-    selected_sections: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     流日分析工具 - 专门分析指定日期的流日影响
@@ -295,24 +235,8 @@ def calculate_liuri_analysis(
     liuri_info = liuri_result["liuri_info"]
     element_effects = liuri_result["element_effects"]
     summary = liuri_result["enhanced_summary"]
-    snapshot_text = _build_liuri_snapshot_text(
-        person_name=person.name,
-        birth_datetime=normalized_birth_time.input_datetime,
-        normalized_birth_datetime=birth_date,
-        timezone_name=normalized_birth_time.timezone,
-        analysis_date=analysis_date,
-        analysis_calendar_context=analysis_calendar_context,
-        liuri_info=liuri_info,
-        element_effects=element_effects,
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="liuri_analysis",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
 
-    result: dict[str, Any] = {
+    return {
         "analysis_type": "流日专项分析",
         "personal_info": {
             "name": person.name,
@@ -340,16 +264,8 @@ def calculate_liuri_analysis(
         },
         "element_effects": serialize_element_effects(element_effects),
         "summary": summary,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
+        "analysis_reference": resolution.reference,
     }
-
-    return with_analysis_reference(
-        result,
-        resolution.reference,
-        technique="liuri_analysis",
-        selected_sections=selected_sections,
-    )
 
 
 @calculation_guard("流时分析计算")
@@ -360,7 +276,6 @@ def calculate_liushi_analysis(
     analysis_day: int | None = None,
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
-    selected_sections: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     流时分析工具 - 专门分析指定时刻的流时影响
@@ -402,28 +317,8 @@ def calculate_liushi_analysis(
     detailed_analysis = liushi_result["detailed_analysis"]
     element_effects = liushi_result["element_effects"]
     summary = liushi_result["enhanced_summary"]
-    snapshot_text = _build_liushi_snapshot_text(
-        person_name=person.name,
-        birth_datetime=normalized_birth_time.input_datetime,
-        normalized_birth_datetime=birth_date,
-        timezone_name=normalized_birth_time.timezone,
-        analysis_date=analysis_date,
-        analysis_calendar_context=analysis_calendar_context,
-        liushi_info=liushi_info,
-        detailed_analysis={
-            "stem_relation": detailed_analysis["shishen_analysis"]["stem_relation"],
-            "branch_relations": detailed_analysis["branch_relations"],
-        },
-        element_effects=element_effects,
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="liushi_analysis",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
 
-    result = {
+    return {
         "analysis_type": "流时专项分析",
         "personal_info": {
             "name": person.name,
@@ -458,13 +353,5 @@ def calculate_liushi_analysis(
         },
         "element_effects": serialize_element_effects(element_effects),
         "summary": summary,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
+        "analysis_reference": resolution.reference,
     }
-
-    return with_analysis_reference(
-        result,
-        resolution.reference,
-        technique="liushi_analysis",
-        selected_sections=selected_sections,
-    )

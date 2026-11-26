@@ -86,7 +86,7 @@ class RenAnchoredOutput(PartialOutput):
 
 
 REN_ANCHOR_TOOLS = frozenset(
-    {"jinkou", "liureng_gods", "liureng_runyear", "sanshiunited"}
+    {"jinkou", "liuren_chart", "liuren_yearly_timing", "sanshi_combined_chart"}
 )
 
 
@@ -111,7 +111,7 @@ def require_complete_ren_anchors(
         require_complete_god_yin(obj)
         yin_roles = _get(obj, "god_yin", "year_fate_uppers")
         natal_earth = annual_earth = None
-        if key == "liureng_runyear":
+        if key == "liuren_yearly_timing":
             for role in ("natal", "annual"):
                 placement = _get(result, "runyear", "year_fate", role)
                 if not isinstance(placement, dict) or "sky_branch" not in placement:
@@ -162,7 +162,7 @@ def require_complete_ren_anchors(
 
     if not _year_course:
         board = _get(result, "liureng")
-        if key == "sanshiunited":
+        if key == "sanshi_combined_chart":
             sub = _get(result, "subresults", "liureng_gods")
             pillars(_get(sub, "four_pillars"))
             sub_board = _get(sub, "liureng")
@@ -171,7 +171,7 @@ def require_complete_ren_anchors(
         else:
             pillars(_get(result, "four_pillars"))
         liuren(board)
-    if key == "liureng_runyear":
+    if key == "liuren_yearly_timing":
         require(result, ("runyear.year_fate.day_ganzhi",))
     if key == "jinkou":
 

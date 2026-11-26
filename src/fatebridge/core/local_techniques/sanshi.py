@@ -12,33 +12,17 @@ from typing import Any
 from fatebridge.core.local_techniques.chart import (
     _build_metaphysics_analysis_context,
     _build_metaphysics_seed,
-    _build_qimen_palace_overview_lines,
     _normalize_date_text,
     _normalize_time_text,
-    _render_qimen_palace_sections,
 )
-from fatebridge.core.local_techniques.qimen import (
-    _qimen_stem_context_lines,
-    _render_qimen_pattern_line,
-    _render_qimen_source_disagreements,
-    build_qimen_with_options,
-)
-from fatebridge.core.local_techniques.snapshot import join_lines, render_snapshot_text
+from fatebridge.core.local_techniques.qimen import build_qimen_with_options
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.liureng import build_liureng_board
 from fatebridge.core.metaphysics.ren_calendar import require_ren_calendar
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
-from fatebridge.core.metaphysics.sanshi_correspondences import (
-    correspondence_text,
-    palace_correspondences,
-)
+from fatebridge.core.metaphysics.sanshi_correspondences import palace_correspondences
 from fatebridge.core.metaphysics.taiyi import build_taiyi_board
-from fatebridge.core.metaphysics.taiyi_dangshi import (
-    noble_source_assessment,
-    noble_source_text,
-)
-from fatebridge.core.metaphysics.taiyi_evidence import evidence_text
-from fatebridge.core.metaphysics.taiyi_long_cycles import long_cycle_text
+from fatebridge.core.metaphysics.taiyi_dangshi import noble_source_assessment
 from fatebridge.utils.formatting import create_pillar_dict
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
@@ -108,145 +92,6 @@ def _source_profiles(qimen: dict[str, Any], liureng: dict[str, Any]) -> dict[str
     return result
 
 
-def _build_sanshi_snapshot_text(
-    *,
-    seed: MetaphysicsSeed,
-    qimen_seed: MetaphysicsSeed | None,
-    qimen: dict[str, Any],
-    taiyi: dict[str, Any],
-    liureng: dict[str, Any],
-    correspondences: dict[str, Any],
-    noble_assessment: dict[str, Any],
-) -> str:
-    qimen_display_seed = qimen_seed or seed
-    palace_lines = _build_qimen_palace_overview_lines(qimen)
-    taiyi_mark_lines = [
-        f"{item.get('palace', '宫位')}：{'、'.join(item.get('markers', []) or []) or '无'}"
-        for item in taiyi.get("palace_marks", []) or []
-        if isinstance(item, dict)
-    ]
-    liureng_four_lesson_lines = [
-        f"第{lesson.get('index', 0)}课：{lesson.get('text', '无')}（{lesson.get('relation', '无')}）"
-        for lesson in liureng.get("four_lessons", []) or []
-        if isinstance(lesson, dict)
-    ]
-    liureng_transmission_lines = []
-    transmissions = liureng["three_transmissions"]
-    for label, title in (("initial", "初传"), ("middle", "中传"), ("final", "末传")):
-        item = transmissions[label]
-        liureng_transmission_lines.append(
-            f"{title}：{item.get('branch', '无')} / {item.get('relation', '无')} / {item.get('god', '无')}"
-        )
-    big_pattern = next(
-        (item for item in liureng.get("patterns", []) or [] if isinstance(item, dict)),
-        {},
-    )
-    month_general = liureng["month_general"]
-    sections = [
-        (
-            "起盘信息",
-            join_lines(
-                [
-                    (
-                        "时间上下文农历：未扩展；太乙历史历表日期见太乙规则依据（仅太乙年计使用）。"
-                        if (taiyi.get("calendar_rules") or {}).get(
-                            "historical_calendar"
-                        )
-                        else f"时间上下文农历：{(seed.calendar_context.get('lunar_calendar') or {}).get('display') or '未提供'}（父级钟面上下文，太乙年计日期见太乙规则依据）"
-                    ),
-                    f"奇门输入钟时：{qimen_display_seed.input_datetime.isoformat()}；时区：{qimen_display_seed.timezone}",
-                    f"奇门计算钟面：{qimen_display_seed.calendar_context['solar_datetime']}",
-                    f"四柱：{qimen_display_seed.pillars['year'][0]}{qimen_display_seed.pillars['year'][1]}年/{qimen_display_seed.pillars['month'][0]}{qimen_display_seed.pillars['month'][1]}月/{qimen_display_seed.pillars['day'][0]}{qimen_display_seed.pillars['day'][1]}日/{qimen_display_seed.pillars['hour'][0]}{qimen_display_seed.pillars['hour'][1]}时",
-                    (
-                        "时间算法：真太阳时 + 本地节气换月"
-                        if qimen_display_seed.applied_true_solar
-                        else "时间算法：直接时间 + 本地节气换月"
-                    ),
-                    "换日：按各子盘注明的实际口径",
-                    f"月将：{month_general.get('branch', '无')}({month_general.get('name', '无')})",
-                    f"年命：{seed.pillars['year'][1]}",
-                ]
-            ),
-        ),
-        (
-            "概览",
-            join_lines(
-                [
-                    f"盘型：{qimen.get('dun_type', '无')}{qimen.get('ju_number', '无')}局",
-                    f"旬首：{qimen.get('xun_head', '无')}",
-                    f"空亡：{qimen.get('kongwang', '无')}",
-                    f"值符：{(qimen.get('zhifu') or {}).get('star', '无')}在{(qimen.get('zhifu') or {}).get('palace', '无')}",
-                    f"值使：{(qimen.get('zhishi') or {}).get('door', '无')}在{(qimen.get('zhishi') or {}).get('palace', '无')}",
-                    f"八神口径：{qimen['rule_profiles']['god']['title']}（{qimen['god_profile']}）",
-                    f"九星旺衰口径：{qimen['rule_profiles']['season']['title']}（{qimen['season_profile']}）",
-                    *_qimen_stem_context_lines(qimen),
-                    f"伏使卦：{(qimen.get('fushi_hexagram') or {}).get('name', '无')}",
-                    "奇门格局按条件读取；下列结构不等于现实成败判断：",
-                    *_render_qimen_source_disagreements(qimen),
-                    *[_render_qimen_pattern_line(p) for p in qimen.get("patterns", [])],
-                ]
-            ),
-        ),
-        (
-            "太乙",
-            join_lines(
-                [
-                    taiyi.get("style_label", "无"),
-                    taiyi.get("accumulation_label", "无"),
-                    taiyi.get("rotation", "无"),
-                    taiyi.get("life_method", "无"),
-                    taiyi.get("big_pattern", ""),
-                    taiyi.get("small_pattern", ""),
-                    (taiyi.get("core_board") or {}).get("main_calculation", "无"),
-                    (taiyi.get("core_board") or {}).get("taiyi_position", "无"),
-                    (taiyi.get("core_board") or {}).get("wenchang_position", "无"),
-                    f"{taiyi['core_board'].get('ruler_label', '岁君')}：{taiyi['core_board'].get('ruler_branch', taiyi['core_board'].get('suijun', '无'))}",
-                    f"合神：{(taiyi.get('core_board') or {}).get('heshen', '无')}",
-                ]
-            ),
-        ),
-        ("太乙十六宫", join_lines(taiyi_mark_lines) or "无"),
-        ("太乙中宫", "、".join(taiyi["center_marks"]["markers"]) or "无星标"),
-        ("太乙规则依据", evidence_text(taiyi)),
-        ("太乙年运十神", long_cycle_text(taiyi.get("long_cycles"))),
-        ("三式宫位对应", correspondence_text(correspondences)),
-        ("三式贵人来源对照", noble_source_text(noble_assessment)),
-        (
-            "合参范围",
-            f"太乙采用{taiyi['life_method']}；奇门、六壬为本次时刻盘。尚未完成共同事件的全套合参断法，不能合成胜率或把三式视为三份独立证据。",
-        ),
-        (
-            "神煞",
-            join_lines(
-                [
-                    f"月将：{month_general.get('branch', '无')}({month_general.get('name', '无')})",
-                    f"布盘：{liureng.get('board_order', '无')}",
-                    f"课体：{liureng.get('board_style', '无')}",
-                    f"旬首：{liureng.get('xun_head', '无')}",
-                    f"空亡：{liureng.get('kongwang', '无')}",
-                    f"贵人体系：{liureng.get('guiren_system', '无')}",
-                ]
-            ),
-        ),
-        ("大六壬", join_lines(liureng_four_lesson_lines) or "无"),
-        (
-            "六壬大格",
-            join_lines(
-                [
-                    big_pattern.get("name", "无"),
-                    f"依据：{big_pattern.get('basis', '无')}",
-                ]
-            ),
-        ),
-        ("六壬小局", join_lines(liureng_transmission_lines) or "无"),
-        ("六壬参考", join_lines(liureng.get("overview", [])) or "无"),
-        ("六壬概览", join_lines(liureng.get("overview", [])) or "无"),
-        ("八宫详解", join_lines(palace_lines) or "无"),
-        *_render_qimen_palace_sections(qimen),
-    ]
-    return render_snapshot_text(sections)
-
-
 def build_sanshiunited_result(
     *,
     date: str,
@@ -313,15 +158,6 @@ def build_sanshiunited_result(
         seed.pillars["day"][0],
         liureng,
         taiyi_mode=taiyi["calendar_summary"]["calculation_mode"],
-    )
-    snapshot_text = _build_sanshi_snapshot_text(
-        seed=seed,
-        qimen_seed=qimen_seed,
-        qimen=qimen,
-        taiyi=taiyi,
-        liureng=liureng,
-        correspondences=correspondences,
-        noble_assessment=noble_assessment,
     )
     analysis_context = _build_metaphysics_analysis_context(seed)
     four_pillars = create_pillar_dict(seed.pillars)
@@ -405,7 +241,6 @@ def build_sanshiunited_result(
                 "太乙各计法按实际时间层解释；时计至点和时辰边界采用已声明的现代时钟适配，不能外推分钟级事件应验。",
             ],
         },
-        "snapshot_text": snapshot_text,
         "summary": (
             f"已运行本地三式合一聚合算法。"
             f"奇门：{qimen['dun_type']}{qimen['ju_number']}局。"

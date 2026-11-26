@@ -56,37 +56,33 @@ class ZiweiBirthRequest(FateBridgeRequest):
         default=DEFAULT_ZIWEI_DAY_DIVIDE,
         description="晚子（23:00-23:59）分日口径：current（默认，当日农历与当日日/时干）或 forward（算次日早子农历与次日早子日/时干）。",
     )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
-    )
 
 
 class ZiweiHoroscopeRequest(FateBridgeRequest):
-    """Request model for 紫微斗数 horoscope (运限) at a target date-time."""
+    """Request model for 紫微斗数 horoscope (运限) at an analysis date-time."""
 
     birth_utc_offset: str | None = Field(
         default=None,
         description="出生钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与出生时区核对并选择重复钟时，不替换命名时区。",
     )
 
-    target_year: int = Field(description="Target year, e.g., 2026")
-    target_month: int = Field(ge=1, le=12, description="Target month (1-12)")
-    target_day: int = Field(ge=1, le=31, description="Target day (1-31)")
-    target_hour: int = Field(ge=0, le=23, description="Target hour (0-23)")
-    target_minute: int = Field(
+    analysis_year: int = Field(description="Analysis year, e.g., 2026")
+    analysis_month: int = Field(ge=1, le=12, description="Analysis month (1-12)")
+    analysis_day: int = Field(ge=1, le=31, description="Analysis day (1-31)")
+    analysis_hour: int = Field(ge=0, le=23, description="Analysis hour (0-23)")
+    analysis_minute: int = Field(
         default=0,
         ge=0,
         le=59,
-        description="Target minute (0-59); does not imply minute-level predictive accuracy",
+        description="Analysis minute (0-59); does not imply minute-level predictive accuracy",
     )
-    target_timezone: str = Field(
+    analysis_timezone: str = Field(
         default="Asia/Shanghai",
-        description="目标钟表时间的时区，与出生时区独立；默认 Asia/Shanghai，不对目标时刻做真太阳时修正。",
+        description="分析钟表时间的时区，与出生时区独立；默认 Asia/Shanghai，不对分析时刻做真太阳时修正。",
     )
-    target_utc_offset: str | None = Field(
+    analysis_utc_offset: str | None = Field(
         default=None,
-        description="目标钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与target_timezone核对并选择重复钟时。省略仍拒绝歧义或不存在的目标钟时；实际先后按UTC瞬间比较。",
+        description="分析钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone核对并选择重复钟时。省略仍拒绝歧义或不存在的分析钟时；实际先后按UTC瞬间比较。",
     )
     nominal_age_basis: ZiweiAgeBasis = Field(
         default="birth_civil_timezone",
@@ -111,10 +107,6 @@ class ZiweiHoroscopeRequest(FateBridgeRequest):
         default=DEFAULT_ZIWEI_DAY_DIVIDE,
         description="晚子（23:00-23:59）分日口径：current（默认，当日农历与当日日/时干）或 forward（本命与目标均按次日早子起农历与日/时干）。",
     )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
-    )
 
 
 class ZiweiRulesRequest(_DeferredModel):
@@ -138,10 +130,6 @@ class ZiweiRulesRequest(_DeferredModel):
     year_stem: str | None = Field(
         default=None,
         description="Optional heavenly stem filter, e.g. 甲",
-    )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
     )
 
 
@@ -185,10 +173,6 @@ class LiuRengGodsRequest(_DeferredModel):
             "性别（可选）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；"
             "省略默认 未知。"
         ),
-    )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
     )
     use_true_solar_time: bool = Field(
         default=True,
@@ -237,10 +221,6 @@ class LiuRengRunyearRequest(FateBridgeRequest):
     analysis_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="Analysis longitude"
     )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
-    )
 
 
 class QimenAnalysisRequest(_DeferredModel):
@@ -272,10 +252,6 @@ class QimenAnalysisRequest(_DeferredModel):
     qimen_options: dict[str, Any] = Field(
         default_factory=dict,
         description="奇门选项：ju_method=zhirun（默认置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；仅支持转盘layout=direct、palaceShift=0",
-    )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
     )
     use_true_solar_time: bool = Field(
         default=True,
@@ -347,10 +323,6 @@ class TaiyiAnalysisRequest(_DeferredModel):
             "性别（可选）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；"
             "省略默认 未知；当前年计不使用性别定局。"
         ),
-    )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
     )
     use_true_solar_time: bool = Field(
         default=False,

@@ -35,7 +35,9 @@ from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.json_values import same_value
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
-TOOLS = frozenset({"liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"})
+TOOLS = frozenset(
+    {"liuren_chart", "liuren_yearly_timing", "jinkou", "sanshi_combined_chart"}
+)
 MISSING = object()
 
 
@@ -75,7 +77,7 @@ def require_request_binding(
     if key not in TOOLS:
         return
     gender: str | None
-    if key == "sanshiunited":
+    if key == "sanshi_combined_chart":
         assert isinstance(request, SanShiUnitedRequest)
         date_text = _normalize_date_text(request.date)
         time_text = _normalize_time_text(request.time)
@@ -136,7 +138,7 @@ def require_request_binding(
             request.use_true_solar_time
             and longitude is None
             and (
-                key == "liureng_runyear"
+                key == "liuren_yearly_timing"
                 or "use_true_solar_time" in request.model_fields_set
             )
         ):
@@ -235,7 +237,7 @@ def require_request_binding(
                 _mapping(child, policy, "calendar_policy.")
                 _mapping(child, diurnal, "overview.diurnal_evidence.")
                 _gender(child, "overview.gender", gender)
-    elif key == "liureng_runyear":
+    elif key == "liuren_yearly_timing":
         assert isinstance(request, LiuRengRunyearRequest)
         person = _build_person(
             request.model_dump(),

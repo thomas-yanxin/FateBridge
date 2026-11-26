@@ -6,13 +6,6 @@ from typing import Any
 from fatebridge.core.almanac import build_calendar_context, get_jieqi_year_grid
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.services.calendar_input import _parse_calendar_datetime
-from fatebridge.services.snapshot_builders import (
-    build_snapshot_export as _build_snapshot_export,
-)
-from fatebridge.services.timing_snapshots import (
-    _build_jieqi_year_snapshot_text,
-    _build_nongli_time_snapshot_text,
-)
 from fatebridge.utils.civil_clock import resolve_civil_clock
 from fatebridge.utils.civil_time import NominalClockLabel
 from fatebridge.utils.coordinates import parse_geo_coordinate
@@ -32,8 +25,6 @@ def calculate_jieqi_year(
     gps_lat: float | None = None,
     gps_lon: float | None = None,
     jieqis: list[str] | None = None,
-    selected_sections: list[str] | None = None,
-    render_snapshot: bool = True,
 ) -> dict[str, Any]:
     """
     全年节气辅助工具 - 生成全年 24 节气列表，并可筛选重点节气。
@@ -70,26 +61,6 @@ def calculate_jieqi_year(
         "selected_jieqi": selected_terms,
         "summary": summary,
     }
-    if render_snapshot:
-        snapshot_text = _build_jieqi_year_snapshot_text(
-            year=normalized_year,
-            timezone_name=timezone_name,
-            lat=lat,
-            lon=lon,
-            gps_lat=gps_lat,
-            gps_lon=gps_lon,
-            requested_terms=requested_terms,
-            annual_grid=annual_grid,
-            selected_terms=selected_terms,
-            missing_terms=missing_terms,
-            summary=summary,
-        )
-        result["snapshot_text"] = snapshot_text
-        result["snapshot_export"] = _build_snapshot_export(
-            technique="jieqi_year",
-            snapshot_text=snapshot_text,
-            selected_sections=selected_sections,
-        )
     if missing_terms:
         result["warnings"] = [f"未识别的节气名称：{'、'.join(missing_terms)}"]
     return result
@@ -109,7 +80,6 @@ def calculate_nongli_time(
     gender: Any | None = None,
     time_alg: int = 0,
     ad: int = 1,
-    selected_sections: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     农历换算辅助工具 - 输出农历、节气与干支上下文。
@@ -181,33 +151,6 @@ def calculate_nongli_time(
         f"{lunar_calendar.get('month_cn', '')}"
         f"{lunar_calendar.get('day_cn', '')}"
     ).strip() or lunar_calendar.get("display", "")
-    snapshot_text = _build_nongli_time_snapshot_text(
-        date=date,
-        time=time,
-        timezone_name=timezone_name,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
-        gender=gender,
-        time_alg=time_alg,
-        time_algorithm_label=time_algorithm_label,
-        ad=ad,
-        effective_longitude=effective_longitude,
-        total_correction_minutes=total_correction_minutes,
-        calendar_context=calendar_context,
-        lunar_calendar=lunar_calendar,
-        year_ganzhi=year_ganzhi,
-        month_ganzhi=lunar_calendar.get("month_ganzhi", month_ganzhi),
-        day_ganzhi=lunar_calendar.get("day_ganzhi", day_ganzhi),
-        time_ganzhi=lunar_calendar.get("time_ganzhi", time_ganzhi),
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="nongli_time",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
 
     result: dict[str, Any] = {
         "analysis_type": "农历换算",
@@ -249,8 +192,6 @@ def calculate_nongli_time(
         "lunar_calendar": lunar_calendar,
         "four_pillars": create_pillar_dict(pillars),
         "summary": summary,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
     if warnings:
         result["warnings"] = warnings

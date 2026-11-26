@@ -5,7 +5,7 @@ from __future__ import annotations
 from pydantic import Field
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
-from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.core.requests.base import AnalysisDateFields, _DeferredModel
 from fatebridge.core.requests.birth import BaziClockRequest
 
 PILLAR_PATTERN = "^(?:" + "|".join(SEXAGENARY_CYCLE) + ")$"
@@ -41,7 +41,7 @@ class BaziSourceCompareRequest(_DeferredModel):
     )
 
 
-class BaziDimensionRequest(BaziClockRequest):
+class BaziDimensionRequest(AnalysisDateFields, BaziClockRequest):
     """Shared base for BaZi single-dimension analyses.
 
     大运/流年默认由命盘 + 分析日期内部推算（analysis_* 缺省为今天），用户无需自己
@@ -50,12 +50,6 @@ class BaziDimensionRequest(BaziClockRequest):
 
     analysis_year: int | None = Field(
         default=None, description="Analysis year (defaults to current year)"
-    )
-    analysis_month: int | None = Field(
-        default=None, ge=1, le=12, description="Analysis month (1-12)"
-    )
-    analysis_day: int | None = Field(
-        default=None, ge=1, le=31, description="Analysis day (1-31)"
     )
     dayun_pillar: str | None = Field(
         default=None,
@@ -73,20 +67,8 @@ class BaziDimensionRequest(BaziClockRequest):
     )
 
 
-class BaziBirthRequest(BaziClockRequest):
+class BaziBirthRequest(AnalysisDateFields, BaziClockRequest):
     """Request model for standalone BaZi birth output."""
-
-    analysis_year: int | None = Field(default=None, description="Analysis year")
-    analysis_month: int | None = Field(
-        default=None, ge=1, le=12, description="Analysis month (1-12)"
-    )
-    analysis_day: int | None = Field(
-        default=None, ge=1, le=31, description="Analysis day (1-31)"
-    )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
-    )
 
 
 class BaziMarriageRequest(BaziDimensionRequest):

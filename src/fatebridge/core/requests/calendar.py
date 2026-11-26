@@ -19,10 +19,6 @@ class JieqiYearRequest(_DeferredModel):
     jieqis: list[str] = Field(
         default_factory=list, description="Optional focused jieqi names"
     )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
-    )
 
 
 class NongliTimeRequest(_DeferredModel):
@@ -55,8 +51,4 @@ class NongliTimeRequest(_DeferredModel):
     ad: int = Field(
         default=1,
         description="Common era flag; offline nongli conversion supports ad=1 only within 1900-01-01 to 2100-12-31",
-    )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
     )

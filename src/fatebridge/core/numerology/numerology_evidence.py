@@ -14,10 +14,10 @@ from fatebridge.core.heluo.heluo_najia import (
 from fatebridge.core.heluo.heluo_poems import (
     collation_summary as poem_collation_summary,
 )
-from fatebridge.core.heluo.heluo_snapshot import yao_text
 from fatebridge.core.heluo.heluo_texts import (
     collation_summary,
     commentary_collation_summary,
+    yao_text,
 )
 from fatebridge.core.heluo.heluo_timing import RULESET_ID
 from fatebridge.core.numerology.canping_texts import (

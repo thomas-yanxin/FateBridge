@@ -1,7 +1,7 @@
 """Chart construction and shared clock inputs for local divination techniques.
 
 Zodiac/house tables, chart objects, house rings, coordinate/date parsing and the
-MetaphysicsSeed bridge live here; reusable text rendering lives in snapshot.
+MetaphysicsSeed bridge live here.
 """
 
 from __future__ import annotations
@@ -29,7 +29,6 @@ from ..astro.geometry import (
     longitude_float,
 )
 from .house_geometry import HouseGeometry, HouseRecord
-from .snapshot import join_lines
 
 ZODIAC_SIGN_CN = {
     "Aries": "白羊座",
@@ -610,91 +609,3 @@ def _build_metaphysics_analysis_context(seed: MetaphysicsSeed) -> dict[str, Any]
         "next_jieqi": seed.calendar_context["next_solar_term"]["name"],
         "lunar_display": lunar_context.get("display"),
     }
-
-
-def _render_qimen_palace_sections(qimen: dict[str, Any]) -> list[tuple[str, str]]:
-    sections: list[tuple[str, str]] = []
-    for palace in qimen.get("palaces", []) or []:
-        if not isinstance(palace, dict):
-            continue
-        evidence = palace.get("evidence") or {}
-        god_meaning = evidence.get("god_interpretation") or {}
-        tomb = evidence.get("wonder_tomb") or {}
-        punishment = evidence.get("six_instrument_punishment") or {}
-        gate_relation = evidence.get("door_palace_relation") or {}
-        content_palace = palace.get("content_palace")
-        content_trigram = palace.get("content_trigram")
-        content_line = ""
-        if content_palace and (
-            content_palace != palace.get("name")
-            or content_trigram != palace.get("trigram")
-        ):
-            content_line = f"内容来源：{content_palace} / {content_trigram or '无'}"
-        sections.append(
-            (
-                palace.get("name", "宫位"),
-                join_lines(
-                    [
-                        f"宫卦：{palace.get('trigram', '无')}",
-                        content_line,
-                        f"天盘干：{'/'.join(palace.get('heaven_stems', [])) or '无'}",
-                        f"地盘干：{'/'.join(palace.get('earth_stems', [])) or palace.get('earth_stem') or '无'}",
-                        f"八神：{palace.get('god') or '无'}",
-                        f"九星：{'/'.join([palace['star'], *palace.get('hosted_stars', [])]) if palace.get('star') else '无'}",
-                        (
-                            f"九星月令：{evidence['season_month_branch']}月（{evidence['season_month_element']}），{evidence['star_season_state']}；依据{evidence['star_season_source_section']}"
-                            if evidence.get("star_season_state")
-                            else ""
-                        ),
-                        (
-                            f"八神传统象义：{god_meaning['traditional_role']}"
-                            if god_meaning
-                            else ""
-                        ),
-                        god_meaning.get("source_qualification", ""),
-                        (
-                            f"三奇入墓对照：王璋口径本宫命中{'/'.join(tomb['selected_matched_stems']) or '无'}；段首字面候选命中{'/'.join(tomb['unadopted_literal_candidate_matched_stems']) or '无'}，候选未采纳，释读及优先关系待核"
-                            if tomb.get("disputed_stems_at_this_palace")
-                            else ""
-                        ),
-                        (
-                            f"非本时直符六仪的落刑宫几何观察：{'/'.join(punishment['non_current_geometric_stems'])}；按暂定广义取法保留匹配，本时直符窄读候选另列，原文范围未裁定"
-                            if punishment.get("non_current_geometric_stems")
-                            else ""
-                        ),
-                        f"八门：{palace.get('door') or '无'}",
-                        (
-                            f"门宫生克：{gate_relation['door']}（{gate_relation['door_element']}）／{palace['trigram']}宫（{gate_relation['palace_element']}），{gate_relation['relation_text']}；歌诀门迫{'是' if gate_relation['verse_door_pressure'] else '否'}；正文关系名{gate_relation['prose_label'] or '本段未另命名'}，不作现实吉凶结论"
-                            if gate_relation
-                            else ""
-                        ),
-                        f"门卦：{(palace.get('door_hexagram') or {}).get('name', '无')}",
-                    ]
-                ),
-            )
-        )
-    return sections
-
-
-def _build_qimen_palace_overview_lines(qimen: dict[str, Any]) -> list[str]:
-    return [
-        (
-            f"{palace.get('name', '宫位')}："
-            f"天盘干：{'/'.join(palace.get('heaven_stems', [])) or '无'}；"
-            f"地盘干：{'/'.join(palace.get('earth_stems', [])) or palace.get('earth_stem') or '无'}；"
-            f"八神：{palace.get('god') or '无'}；"
-            f"九星：{'/'.join([palace['star'], *palace.get('hosted_stars', [])]) if palace.get('star') else '无'}；"
-            f"八门：{palace.get('door') or '无'}"
-            + (
-                f"；内容来源：{palace.get('content_palace', '无')} / {palace.get('content_trigram', '无')}"
-                if palace.get("content_palace")
-                and (
-                    palace.get("content_palace") != palace.get("name")
-                    or palace.get("content_trigram") != palace.get("trigram")
-                )
-                else ""
-            )
-        )
-        for palace in qimen.get("palaces", []) or []
-        if isinstance(palace, dict)
-    ]

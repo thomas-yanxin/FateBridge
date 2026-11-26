@@ -7,20 +7,12 @@ extension fields remain open. Definitions follow the service builders.
 from typing import Any
 
 from fatebridge.core.contracts.output_knowledge import (
-    AstroMeaningSetting,
-    ExportTechnique,
     HumanDesignKnowledgeDetails,
     KnowledgeDomain,
     KnowledgeProvenance,
     KnowledgeQuery,
     NumerologyKnowledgeDetails,
-    PlanetInfoSetting,
     ReferenceTrue,
-)
-from fatebridge.core.contracts.output_snapshot_export import (
-    ExportSection,
-    NormalizedExportSettings,
-    SnapshotExport,
 )
 from fatebridge.core.contracts.output_sukuyo_relationships import (
     SukuyoCandidateAnalysis,
@@ -34,7 +26,6 @@ __all__ = [
     "HumanDesignKnowledgeDetails",
     "NumerologyKnowledgeDetails",
     "REFERENCE_TOOL_FIELDS",
-    "SnapshotExport",
     "SukuyoDay",
 ]
 
@@ -52,7 +43,7 @@ REFERENCE_TOOL_FIELDS: dict[str, dict[str, Any]] = {
         "pair": str,
         "summary": str,
     },
-    "knowledge_registry": {
+    "knowledge_catalog": {
         "domains": list[KnowledgeDomain],
         "provenance": KnowledgeProvenance,
     },
@@ -63,22 +54,5 @@ REFERENCE_TOOL_FIELDS: dict[str, dict[str, Any]] = {
         "tips": list[str],
         "reference_only": ReferenceTrue,
         "reference_details": NumerologyKnowledgeDetails | HumanDesignKnowledgeDetails,
-    },
-    "export_registry": {
-        "techniques": list[ExportTechnique],
-        "selected_technique": ExportTechnique,
-        "planet_info_default": PlanetInfoSetting,
-        "astro_meaning_default": AstroMeaningSetting,
-        "default_normalized_settings": NormalizedExportSettings,
-        "jieqi_split_keys": list[str],
-    },
-    "export_parse": {
-        "technique": ExportTechnique,
-        "settings_used": NormalizedExportSettings,
-        "sections": list[ExportSection],
-        "selected_sections": list[str],
-        "section_titles_detected": list[str],
-        "unknown_detected_sections": list[str],
-        "missing_selected_sections": list[str],
     },
 }

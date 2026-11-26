@@ -88,10 +88,6 @@ class GuaLookupRequest(_DeferredModel):
         default="auto",
         description="Lookup mode: auto, hexagram, or trigram. auto keeps the eight pure names as trigrams; hexagram explicitly selects their six-line figures.",
     )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
-    )
 
 
 class GuaMeiyiRequest(_DeferredModel):
@@ -99,10 +95,6 @@ class GuaMeiyiRequest(_DeferredModel):
 
     name: list[str] = Field(
         description="Trigram/hexagram names or 3/6-bit codes; source short names and simplified/traditional forms are supported. The eight pure names select trigrams in batch auto mode; use a full name or six-bit code for their hexagrams."
-    )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
     )
 
 
@@ -652,10 +644,6 @@ class SanShiUnitedRequest(_DeferredModel):
     taiyi_options: dict[str, Any] = Field(
         default_factory=dict,
         description="太乙calculation_mode=year/month/day/hour，默认year；仅year可设year_profile=jinjing_year_historical_table_v1选381—385晋历主表，或jinjing_year_qiliang_table_v1选501—505齐梁史历表并保留502年闰标分歧；范围外拒绝，其他两术古历不因而认证；默认年计仍为通用现代农历。仅month可设month_profile=jinjing_month_jie_360_v1（默认金镜）/key_month_tianzheng_jie_v1（金钥匙天地二正，现代节月适配，门数分歧及三门未知保留）；day为金钥匙冬至前甲子积日、所选钟面零时换日，附十精及异数；仅hour可设hour_profile=jinjing_hour_solstice_v1（默认现代至点置一）或key_hour_winter_jiazi_v1（金钥匙完整积时/时支合神/四门，三门主体未决）。shiji_profile 可选《金镜》卷二推演、卷三表列始击并重算客算、或卷三表列始击与客算。接受 calculation_mode、shiji_profile 及对应计法的 year_profile、month_profile、hour_profile。阴阳遁与布盘方向由实际计法和日期决定。日计古历日期仍未复原，不按吉凶择法。",
-    )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
     )
     liureng_yue: str | None = Field(
         default=None,

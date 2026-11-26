@@ -25,11 +25,8 @@ from fatebridge.core.heluo.heluo_months import (
 from fatebridge.core.heluo.heluo_najia import annotate_positions
 from fatebridge.core.heluo.heluo_qi import phase_qi_evidence
 from fatebridge.core.heluo.heluo_seasonal import seasonal_number_evidence
-from fatebridge.core.heluo.heluo_snapshot import (
-    build_snapshot_text as build_snapshot_text,
-)
-from fatebridge.core.heluo.heluo_snapshot import yao_name as yao_name
-from fatebridge.core.heluo.heluo_snapshot import yao_text as yao_text
+from fatebridge.core.heluo.heluo_texts import yao_name as yao_name
+from fatebridge.core.heluo.heluo_texts import yao_text as yao_text
 from fatebridge.core.heluo.heluo_solar_context import solar_term as solar_term
 from fatebridge.core.heluo.heluo_solar_context import (
     solar_term_huagong as solar_term_huagong,

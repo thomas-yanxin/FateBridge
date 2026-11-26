@@ -12,10 +12,7 @@ from fatebridge.core.almanac import (
     get_lunar_context,
     localize_datetime,
 )
-from fatebridge.core.local_techniques.qimen import (
-    build_qimen_snapshot_text,
-    build_qimen_with_options,
-)
+from fatebridge.core.local_techniques.qimen import build_qimen_with_options
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.jinkou import build_jinkou_board
 from fatebridge.core.metaphysics.jinkou_natal_course import (
@@ -61,19 +58,6 @@ from fatebridge.core.ziwei.ziwei_rulesets import (
 )
 from fatebridge.core.ziwei.ziwei_tables import ZiweiBrightnessSource
 from fatebridge.core.ziwei.ziwei_time_input import birth_clock_receipt
-from fatebridge.services.jinkou_snapshot import (
-    build_jinkou_snapshot_text as _build_jinkou_snapshot_text,
-)
-from fatebridge.services.liureng_snapshot import build_liureng_snapshot_text
-from fatebridge.services.snapshot_builders import (
-    build_snapshot_export as _build_snapshot_export,
-)
-from fatebridge.services.taiyi_snapshot import build_taiyi_snapshot_text
-from fatebridge.services.ziwei_snapshot import (
-    build_ziwei_horoscope_snapshot_text,
-    build_ziwei_rules_snapshot_text,
-    build_ziwei_snapshot_text,
-)
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.civil_clock import (
     format_utc_offset,
@@ -152,8 +136,6 @@ def _analysis_context_payload(seed: MetaphysicsSeed) -> AnalysisClockContext:
 def calculate_ziwei_birth(
     person: PersonInfo,
     *,
-    selected_sections: list[str] | None = None,
-    render_snapshot: bool = True,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
     sihua_source: str = "rule_profile",
     brightness_source: ZiweiBrightnessSource = "rule_profile",
@@ -173,7 +155,7 @@ def calculate_ziwei_birth(
         include_calendar_basis=True,
     )
     ziwei_birth["engine"] = "fatebridge-offline"
-    result: dict[str, Any] = {
+    return {
         "analysis_type": "紫微斗数命盘",
         "person_info": {
             "name": person.name or "未提供",
@@ -197,28 +179,19 @@ def calculate_ziwei_birth(
         "calendar_context": seed.calendar_context,
         "ziwei_birth": ziwei_birth,
     }
-    if render_snapshot or selected_sections:
-        snapshot_text = build_ziwei_snapshot_text(seed=seed, ziwei_birth=ziwei_birth)
-        snapshot_export = _build_snapshot_export(
-            technique="ziwei",
-            snapshot_text=snapshot_text,
-            selected_sections=selected_sections,
-        )
-        result.update(snapshot_text=snapshot_text, snapshot_export=snapshot_export)
-    return result
 
 
 @calculation_guard("紫微斗数运限")
 def calculate_ziwei_horoscope(
     person: PersonInfo,
     *,
-    target_year: int,
-    target_month: int,
-    target_day: int,
-    target_hour: int,
-    target_minute: int = 0,
-    target_timezone: str = "Asia/Shanghai",
-    target_utc_offset: str | None = None,
+    analysis_year: int,
+    analysis_month: int,
+    analysis_day: int,
+    analysis_hour: int,
+    analysis_minute: int = 0,
+    analysis_timezone: str = "Asia/Shanghai",
+    analysis_utc_offset: str | None = None,
     birth_utc_offset: str | None = None,
     natal_leap_month_policy: ZiweiNatalLeapMonthPolicy | None = None,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
@@ -226,8 +199,6 @@ def calculate_ziwei_horoscope(
     brightness_source: ZiweiBrightnessSource = "rule_profile",
     day_divide: str = DEFAULT_ZIWEI_DAY_DIVIDE,
     nominal_age_basis: str = "birth_civil_timezone",
-    selected_sections: list[str] | None = None,
-    render_snapshot: bool = True,
 ) -> dict[str, Any]:
     seed = _build_person_seed(person, birth_utc_offset=birth_utc_offset)
     chart = build_ziwei_chart(
@@ -241,15 +212,15 @@ def calculate_ziwei_horoscope(
         include_calendar_basis=True,
     )
     target_seed = build_analysis_seed(
-        analysis_year=target_year,
-        analysis_month=target_month,
-        analysis_day=target_day,
-        analysis_hour=target_hour,
-        analysis_minute=target_minute,
-        analysis_timezone=target_timezone,
-        analysis_utc_offset=target_utc_offset,
-        timezone_field="target_timezone",
-        utc_offset_field="target_utc_offset",
+        analysis_year=analysis_year,
+        analysis_month=analysis_month,
+        analysis_day=analysis_day,
+        analysis_hour=analysis_hour,
+        analysis_minute=analysis_minute,
+        analysis_timezone=analysis_timezone,
+        analysis_utc_offset=analysis_utc_offset,
+        timezone_field="analysis_timezone",
+        utc_offset_field="analysis_utc_offset",
     )
     horoscope = build_ziwei_horoscope(
         chart=chart,
@@ -259,7 +230,7 @@ def calculate_ziwei_horoscope(
         nominal_age_basis=nominal_age_basis,
         day_divide=day_divide,
     )
-    result: dict[str, Any] = {
+    return {
         "analysis_type": "紫微斗数运限",
         "person_info": {
             "name": person.name or "未提供",
@@ -276,7 +247,7 @@ def calculate_ziwei_horoscope(
             "time_algorithm": "真太阳时" if seed.applied_true_solar else "直接时间",
         },
         # Correct the old birth-seed receipt here; preserve it under an explicit
-        # birth key. Target civil timezone/minute are independent birth inputs.
+        # birth key. Analysis civil timezone/minute are independent birth inputs.
         "birth_context": {
             **_analysis_context_payload(seed),
             **context_basis(horoscope["calendar_basis"]["birth"]),
@@ -297,25 +268,12 @@ def calculate_ziwei_horoscope(
         },
         "ziwei_horoscope": horoscope,
     }
-    if render_snapshot or selected_sections:
-        snapshot_text = build_ziwei_horoscope_snapshot_text(
-            target_seed=target_seed, horoscope=horoscope
-        )
-        snapshot_export = _build_snapshot_export(
-            technique="ziwei_horoscope",
-            snapshot_text=snapshot_text,
-            selected_sections=selected_sections,
-        )
-        result.update(snapshot_text=snapshot_text, snapshot_export=snapshot_export)
-    return result
 
 
 @calculation_guard("紫微规则库")
 def calculate_ziwei_rules(
     year_stem: str | None = None,
     *,
-    selected_sections: list[str] | None = None,
-    render_snapshot: bool = True,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
     sihua_source: str = "rule_profile",
     brightness_source: ZiweiBrightnessSource = "rule_profile",
@@ -331,19 +289,10 @@ def calculate_ziwei_rules(
         day_divide=day_divide,
     )
     payload["engine"] = "fatebridge-offline"
-    result: dict[str, Any] = {
+    return {
         "analysis_type": "紫微规则库",
         **payload,
     }
-    if render_snapshot or selected_sections:
-        snapshot_text = build_ziwei_rules_snapshot_text(payload)
-        snapshot_export = _build_snapshot_export(
-            technique="ziwei_rules",
-            snapshot_text=snapshot_text,
-            selected_sections=selected_sections,
-        )
-        result.update(snapshot_text=snapshot_text, snapshot_export=snapshot_export)
-    return result
 
 
 @calculation_guard("大六壬起课")
@@ -361,7 +310,6 @@ def calculate_liureng_gods(
     gender: str = "未知",
     use_true_solar_time: bool = True,
     true_solar_explicit: bool = True,
-    selected_sections: list[str] | None = None,
     is_diurnal: bool | None = None,
     guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
 ) -> dict[str, Any]:
@@ -388,20 +336,12 @@ def calculate_liureng_gods(
         guiren_profile=guiren_profile,
     )
     liureng["engine"] = "fatebridge-offline"
-    snapshot_text = build_liureng_snapshot_text(seed=seed, liureng=liureng)
-    snapshot_export = _build_snapshot_export(
-        technique="liureng",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
     return {
         "analysis_type": "大六壬起课",
         "analysis_context": _analysis_context_payload(seed),
         "four_pillars": create_pillar_dict(seed.pillars),
         "calendar_context": seed.calendar_context,
         "liureng": liureng,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
 
 
@@ -421,7 +361,6 @@ def calculate_liureng_runyear(
     analysis_longitude: float | None = None,
     use_true_solar_time: bool = True,
     true_solar_explicit: bool = True,
-    selected_sections: list[str] | None = None,
     is_diurnal: bool | None = None,
     guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
 ) -> dict[str, Any]:
@@ -500,16 +439,6 @@ def calculate_liureng_runyear(
         natal=runyear["year_fate"]["natal"]["earth_branch"],
         annual=runyear["year_fate"]["annual"]["earth_branch"],
     )
-    snapshot_text = build_liureng_snapshot_text(
-        seed=seed,
-        liureng=liureng,
-        runyear=runyear,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="liureng",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
     return {
         "analysis_type": "大六壬行年",
         "analysis_context": _analysis_context_payload(seed),
@@ -517,8 +446,6 @@ def calculate_liureng_runyear(
         "calendar_context": seed.calendar_context,
         "runyear": runyear,
         "liureng": liureng,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
 
 
@@ -537,7 +464,6 @@ def calculate_qimen_analysis(
     use_true_solar_time: bool = True,
     true_solar_explicit: bool = True,
     qimen_options: dict[str, Any] | None = None,
-    selected_sections: list[str] | None = None,
 ) -> dict[str, Any]:
     seed = build_analysis_seed(
         analysis_year=analysis_year,
@@ -579,20 +505,12 @@ def calculate_qimen_analysis(
                 "evidence_paths": ["qimen.calendar_policy.civil_clock_resolution"],
             }
         )
-    snapshot_text = build_qimen_snapshot_text(seed=seed, qimen=qimen)
-    snapshot_export = _build_snapshot_export(
-        technique="qimen",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
     return {
         "analysis_type": "奇门遁甲",
         "analysis_context": _analysis_context_payload(seed),
         "four_pillars": create_pillar_dict(seed.pillars),
         "calendar_context": seed.calendar_context,
         "qimen": qimen,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
 
 
@@ -616,7 +534,6 @@ def calculate_taiyi_analysis(
     shiji_profile: TaiyiShijiProfile | None = None,
     use_true_solar_time: bool = False,
     true_solar_explicit: bool = True,
-    selected_sections: list[str] | None = None,
 ) -> dict[str, Any]:
     seed = build_analysis_seed(
         analysis_year=analysis_year,
@@ -645,20 +562,12 @@ def calculate_taiyi_analysis(
         taiyi["calendar_rules"]["civil_clock_resolution"] = resolution
         taiyi["calendar_summary"]["civil_clock_resolution"] = dict(resolution)
     taiyi["engine"] = "fatebridge-offline"
-    snapshot_text = build_taiyi_snapshot_text(seed=seed, taiyi=taiyi)
-    snapshot_export = _build_snapshot_export(
-        technique="taiyi",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
     return {
         "analysis_type": "太乙神数",
         "analysis_context": _analysis_context_payload(seed),
         "four_pillars": create_pillar_dict(seed.pillars),
         "calendar_context": seed.calendar_context,
         "taiyi": taiyi,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
 
 
@@ -681,7 +590,6 @@ def calculate_jinkou_analysis(
     year_fate_age: int | None = None,
     use_true_solar_time: bool = True,
     true_solar_explicit: bool = True,
-    selected_sections: list[str] | None = None,
     is_diurnal: bool | None = None,
     guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
 ) -> dict[str, Any]:
@@ -749,12 +657,6 @@ def calculate_jinkou_analysis(
     )
     jinkou["rule_trace"].append(natal_course_trace(jinkou["natal_course"]))
     jinkou["engine"] = "fatebridge-offline"
-    snapshot_text = _build_jinkou_snapshot_text(seed=seed, jinkou=jinkou)
-    snapshot_export = _build_snapshot_export(
-        technique="jinkou",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
     return {
         "analysis_type": "金口诀",
         "analysis_context": _analysis_context_payload(seed),
@@ -762,6 +664,4 @@ def calculate_jinkou_analysis(
         "calendar_context": seed.calendar_context,
         "liureng": liureng,
         "jinkou": jinkou,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }

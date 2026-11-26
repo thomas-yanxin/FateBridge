@@ -12,7 +12,6 @@ from typing import Any, Literal, TypedDict
 from fatebridge.core.numerology.canping_texts import (
     lookup_record,
     pair_resolution,
-    selection_snapshot,
 )
 from fatebridge.utils.birth_input import normalize_gender
 from fatebridge.utils.data import get_nayin
@@ -403,73 +402,3 @@ def liunian_series(
         ),
         "age_policy": "relative_sexagenary_year_ordinal; no_actual_boundaries",
     }
-
-
-def build_snapshot_text(result: dict[str, Any]) -> str:
-    """渲染 [起盘]/[本命]/[大运·歲運]/[流年·歲運] 四段中文快照。"""
-    if not result:
-        return ""
-    lines: list[str] = []
-    benming = result.get("benming") or {}
-    verses = benming.get("verses") or {}
-    method_label = "古法(八字日支)" if result["method"] == "gu" else "明法(月支反向)"
-
-    lines.append("[起盘]")
-    lines.append(
-        f"年纳音：{result['element']}（{result['partName']}）  取法：{method_label}"
-    )
-    if result.get("mingGong"):
-        lines.append(f"日宫支：{result['dayPalaceBranch']}  命宫：{result['mingGong']}")
-    else:
-        lines.append(f"日宫支：{result['dayPalaceBranch']}")
-    if result.get("timing"):
-        lines.append(
-            f"配运政策：{result['timing']['profile_id']}（与河洛六九年大限区分）"
-        )
-    lines.append("")
-    lines.append("[本命]")
-    if result.get("kindMain") is None:
-        lines.append("未提供计算性别；保留两数，本命未选择男／女栏目。")
-    lines.append(f"顺 {verses.get('numShun')}：{verses.get('textShun')}")
-    lines.append(f"逆 {verses.get('numNi')}：{verses.get('textNi')}")
-    lines.append("")
-    lines.append("[大运·歲運]")
-    for step in result.get("dayun") or []:
-        step_verses = step.get("verses") or {}
-        interval = (
-            f"[{step['start_at']}, {step['end_at']}) {step['pillar']}"
-            if "start_at" in step
-            else f"{step['ageStart']}-{step['ageEnd']}岁 {step['branch']}"
-        )
-        lines.append(
-            f"{interval}："
-            f"顺{step_verses.get('numShun')} {step_verses.get('textShun')} ／ "
-            f"逆{step_verses.get('numNi')} {step_verses.get('textNi')}"
-        )
-    selected = (result.get("timing") or {}).get("selected")
-    if selected:
-        lines += ["", f"[查询时刻·{selected['at']}]", f"立春年柱：{selected['ganzhi']}"]
-        if selected["status"] == "not_started":
-            lines.append("尚未起运；不取第一运代替，未生成当段流年数或岁运条文。")
-        else:
-            verses = selected["verses"]
-            lines.append(
-                f"大运{selected['dayun_pillar']}：顺{selected['numShun']} {verses['textShun']} ／ "
-                f"逆{selected['numNi']} {verses['textNi']}"
-            )
-    liunian = result.get("liunian")
-    if liunian:
-        lv = liunian.get("verses") or {}
-        lines.append("")
-        lines.append("[流年·歲運]")
-        lines.append(
-            f"太岁{liunian['taisuiBranch']}/大运{liunian['dayunBranch']}："
-            f"顺{lv.get('numShun')} {lv.get('textShun')} ／ "
-            f"逆{lv.get('numNi')} {lv.get('textNi')}"
-        )
-    lines.extend(
-        ["", "[参评选条与来源]", selection_snapshot(benming.get("verses") or {})]
-    )
-    if selected and selected["status"] == "active":
-        lines.append("查询当段：" + selection_snapshot(selected["verses"]))
-    return "\n".join(lines)

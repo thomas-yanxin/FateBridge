@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fatebridge.application.bindings import lazy_service, person_invoke, raw_invoke
+from fatebridge.application.bindings import bind_kwargs, bind_person, service_ref
 from fatebridge.application.domain_validators import validate_ren_output
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.core.requests.metaphysics import (
@@ -16,42 +16,42 @@ from fatebridge.core.requests.metaphysics import (
     ZiweiRulesRequest,
 )
 
-calculate_jinkou_analysis = lazy_service(
+calculate_jinkou_analysis = service_ref(
     "fatebridge.services.metaphysics", "calculate_jinkou_analysis"
 )
 
 
-calculate_liureng_gods = lazy_service(
+calculate_liureng_gods = service_ref(
     "fatebridge.services.metaphysics", "calculate_liureng_gods"
 )
 
 
-calculate_liureng_runyear = lazy_service(
+calculate_liureng_runyear = service_ref(
     "fatebridge.services.metaphysics", "calculate_liureng_runyear"
 )
 
 
-calculate_qimen_analysis = lazy_service(
+calculate_qimen_analysis = service_ref(
     "fatebridge.services.metaphysics", "calculate_qimen_analysis"
 )
 
 
-calculate_taiyi_analysis = lazy_service(
+calculate_taiyi_analysis = service_ref(
     "fatebridge.services.metaphysics", "calculate_taiyi_analysis"
 )
 
 
-calculate_ziwei_birth = lazy_service(
+calculate_ziwei_birth = service_ref(
     "fatebridge.services.metaphysics", "calculate_ziwei_birth"
 )
 
 
-calculate_ziwei_horoscope = lazy_service(
+calculate_ziwei_horoscope = service_ref(
     "fatebridge.services.metaphysics", "calculate_ziwei_horoscope"
 )
 
 
-calculate_ziwei_rules = lazy_service(
+calculate_ziwei_rules = service_ref(
     "fatebridge.services.metaphysics", "calculate_ziwei_rules"
 )
 
@@ -111,33 +111,29 @@ def _compact_ziwei_rules(result: ServiceResult) -> ServiceResult:
 
 SPECS: list[ToolSpec] = [
     ToolSpec(
-        key="ziwei_birth",
-        bind=person_invoke(calculate_ziwei_birth, also_pass=("birth_utc_offset",)),
+        name="ziwei_birth_chart",
+        bind=bind_person(calculate_ziwei_birth, also_pass=("birth_utc_offset",)),
         request_model=ZiweiBirthRequest,
         summary="紫微斗数本命盘（星位、结构与循环来源；四化可显式选明刊原表，未知性别保留可确定标记）。",
         operation_label_zh="紫微命盘",
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/ziwei/birth-chart",
-        mcp_name="ziwei_birth_chart",
-        optional_snapshot=True,
     ),
     ToolSpec(
-        key="ziwei_horoscope",
-        bind=person_invoke(calculate_ziwei_horoscope, also_pass=("birth_utc_offset",)),
+        name="ziwei_timing",
+        bind=bind_person(calculate_ziwei_horoscope, also_pass=("birth_utc_offset",)),
         request_model=ZiweiHoroscopeRequest,
         summary="紫微斗数运限（六层索引与独立童限；四化继承所选表，未起大限时大限为空，未知性别仅大限/小限标不可定而流年/月/日/时与虚岁正常返回，未含全部流曜飞宫）。",
         operation_label_zh="紫微运限",
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/ziwei/timing",
-        mcp_name="ziwei_timing",
-        optional_snapshot=True,
         compact_view=_compact_ziwei_horoscope,
     ),
     ToolSpec(
-        key="ziwei_rules",
-        bind=raw_invoke(calculate_ziwei_rules),
+        name="ziwei_rules",
+        bind=bind_kwargs(calculate_ziwei_rules),
         request_model=ZiweiRulesRequest,
         summary=(
             "紫微斗数规则查表：按年干返回四化等规则参照，供解读时查证；"
@@ -146,13 +142,11 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="紫微规则",
         family="metaphysics",
         rest_path="/api/ziwei/rules",
-        mcp_name="ziwei_rules",
-        optional_snapshot=True,
         compact_view=_compact_ziwei_rules,
     ),
     ToolSpec(
-        key="liureng_gods",
-        bind=raw_invoke(calculate_liureng_gods),
+        name="liuren_chart",
+        bind=bind_kwargs(calculate_liureng_gods),
         request_model=LiuRengGodsRequest,
         summary=(
             "六壬起课：输出四课、九宗门三传、天将、旬遁与从实际计算推导的细课名；"
@@ -162,12 +156,11 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/liuren/chart",
-        mcp_name="liuren_chart",
         output_validators=(validate_ren_output,),
     ),
     ToolSpec(
-        key="liureng_runyear",
-        bind=person_invoke(
+        name="liuren_yearly_timing",
+        bind=bind_person(
             calculate_liureng_runyear,
             also_pass=("use_true_solar_time", "birth_utc_offset"),
         ),
@@ -180,12 +173,11 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/liuren/timing/yearly",
-        mcp_name="liuren_yearly_timing",
         output_validators=(validate_ren_output,),
     ),
     ToolSpec(
-        key="qimen",
-        bind=raw_invoke(calculate_qimen_analysis),
+        name="qimen",
+        bind=bind_kwargs(calculate_qimen_analysis),
         request_model=QimenAnalysisRequest,
         summary=(
             "奇门遁甲：问方位选择 / 行动时机 / 谋略布局（含趋吉避凶方位）；"
@@ -195,12 +187,11 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/qimen",
-        mcp_name="qimen",
         compact_view=_compact_qimen,
     ),
     ToolSpec(
-        key="taiyi",
-        bind=raw_invoke(calculate_taiyi_analysis),
+        name="taiyi",
+        bind=bind_kwargs(calculate_taiyi_analysis),
         request_model=TaiyiAnalysisRequest,
         summary=(
             "太乙神数：年计、节月月计、金钥匙积日日计、冬夏至换遁时计，返回二目、主客算、四将及规则路径；年计另附卷五年度十神。"
@@ -212,11 +203,10 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/taiyi",
-        mcp_name="taiyi",
     ),
     ToolSpec(
-        key="jinkou",
-        bind=raw_invoke(calculate_jinkou_analysis),
+        name="jinkou",
+        bind=bind_kwargs(calculate_jinkou_analysis),
         request_model=JinkouAnalysisRequest,
         summary=(
             "金口诀：按日干、月将、占时和地分起四位，分列旺衰、得气、阴阳用位条件、五动三动、六十四课钤与三合空破条件；"
@@ -226,7 +216,6 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/jinkou",
-        mcp_name="jinkou",
         output_validators=(validate_ren_output,),
     ),
 ]

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from functools import partial
 
-from fatebridge.application.bindings import lazy_service, raw_invoke
+from fatebridge.application.bindings import bind_kwargs, service_ref
 from fatebridge.application.domain_validators import (
     validate_canping_schedule,
     validate_meihua_clock,
@@ -34,60 +34,60 @@ from fatebridge.services.catalog.detail_views import traditional_detail_view
 
 MEIHUA_DETAIL_VIEW = partial(traditional_detail_view, keep_lunar_meihua=True)
 
-calculate_canping_analysis = lazy_service(
+calculate_canping_analysis = service_ref(
     "fatebridge.services.divination", "calculate_canping_analysis"
 )
 
 
-calculate_gua_lookup = lazy_service(
+calculate_gua_lookup = service_ref(
     "fatebridge.services.divination", "calculate_gua_lookup"
 )
 
 
-calculate_gua_meiyi = lazy_service(
+calculate_gua_meiyi = service_ref(
     "fatebridge.services.divination", "calculate_gua_meiyi"
 )
 
 
-calculate_heluo_analysis = lazy_service(
+calculate_heluo_analysis = service_ref(
     "fatebridge.services.divination", "calculate_heluo_analysis"
 )
 
 
-calculate_meihua_analysis = lazy_service(
+calculate_meihua_analysis = service_ref(
     "fatebridge.services.divination", "calculate_meihua_analysis"
 )
-calculate_meihua_cast = lazy_service(
+calculate_meihua_cast = service_ref(
     "fatebridge.services.meihua", "calculate_meihua_cast"
 )
 
 
-calculate_otherbu_analysis = lazy_service(
+calculate_otherbu_analysis = service_ref(
     "fatebridge.services.divination", "calculate_otherbu_analysis"
 )
 
 
-calculate_sanshiunited_analysis = lazy_service(
+calculate_sanshiunited_analysis = service_ref(
     "fatebridge.services.divination", "calculate_sanshiunited_analysis"
 )
 
 
-calculate_sixyao_analysis = lazy_service(
+calculate_sixyao_analysis = service_ref(
     "fatebridge.services.divination", "calculate_sixyao_analysis"
 )
 
 
-calculate_sukuyo_compatibility = lazy_service(
+calculate_sukuyo_compatibility = service_ref(
     "fatebridge.services.divination", "calculate_sukuyo_compatibility"
 )
 
 
-calculate_suzhan_analysis = lazy_service(
+calculate_suzhan_analysis = service_ref(
     "fatebridge.services.divination", "calculate_suzhan_analysis"
 )
 
 
-calculate_tongshefa_analysis = lazy_service(
+calculate_tongshefa_analysis = service_ref(
     "fatebridge.services.divination", "calculate_tongshefa_analysis"
 )
 
@@ -127,27 +127,25 @@ def _meihua_cast_views(views: EvidenceViews | None) -> EvidenceViews | None:
 
 SPECS: list[ToolSpec] = [
     ToolSpec(
-        key="gua_lookup",
-        bind=raw_invoke(calculate_gua_lookup),
+        name="gua_lookup",
+        bind=bind_kwargs(calculate_gua_lookup),
         request_model=GuaLookupRequest,
         summary="卦象查询：按八卦或六十四卦名、卦码查结构，六十四卦附《周易》经文与出处。批量查询用 gua_meanings。",
         operation_label_zh="卦象查询",
         family="divination",
         rest_path="/api/divination/gua",
-        mcp_name="gua_lookup",
     ),
     ToolSpec(
-        key="gua_meiyi",
-        bind=raw_invoke(calculate_gua_meiyi),
+        name="gua_meanings",
+        bind=bind_kwargs(calculate_gua_meiyi),
         request_model=GuaMeiyiRequest,
         summary="批量查卦：按卦名或卦码返回结构，六十四卦附《周易》经文与出处。单卦查询用 gua_lookup。",
         operation_label_zh="卦义",
         family="divination",
         rest_path="/api/divination/gua/meanings",
-        mcp_name="gua_meanings",
     ),
     ToolSpec(
-        key="meihua_analysis",
+        name="meihua_time_cast",
         bind=meihua_time_invoke(calculate_meihua_analysis),
         request_model=MeihuaAnalysisRequest,
         summary=(
@@ -159,15 +157,14 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="梅花易数",
         family="divination",
         rest_path="/api/divination/meihua/time-cast",
-        mcp_name="meihua_time_cast",
         cli_request_file=True,
         evidence_views_builder=_meihua_analysis_views,
         output_validators=(validate_meihua_clock,),
         detail_view=MEIHUA_DETAIL_VIEW,
     ),
     ToolSpec(
-        key="meihua_cast",
-        bind=raw_invoke(calculate_meihua_cast),
+        name="meihua_cast",
+        bind=bind_kwargs(calculate_meihua_cast),
         request_model=MeihuaCastRequest,
         output_model=MeihuaCastOutput,
         required_output_fields=(
@@ -187,14 +184,13 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="梅花显式起卦",
         family="divination",
         rest_path="/api/divination/meihua/cast",
-        mcp_name="meihua_cast",
         cli_request_file=True,
         evidence_views_builder=_meihua_cast_views,
         detail_view=MEIHUA_DETAIL_VIEW,
     ),
     ToolSpec(
-        key="tongshefa",
-        bind=raw_invoke(calculate_tongshefa_analysis),
+        name="combine_four_gua",
+        bind=bind_kwargs(calculate_tongshefa_analysis),
         request_model=TongSheFaRequest,
         summary=(
             "统摄四卦组合：按实际给定的 taiyin/taiyang/shaoyang/shaoyin "
@@ -203,11 +199,10 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="统摄法",
         family="divination",
         rest_path="/api/divination/combine-four-gua",
-        mcp_name="combine_four_gua",
     ),
     ToolSpec(
-        key="sixyao",
-        bind=raw_invoke(calculate_sixyao_analysis),
+        name="liuyao",
+        bind=bind_kwargs(calculate_sixyao_analysis),
         request_model=SixYaoRequest,
         summary=(
             "六爻纳甲：问一件具体事能不能成（需明确一事一方向）；"
@@ -222,13 +217,11 @@ SPECS: list[ToolSpec] = [
         family="divination",
         cpu_bound=True,
         rest_path="/api/divination/liuyao",
-        mcp_name="liuyao",
-        optional_snapshot=True,
         needs_random_seed=_sixyao_needs_seed,
     ),
     ToolSpec(
-        key="canping",
-        bind=raw_invoke(calculate_canping_analysis),
+        name="canping",
+        bind=bind_kwargs(calculate_canping_analysis),
         request_model=CanpingRequest,
         summary=(
             "邵子参评数 / 金锁银匙：需明确性别，默认卷六日支起数，命名选择卷七附子平配运，支持带时区时刻查询及年内交运分段；提供规则依据与条文，现实预测效力未验证。"
@@ -238,12 +231,11 @@ SPECS: list[ToolSpec] = [
         family="divination",
         cpu_bound=True,
         rest_path="/api/divination/canping",
-        mcp_name="canping",
         output_validators=(validate_numerology_clock, validate_canping_schedule),
     ),
     ToolSpec(
-        key="heluo",
-        bind=raw_invoke(calculate_heluo_analysis),
+        name="heluo",
+        bind=bind_kwargs(calculate_heluo_analysis),
         request_model=HeluoRequest,
         summary=(
             "河洛理数：须明确性别；天地数、元堂、先后天卦、大限和影印规则流年月日卦序，附逐条爻辞校勘状态与日期映射限制；现实预测效力未验证。"
@@ -253,12 +245,11 @@ SPECS: list[ToolSpec] = [
         family="divination",
         cpu_bound=True,
         rest_path="/api/divination/heluo",
-        mcp_name="heluo",
         output_validators=(validate_numerology_clock,),
     ),
     ToolSpec(
-        key="suzhan",
-        bind=raw_invoke(calculate_suzhan_analysis),
+        name="suzhan",
+        bind=bind_kwargs(calculate_suzhan_analysis),
         request_model=SuZhanRequest,
         summary=(
             "宿占：按日期计算农历二十七宿、七曜及T1299事项条文；已知钟时可确定宿主历日，缺钟时保留历法候选。星图和天文28宿需提供钟时及完整经纬度，默认采用现代视赤经不等宽研究宿界。"
@@ -268,22 +259,20 @@ SPECS: list[ToolSpec] = [
         family="divination",
         cpu_bound=True,
         rest_path="/api/divination/suzhan",
-        mcp_name="suzhan",
         output_validators=(validate_suzhan_clock,),
     ),
     ToolSpec(
-        key="sukuyo_compatibility",
-        bind=raw_invoke(calculate_sukuyo_compatibility),
+        name="sukuyo_compatibility",
+        bind=bind_kwargs(calculate_sukuyo_compatibility),
         request_model=SukuyoCompatibilityRequest,
         summary="宿曜双人相性：农历月日定二十七宿，T1299三九法双向关系；闰月保留候选。",
         operation_label_zh="宿曜合盘",
         family="compatibility",
         rest_path="/api/compatibility/sukuyo",
-        mcp_name="sukuyo_compatibility",
     ),
     ToolSpec(
-        key="otherbu",
-        bind=raw_invoke(calculate_otherbu_analysis),
+        name="interpret_astrology_dice",
+        bind=bind_kwargs(calculate_otherbu_analysis),
         request_model=OtherBuRequest,
         summary=(
             "占星骰面解读：必须提供实际planet/sign/house，house为0..11索引（实际第N宫传N-1）；"
@@ -293,11 +282,10 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="占星骰解读",
         family="divination",
         rest_path="/api/divination/astrology-dice/interpret",
-        mcp_name="interpret_astrology_dice",
     ),
     ToolSpec(
-        key="sanshiunited",
-        bind=raw_invoke(calculate_sanshiunited_analysis),
+        name="sanshi_combined_chart",
+        bind=bind_kwargs(calculate_sanshiunited_analysis),
         request_model=SanShiUnitedRequest,
         summary=(
             "三式合参：太乙年/月/日/时计、六壬和奇门时刻盘，按真实方位对应五将与星门神；日计明确采用金钥匙积日及十精，保留异数和未决。"
@@ -308,7 +296,6 @@ SPECS: list[ToolSpec] = [
         family="divination",
         cpu_bound=True,
         rest_path="/api/divination/sanshi",
-        mcp_name="sanshi_combined_chart",
         output_validators=(validate_ren_output,),
     ),
 ]

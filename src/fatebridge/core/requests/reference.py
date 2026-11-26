@@ -2,36 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from pydantic import Field
 
 from fatebridge.core.requests.base import _DeferredModel
-
-
-class ExportRegistryRequest(_DeferredModel):
-    """Request model for export registry lookup."""
-
-    technique: str | None = Field(default=None, description="Optional technique key")
-
-
-class ExportParseRequest(_DeferredModel):
-    """Request model for export snapshot parsing."""
-
-    technique: str = Field(description="Technique key, e.g. qimen")
-    content: str = Field(description="Snapshot text content")
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional selected section titles",
-    )
-    planet_info: dict[str, Any] | None = Field(
-        default=None,
-        description="Optional planet info export toggles",
-    )
-    astro_meaning: dict[str, Any] | None = Field(
-        default=None,
-        description="Optional astro meaning export toggles",
-    )
 
 
 class KnowledgeRegistryRequest(_DeferredModel):
@@ -40,10 +13,6 @@ class KnowledgeRegistryRequest(_DeferredModel):
     domain: str | None = Field(
         default=None,
         description="Optional domain filter: astro/bazi/liureng/qimen/heluo/canping/human_design. Heluo/Canping/Human Design expose source-bound partial references; catalogues do not select rules applicable to a person. Human Design retains384line locators; actual coverage reports pending local paraphrases, uncurated meanings and independent acceptance separately. Omit for all domains with separate source provenance.",
-    )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
     )
 
 
@@ -71,10 +40,6 @@ class KnowledgeReadRequest(_DeferredModel):
         ),
     )
     key: str | None = Field(default=None, description="Primary lookup key")
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
-    )
     aspect_degree: int | None = Field(
         default=None,
         description="[domain=astro, category=aspect] 相位角度；无 key 时须显式提供 category=aspect",
