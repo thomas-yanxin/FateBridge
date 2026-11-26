@@ -14,10 +14,11 @@ import gzip
 import hashlib
 import json
 import struct
+from collections.abc import Iterator
 from copy import deepcopy
 from itertools import chain
 from pathlib import Path
-from typing import Iterator, TypedDict
+from typing import TypedDict
 
 from fatebridge.core.astro.coefficient_storage import RecordBlock, pack_records
 from fatebridge.core.astro.de441_source import (
@@ -46,6 +47,8 @@ SOLAR_SOURCE_SHA256 = {
 
 
 class SourceGroup(TypedDict):
+    """Header layout for one planetary body group in the DE441 source."""
+
     source_group: int
     source_pointer: list[int]
     offset_words: int
@@ -54,12 +57,14 @@ class SourceGroup(TypedDict):
 
 
 def encoded(value: object) -> bytes:
+    """Serialize a manifest dictionary to deterministic UTF-8 JSON bytes."""
     return (
         json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     ).encode()
 
 
 def solar_atlas(staging: Path) -> dict[str, bytes]:
+    """Merge the five staged DE440 solar profiles into one shared record atlas."""
     profiles: dict[str, SolarManifest] = {}
     records: dict[tuple[int, int], dict[float, bytes]] = {}
     formats: dict[tuple[int, int], tuple[int, float]] = {}
@@ -136,8 +141,9 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
                 "sha256": hashlib.sha256(raw).hexdigest(),
             }
         )
+    logical_bytes = bytes(logical)
     packed = pack_records(
-        bytes(logical),
+        logical_bytes,
         [
             RecordBlock(s["record_count"], s["record_size_doubles"] * 8)
             for s in segments
@@ -149,8 +155,8 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
         "model_id": "lossless_de440_solar_record_atlas_v1",
         "storage": "record_byte_channels_gzip_v1",
         "file": name + ".bin.gz",
-        "uncompressed_bytes": len(logical),
-        "uncompressed_sha256": hashlib.sha256(logical).hexdigest(),
+        "uncompressed_bytes": len(logical_bytes),
+        "uncompressed_sha256": hashlib.sha256(logical_bytes).hexdigest(),
         "compressed_sha256": packed_sha,
         "segments": segments,
         "coefficient_values_or_record_domains_changed": False,
@@ -174,12 +180,12 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
                 pass
             segment["offset_bytes"] = base + index * size
             at = segment["offset_bytes"]
-            raw = logical[at : at + segment["bytes"]]
-            if hashlib.sha256(raw).hexdigest() != segment["sha256"]:
+            segment_raw = logical_bytes[at : at + segment["bytes"]]
+            if hashlib.sha256(segment_raw).hexdigest() != segment["sha256"]:
                 raise ValueError("DE440 selected source-record words changed")
             else:
                 pass
-            selected.extend(raw)
+            selected.extend(segment_raw)
         if (
             len(selected) != original["uncompressed_bytes"]
             or hashlib.sha256(selected).hexdigest() != original["uncompressed_sha256"]
@@ -194,6 +200,7 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
 def planetary_archive(
     source: Path, download_manifest: Path
 ) -> Iterator[tuple[str, bytes]]:
+    """Chunk continuous DE441 polynomial records and yield archive files and metadata."""
     if (
         hashlib.sha256(download_manifest.read_bytes()).hexdigest()
         != DE441_DOWNLOAD_MANIFEST_SHA256
@@ -268,7 +275,7 @@ def planetary_archive(
                 count = 3 * group["coefficient_count"] * group["subintervals"]
                 selected = raw[at : at + count * 8]
                 selected_source_sha.update(selected)
-                # Preserve the actual8-byte words, including signed zero and
+                # Preserve the actual 8-byte words, including signed zero and
                 # every coefficient bit; no float decode/encode is performed.
                 words.extend(selected)
             chunk_count += 1
@@ -355,7 +362,8 @@ def planetary_archive(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(__doc__)
+    """Build or verify shared DE440 and DE441 runtime coefficient archives."""
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--solar-profiles", type=Path)
     parser.add_argument("--de441-source", type=Path, required=True)
     parser.add_argument("--de441-source-manifest", type=Path, required=True)
