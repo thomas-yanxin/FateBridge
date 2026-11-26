@@ -20,28 +20,7 @@ from fatebridge.core.guolao.guolao_birth_clock import coherent_guolao_solar_call
 from fatebridge.core.guolao.guolao_timing import enrich_guolao_timing
 from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
 from fatebridge.core.jyotish.jyotish_sources import coherent_india_call
-from fatebridge.services.astrology_classical_snapshot import (
-    _build_almuten_figuris_line as _build_almuten_figuris_line,
-)
-from fatebridge.services.astrology_classical_snapshot import (
-    _build_classical_lines as _build_classical_lines,
-)
-from fatebridge.services.astrology_classical_snapshot import (
-    _build_classical_patterns_lines as _build_classical_patterns_lines,
-)
-from fatebridge.services.astrology_classical_snapshot import (
-    _build_fixed_stars_lines as _build_fixed_stars_lines,
-)
 from fatebridge.services.astrology_snapshot import _build_chart_snapshot
-from fatebridge.services.astrology_snapshot_sections import (
-    _build_angle_lines as _build_angle_lines,
-)
-from fatebridge.services.astrology_snapshot_sections import (
-    _build_house_lines as _build_house_lines,
-)
-from fatebridge.services.astrology_snapshot_sections import (
-    _build_planet_lines as _build_planet_lines,
-)
 from fatebridge.services.astrology_snapshot_sections import _chart_calculation_notes
 from fatebridge.services.jyotish import enrich_india_chart
 from fatebridge.services.structured_snapshot import render_structured_snapshot_text
@@ -52,13 +31,6 @@ __all__ = [
     "calculate_core_chart_analysis",
     "calculate_germany_chart_analysis",
     "calculate_relative_chart_analysis",
-    "_build_almuten_figuris_line",
-    "_build_angle_lines",
-    "_build_classical_lines",
-    "_build_classical_patterns_lines",
-    "_build_fixed_stars_lines",
-    "_build_house_lines",
-    "_build_planet_lines",
 ]
 
 SUPPORTED_CHART_VARIANTS = {

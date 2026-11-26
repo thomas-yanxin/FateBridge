@@ -14,10 +14,8 @@ from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.chart import build_core_chart_payload
 from fatebridge.core.classical_western import FIXED_STARS
 from fatebridge.core.ephemeris_runtime import preserve_ephemeris_path, swe
-from fatebridge.services.astrology import (
-    _build_fixed_stars_lines,
-    calculate_core_chart_analysis,
-)
+from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.services.astrology_classical_snapshot import _build_fixed_stars_lines
 from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"

@@ -28,7 +28,7 @@ from fatebridge.core.classical_western import (
     essential_dignities,
 )
 from fatebridge.core.contracts.output_western import Horary
-from fatebridge.services.astrology import _build_classical_lines
+from fatebridge.services.astrology_classical_snapshot import _build_classical_lines
 from fatebridge.services.western_horary import calculate_horary
 from tests.unit_test.fixtures.western_event_cases import QUESTION
 

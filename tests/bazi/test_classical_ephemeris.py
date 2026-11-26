@@ -28,10 +28,8 @@ from fatebridge.core.classical_western import (
 )
 from fatebridge.core.contracts.output_charts import AlmutenFiguris
 from fatebridge.core.ephemeris_runtime import swe
-from fatebridge.services.astrology import (
-    _build_almuten_figuris_line,
-    calculate_core_chart_analysis,
-)
+from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.services.astrology_classical_snapshot import _build_almuten_figuris_line
 
 _SWE_AVAILABLE = swe is not None
 _requires_swe = pytest.mark.skipif(

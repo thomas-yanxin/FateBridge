@@ -26,7 +26,9 @@ from fatebridge.core.classical_western import (
     combustion_state,
 )
 from fatebridge.core.predictive._common import collect_aspect_hits
-from fatebridge.services.astrology import _build_classical_patterns_lines
+from fatebridge.services.astrology_classical_snapshot import (
+    _build_classical_patterns_lines,
+)
 from tests.support.western_angular_reference import (
     ANGLES,
     RADII,
