@@ -19,7 +19,7 @@
 
 ## 运行示例
 
-按[快速入门](../getting-started.md)安装后，在仓库根目录执行 CLI（所有 91 个工具均支持 `--request-file`）：
+按[快速入门](../getting-started.md)安装后，在仓库根目录执行 CLI（所有 90 个工具均支持 `--request-file`）：
 
 ```bash
 uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json \

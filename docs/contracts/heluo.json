@@ -245,40 +245,15 @@
         "title": "Day Index"
       },
       "gender": {
-        "description": "性别 男/女 — 影响起命相盪与元堂推导。接受 男/女、male/female 等写法；必须明确提供，不默认性别。",
+        "description": "性别 男/女 — 影响起命排运与男女条文。接受 男/女、male/female 等写法；必须明确提供，不默认性别。",
         "title": "Gender",
         "type": "string"
       },
-      "gps_lat": {
+      "latitude": {
         "anyOf": [
           {
             "type": "number"
           },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "GPS latitude",
-        "title": "Gps Lat"
-      },
-      "gps_lon": {
-        "anyOf": [
-          {
-            "maximum": 180,
-            "minimum": -180,
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Explicit numeric GPS longitude; preferred over lon; zero is valid",
-        "title": "Gps Lon"
-      },
-      "lat": {
-        "anyOf": [
           {
             "type": "string"
           },
@@ -288,10 +263,13 @@
         ],
         "default": null,
         "description": "Latitude text or decimal (optional)",
-        "title": "Lat"
+        "title": "Latitude"
       },
-      "lon": {
+      "longitude": {
         "anyOf": [
+          {
+            "type": "number"
+          },
           {
             "type": "string"
           },
@@ -301,7 +279,7 @@
         ],
         "default": null,
         "description": "Longitude text or decimal; required when true solar time is on",
-        "title": "Lon"
+        "title": "Longitude"
       },
       "month_assignment_method": {
         "default": "intro_preferred_v1",
@@ -329,17 +307,11 @@
         "title": "Month Index"
       },
       "time": {
-        "description": "Known birth local time HH:MM[:SS[.ffffff]], up to six fractional digits; required, blank is not midnight; timezone goes in zone. Supplied components are retained separately from zero calculation defaults. Textual digits do not certify birth-record precision or imply an uncertainty interval.",
+        "description": "Known birth local time HH:MM[:SS[.ffffff]], up to six fractional digits; required, blank is not midnight; timezone goes in timezone. Supplied components are retained separately from zero calculation defaults. Textual digits do not certify birth-record precision or imply an uncertainty interval.",
         "title": "Time",
         "type": "string"
       },
-      "use_true_solar_time": {
-        "default": true,
-        "description": "Apply true solar time correction (needs lon); default on — 数算 derives from the BaZi pillars",
-        "title": "Use True Solar Time",
-        "type": "boolean"
-      },
-      "zone": {
+      "timezone": {
         "anyOf": [
           {
             "type": "string"
@@ -350,7 +322,13 @@
         ],
         "default": "+08:00",
         "description": "IANA zone or UTC offset; omitted/null means fixed +08:00, not historical Asia/Shanghai. Blank/invalid zones and nonexistent clocks are rejected. Repeated clocks require a confirmed birth_utc_offset; the IANA zone remains in use for later boundaries.",
-        "title": "Zone"
+        "title": "Timezone"
+      },
+      "use_true_solar_time": {
+        "default": true,
+        "description": "Apply true solar time correction (needs longitude); default on — 数算 derives from the BaZi pillars",
+        "title": "Use True Solar Time",
+        "type": "boolean"
       }
     },
     "required": [

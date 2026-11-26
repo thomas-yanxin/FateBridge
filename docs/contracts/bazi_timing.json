@@ -1,4 +1,7 @@
 {
+  "call_guidance": {
+    "clock_defaults": "分析日期全省略时用 as_of/执行开始的完整当地瞬间；实际时刻与补齐来源见 analysis_reference。"
+  },
   "evidence_views": {
     "analysis_clock": {
       "fields": [
@@ -353,7 +356,7 @@
           }
         ],
         "default": "未提供",
-        "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）",
+        "description": "姓名（可选，仅用于结果标识，不参与计算）",
         "title": "Name"
       },
       "use_true_solar_time": {

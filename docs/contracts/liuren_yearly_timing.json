@@ -189,7 +189,7 @@
       },
       "analysis_second": {
         "default": 0,
-        "description": "分析时刻秒数（0-59），保留中气换将与时辰边界。",
+        "description": "Analysis second (0-59)",
         "maximum": 59,
         "minimum": 0,
         "title": "Analysis Second",
@@ -218,7 +218,7 @@
           }
         ],
         "default": null,
-        "description": "起课民用钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone共同核对并选择重复时刻，不替换命名时区规则。省略时拒绝歧义或不存在的钟时。",
+        "description": "已确认的民用 UTC 偏移，格式 ±HH:MM 或 ±HH:MM:SS，用于消歧重复钟时。",
         "title": "Analysis Utc Offset"
       },
       "analysis_year": {
@@ -362,7 +362,7 @@
           }
         ],
         "default": "未提供",
-        "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）",
+        "description": "姓名（可选，仅用于结果标识，不参与计算）",
         "title": "Name"
       },
       "use_true_solar_time": {

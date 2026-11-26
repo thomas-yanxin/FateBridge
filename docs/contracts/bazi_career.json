@@ -465,7 +465,7 @@
           }
         ],
         "default": "未提供",
-        "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）",
+        "description": "姓名（可选，仅用于结果标识，不参与计算）",
         "title": "Name"
       },
       "use_true_solar_time": {

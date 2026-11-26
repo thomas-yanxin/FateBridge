@@ -18,7 +18,7 @@
 
 已连接 FateBridge MCP 时，按所选工具的实际定义直接调用，不为用户咨询先运行安装诊断、搜索仓库或项目历史。当前聊天已确认的资料足够时直接计算；只有用户要求沿用历史资料才核对历史。以下 CLI 是无连接时的本地后备及可复核示例，不需要启动 REST 服务。
 
-MCP 仅公开 `discover_tools` 与 `run_calculation` 两个入口（无资源 URI）。已知能力和业务参数时，用 `run_calculation(tool=能力名, arguments=业务输入)`；三端默认均为 `detail=compact` 返回精简核心业务字段。完整 JSON、全部时间线或方法依据使用 `detail=audit`、`fields=null`。需要参数时按名称用 `discover_tools(tool=能力名)`（需要 `output_schema` 时加 `detail="full"`），不把能力名当独立的 MCP 协议工具调用。已取得完整参数且能力公开时，不重复发现。工具描述的默认 `compact_fields` 与推荐 `suggested_fields` 来自共享字段配置；部分工具还发布按用户任务选择的 `evidence_views`（CLI `discover <tool>`、REST `/api/tools?tool=<tool>` 也可读取）。先选任务卡，再把其中 `fields` 复制到真实请求；卡名和 `view` 不是请求参数，不发送 `evidence_views/view/task`。关系盘按规范模式选卡，西占时运按 stage／annual／short_term 选卡；事业岗位／年度安排按 direction／target_year 选卡，西占事业补证可合并 career 卡，确保并列十神、判断范围和目标时间依据进入首次字段；细节卡与主任务字段合并去重，不用细节卡取代主层。默认视图是安全后备，不表示每次需要解释全部分支。三端对 `fields` 始终严格校验，无效路径返回 `unknown_projection_path` 并在 `constraints.available` 列出可用键名；详细追问时再按合同展开更多字段。没有首轮预设时，依据实际输出合同选字段，不猜路径。下面的出生数据都是示例，不能当作用户资料。
+MCP 仅公开 `discover_tools` 与 `run_calculation` 两个入口（无资源 URI）。已知能力和业务参数时，用 `run_calculation(tool=能力名, arguments=业务输入)`；三端默认均为 `detail=compact` 返回精简核心业务字段。完整 JSON、全部时间线或方法依据使用 `detail=audit`、`fields=null`。需要参数时按名称用 `discover_tools(tool=能力名)`（需要 `output_schema` 时加 `detail="full"`，注意 `detail="full"` 须配合 `tool`、`family` 或 `q` 过滤），不把能力名当独立的 MCP 协议工具调用。已取得完整参数且能力公开时，不重复发现。工具描述的默认 `compact_fields` 与推荐 `suggested_fields` 来自共享字段配置；部分工具还发布按用户任务选择的 `evidence_views`（CLI `discover <tool>`、REST `/api/tools?tool=<tool>` 也可读取）。先选任务卡，再把其中 `fields` 复制到真实请求；卡名和 `view` 不是请求参数，不发送 `evidence_views/view/task`。关系盘按规范模式选卡，西占时运按 stage／annual／short_term 选卡；事业岗位／年度安排按 direction／target_year 选卡，西占事业补证可合并 career 卡，确保并列十神、判断范围和目标时间依据进入首次字段；细节卡与主任务字段合并去重，不用细节卡取代主层。默认视图是安全后备，不表示每次需要解释全部分支。三端对 `fields` 始终严格校验，无效路径返回 `unknown_projection_path` 并在 `constraints.available` 列出可用键名；详细追问时再按合同展开更多字段。没有首轮预设时，依据实际输出合同选字段，不猜路径。下面的出生数据都是示例，不能当作用户资料。
 
 接收调用结果时，先核对实际返回形状（如 MCP 的 `structuredContent` 或文本 `content` JSON），确认结构完整后再解析；不要固定假设某种包装字段始终存在，也不要反复解析被宿主截断的片段。字段选择先用已核对的顶层业务字段，需要细节再展开，不为首轮遍历整个 `$defs`。
 
@@ -47,7 +47,7 @@ fatebridge <tool> [参数...]
 - `--detail {compact,audit}`：默认 `compact` 返回核心业务字段与精简回执；`audit` 返回完整业务载荷、全部时间线与 `calculation_evidence`。
 - `--fields KEY [KEY ...]`：按点号路径严格投影，始终保留 `run_metadata`。
 - `--as-of AS_OF`：传入带时区的 ISO 8601 时刻，冻结隐式当前时钟以便复现。
-- `--request-file PATH`：所有 91 个工具命令均支持从 JSON 文件加载输入，命令行显式参数覆盖同名顶层字段。
+- `--request-file PATH`：所有 90 个工具命令均支持从 JSON 文件加载输入，命令行显式参数覆盖同名顶层字段。
 - `fatebridge list`：以分类文本列出全部工具。
 - `fatebridge discover [tool]`：输出目录摘要或指定工具的完整参数 schema、接口与示例（JSON，加 `--detail full` 附带 `output_schema`）。记不清参数时，先 `discover`，不要猜 flag。
 
@@ -144,9 +144,8 @@ python3 -m fatebridge.cli bazi_romance <出生参数> \
 ```
 --birth-latitude 39.90 --birth-longitude 116.40   # 核心盘可按支持城市解析；关系/推运需明确坐标
 --birth-timezone Asia/Shanghai
---hsys 3            # 核心/关系盘整型宫制 0..8；3 = Placidus
---zodiacal 0        # 核心/关系盘：0=回归，1=恒星
-# 西占推运改用 --house-system P --zodiac-type Tropic
+--house-system P         # 核心/关系盘与西占推运均用 --house-system（支持 P/W/D 等字母、名称或 0..8 整数）
+--zodiac-type Tropic     # 核心/关系盘与西占推运均用 --zodiac-type（Tropic=回归，Sidereal=恒星）
 # 目标时间分别传 --analysis-year、--analysis-month、--analysis-day
 # 精确目标钟时另传 --analysis-hour 12 --analysis-minute 0（按出生时区）
 ```
@@ -159,7 +158,7 @@ python3 -m fatebridge.cli bazi_romance <出生参数> \
 
 ## 常用工具（按家族）
 
-当前 REST 公开 91 个工具，MCP 通过两个入口提供 91 项业务能力，目录共有 91 条记录，CLI 可执行 91 条。完整清单见[算法覆盖](../../algorithm-coverage.md)，请求合同以 `discover` 和[API 参考](../../api-reference.md#22-三端能力边界)为准。
+当前 REST 公开 90 个工具，MCP 通过两个入口提供 90 项业务能力，目录共有 90 条记录，CLI 可执行 90 条。完整清单见[算法覆盖](../../algorithm-coverage.md)，请求合同以 `discover` 和[API 参考](../../api-reference.md#22-三端能力边界)为准。
 
 ### 八字 · 命主本命
 
@@ -188,7 +187,7 @@ python3 -m fatebridge.cli bazi_romance <出生参数> \
 - `meihua_time_cast`：梅花易数，读取结构化 `meihua` / `summary` / `interpretation`，`--question`（可选）+ 起卦时间必填 `--analysis-year/month/day/hour`（要按当下起卦就传当前日期时间）。
 - `liuyao`：六爻，`--question`，CLI 手摇用 `--coins`（六掷之和，初爻到上爻，每项 6/7/8/9）或 `--gua-code`，也可按时间起。`lines` 对象列表使用 REST/MCP 传入，CLI 不解析对象字符串。
 - `combine_four_gua`：统摄四卦组合，读取实际 `taiyin/taiyang/shaoyang/shaoyin`；固定默认不是用户起卦，不实现蓍草十八变／大衍随机起卦。
-- `gua_lookup` / `gua_meanings`：卦象查询 / 卦义。
+- `gua_lookup`：八卦与六十四卦批量查询（支持 `queries` 与 `lookup_mode`）。
 - `qimen`：奇门遁甲，起局 + 用神。
 - `taiyi`：太乙神数，支持明确选择年／月／日／时计；合参对应选项放入`taiyi_options`。先按[太乙取证](../zhanbu/taiyi-sanshi.md)核模式、起元、钟面和实际证据，现代适配不冒称完整古历。年／月八门与定计用`gates`、`gate_comparison`、`determinate`分源深读；日计读`daily_calendar/daily_essences`，始击读`shiji_derivation`，原表读`count_sources`。`menju_jiangfa`为三值条件合取，时计三门仍未裁定；默认至点时计不附定计，显式`key_hour_winter_jiazi_v1`可读完整积时和定计并保留原例三项差异，不按有利结果换法。
 - `jinkou`：金口诀，`--di-fen` 地分 + 时间。

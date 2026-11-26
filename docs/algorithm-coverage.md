@@ -2,7 +2,7 @@
 
 [文档中心](README.md) · [核心概念](concepts.md) · [API 参考](api-reference.md)
 
-本页按中央目录 `src/fatebridge/services/tool_catalog.py` 列出 FateBridge 的 12 个 family 与 91 项计算能力，说明实现状态、依赖条件与适用边界。输入字段与参数详情见 [API 参考](api-reference.md)，结果解读指引见[方法参考](interpretation/README.md)。
+本页按中央目录 `src/fatebridge/services/tool_catalog.py` 列出 FateBridge 的 12 个 family 与 90 项计算能力，说明实现状态、依赖条件与适用边界。输入字段与参数详情见 [API 参考](api-reference.md)，结果解读指引见[方法参考](interpretation/README.md)。
 
 状态分类：
 
@@ -11,7 +11,7 @@
 - `Partial` / `Limited`：已实现明确子集，存在未覆盖或未裁定的规则范围。
 - `Excluded`：当前仓库不提供该能力。
 
-> 工具来自中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **91 个工具**，MCP 通过两个入口提供 **91 项业务能力**，分为 **12 个 family**。目录共有 91 条记录，CLI 可执行 91 条。
+> 工具来自中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **90 个工具**，MCP 通过两个入口提供 **90 项业务能力**，分为 **12 个 family**。目录共有 90 条记录，CLI 可执行 90 条。
 
 ## 怎样核对一次结果
 
@@ -22,14 +22,14 @@
 | 数值与时间精度 | `chart_profile.ephemeris_model`、`time_adjustment` 与 `engine_is_approximate` | 依赖库可导入不代表已加载外部 `.se1` 星历文件 |
 | 可追溯性 | 原输入、`run_metadata`、版本、来源与环境 | 重放需保留原输入、`as_of` 与环境设置 |
 
-## 1. 总览：12 个 family / 91 个工具
+## 1. 总览：12 个 family / 90 个工具
 
 | family | 工具数 | 主题 | 总体状态 |
 | --- | --- | --- | --- |
 | `bazi` | 12 | 八字命盘、九大专项、综合命理及原典四柱核对 | Implemented |
 | `compatibility` | 2 | 双人配合（八字合婚 / 宿曜相性） | Implemented |
 | `timing` | 9 | 大运 / 流年 / 流月 / 流日 / 流时 / 节气 / 农历 | Implemented |
-| `divination` | 11 | 梅花、六爻、统摄法、参评数、河洛、宿占、占星骰、三式合参 | Implemented |
+| `divination` | 10 | 梅花、六爻、统摄法、参评数、河洛、宿占、占星骰、三式合参 | Implemented |
 | `metaphysics` | 8 | 紫微斗数、六壬、奇门、太乙、金口诀 | Implemented |
 | `astro` | 9 | 核心星盘、印占本命／分盘／达沙、果老、德国盘、人类图及关系盘 | Implemented（精度依赖星历） |
 | `western_timing` | 12 | 西占推运总览与 11 项独立推运技法（返照/行运/主限/法达等） | Implemented（依赖 backend） |
@@ -89,8 +89,7 @@
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `gua_lookup` | 六十四卦卦象与义理查询 | Implemented |
-| `gua_meanings` | 批量卦义查询 helper | Implemented |
+| `gua_lookup` | 八卦与六十四卦批量卦象、结构及义理查询（支持 `queries` 与 `lookup_mode`） | Implemented |
 | `meihua_time_cast` | 梅花易数时间取数、体用互变、季令与经文参照 | Implemented |
 | `meihua_cast` | 梅花物数、声音、尺寸、字占、端法、报数与已有卦起卦 | Implemented |
 | `combine_four_gua` | 统摄四卦组合分析 | Implemented，限定组合规则 |
@@ -209,8 +208,8 @@
 | 本地有 `swisseph` 且加载 `.se1` 数据 | Implemented | 本地星历路径，实际模型由 `chart_profile.ephemeris_model` 标志确定 |
 | `swisseph` 可导入但缺 `.se1` 数据 | Implemented / Approximate | 可能使用内置 Moshier 模型，以实际标志为准 |
 | 无 `swisseph` | Approximate | 回退至 FateBridge 内置近似轨道模型 |
-| 显式 `hsys` 覆盖为 `1..8` 的离线宫制 | Implemented（需 `swisseph`） | 缺失运行时时直接报错，不静默降级 |
-| `zodiacal=1` sidereal（Lahiri） | Implemented | 离线恒星黄道模式 |
+| 显式 `house_system` 覆盖为非整宫的离线宫制（如 `1..8` / `P` 等） | Implemented（需 `swisseph`） | 缺失运行时时直接报错，不静默降级 |
+| `zodiac_type="Sidereal"`（Lahiri） | Implemented | 离线恒星黄道模式 |
 
 ### 3.2 关系盘（`relationship_chart`）
 

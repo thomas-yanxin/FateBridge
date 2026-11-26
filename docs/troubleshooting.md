@@ -121,9 +121,9 @@ MCP 已知工具失败返回原生 `isError=true` 与结构化错误包络；Fas
 
 同时检查 `chart_profile.engine_backend`、`engine_precision`、`ephemeris_model` 与 `run_metadata.engine_is_approximate`。运行时可用但缺 `.se1` 时可能使用 Moshier。数据获取与 `SE_EPHE_PATH` 配置见[星历安装](ephemeris.md)。CLI 不自动读取 `.env`，应在启动前设进程环境。
 
-### 显式 `hsys` 覆盖报依赖错误
+### 显式 `house_system` 覆盖报依赖错误
 
-核心/关系盘的 `hsys` 是整数 `0..8`，西占推运的 `house_system` 支持 `P` 等字符串。显式 `hsys=1..8` 缺 `swisseph` 时会报错，需安装或修复运行时，或按需使用 `hsys=0`。
+核心/关系盘与西占推运均使用 `house_system`，支持 SE 字母（如 `W`、`P`、`D`）、名称或整数编码 `0..8`。在核心/关系盘中显式指定非整宫宫制（例如 `1..8` 或 `P`）且缺 `swisseph` 时会报错，需安装或修复运行时，或按需使用整宫 `0` / `W`。
 
 ### 西占推运 `dependency_missing`
 

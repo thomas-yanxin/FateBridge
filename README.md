@@ -33,7 +33,7 @@ FateBridge 为 AI 应用提供本地术数、占星与心理测量计算，通�
 | 风水空间 | 八宅、基础砂水、年／月星、玄空历史宅盘、布局与实测工位 | [家居风水](docs/fengshui.md) · [现场咨询指南](docs/interpretation/fengshui/consultation.md) |
 | 心理测量 | IPIP 50 题大五人格因子标记量表（Goldberg 1992 公有领域） | [覆盖矩阵](docs/algorithm-coverage.md#212-psychometrics--心理测量量表implemented) |
 
-当前源码提供 **91 个业务 REST 路由**。MCP 通过两个入口提供 **91 项业务能力**，覆盖 **12 个 family**。目录共有 91 条记录，CLI 可执行 91 条。三端共用公开工具名、请求字段与领域计算，见[接口边界](docs/api-reference.md#22-三端能力边界)和[算法覆盖矩阵](docs/algorithm-coverage.md)。
+当前源码提供 **90 个业务 REST 路由**。MCP 通过两个入口提供 **90 项业务能力**，覆盖 **12 个 family**。目录共有 90 条记录，CLI 可执行 90 条。三端共用公开工具名、请求字段与领域计算，见[接口边界](docs/api-reference.md#22-三端能力边界)和[算法覆盖矩阵](docs/algorithm-coverage.md)。
 
 ## 快速开始
 

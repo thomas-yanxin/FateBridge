@@ -143,7 +143,7 @@
           }
         ],
         "default": null,
-        "description": "Analysis hour (0-23), in birth_timezone. If omitted, keeps the birth hour for date-only compatibility.",
+        "description": "Analysis hour (0-23)",
         "title": "Analysis Hour"
       },
       "analysis_minute": {
@@ -158,7 +158,7 @@
           }
         ],
         "default": null,
-        "description": "Analysis minute (0-59), in birth_timezone. If omitted, keeps the birth minute for date-only compatibility.",
+        "description": "Analysis minute (0-59)",
         "title": "Analysis Minute"
       },
       "analysis_month": {
@@ -411,7 +411,11 @@
       },
       "zodiac_type": {
         "default": "Tropic",
-        "description": "Zodiac type, e.g. Tropic or Sidereal",
+        "description": "Zodiac type: Tropic or Sidereal",
+        "enum": [
+          "Tropic",
+          "Sidereal"
+        ],
         "title": "Zodiac Type",
         "type": "string"
       }

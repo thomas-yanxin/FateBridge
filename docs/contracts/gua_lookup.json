@@ -9,17 +9,26 @@
       "lookup_mode": {
         "default": "auto",
         "description": "Lookup mode: auto, hexagram, or trigram. auto keeps the eight pure names as trigrams; hexagram explicitly selects their six-line figures.",
+        "enum": [
+          "auto",
+          "hexagram",
+          "trigram"
+        ],
         "title": "Lookup Mode",
         "type": "string"
       },
-      "query": {
-        "description": "Trigram or hexagram name (source short name or common full name, simplified/traditional forms), or a 3/6-bit code from bottom to top. In auto mode the eight pure trigram names select trigrams; use hexagram for their six-line identities.",
-        "title": "Query",
-        "type": "string"
+      "queries": {
+        "description": "Trigram or hexagram names (source short name or common full name, simplified/traditional forms), or 3/6-bit codes from bottom to top. In auto mode the eight pure trigram names select trigrams; use hexagram for their six-line identities.",
+        "items": {
+          "type": "string"
+        },
+        "minItems": 1,
+        "title": "Queries",
+        "type": "array"
       }
     },
     "required": [
-      "query"
+      "queries"
     ],
     "title": "GuaLookupRequest",
     "type": "object"
@@ -44,7 +53,7 @@
       ],
       "method_id": "fatebridge.hexagram_lookup.contract_v1",
       "output_paths": [
-        "result"
+        "results"
       ],
       "prerequisites": [
         "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"

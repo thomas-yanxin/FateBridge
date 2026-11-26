@@ -375,7 +375,7 @@
           }
         ],
         "default": null,
-        "description": "出生钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与出生时区核对并选择重复钟时，不替换命名时区。",
+        "description": "出生钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与解析后的birth_timezone核对，用于选择重复钟时，不替换命名时区。省略仍拒绝歧义或不存在的钟时。",
         "title": "Birth Utc Offset"
       },
       "birth_year": {
@@ -402,7 +402,7 @@
       },
       "day_divide": {
         "default": "current",
-        "description": "晚子（23:00-23:59）分日口径：current（默认，当日农历与当日日/时干）或 forward（本命与目标均按次日早子起农历与日/时干）。",
+        "description": "晚子（23:00-23:59）分日口径：current（默认，当日农历与当日日/时干）或 forward（算次日早子农历与次日早子日/时干）。",
         "enum": [
           "current",
           "forward"
@@ -433,7 +433,7 @@
           }
         ],
         "default": "未提供",
-        "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）",
+        "description": "姓名（可选，仅用于结果标识，不参与计算）",
         "title": "Name"
       },
       "natal_leap_month_policy": {
@@ -451,7 +451,7 @@
           }
         ],
         "default": null,
-        "description": "出生前置及斗君使用的本命闰月月序：split_at_day_15（初一至十五原位，十六日起后移）、all_current_month（全月原位）、all_next_month（全月后移）。省略按rule_profile；目标流月仍固定按十五日分段。",
+        "description": "本命闰月安星月序：split_at_day_15（初一至十五沿用同名月序，十六日起后移一月）、all_current_month（全月原位）、all_next_month（全月后移）。保留出生农历年、日、闰月标记；闰十二月后移为本年安星月序13。省略按rule_profile：iztro分半，摘录全月后移。",
         "title": "Natal Leap Month Policy"
       },
       "nominal_age_basis": {
@@ -463,7 +463,7 @@
       },
       "rule_profile": {
         "default": "iztro_2_5_8",
-        "description": "与本命盘共用的版本化紫微规则；quanshu_v2_excerpt 1.3.2 首大限从父母或兄弟起，火铃按年支定点读法；仍是部分摘录配置。",
+        "description": "紫微规则：iztro_2_5_8 保留软件口径；quanshu_v2_excerpt 1.3.2 选择闰月、四化、亮度、长生、旬空双支、部分流年星，以及邻宫起大限、火铃年支定点读法；另用sihua_source显式选四化表，非全书认证。",
         "enum": [
           "iztro_2_5_8",
           "quanshu_v2_excerpt"
@@ -473,7 +473,7 @@
       },
       "sihua_source": {
         "default": "rule_profile",
-        "description": "本命与可用运限层共用所选四化表；naj_ming_v1取明刊原页。运限按宫干／时间干复用仍为软件约定，不据此认证古典运限法。",
+        "description": "四化表：rule_profile沿用基础配置；naj_ming_v1显式取明刊卷三原页（庚日武同相、壬梁紫府武）。只选四化表，不代表整部原典获认证。",
         "enum": [
           "rule_profile",
           "naj_ming_v1"
@@ -532,12 +532,12 @@
       "quantity_kind": "traditional_rule_result",
       "role": "calculation",
       "selector_fields": [
-        "nominal_age_basis",
         "rule_profile",
         "natal_leap_month_policy",
         "sihua_source",
         "brightness_source",
-        "day_divide"
+        "day_divide",
+        "nominal_age_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"

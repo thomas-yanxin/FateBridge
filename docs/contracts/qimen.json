@@ -51,6 +51,73 @@
     ]
   },
   "input": {
+    "$defs": {
+      "QimenOptions": {
+        "additionalProperties": false,
+        "description": "Typed Qi Men Dun Jia configuration options.",
+        "properties": {
+          "god_profile": {
+            "default": "yanyi_text",
+            "description": "八神表：yanyi_text（默认卷三正文）或 yanyi_diagrams（卷四圆图）。",
+            "enum": [
+              "yanyi_text",
+              "yanyi_diagrams"
+            ],
+            "title": "God Profile",
+            "type": "string"
+          },
+          "ju_method": {
+            "default": "zhirun",
+            "description": "定局法：zhirun（默认置闰）或 chaibu（拆补）。",
+            "enum": [
+              "zhirun",
+              "chaibu"
+            ],
+            "title": "Ju Method",
+            "type": "string"
+          },
+          "layout": {
+            "default": "direct",
+            "description": "转盘排法：仅支持 direct/rotating；飞盘/镜像/反转未实现。",
+            "enum": [
+              "direct",
+              "rotating"
+            ],
+            "title": "Layout",
+            "type": "string"
+          },
+          "palaceShift": {
+            "default": 0,
+            "description": "九宫平移量；仅允许 0（移动九宫内容不能冒充飞盘排法）。",
+            "maximum": 0,
+            "minimum": 0,
+            "title": "Palaceshift",
+            "type": "integer"
+          },
+          "palace_shift": {
+            "default": 0,
+            "description": "palaceShift 的蛇形命名别名；仅允许 0。",
+            "maximum": 0,
+            "minimum": 0,
+            "title": "Palace Shift",
+            "type": "integer"
+          },
+          "season_profile": {
+            "default": "yanyi_vol1_verse",
+            "description": "九星旺衰表：yanyi_vol1_verse（默认卷一烟波钓叟赋）、yanyi_vol3_table（卷三表）或 yanyi_vol3_prose（卷三正文）。",
+            "enum": [
+              "yanyi_vol1_verse",
+              "yanyi_vol3_table",
+              "yanyi_vol3_prose"
+            ],
+            "title": "Season Profile",
+            "type": "string"
+          }
+        },
+        "title": "QimenOptions",
+        "type": "object"
+      }
+    },
     "additionalProperties": false,
     "description": "Request model for Qi Men analysis.",
     "properties": {
@@ -100,7 +167,7 @@
       },
       "analysis_second": {
         "default": 0,
-        "description": "起局钟表秒数（0-59），用于节气实刻与真太阳时辰边界；不代表秒级预测精度。",
+        "description": "Analysis second (0-59)",
         "maximum": 59,
         "minimum": 0,
         "title": "Analysis Second",
@@ -129,7 +196,7 @@
           }
         ],
         "default": null,
-        "description": "起局钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone共同核对并消除重复小时歧义，不替换该时区的全年规则。省略时拒绝不明确或不存在的钟时。",
+        "description": "已确认的民用 UTC 偏移，格式 ±HH:MM 或 ±HH:MM:SS，用于消歧重复钟时。",
         "title": "Analysis Utc Offset"
       },
       "analysis_year": {
@@ -138,10 +205,8 @@
         "type": "integer"
       },
       "qimen_options": {
-        "additionalProperties": true,
-        "description": "奇门选项：ju_method=zhirun（默认置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；仅支持转盘layout=direct、palaceShift=0",
-        "title": "Qimen Options",
-        "type": "object"
+        "$ref": "#/$defs/QimenOptions",
+        "description": "奇门选项：ju_method=zhirun（默认置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；仅支持转盘layout=direct、palaceShift=0"
       },
       "use_true_solar_time": {
         "default": true,

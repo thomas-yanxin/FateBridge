@@ -2,7 +2,7 @@
 
 本文列出 FateBridge 的 REST 路由、FastMCP 工具、CLI 约定、共享请求族与响应字段。首次安装请看[快速入门](getting-started.md)，客户端集成代码与分页交付示例见[接入指南](agent-guide.md)，各能力范围见[算法覆盖矩阵](algorithm-coverage.md)。
 
-OpenAPI 发布 91 个业务 REST 路由，另有 `/health`、`/ready`、`/metrics` 三个运维端点。目录共有 91 条记录，CLI 可执行 91 条目录命令，MCP 通过两个入口提供 91 项业务能力。字段约束以当前服务的 `/openapi.json`、MCP `discover_tools(tool=...)` 或 CLI `fatebridge discover <tool>` 为准。
+OpenAPI 发布 90 个业务 REST 路由，另有 `/health`、`/ready`、`/metrics` 三个运维端点。目录共有 90 条记录，CLI 可执行 90 条目录命令，MCP 通过两个入口提供 90 项业务能力。字段约束以当前服务的 `/openapi.json`、MCP `discover_tools(tool=...)` 或 CLI `fatebridge discover <tool>` 为准。
 
 ## 阅读导航
 
@@ -61,14 +61,14 @@ CLI 成功退出 `0`，计算或校验失败退出 `1`，参数语法或未知 f
 
 ### 2.2 三端能力边界
 
-目录共有 91 条记录。REST 和 MCP 默认公开全量，CLI 可执行 91 条目录命令（另有 `list`、`discover` 与 `doctor`）。三端共用规范工具名（`spec.name`）和业务输入合同，部分主要命名映射如下：
+目录共有 90 条记录。REST 和 MCP 默认公开全量，CLI 可执行 90 条目录命令（另有 `list`、`discover` 与 `doctor`）。三端共用规范工具名（`spec.name`）和业务输入合同，部分主要命名映射如下：
 
 | 能力 | REST | MCP / CLI | 差异说明 |
 | --- | --- | --- | --- |
 | 独立八字命盘 | `/api/bazi/birth-chart` | `bazi_birth_chart` | 业务数据位于 `bazi_birth` |
 | 综合命理分析 | `/api/bazi/overview` | `bazi_overview` | 提供出生盘、喜用与格局事实 |
 | 关系盘 | `/api/astrology/relationship-chart` | `relationship_chart` | 三端统一使用 `inner_birth_*` / `outer_birth_*` |
-| 家居风水 | `/api/fengshui/*` | `fengshui_*` | 八个工具同名；全部 91 个 CLI 命令均支持 `--request-file` 传入 JSON |
+| 家居风水 | `/api/fengshui/*` | `fengshui_*` | 八个工具同名；全部 90 个 CLI 命令均支持 `--request-file` 传入 JSON |
 
 ### 2.3 输出控制与字段投影
 
@@ -88,7 +88,7 @@ CLI 成功退出 `0`，计算或校验失败退出 `1`，参数语法或未知 f
 
 ### 2.5 渐进发现与执行提示
 
-REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surface=...`，CLI 使用 `list` / `discover [tool]`，MCP 使用 `discover_tools`。发现响应始终包含全局 `counts` 与各分类 `families` 计数；`detail=summary`（默认）在未指定 `tool` 时返回摘要，指定 `tool` 时返回完整输入 Schema、参数与 `evidence_views`，`detail=full` 额外返回 `output_schema`。工具名不存在时返回 `unknown_tool`（404）并在 `issues[].constraints.suggestions` 列出候选名称。
+REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surface=...`，CLI 使用 `list` / `discover [tool]`，MCP 使用 `discover_tools`。发现响应始终包含全局 `counts` 与各分类 `families` 计数，每条工具摘要的 `surfaces` 采用 `{"cli": true, "rest": "<path>|null", "mcp": <bool>}`；`detail=summary`（默认）在未指定 `tool` 时返回摘要，指定 `tool` 时返回完整输入 Schema、参数与 `evidence_views`，`detail=full` 额外返回 `output_schema`（须配合 `tool`、`family` 或 `q` 过滤，否则返回 `filter_required_for_full_detail`）。工具名不存在时返回 `unknown_tool`（404）并在 `issues[].constraints.suggestions` 列出候选名称。
 
 ### 2.6 确定性与复现元数据
 
@@ -113,7 +113,7 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 
 ### 3.2 `AstroChartRequest` 家族
 
-用于 `/api/astrology/chart`、`/api/astrology/thirteen-sector-chart`、`/api/astrology/hellenistic-chart`、`/api/astrology/guolao-chart`、`/api/astrology/vedic-chart` 与 `/api/astrology/hamburg-midpoint-chart`：`birth_year/month/day/hour` 必填，`birth_minute` 默认 `0`，`birth_longitude` / `birth_latitude` 条件必需，`use_true_solar_time` 默认 `false`，另可选 `hsys`（`0..8`）与 `zodiacal`（`0` 回归 / `1` 恒星）。
+用于 `/api/astrology/chart`、`/api/astrology/thirteen-sector-chart`、`/api/astrology/hellenistic-chart`、`/api/astrology/guolao-chart`、`/api/astrology/vedic-chart` 与 `/api/astrology/hamburg-midpoint-chart`：`birth_year/month/day/hour` 必填，`birth_minute` 默认 `0`，`birth_longitude` / `birth_latitude` 条件必需，`use_true_solar_time` 默认 `false`，另可选 `house_system`（`0..8`、SE 字母或名称如 `W`/`P`/`D`）与 `zodiac_type`（`Tropic` / `Sidereal`）。
 
 ### 3.3 `WesternTimingRequest` 家族（`/api/astrology/timing*`）
 
@@ -121,7 +121,7 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 
 ### 3.4 本地技法请求约定
 
-`liuyao`、`suzhan`、`interpret_astrology_dice` 与 `sanshi_combined_chart` 等使用 `date` / `time`、`zone`（常见默认 `+08:00`）、`lat` / `lon`、`gps_lat` / `gps_lon`。`suzhan` 在省略 `time` 时仅做日期历法候选计算；已知钟时则需完整经纬度。
+`solar_terms_for_year`、`lunar_calendar_time`、`liuyao`、`canping`、`heluo`、`suzhan`、`interpret_astrology_dice` 与 `sanshi_combined_chart` 等统一使用 `timezone`（常见默认 `+08:00`）、`latitude` / `longitude`；按工具契约配合 `date` / `time`（或 `year`）。`suzhan` 在省略 `time` 时仅做日期历法候选计算；已知钟时则需完整经纬度。`suzhan` 与 `interpret_astrology_dice` 同样支持 `house_system` 与 `zodiac_type`。
 
 ### 3.5 双人关系请求
 
@@ -173,8 +173,7 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 | --- | --- | --- |
 | `POST` | `/api/calendar/solar-terms` | 全年节气时刻表（响应位于 `jieqi_year`） |
 | `POST` | `/api/calendar/lunar-time` | 农历与干支换算（`time_alg=0` 真太阳时 / `1` 直接时间） |
-| `POST` | `/api/divination/gua` | 卦义检索 |
-| `POST` | `/api/divination/gua/meanings` | 批量查询卦象结构与《周易》经文 |
+| `POST` | `/api/divination/gua` | 批量查询八卦/六十四卦结构与《周易》经文（`queries` / `lookup_mode`） |
 | `POST` | `/api/knowledge/catalog` | 内置知识目录 |
 | `POST` | `/api/knowledge/read` | 内置知识条目读取 |
 
@@ -337,7 +336,7 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 
 ### 6.2 MCP 工具分组
 
-全部 91 项业务能力由 `discover_tools` 与 `run_calculation` 两个协议工具暴露（不暴露 MCP 资源），按 `family` 分组如下：
+全部 90 项业务能力由 `discover_tools` 与 `run_calculation` 两个协议工具暴露（不暴露 MCP 资源），按 `family` 分组如下：
 
 #### 基础命理（family `bazi`）
 
@@ -374,7 +373,6 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 #### Divination 与本地技法（family `divination`）
 
 - `gua_lookup`
-- `gua_meanings`
 - `meihua_time_cast`
 - `meihua_cast`
 - `combine_four_gua`

@@ -12,18 +12,18 @@
 | 收集出生资料和时间条件 | [出生信息：一次说清](#出生信息一次说清) |
 | 实现咨询 Agent 或风水集成 | [Agent 接入闭环](#agent-接入闭环) · [家居风水接入](#家居风水接入) |
 
-FateBridge 通过三条通道暴露领域能力：REST（`python -m fatebridge.api`，默认 `:8010`）、FastMCP（`fatebridge-mcp` 或 `python -m fatebridge.mcp_server`）和 CLI（`fatebridge <tool> ...`）。三条通道共用中央 `ToolSpec` 目录、请求模型与共享执行层。目录共有 91 条记录，REST 公开 91 个工具，CLI 可执行 91 条。MCP 通过两个入口提供 91 项业务能力（`discover_tools` 与 `run_calculation`）。三端共用规范工具名（`spec.name`）和请求字段。完整算法清单见 [algorithm-coverage.md](algorithm-coverage.md)，完整端点说明见 [api-reference.md](api-reference.md)。
+FateBridge 通过三条通道暴露领域能力：REST（`python -m fatebridge.api`，默认 `:8010`）、FastMCP（`fatebridge-mcp` 或 `python -m fatebridge.mcp_server`）和 CLI（`fatebridge <tool> ...`）。三条通道共用中央 `ToolSpec` 目录、请求模型与共享执行层。目录共有 90 条记录，REST 公开 90 个工具，CLI 可执行 90 条。MCP 通过两个入口提供 90 项业务能力（`discover_tools` 与 `run_calculation`）。三端共用规范工具名（`spec.name`）和请求字段。完整算法清单见 [algorithm-coverage.md](algorithm-coverage.md)，完整端点说明见 [api-reference.md](api-reference.md)。
 
 ## 发现：自助发现，不硬编码工具列表
 
-工具列表由中央目录动态生成。已知工具定义时可直接调用；不确定用途或参数时按两级发现（`summary` 默认 / `full` 附带 `output_schema`）渐进查询，返回始终包含全局 `families` 计数：
+工具列表由中央目录动态生成。已知工具定义时可直接调用；不确定用途或参数时按两级发现（`summary` 默认 / `full` 附带 `output_schema`，需配合 `tool`、`family` 或 `q` 过滤）渐进查询，返回始终包含全局 `families` 计数：
 
 | 当前已有信息 | 下一步 |
 | --- | --- |
 | 工具已公开，输入 Schema 与用途明确 | 直接调用；解释同一结果无需重新发现或计算 |
 | 知道用户场景，尚未确定工具 | 按 `family` 或 `q` 检索摘要（`detail=summary`），再取选中工具契约 |
 | 已确定工具，仅缺参数或视图定义 | REST `GET /api/tools?tool=...`、CLI `fatebridge discover <tool>` 或 MCP `discover_tools(tool=...)` |
-| 需要完整输出 Schema | 传入 `detail=full` 额外读取 `output_schema` |
+| 需要完整输出 Schema | 传入 `detail=full` 并配合 `tool`、`family` 或 `q` 额外读取 `output_schema` |
 
 拼错工具名时，发现接口与 `run_calculation` 均返回 `unknown_tool`（404）并在 `issues[].constraints.suggestions` 中给出相近候选。咨询组织与边界要求见[方法参考](interpretation/README.md)、[时间选择](interpretation/shared/timing-selection.md)与[硬边界](interpretation/shared/safety-boundaries.md)。公共接口拒绝已知明确的生死或临床医疗请求。
 
@@ -36,7 +36,7 @@ curl 'http://localhost:8010/api/tools?tool=bazi_birth_chart'
 curl 'http://localhost:8010/api/tools?tool=bazi_birth_chart&detail=full'
 ```
 
-`detail=summary`（默认）在未指定 `tool` 时返回各工具摘要，在指定 `tool` 时返回完整 `input_schema`、`parameters`、`evidence_views` 与 `example_input`；`detail=full` 额外附带 `output_schema`。支持按 `family`（逗号分隔）、`q`、`tool` 与 `surface` 筛选。`counts` 返回全局数量，`families` 返回各分类数量，`matched_count` 返回当前匹配数量。
+`detail=summary`（默认）在未指定 `tool` 时返回各工具摘要，在指定 `tool` 时返回完整 `input_schema`、`parameters`、`evidence_views` 与 `example_input`；`detail=full` 额外附带 `output_schema`，但必须配合 `tool`、`family` 或 `q` 过滤（未过滤的 `detail=full` 返回 `filter_required_for_full_detail`），避免全量输出超出上下文预算。支持按 `family`（逗号分隔）、`q`、`tool` 与 `surface` 筛选。`counts` 返回全局数量，`families` 返回各分类数量，`matched_count` 返回当前匹配数量；每条记录的 `surfaces` 采用 `{"cli": true, "rest": "<path>|null", "mcp": <bool>}` 标记可用通道。
 
 ### CLI：`list`、`discover` 与 `doctor`
 
@@ -149,7 +149,7 @@ fatebridge ziwei_birth_chart --birth-year 1990 --birth-month 6 --birth-day 15 --
 fatebridge knowledge_read --domain bazi --category romance --key 桃花咸池
 ```
 
-所有 91 个目录命令均支持 `--request-file PATH` 读取 JSON 请求文件（命令行显式参数覆盖文件中的同名顶层字段），以及 `--detail {compact,audit}`、`--fields` 与 `--as-of`。
+所有 90 个目录命令均支持 `--request-file PATH` 读取 JSON 请求文件（命令行显式参数覆盖文件中的同名顶层字段），以及 `--detail {compact,audit}`、`--fields` 与 `--as-of`。
 
 ## 输出控制与结果读取
 
@@ -217,6 +217,6 @@ MCP 业务/校验失败返回原生 `isError=true`；使用 FastMCP Client 读�
 ## 相关文档
 
 - [api-reference.md](api-reference.md)：全部 REST 路由、FastMCP 工具、请求族与响应字段
-- [algorithm-coverage.md](algorithm-coverage.md)：12 family / 91 工具的能力范围与依赖矩阵
+- [algorithm-coverage.md](algorithm-coverage.md)：12 family / 90 工具的能力范围与依赖矩阵
 - [getting-started.md](getting-started.md)：安装与首次计算
 - [troubleshooting.md](troubleshooting.md)：环境、依赖、投影与错误排错

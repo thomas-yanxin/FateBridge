@@ -36,7 +36,7 @@ Hinoo另返`critical_calendar_reference.image_witness_research`时，按其中�
 
 ## 宿占日课与具体事项
 
-`suzhan`的time可省略或给null：沿用已确认日期和输入时区，计算历法、日期候选及事项证据；chart、astronomy保持null，params.birthTimeImputed=false。缺钟时不计算宫位、瞬时天文28宿或角距tithi；经纬度、宫制及盘式选项没有用于历法层。已知钟时须同时提供完整经纬度才能生成星图，GPS分量优先且0°有效；缺项明确报错，不用默认地点、示例或0点换取星图。先核实际公开Schema；旧连接尚要求time时不要补时，改用已更新接口或完成客户端重连。
+`suzhan`的time可省略或给null：沿用已确认日期和输入时区，计算历法、日期候选及事项证据；chart、astronomy保持null，params.birthTimeImputed=false。缺钟时不计算宫位、瞬时天文28宿或角距tithi；经纬度、宫制及盘式选项没有用于历法层。已知钟时须同时提供完整经纬度（`latitude` / `longitude`）才能生成星图，0°有效；缺项明确报错，不用默认地点、示例或0点换取星图。先核实际公开Schema；旧连接尚要求time时不要补时，改用已更新接口或完成客户端重连。
 
 `suzhan`把三类依据分开：`sukuyo`为农历历日，`calendar_day`为黑白月日名与时段条文，`astronomy`为七曜物理天文。默认天文是现代距星视赤经不等宽研究口径，不能称唐代宿界已经复原；显式legacy方法是旧版等分黄道示意。
 
