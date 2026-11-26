@@ -91,9 +91,9 @@ def _enrich_builtin_spec(spec: ToolSpec) -> ToolSpec:
         spec,
         detail_view=spec.detail_view or traditional_detail_view,
         output_model=spec.output_model
-        or output_model_for(spec.key, western_data_policy=western_policy),
+        or output_model_for(spec.name, western_data_policy=western_policy),
         required_output_fields=spec.required_output_fields
-        or required_output_fields_for(spec.key),
+        or required_output_fields_for(spec.name),
         uses_astronomy_runtime=(
             spec.uses_astronomy_runtime if spec.family == "psychometrics" else True
         ),
@@ -107,7 +107,7 @@ def _enrich_builtin_spec(spec: ToolSpec) -> ToolSpec:
             else spec.evidence_views_builder
         ),
         reproducibility=(
-            policy_for(spec.key, spec.request_model)
+            policy_for(spec.name, spec.request_model)
             if spec.reproducibility == ReproducibilityPolicy()
             else spec.reproducibility
         ),
@@ -127,4 +127,4 @@ def rest_specs() -> list[ToolSpec]:
 
 
 def mcp_specs() -> list[ToolSpec]:
-    return [s for s in CATALOG if s.mcp_name]
+    return [s for s in CATALOG if s.expose_mcp]

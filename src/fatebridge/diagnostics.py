@@ -62,7 +62,7 @@ class StdioProbeResult(TypedDict):
 
 
 StdioStage = Literal[
-    "initialize", "tools/list", "resources/read", "tools/call", "shutdown"
+    "initialize", "tools/list", "discover_tools", "tools/call", "shutdown"
 ]
 
 
@@ -153,23 +153,19 @@ async def _probe_stdio(env: dict[str, str]) -> StdioProbeResult:
                 ) as client:
                     stage = "tools/list"
                     tools = await client.list_tools()
-                    stage = "resources/read"
-                    summary = await client.read_resource("fatebridge://catalog/summary")
-                    summary_text = summary[0].text
-                    catalog = json.loads(summary_text)
+                    stage = "discover_tools"
+                    summary = await client.call_tool("discover_tools", {})
+                    catalog = summary.structured_content
+                    assert isinstance(catalog, dict)
+                    summary_text = json.dumps(catalog, ensure_ascii=False)
                     names = {tool.name for tool in tools}
                     available = {tool["tool"] for tool in catalog["tools"]}
-                    expected = {
-                        "discover_capabilities",
-                        "describe_capability",
-                        "run_calculation",
-                        "read_result",
-                    }
+                    expected = {"discover_tools", "run_calculation"}
                     if names != expected:
                         raise RuntimeError("MCP catalog and tools/list disagree")
                     output: StdioProbeResult = {
                         "ok": True,
-                        "scope": "initialize, tools/list, resources/read",
+                        "scope": "initialize, tools/list, discover_tools",
                         "tool_count": len(tools),
                         "tools_wire_bytes": len(
                             json.dumps(
@@ -184,7 +180,7 @@ async def _probe_stdio(env: dict[str, str]) -> StdioProbeResult:
                     }
                     for spec in CATALOG:
                         if (
-                            spec.mcp_name in available
+                            spec.name in available
                             and (inputs := example_input(spec)) is not None
                         ):
                             pass
@@ -194,19 +190,18 @@ async def _probe_stdio(env: dict[str, str]) -> StdioProbeResult:
                         response = await client.call_tool(
                             "run_calculation",
                             {
-                                "tool": spec.tool_name,
+                                "tool": spec.name,
                                 "arguments": inputs,
                                 "fields": ["run_metadata"],
-                                "strict_fields": True,
                             },
                             raise_on_error=False,
                         )
                         if response.is_error:
                             raise RuntimeError("MCP fictional smoke calculation failed")
                         receipt = response.structured_content["run_metadata"]
-                        if receipt["tool_name"] != spec.tool_name:
+                        if receipt["tool_name"] != spec.name:
                             raise RuntimeError("MCP smoke receipt has wrong tool name")
-                        output["smoke_tool"] = spec.tool_name
+                        output["smoke_tool"] = spec.name
                         output["scope"] += ", one fictional calculation"
                         break
                     stage = "shutdown"
@@ -262,7 +257,7 @@ def diagnose(
         "executable": sys.executable,
         "package_path": str(Path(__file__).parent),
         "dependencies": dependencies,
-        "mcp_tool_count": 4 if selected else 0,
+        "mcp_tool_count": 2 if selected else 0,
         "mcp_capability_count": len(selected),
         "codex": {
             "cli": codex_cli,
@@ -294,7 +289,7 @@ def diagnose(
             if isinstance(exc, _StdioProbeError):
                 output["mcp"].update(exc.details)
     has_fengshui = any(spec.family == "fengshui" for spec in selected)
-    has_human_design = any(spec.key == "human_design" for spec in selected)
+    has_human_design = any(spec.name == "human_design" for spec in selected)
     if has_fengshui or has_human_design:
         active = effective_ephemeris_search_path()
     else:

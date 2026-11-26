@@ -1,13 +1,15 @@
-"""Progressive catalog discovery shared by REST, CLI and MCP resources."""
+"""Progressive catalog discovery shared by REST, CLI and MCP."""
 
+import difflib
+from collections import Counter
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 
 from fatebridge.application.description import (
+    describe_input_spec,
     describe_spec,
     resolve_spec,
-    spec_is_cli_safe,
     summarize_spec,
 )
 from fatebridge.application.tool_spec import ToolSpec
@@ -22,7 +24,7 @@ class DiscoveryQuery(BaseModel):
     q: str | None = None
     tool: str | None = None
     surface: ToolSurface | None = None
-    detail: Literal["index", "summary", "full"] = "full"
+    detail: Literal["summary", "full"] = "summary"
 
 
 def select_mcp_specs(
@@ -45,6 +47,8 @@ def select_specs(
 ) -> list[ToolSpec]:
     """Filter declarations before materializing any expensive schemas."""
     selected = specs
+    if allowed_names is not None:
+        selected = [spec for spec in selected if spec.name in allowed_names]
     if family is not None:
         families = [part.strip() for part in family.split(",")]
         known = {spec.family for spec in specs}
@@ -60,22 +64,23 @@ def select_specs(
                 ],
             )
         selected = [spec for spec in selected if spec.family in families]
-    if tool is not None:
-        resolved = resolve_spec(specs, tool)
-        if resolved is None:
-            raise ParameterError(
-                "工具名称无效", [{"path": "tool", "code": "unknown_tool"}]
-            )
-        selected = [spec for spec in selected if spec is resolved]
     if surface:
         available = {
             "rest": lambda spec: bool(spec.rest_path),
-            "mcp": lambda spec: bool(spec.mcp_name),
-            "cli": spec_is_cli_safe,
+            "mcp": lambda spec: spec.expose_mcp,
+            "cli": lambda _spec: True,
         }
         selected = [spec for spec in selected if available[surface](spec)]
-    if allowed_names is not None:
-        selected = [spec for spec in selected if spec.tool_name in allowed_names]
+    if tool is not None:
+        resolved = resolve_spec(selected, tool)
+        if resolved is None:
+            candidates = sorted(spec.name for spec in selected)
+            suggestions = difflib.get_close_matches(tool, candidates, n=5, cutoff=0.4)
+            issue: dict[str, Any] = {"path": "tool", "code": "unknown_tool"}
+            if suggestions:
+                issue["constraints"] = {"suggestions": suggestions}
+            raise ParameterError(f"未知工具: {tool}", [issue], status_code=404)
+        selected = [resolved]
     if q:
         needle = q.strip().casefold()
         selected = [
@@ -84,7 +89,7 @@ def select_specs(
             if needle
             in " ".join(
                 (
-                    spec.tool_name,
+                    spec.name,
                     spec.summary,
                     spec.operation_label_zh,
                     spec.family,
@@ -101,7 +106,7 @@ def discover_specs(
     q: str | None = None,
     tool: str | None = None,
     surface: str | None = None,
-    detail: str = "full",
+    detail: str = "summary",
     allowed_names: set[str] | None = None,
 ) -> dict[str, Any]:
     try:
@@ -117,28 +122,30 @@ def discover_specs(
     except ValidationError as exc:
         failure = validation_error_result(exc)
         raise ParameterError(failure["error"], failure["issues"]) from None
-    selected = select_specs(
-        specs, **query.model_dump(exclude={"detail"}), allowed_names=allowed_names
+
+    pool = (
+        [spec for spec in specs if spec.name in allowed_names]
+        if allowed_names is not None
+        else specs
     )
-    if query.detail == "index":
-        tools = [
-            {
-                "tool": spec.tool_name,
-                "family": spec.family,
-                "label": spec.operation_label_zh,
-            }
-            for spec in selected
-        ]
+    selected = select_specs(
+        specs,
+        **query.model_dump(exclude={"detail"}),
+        allowed_names=allowed_names,
+    )
+    if query.tool is not None:
+        describe = describe_spec if query.detail == "full" else describe_input_spec
     else:
-        describe = summarize_spec if query.detail == "summary" else describe_spec
-        tools = [describe(spec) for spec in selected]
+        describe = describe_spec if query.detail == "full" else summarize_spec
+    tools = [describe(spec) for spec in selected]
+    families = dict(sorted(Counter(spec.family for spec in pool).items()))
     return {
-        # Counts retain their original global-catalog meaning under filtering.
         "counts": {
-            "rest": sum(bool(spec.rest_path) for spec in specs),
-            "mcp": sum(bool(spec.mcp_name) for spec in specs),
-            "total": len(specs),
+            "rest": sum(bool(spec.rest_path) for spec in pool),
+            "mcp": sum(spec.expose_mcp for spec in pool),
+            "total": len(pool),
         },
+        "families": families,
         "matched_count": len(selected),
         "detail": query.detail,
         "tools": tools,

@@ -20,7 +20,7 @@ from fatebridge.core.schema_cache import model_schema
 
 
 def resolve_spec(specs: list[ToolSpec], name: str) -> ToolSpec | None:
-    return next((spec for spec in specs if spec.tool_name == name), None)
+    return next((spec for spec in specs if spec.name == name), None)
 
 
 def unwrap_optional(annotation: object) -> object:
@@ -55,15 +55,8 @@ def field_type_name(annotation: object) -> str:
     return str(base)
 
 
-def spec_is_cli_safe(spec: ToolSpec) -> bool:
-    """Nested models need an explicit JSON request-file/argument contract."""
-    return spec.cli_request_file or not any(
-        is_model_field(f.annotation) for f in spec.request_model.model_fields.values()
-    )
-
-
 def describe_spec(spec: ToolSpec) -> dict[str, Any]:
-    """Describe one tool's schemas, capabilities and available transports."""
+    """Describe one tool's full schemas, capabilities and available transports."""
     return _describe_contract(spec, include_output_schema=True)
 
 
@@ -90,8 +83,9 @@ def _describe_contract(
     example = example_input(spec)
     views = evidence_views(spec)
     guidance = call_guidance(spec)
-    cli_safe = spec_is_cli_safe(spec)
-    return {
+    fields = suggested_fields(spec)
+    default_fields = compact_fields(spec)
+    record: dict[str, Any] = {
         **(
             {"example_input": example, "example_context": example_context()}
             if example is not None
@@ -99,8 +93,7 @@ def _describe_contract(
         ),
         **({"evidence_views": views} if views is not None else {}),
         **({"call_guidance": guidance} if guidance is not None else {}),
-        "tool": spec.tool_name,
-        "key": spec.key,
+        "tool": spec.name,
         "summary": spec.summary,
         "operation_label_zh": spec.operation_label_zh,
         "family": spec.family,
@@ -117,84 +110,56 @@ def _describe_contract(
             "version_semantics": "contract_v1 is a registration contract; actual algorithm versions are recorded separately",
         },
         "full_result_required_fields": list(spec.required_output_fields),
-        **(
-            {
-                "full_result_required_fields_by_variant": {
-                    variant: list(fields)
-                    for variant, fields in spec.required_output_fields_by_variant.items()
-                }
-            }
-            if spec.required_output_fields_by_variant
-            else {}
-        ),
         "full_result_empty_object_policy": "reject_required_roots",
         "execution": {
             "cpu_bound": spec.cpu_bound,
             "budget_scope": "process_shared_across_transports",
         },
         "surfaces": {
-            "cli": cli_safe,
-            "cli_name": spec.tool_name if cli_safe else None,
+            "cli": True,
+            "cli_name": spec.name,
             "rest_path": spec.rest_path,
-            "mcp_name": spec.mcp_name,
+            "mcp_name": spec.name if spec.expose_mcp else None,
         },
         "parameters": parameters,
         "input_schema": model_schema(spec.request_model),
+        "output_fields": (
+            list(spec.output_model.model_fields) if spec.output_model else []
+        ),
         "cli_request_file": spec.cli_request_file,
-        **(
-            {
-                "output_schema": (
-                    model_schema(spec.output_model) if spec.output_model else None
-                )
-            }
-            if include_output_schema
-            else {}
+        "projection_note": (
+            "默认 detail=compact 返回核心业务字段；需要指定字段时传 fields"
+            "（严格校验路径，支持点号子路径）；需要完整结果时传 detail=audit。"
+            "run_metadata 自动保留；不要猜测字段名。"
         ),
     }
+    if fields is not None:
+        record["suggested_fields"] = fields
+    if default_fields is not None:
+        record["compact_fields"] = default_fields
+    if include_output_schema:
+        record["output_schema"] = (
+            model_schema(spec.output_model) if spec.output_model else None
+        )
+    return record
 
 
 def summarize_spec(spec: ToolSpec) -> dict[str, Any]:
-    cli_safe = spec_is_cli_safe(spec)
     return {
-        "tool": spec.tool_name,
-        "key": spec.key,
-        "summary": spec.summary,
-        "operation_label_zh": spec.operation_label_zh,
+        "tool": spec.name,
         "family": spec.family,
+        "label": spec.operation_label_zh,
+        "summary": spec.summary,
         "surfaces": {
-            "cli": cli_safe,
-            "cli_name": spec.tool_name if cli_safe else None,
+            "cli": True,
+            "cli_name": spec.name,
             "rest_path": spec.rest_path,
-            "mcp_name": spec.mcp_name,
+            "mcp_name": spec.name if spec.expose_mcp else None,
         },
-        "cli_request_file": spec.cli_request_file,
-        "annotations": spec.execution_hints.as_annotations(),
-        "reproducibility": spec.reproducibility.as_manifest(),
         "method_ids": [method.method_id for method in spec.methods],
-        "execution": {
-            "cpu_bound": spec.cpu_bound,
-            "budget_scope": "process_shared_across_transports",
-        },
     }
 
 
 def describe_input_spec(spec: ToolSpec) -> dict[str, Any]:
-    """Compact call contract; full output validation stays available on demand."""
-    record = _describe_contract(spec, include_output_schema=False)
-    record["output_fields"] = (
-        list(spec.output_model.model_fields) if spec.output_model else []
-    )
-    record["output_contract_uri"] = f"fatebridge://tools/{spec.tool_name}"
-    fields = suggested_fields(spec)
-    if fields is not None:
-        record["suggested_fields"] = fields
-    default_fields = compact_fields(spec)
-    if default_fields != fields:
-        record["compact_fields"] = default_fields
-    record["projection_note"] = (
-        "首次摘要使用 detail=compact 并省略 fields。"
-        "suggested_fields 是可显式请求的业务字段参考，按问题取用。"
-        "run_metadata 自动保留。"
-        "需要更细路径时再读完整 output_schema；不要猜测字段名。"
-    )
-    return record
+    """Call contract with input schema and output root names; output_schema is on detail=full."""
+    return _describe_contract(spec, include_output_schema=False)

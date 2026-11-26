@@ -34,8 +34,6 @@ class EvidenceView(TypedDict):
     fields: list[str]
     when: NotRequired[str]
     purpose: NotRequired[str]
-    strict_fields: NotRequired[bool]
-    include_snapshot_text: NotRequired[bool]
     description: NotRequired[str]
     label: NotRequired[str]
     relative_mode: NotRequired[str]
@@ -137,14 +135,12 @@ class ExecutionHints:
 
     read_only: bool = True
     destructive: bool = False
-    idempotent: bool = True
     open_world: bool = False
 
     def as_annotations(self) -> dict[str, bool]:
         return {
             "readOnlyHint": self.read_only,
             "destructiveHint": self.destructive,
-            "idempotentHint": self.idempotent,
             "openWorldHint": self.open_world,
         }
 
@@ -153,17 +149,15 @@ class ExecutionHints:
 class ToolSpec:
     """Single source of truth for one FateBridge tool across all surfaces."""
 
-    key: str
+    name: str
     bind: Bind
     request_model: type[BaseModel]
     summary: str
     operation_label_zh: str
     family: str
     rest_path: str | None = None
-    mcp_name: str | None = None
+    expose_mcp: bool = True
     cpu_bound: bool = False
-    include_snapshot_text: bool = True
-    optional_snapshot: bool = False
     output_model: type[BaseModel] | None = None
     # note (output validation): Complete service results must include these roots before projection.
     required_output_fields: tuple[str, ...] = ()
@@ -180,11 +174,6 @@ class ToolSpec:
     approximate_record: ApproximationDetector | None = None
     uses_astronomy_runtime: bool = False
     execution_wrapper: ExecutionWrapper | None = None
-    required_output_fields_by_variant: dict[str, tuple[str, ...]] | None = None
     evidence_views_builder: EvidenceViewsBuilder | None = None
     compact_view: CompactView | None = None
     detail_view: DetailView | None = None
-
-    @property
-    def tool_name(self) -> str:
-        return self.mcp_name or self.key

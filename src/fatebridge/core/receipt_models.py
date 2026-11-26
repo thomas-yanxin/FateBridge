@@ -29,12 +29,10 @@ class Determinism(PartialOutput):
 
 class RunMetadata(PartialOutput):
     run_id: str
-    trace_id: str
     tool_name: str
     generated_at: str
     engine: str
     engine_is_approximate: bool
-    parent_run_id: str | None = None
     metadata_schema_version: str | None = None
     package_version: str | None = None
     duration_ms: float | None = Field(default=None, ge=0)

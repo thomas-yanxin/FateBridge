@@ -17,13 +17,13 @@ class DomainPlugin:
 
 
 def assemble_catalog(plugins: Sequence[DomainPlugin]) -> list[ToolSpec]:
-    """Flatten registered domain plugins while enforcing unique tool keys."""
+    """Flatten registered domain plugins while enforcing unique tool names."""
     catalog: list[ToolSpec] = []
-    seen_keys: set[str] = set()
+    seen_names: set[str] = set()
     for plugin in plugins:
         for spec in plugin.specs:
-            if spec.key in seen_keys:
-                raise ValueError(f"Duplicate key {spec.key} in domain {plugin.name}")
-            seen_keys.add(spec.key)
+            if spec.name in seen_names:
+                raise ValueError(f"Duplicate tool {spec.name} in domain {plugin.name}")
+            seen_names.add(spec.name)
             catalog.append(spec)
     return catalog
