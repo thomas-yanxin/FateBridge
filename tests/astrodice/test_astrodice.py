@@ -19,25 +19,45 @@ from fatebridge.services.divination import calculate_otherbu_analysis
 from tests.support.ephemeris_context import empty_ephemeris_path
 
 FIXTURES = Path(__file__).parents[1] / "data/astrodice/tables"
-REFERENCE = json.loads((FIXTURES / "sign-reference.json").read_text())
-PLANETS = [
-    *REFERENCE["planets"],
+PLANETS = (
+    "Sun",
+    "Moon",
+    "Mercury",
+    "Venus",
+    "Mars",
+    "Jupiter",
+    "Saturn",
     "Uranus",
     "Neptune",
     "Pluto",
     "NorthNode",
     "SouthNode",
+)
+SIGNS = [
+    "Aries",
+    "Taurus",
+    "Gemini",
+    "Cancer",
+    "Leo",
+    "Virgo",
+    "Libra",
+    "Scorpio",
+    "Sagittarius",
+    "Capricorn",
+    "Aquarius",
+    "Pisces",
 ]
-SIGNS = list(REFERENCE["rows"])
 FACES = dict(planet="Mercury", sign="Virgo", house=6)
 SKY = dict(date="2000-02-29", time="18:15:00", zone="UTC", lat="0", lon="0")
 
 
-@pytest.mark.parametrize("sign,planet", tuple(product(SIGNS, REFERENCE["planets"])))
+@pytest.mark.local_data
+@pytest.mark.parametrize("sign,planet", tuple(product(SIGNS, PLANETS[:7])))
 def test_sign_conditions_against_manually_transcribed_primary_text(
-    sign, planet
+    sign: str, planet: str
 ) -> None:
-    code = REFERENCE["rows"][sign][REFERENCE["planets"].index(planet)]
+    reference = json.loads((FIXTURES / "sign-reference.json").read_text())
+    code = reference["rows"][sign][reference["planets"].index(planet)]
     expected = [
         name
         for symbol, name in (
@@ -228,62 +248,54 @@ def test_sky_is_invariant_for_equivalent_offsets_and_changes_with_seconds() -> N
     assert original["symbolic_details"] == seconds["symbolic_details"]
 
 
-@pytest.mark.parametrize(
-    "reference",
-    json.loads(
-        (Path(__file__).parents[1] / "fixtures/jyotish-horizons.json").read_text()
-    )["references"],
-    ids=lambda r: r["body"],
-)
+@pytest.mark.local_data
 @pytest.mark.parametrize("file_free", [False, True], ids=["configured", "empty_path"])
 def test_optional_sky_positions_against_frozen_nasa_jpl_horizons(
-    reference, file_free: bool
+    file_free: bool,
 ) -> None:
-
     fixture = json.loads(
         (Path(__file__).parents[1] / "fixtures/jyotish-horizons.json").read_text()
     )
-    assert (
-        hashlib.sha256(reference["response"]["result"].encode()).hexdigest()
-        == reference["response_sha256"]
-    )
-
     with empty_ephemeris_path() if file_free else nullcontext():
-        for row in reference["rows"]:
-            moment = datetime.fromisoformat(row["utc"])
-            result = build_otherbu_result(
-                **FACES,
-                **{
-                    **SKY,
-                    "date": moment.strftime("%Y-%m-%d"),
-                    "time": moment.strftime("%H:%M:%S"),
-                },
+        for reference in fixture["references"]:
+            assert (
+                hashlib.sha256(reference["response"]["result"].encode()).hexdigest()
+                == reference["response_sha256"]
             )
-            actual = next(
-                obj["lon"]
-                for obj in result["chart"]["chart"]["objects"]
-                if obj["id"] == reference["body"]
-            )
-            error = (
-                abs((actual - row["apparent_ecliptic_longitude"] + 180) % 360 - 180)
-                * 3600
-            )
-            assert error < fixture["tolerance_arcseconds"], (
-                reference["body"],
-                row["utc"],
-                error,
-            )
-            params = result["chart"]["params"]
-            assert params["calculationTimeUtc"] == moment.isoformat()
-            assert params["chart_profile"]["calendar"] == "proleptic_gregorian"
-            if file_free:
-                # Analytical node flags may still report SWIEPH, yielding mixed.
-                assert params["chart_profile"]["ephemeris_model"] in {
-                    "moshier",
-                    "mixed",
-                }
-            else:
-                pass
+            for row in reference["rows"]:
+                moment = datetime.fromisoformat(row["utc"])
+                result = build_otherbu_result(
+                    **FACES,
+                    **{
+                        **SKY,
+                        "date": moment.strftime("%Y-%m-%d"),
+                        "time": moment.strftime("%H:%M:%S"),
+                    },
+                )
+                actual = next(
+                    obj["lon"]
+                    for obj in result["chart"]["chart"]["objects"]
+                    if obj["id"] == reference["body"]
+                )
+                error = (
+                    abs((actual - row["apparent_ecliptic_longitude"] + 180) % 360 - 180)
+                    * 3600
+                )
+                assert error < fixture["tolerance_arcseconds"], (
+                    reference["body"],
+                    row["utc"],
+                    error,
+                )
+                params = result["chart"]["params"]
+                assert params["calculationTimeUtc"] == moment.isoformat()
+                assert params["chart_profile"]["calendar"] == "proleptic_gregorian"
+                if file_free:
+                    assert params["chart_profile"]["ephemeris_model"] in {
+                        "moshier",
+                        "mixed",
+                    }
+                else:
+                    pass
 
 
 @pytest.mark.parametrize(

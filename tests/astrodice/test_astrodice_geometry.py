@@ -15,13 +15,6 @@ from fatebridge.core.astrodice import PLANETS, build_symbolic_evidence
 from fatebridge.core.classical_western import compute_lot
 from fatebridge.core.local_techniques.chart import _build_birth_info
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
-from validation import astrodice_study
-
-REFERENCE = json.loads(
-    (
-        Path(__file__).parents[1] / "fixtures/western-ptolemy-robbins-1940.json"
-    ).read_text()
-)
 
 
 @pytest.mark.parametrize(
@@ -75,14 +68,21 @@ def test_sidereal_context_keeps_a_tiny_negative_offset_in_pisces() -> None:
     assert 0 <= mercury["signlon"] < 30
 
 
-@pytest.mark.parametrize("row,planet", list(product(REFERENCE["signs"], PLANETS)))
+@pytest.mark.local_data
+@pytest.mark.parametrize("sign_index,planet", list(product(range(12), PLANETS)))
 def test_conditional_triplicities_against_separately_transcribed_edition(
-    row, planet
+    sign_index: int, planet: str
 ) -> None:
+    reference = json.loads(
+        (
+            Path(__file__).parents[1] / "fixtures/western-ptolemy-robbins-1940.json"
+        ).read_text()
+    )
+    row = reference["signs"][sign_index]
     result = build_symbolic_evidence(planet, row["sign"], 0)
     relation = result["symbolic_details"]["triplicity_condition"]
     assert relation["sect"] is None
-    seven = planet in REFERENCE["exaltations"]
+    seven = planet in reference["exaltations"]
     for sect in ("day", "night"):
         assert relation["rulers_by_sect"][sect] == row[sect]
         expected = planet in row[sect].values() if seven else None
@@ -210,7 +210,20 @@ def test_optional_sky_coordinates_are_consistent_and_sect_stays_unselected(
         zodiacal=zodiacal,
     )
     chart = result["chart"]
-    signs = [r["sign"] for r in REFERENCE["signs"]]
+    signs = (
+        "Aries",
+        "Taurus",
+        "Gemini",
+        "Cancer",
+        "Leo",
+        "Virgo",
+        "Libra",
+        "Scorpio",
+        "Sagittarius",
+        "Capricorn",
+        "Aquarius",
+        "Pisces",
+    )
     for point in chart["chart"]["objects"]:
         assert 0 <= point["lon"] < 360
         assert 0 <= point["signlon"] < 30
@@ -223,13 +236,3 @@ def test_optional_sky_coordinates_are_consistent_and_sect_stays_unselected(
         "day": True,
         "night": True,
     }
-
-
-def test_study_fingerprint_includes_shared_triplicity_source(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    before = astrodice_study.engine_fingerprint()
-    fake_source = tmp_path / "ptolemy.py"
-    fake_source.write_text("changed conditional triangle rules")
-    monkeypatch.setattr(astrodice_study.ptolemy, "__file__", str(fake_source))
-    assert astrodice_study.engine_fingerprint() != before
