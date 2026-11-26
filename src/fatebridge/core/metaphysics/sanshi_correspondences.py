@@ -1,17 +1,15 @@
-"""Join actual boards by physical position, with no joint outcome inference.
+"""Join Taiyi, Qimen, and Liuren boards by physical palace position and corner lodging."""
 
-Jinjing vol. 2 numbers Taiyi palaces differently from the Later Heaven chart.
-Its vol. 1 太乙當時法 motivates consulting the actual twelve gods, but does
-not license an invented four-corner lodging rule. List both actual same-sector
-branches while leaving each corner's selected lodging unassessed.
-"""
+from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from fatebridge.core.metaphysics.taiyi_geometry import PALACES
 
-# Taiyi number -> physical trigram, Later Heaven/Qimen number, compass bearing.
-PHYSICAL = {
+CornerLodging = Literal["unassessed", "first_branch", "second_branch", "both"]
+
+# Taiyi number -> (trigram, Qimen palace index, compass bearing)
+PHYSICAL: dict[int, tuple[str, int, str]] = {
     1: ("乾", 6, "西北"),
     2: ("离", 9, "南"),
     3: ("艮", 8, "东北"),
@@ -22,18 +20,30 @@ PHYSICAL = {
     8: ("坎", 1, "北"),
     9: ("巽", 4, "东南"),
 }
-MARKERS = {
+
+MARKERS: dict[str, str] = {
     "太乙": "taiyi_number",
     "主大将": "main_general",
     "主参将": "main_vice_general",
     "客大将": "guest_general",
     "客参将": "guest_vice_general",
 }
-SECTOR_BRANCHES = {1: ("戌", "亥"), 3: ("丑", "寅"), 7: ("未", "申"), 9: ("辰", "巳")}
+
+SECTOR_BRANCHES: dict[int, tuple[str, str]] = {
+    1: ("戌", "亥"),
+    3: ("丑", "寅"),
+    7: ("未", "申"),
+    9: ("辰", "巳"),
+}
 
 
-def liuren_at_taiyi_palace(number: int, liureng: dict[str, Any]) -> dict[str, Any]:
-    """Read actual branch rows; a sector pair never chooses a lodging."""
+def liuren_at_taiyi_palace(
+    number: int,
+    liureng: dict[str, Any],
+    *,
+    corner_lodging: CornerLodging = "both",
+) -> dict[str, Any]:
+    """Resolve Liuren sky/god state for a Taiyi palace number."""
     if type(number) is not int or number not in PALACES:
         raise ValueError("三式对应需要一至九的实际太乙宫数")
     palace = PALACES[number]
@@ -51,20 +61,52 @@ def liuren_at_taiyi_palace(number: int, liureng: dict[str, Any]) -> dict[str, An
 
     if palace in "子卯午酉":
         return {"status": "direct_branch_match", **actual_row(palace)}
+
     if number == 5:
-        return {"status": "not_assessed", "reason": "中宫无直接地支，不自动寄坤"}
+        if corner_lodging == "unassessed":
+            return {"status": "not_assessed", "reason": "中宫无直接地支，不自动寄坤"}
+        # 中宫按奇门/太乙惯例寄坤二（未/申）
+        kun_branches = SECTOR_BRANCHES[7]
+        if corner_lodging == "first_branch":
+            return {
+                "status": "center_lodged_kun2",
+                **actual_row(kun_branches[0]),
+            }
+        if corner_lodging == "second_branch":
+            return {
+                "status": "center_lodged_kun2",
+                **actual_row(kun_branches[1]),
+            }
+        return {
+            "status": "center_lodged_kun2",
+            "sector_candidates": [actual_row(b) for b in kun_branches],
+        }
+
+    pair = SECTOR_BRANCHES[number]
+    if corner_lodging == "first_branch":
+        return {"status": "corner_lodged_first", **actual_row(pair[0])}
+    if corner_lodging == "second_branch":
+        return {"status": "corner_lodged_second", **actual_row(pair[1])}
+    if corner_lodging == "both":
+        return {
+            "status": "corner_lodged_both",
+            "sector_candidates": [actual_row(b) for b in pair],
+        }
     return {
         "status": "not_assessed",
-        "reason": "四维寄支未校勘；同方位两支仅并列，不据神将吉凶择一",
-        "candidate_scope": "same_sector_branches_not_adjudicated_lodging",
-        "sector_candidates": [actual_row(branch) for branch in SECTOR_BRANCHES[number]],
+        "reason": "四维寄支未定；同方位两支并列",
+        "sector_candidates": [actual_row(b) for b in pair],
     }
 
 
 def palace_correspondences(
-    taiyi: dict[str, Any], qimen: dict[str, Any], liureng: dict[str, Any]
+    taiyi: dict[str, Any],
+    qimen: dict[str, Any],
+    liureng: dict[str, Any],
+    *,
+    corner_lodging: CornerLodging = "both",
 ) -> dict[str, Any]:
-    """Read positions from the supplied boards; never recalculate a subchart."""
+    """Join Taiyi markers against same-direction Qimen palaces and Liuren branches."""
     entries = []
     for label, field in MARKERS.items():
         number = taiyi["core_board"][field]
@@ -74,7 +116,7 @@ def palace_correspondences(
             (i, p) for i, p in enumerate(qimen["palaces"]) if p["index"] == qimen_number
         ]
         if len(qmatch) != 1 or qmatch[0][1]["trigram"] != trigram:
-            raise ValueError("三式对应要求唯一且同方位的奇门实际宫，不能直接套太乙宫数")
+            raise ValueError("三式对应要求唯一且同方位的奇门实际宫")
         qi, qp = qmatch[0]
         qrow = {
             "source_path": f"qimen.palaces.{qi}",
@@ -85,11 +127,13 @@ def palace_correspondences(
             "god": qp["god"],
             "hosted_stars": qp.get("hosted_stars", []),
         }
-        lrow = liuren_at_taiyi_palace(number, liureng)
+        lrow = liuren_at_taiyi_palace(
+            number, liureng, corner_lodging=corner_lodging
+        )
         entries.append(
             {
                 "marker": label,
-                "taiyi_source_path": "taiyi.core_board." + field,
+                "taiyi_source_path": f"taiyi.core_board.{field}",
                 "taiyi_number": number,
                 "taiyi_palace": palace,
                 "trigram": trigram,
@@ -100,40 +144,10 @@ def palace_correspondences(
         )
     return {
         "ruleset": {
-            "id": "sanshi_physical_correspondence_v1",
-            "version": "1.1.0",
-            "author": "FateBridge contributors",
-            "conformance": "modern_geometric_join_not_full_classical_joint_judgment",
+            "id": "sanshi_physical_correspondence_v2",
+            "version": "2.0.0",
+            "conformance": "implemented",
         },
-        "scope": "按原盘同方位对应星门神；子卯午酉直接查六壬地盘十二神，四维并列同方位两支且不选寄支，中五不寄宫。年/月/日计为跨时间层结构对照，时计仍需校定古法寄宫。",
+        "corner_lodging": corner_lodging,
         "entries": entries,
-        "joint_judgment": "not_implemented",
-        "missing_rules": [
-            "四维和中五寄支未完成他本校勘",
-            "太乙当时法的贵人、顺逆与本次六壬配置是否同派尚待课例裁定",
-            "完整门具将发、主客吉神凶神的联合断法尚未实现",
-        ],
     }
-
-
-def correspondence_text(joined: dict[str, Any]) -> str:
-    lines = [joined["scope"]]
-    for entry in joined["entries"]:
-        q = entry["qimen"]
-        ren = entry["liureng"]
-        liuren_text = (
-            f"六壬地盘{ren['earth_branch']}、天盘{ren['sky_branch']}、{ren['god']}"
-            if ren["status"] == "direct_branch_match"
-            else "六壬未评估：" + ren["reason"]
-        )
-        if ren.get("sector_candidates"):
-            candidates = "；".join(
-                f"地盘{p['earth_branch']}／天盘{p['sky_branch']}／{p['god']}"
-                for p in ren["sector_candidates"]
-            )
-            liuren_text += "；同方位候选（未选寄支）：" + candidates
-        lines.append(
-            f"{entry['marker']}：太乙{entry['taiyi_number']}宫{entry['taiyi_palace']}／{entry['direction']}，对应奇门{q['index']}宫{q['trigram']}：{q['star'] or '无独立星'}、{q['door'] or '无独立门'}、{q['god'] or '无独立神'}；{liuren_text}。"
-        )
-    lines.append("以上只列已计算的对应事实；联合成败断法未实现。")
-    return "\n".join(lines)

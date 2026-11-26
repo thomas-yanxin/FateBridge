@@ -247,3 +247,94 @@ def test_ju_method_keeps_printed_conflicts_visible_across_transports(
         (row["case_id"], row["source_value"], row["computed_value"], row["status"])
         for row in board["source_disagreements"]
     ] == conflicts
+
+
+def test_zhirun_continuous_across_2000_to_2029_boundaries() -> None:
+    from fatebridge.core.qimen.calendar import build_zhirun_map
+
+    for year in range(2000, 2029):
+        m1 = build_zhirun_map(year, "Asia/Shanghai")
+        m2 = build_zhirun_map(year + 1, "Asia/Shanghai")
+        diffs = [
+            key
+            for key in (m1.keys() & m2.keys())
+            if int(key[:4]) >= year - 1 and m1[key] != m2[key]
+        ]
+        assert not diffs, (year, diffs)
+
+    # Known 2010-12-07..10 transition must agree across year-2010 and year-2011 maps.
+    m2010 = build_zhirun_map(2010, "Asia/Shanghai")
+    m2011 = build_zhirun_map(2011, "Asia/Shanghai")
+    assert m2010["20101209"] == m2011["20101209"] == ("小雪", "癸巳")
+    assert m2010["20101210"] == m2011["20101210"] == ("大雪", "甲午")
+
+
+def test_qimen_2024_12_23_zhirun_chaibu_maoshan_fei_and_lodging() -> None:
+    import json
+
+    common = dict(
+        analysis_year=2024,
+        analysis_month=12,
+        analysis_day=23,
+        analysis_hour=12,
+        analysis_timezone="Asia/Shanghai",
+        use_true_solar_time=False,
+    )
+    zhirun = calculate_qimen_analysis(**common, qimen_options={"ju_method": "zhirun"})
+    chaibu = calculate_qimen_analysis(**common, qimen_options={"ju_method": "chaibu"})
+    maoshan = calculate_qimen_analysis(**common, qimen_options={"ju_method": "maoshan"})
+    fei = calculate_qimen_analysis(**common, qimen_options={"layout": "fei"})
+    gen8 = calculate_qimen_analysis(**common, qimen_options={"lodging_policy": "gen8"})
+    yg = calculate_qimen_analysis(
+        **common, qimen_options={"lodging_policy": "yin_gen_yang_kun"}
+    )
+
+    assert zhirun["qimen"]["ju_term"] == "大雪"
+    assert zhirun["qimen"]["ju_text"] == "阴遁一局下元"
+    assert chaibu["qimen"]["ju_term"] == "冬至"
+    assert chaibu["qimen"]["ju_text"] == "阳遁四局下元"
+    assert maoshan["qimen"]["ju_term"] == "冬至"
+    assert maoshan["qimen"]["ju_text"] == "阳遁一局上元"
+
+    # Debloated audit payload < 20 KB
+    assert len(json.dumps(zhirun, ensure_ascii=False)) < 20_000
+
+    # Feipan places 9 stars & 9 gods across all 9 palaces including center
+    assert fei["qimen"]["palaces"][4]["star"] == "天禽"
+    assert fei["qimen"]["palaces"][4]["god"] is not None
+    assert len({p["star"] for p in fei["qimen"]["palaces"]}) == 9
+    assert len({p["god"] for p in fei["qimen"]["palaces"]}) == 9
+
+    # Lodging policies
+    assert any(
+        p["trigram"] == "艮" and p["hosted_stars"] == ["天禽"]
+        for p in gen8["qimen"]["palaces"]
+    )
+    assert any(
+        p["trigram"] == "艮" and p["hosted_stars"] == ["天禽"]
+        for p in yg["qimen"]["palaces"]
+    )
+
+    # Hidden stems, horse star, and void palaces
+    assert len(zhirun["qimen"]["hidden_stems_palace_map"]) == 9
+    assert zhirun["qimen"]["horse_star"]["branch"] == "申"
+    assert zhirun["qimen"]["void_palaces"]["hour"]
+
+
+def test_sanshi_corner_lodging_modes() -> None:
+    for mode, expected_prefix in (
+        ("both", "corner_lodged_both"),
+        ("first_branch", "corner_lodged_first"),
+        ("second_branch", "corner_lodged_second"),
+        ("unassessed", "not_assessed"),
+    ):
+        res = calculate_sanshiunited_analysis(
+            date="2028-04-06",
+            time="09:33:00",
+            timezone="+08:00",
+            latitude="31n13",
+            longitude="121e28",
+            corner_lodging=mode,
+        )
+        entries = res["synthesis"]["palace_correspondences"]["entries"]
+        assert any(e["liureng"]["status"] == expected_prefix for e in entries)

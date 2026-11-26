@@ -797,6 +797,7 @@ def calculate_sanshiunited_analysis(
     liureng_is_diurnal: bool | None = None,
     liureng_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
     use_true_solar_time: bool = True,
+    corner_lodging: Literal["unassessed", "first_branch", "second_branch", "both"] = "both",
 ) -> dict[str, Any]:
     """三式合一本地聚合工具。"""
     return build_sanshiunited_result(
@@ -811,4 +812,5 @@ def calculate_sanshiunited_analysis(
         liureng_is_diurnal=liureng_is_diurnal,
         liureng_guiren_profile=liureng_guiren_profile,
         use_true_solar_time=use_true_solar_time,
+        corner_lodging=corner_lodging,
     )

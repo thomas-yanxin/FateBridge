@@ -1,12 +1,5 @@
-"""Shared definitions, independent of the domain entry point."""
+"""Re-export for knowledge_rule_tables."""
 
-from __future__ import annotations
+from fatebridge.core.qimen.calendar import QIMEN_FUHEAD_HEAVEN_STEM
 
-QIMEN_FUHEAD_HEAVEN_STEM = {
-    "甲子": "戊",
-    "甲戌": "己",
-    "甲申": "庚",
-    "甲午": "辛",
-    "甲辰": "壬",
-    "甲寅": "癸",
-}
+__all__ = ["QIMEN_FUHEAD_HEAVEN_STEM"]

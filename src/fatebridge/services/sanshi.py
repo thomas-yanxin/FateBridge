@@ -6,7 +6,6 @@ from datetime import datetime
 from typing import Any
 
 from fatebridge.core.almanac import get_lunar_context, localize_datetime
-from fatebridge.core.local_techniques.qimen import build_qimen_with_options
 from fatebridge.core.metaphysics.jinkou import build_jinkou_board
 from fatebridge.core.metaphysics.jinkou_natal_course import (
     build_natal_course,
@@ -36,6 +35,7 @@ from fatebridge.core.metaphysics.seed import (
 from fatebridge.core.metaphysics.taiyi import build_taiyi_board
 from fatebridge.core.metaphysics.taiyi_clock import civil_clock_resolution
 from fatebridge.core.metaphysics.taiyi_shiji import TaiyiShijiProfile
+from fatebridge.core.qimen import build_qimen_with_options
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.civil_clock import format_utc_offset
 from fatebridge.utils.civil_time import utc_calendar, utc_ordering_key

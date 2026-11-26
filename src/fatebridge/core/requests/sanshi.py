@@ -31,13 +31,17 @@ TaiyiShijiProfile = Literal[
 class QimenOptions(FateBridgeBaseRequest):
     """Typed Qi Men Dun Jia configuration options."""
 
-    layout: Literal["direct", "rotating"] = Field(
+    layout: Literal["direct", "rotating", "fei"] = Field(
         default="direct",
-        description="转盘排法：direct/rotating。",
+        description="排盘法：direct/rotating（转盘）或 fei（飞盘）。",
     )
-    ju_method: Literal["zhirun", "chaibu"] = Field(
+    ju_method: Literal["zhirun", "chaibu", "maoshan"] = Field(
         default="zhirun",
-        description="定局法：zhirun（默认置闰）或 chaibu（拆补）。",
+        description="定局法：zhirun（默认置闰）、chaibu（拆补）或 maoshan（茅山）。",
+    )
+    lodging_policy: Literal["kun2", "gen8", "yin_gen_yang_kun"] = Field(
+        default="kun2",
+        description="转盘中五寄宫：kun2（默认寄坤二）、gen8（寄艮八）或 yin_gen_yang_kun（阳遁寄坤阴遁寄艮）。",
     )
     god_profile: Literal["yanyi_text", "yanyi_diagrams"] = Field(
         default="yanyi_text",

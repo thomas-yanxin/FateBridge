@@ -30,6 +30,7 @@ class QimenPalace(PartialOutput):
     heaven_origin_trigram: str | None = None
     heaven_stems: list[str] | None = None
     earth_stems: list[str] | None = None
+    hidden_stem: str | None = None
     hosted_stars: list[str] | None = None
     evidence: QimenPalaceEvidence | None = None
     name: str | None = None
@@ -38,6 +39,14 @@ class QimenPalace(PartialOutput):
     trigram: str | None = None
     door: str | None = None
     door_hexagram: QimenHexagram | None = None
+    door_palace_relation: str | None = None
+    door_pressure: bool | None = None
+    star_season_state: str | None = None
+    wonder_tombs: list[str] | None = None
+    punishments: list[str] | None = None
+    hour_void_branches: list[str] | None = None
+    day_void_branches: list[str] | None = None
+    is_horse_palace: bool | None = None
     earth_stem: str | None = None
     heaven_stem: str | None = None
     god: str | None = None
@@ -56,6 +65,7 @@ class QimenLeader(PartialOutput):
 
 class QimenOptions(PartialOutput):
     ju_method: str | None = None
+    lodging_policy: str | None = None
     god_profile: str | None = None
     season_profile: str | None = None
     layout: str | None = None
@@ -64,9 +74,9 @@ class QimenOptions(PartialOutput):
 
 
 class Qimen(PartialOutput):
-    stem_context: Object | None = None
     god_profile: str | None = None
     season_profile: str | None = None
+    lodging_policy: str | None = None
     rule_profiles: Object | None = None
     ju_method: str | None = None
     ju_decision: Object | None = None
@@ -75,6 +85,9 @@ class Qimen(PartialOutput):
     time_ganzhi: str | None = None
     day_xun_head: str | None = None
     day_kongwang: str | None = None
+    horse_star: dict[str, str] | None = None
+    void_palaces: dict[str, list[str]] | None = None
+    hidden_stems_palace_map: dict[str, str] | None = None
     rulesets: Annotated[list[QimenRuleset] | None, FULL_FACT] = None
     rule_trace: Annotated[list[QimenRuleTrace] | None, FULL_FACT] = None
     calendar_policy: Annotated[QimenCalendarPolicy | None, FULL_FACT] = None
