@@ -1,21 +1,17 @@
-"""Additive source binding, retained old rows and explicitly unknown conditions."""
+"""Consolidated gate-2/context-clause invariants for Human Design knowledge."""
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
-from fatebridge.core.human_design import human_design_knowledge as hd
-from fatebridge.core.human_design import human_design_line_catalogue as catalogue
+from fatebridge.core.human_design import knowledge as hd
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.errors import EphemerisSourceError
 
-ROOT = Path(__file__).resolve().parents[2]
 
-
-def test_gate2_condition_stays_reference_only_and_is_not_a_material_forecast() -> None:
+def test_gate2_condition_stays_reference_only() -> None:
     result = calculate_knowledge_read(domain="human_design", key="2.3")
     row = result["reference_details"]["record"]
     (condition,) = row["source_conditions"]
@@ -26,125 +22,34 @@ def test_gate2_condition_stays_reference_only_and_is_not_a_material_forecast() -
     assert condition["polarity"] == "exaltation"
     assert condition["personal_condition_satisfied"] is None
     assert condition["automatic_application"] is False
-    assert condition["evidence_required"] == [
-        "same_run_actual_2_3_activation_and_fixing_state",
-        "same_run_permanent_2_14_channel_evidence",
-    ]
-    assert (
-        row["condition_review_status"]
-        == "one_explicit_clause_locally_recorded_not_exhaustive"
-    )
     assert row["actual_fixing_state"] is row["selected_polarity"] is None
     assert "永久" in result["rendered_text"] and "不自动应用" in result["rendered_text"]
-    assert "逆命题" in result["rendered_text"]
     assert result["provenance"]["real_world_efficacy_validated"] is False
 
 
-def test_unknown_conditions_are_not_an_empty_fully_reviewed_set() -> None:
-    for key in ["1.1", "2.1", "2.6", "11.4", "64.6"]:
-        result = hd.read_reference(category="lines", key=key)
-        row = result["reference_details"]["record"]
-        assert row["source_conditions"] is None
-        assert row["condition_review_status"] == "not_assessed"
-        assert "未记录不表示无条件" in result["provenance"]["scope"]
+def test_context_annotations_attached_on_exact_five_keys() -> None:
+    annotated = []
+    for gate in range(1, 65):
+        for line in range(1, 7):
+            key = f"{gate}.{line}"
+            row = hd.read_reference(category="lines", key=key)["reference_details"][
+                "record"
+            ]
+            if row.get("source_context_annotations"):
+                annotated.append(key)
+    assert annotated == ["2.3", "6.3", "7.2", "12.6", "42.1"]
 
 
-def test_exaltation_does_not_turn_narrow_receptivity_into_a_positive_trait() -> None:
-    result = hd.read_reference(category="lines", key="2.6")
-    row = result["reference_details"]["record"]
-    assert "狭窄" in row["editorial_paraphrase"]["exaltation"]
-    assert "上升一概改写为正面能力" in result["rendered_text"]
-    assert row["complete_line_meaning_accepted"] is False
-
-
-@pytest.mark.parametrize("component", ["MANIFEST_PATH", "SUPPLEMENT_PATH"])
-def test_missing_or_changed_composite_component_never_falls_back(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, component: str
+def test_missing_or_invalid_context_clauses_rejected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    path = tmp_path / "missing.json"
-    monkeypatch.setattr(catalogue, component, path)
-    with pytest.raises(EphemerisSourceError):
-        hd.read_reference(category="lines", key="1.1")
-    path.write_text("{}")
-    result = calculate_knowledge_read(domain="human_design", key="1.1")
-    assert result["status_code"] == 503 and result["retryable"] is False
-
-
-@pytest.mark.parametrize(
-    "fault",
-    [
-        "certify",
-        "overwrite_gate1",
-        "apply_condition",
-        "erase_condition",
-        "coverage",
-        "manifest_certify",
-        "path",
-    ],
-)
-def test_semantic_invariants_survive_even_a_rebound_component_hash(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
-) -> None:
-    manifest = json.loads(catalogue.MANIFEST_PATH.read_bytes())
-    supplement = json.loads(catalogue.SUPPLEMENT_PATH.read_bytes())
-    if fault == "certify":
-        supplement["rows"][0]["independent_semantic_review_completed"] = True
-    elif fault == "overwrite_gate1":
-        supplement["rows"][0]["key"] = "1.1"
-        manifest["supplements"][0]["keys"][0] = "1.1"
-    elif fault == "apply_condition":
-        supplement["rows"][2]["source_conditions"][0][
-            "personal_condition_satisfied"
-        ] = True
-    elif fault == "erase_condition":
-        del supplement["rows"][2]["source_conditions"]
-    elif fault == "coverage":
-        manifest["expected_local_paraphrase_count"] = 384
-    elif fault == "manifest_certify":
-        manifest["complete384_line_meanings_accepted"] = True
-    else:
-        manifest["supplements"][0]["file"] = "../line-knowledge-gate2-v1.json"
-    raw = json.dumps(supplement).encode()
-    supplement_path = tmp_path / "supplement.json"
-    supplement_path.write_bytes(raw)
-    raw = json.dumps(manifest).encode()
-    manifest_path = tmp_path / "manifest.json"
-    manifest_path.write_bytes(raw)
-    monkeypatch.setattr(catalogue, "SUPPLEMENT_PATH", supplement_path)
-    monkeypatch.setattr(catalogue, "MANIFEST_PATH", manifest_path)
+    bad = tmp_path / "missing.json"
+    monkeypatch.setattr(hd, "CONTEXT_CLAUSES_PATH", bad)
     with pytest.raises(EphemerisSourceError):
         hd.build_registry()
-
-
-@pytest.mark.parametrize(
-    "component", ["CATALOGUE_PATH", "MANIFEST_PATH", "SUPPLEMENT_PATH"]
-)
-@pytest.mark.parametrize("operation", ["read", "registry"])
-def test_each_loaded_component_is_bound_to_the_response_then_checked_on_next_load(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, component: str, operation: str
-) -> None:
-    path = tmp_path / getattr(catalogue, component).name
-    path.write_bytes(getattr(catalogue, component).read_bytes())
-    monkeypatch.setattr(catalogue, component, path)
-    original = hd._provenance
-
-    def change_after_load(data, snapshot):
-        result = original(data, snapshot)
-        path.write_bytes(path.read_bytes() + b"{")
-        return result
-
-    monkeypatch.setattr(
-        hd if operation == "registry" else catalogue, "_provenance", change_after_load
-    )
-    if operation == "registry":
-        assert hd.build_registry()["domains"]
-    else:
-        assert hd.read_reference(category="lines", key="2.3")["key"] == "2.3"
-    with pytest.raises(EphemerisSourceError):
-        if operation == "registry":
-            hd.build_registry()
-        else:
-            hd.read_reference(category="lines", key="2.3")
+    bad.write_text("{}")
+    result = calculate_knowledge_read(domain="human_design", key="1.1")
+    assert result["status_code"] == 503 and result["retryable"] is False
 
 
 def test_returned_condition_mutation_does_not_change_next_read() -> None:

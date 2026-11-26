@@ -130,8 +130,8 @@ def test_forward_and_reverse_scoring_exact_arithmetic() -> None:
     assert max_result["status"] == "complete"
     assert max_result["answered_count"] == 50
     assert max_result["missing_count"] == 0
-    assert max_result["scale_raw_sum"] == 250
-    assert max_result["scale_mean"] == 5.0
+    assert "scale_raw_sum" not in max_result
+    assert "scale_mean" not in max_result
     for domain in DOMAIN_ORDER:
         d = max_result["domains"][domain]
         assert d["status"] == "complete"
@@ -146,8 +146,8 @@ def test_forward_and_reverse_scoring_exact_arithmetic() -> None:
         item.item_id: (1 if item.keying == 1 else 5) for item in IPIP_BIG_FIVE_ITEMS
     }
     min_result = score_ipip_big_five(min_answers)
-    assert min_result["scale_raw_sum"] == 50
-    assert min_result["scale_mean"] == 1.0
+    assert "scale_raw_sum" not in min_result
+    assert "scale_mean" not in min_result
     for domain in DOMAIN_ORDER:
         assert min_result["domains"][domain]["raw_sum"] == 10
         assert min_result["domains"][domain]["mean"] == 1.0
@@ -166,8 +166,6 @@ def test_forward_and_reverse_scoring_exact_arithmetic() -> None:
     assert all_five["domains"]["emotional_stability"]["mean"] == 1.8
     assert all_five["domains"]["intellect"]["raw_sum"] == 38
     assert all_five["domains"]["intellect"]["mean"] == 3.8
-    assert all_five["scale_raw_sum"] == 154
-    assert all_five["scale_mean"] == 3.08
     # Spot check reverse scoring (6 - raw) on item 4 (-1) and forward on item 5 (+1).
     item4 = next(r for r in all_five["item_breakdown"] if r["item_id"] == 4)
     item5 = next(r for r in all_five["item_breakdown"] if r["item_id"] == 5)
@@ -195,8 +193,8 @@ def test_missing_item_proration_and_insufficient_threshold() -> None:
     assert res["status"] == "partial"
     assert res["answered_count"] == 34
     assert res["missing_count"] == 16
-    assert res["scale_raw_sum"] == 8 * 4 + 9 * 5 + 7 * 3 + 10 * 2
-    assert res["scale_mean"] == round(res["scale_raw_sum"] / 34, 4)
+    assert "scale_raw_sum" not in res
+    assert "scale_mean" not in res
 
     ext = res["domains"]["extraversion"]
     assert ext["status"] == "prorated"
@@ -301,6 +299,14 @@ def test_output_stays_within_psychometric_engine_boundary() -> None:
     assert not re.search(r"[0-9a-f]{64}", serialized)
     assert res["provenance"]["scale_id"] == SCALE_ID
     assert res["provenance"]["method_id"] == METHOD_ID
+    assert (
+        res["provenance"]["scale_url"]
+        == "https://ipip.ori.org/new_ipip-50-item-scale.htm"
+    )
+    assert (
+        res["provenance"]["scoring_url"]
+        == "https://ipip.ori.org/newBigFive5broadKey.htm"
+    )
     assert set(ITEMS_BY_ID) == set(range(1, 51))
 
 
@@ -338,8 +344,12 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
     )
     assert rest_score.status_code == 200
     rest_score_body = rest_score.json()
-    assert rest_score_body["scale_raw_sum"] == 150
-    assert rest_score_body["scale_mean"] == 3.0
+    assert "scale_raw_sum" not in rest_score_body
+    assert "scale_mean" not in rest_score_body
+    assert rest_score_body["domains"]["extraversion"]["raw_sum"] == 30
+    assert rest_score_body["provenance"]["scale_url"].startswith(
+        "https://ipip.ori.org/"
+    )
     Draft202012Validator(spec.output_model.model_json_schema()).validate(
         rest_score_body
     )
@@ -437,8 +447,9 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
         == 0
     )
     cli_ratings_body = json.loads(capsys.readouterr().out)
-    assert cli_ratings_body["scale_raw_sum"] == 150
-    assert cli_ratings_body["scale_mean"] == 3.0
+    assert "provenance" not in cli_ratings_body
+    assert "scale_raw_sum" not in cli_ratings_body
+    assert cli_ratings_body["domains"]["extraversion"]["mean"] == 3.0
 
     def strip_meta(payload):
         return {k: v for k, v in payload.items() if k != "run_metadata"}

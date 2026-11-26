@@ -10,6 +10,9 @@ class GuolaoMansion(PartialOutput):
     su28: str | None = None
     degree_lord: str | None = None
     right_ascension: float | None = None
+    longitude: float | None = None
+    du_in_mansion: float | None = None
+    mansion_du_width: float | None = None
     degree_in_mansion: float | None = None
     mansion_width: float | None = None
     boundary_distance: float | None = None
@@ -24,14 +27,7 @@ class GuolaoBody(PartialOutput):
     longitude: float | None = None
     latitude: float | None = None
     longitude_speed: float | None = None
-    longitude_speed_native: float | None = None
-    longitude_speed_light_time_correction: float | None = None
-    longitude_speed_spatial_aberration_correction: float | None = None
-    longitude_speed_lunar_source_remainder_correction: float | None = None
-    longitude_speed_sidereal_origin_wrap_correction: float | None = None
-    longitude_speed_rotation_correction: float | None = None
-    longitude_speed_position_derivative_correction: float | None = None
-    longitude_speed_reference_frame: str | None = None
+    retrograde: bool | None = None
     right_ascension: float | None = None
     declination: float | None = None
     zodiac_longitude: float | None = None
@@ -45,14 +41,20 @@ class GuolaoBody(PartialOutput):
     in_own_palace: bool | None = None
     in_own_mansion: bool | None = None
     natal_functional_palace: str | None = None
+    hua_yao: str | None = None
+    role_vs_life_lord: str | None = None
+    role_vs_degree_lord: str | None = None
 
 
 class GuolaoLifePalace(PartialOutput):
     longitude: float | None = None
+    degree_in_palace: float | None = None
     branch: str | None = None
     palace_lord: str | None = None
     mansion: GuolaoMansion | None = None
+    degree_lord: str | None = None
     method: str | None = None
+    life_degree_method: str | None = None
     sun_palace_branch: str | None = None
     sun_palace_basis: str | None = None
     birth_hour_branch: str | None = None
@@ -65,12 +67,23 @@ class GuolaoLifePalace(PartialOutput):
     degree_reason: str | None = None
 
 
+class GuolaoBodyPalace(PartialOutput):
+    branch: str | None = None
+    palace_lord: str | None = None
+    longitude: float | None = None
+    degree_in_palace: float | None = None
+    mansion: GuolaoMansion | None = None
+    degree_lord: str | None = None
+    basis: str | None = None
+
+
 class GuolaoPalace(PartialOutput):
     palace: str | None = None
     branch: str | None = None
     lord: str | None = None
     lord_sign_index: int | None = None
     lord_relations: dict[str, str] | None = None
+    gods_in_palace: list[str] | None = None
 
 
 class GuolaoConditions(PartialOutput):
@@ -300,6 +313,7 @@ class GuolaoGodPositions(PartialOutput):
     native_year_comparison: dict[str, OpenJsonValue] | None = None
     year_stem: str | None = None
     year_branch: str | None = None
+    month_branch: str | None = None
     year_boundary_basis: str | None = None
     branches: dict[str, str] | None = None
     aliases: dict[str, str] | None = None
@@ -426,6 +440,7 @@ class GuolaoTiming(PartialOutput):
     calendar_timezone: str | None = None
     calendar: str | None = None
     small_limit: GuolaoSmallLimit | None = None
+    dongwei_daxian: dict[str, OpenJsonValue] | None = None
     month_limit: GuolaoMonthLimit | None = None
     transit_bodies: list[GuolaoBody] | None = None
     mansion_boundaries: list[GuolaoBoundary] | None = None
@@ -436,8 +451,20 @@ class GuolaoTiming(PartialOutput):
 class GuolaoResearch(PartialOutput):
     moira_rule_evaluation: GuolaoMoiraEvaluation | None = None
     moira_source_provider: GuolaoMoiraSourceProvider | None = None
+    lunar_mansion_system: str | None = None
+    mansion_frame: str | None = None
+    weekday_ruler: str | None = None
+    planetary_mansions: list[GuolaoMansion] | None = None
+    moon_mansion: str | None = None
+    si_yu_sign_index: dict[str, int] | None = None
+    god_sign_index: dict[str, int] | None = None
+    moira_patterns: list[GuolaoMoiraRule] | None = None
     bodies: list[GuolaoBody] | None = None
     life_palace: GuolaoLifePalace | None = None
+    body_palace: GuolaoBodyPalace | None = None
+    hua_yao: dict[str, OpenJsonValue] | None = None
+    en_yong_nan_chou: dict[str, OpenJsonValue] | None = None
+    dongwei_daxian: dict[str, OpenJsonValue] | None = None
     palaces: list[GuolaoPalace] | None = None
     conditions: GuolaoConditions | None = None
     profile: GuolaoProfile | None = None

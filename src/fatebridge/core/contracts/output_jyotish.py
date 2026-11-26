@@ -106,6 +106,8 @@ class JyotishProfile(PartialOutput):
     )
     ephemeris_model: str | None = None
     zodiac: str | None = None
+    ayanamsa: str | None = None
+    ayanamsa_id: str | None = None
     ayanamsha_id: str | None = None
     position_method: str | None = None
     house_system: str | None = None
@@ -115,6 +117,7 @@ class JyotishProfile(PartialOutput):
     ephemeris_model_scope: str | None = None
     physical_backend_policy: str | None = None
     ephemeris_by_body: dict[str, str] | None = None
+    physical_ephemeris_source: str | None = None
     nonphysical_factor_models: dict[str, str] | None = None
     native_node_return_flags: dict[str, int] | None = None
     ephemeris_quality: Object | None = None
@@ -174,6 +177,7 @@ class BalaComponent(PartialOutput):
 
 class ConditionalDrik(BalaComponent):
     conditional_targets: list[str] | None = None
+    natures: dict[str, str] | None = None
     scenarios: dict[str, Object] | None = None
     matrix: dict[str, dict[str, float]] | None = None
     nature_context: Object | None = None
@@ -227,6 +231,7 @@ class TemporalBala(BalaComponent):
     temporal_scope: str | None = None
     components: dict[str, Object] | None = None
     scenarios: dict[str, Object] | None = None
+    war_pairs: list[Object] | None = None
     missing_components: list[str] | None = None
     missing_planets: list[str] | None = None
     calendar_context: Object | None = None
@@ -241,7 +246,11 @@ class ShadbalaAssessment(PartialOutput):
     conditional: list[str] | None = None
     partial: list[str] | None = None
     missing: list[str] | None = None
-    total_virupa: float | None = None
+    total_virupa: dict[str, float] | float | None = None
+    total_rupa: dict[str, float] | None = None
+    required_rupa: dict[str, float] | None = None
+    is_strong: dict[str, bool] | None = None
+    ishta_kashta: dict[str, Object] | None = None
     scope: str | None = None
 
 
@@ -253,6 +262,7 @@ class JyotishStrengths(PartialOutput):
     kala_bala: TemporalBala | None = None
     cheshta_bala: TemporalBala | None = None
     shadbala_assessment: ShadbalaAssessment | None = None
+    bhava_bala: list[Object] | None = None
 
 
 class PindaRow(PartialOutput):
@@ -347,6 +357,7 @@ class AiyarBavProfile(PartialOutput):
 
 
 class AshtakavargaChart(PartialOutput):
+    profile: str | None = None
     input_sign_indices: dict[str, int] | None = None
     prastara: dict[str, dict[str, list[int]]] | None = None
     bhinna: dict[str, list[int]] | None = None
@@ -356,12 +367,14 @@ class AshtakavargaChart(PartialOutput):
     chart_method: str | None = None
     chart_rule_ids: list[str] | None = None
     input_claims: list[Object] | None = None
+    pinda: dict[str, Object] | None = None
     reduction_analysis: PindaAnalysis | None = None
     source_profile_comparison: dict[str, AiyarBavProfile] | None = None
 
 
 class Ashtakavarga(PartialOutput):
     status: str | None = None
+    profile: str | None = None
     method_id: str | None = None
     source_id: str | None = None
     source_section: str | None = None
@@ -380,6 +393,7 @@ class Ashtakavarga(PartialOutput):
 
 class JyotishIndia(PartialOutput):
     reading_basis: Object | None = None
+    ayanamsa: str | None = None
     ayanamsha: float | None = None
     moon_nakshatra: str | None = None
     rising_nakshatra: str | None = None
@@ -389,8 +403,13 @@ class JyotishIndia(PartialOutput):
     panchanga: Object | None = None
     nakshatras: dict[str, Nakshatra] | None = None
     charts: VargaCharts | None = None
+    bhava_chalit: Object | None = None
     strengths: JyotishStrengths | None = None
     ashtakavarga: Ashtakavarga | None = None
+    yogas: Object | None = None
+    chara_karakas: list[Object] | None = None
+    arudha_padas: Object | None = None
+    upagrahas: Object | None = None
     topic_evidence: dict[str, Object] | None = None
     birth_time_sensitivity: Object | None = None
     rulesets: list[Object] | None = None

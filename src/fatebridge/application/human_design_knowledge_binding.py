@@ -1,7 +1,7 @@
 """Check the identity of the Human Design reference selected for delivery."""
 
 from fatebridge.application.tool_spec import ServiceResult
-from fatebridge.core.human_design.human_design_line_catalogue import DOMAIN, POLICY_ID
+from fatebridge.core.human_design.knowledge import DOMAIN, POLICY_ID
 from fatebridge.core.requests.reference import (
     KnowledgeReadRequest,
     KnowledgeRegistryRequest,

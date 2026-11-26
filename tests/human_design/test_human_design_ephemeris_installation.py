@@ -8,7 +8,7 @@ import pytest
 from fatebridge import fetch_ephe
 from fatebridge.core import ephemeris_installation as install
 from fatebridge.core import ephemeris_runtime
-from fatebridge.core.human_design.human_design_cycles import HORIZON_DAYS
+from fatebridge.core.human_design.cycles import HORIZON_DAYS
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from tests.fixtures.ephemeris_manifest import manifest_for_payloads
 

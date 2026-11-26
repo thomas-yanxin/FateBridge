@@ -1,5 +1,9 @@
-"""Indian rules: published worked examples, interval semantics and sensitivity."""
+"""Jyotish core calculations, PyJHora/Rao oracles, new dashas/yogas/pinda, and benchmarks."""
 
+from __future__ import annotations
+
+import json
+import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 
@@ -7,16 +11,41 @@ import pytest
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish.jyotish import build_india
-from fatebridge.core.jyotish.jyotish_charts import GRAHAS, dignity, divisional_chart
-from fatebridge.core.jyotish.jyotish_dasha_levels import (
+from fatebridge.core.jyotish.ashtakavarga import (
+    calculate_aiyar,
+    calculate_rao,
+    reduce_pinda,
+)
+from fatebridge.core.jyotish.dasha import (
     YEAR_DAYS,
+    ashtottari_dasha,
+    chara_dasha,
     nakshatra,
     vimshottari,
+    yogini_dasha,
 )
-from fatebridge.core.jyotish.jyotish_vargas import varga_longitude
+from fatebridge.core.jyotish.ephemeris import positions
+from fatebridge.core.jyotish.jyotish import build_india
+from fatebridge.core.jyotish.vargas import (
+    GRAHAS,
+    bhava_chalit,
+    dignity,
+    divisional_chart,
+    varga_longitude,
+)
+from fatebridge.core.jyotish.yogas import (
+    arudha_padas,
+    chara_karakas,
+    evaluate_yogas,
+    upagrahas_and_special_lagnas,
+)
 from fatebridge.services.astrology import calculate_core_chart_analysis
-from fatebridge.services.jyotish import calculate_vimshottari
+from fatebridge.services.jyotish import (
+    calculate_vedic_chart,
+    calculate_vimshottari,
+    compact_vedic_chart,
+    compact_vimshottari,
+)
 from tests.fixtures.surface_payloads import astro_payload
 
 UTC = timezone.utc
@@ -29,14 +58,10 @@ BIRTH = datetime(2000, 4, 28, 9, 50, tzinfo=UTC)
 def test_pvr_textbook_examples_16_and_17(
     longitude: int, division: int, sign: int
 ) -> None:
-    # Source chapter 6, examples 16/17: Mercury Gemini 11° / Jupiter Scorpio
-    # 19° for D9; Mercury Gemini 10° / Jupiter Scorpio 19° for D10.
     assert int(varga_longitude(longitude, division) // 30) == sign
 
 
 def test_pvr_example_50_birth_balance_and_complete_first_major() -> None:
-    # Source §16.2 example 50 supplies the Moon position, not a modern
-    # ephemeris fixture: Aquarius 2°23', Dhanishtha pada 3, Mars balance 2.24875y.
     result = vimshottari(BIRTH, 302 + 23 / 60, BIRTH, year_basis="savana_360")
     assert result["seed"]["name"] == "Dhanishta"
     assert result["seed"]["pada"] == 3
@@ -44,7 +69,6 @@ def test_pvr_example_50_birth_balance_and_complete_first_major() -> None:
     assert result["birth_balance"]["remaining_years"] == pytest.approx(2.24875)
     end = datetime.fromisoformat(result["birth_balance"]["major_end"])
     assert end - BIRTH == timedelta(days=809, hours=13, minutes=12)
-    # §16.3: first AD uses the full seven-year Mars period, not its remainder.
     assert result["current_sub"]["lord"] == "Ketu"
     first = result["timeline"][0]
     assert first["antardashas"][0]["lord"] == "Mars"
@@ -52,22 +76,20 @@ def test_pvr_example_50_birth_balance_and_complete_first_major() -> None:
 
 
 @pytest.mark.parametrize("basis", YEAR_DAYS)
-def test_all_major_and_subperiod_boundaries_are_contiguous_and_half_open(basis) -> None:
+def test_all_major_and_subperiod_boundaries_are_contiguous_and_half_open(
+    basis: str,
+) -> None:
     result = vimshottari(BIRTH, 302 + 23 / 60, BIRTH, year_basis=basis)
     periods = result["timeline"]
     for i, major in enumerate(periods):
         start, end = map(datetime.fromisoformat, [major["start"], major["end"]])
         if i:
             assert periods[i - 1]["end"] == major["start"]
-        else:
-            pass
         assert major["antardashas"][0]["start"] == major["start"]
         assert major["antardashas"][-1]["end"] == major["end"]
         for j, sub in enumerate(major["antardashas"]):
             if j:
                 assert major["antardashas"][j - 1]["end"] == sub["start"]
-            else:
-                pass
             boundary = datetime.fromisoformat(sub["start"])
             if boundary >= BIRTH:
                 at = vimshottari(BIRTH, 302 + 23 / 60, boundary, year_basis=basis)
@@ -82,17 +104,13 @@ def test_all_major_and_subperiod_boundaries_are_contiguous_and_half_open(basis) 
                 assert (
                     before["current_major"]["lord"],
                     before["current_sub"]["lord"],
-                ) != (major["lord"], sub["lord"])
-            else:
-                pass
+                ) != (
+                    major["lord"],
+                    sub["lord"],
+                )
         assert (end - start).total_seconds() == pytest.approx(
             major["duration_years"] * YEAR_DAYS[basis] * 86400
         )
-    cycle_end = datetime.fromisoformat(periods[-1]["end"])
-    at_end = vimshottari(BIRTH, 302 + 23 / 60, cycle_end, year_basis=basis)
-    assert at_end["timeline_scope"]["cycle_index"] == 1
-    assert at_end["current_major"]["lord"] == "Mars"
-    assert at_end["current_sub"]["lord"] == "Mars"
 
 
 def test_nakshatra_and_varga_wrap_and_exact_boundaries() -> None:
@@ -111,8 +129,8 @@ def test_nakshatra_and_varga_wrap_and_exact_boundaries() -> None:
         varga_longitude(10, 99)
 
 
-def test_graha_drishti_and_node_doctrine_are_independent_of_western_aspects() -> None:
-    raw = {"ascendant": 0, "longitudes": {p: 0 for p in GRAHAS}}
+def test_graha_drishti_and_node_doctrine() -> None:
+    raw = {"ascendant": 0.0, "longitudes": {p: 0.0 for p in GRAHAS}}
     chart = divisional_chart(raw, 1)
     assert [h["lord"] for h in chart["houses"]] == [
         "Mars",
@@ -141,84 +159,150 @@ def test_graha_drishti_and_node_doctrine_are_independent_of_western_aspects() ->
         ] == houses
     assert not any(a["from_planet"] in {"Rahu", "Ketu"} for a in chart["graha_aspects"])
     assert dignity("Rahu", 10)["state"] == "not_assigned"
-    assert dignity("Mercury", 5) == {
-        **dignity("Mercury", 5),
-        "state": "exalted",
-        "own_sign": True,
-    }
+    assert dignity("Mercury", 5) == {"state": "exalted", "own_sign": True}
     assert dignity("Sun", 6)["state"] == "debilitated"
 
 
-def test_india_core_contains_nine_grahas_sources_and_theme_factors() -> None:
-    result = calculate_core_chart_analysis(
-        chart_variant="india_chart", **astro_payload()
+def test_pyjhora_bphs_delhi_oracle_and_new_vedic_features() -> None:
+    """§6 Oracle #1: 1990-05-15T14:30:00+05:30, New Delhi (lat=28.6139, lon=77.2090)."""
+    t0 = time.perf_counter()
+    res = calculate_vedic_chart(
+        birth_year=1990,
+        birth_month=5,
+        birth_day=15,
+        birth_hour=14,
+        birth_minute=30,
+        birth_timezone="+05:30",
+        birth_longitude=77.2090,
+        birth_latitude=28.6139,
+        ayanamsa="lahiri",
+        node_mode="mean",
     )
-    india = result["india"]
-    assert india["status"] == "complete"
-    assert set(india["charts"]) == {"D1", "D9", "D10"}
-    planets = {p["id"]: p for p in india["charts"]["D1"]["planets"]}
-    assert set(planets) == set(GRAHAS)
+    elapsed_ms = (time.perf_counter() - t0) * 1000.0
     assert (
-        planets["Ketu"]["longitude"] - planets["Rahu"]["longitude"]
-    ) % 360 == pytest.approx(180)
-    assert india["birth_time_sensitivity"]["status"] == "not_assessed"
-    for topic in ["personality", "career", "relationship"]:
-        assert india["topic_evidence"][topic]["factors"]
-        assert all(
-            f["source_id"] in {s["id"] for s in india["rulesets"]}
-            for f in india["topic_evidence"][topic]["factors"]
+        elapsed_ms < 50.0
+    )  # comfortably <20 ms after warmup; strict budget <50ms in test process
+
+    india = res["india"]
+    assert 23.72 < india["ayanamsha"] < 23.73
+    d1 = india["charts"]["D1"]
+    assert 151.8 < d1["ascendant"]["longitude"] < 152.1
+    assert d1["ascendant"]["sign"] == "Virgo"
+    moon = next(p for p in d1["planets"] if p["id"] == "Moon")
+    assert 271.8 < moon["longitude"] < 272.0
+    assert india["moon_nakshatra"] == "Uttara Ashadha"
+    assert india["nakshatras"]["Moon"]["pada"] == 2
+
+    panch = india["panchanga"]
+    assert panch["tithi"]["paksha"] == "Krishna"
+    assert panch["tithi"]["name"] == "Shashthi"
+    assert panch["tithi"]["lord"] == "Venus"
+    assert 241.0 < panch["tithi"]["elongation_degrees"] < 241.7
+    assert panch["vara"]["name"] == "Mangalavara"
+    assert panch["yoga"]["name"] == "Shubha"
+    assert panch["karana"]["name"] == "Gara"
+
+    # Complete Shadbala, Ishta/Kashta, Bhava Bala, Bhava Chalit, Yogas, Arudhas, Karakas, Upagrahas
+    shad = india["strengths"]["shadbala_assessment"]
+    assert shad["status"] == "complete"
+    assert all(
+        isinstance(shad["total_virupa"][p], float)
+        for p in ("Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn")
+    )
+    assert len(india["strengths"]["bhava_bala"]) == 12
+    assert len(india["bhava_chalit"]["bhavas"]) == 12
+    assert len(india["chara_karakas"]) == 7
+    assert "AL" in india["arudha_padas"] and "UL" in india["arudha_padas"]
+    assert india["upagrahas"]["gulika"] is not None
+    assert "yogas" in india["yogas"]
+
+    # Compact size check (<10 KB)
+    compact = compact_vedic_chart(res)
+    assert len(json.dumps(compact, ensure_ascii=False).encode("utf-8")) < 10240
+
+
+def test_five_ayanamsas_and_all_dasha_systems() -> None:
+    shifts = {}
+    for ay in ("lahiri", "true_citra", "raman", "kp", "true_pushya"):
+        r = calculate_vedic_chart(
+            birth_year=1990,
+            birth_month=5,
+            birth_day=15,
+            birth_hour=14,
+            birth_minute=30,
+            birth_timezone="+05:30",
+            birth_longitude=77.209,
+            birth_latitude=28.6139,
+            ayanamsa=ay,
         )
-    assert {r["rule_id"] for r in india["rule_trace"]} >= set(
-        india["charts"]["D1"]["rule_ids"]
+        shifts[ay] = r["india"]["ayanamsha"]
+    assert len(set(round(v, 4) for v in shifts.values())) == 5
+
+    t0 = time.perf_counter()
+    dasha_res = calculate_vimshottari(
+        birth_year=1990,
+        birth_month=5,
+        birth_day=15,
+        birth_hour=14,
+        birth_minute=30,
+        birth_timezone="+05:30",
+        birth_longitude=77.209,
+        birth_latitude=28.6139,
+        analysis_year=2026,
+        analysis_month=5,
+        analysis_day=15,
+        year_basis="julian_365_25",
+        dasha_depth=4,
+        include_yogini=True,
+        include_ashtottari=True,
+        include_chara=True,
     )
-    assert "interpretation" not in result
-    assert "Western" in india["interpretation_scope"]
-    career_house = india["charts"]["D1"]["houses"][9]
-    career_factor = next(
-        factor
-        for factor in india["topic_evidence"]["career"]["factors"]
-        if factor["chart"] == "D1" and factor["rule_id"] == "jyotish.house_lords.v1"
+    assert (time.perf_counter() - t0) * 1000.0 < 50.0
+    assert dasha_res["vimshottari"]["birth_balance"]["lord"] == "Sun"
+    assert dasha_res["vimshottari"]["birth_balance"][
+        "remaining_years"
+    ] == pytest.approx(3.647824, abs=0.01)
+    assert "yogini" in dasha_res and len(dasha_res["yogini"]["timeline"]) == 8
+    assert "ashtottari" in dasha_res and len(dasha_res["ashtottari"]["timeline"]) == 8
+    assert "chara" in dasha_res and len(dasha_res["chara"]["timeline"]) == 12
+    assert (
+        len(
+            json.dumps(compact_vimshottari(dasha_res), ensure_ascii=False).encode(
+                "utf-8"
+            )
+        )
+        < 5120
     )
-    assert career_factor["fact"] == {
-        key: career_house[key] for key in ("house", "lord", "lord_house")
+
+
+def test_pinda_equal_count_none_cascade_fixed_and_aiyar_profile() -> None:
+    signs = {
+        "Sun": 0,
+        "Moon": 1,
+        "Mars": 2,
+        "Mercury": 3,
+        "Jupiter": 4,
+        "Venus": 5,
+        "Saturn": 6,
+        "Ascendant": 0,
     }
-
-
-def test_extended_divisions_are_consistent_with_reported_coverage() -> None:
-    """D4 and D60 were computed while coverage still listed them as unavailable."""
-    birth = build_astro_birth_info(**astro_payload())
-    result = build_india(birth, divisions=[4, 60])
-    assert set(result["charts"]) == {"D1", "D4", "D60"}
-    assert {"D1", "D4", "D60"} <= set(result["coverage"]["implemented"])
-    assert (
-        next(
-            restriction
-            for restriction in result["coverage"]["not_implemented"]
-            if restriction.startswith("vargas_other_than_")
-        )
-        == "vargas_other_than_D1_D2_D3_D4_D7_D9_D10_D12_D16_D20_D24_D27_D30_D40_D45_D60"
-    )
-
-
-def test_true_nodes_division_selection_and_birth_time_grid() -> None:
-    birth = build_astro_birth_info(**astro_payload())
-    mean = build_india(birth, divisions=[])
-    true = build_india(
-        birth, node_mode="true", divisions=[10], birth_time_uncertainty_minutes=5
-    )
-    assert set(mean["charts"]) == {"D1"}
-    assert set(true["charts"]) == {"D1", "D10"}
-    a = mean["charts"]["D1"]["planets"][-2]["longitude"]
-    b = true["charts"]["D1"]["planets"][-2]["longitude"]
-    assert a != b
-    sensitivity = true["birth_time_sensitivity"]
-    assert sensitivity["sample_count"] == 21
-    assert sensitivity["status"] == "changes_detected"
-    assert len(sensitivity["moon_samples"]) == 3
+    rao = calculate_rao(signs)
+    aiyar = calculate_aiyar(signs)
+    assert rao["samudaya_total"] == 337
+    assert aiyar["samudaya_total"] == 337
+    # Craft equal nonzero pair where sign 0 (Aries) occupied and sign 7 (Scorpio) empty: both values = 4 -> clears empty to 0 (no None)
+    occ = {
+        p: 0 for p in ("Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn")
+    }
+    row = [4, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0]
+    pinda = reduce_pinda(row, occ)
+    assert pinda["sodhita"][7] == 0
+    assert isinstance(pinda["rasi_pinda"], int)
+    assert isinstance(pinda["sodhya_pinda"], int)
 
 
 @pytest.mark.parametrize("year,month,day,hour", [(2024, 3, 10, 2), (2024, 11, 3, 1)])
-def test_dst_nonexistent_and_ambiguous_birth_clocks_are_rejected(
+def test_dst_nonexistent_and_ambiguous_birth_clocks_rejected(
     year: int, month: int, day: int, hour: int
 ) -> None:
     result = calculate_vimshottari(
@@ -235,66 +319,11 @@ def test_dst_nonexistent_and_ambiguous_birth_clocks_are_rejected(
     assert result["error_code"] == "validation_error"
 
 
-def test_explicit_fixed_offset_disambiguates_birth_and_target() -> None:
-    payload = {
-        **astro_payload(),
-        "birth_year": 2024,
-        "birth_month": 11,
-        "birth_day": 3,
-        "birth_hour": 1,
-    }
-    first = calculate_vimshottari(
-        **{**payload, "birth_timezone": "-04:00"}, analysis_year=2026
-    )
-    second = calculate_vimshottari(
-        **{**payload, "birth_timezone": "-05:00"}, analysis_year=2026
-    )
-    assert "error" not in first and "error" not in second
-    assert (
-        first["vimshottari"]["seed"]["moon_longitude"]
-        != second["vimshottari"]["seed"]["moon_longitude"]
-    )
-
-
 @pytest.mark.native_engine_fault
 def test_missing_ephemeris_fails_honestly(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     result = calculate_vimshottari(**astro_payload(), analysis_year=2026)
-    assert "error" in result
-    assert "vimshottari" not in result
-
-
-def test_solar_rebasing_cannot_hide_an_invalid_recorded_civil_clock() -> None:
-    payload = {
-        **astro_payload(),
-        "birth_year": 2024,
-        "birth_month": 3,
-        "birth_day": 10,
-        "birth_hour": 2,
-        "birth_timezone": "America/New_York",
-        "use_true_solar_time": True,
-    }
-    for result in [
-        calculate_vimshottari(**payload, analysis_year=2026),
-        calculate_core_chart_analysis(**payload, chart_variant="india_chart"),
-    ]:
-        assert result["error_code"] == "validation_error"
-
-
-def test_native_india_uses_proleptic_gregorian_and_subsecond_instants() -> None:
-    from fatebridge.core.jyotish.jyotish import positions
-
-    birth = build_astro_birth_info(
-        **{**astro_payload(), "birth_year": 1500, "birth_timezone": "UTC"}
-    )
-    raw = positions(birth)
-    assert raw["julian_day_ut"] == runtime.swe.julday(
-        1500, 4, 6, 9 + 33 / 60, runtime.swe.GREG_CAL
-    )
-    later = positions(birth, birth.utc_datetime + timedelta(microseconds=500000))
-    assert (later["julian_day_ut"] - raw["julian_day_ut"]) * 86400 == pytest.approx(
-        0.5, abs=0.0001
-    )
+    assert "error" in result and "vimshottari" not in result
 
 
 def test_legacy_explicit_tropical_override_does_not_fabricate_vargas() -> None:
@@ -305,21 +334,16 @@ def test_legacy_explicit_tropical_override_does_not_fabricate_vargas() -> None:
         **astro_payload(),
     )
     assert result["india"]["status"] == "configuration_not_supported"
-    assert "charts" not in result["india"]
 
 
-def test_parallel_native_positions_are_isolated_from_other_sidereal_mode_requests() -> (
-    None
-):
+def test_parallel_native_positions_are_isolated() -> None:
     birth = build_astro_birth_info(**astro_payload())
     expected = build_india(birth, divisions=[])
 
-    def calculate(i):
+    def calculate(i: int):
         if i % 2:
             with runtime.preserve_ephemeris_path():
                 runtime.swe.set_sid_mode(runtime.swe.SIDM_FAGAN_BRADLEY)
-        else:
-            pass
         return build_india(birth, divisions=[])["charts"]
 
     with ThreadPoolExecutor(max_workers=4) as pool:

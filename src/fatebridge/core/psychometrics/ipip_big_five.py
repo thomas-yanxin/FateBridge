@@ -245,6 +245,8 @@ def scale_provenance() -> dict[str, JsonValue]:
         "scale_name_zh": "IPIP 50题大五人格因子标记量表",
         "author": "Lewis R. Goldberg (1992)",
         "license": "Public Domain",
+        "scale_url": "https://ipip.ori.org/new_ipip-50-item-scale.htm",
+        "scoring_url": "https://ipip.ori.org/newBigFive5broadKey.htm",
         "domains": {
             domain: {
                 "factor": DOMAIN_METADATA[domain][0],
@@ -457,8 +459,6 @@ class IpipBigFiveOutput(ProjectedOutput):
     answered_count: int | None = None
     missing_count: int | None = None
     total_items: int | None = None
-    scale_raw_sum: int | None = None
-    scale_mean: float | None = None
     domains: dict[str, IpipDomainScoreOutput] | None = None
     item_breakdown: list[IpipItemBreakdownOutput] | None = None
     provenance: IpipScaleProvenance | None = None
@@ -591,10 +591,6 @@ def score_ipip_big_five(
 
     total_answered = sum(domain_answered_counts.values())
     total_missing = TOTAL_ITEMS - total_answered
-    scale_raw_sum = sum(domain_raw_sums.values())
-    scale_mean: float | None = (
-        float(round(scale_raw_sum / total_answered, 4)) if total_answered > 0 else None
-    )
     if total_answered == TOTAL_ITEMS:
         overall_status: ScaleStatus = "complete"
     elif insufficient_domains == len(DOMAIN_ORDER):
@@ -603,8 +599,7 @@ def score_ipip_big_five(
         overall_status = "partial"
 
     summary = (
-        f"IPIP-50 计分（{overall_status}，作答 {total_answered}/{TOTAL_ITEMS} 题，"
-        f"总量表原始分 {scale_raw_sum}，作答均分 {scale_mean}）："
+        f"IPIP-50 计分（{overall_status}，作答 {total_answered}/{TOTAL_ITEMS} 题）："
         + "；".join(domain_parts)
         + "。"
     )
@@ -615,8 +610,6 @@ def score_ipip_big_five(
         "answered_count": total_answered,
         "missing_count": total_missing,
         "total_items": TOTAL_ITEMS,
-        "scale_raw_sum": scale_raw_sum,
-        "scale_mean": scale_mean,
         "domains": domains_payload,
         "provenance": scale_provenance(),
         "summary": summary,
