@@ -23,20 +23,17 @@ def analytical_provider(monkeypatch):
             return (100.0 + function(x), 0.0, 1.0, 0.4, 0.0, 0.0), flags
 
         monkeypatch.setattr(motion.runtime, "ephemeris_call", call)
+
         # This synthetic signal has no light-time rounding. Its physical
         # stabilization is the identity; retarded-state API contracts have
         # separate real-provider tests.
-        if hasattr(motion, "stabilized_longitude_sample"):
+        def identity(planet, epoch, coordinates, model, **kwargs):
+            return 100.0 + function(epoch - center), {
+                "epoch_remainder_days": 0.0,
+                "sampling_longitude_shift_arcseconds": 0.0,
+            }
 
-            def identity(planet, epoch, coordinates, model, **kwargs):
-                return 100.0 + function(epoch - center), {
-                    "epoch_remainder_days": 0.0,
-                    "sampling_longitude_shift_arcseconds": 0.0,
-                }
-
-            monkeypatch.setattr(motion, "stabilized_longitude_sample", identity)
-        else:
-            pass
+        monkeypatch.setattr(motion, "stabilized_longitude_sample", identity)
         monkeypatch.setattr(
             motion, "assert_physical_configuration", lambda selected: None
         )
@@ -96,6 +93,7 @@ def test_local_polynomial_derivative_preserves_degree_six_exactness() -> None:
         assert abs(value - expected) < 1e-12
 
 
+@pytest.mark.local_data
 def test_real_solar_disc_venus_keeps_guard_and_failed_primary_evidence(
     native_ephemeris_files,
 ) -> None:

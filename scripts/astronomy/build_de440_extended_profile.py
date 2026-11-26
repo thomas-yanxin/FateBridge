@@ -11,6 +11,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from jplephem.spk import SPK  # type: ignore[import-untyped]
+
 MODEL_ID = "fatebridge_de440_solar_extended_v1"
 KERNEL_SHA256 = "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5"
 SOFTWARE_YEARS = (1684, 2304)
@@ -19,8 +21,6 @@ PADDING_YEARS = (1682, 2307)
 
 
 def extract(kernel_path: Path, tdb_path: Path) -> tuple[bytes, dict[str, Any]]:
-    from jplephem.spk import SPK  # type: ignore[import-untyped]
-
     digest = hashlib.sha256(kernel_path.read_bytes()).hexdigest()
     if digest != KERNEL_SHA256:
         raise ValueError("The extended profile requires the pinned DE440 kernel")

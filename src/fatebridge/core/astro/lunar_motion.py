@@ -24,6 +24,7 @@ from fatebridge.core.astro.aberration_math import (
     dot,
     longitude_rate_change,
 )
+from fatebridge.core.astro.lunar_observer import lunar_observer_remainder
 from fatebridge.core.astro.native_identity import binding_distribution_version
 from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
@@ -266,10 +267,6 @@ def lunar_light_time_correction(
                 raise EphemerisSourceError("lunar_motion_position_mismatch")
             correction = longitude_rate_change(apparent, change)
             spatial_correction = longitude_rate_change(apparent, spatial_change)
-            # Late import keeps the pure Jacobians available to the sampler
-            # without a module-initialization cycle.
-            from fatebridge.core.astro.lunar_observer import lunar_observer_remainder
-
             observer_remainder, observer_policy = lunar_observer_remainder(
                 julian_day_tt,
                 model,
