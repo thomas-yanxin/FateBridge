@@ -45,6 +45,15 @@ class SixyaoCast(PartialOutput):
     time_ruleset: SixyaoTimeRuleset | None = None
 
 
+class GuaShenInfo(PartialOutput):
+    branch: str | None = None
+    element: str | None = None
+    liuqin: str | None = None
+    shi_line: int | None = None
+    shi_yin_yang: str | None = None
+    present_positions: list[int] | None = None
+
+
 class SixyaoHexagramInfo(PartialOutput):
     changed_palace: str | None = None
     changed_palace_element: str | None = None
@@ -54,6 +63,7 @@ class SixyaoHexagramInfo(PartialOutput):
     current_position: str | None = None
     shi_line: int | None = None
     ying_line: int | None = None
+    gua_shen: GuaShenInfo | None = None
 
 
 class SixyaoDescription(PartialOutput):
@@ -76,7 +86,14 @@ class Tongshefa(PartialOutput):
     baseRight: Hexagram | None = None
     mutualLeft: Hexagram | None = None
     mutualRight: Hexagram | None = None
+    oppositeLeft: Hexagram | None = None
+    oppositeRight: Hexagram | None = None
     relation: str | None = None
     main_relation: str | None = None
+    lower_relation: str | None = None
+    mutual_relations: dict[str, str] | None = None
+    opposite_relations: dict[str, str] | None = None
     left_elem: str | None = None
     right_elem: str | None = None
+    lower_left_elem: str | None = None
+    lower_right_elem: str | None = None

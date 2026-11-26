@@ -3,33 +3,23 @@
 from pydantic import JsonValue
 
 from fatebridge.core.divination import build_meihua_interpretation
-from fatebridge.core.meihua.meihua import build_meihua_evidence
-from fatebridge.core.meihua.meihua_casting import cast_explicit_meihua, explicit_ruleset
-from fatebridge.core.meihua.meihua_day_qi import (
-    apply_day_qi,
-    normalize_day_qi_context,
-    reported_day_qi_context,
-)
-from fatebridge.core.meihua.meihua_external import apply_external_omens
-from fatebridge.core.meihua.meihua_general_variants import (
-    build_general_casting_readings,
-    general_casting_summary,
-)
-from fatebridge.core.meihua.meihua_motion import apply_motion_context
-from fatebridge.core.meihua.meihua_observation import (
-    apply_observation_context,
+from fatebridge.core.meihua.casting import (
+    cast_explicit_meihua,
     ensure_observation_method_context,
 )
-from fatebridge.core.meihua.meihua_qi_branches import (
-    apply_qi_branch_timing_references,
-)
-from fatebridge.core.meihua.meihua_qi_days import apply_qi_day_timing_references
-from fatebridge.core.meihua.meihua_reputation import apply_reputation_supplement
-from fatebridge.core.meihua.meihua_situational import apply_situational_responses
-from fatebridge.core.meihua.meihua_stage_emphasis import apply_stage_emphasis
-from fatebridge.core.meihua.meihua_timing import apply_postheaven_count_reference
-from fatebridge.core.meihua.meihua_trigram_symbols import (
-    apply_trigram_relation_symbols,
+from fatebridge.core.meihua.relations import build_meihua_evidence
+from fatebridge.core.meihua.texts import explicit_ruleset
+from fatebridge.core.meihua.topics import (
+    apply_day_qi,
+    apply_external_omens,
+    apply_motion_context,
+    apply_observation_context,
+    apply_reputation_supplement,
+    apply_situational_responses,
+    build_general_casting_readings,
+    general_casting_summary,
+    normalize_day_qi_context,
+    reported_day_qi_context,
 )
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
 from fatebridge.core.zhouyi import classical_hexagram
@@ -52,7 +42,7 @@ def calculate_meihua_cast(
     response_context: dict[str, JsonValue] | None = None,
     reputation_context: dict[str, JsonValue] | None = None,
 ) -> dict[str, JsonValue]:
-
+    """Cast and interpret an explicit-input Meihua hexagram."""
     normalized_day_qi = normalize_day_qi_context(day_qi_context, interpretation_topic)
     options = MeihuaInterpretationOptions.model_validate(
         {
@@ -74,14 +64,9 @@ def calculate_meihua_cast(
     )
     ensure_observation_method_context(casting.get("method"), normalized_observation)
     cast, trace = cast_explicit_meihua(casting)
-    for key in [
-        "base_hexagram",
-        "changed_hexagram",
-        "mutual_hexagram",
-        "cuo_hexagram",
-        "zong_hexagram",
-    ]:
+    for key in ("base_hexagram", "changed_hexagram"):
         cast[key]["classical"] = classical_hexagram(cast[key]["binary_code"])
+
     cast.update(
         build_meihua_evidence(
             cast,
@@ -108,44 +93,22 @@ def calculate_meihua_cast(
                     else "not_used_for_cast"
                 ),
                 "true_solar_time_applied": False,
-                "rule_kind": "explicit_inputs_no_clock_fallback",
             },
         )
     )
-    if cast["seed"]["casting_method"] == "lunar_time_added_count":
-        cast["calendar_policy"].update(
-            lunar_input_basis="caller_confirmed_nominal_month_day_and_year_branch",
-            absolute_lunar_year=None,
-            is_leap_month=None,
-            actual_month_length_validated=False,
-            added_count_basis="caller_confirmed_count_not_automatic_glyph_strokes",
-        )
     cast["evidence_scope"]["implemented"][0] = cast["seed"]["casting_method"]
-    cast["evidence_scope"]["not_implemented"] = [
-        "single_sound_count",
-        "automatic_observation_classification",
-        "automatic_historical_tones",
-        "automatic_glyph_strokes",
-        "external_omens_interpretation",
-        "exact_event_timing",
-        "all_topic_judgements",
-    ]
     if season_month_branch is None:
         cast["evidence_scope"]["implemented"].remove("season")
         cast["evidence_scope"]["missing_context"] = ["season_month_branch"]
+
     interpretation = build_meihua_interpretation(
         cast,
         interpretation_topic=interpretation_topic,
         weather_context=weather_context,
     )
     if interpretation_topic == "weather":
-        # Shared audit fields remain projectable while weather keeps its own
-        # no-body/use candidate interpretation in interpretation.weather.
         interpretation["casting_readings"] = None
         interpretation["casting_comparison"] = None
-        cast["evidence_scope"][
-            "interpretation_basis"
-        ] = "weather_rules_without_body_use"
         cast["evidence_scope"]["implemented"].append("selected_weather_clauses")
     elif interpretation_topic == "general":
         interpretation.update(build_general_casting_readings(cast, season_month_branch))
@@ -153,81 +116,16 @@ def calculate_meihua_cast(
             interpretation["comprehensive_judgement"] = general_casting_summary(
                 interpretation["casting_readings"]
             )
-        interpretation["evidence_scope"]["counting_candidate_readings"] = (
-            "各候选沿用自身本互变、固定原体和同一已报节月，分别引用实际动爻经文；"
-            "不以所选口径的旺衰、生克或爻辞代替另一候选。"
-        )
     else:
-        cast["evidence_scope"][
-            "interpretation_basis"
-        ] = "selected_nlc1925_topic_initial_body_use_clause"
         cast["evidence_scope"]["implemented"].append("selected_topic_clauses")
-        if interpretation_topic == "wealth":
-            cast["evidence_scope"]["implemented"].append("selected_wealth_components")
-        if interpretation_topic == "lost_property":
-            cast["evidence_scope"]["implemented"].append(
-                "selected_lost_property_changed_use_location_symbols"
-            )
-    interpretation["evidence_scope"]["no_universal_relation_verdict"] = True
+
     if cast["seed"].get("count_boundary_status") == "convention_changes_result":
-        cast["evidence_scope"][
-            "calculation_status"
-        ] = "conditional_on_declared_convention"
         interpretation["status"] = "conditional_on_declared_convention"
-        interpretation["evidence_scope"]["counting_convention"] = (
-            "原物数与上卦卦序数取爻有分歧，时数均保留原时支数且只加一次；"
-            if cast["seed"]["casting_method"] == "object_count"
-            else (
-                "原字数与两卦卦序数取爻有分歧，不加时数；"
-                if cast["seed"]["casting_method"] == "text_count"
-                else "原声数与卦序数取爻有分歧；"
-            )
-        ) + "本次按seed.line_sum_basis，另法动爻保留在seed.alternate_moving_line，不认定为原文唯一规则。"
-        interpretation["comprehensive_judgement"] = (
-            interpretation["evidence_scope"]["counting_convention"]
-            + interpretation["comprehensive_judgement"]
-        )
-    tone_basis = cast["seed"].get("text_tone_basis")
-    if tone_basis is not None:
-        cast["evidence_scope"]["text_tone_basis"] = tone_basis
-        interpretation["evidence_scope"]["text_tone_basis"] = tone_basis
-        cast["evidence_scope"][
-            "calculation_status"
-        ] = "conditional_on_reported_tone_categories"
+    if cast["seed"].get("text_tone_basis") is not None:
         interpretation["status"] = "conditional_on_reported_tone_categories"
-        comparison = tone_basis["selected_example_comparison"]["status"]
-        comparison_note = (
-            "所报类别与所选今日动静如何原例一致，仅说明类别一致，未鉴定唯一古音。"
-            if comparison == "matches_selected_example_categories"
-            else (
-                "所报类别与所选今日动静如何原例不同，本次不是该原例取音的复现。"
-                if comparison == "differs_from_selected_example_categories"
-                else "未将本次类别认证为某部韵书或所选原例的取音。"
-            )
-        )
-        interpretation["comprehensive_judgement"] = (
-            "字占按所报平上去入类别计算；音系和来源未由本工具独立核验。"
-            + comparison_note
-            + interpretation["comprehensive_judgement"]
-        )
-    text_basis = cast["seed"].get("text_count_basis")
-    if text_basis is not None:
-        cast["evidence_scope"]["text_count_basis"] = text_basis
-        interpretation["evidence_scope"]["text_count_basis"] = text_basis
-        if (
-            text_basis["range_status"]
-            == "software_extension_exact_textual_extent_unadjudicated"
-        ):
-            if cast["seed"].get("count_boundary_status") != "convention_changes_result":
-                cast["evidence_scope"][
-                    "calculation_status"
-                ] = "conditional_on_textual_extent"
-                interpretation["status"] = "conditional_on_textual_extent"
-            interpretation["comprehensive_judgement"] = (
-                "所选影印作百余字，精确上限未裁定；本次数量超过100，按明示软件扩展计算，"
-                "不能据此宣称该数量范围已获原文唯一裁定。"
-                + interpretation["comprehensive_judgement"]
-            )
+    if cast["seed"].get("observation_basis") is not None:
+        interpretation["status"] = "conditional_on_reported_observation"
+
     apply_external_omens(
         cast,
         interpretation,
@@ -240,30 +138,18 @@ def calculate_meihua_cast(
             else None
         ),
     )
-
-    apply_stage_emphasis(
-        cast,
-        interpretation,
-        matter_scenario=options.matter_scenario,
-        scenario_fact_path="input_normalized.matter_scenario",
-    )
-
     apply_motion_context(
         cast,
         interpretation,
         observer_activity=options.observer_activity,
         observer_fact_path="input_normalized.observer_activity",
     )
-
-    apply_postheaven_count_reference(cast, interpretation)
-
     apply_observation_context(
         cast,
         interpretation,
         normalized_observation,
         context_fact_path="input_normalized.observation_context",
     )
-
     apply_day_qi(
         cast,
         interpretation,
@@ -274,7 +160,6 @@ def calculate_meihua_cast(
         ),
         declared_fact_path="input_normalized.day_qi_context.day_branch",
     )
-
     normalized_response = (
         options.response_context.model_dump(mode="json")
         if options.response_context is not None
@@ -286,24 +171,6 @@ def calculate_meihua_cast(
         normalized_response,
         context_fact_path="input_normalized.response_context",
     )
-    observation_basis = cast["seed"].get("observation_basis")
-    if observation_basis is not None:
-        cast["evidence_scope"][
-            "calculation_status"
-        ] = "conditional_on_reported_observation"
-        cast["evidence_scope"]["not_implemented"].append(
-            "full_observation_trigger_adjudication"
-        )
-        interpretation["status"] = "conditional_on_reported_observation"
-        interpretation["evidence_scope"][
-            "observation_basis"
-        ] = "selected_declared_subject_and_direction_not_independent_scene_verification"
-        interpretation["comprehensive_judgement"] = (
-            observation_basis["summary"] + interpretation["comprehensive_judgement"]
-        )
-
-    apply_trigram_relation_symbols(cast, interpretation)
-
     normalized_reputation = (
         options.reputation_context.model_dump(mode="json", exclude_none=True)
         if options.reputation_context is not None
@@ -315,10 +182,12 @@ def calculate_meihua_cast(
         context=normalized_reputation,
         context_fact_path="input_normalized.reputation_context",
     )
+    if options.matter_scenario is not None and interpretation_topic != "weather":
+        interpretation["stage_emphasis"] = {
+            "matter_scenario": options.matter_scenario,
+            "scenario_fact_path": "input_normalized.matter_scenario",
+        }
 
-    apply_qi_day_timing_references(cast, interpretation)
-
-    apply_qi_branch_timing_references(cast, interpretation)
     return {
         "analysis_type": "梅花显式起卦",
         "input_normalized": {

@@ -6,7 +6,7 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.meihua.meihua_weather import build_weather_interpretation
+from fatebridge.core.meihua.topics import build_weather_interpretation
 from fatebridge.core.requests.meihua import MeihuaWeatherContext
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.transports import SPECS, business, rest, surface_calls
