@@ -55,15 +55,15 @@ For current branch features or development:
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
-uv sync --locked --extra dev
-uv run --locked --extra dev fatebridge doctor
+uv sync --extra dev
+uv run --extra dev fatebridge doctor
 ```
 
 This README describes the development branch. For a released package, use the documentation at its [Git tag](https://github.com/thomas-yanxin/FateBridge/tags); pending changes appear in the [Changelog](CHANGELOG.md#unreleased). The Python wheel contains calculation code and rule data. Method scope and result-reading guidance are in the [method references](docs/interpretation/README.md).
 
 ### Run a calculation
 
-The fictional example below runs in a macOS / Linux terminal without starting a service. Source users should prefix `fatebridge` with `uv run --locked --extra dev`. See the [Windows example](docs/mcp-deployment.md#windows-powershell) for PowerShell.
+The fictional example below runs in a macOS / Linux terminal without starting a service. Source users should prefix `fatebridge` with `uv run --extra dev`. See the [Windows example](docs/mcp-deployment.md#windows-powershell) for PowerShell.
 
 ```bash
 fatebridge bazi_birth_chart \
@@ -103,13 +103,13 @@ Start REST locally with `API_HOST=127.0.0.1 fatebridge-api`. The default port is
 
 ## Development and contributions
 
-The package uses a Python `src` layout. FastAPI, FastMCP, and CLI adapters call shared execution and domain services through a central `ToolSpec` catalog. See [architecture](docs/architecture.md). Dependencies are declared in [pyproject.toml](pyproject.toml), with development resolutions pinned in [uv.lock](uv.lock).
+The package uses a Python `src` layout. FastAPI, FastMCP, and CLI adapters call shared execution and domain services through a central `ToolSpec` catalog. See [architecture](docs/architecture.md). Dependencies are declared in [pyproject.toml](pyproject.toml).
 
 Contributions to documentation, algorithms, interfaces, and tests are welcome. Follow [CONTRIBUTING](CONTRIBUTING.md) and select checks from the [development guide](docs/development-guide.md). See the [documentation writing guide (Chinese)](docs/development-guide.md#文档写作). Start documentation-only validation with:
 
 ```bash
-uv run --locked --extra dev python scripts/check_docs.py
-uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
+uv run --extra dev python scripts/check_docs.py
+uv run --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
 ```
 
 [Documentation maintenance](docs/development-guide.md#文档维护与验证) covers interface and generated-contract synchronization. Include the version, a minimal fictional reproduction, and the actual error in bug reports. Report vulnerabilities privately under [SECURITY.md](SECURITY.md).

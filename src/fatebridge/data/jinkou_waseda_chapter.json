@@ -528,7 +528,6 @@
     "independent_transmission_established": false,
     "inventory_id": "waseda_jinkou_chapter_v1",
     "observed_heading_occurrences": 53,
-    "raw_inventory_sha256": "5a395c1b5d2b586f3f755d9d6eda6782195e5e0be9e6f009d54077bfdd8f3f86",
     "reviewed_pdf_pages": [
       49,
       50,
@@ -548,6 +547,5 @@
     "unique_raw_headings": 52,
     "whole_volume_transcription_complete": false
   },
-  "full_scan_sha256": "94553ff1aba40c0e60f51f229c2c368912e133a09547fb6d7edaa57706f1f220",
   "full_scan_url": "https://upload.wikimedia.org/wikipedia/commons/2/25/WUL-ro14_02466_%E6%B9%96%E7%A4%BE%E5%8F%A2%E8%A9%B1_06.pdf"
 }

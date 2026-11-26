@@ -43,7 +43,7 @@ Sydney, Nova Scotia, Canada       → Sydney，America/Glace_Bay
 使用逗号或换行分隔多个地址成分时，所有识别成分需指向同一候选辖区；无法消除歧义的地区（如同一省内重名城市）将保留未定位状态并提示传入经纬度。调用示例：
 
 ```bash
-uv run --locked --extra dev fatebridge astrology_chart \
+uv run --extra dev fatebridge astrology_chart \
   --birth-year 2000 --birth-month 7 --birth-day 1 \
   --birth-hour 12 --birth-minute 10 --birth-place 'Paris, France'
 ```
@@ -57,7 +57,7 @@ uv run --locked --extra dev fatebridge astrology_chart \
 离线回归测试命令（核对静态目录解析、坐标与边界）：
 
 ```bash
-uv run --locked --extra dev pytest -q tests/integration/test_place_catalog.py tests/integration/test_birth_place_resolution.py
+uv run --extra dev pytest -q tests/integration/test_place_catalog.py tests/integration/test_birth_place_resolution.py
 ```
 
 ## English note

@@ -1,7 +1,6 @@
 {
   "id": "t1299_calendar_day_evidence_v5",
   "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
-  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
   "edition": "大正藏T21 No.1299; CBETA TEI P5 header 2025-01-30",
   "authors": "不空译；上卷杨景风修注",
   "annotation_method": "Printed month table retained as literal source rows; day names and bounded activity mappings manually transcribed from named passages, independently of production results.",
@@ -879,7 +878,6 @@
   "clock_doctrine": {
     "id": "t1299_daybreak_eight_times_reference_v1",
     "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
-    "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
     "locator": "T21n1299_p0399b25-28",
     "source_excerpt": "國，未審知委。其曜亦每日分為八時，平明即是所直之曜，乃至酉戌，則八時而周。夜亦分為八時，轉到明日曉時，即次後曜當直。如是細解，用之萬不失一。",
     "day_parts": 8,
@@ -896,7 +894,6 @@
     "id": "t1299_white_one_night_abbreviation_v1",
     "locator": "T21n1299_p0393c26",
     "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
-    "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
     "source_excerpt": "所謂一夜者，十一夜也。勒頌者貴省文也",
     "xml_kind": "note[@place=inline]",
     "literal_expression": "一夜",

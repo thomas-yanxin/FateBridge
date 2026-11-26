@@ -4,7 +4,6 @@
   "author_catalogue": "堅雄",
   "source_url": "https://doi.org/10.20730/100159236",
   "manifest_url": "https://kokusho.nijl.ac.jp/biblio/100159236/manifest",
-  "manifest_sha256": "fbd4602119d733ed58b01e6206abba8fc271bd01262da6dfe672a3d9c19aca65",
   "credit": "名古屋大学附属図書館 国文学研究資料館",
   "catalogue": {
     "holder": "名古屋大学附属図書館",
@@ -27,7 +26,6 @@
       "canvas": "https://kokusho.nijl.ac.jp/biblio/100159236/canvas/8",
       "url": "https://kokusho.nijl.ac.jp/api/iiif/100159236/v4/0007/0007-004002/0007-004002-0007.tif/full/full/0/default.jpg",
       "bytes": 1728516,
-      "sha256": "4b775fce10cd378f6b880a68aa2dc611c426bc428565b33a36aea2327c1cf544",
       "retrieved_at": "2026-10-22T23:57:00.259482+00:00"
     },
     {
@@ -35,7 +33,6 @@
       "canvas": "https://kokusho.nijl.ac.jp/biblio/100159236/canvas/17",
       "url": "https://kokusho.nijl.ac.jp/api/iiif/100159236/v4/0007/0007-004002/0007-004002-0016.tif/full/full/0/default.jpg",
       "bytes": 1519652,
-      "sha256": "83b547ba5da76bffe8e179166c89a0514cf99005a49c26afce1570a922bb3945",
       "retrieved_at": "2026-10-22T23:57:03.078600+00:00"
     },
     {
@@ -43,7 +40,6 @@
       "canvas": "https://kokusho.nijl.ac.jp/biblio/100159236/canvas/18",
       "url": "https://kokusho.nijl.ac.jp/api/iiif/100159236/v4/0007/0007-004002/0007-004002-0017.tif/full/full/0/default.jpg",
       "bytes": 1693129,
-      "sha256": "a385211bdeda196fd4d79ef5d2ec3ede788b3f6c67cb7dbdcb483190d968a6ae",
       "retrieved_at": "2026-10-22T23:57:07.961011+00:00"
     }
   ],
@@ -359,7 +355,6 @@
   "commentary_selected": {
     "title": "大日經疏演奧鈔",
     "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/T2216_,59,0058a01:2216_,59,0059a01.html",
-    "html_sha256": "c178d2016d427b7497e576da83f3ab9a8286add83d30294c5255750484898f6e",
     "html_bytes": 34663,
     "passages": [
       {
@@ -395,28 +390,24 @@
     {
       "role": "generator",
       "file": "generator-primary-reading-1.json",
-      "sha256": "cc1dc6341f665c2e42bcd896ffeb1bcdf6cccd6b77e4f26d6687476bc0aa1623",
       "table_cells_agree": 56,
       "human_or_provider_independence": false
     },
     {
       "role": "reviewer",
       "file": "reviewer-primary-reading-1.json",
-      "sha256": "ed5f48bbf963da528822096116baa48fdba6a04f52d53b8133b17c43e3317eeb",
       "table_cells_agree": 56,
       "human_or_provider_independence": false
     },
     {
       "role": "generator",
       "file": "generator-primary-reading-2.json",
-      "sha256": "39b76ff807f3bebf8cd01a5d60d31e111096b9f6455c4854dc60c6347b8c32d6",
       "selected_frame": 8,
       "human_or_provider_independence": false
     },
     {
       "role": "reviewer",
       "file": "reviewer-primary-reading-2.json",
-      "sha256": "a7c16e7dfc21b59690e5df3d4cb13de0f1d364ef9bd7fac21b8d8f8a91332376",
       "selected_frame": 8,
       "human_or_provider_independence": false
     }

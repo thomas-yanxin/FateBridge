@@ -6,7 +6,6 @@
     "selected_edition": "nlc_1925",
     "title": "文明書局《梅花易數》卷二靜占",
     "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
-    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
     "original_pdf_index": 92,
     "paper_volume_and_page": "卷二三九",
     "attribution_scope": "Hosting bibliography; no independent author or dating authentication"
@@ -17,7 +16,6 @@
     "id": "wikisource_1441921",
     "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
     "revision": 1441921,
-    "saved_text_sha256": "903b109b37071584ccbf54e15ee10813d32c702bb3d7e690e15d5b77cd0ff7cb",
     "quote": "凡占在靜室，無所聞見，則無外卦，即不論外卦。但以全卦年月日值五行衰旺之氣，以體用決之。",
     "used_to_override_selected_edition": false
   },

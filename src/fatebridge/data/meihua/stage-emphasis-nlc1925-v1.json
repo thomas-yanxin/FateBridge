@@ -6,7 +6,6 @@
     "edition_id": "nlc_1925",
     "title": "文明書局《梅花易數》卷三占卦訣、體用互變之訣所选片段",
     "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
-    "raw_pdf_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
     "raw_pdf_bytes": 5621631,
     "original_pdf_indices": [
       107,
@@ -21,7 +20,6 @@
     "comparison": {
       "fixed_revision": 1441927,
       "local_file": "tests/fixtures/meihua_v1/sources/volume-3.txt",
-      "sha256": "40dc414defbc2cf93f5a3c398e16a1cb3d0b62f7ad5db14603be7dba2e37e7f6",
       "selected_fixed_wordings": [
         "如生體是用卦，則事即成。",
         "生體是互卦，則漸成。",
@@ -196,7 +194,6 @@
   "scenario_source_supplement": {
     "source_url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
     "source_edition": "nlc_1925",
-    "raw_pdf_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
     "original_pdf_index": 107,
     "printed_page": "卷三六",
     "section": "占卦訣",

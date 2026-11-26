@@ -69,7 +69,6 @@
     "publisher": "香港天文台",
     "title": "2100年公曆與農曆日期對照表",
     "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2100c.txt",
-    "raw_sha256": "e8da3a341c440b2f097c420696f00c71dc1917ac927433dd76b24fb2fa5d5df9",
     "retrieved_on": "2026-10-21",
     "clock": "UTC+08 civil calendar dates",
     "scope": "Official month-start data for this finite published calendar segment; no extrapolation beyond the listed solar_end. Future near-midnight astronomical uncertainty remains."

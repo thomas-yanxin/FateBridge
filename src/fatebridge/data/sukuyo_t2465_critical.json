@@ -10,14 +10,12 @@
     "copy_date_established": false,
     "identified_as_taisho_base_or_ko_witness": false,
     "manifest_url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/metadata_manifest/RB00017868/manifest.json",
-    "manifest_sha256": "aa3df8175b1844c8261ca0b7486a13104e33e43d4488b656e779ecf49e10a795",
     "manifest_version": 3,
     "canvas_count": 32,
     "canvas_id": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00017868/canvas/p28",
     "canvas_index_one_based": 28,
     "page_description": "left page marked 二十五",
     "image_url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00017868%2FRB00017868_00028_0.ptif/full/max/0/default.jpg",
-    "image_sha256": "ac5c280af97d81ddfd57fafdb384f770039cd6d5b6010229bfb4ed9d3ba0e99d",
     "image_bytes": 2162906,
     "image_dimensions": [
       5616,
@@ -97,10 +95,6 @@
       }
     ],
     "supplemental_model_collation": {
-      "protocol_sha256": "01a1f9bdb50470e71282e59640a61cf3a2ed574456949eb09fcd62024f828026",
-      "original_image_sha256": "ac5c280af97d81ddfd57fafdb384f770039cd6d5b6010229bfb4ed9d3ba0e99d",
-      "generator_first_sha256": "af20c5345fe6065e30e6bea15b246f22030ea67e319bafa96efdcd2c27695e29",
-      "reviewer_first_sha256": "d1dd090f12151f37804adb2d1ae8a7e074193b60238baf56379728975f960f6c",
       "conflicts": [
         {
           "location": "twelfth month first day verb",
@@ -141,7 +135,6 @@
       "text": "取小月闕第三十日直宿之法。假令正月小闕第三十日。雖無其第三十日。而彼日分直宿猶有故。次二月初一日半已上者。正月闕日之分宿直也。半已下者即彼當日宿直。故雖大小異日有増減。而小月闕日直宿無日不得。次月初一日眞宿無改代也｣"
     }
   ],
-  "taisho_publisher_html_sha256": "74c63f5151c2b8c3ac554f7a0acae0776e5247e740a712834e1b600a065050e6",
   "taisho_selected_controls": [
     {
       "month": 12,
@@ -172,7 +165,6 @@
   },
   "day_boundary_reference": {
     "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
-    "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
     "locator": "T21n1299_p0399b25-28",
     "source_excerpt": "國，未審知委。其曜亦每日分為八時，平明即是所直之曜，乃至酉戌，則八時而周。夜亦分為八時，轉到明日曉時，即次後曜當直。如是細解，用之萬不失一。",
     "starting_boundary_literal": "平明",
@@ -193,7 +185,6 @@
   },
   "critical_study": {
     "url": "https://doi.org/10.3390/rel13050458",
-    "publisher_pdf_sha256": "7693cf602eacfa476e03d518c19ac631a64bec890f25ba6c5c3ffb49ec236bb3",
     "selected_locator": "pp.7,9; notes 13,15",
     "scope": "研究论文对三十日作校改并译前后半；不代替京都写本的直接字形证据。"
   }

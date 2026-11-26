@@ -2,12 +2,12 @@
 
 通用开发、契约生成、CI 与发布工具位于 `scripts/` 顶层，星历数据工具位于 `scripts/astronomy/`。生产计算均由 `src/fatebridge/` 提供。
 
-从仓库根目录使用锁定环境运行：
+从仓库根目录使用开发环境运行：
 
 ```bash
-uv sync --locked --extra dev
-uv run --locked --extra dev python scripts/check_docs.py
-uv run --locked --extra dev python scripts/run_ci_checks.py
+uv sync --extra dev
+uv run --extra dev python scripts/check_docs.py
+uv run --extra dev python scripts/run_ci_checks.py
 ```
 
 ## 脚本清单

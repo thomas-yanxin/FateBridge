@@ -41,7 +41,6 @@
               "source_url": "https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu",
               "catalog_url": "https://cadal.edu.cn/cardpage/bookCardPage?ssno=07005210",
               "source_kind": "additional_digital_witness_single_reader_not_independent_edition",
-              "source_sha256": "1d0a16f528ed3074cdefad33b2d2f9233a47199cf88a8b02001c897e16996e60",
               "source_djvu_leaves": [
                 51
               ],
@@ -58,11 +57,6 @@
             }
           ],
           "source_binding": {
-            "source_supplement_sha256": "8e103a5435c1ba81be4f3a0562337aaa3fd9ed271c05a870620a346e4d025725",
-            "gap_review_sha256": "c296fc6035f25cf7cdaa0d99165e7af2f26ef2f5fd13e377070ba0b53860676d",
-            "source_leaf_images_sha256": {
-              "tests/data/bazi/primary/leaf-0051.png": "a4817814f5f961b1c80bbd73c9b2a4caaa19fb57a029b6c6ece9af93750c796f"
-            },
             "original516_source_not_replaced": true
           },
           "numerical_strength_rules_adopted": false,
@@ -78,13 +72,11 @@
           ],
           "separate_Ren_passage": {
             "existing_key": "日元强弱与性情措辞",
-            "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
             "source_pdf_pages": [
               177,
               178
             ],
             "source_claim_id": "CENSUS-R539",
-            "source_rows_sha256": "ab91152988059b5cf32f67d20f4f10a93ec6ee951412024db17687b80eff83d9",
             "no_cross_author_table_merging": true
           }
         }
@@ -121,7 +113,6 @@
               "source_url": "https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu",
               "catalog_url": "https://cadal.edu.cn/cardpage/bookCardPage?ssno=07005210",
               "source_kind": "additional_digital_witness_single_reader_not_independent_edition",
-              "source_sha256": "1d0a16f528ed3074cdefad33b2d2f9233a47199cf88a8b02001c897e16996e60",
               "source_djvu_leaves": [
                 52
               ],
@@ -136,11 +127,6 @@
             }
           ],
           "source_binding": {
-            "source_supplement_sha256": "8e103a5435c1ba81be4f3a0562337aaa3fd9ed271c05a870620a346e4d025725",
-            "gap_review_sha256": "c296fc6035f25cf7cdaa0d99165e7af2f26ef2f5fd13e377070ba0b53860676d",
-            "source_leaf_images_sha256": {
-              "tests/data/bazi/primary/leaf-0052.png": "8566e9f31bcd0cc0b3c578c98355921ca006cca8b714322530bd8f753f5285f2"
-            },
             "original516_source_not_replaced": true
           },
           "numerical_strength_rules_adopted": false,
@@ -192,7 +178,6 @@
               "source_url": "https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu",
               "catalog_url": "https://cadal.edu.cn/cardpage/bookCardPage?ssno=07005210",
               "source_kind": "additional_digital_witness_single_reader_not_independent_edition",
-              "source_sha256": "1d0a16f528ed3074cdefad33b2d2f9233a47199cf88a8b02001c897e16996e60",
               "source_djvu_leaves": [
                 52,
                 53,
@@ -218,14 +203,6 @@
             }
           ],
           "source_binding": {
-            "source_supplement_sha256": "8e103a5435c1ba81be4f3a0562337aaa3fd9ed271c05a870620a346e4d025725",
-            "gap_review_sha256": "c296fc6035f25cf7cdaa0d99165e7af2f26ef2f5fd13e377070ba0b53860676d",
-            "source_leaf_images_sha256": {
-              "tests/data/bazi/primary/leaf-0052.png": "8566e9f31bcd0cc0b3c578c98355921ca006cca8b714322530bd8f753f5285f2",
-              "tests/data/bazi/primary/leaf-0053.png": "e9cb28e7c5db1b61cdb262ebb38c30cf0ea4c3684517fc0a11e1a7b05dd9ef73",
-              "tests/data/bazi/primary/leaf-0054.png": "27de8c9827f0c0ef829ec1b947839711ae99c7341b3bd9c85ec8be02a8c2cdcf",
-              "tests/data/bazi/primary/leaf-0056.png": "e23f8200e04e60e42b42a8f581a455d3ea1b232bd9a1b5808d9a9699cc4c12cf"
-            },
             "original516_source_not_replaced": true
           },
           "numerical_strength_rules_adopted": false,
@@ -235,13 +212,11 @@
           "citation": "FateBridge限域编释及源表编录，非逐字引文；李雨田增补《初学捷径》，收入《任注滴天髓阐微》；CADAL07005210数字扫描叶52、53、54、56；单读者校读，未完成独立专家审定；https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu",
           "separate_Ren_passage": {
             "existing_key": "日元强弱与性情措辞",
-            "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
             "source_pdf_pages": [
               177,
               178
             ],
             "source_claim_id": "CENSUS-R539",
-            "source_rows_sha256": "ab91152988059b5cf32f67d20f4f10a93ec6ee951412024db17687b80eff83d9",
             "no_cross_author_table_merging": true
           },
           "source_table_binding": {

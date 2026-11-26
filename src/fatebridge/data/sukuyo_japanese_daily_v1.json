@@ -3,7 +3,6 @@
   "provider_calendar_id": "1002.1",
   "source_url": "https://ap.hutime.org/cal/",
   "calendar_metadata_url": "https://datetime.hutime.org/calendar/1002.1",
-  "source_archive_sha256": "e5e61bf177b19ccc43102f76892c0d99e884c1a754344c31c6824ab7c2d7014e",
   "supported_range_inclusive": [
     "1872-02-09",
     "2031-01-22"

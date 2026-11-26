@@ -1,8 +1,6 @@
 {
   "schema_version": 1,
   "supplement_id": "human_design_gate3_editorial_v1",
-  "base_catalogue_sha256": "e0be8121e433f1513fdd45ac560acd4c7519f67cf12d11bd86b966b0e011430e",
-  "source_pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
   "curated_by": "FateBridge root-agent visual review and short original editorial notes",
   "curated_on": "2026-10-28",
   "independently_accepted_line_count": 0,
@@ -12,7 +10,6 @@
     "url": "https://cdn.shopify.com/s/files/1/0872/4984/6576/files/RA_1.6_-_The_Third_Gate_-_The_Power_of_Mutation_-_eBook_Sample.pdf?v=1757005762",
     "linked_from": "https://jovianarchive.com/products/the-third-gate-the-power-of-mutation-ra-1-6",
     "status": "downloaded",
-    "sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
     "bytes": 918462,
     "body_of_six_lines_available": false,
     "publisher_master_authenticated": false
@@ -21,7 +18,6 @@
     {
       "key": "3.1",
       "source_pdf_page_one_based": 11,
-      "source_layout_block_sha256": "48bbe0548276b5c848645f38f4f1a59ad7d6ba034409ebf55fc349a35c208b60",
       "source_line_heading": "Synthesis",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -48,7 +44,6 @@
       ],
       "heading_corroboration": {
         "publisher": "Jovian Archive Media",
-        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
         "sample_pdf_page_one_based": 2,
         "printed_contents_page": "i",
         "listed_body_page": 6,
@@ -60,7 +55,6 @@
     {
       "key": "3.2",
       "source_pdf_page_one_based": 11,
-      "source_layout_block_sha256": "45a0ce7948d9245388c5c411bb55a76ae8926c8d54255b47a3ecd5d90d11c5c5",
       "source_line_heading": "Immaturity",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -87,7 +81,6 @@
       ],
       "heading_corroboration": {
         "publisher": "Jovian Archive Media",
-        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
         "sample_pdf_page_one_based": 2,
         "printed_contents_page": "i",
         "listed_body_page": 7,
@@ -99,7 +92,6 @@
     {
       "key": "3.3",
       "source_pdf_page_one_based": 11,
-      "source_layout_block_sha256": "dc91bcdb1aa32f7017cc2805c22538c06334311e7359e4467dceb2d48556fa8b",
       "source_line_heading": "Survival",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -127,7 +119,6 @@
       ],
       "heading_corroboration": {
         "publisher": "Jovian Archive Media",
-        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
         "sample_pdf_page_one_based": 2,
         "printed_contents_page": "i",
         "listed_body_page": 10,
@@ -139,7 +130,6 @@
     {
       "key": "3.4",
       "source_pdf_page_one_based": 11,
-      "source_layout_block_sha256": "14549e38d4eecccf50cba902501bf9fc59f1964bd2c774ce9cad8f45e68a4c45",
       "source_line_heading": "Charisma",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -167,7 +157,6 @@
       ],
       "heading_corroboration": {
         "publisher": "Jovian Archive Media",
-        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
         "sample_pdf_page_one_based": 2,
         "printed_contents_page": "i",
         "listed_body_page": 11,
@@ -179,7 +168,6 @@
     {
       "key": "3.5",
       "source_pdf_page_one_based": 11,
-      "source_layout_block_sha256": "ed4d7b53b74520834aa30fd7b54b585d27d28a3a9a6732ca4e5a32d3443965a2",
       "source_line_heading": "Victimization",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -206,7 +194,6 @@
       ],
       "heading_corroboration": {
         "publisher": "Jovian Archive Media",
-        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
         "sample_pdf_page_one_based": 2,
         "printed_contents_page": "i",
         "listed_body_page": 13,
@@ -218,7 +205,6 @@
     {
       "key": "3.6",
       "source_pdf_page_one_based": 11,
-      "source_layout_block_sha256": "a16d86bb86076662c66c0128159fd3108e9dc58633074a0e4a6f42e77698995c",
       "source_line_heading": "Surrender",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -246,7 +232,6 @@
       ],
       "heading_corroboration": {
         "publisher": "Jovian Archive Media",
-        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
         "sample_pdf_page_one_based": 2,
         "printed_contents_page": "i",
         "listed_body_page": 14,

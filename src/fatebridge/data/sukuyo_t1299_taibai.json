@@ -2,7 +2,6 @@
   "id": "t1299_taibai_lunar_direction_v1",
   "author": "不空译；T1299下卷太白所在章",
   "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
-  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
   "locator": "T21n1299_p0399b29-0399c18",
   "title_literal": "釋大白所在八方天上地下吉凶法",
   "selected_witness": "lower_taisho",
@@ -266,7 +265,6 @@
   },
   "publisher_primary": {
     "url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&useid=1299_,00,0399&nonum=&kaeri=",
-    "response_sha256": "2807fa2a7dc244709be30e75a12e9393007e24af91baa718a1aa7f5b1f71b84f",
     "response_bytes": 123921,
     "quotation_fixture": "sukuyo-taibai-primary.json",
     "scope": "Selected publisher HTML quotations retained; complete HTML kept privately. Not manuscript or facsimile collation.",

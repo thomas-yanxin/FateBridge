@@ -9,21 +9,18 @@
   "holder_list_url": "https://kokusho.nijl.ac.jp/page/list-zentsuji.html",
   "doi": "10.20730/100223663",
   "manifest_url": "https://kokusho.nijl.ac.jp/biblio/100223663/manifest",
-  "manifest_sha256": "dc41c230e83b2d4dcaf094b21e1d93df3d5a4c6a86763d35f062e0934c9b3f59",
   "manifest_version": 2,
   "canvas_count": 34,
   "selected_canvas_id": "https://kokusho.nijl.ac.jp/biblio/100223663/canvas/29",
   "canvas_one_based": 29,
   "visible_left_leaf": "廿五",
   "image_url": "https://kokusho.nijl.ac.jp/api/iiif/100223663/v4/XSE1/XSE1-25903/XSE1-25903-0028.tif/full/full/0/default.jpg",
-  "image_sha256": "55cd7cea03bb02435d0e805e5fc256b4f02032a24f7dd3bc954015178622e602",
   "image_bytes": 1471968,
   "image_dimensions": [
     6153,
     4677
   ],
   "image_use_terms_url": "https://kokusho.nijl.ac.jp/page/usage.html",
-  "transcription_receipt_sha256": "ca4b5f9216e71aa45a0652625ffc7e5a9a085a586949c7324b38004dbab81635",
   "transcription_method": "Root visual inspection of the complete original JPEG and exact plain crops; no model completion of uncertain glyphs. Whitespace, reading marks and layout omitted, virtual mansion name 虛 normalized to 虚 in mansion fields only. Literal strings retain 虛.",
   "observations": [
     {

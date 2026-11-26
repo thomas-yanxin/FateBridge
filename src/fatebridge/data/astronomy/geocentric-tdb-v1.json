@@ -3,7 +3,6 @@
   "source": {
     "commit": "9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3",
     "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/dtdb.c",
-    "sha256": "228bd7c7c1c88dda44c29a076f289c968f64d77a2dc389138b03ab5d1d442105",
     "policy": "Full787Fairheadtermsandoriginalmassadjustments; zeroobserveru/v, no topocentric terms. Reuse existing completeERFAbsdlicense. Record1950..2050authorcomparisonlimit, not full-domainphysicalcertification."
   },
   "license": "erfa-license.txt",

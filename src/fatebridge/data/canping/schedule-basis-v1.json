@@ -7,13 +7,11 @@
     "heluo_najda": {
       "title": "河洛理數 史應選校訂 卷七附八字法",
       "url": "https://www.digital.archives.go.jp/DAS/contents/pdf/lossy/03050271000050/0001.pdf",
-      "pdf_sha256": "199c7c1100a86857bc6973da4f0cfb27be473fdd5ede7b0241fc8cdb101877ea",
       "edition": "国立公文书馆305-0271，目录标明刊清印；确切印年未定"
     },
     "sanming_nlc": {
       "title": "三命通會 卷二 論大運",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/23/NLC416-13jh000156-94145_%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83.pdf",
-      "pdf_sha256": "c6eac6fca6411e45cb801f9b771aca6dd6a6d2dfb57ecc36ea5f42ecf1ac8bf9",
       "edition": "NLC416-13jh000156-94145；Commons转录目录标秦慎安校勘、文明書局1926；刊记未独立核验"
     }
   },

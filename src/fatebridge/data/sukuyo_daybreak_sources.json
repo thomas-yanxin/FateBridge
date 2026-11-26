@@ -7,7 +7,6 @@
         "title": "四分律名義標釋",
         "edition": "CBETA pinned electronic main text; inline notes separately recorded, no new printed or manuscript collation",
         "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/X/X44/X44n0744.xml",
-        "sha256": "ae88ebd75dad749fc0b958ef49e6402ad638ace743b35617cdfea169fe5c8949",
         "bytes": 3415725,
         "capture_file": "X0744.xml",
         "windows": {
@@ -33,7 +32,6 @@
         "title": "翻譯名義集",
         "edition": "CBETA pinned electronic main text; inline notes separately recorded, no new printed or manuscript collation",
         "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T54/T54n2131.xml",
-        "sha256": "9094078afad441c2fb0b48cb32a9e5e190895e1d0218a597e8760683c6816a58",
         "bytes": 2209193,
         "capture_file": "T2131.xml",
         "windows": {
@@ -50,7 +48,6 @@
         "title": "薩婆多毘尼毘婆沙",
         "edition": "CBETA pinned electronic main text; inline notes separately recorded, no new printed or manuscript collation",
         "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T23/T23n1440.xml",
-        "sha256": "e3e863f58974c673fc63dc95bf66549b88a26b1efe16b30d341b5c794c9c2447",
         "bytes": 1018907,
         "capture_file": "T1440.xml",
         "windows": {
@@ -67,7 +64,6 @@
         "title": "大唐西域記",
         "edition": "CBETA pinned electronic main text; inline notes separately recorded, no new printed or manuscript collation",
         "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T51/T51n2087.xml",
-        "sha256": "ac50f33584ac90ecb9fd61a1fbfa1f8a802464103b4eb6a26d20ff6f9d578763",
         "bytes": 2599669,
         "capture_file": "T2087.xml",
         "windows": {
@@ -489,12 +485,6 @@
       }
     ],
     "all_postposed_note_and_app_records_linked_to_all_five_windows": true,
-    "source_xml_sha256": {
-      "X0744": "ae88ebd75dad749fc0b958ef49e6402ad638ace743b35617cdfea169fe5c8949",
-      "T2131": "9094078afad441c2fb0b48cb32a9e5e190895e1d0218a597e8760683c6816a58",
-      "T1440": "e3e863f58974c673fc63dc95bf66549b88a26b1efe16b30d341b5c794c9c2447",
-      "T2087": "ac50f33584ac90ecb9fd61a1fbfa1f8a802464103b4eb6a26d20ff6f9d578763"
-    },
     "paper_or_manuscript_witness_independently_inspected": false,
     "runtime_text_emendation_applied": false
   },
@@ -509,7 +499,6 @@
           "明　廣州沙門釋　弘贊在犙　輯",
           "新安沙門釋　弘麗羅峰　校"
         ],
-        "source_sha256": "ae88ebd75dad749fc0b958ef49e6402ad638ace743b35617cdfea169fe5c8949",
         "scope": "XML题头与所选正文署名，非独立纸本认证或作者每条所述皆亲历；序文署名不移作本书编译者。"
       },
       {
@@ -523,7 +512,6 @@
           "姑蘇景德寺法潤大師法雲編",
           "姑蘇景德寺普潤大師法雲篇"
         ],
-        "source_sha256": "9094078afad441c2fb0b48cb32a9e5e190895e1d0218a597e8760683c6816a58",
         "scope": "XML题头与所选正文署名，非独立纸本认证或作者每条所述皆亲历；序文署名不移作本书编译者。"
       },
       {
@@ -534,7 +522,6 @@
         "selected_body_bylines": [
           "失譯人名今附秦錄"
         ],
-        "source_sha256": "e3e863f58974c673fc63dc95bf66549b88a26b1efe16b30d341b5c794c9c2447",
         "scope": "XML题头与所选正文署名，非独立纸本认证或作者每条所述皆亲历；序文署名不移作本书编译者。"
       },
       {
@@ -546,7 +533,6 @@
           "三藏法師玄奘奉　詔譯",
           "大總持寺沙門辯機撰"
         ],
-        "source_sha256": "ac50f33584ac90ecb9fd61a1fbfa1f8a802464103b4eb6a26d20ff6f9d578763",
         "scope": "XML题头与所选正文署名，非独立纸本认证或作者每条所述皆亲历；序文署名不移作本书编译者。"
       }
     ],

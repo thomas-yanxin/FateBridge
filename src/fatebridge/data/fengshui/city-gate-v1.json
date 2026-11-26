@@ -20,7 +20,6 @@
   "sources": {
     "G1": {
       "url": "https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E6%B2%89%E6%B0%8F%E7%8E%84%E7%A9%BA_%E4%B8%8A.pdf",
-      "sha256": "30d653cd53a768a957d2416d2c1586b65310f3aad3b103c90cf8af4347e4a490",
       "pages": 71,
       "retrieved_at": "2026-10-22",
       "locator": "卷一 論城門 PDF57-60, printed115-121",
@@ -36,7 +35,6 @@
       "kind": "published_original_text_reprint",
       "source_version": "2011.3出版，2016.2重印，ISBN978-7-5117-0801-4；CIP在PDF5，原文论城门在PDF90–94；五黄寄运原文在PDF128",
       "retrieved_at": "2026-10-22",
-      "retrieved_sha256": "b0c2a7af0a1b94f36cf1cc9f0d2ce4b65e8ea49bd793bc128b8fdc525b5ba847",
       "scope": "仅交叉核对原文段落与出版信息；不采用现代译注和历史家运叙述作为现实验证；原文论分金说明一运五寄坎、二运五寄坤及随运寄宫通则"
     }
   },

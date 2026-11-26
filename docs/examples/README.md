@@ -22,10 +22,10 @@
 按[快速入门](../getting-started.md)安装后，在仓库根目录执行 CLI（所有 90 个工具均支持 `--request-file`）：
 
 ```bash
-uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json \
+uv run --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json \
   --fields status layers coverage rulesets rule_trace --detail compact
-uv run --locked --extra dev fatebridge fengshui_xuankong_house_chart --request-file docs/examples/fengshui-xuankong.json --detail compact
-uv run --locked --extra dev fatebridge astrology_chart --request-file examples/demo-subject.json --detail compact
+uv run --extra dev fatebridge fengshui_xuankong_house_chart --request-file docs/examples/fengshui-xuankong.json --detail compact
+uv run --extra dev fatebridge astrology_chart --request-file examples/demo-subject.json --detail compact
 ```
 
 REST 可用 `--data-binary @docs/examples/fengshui-home.json` 发送到对应 POST 路由；MCP 直接将文件内容作为 `arguments` 参数对象传递。六爻示例 JSON 可作为 MCP 参数、REST `/api/divination/liuyao` 请求体或 CLI `--request-file docs/examples/liuyao-conditional-demo.json` 传入；CLI 命令行参数详情可通过 `fatebridge discover liuyao` 查看。

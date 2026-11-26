@@ -4,28 +4,24 @@
     {
       "capture_file": "T2125.xml",
       "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T54/T54n2125.xml",
-      "sha256": "2d555d871e45388785f2e07e6a86d0d5657ce40df09295efda4212e67fec8ea9",
       "bytes": 668411,
       "format": "CBETA_TEI"
     },
     {
       "capture_file": "T1299.xml",
       "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1299.xml",
-      "sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
       "bytes": 387099,
       "format": "CBETA_TEI"
     },
     {
       "capture_file": "T2216-0058.html",
       "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/T2216_,59,0058a01:2216_,59,0059a01.html",
-      "sha256": "c178d2016d427b7497e576da83f3ab9a8286add83d30294c5255750484898f6e",
       "bytes": 34663,
       "format": "SAT_HTML"
     },
     {
       "capture_file": "T2216-0233.html",
       "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/T2216_,59,0233a01:2216_,59,0234a01.html",
-      "sha256": "df54d7049fff76809117e6785eba47995f81af63e9fe884a0f52d49c9c43ca66",
       "bytes": 34938,
       "format": "SAT_HTML"
     }

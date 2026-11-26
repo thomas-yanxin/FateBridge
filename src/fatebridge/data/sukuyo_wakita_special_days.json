@@ -9,19 +9,16 @@
     "catalogue_url": "https://ndlsearch.ndl.go.jp/books/R100000039-I817827",
     "doi": "10.11501/817827",
     "manifest_url": "https://dl.ndl.go.jp/api/iiif/817827/manifest.json",
-    "manifest_sha256": "7b2b111e19ca158f92b2d82ab22645cb9d6185dc3bd218c218b63b67c6ae9834",
     "images": [
       {
         "canvas": 37,
         "file": "ndl-817827-p037.jpg",
-        "url": "https://dl.ndl.go.jp/api/iiif/817827/R0000037/full/full/0/default.jpg",
-        "sha256": "7716b5641a7ae58daf022e5a7b056d4b327244af5658ec5424d1845eb14aa75a"
+        "url": "https://dl.ndl.go.jp/api/iiif/817827/R0000037/full/full/0/default.jpg"
       },
       {
         "canvas": 38,
         "file": "ndl-817827-p038.jpg",
-        "url": "https://dl.ndl.go.jp/api/iiif/817827/R0000038/full/full/0/default.jpg",
-        "sha256": "da4ce2ecafafea1cae0ac121bae2bba383f69a64e88e527eb9aa5c3ad56c7e19"
+        "url": "https://dl.ndl.go.jp/api/iiif/817827/R0000038/full/full/0/default.jpg"
       }
     ],
     "locator": "lower printed pp27-28; IIIF canvas37 left and canvas38 right",

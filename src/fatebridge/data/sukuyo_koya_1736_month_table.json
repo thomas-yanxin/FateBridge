@@ -238,25 +238,21 @@
     }
   ],
   "transcription_method": "Root visual transcription of all 360 printed body cells in frames 14–16, frozen before runtime comparison; physical order February through January. Handwriting, red annotations, editorial correction and computed replacement excluded. 虛/虚 normalized only for comparison.",
-  "root_transcription_sha256": "69b73bbb4eb4b396c00217e9147bea0416b0b747b9664faece8598db8766ca65",
   "independent_human_transcription_accepted": false,
   "full_book_collation_accepted": false,
   "source_images": [
     {
       "frame": 14,
-      "image_sha256": "727e23b9594631a6814c933ce6f3702e5c87dc7ac5fded8dc2bbc741a0dc6c89",
       "image_url": "https://www.arc.ritsumei.ac.jp/archive01/theater/image/PB/arc/Books/arcBK/arcBK01-0086/arcBK01-0086-01/arcBK01-0086-01_14.jpg",
       "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/13/"
     },
     {
       "frame": 15,
-      "image_sha256": "3360a970c9e7872567c2f2a441fbd33fdb11ddf5282f8e9a53b6081d263d0727",
       "image_url": "https://www.arc.ritsumei.ac.jp/archive01/theater/image/PB/arc/Books/arcBK/arcBK01-0086/arcBK01-0086-01/arcBK01-0086-01_15.jpg",
       "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/14/"
     },
     {
       "frame": 16,
-      "image_sha256": "10cbae5563c1f504b2dfe5bf4ae43ca93a6bb9c838f81274eeb3cb8ea54b615c",
       "image_url": "https://www.arc.ritsumei.ac.jp/archive01/theater/image/PB/arc/Books/arcBK/arcBK01-0086/arcBK01-0086-01/arcBK01-0086-01_16.jpg",
       "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/15/"
     }
@@ -275,23 +271,18 @@
     "images": [
       {
         "frame": 5,
-        "image_sha256": "2b469c1eedae354ddd5c2322848e08bb25c700d3b32106de65dcf3640450ebd9",
         "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/4/"
       },
       {
         "frame": 6,
-        "image_sha256": "c5a57cbed3698b126fc74a20fc89add358e392e16be0ce04b0d9c9428124f65a",
         "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/5/"
       },
       {
         "frame": 7,
-        "image_sha256": "23926dfc8e03ec4e833bf832da7b7b205289027841efb174bd6ccfd234d80cea",
         "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/6/"
       }
     ],
-    "visible_signature": "享保二十一年仲春日沙門覺勝",
-    "separate_date_reading_sha256": "8a520d0b651b8c194ff0dcea8c5f39048912fc41ef9550d6565714cfa114f568",
-    "separate_prose_reading_sha256": "a32b200d20628dc7bf98dcf150f621e1ffa8f8bd47566fc17903e76286ef13de"
+    "visible_signature": "享保二十一年仲春日沙門覺勝"
   },
   "calendar_policy_evidence": {
     "modern_clock_boundary_established": false,
@@ -328,8 +319,6 @@
     }
   ],
   "model_reading_collation": {
-    "root_reading_sha256": "69b73bbb4eb4b396c00217e9147bea0416b0b747b9664faece8598db8766ca65",
-    "separate_reader_reading_sha256": "5289d41f8e89924e03f2a2bec4528de2060e3af4642764b2cb5da83d942550e4",
     "all_cells_compared": 360,
     "agreed_cells": 358,
     "no_prior_reading_overwritten": true,

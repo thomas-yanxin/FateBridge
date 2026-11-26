@@ -33,11 +33,9 @@ class TreeEntry(TypedDict):
 
 
 class ManifestFileRecord(TypedDict):
-    """Pinned size and digest record for one .se1 ephemeris file."""
+    """Pinned size record for one .se1 ephemeris file."""
 
     bytes: int
-    sha256: str
-    git_blob_sha1: str
 
 
 class EphemerisManifest(TypedDict):
@@ -48,7 +46,6 @@ class EphemerisManifest(TypedDict):
     source_repository: str
     source_commit: str
     source_tree_url: str
-    source_tree_sha256: str
     base_url: str
     scope: str
     files: dict[str, ManifestFileRecord]
@@ -154,8 +151,6 @@ def build(commit: str, cache_dir: Path, output: Path) -> EphemerisManifest:
             pass
         return name, {
             "bytes": len(data),
-            "sha256": hashlib.sha256(data).hexdigest(),
-            "git_blob_sha1": blob,
         }
 
     files: dict[str, ManifestFileRecord] = {}
@@ -182,7 +177,6 @@ def build(commit: str, cache_dir: Path, output: Path) -> EphemerisManifest:
         "source_repository": f"https://github.com/{REPOSITORY}",
         "source_commit": commit,
         "source_tree_url": tree_url,
-        "source_tree_sha256": hashlib.sha256(raw_tree).hexdigest(),
         "base_url": base_url,
         "scope": "Root official .se1 files at the pinned commit; content identity only, not astronomical accuracy certification",
         "files": dict(sorted(files.items())),

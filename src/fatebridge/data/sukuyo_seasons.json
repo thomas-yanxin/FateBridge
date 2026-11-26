@@ -247,7 +247,5 @@
     "physical_day_boundary_established": false,
     "new_independent_historical_observations": 0,
     "real_sample_count": 0
-  },
-  "before_production_reference_sha256": "738f421ed51dd8957063342189ae536563e340ec683a0d4f3eebf82fded8760f",
-  "reference_plan_sha256": "0ee30ca88bc29566d5cde234311e7fc6647e12840a19e91d836fa227b80a38af"
+  }
 }

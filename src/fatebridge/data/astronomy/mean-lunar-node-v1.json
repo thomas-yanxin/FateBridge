@@ -3,7 +3,6 @@
   "source_url": "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swemmoon.c",
   "method_reference_url": "https://www.astro.com/swisseph/swisseph.htm",
   "method_reference_section": "2.2.1",
-  "source_file_sha256": "1d5f5ef9a95cf9a2f395b6334a58c63851ce0512d65bf08e49d3caf0a9fecb00",
   "source_native_version": "2.10.03",
   "definition": "Moshier ELP2000-85 adjusted mean elements L-F minus the published DE431-derived secular correction. The mean point has no direct JPL record.",
   "scope": "Published model parameters only; no FateBridge fit or residual calibration. Equality to native software is not independent dynamics or observational accuracy certification.",

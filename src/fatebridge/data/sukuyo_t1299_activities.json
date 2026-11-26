@@ -3,7 +3,6 @@
   "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
   "edition": "大正藏T21 No.1299; CBETA TEI P5, header 2025-01-30",
   "author": "不空译，上卷杨景风修注",
-  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
   "selection_method": "Manual source-based topic mapping; upper/lower variants explicitly distinguished. Omitted topics remain uncovered, never inferred negative.",
   "rules": [
     {

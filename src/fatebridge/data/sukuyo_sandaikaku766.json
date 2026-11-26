@@ -1,6 +1,5 @@
 {
   "id": "kyoto_rb00028238_quoted766_edict_v2",
-  "before_production_source_facts_sha256": "c0c6f02d1b1d0803efbe969a060f37bfff3be0eeac9dcda0670e9e1620c92df9",
   "witness": {
     "work": "類聚三代格",
     "catalog_url": "https://rmda.kulib.kyoto-u.ac.jp/item/rb00028238",
@@ -16,20 +15,16 @@
         "canvas_id": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00028238/canvas/p320",
         "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00028238%2F08%2FRB00028238_00320_0.ptif/full/max/0/default.jpg",
         "actual_url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00028238%2F08%2FRB00028238_00320_0.ptif/full/max/0/default.jpg",
-        "bytes": 2561316,
-        "sha256": "e3e7ac0ca28b0405ce49196e040cc2fc4ac6581c179acbf8339fe15ebecace07"
+        "bytes": 2561316
       },
       {
         "frame": 321,
         "canvas_id": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00028238/canvas/p321",
         "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00028238%2F08%2FRB00028238_00321_0.ptif/full/max/0/default.jpg",
         "actual_url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00028238%2F08%2FRB00028238_00321_0.ptif/full/max/0/default.jpg",
-        "bytes": 2545004,
-        "sha256": "4d2c2a4474b3f03f041907e4bf4c370281ac8642ff4f9797066a3086fab29468"
+        "bytes": 2545004
       }
-    ],
-    "actual_catalog_sha256": "b4aba7de91191e5d410464c5e3f2bc520be906b63fa31ab83702db384dfe4b4e",
-    "actual_manifest_sha256": "870754c63d4d8acc8279f32f763eeb82a9d2ba202798f4a3d36a1f77bb533f79"
+    ]
   },
   "transmitted_record": {
     "reported_document_date_literal": "弘仁十三年三月廿八日",
@@ -112,6 +107,5 @@
       ],
       "role": "transmitted_document_month"
     }
-  ],
-  "source_fact_correction_sha256": "c2ae313577ab507f863485e57e0f2d52d62fe70d897ad92a8abb2d471473c432"
+  ]
 }

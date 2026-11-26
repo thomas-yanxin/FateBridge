@@ -31,12 +31,10 @@
       "images": [
         {
           "frame": 234,
-          "sha256": "ad72451fe390320cd91bd41f0a73643f9c24be30a09fc58e068456695522f688",
           "url": "https://dl.ndl.go.jp/api/iiif/991092/R0000234/full/full/0/default.jpg"
         },
         {
           "frame": 236,
-          "sha256": "f90e54e573b57e4e01c61ca2a7eb786aa97d323cf2fef674f332de9a46612300",
           "url": "https://dl.ndl.go.jp/api/iiif/991092/R0000236/full/full/0/default.jpg"
         }
       ]
@@ -58,19 +56,16 @@
       "images": [
         {
           "frame": 701,
-          "sha256": "a3cbd8f5a6f77c561b8e1b432993b0456edede1410619b4d5e3aaa15db9c47ec",
           "url": "https://codh.rois.ac.jp/pmjt/iiif/200018998/200018998_00701.tif/full/full/0/default.jpg"
         },
         {
           "frame": 708,
-          "sha256": "7a57ffa28b32c8af4d0ce850263bf7c112086a2fab0d08eb04d1da36a2aebad3",
           "url": "https://codh.rois.ac.jp/pmjt/iiif/200018998/200018998_00708.tif/full/full/0/default.jpg"
         }
       ]
     }
   ],
   "source_id": "shoku766_selected_witnesses_v1",
-  "before_production_source_facts_sha256": "f207ffd8d4adf29ac9f6d51c5328eb3ce8ed8087ef7388b101bbc69f9453967d",
   "evaluation_policy": {
     "root_model_selected_image_reading": true,
     "human_or_blind_collation": false,

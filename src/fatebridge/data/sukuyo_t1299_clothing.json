@@ -2,7 +2,6 @@
   "id": "t1299_clothing_witnesses_and_actions_v1",
   "author": "不空译；上卷杨景风修注",
   "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
-  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
   "selected_witness": "lower_taisho",
   "locator": "T21n1299_p0397b16-27",
   "title_literal": "裁縫衣裳服著用宿法",
@@ -1307,7 +1306,6 @@
   ],
   "publisher_primary": {
     "url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&useid=1299_,00,0397&nonum=&kaeri=",
-    "response_sha256": "fbf3b89fa3843d285b582851c0d818c348a621b68539b3015135e48f9217638b",
     "response_bytes": 124407,
     "scope": "Selected electronic main text and apparatus; not independent Ming print collation."
   },

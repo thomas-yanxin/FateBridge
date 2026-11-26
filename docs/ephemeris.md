@@ -13,7 +13,7 @@
 源码安装可在仓库根目录下载默认星历段（此步骤需要网络）：
 
 ```bash
-uv run --locked --extra dev python -m fatebridge.fetch_ephe
+uv run --extra dev python -m fatebridge.fetch_ephe
 ```
 
 默认下载 `sepl_18.se1`、`semo_18.se1`、`seas_18.se1` 到源码仓库 `ephe/`。
@@ -23,13 +23,13 @@ uv run --locked --extra dev python -m fatebridge.fetch_ephe
 按所需公历年份选择行星和月球分段，可用 `--years 1500 9999`；连续范围用 `--year-range 2399 2401`。这些选项与 `--files` 互斥，并在 600 年分段交界包含相邻年份可能需要的文件。例如：
 
 ```bash
-uv run --locked --extra dev python -m fatebridge.fetch_ephe --years 9999
+uv run --extra dev python -m fatebridge.fetch_ephe --years 9999
 ```
 
 下载到自定义目录后，须设置运行服务的 `SE_EPHE_PATH`；下载成功本身不代表服务已读取该目录。可用 `--verify-only` 离线检查已有文件，`--base-url` 指定镜像，`--manifest` 指定自定义文件清单：
 
 ```bash
-uv run --locked --extra dev python -m fatebridge.fetch_ephe --year-range 1 9999 --verify-only
+uv run --extra dev python -m fatebridge.fetch_ephe --year-range 1 9999 --verify-only
 ```
 
 ### 独立安装与自定义路径
@@ -50,8 +50,8 @@ export SE_EPHE_PATH=/absolute/path/to/ephe
 跨年代精度核对可显式安装完整原始 DE441 文件，并设置环境变量：
 
 ```bash
-uv run --locked --extra dev python -m fatebridge.fetch_jpl --dest /absolute/path/to/jpl-de441
-uv run --locked --extra dev python -m fatebridge.fetch_jpl --dest /absolute/path/to/jpl-de441 --verify-only
+uv run --extra dev python -m fatebridge.fetch_jpl --dest /absolute/path/to/jpl-de441
+uv run --extra dev python -m fatebridge.fetch_jpl --dest /absolute/path/to/jpl-de441 --verify-only
 export SE_EPHE_PATH=/absolute/path/to/jpl-de441
 export FATEBRIDGE_JPL_FILE=linux_m13000p17000.441
 ```

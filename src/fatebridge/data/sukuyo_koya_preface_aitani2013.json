@@ -6,7 +6,6 @@
   "modern_publication_date": "2013-03",
   "publisher": "二松学舎大学 日本漢文教育研究推進室",
   "isbn": "4-903353-33-8",
-  "pdf_sha256": "8d426364ae8198c8d992a90086d10d90bb9379c1d255c4b722e6a567e6b0b6f6",
   "pdf_bytes": 7852267,
   "entry_number": "095",
   "printed_pages": [
@@ -19,12 +18,10 @@
   ],
   "selected_page_images": [
     {
-      "pdf_page": 83,
-      "sha256": "789e4500254ca609cbeb6d63b2e553da7ce5307b86ea6ae3bad5340c03585890"
+      "pdf_page": 83
     },
     {
-      "pdf_page": 84,
-      "sha256": "c3d97ff037615b38553dc1c00c4711a1bad4c1b139c02ebdc51138bcca881b93"
+      "pdf_page": 84
     }
   ],
   "catalogue_witness": {
@@ -41,11 +38,6 @@
   },
   "arc_companion_identity": {
     "record": "arcBK01-0086-01",
-    "preface_images_sha256": {
-      "5": "2b469c1eedae354ddd5c2322848e08bb25c700d3b32106de65dcf3640450ebd9",
-      "6": "c5a57cbed3698b126fc74a20fc89add358e392e16be0ce04b0d9c9428124f65a",
-      "7": "23926dfc8e03ec4e833bf832da7b7b205289027841efb174bd6ccfd234d80cea"
-    },
     "signature": "享保二十一年仲春日沙門覺勝"
   },
   "preface_selected": {
@@ -92,7 +84,6 @@
   },
   "weekday_name_evidence": {
     "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/T1299_%2C21%2C0398a27%3A1299_%2C21%2C0398c07.html",
-    "html_sha256": "d80df072ab0918002624863b40b298514ace0ed416085b0bafa920a61524a108",
     "locator": "T1299_.21.0398b03-05",
     "main_literals": [
       "密日持齋",
@@ -168,7 +159,6 @@
     "frame_one_based": 28,
     "printed_leaf": "二十七",
     "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-02/portal/27/",
-    "image_sha256": "e0c54a9bfe4cf9eb888215bb9ba2403e9c87c800287ab6d6ba70bcc1b609a8c6",
     "body_third_date_literal": "又大同三年二月七日又是蜜日也",
     "body_day_ganzhi": null,
     "marginal_selected_literal": "二月當作正月……大同三年正月七日己丑……二月七日己未火曜直而非蜜日也",
@@ -210,10 +200,6 @@
     "body_and_margin_not_merged": true,
     "same_physical_witness_newly_selected_not_new_independent_observation": true,
     "independent_human_collation_accepted": false,
-    "model_readings_sha256": {
-      "generator-arc-supplement-reading.json": "7159f326f59b5fcd5b4cc259414cf5c8e417988cef7c42a375415b3b58454101",
-      "reviewer-arc-supplement-reading.json": "165d59552470424492ab0fc2c7f59d14187dc136207d816e3c081dd861c56952"
-    },
     "dated_claims": [
       {
         "claim_role": "校按拟正月七日",

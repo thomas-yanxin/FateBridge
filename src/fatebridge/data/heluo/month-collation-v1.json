@@ -2,7 +2,6 @@
   "corpus_id": "heluo_wenming_month_intro_collation_v1",
   "version": "2.2.0",
   "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
-  "source_pdf_sha256": "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c",
   "review_status": "single_visual_review; independent_second_review_pending",
   "reviewed_hexagram_introductions": 64,
   "scope": "Assigned-month labels and selected additional month clauses in hexagram introductions; not complete commentary, deTime or deTi collation. Thirteen registered natal-month/Najia phrases expose separate month-label and current-phase birth-year Najia facts. Connector scope and the Jie exception remain unresolved; a false component is not a whole-clause verdict.",

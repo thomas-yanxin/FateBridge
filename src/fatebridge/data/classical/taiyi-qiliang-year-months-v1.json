@@ -6,14 +6,11 @@
     "edition": "商務印書館1940",
     "holding_institution": "國立臺灣大學圖書館",
     "url": "https://commons.wikimedia.org/wiki/File:NTUL-9900013521F02_兩千年中西曆對照表.pdf",
-    "pdf_sha256": "6ae47386aa8fa645da9e7540b81170ba95fc09407cef3194c33818dcd8ca9e1d",
     "pdf_bytes": 99925249,
     "pdf_page": 7,
     "printed_page": 101,
     "western_calendar": "julian",
-    "reading_file": "tests/fixtures/taiyi_jinjing_v35/historical-months-initial.json",
-    "reading_sha256": "6d080a4010d9ce6ebff2bbd7790572ad0973787a119246a262e8bb77ec4f5acc",
-    "reading_freeze_sha256": "e24226d89c43f82c39d8b57ff6f9264ef449bfcf2c9f88828533d1704e36aa2e"
+    "reading_file": "tests/fixtures/taiyi_jinjing_v35/historical-months-initial.json"
   },
   "supported_years": [
     501,

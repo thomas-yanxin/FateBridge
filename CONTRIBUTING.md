@@ -6,7 +6,7 @@
 
 阅读导航：[开始贡献](#开始贡献) · [报告问题](#报告问题) · [修改约束](#修改约束) · [验证](#提交前验证) · [提交 PR](#提交与-pull-request) · [同步 Fork](#保持-fork-同步)
 
-贡献的典型闭环为：**安装（`uv sync --locked --extra dev`）→ 复现（最小虚构请求 + `doctor`）→ 修改 → 验证（领域测试与静态检查）→ 贡献（提交与 PR）**。
+贡献的典型闭环为：**安装（`uv sync --extra dev`）→ 复现（最小虚构请求 + `doctor`）→ 修改 → 验证（领域测试与静态检查）→ 贡献（提交与 PR）**。
 
 ## 开始贡献
 
@@ -20,17 +20,17 @@ cd FateBridge
 git remote add upstream https://github.com/thomas-yanxin/FateBridge.git
 git fetch upstream
 git switch -c feat/your-change upstream/master
-uv sync --locked --extra dev
-uv run --locked --extra dev fatebridge doctor
+uv sync --extra dev
+uv run --extra dev fatebridge doctor
 ```
 
-包管理统一使用 uv；依赖变更使用 `uv add`／`uv remove`，同时提交 `pyproject.toml` 和 `uv.lock`。开发工具依赖使用 `uv add --optional dev <package>`。Windows 环境命令见 [快速入门](docs/getting-started.md)。PR 目标分支为 `master`。仓库使用 `src` 布局，后续命令通过 `uv run --locked --extra dev` 运行，以确保使用刚安装的包和开发工具。
+包管理统一使用 uv；依赖变更使用 `uv add`／`uv remove` 更新 `pyproject.toml`。开发工具依赖使用 `uv add --optional dev <package>`。Windows 环境命令见 [快速入门](docs/getting-started.md)。PR 目标分支为 `master`。仓库使用 `src` 布局，后续命令通过 `uv run --extra dev` 运行，以确保使用刚安装的包和开发工具。
 
 ## 报告问题
 
 一个可复现的报告能更快区分环境问题、输入校验和算法偏差。请附上：
 
-- 实际版本或提交、操作系统、Python 与相关依赖版本；可运行 `uv run --locked --extra dev fatebridge doctor` 收集环境诊断。
+- 实际版本或提交、操作系统、Python 与相关依赖版本；可运行 `uv run --extra dev fatebridge doctor` 收集环境诊断。
 - 最小请求或完整 CLI 命令，以及预期结果和实际结果。
 - 涉及时间或精度时，注明时区、坐标、太阳时策略、分析日期及返回的星历模型。
 - 若有独立参考，给出其版本、来源与比较口径。
@@ -48,12 +48,12 @@ uv run --locked --extra dev fatebridge doctor
 按[开发指南的检查表](docs/development-guide.md#常用开发命令)选择与改动相关的领域、合同和静态检查。自包含云端检查可在本地运行：
 
 ```bash
-uv run --locked --extra dev python scripts/run_ci_checks.py
+uv run --extra dev python scripts/run_ci_checks.py
 ```
 
 它只执行脚本明列的集合；完整本地回归还需要对应外部数据。共享计算或合同改动须核对 REST、MCP 与 CLI，具体命令与 CI 范围统一维护在开发指南。
 
-纯文档变更运行 `uv run --locked --extra dev python scripts/check_docs.py` 与[文档合同和示例检查](docs/development-guide.md#文档维护与验证)；修改生成源后重新生成并检查派生文件。报告实际测试结果与跳过项，不将本地通过写成 CI 已通过。
+纯文档变更运行 `uv run --extra dev python scripts/check_docs.py` 与[文档合同和示例检查](docs/development-guide.md#文档维护与验证)；修改生成源后重新生成并检查派生文件。报告实际测试结果与跳过项，不将本地通过写成 CI 已通过。
 
 版本与数据打包变更还需检查 `pyproject.toml`、版本常量、CHANGELOG 和 wheel 的数据文件；发布流程见 [开发指南](docs/development-guide.md#构建与发布)。
 

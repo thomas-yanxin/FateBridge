@@ -42,7 +42,6 @@
               "title": "任注滴天髓闡微·命例比较",
               "edition": "李雨田校訂，上海大東書局，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
               "source_pdf_pages": [
                 100,
                 106,
@@ -80,7 +79,6 @@
               "title": "初學捷徑·遁月遁時（收入任注滴天髓闡微）",
               "edition": "李雨田校訂，上海大東書局，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
               "source_pdf_pages": [
                 32,
                 34,
@@ -92,8 +90,6 @@
           ],
           "implementation_refs": [],
           "source_contrast_binding": {
-            "source_analysis_sha256": "5ddf81f171ea071be15ca21c394e7d61c8698039d72dd03c3aeeafbc95266a94",
-            "source_bindings_sha256": "5f695cc03340c70a7f1c4d40240bb6fe446fd73a4f54a7bad281cd75ea8dc8ce",
             "all15_printed_pairs": [
               {
                 "before_case_id": "MAIN-C039",
@@ -2901,13 +2897,11 @@
                 ]
               }
             ],
-            "correspondence_reference_sha256": "cbe719be20aac9fd366169696cb9e5f3cb42464ef41b3e5751c97ede2836f273",
             "all_original_questions_retained": {
               "original22": [
                 {
                   "source_kind": "page",
                   "original_document": "review-batch-0001-pages0001-0004.json",
-                  "original_document_sha256": "594b82ffd176353f808b3e366ce388397b682c7f7a5796bfa8655dda4412afbd",
                   "pdf_page": 1,
                   "warning_index": 0,
                   "item": "题签末字及印章不作作者身份断言；不影响本页无四柱命例的观察。",
@@ -2916,7 +2910,6 @@
                 {
                   "source_kind": "page",
                   "original_document": "review-batch-0005-pages0041-0056.json",
-                  "original_document_sha256": "d419cde99081c6b9fe6634425b5af9088dc29b5b38678535861b10ba5f4f253b",
                   "pdf_page": 53,
                   "warning_index": 0,
                   "item": "史姓例首干字形待独立核对。",
@@ -2925,7 +2918,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 1,
                   "warning_index": 0,
                   "item": "Page1signaturelastglyph",
@@ -2934,7 +2926,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 5,
                   "warning_index": 1,
                   "item": "Page5twoincompletesourcecasesandquotedcomparison",
@@ -2943,7 +2934,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": null,
                   "warning_index": 3,
                   "item": "Laterfullbookqualificationsofintroductoryrelations",
@@ -2952,7 +2942,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": null,
                   "warning_index": 5,
                   "item": "Clockexampleslackuniqueyearcycleandmodernclockbasis",
@@ -2961,7 +2950,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": null,
                   "warning_index": 6,
                   "item": "Nightzianddayuntextprofileshavenotbeenadoptedorcompared",
@@ -2970,7 +2958,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 53,
                   "warning_index": 7,
                   "item": "Page53Shicasefirststemglyph",
@@ -2979,7 +2966,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": null,
                   "warning_index": 8,
                   "item": "Sourcefourlevelvocabularyandmechanismsnotadjudicatedasengineeringthreegrades",
@@ -2988,7 +2974,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": null,
                   "warning_index": 9,
                   "item": "VoiceSpecific旺強衰弱MappingBeforeNewCensusComparison",
@@ -2997,7 +2982,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 26,
                   "warning_index": 10,
                   "item": "Page26later_wangshuai_section_located_and_table_crossbound_but_no_new_calculation_or_independent_certification",
@@ -3006,7 +2990,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 210,
                   "warning_index": 11,
                   "item": "Page210printed_self_case_calendar_caption_identity_not_resolved",
@@ -3015,7 +2998,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": null,
                   "warning_index": 12,
                   "item": "Pages234-235只换辛原话与图版两干差异并存",
@@ -3024,7 +3006,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 238,
                   "warning_index": 13,
                   "item": "Page238财字疑印字之误保留作者与校注两层",
@@ -3033,7 +3014,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": null,
                   "warning_index": 14,
                   "item": "MAIN-C210初始虚弱随后甲丙印化最终唯一档未认证",
@@ -3042,7 +3022,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 280,
                   "warning_index": 15,
                   "item": "Page280原文癸水之财与十神名不按公式改写",
@@ -3051,7 +3030,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 293,
                   "warning_index": 16,
                   "item": "Page293相火有焰不作旺论源词三档映射待核",
@@ -3060,7 +3038,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 299,
                   "warning_index": 17,
                   "item": "Page299辛巳月图与立夏前五日原文并存，月界定位待核不静默改字",
@@ -3069,7 +3046,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 372,
                   "warning_index": 18,
                   "item": "Page372甲丙联合强旺极与唯一日主强档映射未认证",
@@ -3078,7 +3054,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 379,
                   "warning_index": 19,
                   "item": "Page379只换一卯字原话与图版时柱甲辰到癸卯两字不同并存",
@@ -3087,7 +3062,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 403,
                   "warning_index": 20,
                   "item": "Page403只换一戌字与图版年干月干月支三字差异并存",
@@ -3096,7 +3070,6 @@
                 {
                   "source_kind": "full_page_progress",
                   "original_document": "progress-thirtyseventh.json",
-                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
                   "pdf_page": 441,
                   "warning_index": 21,
                   "item": "Page441衰极从衰源词保留而未自动映射弱",

@@ -4,20 +4,20 @@
 
 ## 运行测试
 
-在仓库根目录使用锁定开发环境执行：
+在仓库根目录使用开发环境执行：
 
 ```bash
-uv sync --locked --extra dev
-uv run --locked --extra dev python -m pytest -q tests/bazi
-uv run --locked --extra dev python -m pytest -q tests/integration/test_full_surface_validation.py
-uv run --locked --extra dev python scripts/run_ci_checks.py
+uv sync --extra dev
+uv run --extra dev python -m pytest -q tests/bazi
+uv run --extra dev python -m pytest -q tests/integration/test_full_surface_validation.py
+uv run --extra dev python scripts/run_ci_checks.py
 ```
 
 完整本地收集与执行：
 
 ```bash
-uv run --locked --extra dev python -m pytest --collect-only -q
-uv run --locked --extra dev python -m pytest -q
+uv run --extra dev python -m pytest --collect-only -q
+uv run --extra dev python -m pytest -q
 ```
 
 `scripts/run_ci_checks.py` 仅运行自包含 CI 集合；完整本地运行会额外执行标记为 `local_data` 的用例，需按[星历安装说明](../docs/ephemeris.md)提前准备对应外部数据。

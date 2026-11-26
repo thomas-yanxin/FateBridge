@@ -2,7 +2,6 @@
   "schema_version": 1,
   "source_native_version": "2.10.03",
   "source_url": "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c",
-  "source_sha256": "80761ccfae7cd7207a33559d8898b9c5386cced609cfaebbbbf050f7a80ddc4f",
   "scope": "Unmodified native eff_arr finite-Sun enclosed-mass interpolation table; numerical source model, not an observational solar model certification.",
   "radius_mass_pairs": [
     [

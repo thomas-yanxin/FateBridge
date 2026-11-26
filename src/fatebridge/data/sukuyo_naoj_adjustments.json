@@ -2,13 +2,11 @@
   "id": "naoj_published_calendar_adjustment_facts_v1",
   "source": {
     "url": "https://eco.mtk.nao.ac.jp/koyomi/wiki/C2C0B1A2C2C0CDDBCEF12FC6FCCBDCA4CECEF1C6FCA5C7A1BCA5BFA5D9A1BCA5B9.html",
-    "sha256": "11ec8b833c5fca68c5c62c56762ae6e48020ed1cc3ecde6af6eeceefdf60bae7",
     "encoding": "euc_jp",
     "scope": "Same full official provider page already frozen for lineage; newly normalize all its tables, not new historical observations or independently acquired original古籍."
   },
   "date_convention_source": {
     "url": "https://eco.mtk.nao.ac.jp/cgi-bin/koyomi/caldb.cgi",
-    "sha256": "2212b1b813143c24d9f3240a1ba2bee440b3c9f31ad1d93900f0c665bf7b03a3",
     "encoding": "euc_jp",
     "declared": "Default Gregorian from1582-10-15 inclusive, Julian before; source correction table dates interpreted using this declared provider convention, not silently taken as proleptic Gregorian.",
     "table_date_convention_is_directly_stated_in_table": false

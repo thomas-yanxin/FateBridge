@@ -3,9 +3,7 @@
   "model_id": "iers2010_printed_tables_20120810_tt_ut1_v1",
   "source_documents": {
     "chapter5": "https://iers-conventions.obspm.fr/content/chapter5/icc5.pdf",
-    "chapter8": "https://iers-conventions.obspm.fr/content/chapter8/icc8.pdf",
-    "chapter5_sha256": "9ec6fac43f7037ff43896539d759333fc7e6007176cd72043b38d71cfd3e69c0",
-    "chapter8_sha256": "8314a59c3f89536bcd081afe57ab49efaf9ebf1191d23109fa65b15cb4d56669"
+    "chapter8": "https://iers-conventions.obspm.fr/content/chapter8/icc8.pdf"
   },
   "fundamental_arcseconds": [
     [

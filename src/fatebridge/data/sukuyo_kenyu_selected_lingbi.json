@@ -4,12 +4,10 @@
   "source_url": "https://doi.org/10.20730/100159236",
   "holder": "名古屋大学附属図書館148.8-Ke",
   "credit": "名古屋大学附属図書館 国文学研究資料館",
-  "manifest_sha256": "fbd4602119d733ed58b01e6206abba8fc271bd01262da6dfe672a3d9c19aca65",
   "source_image": {
     "frame": 8,
     "canvas": "https://kokusho.nijl.ac.jp/biblio/100159236/canvas/8",
-    "url": "https://kokusho.nijl.ac.jp/api/iiif/100159236/v4/0007/0007-004002/0007-004002-0007.tif/full/full/0/default.jpg",
-    "sha256": "4b775fce10cd378f6b880a68aa2dc611c426bc428565b33a36aea2327c1cf544"
+    "url": "https://kokusho.nijl.ac.jp/api/iiif/100159236/v4/0007/0007-004002/0007-004002-0007.tif/full/full/0/default.jpg"
   },
   "printed_rows": [
     {
@@ -252,7 +250,6 @@
   },
   "appendix": {
     "frame": 7,
-    "sha256": "7e58b815da4ed405ca1a89eea7c60c44af5d84db315efc2aa20b13a84476a8f2",
     "layer_marker_literal": "宿曜經撮要序文之次入紙",
     "context_literal": "陵逼之間",
     "urgent_condition_literal": "若有急事欲作之者",
@@ -320,23 +317,19 @@
   },
   "comparison_t1299": {
     "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/master/T/T21/T21n1299.xml",
-    "captured_tei_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
     "locator": "T21n1299_p0398a18-26",
     "requirement_literal": "如此當須問知司天者，乃知此年此月熒惑、鎮歲、辰星、太白及日月等在何宿。",
     "meaning": "T1299此段要求知实际天体所在宿；后出月朔曜表不是相同计算，未用现代宿名或任意角距判定陵犯守逼。"
   },
   "model_reading_receipts": [
     {
-      "file": "generator-primary-current-1.json",
-      "sha256": "88ac28e944386e6b3a9e6d820eca114ea95e7519c2d0ac6ec07ce2e97d28edb4"
+      "file": "generator-primary-current-1.json"
     },
     {
-      "file": "reviewer-primary-current-1.json",
-      "sha256": "28257df33918aeddc8a29fe36f90ed18248d25d9630b6a9686273b488c3887b6"
+      "file": "reviewer-primary-current-1.json"
     },
     {
-      "file": "reviewer-primary-current-2.json",
-      "sha256": "87bc63bb554dde7d18ed48eea87eb27201a64fa0149f25b79843f41f4d023974"
+      "file": "reviewer-primary-current-2.json"
     }
   ],
   "reading_status": "two_existing_model_roles_agree_on_23_literal_table_rows_not_human_independent_collation",

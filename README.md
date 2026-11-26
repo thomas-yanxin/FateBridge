@@ -55,15 +55,15 @@ fatebridge doctor
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
-uv sync --locked --extra dev
-uv run --locked --extra dev fatebridge doctor
+uv sync --extra dev
+uv run --extra dev fatebridge doctor
 ```
 
 本文对应当前开发分支。已发布包查阅[对应标签](https://github.com/thomas-yanxin/FateBridge/tags)的文档，未发布变化见 [CHANGELOG](CHANGELOG.md#unreleased)。Python wheel 包含计算代码和规则数据，方法范围与结果读取见[方法参考](docs/interpretation/README.md)。
 
 ### 完成第一次计算
 
-下列命令使用虚构资料，在 macOS / Linux 终端执行，无需启动服务。源码用户在 `fatebridge` 前加 `uv run --locked --extra dev`；[Windows 写法](docs/mcp-deployment.md#windows-powershell)另见部署指南。
+下列命令使用虚构资料，在 macOS / Linux 终端执行，无需启动服务。源码用户在 `fatebridge` 前加 `uv run --extra dev`；[Windows 写法](docs/mcp-deployment.md#windows-powershell)另见部署指南。
 
 ```bash
 fatebridge bazi_birth_chart \
@@ -103,13 +103,13 @@ REST 本机启动命令为 `API_HOST=127.0.0.1 fatebridge-api`。默认端口 `8
 
 ## 开发与贡献
 
-源码使用 Python `src` 布局。FastAPI、FastMCP 与 CLI 通过中央 `ToolSpec` 目录调用共享执行层和领域服务；分层与数据流见[架构说明](docs/architecture.md)。依赖声明在 [pyproject.toml](pyproject.toml)，开发解析版本由 [uv.lock](uv.lock) 固定。
+源码使用 Python `src` 布局。FastAPI、FastMCP 与 CLI 通过中央 `ToolSpec` 目录调用共享执行层和领域服务；分层与数据流见[架构说明](docs/architecture.md)。依赖声明在 [pyproject.toml](pyproject.toml)。
 
 文档、算法、接口和测试均欢迎贡献。先按[贡献指南](CONTRIBUTING.md)准备改动，再按[开发指南](docs/development-guide.md)选择检查。文档写作要求见[维护指南](docs/development-guide.md#文档写作)。纯文档改动的起始检查：
 
 ```bash
-uv run --locked --extra dev python scripts/check_docs.py
-uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
+uv run --extra dev python scripts/check_docs.py
+uv run --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
 ```
 
 接口与生成合同的同步要求见[文档维护与验证](docs/development-guide.md#文档维护与验证)。报告问题请附版本、虚构的最小复现和实际错误；安全问题按 [SECURITY.md](SECURITY.md) 私下报告。

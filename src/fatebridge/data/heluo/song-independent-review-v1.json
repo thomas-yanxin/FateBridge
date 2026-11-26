@@ -1,15 +1,10 @@
 {
   "review_id": "heluo_song_five_independent_v1",
   "version": "1.0.0",
-  "source_pdf_sha256": "4a04e1e32a42719f001b56936e3c7561b5f68563ae54f0a23ed004af146cfcd7",
   "source_pdf_pages": [
     11,
     12
   ],
-  "first_transcription_sha256": "4b0c4579bc82ad3898dbfcf905f91c01e021d939b0b862d801f97891d196c34b",
-  "first_freeze_sha256": "6dc3b2c4db2069f58e5196fab1dcb1394aeeae420b39c92b82e80296574f86a7",
-  "comparison_sha256": "ef8108cc8e9dc50351e1df22fcc165d2960effc99e620c8e07e422c1e2e1063c",
-  "comparison_freeze_sha256": "0c1c7126b920a626c104cfbde2c83252ea9e005bf3c307f3f467eb10f3bb1710",
   "review_stage": "post_R82_adoption_same_model_reader; first_transcription_frozen_before_candidate_exposure; comparison_completed_with_unresolved_glyphs",
   "scope_note": "只复核五首116字及20个印刷句点；同一模型代理，非外部专家、异版本或全书认证。R82当时独立复核未完成的历史不改写。初、二全文一致仍非文字准确率分数；七处候选包括四处尚未裁决的首稿分歧。",
   "reviewed_poems": 5,

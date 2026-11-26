@@ -19,8 +19,8 @@
 源码环境在仓库根目录执行以下命令；独立工具安装可直接运行 `fatebridge doctor`。诊断只检查当前安装，不修改 host 设置。
 
 ```bash
-uv run --locked --extra dev python -c "import sys, fatebridge; print(sys.executable); print(fatebridge.__version__, fatebridge.__file__)"
-uv run --locked --extra dev fatebridge doctor
+uv run --extra dev python -c "import sys, fatebridge; print(sys.executable); print(fatebridge.__version__, fatebridge.__file__)"
+uv run --extra dev fatebridge doctor
 ```
 
 若问题只出现在 MCP host，再用相同环境运行 `fatebridge doctor --mcp --family bazi`，将分类替换为实际范围。REST 问题还应检查实际端口的 `/health` 与 `/ready`。
@@ -33,19 +33,18 @@ uv run --locked --extra dev fatebridge doctor
 
 ```bash
 cd /path/to/FateBridge
-uv sync --locked --extra dev
-uv run --locked --extra dev python -c "import sys, fatebridge; print(sys.executable); print(fatebridge.__version__, fatebridge.__file__)"
+uv sync --extra dev
+uv run --extra dev python -c "import sys, fatebridge; print(sys.executable); print(fatebridge.__version__, fatebridge.__file__)"
 ```
 
 `fatebridge.__file__` 应指向当前 checkout 的 `src/fatebridge/`。若仍来自其他安装，确认启动器和 host 使用的是本次 `.venv` 中的解释器。
 
 ### 安装失败或异步测试不能执行
 
-确认满足 Python 3.10+（CI 覆盖 3.10–3.13），并检查锁文件与开发环境同步：
+确认满足 Python 3.10+（CI 覆盖 3.10–3.13），并重新同步开发环境：
 
 ```bash
-uv lock --check
-uv sync --locked --extra dev
+uv sync --extra dev
 ```
 
 `async def functions are not natively supported` 说明当前测试解释器缺少 `pytest-asyncio`，需使用 `--extra dev` 环境。缺少 `swisseph` 是 Python 依赖问题，缺 `.se1` 则是星历数据文件未配置。

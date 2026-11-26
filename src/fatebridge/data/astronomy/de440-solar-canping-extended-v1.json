@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "source": {
     "kernel_filename": "de440.bsp",
-    "kernel_sha256": "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5",
     "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440.bsp",
     "publication_url": "https://ssd.jpl.nasa.gov/doc/de440_de441.html",
     "format_url": "https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/spk.html",
@@ -11,7 +10,6 @@
   },
   "storage": "shared_original_type2_record_atlas_v1",
   "file": "de440-solar-record-atlas-v1.bin.gz",
-  "uncompressed_sha256": "de6e16d62b8bdf293261d88bf47dec2bf4bb548ee1bd5424d8adc8f5c8dffac5",
   "uncompressed_bytes": 5391968,
   "selected_tdb_years_with_padding": [
     2300,
@@ -41,7 +39,6 @@
       "record_count": 2809,
       "offset_bytes": 4627096,
       "bytes": 921352,
-      "sha256": "5ea0acd945c44d9e399e885a365c2a76b2376a8efb4ae196ca63e5fece89765a",
       "original_first_record_index": 17120,
       "original_record_count": 25112,
       "original_segment_start_word": 3021513,
@@ -58,7 +55,6 @@
       "record_count": 11232,
       "offset_bytes": 28793968,
       "bytes": 3684096,
-      "sha256": "953ad728db114f7c5c1ec9a44e7f1475b0274b11ef7c9cedec8ce66be50efc0c",
       "original_first_record_index": 68483,
       "original_record_count": 100448,
       "original_segment_start_word": 10856493,
@@ -75,15 +71,12 @@
       "record_count": 2809,
       "offset_bytes": 9498408,
       "bytes": 786520,
-      "sha256": "ec0fc38011e6055bfc59d02b7d25fe960b245fdcf818449bc72d259429515b64",
       "original_first_record_index": 17120,
       "original_record_count": 25112,
       "original_segment_start_word": 5859197,
       "original_start_byte": 51667168
     }
   ],
-  "tdb_coefficient_sha256": "a092d8bd128309277135097c6cd29f2aed2e7abe03d51f9522890d97f49a7c25",
-  "selection_protocol_sha256": "aa6154f8a5190797e121f818257d96503fce2f79ce204da83f13f1559070825a",
   "coefficients_resampled_rounded_fitted_or_degree_reduced": false,
   "reference_event_table_used": false,
   "source_endorsement_or_full_accuracy_certified": false,
@@ -94,6 +87,5 @@
     "modifications": "Body/time selection and storage; selected original coefficient bytes retained",
     "original_kernel_comments_are_source_archive_only": true,
     "redistribution_rules_url": "https://naif.jpl.nasa.gov/naif/rules.html"
-  },
-  "compressed_sha256": "1f2e21ee0601bf4abaa557b21196d51fb01442a3293bc5b680da140d2f75610b"
+  }
 }

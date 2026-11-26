@@ -2,7 +2,6 @@
   "id": "sukuyo_direct_fortnight_sources_v69",
   "actual_sources": {
     "T51n2087.xml": {
-      "sha256": "ac50f33584ac90ecb9fd61a1fbfa1f8a802464103b4eb6a26d20ff6f9d578763",
       "bytes": 2599669,
       "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T51/T51n2087.xml",
       "edition_header_authors": [
@@ -10,7 +9,6 @@
       ]
     },
     "T41n1821.xml": {
-      "sha256": "397d2bd4c31fdbd1a69181b613e0b43c13bb71cf63a913ba94e7bcd84b836069",
       "bytes": 6447506,
       "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T41/T41n1821.xml",
       "edition_header_authors": [
@@ -18,7 +16,6 @@
       ]
     },
     "T41n1822.xml": {
-      "sha256": "eee95b9d6970c953060ca208f859549e6354a9a363621d4a630d787fd297656e",
       "bytes": 7579060,
       "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T41/T41n1822.xml",
       "edition_header_authors": [
@@ -26,7 +23,6 @@
       ]
     },
     "T32n1644.xml": {
-      "sha256": "ba452e0d2a9dc4499c8bed61fd5aa5d7abe5c10e03bd62104b9e340a0120b92f",
       "bytes": 797348,
       "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T32/T32n1644.xml",
       "edition_header_authors": [
@@ -34,7 +30,6 @@
       ]
     },
     "T2251-selected.html": {
-      "sha256": "a4942f4c90235061460e5fe7f35d357b29b5af81bc2d04991ce1862e925f7718",
       "bytes": 509407,
       "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?key=%E5%96%84&mode=detail&useid=2251_%2C64%2C0172",
       "edition_header_authors": null,
@@ -42,7 +37,6 @@
       "request_page_is_not_quote_locator": true
     },
     "T13n0397.xml": {
-      "sha256": "64d0dbf21d28e11d76488a2bf7ff0f651883f1f7d5d76392616b97da5d38ce17",
       "bytes": 6969939,
       "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T13/T13n0397.xml",
       "edition_header_authors": [
@@ -50,7 +44,6 @@
       ]
     },
     "T21n1299.xml": {
-      "sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
       "bytes": 387099,
       "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1299.xml",
       "edition_header_authors": [
@@ -488,15 +481,11 @@
   },
   "T1644_T2251_explicit_correction_context": {
     "at": "2026-10-24T23:46:13.444063+00:00",
-    "prior_R1_sha256": "54d276f379e36b30f1ab0b0ed14ddc5cccd214a971a1ca6169c85dafb83cf42a",
-    "same_actual_SAT_capture_sha256": "a4942f4c90235061460e5fe7f35d357b29b5af81bc2d04991ce1862e925f7718",
-    "same_actual_T1644_sha256": "ba452e0d2a9dc4499c8bed61fd5aa5d7abe5c10e03bd62104b9e340a0120b92f",
     "R2_actual_selected_SAT_rows": [
       {
         "observed_locator": "0183c15",
         "main_literal": "九日。是時日最長十八牟休多。夜最短十二",
         "small_type_notes": [],
-        "fragment_sha256": "e4ab47b6fa627b6d0907cabcf621814282a4f388863856e87c7516ca81232b77",
         "literal_with_notes": "九日。是時日最長十八牟休多。夜最短十二"
       },
       {
@@ -505,7 +494,6 @@
         "small_type_notes": [
           "此方夏至當此方六月九日"
         ],
-        "fragment_sha256": "fa713ad952e00e48c4abee7f1e583ce08c8e063d172c16d45847f24d5d527c9f",
         "literal_with_notes": "牟休多此方夏至當此方六月九日至九月九日日夜平等"
       },
       {
@@ -515,7 +503,6 @@
           "秋分中當此九月九日",
           "傍本作一誤也"
         ],
-        "fragment_sha256": "7c66cad18f90668fbfdd612a3c40c20f8046ba62e9f78df70d77455ca8d70910",
         "literal_with_notes": "各十五牟休多秋分中當此九月九日十二傍本作一誤也月九日"
       },
       {
@@ -524,7 +511,6 @@
         "small_type_notes": [
           "此冬至當此十二月九日"
         ],
-        "fragment_sha256": "dfa798eeb951eef04309305618b49b8f4b097cc8505e7315ac3a915a2187dfa9",
         "literal_with_notes": "是夜最長十八日。最短十二此冬至當此十二月九日三月"
       },
       {
@@ -533,14 +519,12 @@
         "small_type_notes": [
           "已上"
         ],
-        "fragment_sha256": "5071ff0f75d38f93af9572fda549d70e3f160c4d816880dfbc284ee261275b61",
         "literal_with_notes": "九日日夜平等各十五牟休多已上是等於月"
       },
       {
         "observed_locator": "0183c20",
         "main_literal": "不同。於日亦有十五日八日九日不同。方",
         "small_type_notes": [],
-        "fragment_sha256": "dabfff90145c832c68198d543ab5b6486f1a013232bbbeddc6d6c84fbf4e6503",
         "literal_with_notes": "不同。於日亦有十五日八日九日不同。方"
       }
     ],
@@ -559,8 +543,6 @@
     "independent_historical_observations": 0,
     "scope": "Additional actual collation found before production. R1 complete source paragraphs and ledger remain byte-identical, including十一. R2 separately preserves explicit quoted correction and small-type layer, not backfill or arithmetic smoothing. Source note authorship and actual cited exemplar not certified."
   },
-  "R1_sha256": "54d276f379e36b30f1ab0b0ed14ddc5cccd214a971a1ca6169c85dafb83cf42a",
-  "R2_sha256": "ddd04cd58afeccf2a1e7b017ef951272265167dcab3aad28df4f0dea84830bdf",
   "interpretation_scope": {
     "applied_to_current_calendar": false,
     "absolute_year_or_uniform_date_conversion_established": false,

@@ -6,7 +6,6 @@
       "catalog_id": "CNTS-00047981961",
       "catalog_url": "https://commons.wikimedia.org/wiki/File:CNTS-00047981961_2_六壬神課金口訣.pdf",
       "scan_url": "https://upload.wikimedia.org/wikipedia/commons/1/10/CNTS-00047981961_2_六壬神課金口訣.pdf",
-      "source_sha256": "ee80bf68c7f87570540c88f073814af7adcd142b22ae71f6679253f59387785b",
       "chronology": "本轮未鉴定版本先后"
     },
     {
@@ -15,7 +14,6 @@
       "catalog_id": "早稻田大学図書館 ロ14 02466",
       "catalog_url": "https://www.wul.waseda.ac.jp/kotenseki/html/ro14/ro14_02466/index.html",
       "scan_url": "https://archive.wul.waseda.ac.jp/kosho/ro14/ro14_02466/ro14_02466_0006/ro14_02466_0006.html",
-      "source_sha256": null,
       "chronology": "馆藏目录记写本、書写年不明；不得据此声称早于CNTS或独立传承"
     }
   ],

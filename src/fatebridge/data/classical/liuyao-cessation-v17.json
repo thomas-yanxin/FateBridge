@@ -3,7 +3,6 @@
   "ruleset_version": "17.0.1",
   "source": {
     "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
-    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
     "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
     "method": "Visual collation of same-edition PDF97-100 and127 before implementation; no borrowed fire completion."
   },
@@ -42,15 +41,11 @@
     {
       "artifact": "liuyao-cessation-v17.json",
       "clause_id": "earth-cessation-exception",
-      "original_profile_sha256": "d1025a918ffd1a7e44555a2c25dc1bc09fd838ca6364fdc28c5ba58e3d99b03e",
-      "published_before_sha256": "d1025a918ffd1a7e44555a2c25dc1bc09fd838ca6364fdc28c5ba58e3d99b03e",
       "old_quote": "土爻雖絕於巳必須休囚無氣又逢巳者謂之絕也若土爻旺相或得日月動爻生扶再遇巳者巳火反能生土論生不論絕也",
       "new_quote": "土爻雖絕於巳必須休囚無氣又逢巳者謂之絕也若土爻旺相或得日月動爻生扶再遇巳爻者巳火反能生土論生不論絕也",
       "new_ruleset_version": "17.0.1",
-      "source_sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
       "pdf_page": 98,
       "passage_id": "earth-si",
-      "source_image_sha256": "f995df987f4352717a4585318055f9c9bc20c928911dbfdbde6fa8a5652fe347",
       "revision": "43.0.0",
       "reason": "Verbatim quotation corrected against the same frozen edition; computations and stage tables unchanged"
     }

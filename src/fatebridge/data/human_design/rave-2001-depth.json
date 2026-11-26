@@ -5,7 +5,6 @@
     "publisher": "Jovian Archive Corporation",
     "edition_year": 2001,
     "url": "https://www.myhumandesign.be/downloads/Rave-I%27Ching.pdf",
-    "pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
     "scope": "64 gate identifiers, 192 angle-specific cross identifiers, 36 channel identifiers, 384 numeric line/planet-polarity assignments. No line readings or commentary bundled.",
     "extraction": "pdftotext -raw; source font glyphs mapped explicitly; ordered 6-to-1 line headings associated with printed p/s glyphs; 375 dual lines cross-checked against Ra's 1997 newsletter."
   },

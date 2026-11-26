@@ -4,7 +4,12 @@
     "ruleset_id": "desktop_bagua_btb_v1",
     "version": "1.1.0",
     "method": "desktop_bagua",
-    "source_ids": ["D1", "D2", "D3", "D4"],
+    "source_ids": [
+      "D1",
+      "D2",
+      "D3",
+      "D4"
+    ],
     "scope": "现代BTB作者的矩形桌面九格与事业/丰盛候选；坐者近侧桌沿定位，不是罗盘八宅或飞星落宫",
     "conventions": [
       "只覆盖作者明示的桌面分区与代表物，不按手机、饮料瓶或玩偶名称推断元素",
@@ -22,7 +27,6 @@
       "source_version": "2014-05-04 authored desktop grid; BTB seated-edge interpretation",
       "scope": "九格可用于桌面；明确远左丰盛、远右关系；桌面参考系不取罗盘北",
       "retrieved_at": "2026-10-14",
-      "retrieved_sha256": "7ddf8ce6630e6a7d4aaf93fbb94229391cf0dd4064b9577a7a9a3e76c4aecb3f",
       "retrieved_bytes": 353166
     },
     "D2": {
@@ -33,7 +37,6 @@
       "scope": "以坐者为基准，远左放盆栽、新鲜剪枝或鲜花作为事业丰盛象征；剪枝/鲜花定期换水并在萎蔫时更新；不采纳现实效力断语",
       "locator": "seated Wealth corner paragraph; potted plant or freshly cut branches/flowers and stem-care paragraph",
       "retrieved_at": "2026-11-17",
-      "retrieved_sha256": "97911a834c5c83ac62a4fae7c20f273217f5cffda1ec14031e33a5f04dc0200e",
       "retrieved_bytes": 347877
     },
     "D3": {
@@ -43,7 +46,6 @@
       "source_version": "2022-12-02; Black Sect author",
       "scope": "桌面近中事业区；深蓝黑深灰或水景图作为象征候选；不采纳财富效力、不建议带电桌面新增实际水装置",
       "retrieved_at": "2026-10-14",
-      "retrieved_sha256": "56d3744292b568784c8b6376631ecb184c5f7d3e2522d33035355370d6c5b72d",
       "retrieved_bytes": 207165
     },
     "D4": {
@@ -56,30 +58,56 @@
       "locator": "paragraph beginning with existing plants being healthy and well taken care of",
       "retrieved_at": "2026-11-17",
       "retrieved_format": "raw_html",
-      "retrieved_sha256": "6757dabb92b56307b56d6fac9a23872ea898ac7d9d9c8dafa19e8e17e1d5d24e",
       "retrieved_bytes": 346504
     }
   },
   "entries": [
     {
       "rule_id": "desktop_bagua_btb_v1.career_abundance_plant",
-      "goals": ["career", "abundance"],
+      "goals": [
+        "career",
+        "abundance"
+      ],
       "zone": "far_left",
       "zone_label": "坐着使用时的桌面左后九分之一区域",
-      "representations": ["living_plant", "fresh_flowers", "fresh_cut_branches"],
-      "source_ids": ["D1", "D2", "D4"],
+      "representations": [
+        "living_plant",
+        "fresh_flowers",
+        "fresh_cut_branches"
+      ],
+      "source_ids": [
+        "D1",
+        "D2",
+        "D4"
+      ],
       "reason": "该作者将桌面远左定义为丰盛区，并用盆栽、新鲜剪枝或鲜花表达事业的生长与丰盛",
-      "conditions": ["植物、鲜花或剪枝状态良好", "剪枝/鲜花定期换水并在萎蔫时更新", "保持实际入口视野，不遮挡屏幕", "目标区域能容纳物件"]
+      "conditions": [
+        "植物、鲜花或剪枝状态良好",
+        "剪枝/鲜花定期换水并在萎蔫时更新",
+        "保持实际入口视野，不遮挡屏幕",
+        "目标区域能容纳物件"
+      ]
     },
     {
       "rule_id": "desktop_bagua_btb_v1.career_water_symbol",
-      "goals": ["career"],
+      "goals": [
+        "career"
+      ],
       "zone": "near_center",
       "zone_label": "靠近坐者的桌面中间九分之一区域",
-      "representations": ["water_image", "dark_accessory"],
-      "source_ids": ["D3"],
+      "representations": [
+        "water_image",
+        "dark_accessory"
+      ],
+      "source_ids": [
+        "D3"
+      ],
       "reason": "该作者将桌面近中定义为事业区，以水景图或深蓝黑深灰表达水的象征",
-      "conditions": ["采用现有图案或用品优先，不要求购买", "不把饮料瓶自动当流水装置", "保留实际操作空间"]
+      "conditions": [
+        "采用现有图案或用品优先，不要求购买",
+        "不把饮料瓶自动当流水装置",
+        "保留实际操作空间"
+      ]
     }
   ]
 }

@@ -5,7 +5,6 @@
     "author": "竹迫忍",
     "publication": "数学史研究208号2011 pp1–40; actual author-hosted PDF2022/12/30 red revision",
     "url": "https://www.kotenmon.com/dld/papers/208.pdf",
-    "pdf_sha256": "565b983d6e5d61053ab2c0d34feda0c34417344bac66170cd52f93863311668a",
     "pdf_pages_inspected": [
       3,
       4,
@@ -27,19 +26,15 @@
     "reference_scope": "Third-party implementation based on named research, not an independent ancient calendar observation.",
     "license": "MIT",
     "code_path": "lib/when_exe/region/chinese/twins.rb and lib/when_exe/region/chinese.rb",
-    "source_tables_sha256": "45a88dbf9d13c9a953ba87af4fe5faad9cccc23b7fa4aaa9d5124be774a63963",
-    "source_algorithm_sha256": "b58999f5d6b9453e5884367bf452307918455c269c2b00c9af1890a43d1de657",
     "coefficients_basis": "Exact decimal strings of the fixed reference table, not newly certified every-glyph transcription of paper table2. Root visually inspected paper example, constants and solar/moon tables; any paper/reference coefficient differences remain a collation task.",
     "source_independent_historical_observation": false,
     "repository_url": "https://github.com/suchowan/when_exe",
     "author_literal": "Takashi SUGA",
     "author_attribution_source_url": "https://github.com/suchowan/when_exe/blob/26751a8cce76b989680586e4b8ab15abb0ef3ad8/when_exe.gemspec",
     "author_attribution_gemspec_literal": "  s.authors     = [\"Takashi SUGA\"]",
-    "author_attribution_source_sha256": "5951b152ea1bd6c7dd2b1bcb2a5fb20792b27cf1777bd7778fbbec110d97d3b1",
     "author_attribution_git_blob_sha1": "6872a172d911e75fb1c96a4b9c5540431464a177",
     "source_table_url": "https://github.com/suchowan/when_exe/blob/26751a8cce76b989680586e4b8ab15abb0ef3ad8/lib/when_exe/region/chinese/twins.rb",
     "source_algorithm_url": "https://github.com/suchowan/when_exe/blob/26751a8cce76b989680586e4b8ab15abb0ef3ad8/lib/when_exe/region/chinese.rb",
-    "license_sha256": "29f4de7606a10c5bcb9cdd41f60838e5f6308f0b9387cba92d56d4a83b13b1d7",
     "attribution_basis": "Actual pinned source gemspec authors literal and source-file copyright, not inferred from model id or independent personal-identity certification."
   },
   "constants": {
@@ -394,7 +389,6 @@
     "historical_day_boundary_or_leap_short_precedence_established": false,
     "applied_to_current_calendar_date_or_mansion": false
   },
-  "reference_all327_before_production_sha256": "27cd59eb079255e653bd504f38bb881338cfd7006878f60c9ed2c2a78ca7f4c5",
   "new_independent_historical_observations": 0,
   "real_samples": 0,
   "all_month_reference_scope": {
@@ -402,9 +396,7 @@
     "declared_lunar_year_end": 861,
     "reference_corpus_months": 1212,
     "printed_2022_selected_rows": 327,
-    "reference_before_production_sha256": "4aab058c7b474aaf2b8e9238939534708af524c2531d3f53d4b49935091e85bb",
     "reference_commit": "26751a8cce76b989680586e4b8ab15abb0ef3ad8",
-    "host_table_sha256_used_as_selector": "1d5c285d15339e264c85d87be7ec98aac8758354b6e27cb50a390c4a0735d440",
     "reference_role": "numerical_implementation_conformance_not_independent_historical_observations",
     "new_original_manuscript_images": 0,
     "every_glyph_primary_coefficients_collation_certified": false,

@@ -42,7 +42,7 @@ def ephemeris_files(tmp_path: Path) -> tuple[Path, Path]:
         if not (source / name).is_file():
             pytest.fail(
                 "This integration test requires separately acquired, pinned Swiss files: "
-                "uv run --locked --extra dev python -m fatebridge.fetch_ephe --years 1800 2500"
+                "uv run --extra dev python -m fatebridge.fetch_ephe --years 1800 2500"
             )
         else:
             pass

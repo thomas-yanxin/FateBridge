@@ -4,8 +4,7 @@
   "source": {
     "title": "Template:另",
     "revision": 5438530,
-    "url": "https://zh.wikisource.org/w/index.php?title=Template:%E5%8F%A6&oldid=5438530",
-    "wikitext_sha256": "ae0c04ee1274a24709cf9aed437b6ff745dbe30aea37b70ca8946bd4a0312abe"
+    "url": "https://zh.wikisource.org/w/index.php?title=Template:%E5%8F%A6&oldid=5438530"
   },
   "grammar": "Exact two positional arguments: {{另|main|alternative}}; no named parameters, nesting or other markup is resolved.",
   "display_policy": "Keep the source argument order and both complete readings: main〔一作「alternative」〕. Do not split an alternative containing Chinese enumeration punctuation.",

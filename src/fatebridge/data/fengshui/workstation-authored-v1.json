@@ -49,7 +49,6 @@
       },
       "locator": "正文普通家具、小物、仙人掌及显著结构段落",
       "retrieved_at": "2026-10-15",
-      "retrieved_sha256": "6e7bcae4274c7dbbd6f29345b877d73ea1f90e9b4754ea11a22f62a2c0ff49b6",
       "retrieved_bytes": 60422
     },
     "J2": {
@@ -63,7 +62,6 @@
       },
       "locator": "装饰象征、植物及位置方向讨论",
       "retrieved_at": "2026-10-15",
-      "retrieved_sha256": "fd64733cedf81a88dc27cede2161573c641c47c996f149cfeb919d38314317a8",
       "retrieved_bytes": 67026
     },
     "SEAN_CURE": {
@@ -78,7 +76,6 @@
       },
       "locator": "作者对物件化解的立场及说明",
       "retrieved_at": "2026-10-15",
-      "retrieved_sha256": "b883213b45004a92cd0f82242c250021d152497ecd3182227449a4dc3f41e5d3",
       "retrieved_bytes": 98815
     },
     "W1": {
@@ -92,7 +89,6 @@
       },
       "locator": "第1、5、7节；Flowers、Plants、Crystals、Lamps、Calculators and Computers",
       "retrieved_at": "2026-10-15",
-      "retrieved_sha256": "99ac6d76a5e586015a503875fcc5dc76c3879d24986ecb10f6e74a076aa97c18",
       "retrieved_bytes": 220062
     },
     "A1": {
@@ -106,7 +102,6 @@
       },
       "locator": "印刷／PDF第30–31页；第30页图示已查看",
       "retrieved_at": "2026-10-15",
-      "retrieved_sha256": "690b5698cc098bf42a0bb5375fba7b26d16db685c4ecd0702b2e5fad08383bae",
       "retrieved_bytes": 290185
     },
     "A2": {
@@ -120,7 +115,6 @@
       },
       "locator": "印刷12／23／28–29；PDF16／27／32–33；PDF32页面图像已查看",
       "retrieved_at": "2026-10-15",
-      "retrieved_sha256": "b4f59b1ac6aee3ecc049438df92f6a4820a6a9488546372f5f55965ae20eb44c",
       "retrieved_bytes": 191387
     },
     "A3": {
@@ -136,7 +130,6 @@
       },
       "locator": "印刷23、25；当前219页PDF40、42，均从1计；两个页面图像已查看",
       "retrieved_at": "2026-10-15",
-      "retrieved_sha256": "6ab5135060df281fd6a6e376e0516e660c185dd2af2f146a5f850df64cc3b024",
       "retrieved_bytes": 4418704
     },
     "K5": {

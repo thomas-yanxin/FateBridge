@@ -7,7 +7,6 @@
       "author_attribution": "杲寶撰; selected published commentary and nested quotations, not independently accepted originals of cited works",
       "format": "SAT_HTML",
       "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/T2216_,59,0054a01:2216_,59,0056a01.html",
-      "capture_sha256": "5c62eaa9078aef1b28e7e84e496296d327fe9ef569ff5590ead238a9888143f4",
       "capture_bytes": 47173,
       "selected_quotations": [
         {
@@ -30,7 +29,6 @@
       "source_header_author_literal": "唐 慧沼撰",
       "format": "CBETA_TEI",
       "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T39/T39n1788.xml",
-      "capture_sha256": "d9276b4990dc60047aee6fcddef129d6601d8b0563cda14ed7d0ac10bfd37c3d",
       "capture_bytes": 1624365,
       "selected_quotations": [
         {
@@ -47,7 +45,6 @@
       "source_header_author_literal": "唐 義淨譯",
       "format": "CBETA_TEI",
       "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T16/T16n0665.xml",
-      "capture_sha256": "9be6dbde0f8a04ea5206cfda4cd7a7c5abaeed162b6f38ce0e4b3ed2737e1a48",
       "capture_bytes": 956463,
       "selected_quotations": [
         {

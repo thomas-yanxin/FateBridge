@@ -65,7 +65,6 @@
       "kind": "author_published_book",
       "source_version": "publisher PDF, Chapter 3, printed pp.19-28; PDF pp.36-45 (one-based)",
       "retrieved_at": "2026-10-15",
-      "retrieved_sha256": "6ab5135060df281fd6a6e376e0516e660c185dd2af2f146a5f850df64cc3b024",
       "retrieved_bytes": 4418704,
       "retrieved_format": "raw_pdf",
       "verification_note": "2026-10-15 direct HTTP retrieved 4418704 bytes; SHA-256 unchanged; page locators verified",

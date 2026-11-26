@@ -2,7 +2,6 @@
   "method_id": "swiss_77term_full_Simon_nutation_v1",
   "source_url": "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swephlib.c",
   "source_table_url": "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swenut2000a.h",
-  "source_table_sha256": "83b0a2f569174b56c8e26971b00f85f5ae52265b34c1c53436c7122e0f1faad7",
   "scope": "Pinned native 77-term variant with full Simon polynomial arguments, not ERFA00B simplified angles/fixed planetary offsets; coefficients of 0.1 microarcsecond and per Julian century",
   "terms": [
     [

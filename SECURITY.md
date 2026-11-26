@@ -48,7 +48,7 @@ REST binds to `0.0.0.0:8010` by default. For local use set `API_HOST=127.0.0.1`.
 
 FastMCP (`fatebridge-mcp`) uses stdio by default. REST API key settings do not apply to MCP or CLI. If a host changes the MCP transport to expose a network endpoint, it must provide transport authentication.
 
-The Python distribution does not bundle Swiss Ephemeris `.se1` data. The optional `uv run --locked python -m fatebridge.fetch_ephe` command downloads data separately from a source checkout. Project code, third-party dependencies and downloaded data have separate license declarations; see [LICENSE](LICENSE) and [NOTICE](NOTICE).
+The Python distribution does not bundle Swiss Ephemeris `.se1` data. The optional `uv run python -m fatebridge.fetch_ephe` command downloads data separately from a source checkout. Project code, third-party dependencies and downloaded data have separate license declarations; see [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
 ## Personal Data
 

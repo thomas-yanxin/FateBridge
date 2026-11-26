@@ -4,13 +4,11 @@
     "author": "Ra Uru Hu",
     "publisher": "Jovian Archive Corporation",
     "edition": "2001 English",
-    "url": "https://www.myhumandesign.be/downloads/Rave-I%27Ching.pdf",
-    "pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495"
+    "url": "https://www.myhumandesign.be/downloads/Rave-I%27Ching.pdf"
   },
   "dictionary_source": {
     "publisher": "Jovian Archive",
     "url": "https://jovianarchive.com/pages/human-design-dictionary",
-    "html_sha256": "9d0490989e77908be14892b0c04b09bc894134356a47ef32dfe06e507f3db231",
     "retrieved_date": "2026-10-22",
     "line_arcseconds": 3375,
     "foundation_arcseconds": 2925,
@@ -2710,17 +2708,13 @@
   "observed_cross_label_sources": [
     {
       "fixture": "human-design-official-charts.json",
-      "sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
       "publisher": "Jovian Archive / Maia Mechanics",
       "url": "https://jovianarchive.com/pages/get-your-human-design-chart",
       "collection": "Normal interactive public page; fictitious inputs, optional email omitted. Direct validity API returned 401 and was not used for calculation. Rendered SVG numeric labels and properties copied independently of FateBridge results; every PDF downloaded through the page.",
-      "page_sha256": "47be250ac9cdf491c48c17ec012a3bae22eda2d6f4b760df409dc0927df7d448",
-      "widget_script_sha256": "aeb530d406f29b81341543641b436b451138ed6d8f88e22ba717c8d5bdbcdd07",
       "collected_at": "2026-10-21T22:23:01.227273+00:00"
     },
     {
       "fixture": "human-design-official-authority-charts.json",
-      "sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
       "publisher": "Jovian Archive / Maia Mechanics",
       "url": "https://jovianarchive.com/pages/get-your-human-design-chart",
       "collection": "Normal interactive public page, 11 fictitious frozen inputs; optional email omitted; no account or direct calculation API. Gate.lines and defined graph copied from rendered SVG; properties independently read from downloaded PDF and checked against rendered page. PDFs retained locally under /tmp/fatebridge-human-design-authority-sources; only hashes and bounded factual transcription are redistributed.",
@@ -2737,8 +2731,6 @@
   "observed_cross_labels": [
     {
       "case_id": "winter-1900",
-      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
-      "pdf_sha256": "8ad52f0b894bbdd06f626f27547572e3ce9611b7a5f0797739d35a7ad2021f9c",
       "angle": "right",
       "gates": [
         38,
@@ -2750,8 +2742,6 @@
     },
     {
       "case_id": "winter-1955",
-      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
-      "pdf_sha256": "4f881834c15fc245e5732291ceed2991982d3998bc30f57ac151488ac1caeddf",
       "angle": "right",
       "gates": [
         38,
@@ -2763,8 +2753,6 @@
     },
     {
       "case_id": "winter-1965",
-      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
-      "pdf_sha256": "fc66072fab26077435261a925f9cb6671050ca4a92f9bddc9cf767141081ff3f",
       "angle": "right",
       "gates": [
         38,
@@ -2776,8 +2764,6 @@
     },
     {
       "case_id": "winter-1971",
-      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
-      "pdf_sha256": "4f015cc8731fa01b99c11bb886d72a5b39e3a764ca564c1c69de4782d511229f",
       "angle": "right",
       "gates": [
         38,
@@ -2789,8 +2775,6 @@
     },
     {
       "case_id": "winter-1990",
-      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
-      "pdf_sha256": "b7de2730c4b0a0e5561f7fe9e626f32427b248be5035956fa83125e4ab138234",
       "angle": "right",
       "gates": [
         38,
@@ -2802,8 +2786,6 @@
     },
     {
       "case_id": "winter-2000",
-      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
-      "pdf_sha256": "af68d1c1ddf3a1a46454ccdfa93b04ea271951e29d9495bcda0be1e2fd5e4d5f",
       "angle": "right",
       "gates": [
         38,
@@ -2815,8 +2797,6 @@
     },
     {
       "case_id": "winter-2024",
-      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
-      "pdf_sha256": "db379b9e6f6373aa43f5309187b66038693e997c69aeb54d81232e223bcc7c61",
       "angle": "right",
       "gates": [
         38,
@@ -2828,8 +2808,6 @@
     },
     {
       "case_id": "winter-2026",
-      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
-      "pdf_sha256": "21aec80e8b4d1c376c8a4298cccb470d5a841e8db0808957a3f97312ccabde62",
       "angle": "right",
       "gates": [
         38,
@@ -2841,8 +2819,6 @@
     },
     {
       "case_id": "branch-1980-09-09",
-      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
-      "pdf_sha256": "767e06a572b530054ddd77a5addaa5ae9bb69e9b636252ad008d5b9873aae095",
       "angle": "left",
       "gates": [
         64,
@@ -2854,8 +2830,6 @@
     },
     {
       "case_id": "branch-1980-11-13",
-      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
-      "pdf_sha256": "cfcb6598373be4d1b7caf5e7d71b382056d7539f12ac7e6061ee38a819f5c869",
       "angle": "right",
       "gates": [
         43,
@@ -2867,8 +2841,6 @@
     },
     {
       "case_id": "branch-1980-11-18",
-      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
-      "pdf_sha256": "e9069a837d24bc335b996cd398b85a4a413e8a054ae91cc964d235872df79b0c",
       "angle": "right",
       "gates": [
         14,
@@ -2880,8 +2852,6 @@
     },
     {
       "case_id": "branch-1981-07-04",
-      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
-      "pdf_sha256": "3fd1c37daa2b63fc92bd2f7e4c749ca780f3eae075e801b00818d75c3982474d",
       "angle": "right",
       "gates": [
         39,
@@ -2893,8 +2863,6 @@
     },
     {
       "case_id": "branch-1988-03-18",
-      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
-      "pdf_sha256": "e9ec1bdd7af8f2b6fe6e986e8355a77a9af48b87aee870634d9d3df266b3a31c",
       "angle": "left",
       "gates": [
         36,
@@ -2906,8 +2874,6 @@
     },
     {
       "case_id": "branch-1980-01-14",
-      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
-      "pdf_sha256": "6e8d482495dcb38459f42508cb29b69c867530fbba085546694684ec4e0ae895",
       "angle": "right",
       "gates": [
         61,
@@ -2919,8 +2885,6 @@
     },
     {
       "case_id": "branch-1980-03-28",
-      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
-      "pdf_sha256": "49aea177312e9cd8cd5f7f9b345f4014ef2b8e81e5f4f6a277ce30fc98bde03a",
       "angle": "left",
       "gates": [
         17,
@@ -2932,8 +2896,6 @@
     },
     {
       "case_id": "branch-1980-06-12",
-      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
-      "pdf_sha256": "e5a1d522cb1efc75fd1d47b9e693064ee6eaa622138be27c3a6be95e310b589a",
       "angle": "left",
       "gates": [
         45,
@@ -2945,8 +2907,6 @@
     },
     {
       "case_id": "branch-1982-08-27",
-      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
-      "pdf_sha256": "ba047c188bf0edef1ccd739dd97082845f8e85811fa9d968cb8beb6cea882ab0",
       "angle": "juxtaposition",
       "gates": [
         59,
@@ -2958,8 +2918,6 @@
     },
     {
       "case_id": "branch-1980-01-02",
-      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
-      "pdf_sha256": "b8086f24e690e8ff24ed76bf39c6c6740eaa88f58c3ffb6cd4dce8ed9884b2c3",
       "angle": "right",
       "gates": [
         38,
@@ -2971,8 +2929,6 @@
     },
     {
       "case_id": "branch-1988-03-22",
-      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
-      "pdf_sha256": "5d587ea7509371219e9385724200354de6819260aa0088b6e46073a33b4544ff",
       "angle": "left",
       "gates": [
         25,

@@ -7,7 +7,6 @@
       "author": "任鐵樵增注，李雨田校訂",
       "edition": "上海大東書局經售，1947年4月初版",
       "url": "https://commons.wikimedia.org/wiki/File:SSID-11335994_滴天髓闡微.pdf",
-      "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
       "pdf_pages": [
         170,
         171,
@@ -25,7 +24,6 @@
       "publication_as_platform_metadata": "北京大學-字節跳動古籍開放文本庫",
       "platform_book_version": 37,
       "platform_volume_version": 36,
-      "digital_paragraphs_sha256": "fafc44e15f0591c81ed2a2cf4e90741834573f37aff6f968be72fc294daf5e93",
       "review_status": "digital_primary_text_transcribed_not_scan_collated",
       "scope": "完整13段数字原文；平台版本和底本自述不是已逐页核对书影。保留字形与算术不一致，不据此断定原刊错字。"
     }

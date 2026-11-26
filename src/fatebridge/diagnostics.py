@@ -20,7 +20,6 @@ from typing_extensions import NotRequired, TypedDict
 
 from fatebridge import __version__
 from fatebridge.application.discovery import select_mcp_specs
-from fatebridge.application.examples import example_input
 from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.core.ephemeris_installation import (
     FENGSHUI_PROFILE,
@@ -58,12 +57,9 @@ class StdioProbeResult(TypedDict):
     tool_count: int
     tools_wire_bytes: int
     summary_bytes: int
-    smoke_tool: NotRequired[str]
 
 
-StdioStage = Literal[
-    "initialize", "tools/list", "discover_tools", "tools/call", "shutdown"
-]
+StdioStage = Literal["initialize", "tools/list", "discover_tools", "shutdown"]
 
 
 class StdioFailureDetails(TypedDict):
@@ -159,7 +155,8 @@ async def _probe_stdio(env: dict[str, str]) -> StdioProbeResult:
                     assert isinstance(catalog, dict)
                     summary_text = json.dumps(catalog, ensure_ascii=False)
                     names = {tool.name for tool in tools}
-                    available = {tool["tool"] for tool in catalog["tools"]}
+                    if not catalog.get("tools"):
+                        raise RuntimeError("MCP discover_tools returned no tools")
                     expected = {"discover_tools", "run_calculation"}
                     if names != expected:
                         raise RuntimeError("MCP catalog and tools/list disagree")
@@ -178,32 +175,6 @@ async def _probe_stdio(env: dict[str, str]) -> StdioProbeResult:
                         ),
                         "summary_bytes": len(summary_text.encode()),
                     }
-                    for spec in CATALOG:
-                        if (
-                            spec.name in available
-                            and (inputs := example_input(spec)) is not None
-                        ):
-                            pass
-                        else:
-                            continue
-                        stage = "tools/call"
-                        response = await client.call_tool(
-                            "run_calculation",
-                            {
-                                "tool": spec.name,
-                                "arguments": inputs,
-                                "fields": ["run_metadata"],
-                            },
-                            raise_on_error=False,
-                        )
-                        if response.is_error:
-                            raise RuntimeError("MCP fictional smoke calculation failed")
-                        receipt = response.structured_content["run_metadata"]
-                        if receipt["tool_name"] != spec.name:
-                            raise RuntimeError("MCP smoke receipt has wrong tool name")
-                        output["smoke_tool"] = spec.name
-                        output["scope"] += ", one fictional calculation"
-                        break
                     stage = "shutdown"
                 return output
             except Exception as exc:

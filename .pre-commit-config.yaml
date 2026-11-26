@@ -2,38 +2,38 @@ minimum_pre_commit_version: '4.0.0'
 default_install_hook_types: [pre-commit]
 default_stages: [pre-commit, manual]
 
-# Run the same uv-locked tools in Git hooks and CI.
+# Run the same uv-managed tools in Git hooks and CI.
 repos:
   - repo: local
     hooks:
       - id: check-json
         name: Check JSON syntax
-        entry: uv run --locked --extra dev check-json --
+        entry: uv run --extra dev check-json --
         language: system
         types: [json]
       - id: check-yaml
         name: Check YAML syntax
-        entry: uv run --locked --extra dev check-yaml --allow-multiple-documents --
+        entry: uv run --extra dev check-yaml --allow-multiple-documents --
         language: system
         types: [yaml]
       - id: check-toml
         name: Check TOML syntax
-        entry: uv run --locked --extra dev check-toml --
+        entry: uv run --extra dev check-toml --
         language: system
         types: [toml]
       - id: check-merge-conflict
         name: Check merge conflict markers
-        entry: uv run --locked --extra dev check-merge-conflict --assume-in-merge --
+        entry: uv run --extra dev check-merge-conflict --assume-in-merge --
         language: system
         types: [text]
       - id: detect-private-key
         name: Detect private key markers
-        entry: uv run --locked --extra dev detect-private-key --
+        entry: uv run --extra dev detect-private-key --
         language: system
         types: [text]
       - id: check-added-large-files
         name: Check file sizes (10 MiB limit)
-        entry: uv run --locked --extra dev check-added-large-files --maxkb=10240 --enforce-all --
+        entry: uv run --extra dev check-added-large-files --maxkb=10240 --enforce-all --
         language: system
         # Existing bundled ephemerides exceed the limit by design.
         exclude: >-
@@ -43,7 +43,7 @@ repos:
           )$
       - id: trailing-whitespace
         name: Trim trailing whitespace in source and configuration
-        entry: uv run --locked --extra dev trailing-whitespace-fixer --
+        entry: uv run --extra dev trailing-whitespace-fixer --
         language: system
         files: &maintained_text >-
           (?x)^(?:
@@ -52,31 +52,31 @@ repos:
           )$
       - id: end-of-file-fixer
         name: Normalize final newline in source and configuration
-        entry: uv run --locked --extra dev end-of-file-fixer --
+        entry: uv run --extra dev end-of-file-fixer --
         language: system
         files: *maintained_text
       - id: isort
         name: Check Python import order
-        entry: uv run --locked --extra dev isort --check-only --
+        entry: uv run --extra dev isort --check-only --
         language: system
         files: &python_sources ^(?:src/fatebridge|scripts|tests)/.*\.pyi?$
         require_serial: true
       - id: black
         name: Check Python formatting
-        entry: uv run --locked --extra dev black --check --
+        entry: uv run --extra dev black --check --
         language: system
         files: *python_sources
         require_serial: true
       - id: mypy
         name: Check FateBridge types
-        entry: uv run --locked --extra dev mypy src/fatebridge/
+        entry: uv run --extra dev mypy src/fatebridge/
         language: system
         stages: [manual]
         pass_filenames: false
         always_run: true
       - id: codex-call-contracts
         name: Check generated call contracts
-        entry: uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
+        entry: uv run --extra dev python scripts/build_codex_call_contracts.py --check
         language: system
         stages: [manual]
         pass_filenames: false

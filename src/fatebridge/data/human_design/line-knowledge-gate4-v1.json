@@ -3,8 +3,6 @@
   "version": 5,
   "catalogue_id": "human_design_gate4_editorial_v5",
   "parent_version": 4,
-  "parent_catalogue_sha256": "cc82bc7418315c90edc182c3e510842b1e79cdd583aaf587f99a664b286b5d4b",
-  "source_pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
   "curated_by": "FateBridge primary agent; bounded visual source reading, not independent review",
   "required_line_count": 384,
   "expected_local_paraphrase_count": 24,
@@ -17,7 +15,6 @@
     {
       "key": "4.1",
       "source_pdf_page_one_based": 13,
-      "source_layout_block_sha256": "f7da07b608e4410821c6ccf5748b13fa792d564ea3f555f2463bfed6a5f83306",
       "source_line_heading": "Pleasure",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -48,7 +45,6 @@
     {
       "key": "4.2",
       "source_pdf_page_one_based": 13,
-      "source_layout_block_sha256": "79aaae67e515934bcca49324c5c2462d96dddb68a71bee820b3ce7f94097837a",
       "source_line_heading": "Acceptance",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -78,7 +74,6 @@
     {
       "key": "4.3",
       "source_pdf_page_one_based": 13,
-      "source_layout_block_sha256": "9516afcf99d3d197abbb26812aebc3c91a81cb4ab1f0de35291b1cdb676031b1",
       "source_line_heading": "Irresponsibility",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -109,7 +104,6 @@
     {
       "key": "4.4",
       "source_pdf_page_one_based": 13,
-      "source_layout_block_sha256": "0b116640d392b68b5dca5cbff6d5ae41e5ff2c8fe420945052a3a6379740f8e4",
       "source_line_heading": "The liar",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -140,7 +134,6 @@
     {
       "key": "4.5",
       "source_pdf_page_one_based": 13,
-      "source_layout_block_sha256": "972aa92878cca2610ad24248ecfdfcd157db70adcd802b82b2e4e4ebfcd3ca1f",
       "source_line_heading": "Seduction",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -170,7 +163,6 @@
     {
       "key": "4.6",
       "source_pdf_page_one_based": 13,
-      "source_layout_block_sha256": "0f0c05a314baf29cd3bffb479b6a7d2074ba30538210e29da59d5bc7de71398f",
       "source_line_heading": "Excess",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {

@@ -4,50 +4,37 @@
   "areacity_release": "2025.251231.260403",
   "sources": {
     "ok_data_level3.csv": {
-      "sha256": "dd5a1594565b65fa3fea5ce4b9935e0b28908226949ae44f07ebfd533428e8ff",
       "url": "extracted from AreaCity 2025.251231.260403",
       "license": "MIT"
     },
     "ok_geo.csv": {
-      "sha256": "ac2641b1cb137d099779f49b21b965919591af9d82a29a911f6270530fef8ed7",
       "url": "extracted from AreaCity 2025.251231.260403",
       "license": "MIT"
     },
     "cities15000.zip": {
-      "sha256": "94fc1384d9ec03160b70b24c8d74c38421c541576ec4e26959490efcf1b6afd7",
       "url": "https://download.geonames.org/export/dump/cities15000.zip",
       "license": "CC-BY-4.0"
     },
     "countryInfo.txt": {
-      "sha256": "c55f638cfaafb4fe45a9aa15120a0f1f78e8a34a8e1847d7b9320cf740fbc9ab",
       "url": "https://download.geonames.org/export/dump/countryInfo.txt",
       "license": "CC-BY-4.0"
     },
     "admin1CodesASCII.txt": {
-      "sha256": "b577baa3476bbe94f0454545e517e1835401d79c5b1105c8e02cf1d4a505e8ec",
       "url": "https://download.geonames.org/export/dump/admin1CodesASCII.txt",
       "license": "CC-BY-4.0"
     },
     "TW.zip": {
-      "sha256": "f1f0bda4e4695b3657fa683562aba3cf811c84a0efff6607a03f03b3c5da95bc",
       "url": "https://download.geonames.org/export/dump/TW.zip",
       "license": "CC-BY-4.0"
     },
     "ok_data_level3-4.csv.7z": {
-      "sha256": "0b181b4105c32b2631b1c8c8654859f10684c3748b188ebe08f342291dec1169",
       "url": "https://github.com/xiangyuecn/AreaCity-JsSpider-StatsGov/releases/download/2025.251231.260403/ok_data_level3-4.csv.7z",
       "license": "MIT"
     },
     "ok_geo.csv.7z": {
-      "sha256": "675c3e9b8dec6444994d3ef53259a145304f6a957db8a5e601e55c0b9e61e21a",
       "url": "https://github.com/xiangyuecn/AreaCity-JsSpider-StatsGov/releases/download/2025.251231.260403/ok_geo.csv.7z",
       "license": "MIT"
     }
-  },
-  "files": {
-    "china.json": "981939da152d512ac801ed6532efd22c5130dad2c788ac996a0a7d51737d5fa9",
-    "world.json": "092ee44c7acaf0e2e0e54caeed31be7c7a190d0fc612323032d8994ac7071dbc",
-    "countries.json": "5f2f957fa982ef5f90350d0b50a0f531765b154cc79d8b0b01cec4602a7439f9"
   },
   "counts": {
     "china": 3602,

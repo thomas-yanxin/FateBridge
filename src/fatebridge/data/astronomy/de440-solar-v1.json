@@ -11,7 +11,6 @@
   },
   "storage": "shared_original_type2_record_atlas_v1",
   "file": "de440-solar-record-atlas-v1.bin.gz",
-  "uncompressed_sha256": "19e443ed65e73871ef342effa7bc931bbfb51753270377b9511c75b29b7e4850",
   "uncompressed_bytes": 17751664,
   "selected_tdb_years_with_padding": [
     1798,
@@ -33,7 +32,6 @@
       "record_count": 9246,
       "offset_bytes": 868544,
       "bytes": 3032688,
-      "sha256": "65f363ffd89af7210194104ea6412b1d0ca67d7bfd4dc2abad0faba853d75236",
       "original_first_record_index": 5661,
       "original_record_count": 25112,
       "original_segment_start_word": 3021513,
@@ -50,7 +48,6 @@
       "record_count": 36982,
       "offset_bytes": 13759104,
       "bytes": 12130096,
-      "sha256": "da86c7d21965d2e9c24eeca35f2c82d081342c64a226195033fc50da69988a27",
       "original_first_record_index": 22645,
       "original_record_count": 100448,
       "original_segment_start_word": 10856493,
@@ -67,7 +64,6 @@
       "record_count": 9246,
       "offset_bytes": 6289888,
       "bytes": 2588880,
-      "sha256": "a12f39b4c08971f1460400ea56257a32de441404078b1775b31182b6c17aedec",
       "original_first_record_index": 5661,
       "original_record_count": 25112,
       "original_segment_start_word": 5859197,
@@ -84,7 +80,5 @@
     "modifications": "Body/time selection and storage format; all selected original coefficient bytes retained",
     "original_kernel_comments_are_source_archive_only": true,
     "redistribution_rules_url": "https://naif.jpl.nasa.gov/naif/rules.html"
-  },
-  "compressed_sha256": "1f2e21ee0601bf4abaa557b21196d51fb01442a3293bc5b680da140d2f75610b",
-  "tdb_coefficient_sha256": "a092d8bd128309277135097c6cd29f2aed2e7abe03d51f9522890d97f49a7c25"
+  }
 }

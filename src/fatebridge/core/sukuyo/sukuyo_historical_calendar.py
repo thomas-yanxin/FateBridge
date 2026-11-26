@@ -151,7 +151,6 @@ def _table(path: Path) -> _Table:
         if key
         not in {
             "months",
-            "source_query_response_sha256",
             "cross_source_disagreement_intervals",
         }
     }

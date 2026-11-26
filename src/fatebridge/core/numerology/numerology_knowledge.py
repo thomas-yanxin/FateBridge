@@ -117,11 +117,7 @@ def _source(domain: str, key: str) -> tuple[dict[str, Any], dict[str, Any]]:
         raw = path.read_bytes()
         data = json.loads(raw)
         meta = {
-            **{
-                k: deepcopy(v)
-                for k, v in entry.items()
-                if k != "canonical_content_sha256"
-            },
+            **deepcopy(entry),
             "source_title": data.get("source_title"),
             "source_revision": data.get("version"),
             "review_status": data.get(

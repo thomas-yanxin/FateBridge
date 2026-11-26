@@ -13,7 +13,6 @@
     "catalogue_frame_count": 46,
     "manifest_canvas_count": 47,
     "manifest_url": "https://kokusho.nijl.ac.jp/biblio/100223664/manifest",
-    "manifest_sha256": "3fde4de889e40b2ab265e3700d372ec6c4f593de4ed5f57ca0f54dbf619b20d4",
     "attribution": "善通寺宝物館 国文学研究資料館",
     "independent_human_transcription_accepted": false,
     "whole_work_collation_complete": false,
@@ -24,7 +23,6 @@
         "canvas_index_one_based": 28,
         "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100223664/canvas/28",
         "url": "https://kokusho.nijl.ac.jp/api/iiif/100223664/v4/XSE1/XSE1-25904/XSE1-25904-0027.tif/full/full/0/default.jpg",
-        "sha256": "549e9f892a73dc0a41ab9c3e5c49db13c7fda0c7c2005b6708e694e24e847f56",
         "bytes": 1594630,
         "width": 6153,
         "height": 4677
@@ -33,7 +31,6 @@
         "canvas_index_one_based": 29,
         "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100223664/canvas/29",
         "url": "https://kokusho.nijl.ac.jp/api/iiif/100223664/v4/XSE1/XSE1-25904/XSE1-25904-0028.tif/full/full/0/default.jpg",
-        "sha256": "a62fe34e3880ef8416d7afbacf8cdfe6bab335edbde85d0e30579872111429c7",
         "bytes": 1542013,
         "width": 6153,
         "height": 4677
@@ -136,7 +133,6 @@
     "variant_resolved": false
   },
   "T2216_comparison_context": {
-    "publisher_capture_sha256": "5c62eaa9078aef1b28e7e84e496296d327fe9ef569ff5590ead238a9888143f4",
     "locator": "T2216_.59.0055c11-17",
     "identified_as_exact_cited_exemplar": false,
     "same_titled_physical_witness_available": true,

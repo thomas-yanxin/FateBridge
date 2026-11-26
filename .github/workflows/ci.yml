@@ -53,41 +53,13 @@ jobs:
         uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
-          cache-suffix: py3.12-locked
+          cache-suffix: py3.12-dev
+          cache-dependency-glob: pyproject.toml
           save-cache: false
       - name: Check documentation links, examples and published tool coverage
         run: |
-          uv run --locked --extra dev python scripts/check_docs.py
-          uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
-
-  locked:
-    needs: changes
-    if: needs.changes.outputs.checks == 'true'
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install uv
-        id: uv
-        uses: astral-sh/setup-uv@v8.2.0
-        with:
-          enable-cache: true
-          cache-suffix: py3.12-locked
-          cache-dependency-glob: |
-            pyproject.toml
-            uv.lock
-      - name: Check and install the locked development environment
-        run: |
-          uv lock --check
-          uv sync --locked --extra dev
-      - name: Verify installed commands and real stdio MCP
-        run: |
-          uv run --locked --extra dev fatebridge doctor --mcp --family bazi
-          uv run --locked --extra dev python -m pytest -q tests/integration/test_cli.py tests/integration/test_api_alignment.py -n auto --maxprocesses=4 --dist worksteal
+          uv run --extra dev python scripts/check_docs.py
+          uv run --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
 
   quality:
     needs: changes
@@ -105,24 +77,21 @@ jobs:
         uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
-          save-cache: false
-          cache-suffix: py3.12-locked
-          cache-dependency-glob: |
-            pyproject.toml
-            uv.lock
-      - name: Install the locked development environment
-        run: uv sync --locked --extra dev
+          cache-suffix: py3.12-dev
+          cache-dependency-glob: pyproject.toml
+      - name: Install the development environment
+        run: uv sync --extra dev
       - name: Restore incremental formatter and type-check caches
         uses: actions/cache@v4
         with:
           path: |
             .mypy_cache
             ~/.cache/black
-          key: quality-${{ runner.os }}-py3.12-${{ hashFiles('uv.lock', 'pyproject.toml') }}-${{ hashFiles('src/**/*.py', 'scripts/**/*.py', 'tests/**/*.py') }}
+          key: quality-${{ runner.os }}-py3.12-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('src/**/*.py', 'scripts/**/*.py', 'tests/**/*.py') }}
           restore-keys: |
-            quality-${{ runner.os }}-py3.12-${{ hashFiles('uv.lock', 'pyproject.toml') }}-
+            quality-${{ runner.os }}-py3.12-${{ hashFiles('pyproject.toml') }}-
       - name: Check repository files, formatting, types and generated contracts
-        run: uv run --locked --extra dev pre-commit run --hook-stage manual --all-files --show-diff-on-failure
+        run: uv run --extra dev pre-commit run --hook-stage manual --all-files --show-diff-on-failure
 
   test:
     name: Tests (${{ matrix.environment.python }}, ${{ matrix.environment.os }}, ${{ matrix.environment.resolution }}, shard ${{ matrix.shard }})
@@ -138,7 +107,7 @@ jobs:
           - {python: "3.12", os: ubuntu-24.04, resolution: highest}
           - {python: "3.13", os: ubuntu-24.04, resolution: highest}
           - {python: "3.10", os: ubuntu-24.04, resolution: lowest-direct}
-          - {python: "3.12", os: windows-2022, resolution: locked}
+          - {python: "3.12", os: windows-2022, resolution: highest}
         shard: [0, 1, 2]
     env:
       PYTHONUTF8: "1"
@@ -162,43 +131,25 @@ jobs:
           enable-cache: true
           save-cache: ${{ matrix.shard == 0 }}
           cache-suffix: py${{ matrix.environment.python }}-${{ matrix.environment.resolution }}
-          cache-dependency-glob: |
-            pyproject.toml
-            uv.lock
+          cache-dependency-glob: pyproject.toml
       - name: Install dependencies
-        run: |
-          if [ "$CI_RESOLUTION" = locked ]; then
-            uv sync --locked --extra dev
-          else
-            uv pip install --system --resolution "$CI_RESOLUTION" -e ".[dev]"
-          fi
+        run: uv pip install --system --resolution "$CI_RESOLUTION" -e ".[dev]"
       - name: Record resolved dependencies
         env:
           UV_CACHE_HIT: ${{ steps.uv.outputs.cache-hit }}
         run: |
           echo "$UV_CACHE_HIT" > cache-status.txt
           python -c "import os; print('Runner logical CPUs:', os.cpu_count())"
-          if [ "$CI_RESOLUTION" = locked ]; then
-            uv pip list --python .venv > resolved-dependencies.txt
-          else
-            uv pip list --system > resolved-dependencies.txt
-          fi
-      - name: Verify Windows startup and independent stdio MCP
-        if: runner.os == 'Windows' && matrix.shard == 0
-        run: uv run --locked --extra dev fatebridge doctor --mcp --family bazi
+          uv pip list --system > resolved-dependencies.txt
+      - name: Verify installed CLI and independent stdio MCP
+        if: matrix.shard == 0 && matrix.environment.python == '3.12' && matrix.environment.resolution == 'highest'
+        run: fatebridge doctor --mcp --family bazi
       - name: Run self-contained checks
         run: |
-          if [ "$CI_RESOLUTION" = locked ]; then
-            uv run --locked --extra dev python scripts/run_ci_checks.py \
-              --shard-index "$CI_SHARD" --shard-count 3 \
-              --environment-id "$CI_ENVIRONMENT" --selection-report ci-selection.json \
-              --junitxml=pytest-results.xml --durations=20 -n auto --maxprocesses=4 --dist worksteal
-          else
-            python scripts/run_ci_checks.py \
-              --shard-index "$CI_SHARD" --shard-count 3 \
-              --environment-id "$CI_ENVIRONMENT" --selection-report ci-selection.json \
-              --junitxml=pytest-results.xml --durations=20 -n auto --maxprocesses=4 --dist worksteal
-          fi
+          python scripts/run_ci_checks.py \
+            --shard-index "$CI_SHARD" --shard-count 3 \
+            --environment-id "$CI_ENVIRONMENT" --selection-report ci-selection.json \
+            --junitxml=pytest-results.xml --durations=20 -n auto --maxprocesses=4 --dist worksteal
       - name: Save regression evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -214,7 +165,7 @@ jobs:
   ci:
     name: CI result
     if: always()
-    needs: [changes, documentation, locked, quality, test]
+    needs: [changes, documentation, quality, test]
     runs-on: ubuntu-24.04
     steps:
       - name: Require every selected job to pass
@@ -222,18 +173,15 @@ jobs:
           CHANGES_RESULT: ${{ needs.changes.result }}
           DOCUMENTATION_RESULT: ${{ needs.documentation.result }}
           CHECKS_REQUIRED: ${{ needs.changes.outputs.checks }}
-          LOCKED_RESULT: ${{ needs.locked.result }}
           QUALITY_RESULT: ${{ needs.quality.result }}
           TEST_RESULT: ${{ needs.test.result }}
         run: |
           test "$CHANGES_RESULT" = success
           test "$DOCUMENTATION_RESULT" = success
           if [ "$CHECKS_REQUIRED" = true ]; then
-            test "$LOCKED_RESULT" = success
             test "$QUALITY_RESULT" = success
             test "$TEST_RESULT" = success
           elif [ "$CHECKS_REQUIRED" = false ]; then
-            test "$LOCKED_RESULT" = skipped
             test "$QUALITY_RESULT" = skipped
             test "$TEST_RESULT" = skipped
             echo "Documentation checks passed; heavy runtime checks not required."

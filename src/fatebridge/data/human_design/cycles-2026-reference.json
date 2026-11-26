@@ -4,26 +4,21 @@
   "sources": {
     "dictionary": {
       "url": "https://jovianarchive.com/pages/human-design-dictionary",
-      "html_sha256": "2e2316117a5ceeabd6aed00386b6a82f1843be6550f80c990a5daeaa5d0b657b",
       "captured_date": "2026-10-22"
     },
     "six_lines": {
       "url": "https://jovianarchive.com/blogs/chart-interpretations-components/the-six-lines-of-the-hexagram",
-      "html_sha256": "8d9d0c69a09a143c7f1463afcffa797ddce1d6bfb5e460efd512d8ef2b484d74",
       "captured_date": "2026-10-22"
     },
     "cycles": {
       "url": "https://jovianarchive.com/pages/cycle-analysis-in-human-design",
-      "html_sha256": "89f0482a6679e50aa4870c4e8e27a66b27e0dde9f3cd2cfe1bb8b592b42e76b7",
       "captured_date": "2026-10-22"
     },
     "uranus_origin_followup": {
       "url": "https://jovianarchive.com/pages/human-design-dictionary",
-      "html_sha256": "282b87fa9875d9e635db941ea0a25e21ae520843806aa804bec583d0ddeeac0e",
       "captured_date": "2026-10-25",
       "heading": "Uranus Opposition",
-      "quote": "Technically, the Uranus opposition occurs when the transiting Uranus reaches a point exactly opposite its position at birth.",
-      "quote_sha256": "646ed48912a1ab4e834c38c210067699b6f403c6e7178ff626ee2272787852b8"
+      "quote": "Technically, the Uranus opposition occurs when the transiting Uranus reaches a point exactly opposite its position at birth."
     }
   },
   "bounded_facts": {

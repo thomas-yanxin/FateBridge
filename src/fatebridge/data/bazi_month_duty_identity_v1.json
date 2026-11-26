@@ -7,7 +7,6 @@
     "edition_as_holding_metadata": "欽定四庫全書本，浙江大学图书馆／CADAL06066038",
     "url": "https://archive.org/details/06066038.cn",
     "pdf_url": "https://archive.org/download/06066038.cn/06066038.cn.pdf",
-    "source_pdf_sha256": "af4a8ca65cc4dfdf63d6294adc7925a868214563d0d52664c7ba779b833db14a",
     "source_pdf_pages": 232,
     "chapter_original_pdf_pages": [
       9,
@@ -229,7 +228,6 @@
   ],
   "preserved_month_witness": {
     "method_id": "month_duty_scanned_witness_v1",
-    "source_sha256": "d1cb39bc138af624d3dc26b9ce482dca59a22823338fbcd1d2b8157a408600f7",
     "local_chapter_identity_values_unchanged": true
   },
   "interpretation_constraints": [

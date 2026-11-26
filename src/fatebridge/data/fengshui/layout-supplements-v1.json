@@ -4,7 +4,6 @@
     "F1": {
       "url": "https://www.ifsguild.org/the-feng-shui-command-position/",
       "retrieved_at": "2026-11-17",
-      "retrieved_sha256": "8f28d966a3a5058234805867c9c096ef600591af1749403c67fa2f54aefcc78f",
       "retrieved_bytes": 191694,
       "retrieved_format": "raw_html",
       "title": "Tori McBrien: The Feng Shui Command Position, IFSG",
@@ -16,7 +15,6 @@
     "F2": {
       "url": "https://www.clearspaceliving.com/blog/feng-shui-command-position/",
       "retrieved_at": "2026-11-17",
-      "retrieved_sha256": "a2b837988d514ac8e0ca7dfb83aa4dcfb9718a524475bfb501c5441f62b8cbc5",
       "retrieved_bytes": 363545,
       "retrieved_format": "raw_html",
       "title": "Karen Kingston: The feng shui command position",
@@ -28,7 +26,6 @@
     "E1": {
       "url": "https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf",
       "retrieved_at": "2026-10-15",
-      "retrieved_sha256": "6ab5135060df281fd6a6e376e0516e660c185dd2af2f146a5f850df64cc3b024",
       "retrieved_bytes": 4418704,
       "retrieved_format": "raw_pdf",
       "title": "Larry Sang / American Feng Shui Institute: The Principles of Feng Shui",
@@ -41,7 +38,6 @@
     "E2": {
       "url": "https://adelinapang.com/wp-content/uploads/2025/09/@2026-Horoscope-Forecast-Fengshui-Guide-by-Adelina-Pang-1.pdf",
       "retrieved_at": "2026-10-14",
-      "retrieved_sha256": "4eabc8ef89f396ab271471682030c3c6ca54296279e662df7bf6fe6681d15b64",
       "retrieved_bytes": 3604323,
       "retrieved_format": "raw_pdf",
       "title": "Adelina Pang: 2026 Horoscope Forecast & Fengshui Guide",
@@ -53,7 +49,6 @@
     "E3": {
       "url": "https://www.masterseanchan.com/blog/what-feng-shui-cure-really-is/",
       "retrieved_at": "2026-10-14",
-      "retrieved_sha256": "b883213b45004a92cd0f82242c250021d152497ecd3182227449a4dc3f41e5d3",
       "retrieved_bytes": 98815,
       "retrieved_format": "raw_html",
       "title": "Sean Chan: What A Feng Shui Cure Really Is",
@@ -68,7 +63,6 @@
       "source_version": "2022-06-08 authored desk/career teaching",
       "scope": "书桌窗在使用者侧边的作者条件；不把侧窗自动判凶，不推出窗与宅盘的砂水关系",
       "retrieved_at": "2026-10-14",
-      "retrieved_sha256": "d0d9ebe597be8dc22ef5282ca834cc60034acc8f74be9040573e7ee977c2207c",
       "retrieved_bytes": 348199
     },
     "F4": {
@@ -78,7 +72,6 @@
       "source_version": "WOFS authored office guidance; scope excludes efficacy claims and wired-phone extrapolation",
       "scope": "书桌座位避开直走道、裸露梁下及朝向人的家具尖角；尖角可选叶状植物作为条件屏障；不采纳健康财富预测",
       "retrieved_at": "2026-10-14",
-      "retrieved_sha256": "99ac6d76a5e586015a503875fcc5dc76c3879d24986ecb10f6e74a076aa97c18",
       "retrieved_bytes": 220062
     }
   },

@@ -1,7 +1,6 @@
 {
   "format": "sukuyo_shogonji_header_transcription_v1",
   "source_url": "https://naoj-repository.repo.nii.ac.jp/record/80/files/daiho1992_1-3-3.pdf",
-  "publisher_pdf_sha256": "dbe9e50e2be0bbcd11058df49fe293610819eeb54ac0ac5f3e58258d4fa761dc",
   "scope": "All 37 month headings and day-one stem/branch entries from the study author transcription, plus only visible marginal annotations. Not a transcription of all days or all lower annotations.",
   "method": "Primary agent visual reading of all 56 rotated top-header strips, followed by source-internal sexagenary continuity check; no implementation output for these years opened before freezing. Agent knew pre-existing profile theory, so not blind. Kana capitalization, cursive print readings, and phonetic normalization are editorial and are not a diplomatic manuscript edition.",
   "source_relation": "1992 study author transcription; 1345 printed calendar with red stamps, 1346/1347 handwritten calendars. Not independently collated original manuscripts or independent human readings.",
@@ -644,7 +643,6 @@
   ],
   "title": "荘厳寺で発見された仮名暦の調査",
   "publication": "国立天文台報 1(3), 1992, 229-292",
-  "pre_comparison_transcription_sha256": "5d089d06bdd7822d88c774e88b30cffcb9f0b2da2baa9db8ee3b59ffb4691564",
   "full_manuscript_collation": false,
   "original_manuscript_images_independently_read": false,
   "ancient_day_boundary_accepted": false,

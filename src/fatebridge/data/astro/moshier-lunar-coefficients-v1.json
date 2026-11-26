@@ -14,7 +14,6 @@
     "SWELP"
   ],
   "authors": "Stephen L. Moshier; Swiss Ephemeris author revisions by Dieter Koch and Alois Treindl",
-  "formula_reference_sha256": "dba57badbf005b05bde0de60b5bc26f8bd416bf84af61e69ac590d56b16594c7",
   "mean_elements": {
     "D": {
       "before_modulo": [
@@ -177,7 +176,6 @@
   "original_missing_harmonic_preserved": true,
   "parameter_semantics": "Exact binary64 author constants; rational polynomial reductions and independent Fourier-sum evaluator.",
   "radius_constant_km": 385000.52899,
-  "source_sha256": "1d5f5ef9a95cf9a2f395b6334a58c63851ce0512d65bf08e49d3caf0a9fecb00",
   "source_url": "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swemmoon.c",
   "terms": [
     {

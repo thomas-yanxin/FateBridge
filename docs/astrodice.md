@@ -11,7 +11,7 @@
 仅解读骰面时无需日期或坐标：
 
 ```bash
-uv run --locked --extra dev fatebridge interpret_astrology_dice \
+uv run --extra dev fatebridge interpret_astrology_dice \
   --planet Mercury --sign Virgo --house 6 \
   --question '虚构示例：合作沟通中应核对什么？' \
   --fields method_id planet sign house symbolic_details rulesets rule_trace validation

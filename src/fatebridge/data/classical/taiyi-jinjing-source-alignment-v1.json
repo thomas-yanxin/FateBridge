@@ -2,8 +2,6 @@
   "author": "FateBridge contributors",
   "classical_author": "王希明编录，四库本卷二/卷三",
   "count_rule_source": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷02#推太乙運式法",
-  "facsimile_collation_manifest_sha256": "62a40d4517386efea5557598b081aab1e99a1db1d8b58895ae8901ab8a54eced",
-  "facsimile_correction_manifest_sha256": "fe5acfabb611c2b65563315c431a20b9c929380243a16882ba1f575976b2b778",
   "facsimile_source": "https://commons.wikimedia.org/wiki/File:CADAL06056494_太乙金鏡式經·卷一~卷四.djvu",
   "id": "jinjing_core_table_alignment_v1",
   "rows": [
@@ -6906,8 +6904,6 @@
   ],
   "scope": "144局四位置和两算已按原生书影核读语义，异体神名按声明索引；不认证逐字字形、日期历法、四将全盘或全书。初录/订正、旧转录与书影并存，通则重算不自动裁定原表异数。",
   "source": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷03",
-  "source_manifest_sha256": "5f8d272c55d567c1cb127daa4fb3a3f97f9094b98b389392b9b5ba178df5c9d3",
   "source_title": "太乙金鏡式經·四庫全書本卷三立成表、卷二通则",
-  "transcription_collation_manifest_sha256": "4711cec76085817188df2b61e3cf124baaa0653244a74e9f676f125a3bfad006",
   "version": "1.1.0"
 }

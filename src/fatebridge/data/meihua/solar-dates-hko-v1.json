@@ -14,7 +14,6 @@
     "publisher": "香港天文台",
     "title": "二十四節氣的日期及時間資料：注意二",
     "url": "https://www.hko.gov.hk/tc/gts/astronomy/Solar_Term.htm",
-    "raw_sha256": "0458df63b5516985d1128a598543e51d1dad7e1facff2e41ef3c9369fbc1eaf7",
     "retrieved_on": "2026-10-23"
   },
   "caveat_source": {
@@ -22,7 +21,6 @@
     "publisher": "香港天文台",
     "title": "公曆與農曆對照表：註二",
     "url": "https://www.hko.gov.hk/tc/gts/time/conversion.htm",
-    "raw_sha256": "895e11d871163f8b89c6faa6a615ff58bc914ae53b584ee2c707766ca98f485f",
     "retrieved_on": "2026-10-23"
   },
   "publisher_named_events": [
@@ -50,7 +48,6 @@
         "publisher": "香港天文台",
         "title": "1901年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1901c.txt",
-        "raw_sha256": "1f8c489768bc90b52e06023e58047ec6431e75aa7b808770cc5872393461e3f4",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -86,7 +83,6 @@
         "publisher": "香港天文台",
         "title": "1902年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1902c.txt",
-        "raw_sha256": "708a7ad6082e681eb1786f19aeb027c488772c3cf938f277b8e1d233a8af6032",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -122,7 +118,6 @@
         "publisher": "香港天文台",
         "title": "1903年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1903c.txt",
-        "raw_sha256": "17a56a96f93a37ae5b3c994481c7e83c7216883b924c5fee812a6a446cd8a5cb",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -158,7 +153,6 @@
         "publisher": "香港天文台",
         "title": "1904年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1904c.txt",
-        "raw_sha256": "762c0f37ef2b89bc8e3a73e5a9c775d14b0585d2d5b8ea4368a97f6ff39d65c0",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -194,7 +188,6 @@
         "publisher": "香港天文台",
         "title": "1905年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1905c.txt",
-        "raw_sha256": "683eae384742278f19ca511844f9279d0b88832edaf1ece72afa98923f10b3cb",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -230,7 +223,6 @@
         "publisher": "香港天文台",
         "title": "1906年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1906c.txt",
-        "raw_sha256": "2912f3161ccd55b2271d05c3768b067247f9acae651e0c84387ad45735c34587",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -266,7 +258,6 @@
         "publisher": "香港天文台",
         "title": "1907年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1907c.txt",
-        "raw_sha256": "d9d3bf2afad158fd2a9305891b433c0536832f04c3250a98982d16efbcc06245",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -302,7 +293,6 @@
         "publisher": "香港天文台",
         "title": "1908年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1908c.txt",
-        "raw_sha256": "e9167944e1b49f232f9167ef663bbc347813710115e29ed95bd31cf6f0607ce4",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -338,7 +328,6 @@
         "publisher": "香港天文台",
         "title": "1909年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1909c.txt",
-        "raw_sha256": "172574fb9f8d8e86fd22ab97c052cb6edc929abe58e819ade0fb99401dd462cf",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -374,7 +363,6 @@
         "publisher": "香港天文台",
         "title": "1910年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1910c.txt",
-        "raw_sha256": "c0ca7f3030a421657b1f9866f8dac0559693618f66962ead8c6f3d8ccdafc4ad",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -410,7 +398,6 @@
         "publisher": "香港天文台",
         "title": "1911年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1911c.txt",
-        "raw_sha256": "2db572389854a2bb7a1fb83a94678dd01b8b2a5496c9cdcc5dc997d6488c0768",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -446,7 +433,6 @@
         "publisher": "香港天文台",
         "title": "1912年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1912c.txt",
-        "raw_sha256": "82c69f3f72c65db02af8ccfe0103e013e2a52209685ce2ccb7958010fef2f6d0",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -482,7 +468,6 @@
         "publisher": "香港天文台",
         "title": "1913年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1913c.txt",
-        "raw_sha256": "47b880bd2fc1ac547cc4027617db8ae36a048f65b124899ee4b90f87705bd0dc",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -518,7 +503,6 @@
         "publisher": "香港天文台",
         "title": "1914年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1914c.txt",
-        "raw_sha256": "e1767a9e05fb26e344b40ae88a9eaa0279f7b9d225df9f15c2c89a09de70b32a",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -554,7 +538,6 @@
         "publisher": "香港天文台",
         "title": "1915年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1915c.txt",
-        "raw_sha256": "05c0a809f3d909abe1210ed3c1fa83d51b8ed9d431dff33625cd3fb49c206696",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -590,7 +573,6 @@
         "publisher": "香港天文台",
         "title": "1916年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1916c.txt",
-        "raw_sha256": "ef6bf09ecff8893b1d8b816b9ad3b65094142959e95fb6c9b20a4d9dd8276df5",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -626,7 +608,6 @@
         "publisher": "香港天文台",
         "title": "1917年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1917c.txt",
-        "raw_sha256": "e6a645c2d083295740d33a29d26efe01febb009d31204d54268988172e502add",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -662,7 +643,6 @@
         "publisher": "香港天文台",
         "title": "1918年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1918c.txt",
-        "raw_sha256": "9accf854e8b0438d299bd121323da9659a237f661f314bd5604e8e15a1f9ceca",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -698,7 +678,6 @@
         "publisher": "香港天文台",
         "title": "1919年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1919c.txt",
-        "raw_sha256": "d1221f69f89d7b5efd5f34af48b362d4200dfe894697423a81fcae277b868a3a",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -734,7 +713,6 @@
         "publisher": "香港天文台",
         "title": "1920年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1920c.txt",
-        "raw_sha256": "a0da25e4308e8cfd6cb33ed6bba121765f51ed9fcd650ea773f79ecaed6c2ee5",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -770,7 +748,6 @@
         "publisher": "香港天文台",
         "title": "1921年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1921c.txt",
-        "raw_sha256": "a6b8bb01d2b6086d9f49e7a05d1dd1fb6a7f4dfb885139979930963a2b9f047b",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -806,7 +783,6 @@
         "publisher": "香港天文台",
         "title": "1922年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1922c.txt",
-        "raw_sha256": "9dfe70aba5c959ab6420c0c43c7cc7a9ce968c67f297b3719a19dbee9058a615",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -842,7 +818,6 @@
         "publisher": "香港天文台",
         "title": "1923年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1923c.txt",
-        "raw_sha256": "e9d1fa340c0bd4b6d94cf6e1d757c923d8ef340d36e741fe3df0a85bb9348efe",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -878,7 +853,6 @@
         "publisher": "香港天文台",
         "title": "1924年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1924c.txt",
-        "raw_sha256": "98267d73e59706f10aed9cb8ff389f5d5c233a6fa0cdcd955085473edac806ef",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -914,7 +888,6 @@
         "publisher": "香港天文台",
         "title": "1925年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1925c.txt",
-        "raw_sha256": "a7107caa08e4c032827c4aa8b02588f6d36538b021a2a6647134d424fed79013",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -950,7 +923,6 @@
         "publisher": "香港天文台",
         "title": "1926年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1926c.txt",
-        "raw_sha256": "86d7944ee6140216a5c571f3bf36b50f0fa278a08f60883c2930f6c41af7d335",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -986,7 +958,6 @@
         "publisher": "香港天文台",
         "title": "1927年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1927c.txt",
-        "raw_sha256": "5e59b70f9e705def02880e63722311d6bddee8bbef59340ecd093e16a765b0f7",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1022,7 +993,6 @@
         "publisher": "香港天文台",
         "title": "1928年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1928c.txt",
-        "raw_sha256": "f7ab95bb82286245146f5697ac776f85967b977980bcda10a6f7a02e88427685",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1058,7 +1028,6 @@
         "publisher": "香港天文台",
         "title": "1929年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1929c.txt",
-        "raw_sha256": "71f590db3dfa771a6b9516d39375fb60a80047b8447926722c316157bcf9bf41",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1094,7 +1063,6 @@
         "publisher": "香港天文台",
         "title": "1930年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1930c.txt",
-        "raw_sha256": "8eacc9040c0810437e2d8162f34896a6e13e784d0279716a8a99dc96726c70ff",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1130,7 +1098,6 @@
         "publisher": "香港天文台",
         "title": "1931年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1931c.txt",
-        "raw_sha256": "c4fd2fe7d699a50f7df56d777be2f07da5050ce99881dac6ddc18ccc5c6c18d5",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1166,7 +1133,6 @@
         "publisher": "香港天文台",
         "title": "1932年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1932c.txt",
-        "raw_sha256": "ce7d20fe28bb1a3312b22ebd14d972c22d5bbeb660bf5b081ea1f80377468e87",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1202,7 +1168,6 @@
         "publisher": "香港天文台",
         "title": "1933年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1933c.txt",
-        "raw_sha256": "4cfce74b495d4d553dd98b77edbfd988c045325d7f634cc56ee6938933ac9b96",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1238,7 +1203,6 @@
         "publisher": "香港天文台",
         "title": "1934年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1934c.txt",
-        "raw_sha256": "ad9a5cb22af07f6b412b7c22d7a8cb938e0afad5de3e567ae701e1249d603f91",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1274,7 +1238,6 @@
         "publisher": "香港天文台",
         "title": "1935年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1935c.txt",
-        "raw_sha256": "a2698060bb672e6c6099325d9d356dad16935357492467ce16c24da3ebca5fb1",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1310,7 +1273,6 @@
         "publisher": "香港天文台",
         "title": "1936年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1936c.txt",
-        "raw_sha256": "4b820ac1bcbb7c3ed35b2e008bd76ce05e79129e4b1a97f8bbceeb0984b41c7f",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1346,7 +1308,6 @@
         "publisher": "香港天文台",
         "title": "1937年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1937c.txt",
-        "raw_sha256": "65dfc5f78474875bbdc25dc2f07949dab364b018a307f195694d74d24f4d0407",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1382,7 +1343,6 @@
         "publisher": "香港天文台",
         "title": "1938年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1938c.txt",
-        "raw_sha256": "dc3b075fb105630e9ebd36689551c9ccc130a31cfa13654ca8c816ff6272a815",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1418,7 +1378,6 @@
         "publisher": "香港天文台",
         "title": "1939年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1939c.txt",
-        "raw_sha256": "73ce6ca200b9e1b966c8e1de07d34d8d5422ffdfe2090ca8e79a421c0f34fd2d",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1454,7 +1413,6 @@
         "publisher": "香港天文台",
         "title": "1940年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1940c.txt",
-        "raw_sha256": "b3d3c9cfbfa33fc449b2220a9fc11468c2add9ca96cf6cb65052165dc05cc464",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1490,7 +1448,6 @@
         "publisher": "香港天文台",
         "title": "1941年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1941c.txt",
-        "raw_sha256": "74ab635282d4f249d535d52409fd1d5c7d8ea35a62cd4f338b5c650f1cbe8acf",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1526,7 +1483,6 @@
         "publisher": "香港天文台",
         "title": "1942年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1942c.txt",
-        "raw_sha256": "76fd2362acbb52c6d87d68ed0e5f42bbd6b720413eeeada4078445c930746415",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1562,7 +1518,6 @@
         "publisher": "香港天文台",
         "title": "1943年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1943c.txt",
-        "raw_sha256": "92d752c659c50b550cb63ec905946d12e04c6f29bbe50e622315d0f7291d45a6",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1598,7 +1553,6 @@
         "publisher": "香港天文台",
         "title": "1944年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1944c.txt",
-        "raw_sha256": "cb7e889e150b6e537e1cda4405ee9aa6389a4e7c0331bcb59e628ac6b8148b41",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1634,7 +1588,6 @@
         "publisher": "香港天文台",
         "title": "1945年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1945c.txt",
-        "raw_sha256": "ab069d9ef247560c542cc79139e02ddf3de7f757ba5786cf01454e99a2dd6e09",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1670,7 +1623,6 @@
         "publisher": "香港天文台",
         "title": "1946年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1946c.txt",
-        "raw_sha256": "8b2b6dc82cbba06570eeba9cd2602baa3cf760caa035c721e49e7c7ed4cfd227",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1706,7 +1658,6 @@
         "publisher": "香港天文台",
         "title": "1947年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1947c.txt",
-        "raw_sha256": "73a5886f4ce17ffee11070a45cb4f5b12874c2a2add3e77fc661ef4b481d9904",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1742,7 +1693,6 @@
         "publisher": "香港天文台",
         "title": "1948年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1948c.txt",
-        "raw_sha256": "9d45219eb760f95f206a4111e62934e1b06b599c5ed545c6f7ca10b2b8caea5d",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1778,7 +1728,6 @@
         "publisher": "香港天文台",
         "title": "1949年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1949c.txt",
-        "raw_sha256": "ca2ec9e83bae2a2cd91f68d2d6ddab9669814d326baad7f6b914ed9dc21cd6d2",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1814,7 +1763,6 @@
         "publisher": "香港天文台",
         "title": "1950年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1950c.txt",
-        "raw_sha256": "273a125c818a710debe6914f8242b0e14473bcd2f119c1c9756b23ae775842a0",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1850,7 +1798,6 @@
         "publisher": "香港天文台",
         "title": "1951年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1951c.txt",
-        "raw_sha256": "efa0ac949d2c6dde42051302a456e9a2495a88649d8ecd4af5959b2fc06124e2",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1886,7 +1833,6 @@
         "publisher": "香港天文台",
         "title": "1952年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1952c.txt",
-        "raw_sha256": "0fa2c88d6260ecf5ad5c5e05650f3a61ffdff55a9501e3f35470ed384d91daac",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1922,7 +1868,6 @@
         "publisher": "香港天文台",
         "title": "1953年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1953c.txt",
-        "raw_sha256": "a30de8986055712a39a30c7488de1ba754994f47da10d9f77ee576ba47e2f113",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1958,7 +1903,6 @@
         "publisher": "香港天文台",
         "title": "1954年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1954c.txt",
-        "raw_sha256": "5be322c0dcec2ed0411dad7d83ca49f383da8730777187602d6a867738739061",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -1994,7 +1938,6 @@
         "publisher": "香港天文台",
         "title": "1955年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1955c.txt",
-        "raw_sha256": "e3dbdb8d081ab732e3d5d53f4d582a135b1035cfa5cc082140b3c2c596b6ed68",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2030,7 +1973,6 @@
         "publisher": "香港天文台",
         "title": "1956年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1956c.txt",
-        "raw_sha256": "0e04ccef3222b19d5196d248d5239632628b9c2a65c5763112cd0a98d6fb638b",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2066,7 +2008,6 @@
         "publisher": "香港天文台",
         "title": "1957年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1957c.txt",
-        "raw_sha256": "7a17ece2e707be2c0d2956ea778fd9db7adaabf2e4e3944402422ead360b15da",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2102,7 +2043,6 @@
         "publisher": "香港天文台",
         "title": "1958年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1958c.txt",
-        "raw_sha256": "94799b12cbe8307ed406ac7a76ae584207e3b9c1a94aba291c9bd08667befd77",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2138,7 +2078,6 @@
         "publisher": "香港天文台",
         "title": "1959年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1959c.txt",
-        "raw_sha256": "bef8f267c8b58bd508c31e3678cd626d13056185e6e50ab77c109c33f4dada58",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2174,7 +2113,6 @@
         "publisher": "香港天文台",
         "title": "1960年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1960c.txt",
-        "raw_sha256": "826ea05f2dbcd914b1c21f066860589122473616195a25736ce9466a6420fc00",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2210,7 +2148,6 @@
         "publisher": "香港天文台",
         "title": "1961年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1961c.txt",
-        "raw_sha256": "b6536f80753a0091c82c2b2d5550ec3a9a1f1b4dce0df6a487c2dfa5129d97d8",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2246,7 +2183,6 @@
         "publisher": "香港天文台",
         "title": "1962年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1962c.txt",
-        "raw_sha256": "828a0bad6ec1f64fb631e3355061df4ce91243abe68f46ef6a3c0c734b8c7fae",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2282,7 +2218,6 @@
         "publisher": "香港天文台",
         "title": "1963年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1963c.txt",
-        "raw_sha256": "cf2c9b99bceffeb96c39ec3e768ec3849b217496789b5477c2f5470faf58bb0c",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2318,7 +2253,6 @@
         "publisher": "香港天文台",
         "title": "1964年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1964c.txt",
-        "raw_sha256": "7b2fa4a0f239ee601909dc173e7f5997ed15a9e762996e7b4bd6bb9a34d3f09a",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2354,7 +2288,6 @@
         "publisher": "香港天文台",
         "title": "1965年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1965c.txt",
-        "raw_sha256": "56bd21a0f6a495076b1926488b0e87776465d443998d39ff28c99e147ef6ce00",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2390,7 +2323,6 @@
         "publisher": "香港天文台",
         "title": "1966年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1966c.txt",
-        "raw_sha256": "b23c9714ab65b9e0b62b69dc334971f758cefdf91960eec3e743c114a495cbe4",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2426,7 +2358,6 @@
         "publisher": "香港天文台",
         "title": "1967年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1967c.txt",
-        "raw_sha256": "c1d335e5a2bf5ec5a1229041aa0fb4021ee999a0f361356f05c3387b4e8c2392",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2462,7 +2393,6 @@
         "publisher": "香港天文台",
         "title": "1968年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1968c.txt",
-        "raw_sha256": "fc7859a306eadd3e399777bd262221aec7eb370cb146eaed4e01fb735906fed1",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2498,7 +2428,6 @@
         "publisher": "香港天文台",
         "title": "1969年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1969c.txt",
-        "raw_sha256": "28fface7443f08f70ae11e2fb1484bc363a644e15dd3329b0c5e10892abf877c",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2534,7 +2463,6 @@
         "publisher": "香港天文台",
         "title": "1970年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1970c.txt",
-        "raw_sha256": "834f9ae7802cb869d6f6a39fb33de1a4df6aaa51095a2fe1a04281c6c2d22b83",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2570,7 +2498,6 @@
         "publisher": "香港天文台",
         "title": "1971年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1971c.txt",
-        "raw_sha256": "5925cffc4370ad132ba158089e784b99280ae2395d071674d714310c3a489894",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2606,7 +2533,6 @@
         "publisher": "香港天文台",
         "title": "1972年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1972c.txt",
-        "raw_sha256": "65ca8609052087d6083d7f845b5da0ad577774b9af1a6c82a1d8b8ebb5860d91",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2642,7 +2568,6 @@
         "publisher": "香港天文台",
         "title": "1973年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1973c.txt",
-        "raw_sha256": "e4a4902145c7f46693078685b2020918d81ecc4a354e907730204c4cee5a7b6a",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2678,7 +2603,6 @@
         "publisher": "香港天文台",
         "title": "1974年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1974c.txt",
-        "raw_sha256": "09e5a7391ee385aadca195b0c8f55f94fd607b997940ef98f252558da0faa20f",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2714,7 +2638,6 @@
         "publisher": "香港天文台",
         "title": "1975年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1975c.txt",
-        "raw_sha256": "9c131439d8287249ce264f83515b71b59450ef1b5902ffa7cdeeed331ca32867",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2750,7 +2673,6 @@
         "publisher": "香港天文台",
         "title": "1976年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1976c.txt",
-        "raw_sha256": "67497cea413ea24d164eaee9fa81f712e9b838d7510688baf2e96370f90ad658",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2786,7 +2708,6 @@
         "publisher": "香港天文台",
         "title": "1977年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1977c.txt",
-        "raw_sha256": "2b3dc27e03dbda62a9a1122042ce3126eef351f13d27530757e449537096e80d",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2822,7 +2743,6 @@
         "publisher": "香港天文台",
         "title": "1978年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1978c.txt",
-        "raw_sha256": "772263ac71963379c1df82d29ed5297decee401ecfe22711d9c70c6646580045",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2858,7 +2778,6 @@
         "publisher": "香港天文台",
         "title": "1979年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1979c.txt",
-        "raw_sha256": "a83092be0844224fd26524b4430bcc37b34493e2bf6b30cec35ca8da2a25537c",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2894,7 +2813,6 @@
         "publisher": "香港天文台",
         "title": "1980年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1980c.txt",
-        "raw_sha256": "af114e3d6fb1c858656ab34300fa6dfb930f5d0426c78b33154db640bac9f6f3",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2930,7 +2848,6 @@
         "publisher": "香港天文台",
         "title": "1981年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1981c.txt",
-        "raw_sha256": "9ad667489d278d8ec5c0ff43485c78c8e49f0c0385968cbbd5c8b1a721e429f7",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -2966,7 +2883,6 @@
         "publisher": "香港天文台",
         "title": "1982年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1982c.txt",
-        "raw_sha256": "b082d7e405fa824f20494dab964e91196571233b8b26940c5b2982064d6ae3cf",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3002,7 +2918,6 @@
         "publisher": "香港天文台",
         "title": "1983年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1983c.txt",
-        "raw_sha256": "2cd886bac2368557510435103c1f18dc14ebc51822f82a184305c222b730f299",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3038,7 +2953,6 @@
         "publisher": "香港天文台",
         "title": "1984年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1984c.txt",
-        "raw_sha256": "c04534cf3152a900691a27de2f4ae06f4be07df159dc40adfd603a96198dc1ff",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3074,7 +2988,6 @@
         "publisher": "香港天文台",
         "title": "1985年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1985c.txt",
-        "raw_sha256": "9f8e6ba1812cdfda387645467fadc1a777fb874a5cb6af11751aa5ed11525863",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3110,7 +3023,6 @@
         "publisher": "香港天文台",
         "title": "1986年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1986c.txt",
-        "raw_sha256": "e43c929eb607dba5caf3c4b8f3187b53a27999bcfffbbaf604d901cc0286bb0d",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3146,7 +3058,6 @@
         "publisher": "香港天文台",
         "title": "1987年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1987c.txt",
-        "raw_sha256": "6dc0a02e02931dfc040951f47a9732f62361df62265ab29982efd1075af29ff2",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3182,7 +3093,6 @@
         "publisher": "香港天文台",
         "title": "1988年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1988c.txt",
-        "raw_sha256": "aa79d66848467253e24899ce3ebaf49fb1abce459812c63ca72d5879574275a4",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3218,7 +3128,6 @@
         "publisher": "香港天文台",
         "title": "1989年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1989c.txt",
-        "raw_sha256": "d54f7da5bf649da1afe8e8fe79a8a0bfe13d5e6df2f234a9892366d9d6eaebc0",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3254,7 +3163,6 @@
         "publisher": "香港天文台",
         "title": "1990年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1990c.txt",
-        "raw_sha256": "becb61bce6bf3897a17a5ef8b71c63352628db5bb9ccbb57cb5aaabe48240ba8",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3290,7 +3198,6 @@
         "publisher": "香港天文台",
         "title": "1991年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1991c.txt",
-        "raw_sha256": "76a815d7b54c3be57e14b8bbfe3ac63b591781dd3f3dc607ff64ec09aa0af644",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3326,7 +3233,6 @@
         "publisher": "香港天文台",
         "title": "1992年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1992c.txt",
-        "raw_sha256": "ac68662574b3cbef54b65780a29b661b457cfda500813ee2288ee65913da9e3e",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3362,7 +3268,6 @@
         "publisher": "香港天文台",
         "title": "1993年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1993c.txt",
-        "raw_sha256": "5948745b887a2a663cf663af2f9cab78ae09da52fefed9724ab6535fe0c792f1",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3398,7 +3303,6 @@
         "publisher": "香港天文台",
         "title": "1994年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1994c.txt",
-        "raw_sha256": "ca6fe376ed4fc6a5387c77a8e481a99825521059a069dc134c45e2d78e0b4eb1",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3434,7 +3338,6 @@
         "publisher": "香港天文台",
         "title": "1995年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1995c.txt",
-        "raw_sha256": "17e7951a0babd178b1a8745b9ec15883b7422e6b33c89df77f7100c149be581c",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3470,7 +3373,6 @@
         "publisher": "香港天文台",
         "title": "1996年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1996c.txt",
-        "raw_sha256": "0d6f0043b19f7da0ac37f49ada7690939ba278f19f400dbb051ad3d798422e82",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3506,7 +3408,6 @@
         "publisher": "香港天文台",
         "title": "1997年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1997c.txt",
-        "raw_sha256": "56d7d0cce6ce7e80b22ceb97f17e1936e10674ab844f0790154e75cbb5089cc0",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3542,7 +3443,6 @@
         "publisher": "香港天文台",
         "title": "1998年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1998c.txt",
-        "raw_sha256": "ea9cbe8ebe2270d47b272f5a0b5bb56a8d24ad77c12c1e1733c65b9a96fb584a",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3578,7 +3478,6 @@
         "publisher": "香港天文台",
         "title": "1999年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1999c.txt",
-        "raw_sha256": "e359795b1921840d91257c4ee7dca9953fb99b7c764035faecaacb652986a906",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3614,7 +3513,6 @@
         "publisher": "香港天文台",
         "title": "2000年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2000c.txt",
-        "raw_sha256": "f9ac6ea8da6edc8be88e18ce55aec21a352b8f8872f09cc53c860e22abab69cf",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3650,7 +3548,6 @@
         "publisher": "香港天文台",
         "title": "2001年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2001c.txt",
-        "raw_sha256": "9e3746600469c2a1aeb6c6514b00f4efd893469d89b93fcaf95a1342353dfa37",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3686,7 +3583,6 @@
         "publisher": "香港天文台",
         "title": "2002年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2002c.txt",
-        "raw_sha256": "db3d3262ce587fbc66c233964fbe2eb6cc50058c15d210f6d8c9bfc610ae4950",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3722,7 +3618,6 @@
         "publisher": "香港天文台",
         "title": "2003年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2003c.txt",
-        "raw_sha256": "706737d6fbe05aca4b88a6fd896d55fc1e75b0a5ba78b3befe14e5ed39c72bf7",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3758,7 +3653,6 @@
         "publisher": "香港天文台",
         "title": "2004年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2004c.txt",
-        "raw_sha256": "6b071f1d82836b2515723f9ba743c212715c520d142b0ca9e9b4242d95ce24e2",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3794,7 +3688,6 @@
         "publisher": "香港天文台",
         "title": "2005年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2005c.txt",
-        "raw_sha256": "47314535cf7a924ccaf9693c516e050de31d536f297c32a45e93155b852ea549",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3830,7 +3723,6 @@
         "publisher": "香港天文台",
         "title": "2006年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2006c.txt",
-        "raw_sha256": "6202b58cd3e95c0dfbb1221e60f5fa57d81f8def1ffe9427f724edb9fc1707d5",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3866,7 +3758,6 @@
         "publisher": "香港天文台",
         "title": "2007年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2007c.txt",
-        "raw_sha256": "cf8c04905f28f7fb0344773b480659fbd4af5475bdd384c5dc903057bf53ff8a",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3902,7 +3793,6 @@
         "publisher": "香港天文台",
         "title": "2008年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2008c.txt",
-        "raw_sha256": "fe3f8c5e8f8757545d6af51601d4bfd841d55b23fcd86d57b886f2afaca1a745",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3938,7 +3828,6 @@
         "publisher": "香港天文台",
         "title": "2009年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2009c.txt",
-        "raw_sha256": "8cf17f7ff1f1524dad7eb271737c5eb1c7904a333422b2e989017ced79e2c192",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -3974,7 +3863,6 @@
         "publisher": "香港天文台",
         "title": "2010年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2010c.txt",
-        "raw_sha256": "3cdcbdd8a0532f974988c6b2b4594e4342a7e630e13de520a85110446ef7cf77",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4010,7 +3898,6 @@
         "publisher": "香港天文台",
         "title": "2011年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2011c.txt",
-        "raw_sha256": "8e005acca8826c17e162b87fe7389c5bcbfc675ca1519a1bb8a349b3ca4fb656",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4046,7 +3933,6 @@
         "publisher": "香港天文台",
         "title": "2012年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2012c.txt",
-        "raw_sha256": "3e9fe288edc47f8bbf7055df6548ce59a3c2587d647aec89b82fed57264b99cf",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4082,7 +3968,6 @@
         "publisher": "香港天文台",
         "title": "2013年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2013c.txt",
-        "raw_sha256": "aaaec030289ecf5467e55963ec52b9e33abb1550926bdf219b7e77e653cf2eaa",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4118,7 +4003,6 @@
         "publisher": "香港天文台",
         "title": "2014年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2014c.txt",
-        "raw_sha256": "526c6ce3d69a01c750f8d25c239954ec6cbfe1919f0d685bf843d20c65cf3732",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4154,7 +4038,6 @@
         "publisher": "香港天文台",
         "title": "2015年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2015c.txt",
-        "raw_sha256": "b4cbef56453818e2d51ba16debc7df5faaef86b631381afcbffec3fddb20b06c",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4190,7 +4073,6 @@
         "publisher": "香港天文台",
         "title": "2016年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2016c.txt",
-        "raw_sha256": "59879eb094e654d51f6b7b0a2124d8525ec3903e143825bc2af4f610c92884e5",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4226,7 +4108,6 @@
         "publisher": "香港天文台",
         "title": "2017年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2017c.txt",
-        "raw_sha256": "8df96fed1bee2990ed5245c6837200d38e77df0d76f7b884a267638d5166ba00",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4262,7 +4143,6 @@
         "publisher": "香港天文台",
         "title": "2018年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2018c.txt",
-        "raw_sha256": "62e5d7dcd5597bc339342c5c48462994ff6955962beeb8e47dc7cbb28c807827",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4298,7 +4178,6 @@
         "publisher": "香港天文台",
         "title": "2019年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2019c.txt",
-        "raw_sha256": "e21ed5f2852340eb1a9c1c856b63c074dec2ce39e98d6504ad9dce9f27dc1db0",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4334,7 +4213,6 @@
         "publisher": "香港天文台",
         "title": "2020年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2020c.txt",
-        "raw_sha256": "e42824dab7a54fe1f6606cfa00b6ed778cb43cbbabd1bfe077120008b82f3a1b",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4370,7 +4248,6 @@
         "publisher": "香港天文台",
         "title": "2021年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2021c.txt",
-        "raw_sha256": "e8d4aa9b79e2774a2dcba86c902d5ac3bde989867072ec4ab3567489cf9dfad2",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4406,7 +4283,6 @@
         "publisher": "香港天文台",
         "title": "2022年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2022c.txt",
-        "raw_sha256": "3b9352be5d12b46b0278d9dc25b03c7de6669df2d89bf94183643b4768ba3d98",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4442,7 +4318,6 @@
         "publisher": "香港天文台",
         "title": "2023年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2023c.txt",
-        "raw_sha256": "4a5fc4dbb7a1b78824bc2b0cf9c07083f9487e610cece066102759cd5d23edee",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4478,7 +4353,6 @@
         "publisher": "香港天文台",
         "title": "2024年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2024c.txt",
-        "raw_sha256": "0120d4df9b6638b084dcf35a0633f970ec47f8c1adde2553fba3e3c3570217fc",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4514,7 +4388,6 @@
         "publisher": "香港天文台",
         "title": "2025年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2025c.txt",
-        "raw_sha256": "7a2803584dcd12a38a13e3710e643369996f59e690d684b9e3705fc5e988ebc2",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4550,7 +4423,6 @@
         "publisher": "香港天文台",
         "title": "2026年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2026c.txt",
-        "raw_sha256": "7b0831acb16a5a72a1ab553205e938b2f658c3837e06440f22c084e1a39832dd",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4586,7 +4458,6 @@
         "publisher": "香港天文台",
         "title": "2027年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2027c.txt",
-        "raw_sha256": "2c6a406cd2f8c6f1cf11f154737b7c5ae4afb53c87d76b101bd561b482e3b93f",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4622,7 +4493,6 @@
         "publisher": "香港天文台",
         "title": "2028年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2028c.txt",
-        "raw_sha256": "4b0c09cc20947f6199106f2664c3b1178f20510f5ccf044be502c352250bb3c0",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4658,7 +4528,6 @@
         "publisher": "香港天文台",
         "title": "2029年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2029c.txt",
-        "raw_sha256": "4477676453008afe875869c3915acdfc7a62cdbc3c6001751978eea7d7c1f4f7",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4694,7 +4563,6 @@
         "publisher": "香港天文台",
         "title": "2030年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2030c.txt",
-        "raw_sha256": "6f402ba7aa1c1db74172e0eb47cd38feb3562889c289a60d7fb9ba67ba8ca234",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4730,7 +4598,6 @@
         "publisher": "香港天文台",
         "title": "2031年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2031c.txt",
-        "raw_sha256": "e4fc7d762e09c749a117a26e0164c140e1e6c0c110bc571ee4137cb60e75c863",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4766,7 +4633,6 @@
         "publisher": "香港天文台",
         "title": "2032年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2032c.txt",
-        "raw_sha256": "4ccf673be92a44b0471a5aca12c48de3b95a967e07776e346a8ce0e63a5dcb42",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4802,7 +4668,6 @@
         "publisher": "香港天文台",
         "title": "2033年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2033c.txt",
-        "raw_sha256": "d2ec5d438f5838512c38879a8d32b38a6e0cb5dcdd8993ed8b78741fc9f1e899",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4838,7 +4703,6 @@
         "publisher": "香港天文台",
         "title": "2034年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2034c.txt",
-        "raw_sha256": "0b9cdf0733d7069d55851aeed05421365978c58ddc314e524328537a5a011ca2",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4874,7 +4738,6 @@
         "publisher": "香港天文台",
         "title": "2035年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2035c.txt",
-        "raw_sha256": "18a341b931284ddf77d5fe2ca7a0ecc96a5fcf1427611b3e7d4282dc7de9be18",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4910,7 +4773,6 @@
         "publisher": "香港天文台",
         "title": "2036年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2036c.txt",
-        "raw_sha256": "1ab9dbef438932d8f12de4b8ece5d477dc4f40a6429c493d7d6ecf410e9bb511",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4946,7 +4808,6 @@
         "publisher": "香港天文台",
         "title": "2037年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2037c.txt",
-        "raw_sha256": "183dbc985a6f96d86517b5e5a1b99924b74923f8132533d6d63bfe5019f11a51",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -4982,7 +4843,6 @@
         "publisher": "香港天文台",
         "title": "2038年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2038c.txt",
-        "raw_sha256": "08a3de83bec015882c3b800f77789af70dab27a13ee163fc89d876211ef5ed3b",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5018,7 +4878,6 @@
         "publisher": "香港天文台",
         "title": "2039年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2039c.txt",
-        "raw_sha256": "667369c943c3a6b15b0f0dc7069107c7f56e060c18af1364aba2456534eb04b0",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5054,7 +4913,6 @@
         "publisher": "香港天文台",
         "title": "2040年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2040c.txt",
-        "raw_sha256": "07a78d14e2eae1553ff4547d1ebff26066d27378463378815d5eddf0f0b52f9c",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5090,7 +4948,6 @@
         "publisher": "香港天文台",
         "title": "2041年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2041c.txt",
-        "raw_sha256": "97b8bd25593c285d89cb0631b5b2abb7f785c60abaabd1e4a6009199a03f0b7d",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5126,7 +4983,6 @@
         "publisher": "香港天文台",
         "title": "2042年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2042c.txt",
-        "raw_sha256": "ac3e9af080ee76d1890b513fe6b3c1ce4e237b767b26ba6d2f84ba838870eefb",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5162,7 +5018,6 @@
         "publisher": "香港天文台",
         "title": "2043年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2043c.txt",
-        "raw_sha256": "36cef0fb1faf79ea2f806dbceaeab7bc7a99c48039acc1b9c863694f2d536c61",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5198,7 +5053,6 @@
         "publisher": "香港天文台",
         "title": "2044年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2044c.txt",
-        "raw_sha256": "380acbfc7d0c01cc15a87e3e9ce2b82c850f5bce1a6bc56c55f76c2430fb6118",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5234,7 +5088,6 @@
         "publisher": "香港天文台",
         "title": "2045年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2045c.txt",
-        "raw_sha256": "b0f438649aea5a1f9d296c53262ac138f6e59ddde1a9da6c3b09974961c7d021",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5270,7 +5123,6 @@
         "publisher": "香港天文台",
         "title": "2046年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2046c.txt",
-        "raw_sha256": "d56ca428b404652cc3f6298fc83d7da6a003e80990105ed66c6881eeb2559fb9",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5306,7 +5158,6 @@
         "publisher": "香港天文台",
         "title": "2047年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2047c.txt",
-        "raw_sha256": "df27d79e0db38689ba9daa5589be13b561396a729de531aa0bd7fe1d4724fda9",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5342,7 +5193,6 @@
         "publisher": "香港天文台",
         "title": "2048年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2048c.txt",
-        "raw_sha256": "135e10f43bd7109d782426fd9ea899e83d0f815476897300d6d18f5d2c2c42ae",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5378,7 +5228,6 @@
         "publisher": "香港天文台",
         "title": "2049年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2049c.txt",
-        "raw_sha256": "802e2e0c4e92e18067d3ad79578cd6b7e3dff05f77e09de30d735e11e681c523",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5414,7 +5263,6 @@
         "publisher": "香港天文台",
         "title": "2050年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2050c.txt",
-        "raw_sha256": "7b7c35889b147f12eba93aed8cb9ac18886233814948ca6b7cf003423f14c0e0",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5450,7 +5298,6 @@
         "publisher": "香港天文台",
         "title": "2051年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2051c.txt",
-        "raw_sha256": "e0557ff418cc87d9be1e3a57985ef04ae04708afcbb21351065a1452483eb523",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5486,7 +5333,6 @@
         "publisher": "香港天文台",
         "title": "2052年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2052c.txt",
-        "raw_sha256": "1556eb1e945452fa1767b9cada8661ba9df20482d86183e2538e08f288ec4794",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5522,7 +5368,6 @@
         "publisher": "香港天文台",
         "title": "2053年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2053c.txt",
-        "raw_sha256": "7b3576be5ebb7e6f277c8f5dfc3d0fffdaa28093c8b0916dd5239fedb6dcd87c",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5558,7 +5403,6 @@
         "publisher": "香港天文台",
         "title": "2054年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2054c.txt",
-        "raw_sha256": "dc7224b17799ae6a165d7919e2b05275526d63bd482500f2700ba3a81a291d42",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5594,7 +5438,6 @@
         "publisher": "香港天文台",
         "title": "2055年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2055c.txt",
-        "raw_sha256": "9f2097f8503fcc65da163d73c5ef9a5889d4df503896bcda6983d4e5688918ff",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5630,7 +5473,6 @@
         "publisher": "香港天文台",
         "title": "2056年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2056c.txt",
-        "raw_sha256": "d2c4cd04d63b3adb57c2f4d40c12176cc306e0b6f377de383812b86bfc398bd6",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5666,7 +5508,6 @@
         "publisher": "香港天文台",
         "title": "2057年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2057c.txt",
-        "raw_sha256": "39e46acd405f94c399bb3bd7d4ede0cbfc506007b34317499983b8482bffad99",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5702,7 +5543,6 @@
         "publisher": "香港天文台",
         "title": "2058年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2058c.txt",
-        "raw_sha256": "ac731bfbf29fba64f5ea80826dbe51013636a5c221670fcb101d15cc7346465b",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5738,7 +5578,6 @@
         "publisher": "香港天文台",
         "title": "2059年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2059c.txt",
-        "raw_sha256": "e4e04704cf8e52f5e598a269697bc499328629e4be655064d4218fa989d1b9c3",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5774,7 +5613,6 @@
         "publisher": "香港天文台",
         "title": "2060年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2060c.txt",
-        "raw_sha256": "c50bd30b1493e2e43fe30f9ec8baa55376b332440118e4143283bcb87a78acf0",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5810,7 +5648,6 @@
         "publisher": "香港天文台",
         "title": "2061年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2061c.txt",
-        "raw_sha256": "cb393ea73cdd3dd08a0aa6a8cd8d6315db49b116070147801d2c72c712bc1e82",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5846,7 +5683,6 @@
         "publisher": "香港天文台",
         "title": "2062年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2062c.txt",
-        "raw_sha256": "b1f374b5d29253d6a0aa7b45f02cfb6d8ec4dc5ff7dd8fb4c3baa73ad31d3ff9",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5882,7 +5718,6 @@
         "publisher": "香港天文台",
         "title": "2063年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2063c.txt",
-        "raw_sha256": "fadf8e5955ec31dfdf6236690020cf6172057ccc5c77bb071401d19cd7c29eda",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5918,7 +5753,6 @@
         "publisher": "香港天文台",
         "title": "2064年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2064c.txt",
-        "raw_sha256": "8cfa315e03b212e848d1dab2b8c2b3478733b49500f252f2c4c615c85b4fee45",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5954,7 +5788,6 @@
         "publisher": "香港天文台",
         "title": "2065年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2065c.txt",
-        "raw_sha256": "c498f44a705020721f472477e1ce9626b9a5a11563da34e279dd300e6a6b3a2a",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -5990,7 +5823,6 @@
         "publisher": "香港天文台",
         "title": "2066年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2066c.txt",
-        "raw_sha256": "ddf783638fbbfbc69696b2b1578060053f7cbd4f4043196e684cb268b05aee61",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6026,7 +5858,6 @@
         "publisher": "香港天文台",
         "title": "2067年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2067c.txt",
-        "raw_sha256": "a2da3d7af70503aae4d643c156ad6bbb8a2e17ff6c9794cd0033badf4c7621d2",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6062,7 +5893,6 @@
         "publisher": "香港天文台",
         "title": "2068年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2068c.txt",
-        "raw_sha256": "e1a458dac71564d02da9a8cdaab93b10a0346ca783929abe7c0413abad5972d5",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6098,7 +5928,6 @@
         "publisher": "香港天文台",
         "title": "2069年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2069c.txt",
-        "raw_sha256": "817855089c9d6b1c4e071e60449a196f938463e02371e32491501497adff721b",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6134,7 +5963,6 @@
         "publisher": "香港天文台",
         "title": "2070年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2070c.txt",
-        "raw_sha256": "dd769bb8bd532ec5739a55b667cb16c41afcbb0d26a07ab444a934efa571952e",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6170,7 +5998,6 @@
         "publisher": "香港天文台",
         "title": "2071年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2071c.txt",
-        "raw_sha256": "51ab837d96bdc71a632926342e5802e271b2453f3bed9cfe9f0ebc987350a95f",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6206,7 +6033,6 @@
         "publisher": "香港天文台",
         "title": "2072年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2072c.txt",
-        "raw_sha256": "7597d83c0d8d1cfcff60953c659257abb1e278eb0ff561c9bdc637f7be78f5bf",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6242,7 +6068,6 @@
         "publisher": "香港天文台",
         "title": "2073年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2073c.txt",
-        "raw_sha256": "b235e5ae774139f5116ce9e67c996a3f0f4a5df7b53c94c98b8a78c56f5d9089",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6278,7 +6103,6 @@
         "publisher": "香港天文台",
         "title": "2074年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2074c.txt",
-        "raw_sha256": "7d5311cb66326f75a7fced887739c13cb1d66b8bbfaf36706dea7558bd94dde0",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6314,7 +6138,6 @@
         "publisher": "香港天文台",
         "title": "2075年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2075c.txt",
-        "raw_sha256": "e37316bf45c2b582fea8f8c6aada161a4ede5d86a4a68de7148c7b39770d9231",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6350,7 +6173,6 @@
         "publisher": "香港天文台",
         "title": "2076年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2076c.txt",
-        "raw_sha256": "a3c1d9dadf21255902f5779843a3390e40513311768351f379b9aeea538bb1cf",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6386,7 +6208,6 @@
         "publisher": "香港天文台",
         "title": "2077年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2077c.txt",
-        "raw_sha256": "4b460f6e9462f6048a90083d0a8b856856f0eea16e1d515bcbbc10b7b9e1603b",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6422,7 +6243,6 @@
         "publisher": "香港天文台",
         "title": "2078年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2078c.txt",
-        "raw_sha256": "30aa36754e74821b3cb5cf2ff5b1a3610a13f02ca44e3a5087b0f7f623b3901e",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6458,7 +6278,6 @@
         "publisher": "香港天文台",
         "title": "2079年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2079c.txt",
-        "raw_sha256": "59107ad6f57d5ba3eccfb17893eaaaa76b478132e5b65a8d1fea65445dd78e24",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6494,7 +6313,6 @@
         "publisher": "香港天文台",
         "title": "2080年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2080c.txt",
-        "raw_sha256": "b836827fd2ead8da80daaad202ef1f60f9ef668bd4da00ede76143485a60b9c4",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6530,7 +6348,6 @@
         "publisher": "香港天文台",
         "title": "2081年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2081c.txt",
-        "raw_sha256": "6ec6daac880ee50b599803a1bf412a2bdff610e795b1a1396e7bf45a1df6a5df",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6566,7 +6383,6 @@
         "publisher": "香港天文台",
         "title": "2082年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2082c.txt",
-        "raw_sha256": "48631f1c896b48668bf85a64809646ef55e4b683d68402ab9c2bb7ffb60e84d3",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6602,7 +6418,6 @@
         "publisher": "香港天文台",
         "title": "2083年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2083c.txt",
-        "raw_sha256": "5ce05d5417671eef995aa4e787ce219c43c07d53bff0f528633206cc11ce3e71",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6638,7 +6453,6 @@
         "publisher": "香港天文台",
         "title": "2084年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2084c.txt",
-        "raw_sha256": "035ebf1687976aba293985bcd25d116c0392381e8d68c4cb0eb19b34aa7f6516",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6674,7 +6488,6 @@
         "publisher": "香港天文台",
         "title": "2085年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2085c.txt",
-        "raw_sha256": "15eaa76276d3c5dba13b89842fac919aab2641be034f57d8d4dda7b78fbb1312",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6710,7 +6523,6 @@
         "publisher": "香港天文台",
         "title": "2086年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2086c.txt",
-        "raw_sha256": "8426bdded2d6c6289db8024fd0fc304b4b3f20657baadc35816a43cac11f5042",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6746,7 +6558,6 @@
         "publisher": "香港天文台",
         "title": "2087年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2087c.txt",
-        "raw_sha256": "27659d0744448c3b8ed628b992963005874dc63a31f44372c3b2335a723b8755",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6782,7 +6593,6 @@
         "publisher": "香港天文台",
         "title": "2088年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2088c.txt",
-        "raw_sha256": "abf1a2e08038438df727a7e7fd1fe6b6bfa110feb6d9aee3b1d9aa4818f99c54",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6818,7 +6628,6 @@
         "publisher": "香港天文台",
         "title": "2089年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2089c.txt",
-        "raw_sha256": "66fc0e954fe9f0e16ee26e43eca3cef7c5e6e4cf224b912277638ec28680c9fe",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6854,7 +6663,6 @@
         "publisher": "香港天文台",
         "title": "2090年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2090c.txt",
-        "raw_sha256": "9d8ab22f5d18c0802a18ed7c9a99397813cc56d7449b4d28d48597ee8eed91ab",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6890,7 +6698,6 @@
         "publisher": "香港天文台",
         "title": "2091年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2091c.txt",
-        "raw_sha256": "188aca5d503c97990f1d60d79592bbed7aa88b6f084350b145d69398dd3d0b98",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6926,7 +6733,6 @@
         "publisher": "香港天文台",
         "title": "2092年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2092c.txt",
-        "raw_sha256": "c5091fb1d67252125efd13c0a2855204d1b044277256bbe3c5207056adb7736a",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6962,7 +6768,6 @@
         "publisher": "香港天文台",
         "title": "2093年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2093c.txt",
-        "raw_sha256": "c0227740d52e78db11da5c5cb06f91b20c39f6dd506e1a369e0cdf5f8b6fb62e",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -6998,7 +6803,6 @@
         "publisher": "香港天文台",
         "title": "2094年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2094c.txt",
-        "raw_sha256": "ab0c8c4c80dc3c82eaf10a963af1fb8af5189506ec2761b2769fbfc39279e408",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -7034,7 +6838,6 @@
         "publisher": "香港天文台",
         "title": "2095年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2095c.txt",
-        "raw_sha256": "47dcebc7c2e808f778bf7eb1abdcd8e102430613ff24ea1c0b80046df21957fb",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -7070,7 +6873,6 @@
         "publisher": "香港天文台",
         "title": "2096年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2096c.txt",
-        "raw_sha256": "f9ae7b969d0da8d7c32a444e38f7a831ff3e88a9df39a7d598e8b4d0092a060f",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -7106,7 +6908,6 @@
         "publisher": "香港天文台",
         "title": "2097年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2097c.txt",
-        "raw_sha256": "7705d23609e37937dff638fb8f78e09edc19a9d17ffd26ea2399853eb2c2ac2e",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -7142,7 +6943,6 @@
         "publisher": "香港天文台",
         "title": "2098年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2098c.txt",
-        "raw_sha256": "8f7f6bd1baeb1b2b6f30200dd7415742841ba3d1670aa089e42938c9bbba59f5",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -7178,7 +6978,6 @@
         "publisher": "香港天文台",
         "title": "2099年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2099c.txt",
-        "raw_sha256": "fbb29bf02f5e1fc3c3d9872e24f0d674093ed8ede7b2035011874127e653c8a9",
         "retrieved_on": "2026-10-22"
       },
       "terms": {
@@ -7214,7 +7013,6 @@
         "publisher": "香港天文台",
         "title": "2100年公曆與農曆日期對照表",
         "url": "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2100c.txt",
-        "raw_sha256": "e8da3a341c440b2f097c420696f00c71dc1917ac927433dd76b24fb2fa5d5df9",
         "retrieved_on": "2026-10-22"
       },
       "terms": {

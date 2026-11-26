@@ -92,7 +92,7 @@ class Vsop2013SourceProfile(TypedDict):
     working_jd_tt: list[float]
     reference: str
     sources: dict[str, dict[str, str]]
-    native_source_files_sha256: dict[str, str]
+    native_source_files: list[str]
     lunar_replacement_c: str
     source_identity_scope: str
     qualification_reference: str
@@ -196,7 +196,7 @@ def _prepare_sources(
     profile: Vsop2013SourceProfile, upstream: Path, target: Path
 ) -> SeriesPackingReceipt:
     target.mkdir()
-    expected = profile["native_source_files_sha256"]
+    expected = set(profile["native_source_files"])
     with tarfile.open(upstream / "pyswisseph-2.10.3.2.tar.gz") as archive:
         for member in archive:
             parts = Path(member.name).parts

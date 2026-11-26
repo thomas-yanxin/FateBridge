@@ -3,7 +3,6 @@
   "ruleset_version": "2.0.0",
   "source": {
     "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
-    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
     "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
     "method": "Same-edition PDF83,98 visually reread; PDF59 parent-only transformation scope inherited from its frozen scan. Web transcription used for navigation, never replaces this edition."
   },
@@ -38,18 +37,15 @@
   },
   "scope": "同版巳寅申三支位置与寅日不论生条件；刑害总作用及现实结果未裁定。；第98页特定寅生巳排除先于第10章一般回头生许可，逐来源限定日月、本位变支与原动爻；原始关系、月令位置与空破门槛保留，刑的总作用仍未裁定。",
   "quotation_errata": {
-    "profile_sha256": "d4ccd18a0eb72bd8d39e210d9fb1d57d80f9c71dbb64825b20cd93fc2bbd4754",
     "clause_id": "changed-parent-scope",
     "old_quote": "變爻能生尅沖合本位之動爻不能生尅他爻",
     "new_quote": "變爻之巳火能回頭尅本位之酉金並不能生尅他爻",
     "reason": "Initial text was an accurate scope paraphrase incorrectly labelled as a verbatim quotation. PDF59 was rerendered and visually inspected before integration; use its actual concrete Si/You wording. Frozen source and case expectations unchanged.",
-    "pdf_page": 59,
-    "source_sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa"
+    "pdf_page": 59
   },
   "precedence": {
     "id": "liuyao_si_yin_shen_precedence_v21",
     "version": "1.0.0",
-    "source_sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
     "reviewed_pdf_pages": [
       53,
       59,

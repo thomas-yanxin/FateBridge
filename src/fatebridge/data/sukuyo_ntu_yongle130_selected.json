@@ -5,8 +5,6 @@
     "title": "永樂北藏第一三〇冊《文殊師利菩薩及諸仙所說吉凶時日善惡宿曜經》上下卷所选段",
     "catalogue_url": "https://dlbs.liberal.ntu.edu.tw/DLMBS/sutra/chinese/yongle/yongle16.jsp",
     "official_pdf_url": "https://dlbs.liberal.ntu.edu.tw/BDLM/sutra/yongle/chi_pdf/6-130.pdf",
-    "catalogue_html_sha256": "f5c44258324d96c74f4f15f4333028fe36957bd6338d7f013b0e7e1b758b0773",
-    "official_pdf_sha256": "75e2559cf863b7ff0ff3db81683720a540d5bad7f002867f742f29bc394b9f27",
     "official_pdf_bytes": 24966725,
     "official_pdf_pages": 900,
     "source_host": "國立臺灣大學圖書館佛學數位圖書館暨博物館",
@@ -32,9 +30,7 @@
       ]
     ],
     "mirror_upper_pdf_url": "https://rongmotamhon.net/phuluc/split/vinhlac_T21_1299_1.pdf",
-    "mirror_upper_pdf_sha256": "efa09e3a267ac04a95ca80513a29452454d4d93c50d3e7eb3077784fc832bcfd",
     "mirror_lower_pdf_url": "https://rongmotamhon.net/phuluc/split/vinhlac_T21_1299_2.pdf",
-    "mirror_lower_pdf_sha256": "bcf8831827c78373229b5c70c02b7e2e5cfb4c88f7efdfb2dca97e10373be9df",
     "image_identity_method": "Pillow TIFF/CCITT raster decode followed by SHA256 of 1248x1712 one-bit pixel bytes; mask width, height, ImageMask, BitsPerComponent and Decode also equal. pypdf get_data alone emits TIFF-wrapped CCITT, not unpacked pixels.",
     "all_56_selected_page_images_match_official": true,
     "image_identity_is_independent_witness_count": false,
@@ -45,8 +41,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 547,
-        "decoded_image_sha256": "6e588d2ac0324625e90c53468cd7cbb231c2235b40a88f3ca420f5edf1c33fad",
-        "decoded_raster_sha256": "b728b46bdd5ccb165017df8268c22efe22aa210e17689d24746277a2aad5d647",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -57,8 +51,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 548,
-        "decoded_image_sha256": "fa691955cc3a106ac682ca3f04d87538936fb5e5f7eb357c8ae5988b7194c98d",
-        "decoded_raster_sha256": "795b6243fcb2917e4809cf14c0d0e9a2b74ef31748f6b3034cf649282b1dba92",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -69,8 +61,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 549,
-        "decoded_image_sha256": "07a1f08333eeff8c15e34d298c3856664afe8c2d7c1e3c9d16db4513a3b6a621",
-        "decoded_raster_sha256": "d0eabfd0c3dffb97380d162a3c93ed5dae537ff069d471eda7874eb8cfb84fef",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -81,8 +71,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 550,
-        "decoded_image_sha256": "af1a85d22a37ea433191dba780c074503b6b7e0a512b1a76f7e22cef254707b7",
-        "decoded_raster_sha256": "aa8324184f3fefe0c7c2f675fb9db0ed672428de6700a6911ea9dea592085596",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -93,8 +81,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 551,
-        "decoded_image_sha256": "7c3f6ba8740bf3348db01732b15acd95bd44d23de19e47f70d4ccc4b9a7cee35",
-        "decoded_raster_sha256": "a5aacd62a42371082ff4302454c44e0825c8c5de3a07dcf615abe862ffc76d8e",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -105,8 +91,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 552,
-        "decoded_image_sha256": "7f0eed4377dc3b5825305ba8e3f371e66a50350a9147748f2967cfa54ebab61e",
-        "decoded_raster_sha256": "593b5f080d299807caa04e21e95deddba2756e51b0bbd99fc96b1a74324df9a2",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -117,8 +101,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 553,
-        "decoded_image_sha256": "d3909ee8cd97c38d3b7f88cf576404456004839cc0f1d08c4feac52030f7b9a7",
-        "decoded_raster_sha256": "ee8a65e89b6b4ad3af511e94dc52632e1ce83777c4c495ad071f2eca470c5e2f",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -129,8 +111,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 554,
-        "decoded_image_sha256": "098fa626544723f43fedca57dfadf0132113ba5c1683ef5aaea3b818e0fb724d",
-        "decoded_raster_sha256": "3301469bc0784a3b249e24cb4e9a7da854bf3296c1e088aa52c791ac75858093",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -141,8 +121,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 555,
-        "decoded_image_sha256": "dd47d6873fb118cd4e78725bb143cde851520b12a35666200dcddb892e223d1e",
-        "decoded_raster_sha256": "1e86ff64489e403c3680280395d5c04af08b6b577ec3fedbcf1d7d91495a8a4c",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -153,8 +131,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 556,
-        "decoded_image_sha256": "7b7ee6ef727f62f15ec67360b6a56cab6b4c5a8aaf76c875315b79075849bdaa",
-        "decoded_raster_sha256": "fc61462edfbb6eef96351fc7a84c5b785ff9dbaa72df9faf0a9035137a244b4d",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -165,8 +141,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 557,
-        "decoded_image_sha256": "fe8611163e4c668bc9f6e1db685f69e9dfe8deaae98d1d754dca7ebcf02382a0",
-        "decoded_raster_sha256": "b7ad9729945a01e5406afdd6e216dfcf7153aeedbde51f799f3705c7442a3b9e",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -177,8 +151,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 558,
-        "decoded_image_sha256": "9fa9fad4eb073b6bdb73adb3d4d4217539cb1e868a9879d7b841d1e4a1d712ea",
-        "decoded_raster_sha256": "dea6fa001ffd8f011de3b0a394618bd361d47e475068b5a26e312a88dd63bf61",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -189,8 +161,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 559,
-        "decoded_image_sha256": "a2de4224c19c3d178336b9043b85ad66e2bee6dd44da89e8c07164440f0f121c",
-        "decoded_raster_sha256": "6388c40d1d81e3e84c6caa373ed39accb86d988ec1772ebfa32654f7a88a93a5",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -201,8 +171,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 560,
-        "decoded_image_sha256": "1116ed82f0fe2522db1e4d356681af4f4e2dabc9e8039656d5e0a9657411e80f",
-        "decoded_raster_sha256": "8afbfefbd71c91145cdcb341b79b8c7360297ab2cbee73db9b0dcfe16d6f15c3",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -213,8 +181,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 561,
-        "decoded_image_sha256": "3413e1074f4e9e6e8a30cefd43ca6326ffd317876388adbda33daa16a65a0321",
-        "decoded_raster_sha256": "28d2006c28384907d519bb0e0c163e8fe0005620357037aa0616a87606685a3c",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -225,8 +191,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 562,
-        "decoded_image_sha256": "822eb1ec0682d21ef9cfa1a226669788593fb15b2a25720280f1e2cb4dde4547",
-        "decoded_raster_sha256": "6ba72ccccb50997b08c938bab8b880295fee3ca3e7feb17bc49bae880147c16c",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -237,8 +201,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 563,
-        "decoded_image_sha256": "6d56bb79e5c3a23e542117d8d5450d47bfbd51f1320e2d30aa91e1eed79dfb10",
-        "decoded_raster_sha256": "28ecc6665f124ba75da619314d88a2fc9e94f15ef0545937d3ec192ea7911c37",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -249,8 +211,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 564,
-        "decoded_image_sha256": "2e2c09c4f52aad137f21bf4f0cd02202debb305d12cb6fe45410110e4fa372a8",
-        "decoded_raster_sha256": "f6707607eb750247b919015e67b887b41cd3316c94e66f9d2f27c9151b99eb11",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -261,8 +221,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 565,
-        "decoded_image_sha256": "0468e9f828bea02da7ccbcd5aae49698cccb53fbcb55d1a562626a833ecbee84",
-        "decoded_raster_sha256": "9c59b11189cfce42f5c528dd498793fa7d5d138cc1e20c22d0816d4af5837d2a",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -273,8 +231,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 566,
-        "decoded_image_sha256": "8020be0999dc846f1ca363a6b06e51bfbf1f2d7e3e59f3a470dfbfa0e22bd505",
-        "decoded_raster_sha256": "05dc73c59e4317950479c5d397d5f3f76ad489d7b5ebbe4ce6a9c14f3585efae",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -285,8 +241,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 567,
-        "decoded_image_sha256": "88794cd59b802d4ac25337a7fa1fae6e4325cf00fdea117a32a9f3a04b8087e6",
-        "decoded_raster_sha256": "7361c6250a96be9ea53846f1bf0ca14911c37585d7e6bacc40f2fe401a0644dd",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -297,8 +251,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 568,
-        "decoded_image_sha256": "d947c3b522a8de82a7d7618858552e8489e3f959c1b24c951709e26715c48791",
-        "decoded_raster_sha256": "8d530eec5d04d2a50acd4e8199f742cdabbf16494461fcd35732dc1d02a588b4",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -309,8 +261,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 569,
-        "decoded_image_sha256": "1b17f007c99612a1afee5336c6df59483d939920535419ce58be5571ba652a9f",
-        "decoded_raster_sha256": "b930564d6efc8e9c8a6871e0575d356faf7eac828718a461ebdc9fa4605c5cce",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -321,8 +271,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 570,
-        "decoded_image_sha256": "7883ea61a10d490b4c3d8707fe1ddfde24a9235e43943f6ecc7a40fe6ecb0e4d",
-        "decoded_raster_sha256": "51ee4abb660aa1b2296701d7d4b92e327fd0f776b18e86a72593a6c243f04046",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -333,8 +281,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 571,
-        "decoded_image_sha256": "77d9bc35f6d2f61f29c99a227f6803d3ec0f63de882cc371d344648a7fa01693",
-        "decoded_raster_sha256": "bbe6b4782b59e25d9618219b9cb81e39857e7cf11b8d069e8751bc946a3c6f52",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -345,8 +291,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 572,
-        "decoded_image_sha256": "7f641ff4ba571af40619eca5d77a5f1bd6caff3fafe454d09ef486c42b3f4fa1",
-        "decoded_raster_sha256": "4aedfe5625624c7c6fbf2c4865a42c0b3ce5c8cb5f6416881160f28e01769da9",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -357,8 +301,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 573,
-        "decoded_image_sha256": "028831dd3a4b0f126a5d4c849f5a07f3e1f9f090435160afdee2641cf9792d04",
-        "decoded_raster_sha256": "f1cc8b657b07e3d64b750315d6aa0ae2290c323d93d96dd5f16326a14a44bb0b",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -369,8 +311,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 574,
-        "decoded_image_sha256": "a064d144b633a664bfbbb6dbfee30070d0b99218c13ffd505b1d08f35542d052",
-        "decoded_raster_sha256": "bcc43700d1e886c9c182593a274817d1dc705ce1be263d57fcedb8af9753d4f3",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -381,8 +321,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 575,
-        "decoded_image_sha256": "c435da463118f9fc75ca9f206cb3f3057053aa392aa7346debc244d7a5a2edba",
-        "decoded_raster_sha256": "6822a327b97c1846f17e1f46f33a85699379b1f82f3568a212be09904975c76b",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -393,8 +331,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 576,
-        "decoded_image_sha256": "1028109afe54b7b44a7651892ecb5ca0136f57aae2fc024e29b63b945d3005de",
-        "decoded_raster_sha256": "a494f30db7a72416181caffb38726534de97368626d1080f4e21da8d0b17f50e",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -405,8 +341,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 577,
-        "decoded_image_sha256": "66566b207e4fb5a759739653cf1eca08817452f1e6ff74956447471b927bdea3",
-        "decoded_raster_sha256": "defe811bdbf75e15003e7987ee179b11f15948a9eb740e49921a64a00f380792",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -417,8 +351,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 578,
-        "decoded_image_sha256": "4dbd1c0fb43e96cb65f5f27376e40dfcd4e4bff8c22282bd9511f5e6409a8e76",
-        "decoded_raster_sha256": "2bb6b46bb6e997c9d86188685d75948a59f1c28ce10a60bc2acee5e105f6579b",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -429,8 +361,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 579,
-        "decoded_image_sha256": "4eaed87333d384a162a545077aec77e82df1938a1fa27517f1c83104215f0bf6",
-        "decoded_raster_sha256": "58407d18bb6827bd16160ef26dadd213033c83f19988ea526c40599833241865",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -441,8 +371,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 580,
-        "decoded_image_sha256": "22bd24c4424d3e84fc293da539db51f616121c0587b80eed033abb99b8a94e92",
-        "decoded_raster_sha256": "1b34d0a5b02948a4003a27dd880736f2dedb320aff48842d82f8605dfab073ff",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -453,8 +381,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 581,
-        "decoded_image_sha256": "6c89af325b4f3370c0ff0a53f3bbb93a0d94adaf3145101f14fcea99c6b75155",
-        "decoded_raster_sha256": "b4cd29e2ab2e83236b29bc7941d6ae1b6e6c2dcb7b1f2f5239c85e5483012619",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -465,8 +391,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 582,
-        "decoded_image_sha256": "43825ee0e606c25f2863e944e85a0f83c61973a3c6188d6ab168cd2f48a815a7",
-        "decoded_raster_sha256": "3a71fd33068c08ee76cdf2b12842eb4e58cf5da0e440d511efdd451e10a9f6a4",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -477,8 +401,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 583,
-        "decoded_image_sha256": "e1d2550cf8465bacc1b0ab379d7bdff8154007d5acfcf71c0d00c5ce78215d0d",
-        "decoded_raster_sha256": "d77adb0219779f8c3411e9635de687962e4bedb6136c97d2dc8292c0eb53d71a",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -489,8 +411,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 584,
-        "decoded_image_sha256": "9152c0b4b7dcff9942e9e906260ffcca119945fc705b83934c797c308d124b4a",
-        "decoded_raster_sha256": "8803960e561aa7515b5f56f7bae9cd8984360ad4b3e3487c74556d2e7171fd39",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -501,8 +421,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 585,
-        "decoded_image_sha256": "673edbdf42a3325dd2be80fb51108e168278abeca944f5c7b77c789f5eb31767",
-        "decoded_raster_sha256": "73ee0e68f12a35b0b75e26ef6d0f3a5251b8e57903458a5837e2e8cdfbd59771",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -513,8 +431,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 586,
-        "decoded_image_sha256": "3a9a40275dc8adcbf0462089dcec6551093b04059c08a2dfbf730c8118d43e0c",
-        "decoded_raster_sha256": "0ebb663995ef7a36f4e729c8980d98bb530282fa49a2265e459f02136a4057f7",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -525,8 +441,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 587,
-        "decoded_image_sha256": "527b163a63284b6578db0f708ccc9ceb27debeacb30c345c243789b10a6fee0a",
-        "decoded_raster_sha256": "7d32747e4b259e7b156fafb6b2b0cab512cd4ac986473d8635cedd2a7714a0db",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -537,8 +451,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 588,
-        "decoded_image_sha256": "c07dcb1fb381f6bdb85c838c7f6eef352e31049182d59e993244ce6831f09f99",
-        "decoded_raster_sha256": "4064b9a0ba44d88b59f9cac557a39363369b1c10a03174a8db97da575edd51b8",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -549,8 +461,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 589,
-        "decoded_image_sha256": "51c4021b0c2cb58b6e28ecdc82d11b957529ba4eaf655e019d690cb250f22e12",
-        "decoded_raster_sha256": "225c43168ff12d4e0718f705db38659b64418c2a095601f008f65ed550586694",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -561,8 +471,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 590,
-        "decoded_image_sha256": "b2e7eb7f1efd93b432e52436c21a14daa675eeae415905fd177608a2b1878606",
-        "decoded_raster_sha256": "384df5840c63d9f569f204c727a9c377c368af02a0b3be2e9a2fc6eeb08fbc6b",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -573,8 +481,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 591,
-        "decoded_image_sha256": "cac7ffe04ecc064760fe6034870641447a9b4b9f8259e7fd2520b1a88119eddb",
-        "decoded_raster_sha256": "ef025317f9f3f6151b6aa1a6fb9414604915152652dc98f0c8aea5b2cd3ae309",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -585,8 +491,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 592,
-        "decoded_image_sha256": "43c694db95d42148de8ee7bab10d86f0d364d2b2e0afb4baaf062b962e853826",
-        "decoded_raster_sha256": "54437564e1d8221832194ab382fd64210e14d5a788721aeadaaa515e3715acfc",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -597,8 +501,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 593,
-        "decoded_image_sha256": "a85f28c12dc47c5b50d5bf84e86176964268e062c0eaf1baf2e4f407d0e80fab",
-        "decoded_raster_sha256": "45790f907ec6b15934a5063ffe797e0dfd26cc73eed2d345cdfd26bbe2768570",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -609,8 +511,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 594,
-        "decoded_image_sha256": "fcb5674a9fac320ddfb3cc5c8a68bfeb144ec29e0f5e8fa749d09cee177a7f26",
-        "decoded_raster_sha256": "88408be87b2e175198b8f1df104dd194783ab0a00439917e7c9920d2e4242b16",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -621,8 +521,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 595,
-        "decoded_image_sha256": "b9616bbacbd79fb354d62e7609a07708d132ad94cd92caf34168908f5684e869",
-        "decoded_raster_sha256": "48e77bf276c5af97759c66ab3ec62c6b5a95ab15384e34dd89a9010f9fde9a90",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -633,8 +531,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 596,
-        "decoded_image_sha256": "b4b602340c6ac518497beb0ae56056b731188faed8f7db2822f00bfdb655803f",
-        "decoded_raster_sha256": "a907f607684f6d6bd2e1d9653ea45ff0d45280ce5aa55041c88e014a1d7745e8",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -645,8 +541,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 597,
-        "decoded_image_sha256": "21a3e6afc280403cca5a0595cdcd10ecc0cf0d529f5c6695f91b7be4c8bc265e",
-        "decoded_raster_sha256": "0be23676c331197247a616f3f5ce59c70657477be98e066eb70a8c10d5c50cec",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -657,8 +551,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 598,
-        "decoded_image_sha256": "31e736bf43634f6f01d65732f368ce30ecdbf08015105e381f011dd5f007098f",
-        "decoded_raster_sha256": "f65c6f6bc9c9a37a9b9b9333959f9f68aeebd860635605662fbfa42cf686cdbe",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -669,8 +561,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 599,
-        "decoded_image_sha256": "5fa25d3c5d1581e86cde414b47da38b5c73f620a861927f3afe9b3868870c89b",
-        "decoded_raster_sha256": "02a3948e9645d1eb1cddc3364c95f87167b0186a8998be3f72580ad6ce11197c",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -681,8 +571,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 600,
-        "decoded_image_sha256": "cc137b20b518638f806228639ea5791b09aedc3c148989af78b15fb93bfcf2b6",
-        "decoded_raster_sha256": "e878c66be26216b8c2e5d351b16789ee1433641d998f675ad31ac2f1d167d133",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -693,8 +581,6 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 601,
-        "decoded_image_sha256": "bd3ac986d54cb796fc69934dc856df40ba1d274789d3c41f0276dbe2e6c57cc5",
-        "decoded_raster_sha256": "0043a74dd52ad6ea8b6bed54ee16e08449a2cccee09854dd54b7b395fe4ef737",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
@@ -705,16 +591,12 @@
         "width": 1248,
         "height": 1712,
         "ntu_pdf_page": 602,
-        "decoded_image_sha256": "b30db74b4d0e841bf8195477bb4c8712255cbf1a0e2616b63f15288180a7dda9",
-        "decoded_raster_sha256": "83cee0b8c9a5e50ebc0763f853af970fc38e82f59afd059d7bf1a66fec39fe06",
         "raster_mode": "1",
         "raster_pixel_bytes": 267072,
         "mask_display_attributes_identical": true
       }
     ],
-    "pixel_identity_receipt_sha256": "a765a8c1c8acad07d9342f560fdb4404e0446889f4b90570f89d23d70b14c3c3",
     "initial_stream_identity_method_wording_corrected": true,
-    "primary_first_sha256": "be16c03a09d8671b6f6edc73a095f0a703eee1b66a3cb87c5624023461272549",
     "transcription_method": "Root visual reading of selected actual facsimile pages and local crops. Earlier electronic apparatus and other witnesses were already known; this is neither blind transcription nor independent human paleographic certification. No majority vote or OCR fill.",
     "accepted_mansion_readings": 42,
     "unaccepted_mansion_glyph_slots": 0,
@@ -746,8 +628,6 @@
         "title": "永樂北藏第一三〇冊《文殊師利菩薩及諸仙所說吉凶時日善惡宿曜經》上下卷所选段",
         "catalogue_url": "https://dlbs.liberal.ntu.edu.tw/DLMBS/sutra/chinese/yongle/yongle16.jsp",
         "official_pdf_url": "https://dlbs.liberal.ntu.edu.tw/BDLM/sutra/yongle/chi_pdf/6-130.pdf",
-        "catalogue_html_sha256": "f5c44258324d96c74f4f15f4333028fe36957bd6338d7f013b0e7e1b758b0773",
-        "official_pdf_sha256": "75e2559cf863b7ff0ff3db81683720a540d5bad7f002867f742f29bc394b9f27",
         "official_pdf_bytes": 24966725,
         "official_pdf_pages": 900,
         "source_host": "國立臺灣大學圖書館佛學數位圖書館暨博物館",
@@ -773,9 +653,7 @@
           ]
         ],
         "mirror_upper_pdf_url": "https://rongmotamhon.net/phuluc/split/vinhlac_T21_1299_1.pdf",
-        "mirror_upper_pdf_sha256": "efa09e3a267ac04a95ca80513a29452454d4d93c50d3e7eb3077784fc832bcfd",
         "mirror_lower_pdf_url": "https://rongmotamhon.net/phuluc/split/vinhlac_T21_1299_2.pdf",
-        "mirror_lower_pdf_sha256": "bcf8831827c78373229b5c70c02b7e2e5cfb4c88f7efdfb2dca97e10373be9df",
         "image_identity_method": "Pillow TIFF/CCITT raster decode followed by SHA256 of 1248x1712 one-bit pixel bytes; mask width, height, ImageMask, BitsPerComponent and Decode also equal. pypdf get_data alone emits TIFF-wrapped CCITT, not unpacked pixels.",
         "all_56_selected_page_images_match_official": true,
         "image_identity_is_independent_witness_count": false,
@@ -786,8 +664,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 547,
-            "decoded_image_sha256": "6e588d2ac0324625e90c53468cd7cbb231c2235b40a88f3ca420f5edf1c33fad",
-            "decoded_raster_sha256": "b728b46bdd5ccb165017df8268c22efe22aa210e17689d24746277a2aad5d647",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -798,8 +674,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 548,
-            "decoded_image_sha256": "fa691955cc3a106ac682ca3f04d87538936fb5e5f7eb357c8ae5988b7194c98d",
-            "decoded_raster_sha256": "795b6243fcb2917e4809cf14c0d0e9a2b74ef31748f6b3034cf649282b1dba92",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -810,8 +684,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 549,
-            "decoded_image_sha256": "07a1f08333eeff8c15e34d298c3856664afe8c2d7c1e3c9d16db4513a3b6a621",
-            "decoded_raster_sha256": "d0eabfd0c3dffb97380d162a3c93ed5dae537ff069d471eda7874eb8cfb84fef",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -822,8 +694,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 550,
-            "decoded_image_sha256": "af1a85d22a37ea433191dba780c074503b6b7e0a512b1a76f7e22cef254707b7",
-            "decoded_raster_sha256": "aa8324184f3fefe0c7c2f675fb9db0ed672428de6700a6911ea9dea592085596",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -834,8 +704,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 551,
-            "decoded_image_sha256": "7c3f6ba8740bf3348db01732b15acd95bd44d23de19e47f70d4ccc4b9a7cee35",
-            "decoded_raster_sha256": "a5aacd62a42371082ff4302454c44e0825c8c5de3a07dcf615abe862ffc76d8e",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -846,8 +714,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 552,
-            "decoded_image_sha256": "7f0eed4377dc3b5825305ba8e3f371e66a50350a9147748f2967cfa54ebab61e",
-            "decoded_raster_sha256": "593b5f080d299807caa04e21e95deddba2756e51b0bbd99fc96b1a74324df9a2",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -858,8 +724,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 553,
-            "decoded_image_sha256": "d3909ee8cd97c38d3b7f88cf576404456004839cc0f1d08c4feac52030f7b9a7",
-            "decoded_raster_sha256": "ee8a65e89b6b4ad3af511e94dc52632e1ce83777c4c495ad071f2eca470c5e2f",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -870,8 +734,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 554,
-            "decoded_image_sha256": "098fa626544723f43fedca57dfadf0132113ba5c1683ef5aaea3b818e0fb724d",
-            "decoded_raster_sha256": "3301469bc0784a3b249e24cb4e9a7da854bf3296c1e088aa52c791ac75858093",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -882,8 +744,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 555,
-            "decoded_image_sha256": "dd47d6873fb118cd4e78725bb143cde851520b12a35666200dcddb892e223d1e",
-            "decoded_raster_sha256": "1e86ff64489e403c3680280395d5c04af08b6b577ec3fedbcf1d7d91495a8a4c",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -894,8 +754,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 556,
-            "decoded_image_sha256": "7b7ee6ef727f62f15ec67360b6a56cab6b4c5a8aaf76c875315b79075849bdaa",
-            "decoded_raster_sha256": "fc61462edfbb6eef96351fc7a84c5b785ff9dbaa72df9faf0a9035137a244b4d",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -906,8 +764,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 557,
-            "decoded_image_sha256": "fe8611163e4c668bc9f6e1db685f69e9dfe8deaae98d1d754dca7ebcf02382a0",
-            "decoded_raster_sha256": "b7ad9729945a01e5406afdd6e216dfcf7153aeedbde51f799f3705c7442a3b9e",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -918,8 +774,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 558,
-            "decoded_image_sha256": "9fa9fad4eb073b6bdb73adb3d4d4217539cb1e868a9879d7b841d1e4a1d712ea",
-            "decoded_raster_sha256": "dea6fa001ffd8f011de3b0a394618bd361d47e475068b5a26e312a88dd63bf61",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -930,8 +784,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 559,
-            "decoded_image_sha256": "a2de4224c19c3d178336b9043b85ad66e2bee6dd44da89e8c07164440f0f121c",
-            "decoded_raster_sha256": "6388c40d1d81e3e84c6caa373ed39accb86d988ec1772ebfa32654f7a88a93a5",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -942,8 +794,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 560,
-            "decoded_image_sha256": "1116ed82f0fe2522db1e4d356681af4f4e2dabc9e8039656d5e0a9657411e80f",
-            "decoded_raster_sha256": "8afbfefbd71c91145cdcb341b79b8c7360297ab2cbee73db9b0dcfe16d6f15c3",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -954,8 +804,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 561,
-            "decoded_image_sha256": "3413e1074f4e9e6e8a30cefd43ca6326ffd317876388adbda33daa16a65a0321",
-            "decoded_raster_sha256": "28d2006c28384907d519bb0e0c163e8fe0005620357037aa0616a87606685a3c",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -966,8 +814,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 562,
-            "decoded_image_sha256": "822eb1ec0682d21ef9cfa1a226669788593fb15b2a25720280f1e2cb4dde4547",
-            "decoded_raster_sha256": "6ba72ccccb50997b08c938bab8b880295fee3ca3e7feb17bc49bae880147c16c",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -978,8 +824,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 563,
-            "decoded_image_sha256": "6d56bb79e5c3a23e542117d8d5450d47bfbd51f1320e2d30aa91e1eed79dfb10",
-            "decoded_raster_sha256": "28ecc6665f124ba75da619314d88a2fc9e94f15ef0545937d3ec192ea7911c37",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -990,8 +834,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 564,
-            "decoded_image_sha256": "2e2c09c4f52aad137f21bf4f0cd02202debb305d12cb6fe45410110e4fa372a8",
-            "decoded_raster_sha256": "f6707607eb750247b919015e67b887b41cd3316c94e66f9d2f27c9151b99eb11",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1002,8 +844,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 565,
-            "decoded_image_sha256": "0468e9f828bea02da7ccbcd5aae49698cccb53fbcb55d1a562626a833ecbee84",
-            "decoded_raster_sha256": "9c59b11189cfce42f5c528dd498793fa7d5d138cc1e20c22d0816d4af5837d2a",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1014,8 +854,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 566,
-            "decoded_image_sha256": "8020be0999dc846f1ca363a6b06e51bfbf1f2d7e3e59f3a470dfbfa0e22bd505",
-            "decoded_raster_sha256": "05dc73c59e4317950479c5d397d5f3f76ad489d7b5ebbe4ce6a9c14f3585efae",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1026,8 +864,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 567,
-            "decoded_image_sha256": "88794cd59b802d4ac25337a7fa1fae6e4325cf00fdea117a32a9f3a04b8087e6",
-            "decoded_raster_sha256": "7361c6250a96be9ea53846f1bf0ca14911c37585d7e6bacc40f2fe401a0644dd",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1038,8 +874,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 568,
-            "decoded_image_sha256": "d947c3b522a8de82a7d7618858552e8489e3f959c1b24c951709e26715c48791",
-            "decoded_raster_sha256": "8d530eec5d04d2a50acd4e8199f742cdabbf16494461fcd35732dc1d02a588b4",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1050,8 +884,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 569,
-            "decoded_image_sha256": "1b17f007c99612a1afee5336c6df59483d939920535419ce58be5571ba652a9f",
-            "decoded_raster_sha256": "b930564d6efc8e9c8a6871e0575d356faf7eac828718a461ebdc9fa4605c5cce",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1062,8 +894,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 570,
-            "decoded_image_sha256": "7883ea61a10d490b4c3d8707fe1ddfde24a9235e43943f6ecc7a40fe6ecb0e4d",
-            "decoded_raster_sha256": "51ee4abb660aa1b2296701d7d4b92e327fd0f776b18e86a72593a6c243f04046",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1074,8 +904,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 571,
-            "decoded_image_sha256": "77d9bc35f6d2f61f29c99a227f6803d3ec0f63de882cc371d344648a7fa01693",
-            "decoded_raster_sha256": "bbe6b4782b59e25d9618219b9cb81e39857e7cf11b8d069e8751bc946a3c6f52",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1086,8 +914,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 572,
-            "decoded_image_sha256": "7f641ff4ba571af40619eca5d77a5f1bd6caff3fafe454d09ef486c42b3f4fa1",
-            "decoded_raster_sha256": "4aedfe5625624c7c6fbf2c4865a42c0b3ce5c8cb5f6416881160f28e01769da9",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1098,8 +924,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 573,
-            "decoded_image_sha256": "028831dd3a4b0f126a5d4c849f5a07f3e1f9f090435160afdee2641cf9792d04",
-            "decoded_raster_sha256": "f1cc8b657b07e3d64b750315d6aa0ae2290c323d93d96dd5f16326a14a44bb0b",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1110,8 +934,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 574,
-            "decoded_image_sha256": "a064d144b633a664bfbbb6dbfee30070d0b99218c13ffd505b1d08f35542d052",
-            "decoded_raster_sha256": "bcc43700d1e886c9c182593a274817d1dc705ce1be263d57fcedb8af9753d4f3",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1122,8 +944,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 575,
-            "decoded_image_sha256": "c435da463118f9fc75ca9f206cb3f3057053aa392aa7346debc244d7a5a2edba",
-            "decoded_raster_sha256": "6822a327b97c1846f17e1f46f33a85699379b1f82f3568a212be09904975c76b",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1134,8 +954,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 576,
-            "decoded_image_sha256": "1028109afe54b7b44a7651892ecb5ca0136f57aae2fc024e29b63b945d3005de",
-            "decoded_raster_sha256": "a494f30db7a72416181caffb38726534de97368626d1080f4e21da8d0b17f50e",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1146,8 +964,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 577,
-            "decoded_image_sha256": "66566b207e4fb5a759739653cf1eca08817452f1e6ff74956447471b927bdea3",
-            "decoded_raster_sha256": "defe811bdbf75e15003e7987ee179b11f15948a9eb740e49921a64a00f380792",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1158,8 +974,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 578,
-            "decoded_image_sha256": "4dbd1c0fb43e96cb65f5f27376e40dfcd4e4bff8c22282bd9511f5e6409a8e76",
-            "decoded_raster_sha256": "2bb6b46bb6e997c9d86188685d75948a59f1c28ce10a60bc2acee5e105f6579b",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1170,8 +984,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 579,
-            "decoded_image_sha256": "4eaed87333d384a162a545077aec77e82df1938a1fa27517f1c83104215f0bf6",
-            "decoded_raster_sha256": "58407d18bb6827bd16160ef26dadd213033c83f19988ea526c40599833241865",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1182,8 +994,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 580,
-            "decoded_image_sha256": "22bd24c4424d3e84fc293da539db51f616121c0587b80eed033abb99b8a94e92",
-            "decoded_raster_sha256": "1b34d0a5b02948a4003a27dd880736f2dedb320aff48842d82f8605dfab073ff",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1194,8 +1004,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 581,
-            "decoded_image_sha256": "6c89af325b4f3370c0ff0a53f3bbb93a0d94adaf3145101f14fcea99c6b75155",
-            "decoded_raster_sha256": "b4cd29e2ab2e83236b29bc7941d6ae1b6e6c2dcb7b1f2f5239c85e5483012619",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1206,8 +1014,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 582,
-            "decoded_image_sha256": "43825ee0e606c25f2863e944e85a0f83c61973a3c6188d6ab168cd2f48a815a7",
-            "decoded_raster_sha256": "3a71fd33068c08ee76cdf2b12842eb4e58cf5da0e440d511efdd451e10a9f6a4",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1218,8 +1024,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 583,
-            "decoded_image_sha256": "e1d2550cf8465bacc1b0ab379d7bdff8154007d5acfcf71c0d00c5ce78215d0d",
-            "decoded_raster_sha256": "d77adb0219779f8c3411e9635de687962e4bedb6136c97d2dc8292c0eb53d71a",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1230,8 +1034,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 584,
-            "decoded_image_sha256": "9152c0b4b7dcff9942e9e906260ffcca119945fc705b83934c797c308d124b4a",
-            "decoded_raster_sha256": "8803960e561aa7515b5f56f7bae9cd8984360ad4b3e3487c74556d2e7171fd39",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1242,8 +1044,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 585,
-            "decoded_image_sha256": "673edbdf42a3325dd2be80fb51108e168278abeca944f5c7b77c789f5eb31767",
-            "decoded_raster_sha256": "73ee0e68f12a35b0b75e26ef6d0f3a5251b8e57903458a5837e2e8cdfbd59771",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1254,8 +1054,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 586,
-            "decoded_image_sha256": "3a9a40275dc8adcbf0462089dcec6551093b04059c08a2dfbf730c8118d43e0c",
-            "decoded_raster_sha256": "0ebb663995ef7a36f4e729c8980d98bb530282fa49a2265e459f02136a4057f7",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1266,8 +1064,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 587,
-            "decoded_image_sha256": "527b163a63284b6578db0f708ccc9ceb27debeacb30c345c243789b10a6fee0a",
-            "decoded_raster_sha256": "7d32747e4b259e7b156fafb6b2b0cab512cd4ac986473d8635cedd2a7714a0db",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1278,8 +1074,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 588,
-            "decoded_image_sha256": "c07dcb1fb381f6bdb85c838c7f6eef352e31049182d59e993244ce6831f09f99",
-            "decoded_raster_sha256": "4064b9a0ba44d88b59f9cac557a39363369b1c10a03174a8db97da575edd51b8",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1290,8 +1084,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 589,
-            "decoded_image_sha256": "51c4021b0c2cb58b6e28ecdc82d11b957529ba4eaf655e019d690cb250f22e12",
-            "decoded_raster_sha256": "225c43168ff12d4e0718f705db38659b64418c2a095601f008f65ed550586694",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1302,8 +1094,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 590,
-            "decoded_image_sha256": "b2e7eb7f1efd93b432e52436c21a14daa675eeae415905fd177608a2b1878606",
-            "decoded_raster_sha256": "384df5840c63d9f569f204c727a9c377c368af02a0b3be2e9a2fc6eeb08fbc6b",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1314,8 +1104,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 591,
-            "decoded_image_sha256": "cac7ffe04ecc064760fe6034870641447a9b4b9f8259e7fd2520b1a88119eddb",
-            "decoded_raster_sha256": "ef025317f9f3f6151b6aa1a6fb9414604915152652dc98f0c8aea5b2cd3ae309",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1326,8 +1114,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 592,
-            "decoded_image_sha256": "43c694db95d42148de8ee7bab10d86f0d364d2b2e0afb4baaf062b962e853826",
-            "decoded_raster_sha256": "54437564e1d8221832194ab382fd64210e14d5a788721aeadaaa515e3715acfc",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1338,8 +1124,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 593,
-            "decoded_image_sha256": "a85f28c12dc47c5b50d5bf84e86176964268e062c0eaf1baf2e4f407d0e80fab",
-            "decoded_raster_sha256": "45790f907ec6b15934a5063ffe797e0dfd26cc73eed2d345cdfd26bbe2768570",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1350,8 +1134,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 594,
-            "decoded_image_sha256": "fcb5674a9fac320ddfb3cc5c8a68bfeb144ec29e0f5e8fa749d09cee177a7f26",
-            "decoded_raster_sha256": "88408be87b2e175198b8f1df104dd194783ab0a00439917e7c9920d2e4242b16",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1362,8 +1144,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 595,
-            "decoded_image_sha256": "b9616bbacbd79fb354d62e7609a07708d132ad94cd92caf34168908f5684e869",
-            "decoded_raster_sha256": "48e77bf276c5af97759c66ab3ec62c6b5a95ab15384e34dd89a9010f9fde9a90",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1374,8 +1154,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 596,
-            "decoded_image_sha256": "b4b602340c6ac518497beb0ae56056b731188faed8f7db2822f00bfdb655803f",
-            "decoded_raster_sha256": "a907f607684f6d6bd2e1d9653ea45ff0d45280ce5aa55041c88e014a1d7745e8",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1386,8 +1164,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 597,
-            "decoded_image_sha256": "21a3e6afc280403cca5a0595cdcd10ecc0cf0d529f5c6695f91b7be4c8bc265e",
-            "decoded_raster_sha256": "0be23676c331197247a616f3f5ce59c70657477be98e066eb70a8c10d5c50cec",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1398,8 +1174,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 598,
-            "decoded_image_sha256": "31e736bf43634f6f01d65732f368ce30ecdbf08015105e381f011dd5f007098f",
-            "decoded_raster_sha256": "f65c6f6bc9c9a37a9b9b9333959f9f68aeebd860635605662fbfa42cf686cdbe",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1410,8 +1184,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 599,
-            "decoded_image_sha256": "5fa25d3c5d1581e86cde414b47da38b5c73f620a861927f3afe9b3868870c89b",
-            "decoded_raster_sha256": "02a3948e9645d1eb1cddc3364c95f87167b0186a8998be3f72580ad6ce11197c",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1422,8 +1194,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 600,
-            "decoded_image_sha256": "cc137b20b518638f806228639ea5791b09aedc3c148989af78b15fb93bfcf2b6",
-            "decoded_raster_sha256": "e878c66be26216b8c2e5d351b16789ee1433641d998f675ad31ac2f1d167d133",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1434,8 +1204,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 601,
-            "decoded_image_sha256": "bd3ac986d54cb796fc69934dc856df40ba1d274789d3c41f0276dbe2e6c57cc5",
-            "decoded_raster_sha256": "0043a74dd52ad6ea8b6bed54ee16e08449a2cccee09854dd54b7b395fe4ef737",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1446,16 +1214,12 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 602,
-            "decoded_image_sha256": "b30db74b4d0e841bf8195477bb4c8712255cbf1a0e2616b63f15288180a7dda9",
-            "decoded_raster_sha256": "83cee0b8c9a5e50ebc0763f853af970fc38e82f59afd059d7bf1a66fec39fe06",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
           }
         ],
-        "pixel_identity_receipt_sha256": "a765a8c1c8acad07d9342f560fdb4404e0446889f4b90570f89d23d70b14c3c3",
         "initial_stream_identity_method_wording_corrected": true,
-        "primary_first_sha256": "be16c03a09d8671b6f6edc73a095f0a703eee1b66a3cb87c5624023461272549",
         "transcription_method": "Root visual reading of selected actual facsimile pages and local crops. Earlier electronic apparatus and other witnesses were already known; this is neither blind transcription nor independent human paleographic certification. No majority vote or OCR fill.",
         "accepted_mansion_readings": 21,
         "unaccepted_mansion_glyph_slots": 0,
@@ -1873,8 +1637,6 @@
         "title": "永樂北藏第一三〇冊《文殊師利菩薩及諸仙所說吉凶時日善惡宿曜經》上下卷所选段",
         "catalogue_url": "https://dlbs.liberal.ntu.edu.tw/DLMBS/sutra/chinese/yongle/yongle16.jsp",
         "official_pdf_url": "https://dlbs.liberal.ntu.edu.tw/BDLM/sutra/yongle/chi_pdf/6-130.pdf",
-        "catalogue_html_sha256": "f5c44258324d96c74f4f15f4333028fe36957bd6338d7f013b0e7e1b758b0773",
-        "official_pdf_sha256": "75e2559cf863b7ff0ff3db81683720a540d5bad7f002867f742f29bc394b9f27",
         "official_pdf_bytes": 24966725,
         "official_pdf_pages": 900,
         "source_host": "國立臺灣大學圖書館佛學數位圖書館暨博物館",
@@ -1900,9 +1662,7 @@
           ]
         ],
         "mirror_upper_pdf_url": "https://rongmotamhon.net/phuluc/split/vinhlac_T21_1299_1.pdf",
-        "mirror_upper_pdf_sha256": "efa09e3a267ac04a95ca80513a29452454d4d93c50d3e7eb3077784fc832bcfd",
         "mirror_lower_pdf_url": "https://rongmotamhon.net/phuluc/split/vinhlac_T21_1299_2.pdf",
-        "mirror_lower_pdf_sha256": "bcf8831827c78373229b5c70c02b7e2e5cfb4c88f7efdfb2dca97e10373be9df",
         "image_identity_method": "Pillow TIFF/CCITT raster decode followed by SHA256 of 1248x1712 one-bit pixel bytes; mask width, height, ImageMask, BitsPerComponent and Decode also equal. pypdf get_data alone emits TIFF-wrapped CCITT, not unpacked pixels.",
         "all_56_selected_page_images_match_official": true,
         "image_identity_is_independent_witness_count": false,
@@ -1913,8 +1673,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 547,
-            "decoded_image_sha256": "6e588d2ac0324625e90c53468cd7cbb231c2235b40a88f3ca420f5edf1c33fad",
-            "decoded_raster_sha256": "b728b46bdd5ccb165017df8268c22efe22aa210e17689d24746277a2aad5d647",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1925,8 +1683,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 548,
-            "decoded_image_sha256": "fa691955cc3a106ac682ca3f04d87538936fb5e5f7eb357c8ae5988b7194c98d",
-            "decoded_raster_sha256": "795b6243fcb2917e4809cf14c0d0e9a2b74ef31748f6b3034cf649282b1dba92",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1937,8 +1693,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 549,
-            "decoded_image_sha256": "07a1f08333eeff8c15e34d298c3856664afe8c2d7c1e3c9d16db4513a3b6a621",
-            "decoded_raster_sha256": "d0eabfd0c3dffb97380d162a3c93ed5dae537ff069d471eda7874eb8cfb84fef",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1949,8 +1703,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 550,
-            "decoded_image_sha256": "af1a85d22a37ea433191dba780c074503b6b7e0a512b1a76f7e22cef254707b7",
-            "decoded_raster_sha256": "aa8324184f3fefe0c7c2f675fb9db0ed672428de6700a6911ea9dea592085596",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1961,8 +1713,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 551,
-            "decoded_image_sha256": "7c3f6ba8740bf3348db01732b15acd95bd44d23de19e47f70d4ccc4b9a7cee35",
-            "decoded_raster_sha256": "a5aacd62a42371082ff4302454c44e0825c8c5de3a07dcf615abe862ffc76d8e",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1973,8 +1723,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 552,
-            "decoded_image_sha256": "7f0eed4377dc3b5825305ba8e3f371e66a50350a9147748f2967cfa54ebab61e",
-            "decoded_raster_sha256": "593b5f080d299807caa04e21e95deddba2756e51b0bbd99fc96b1a74324df9a2",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1985,8 +1733,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 553,
-            "decoded_image_sha256": "d3909ee8cd97c38d3b7f88cf576404456004839cc0f1d08c4feac52030f7b9a7",
-            "decoded_raster_sha256": "ee8a65e89b6b4ad3af511e94dc52632e1ce83777c4c495ad071f2eca470c5e2f",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -1997,8 +1743,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 554,
-            "decoded_image_sha256": "098fa626544723f43fedca57dfadf0132113ba5c1683ef5aaea3b818e0fb724d",
-            "decoded_raster_sha256": "3301469bc0784a3b249e24cb4e9a7da854bf3296c1e088aa52c791ac75858093",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2009,8 +1753,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 555,
-            "decoded_image_sha256": "dd47d6873fb118cd4e78725bb143cde851520b12a35666200dcddb892e223d1e",
-            "decoded_raster_sha256": "1e86ff64489e403c3680280395d5c04af08b6b577ec3fedbcf1d7d91495a8a4c",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2021,8 +1763,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 556,
-            "decoded_image_sha256": "7b7ee6ef727f62f15ec67360b6a56cab6b4c5a8aaf76c875315b79075849bdaa",
-            "decoded_raster_sha256": "fc61462edfbb6eef96351fc7a84c5b785ff9dbaa72df9faf0a9035137a244b4d",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2033,8 +1773,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 557,
-            "decoded_image_sha256": "fe8611163e4c668bc9f6e1db685f69e9dfe8deaae98d1d754dca7ebcf02382a0",
-            "decoded_raster_sha256": "b7ad9729945a01e5406afdd6e216dfcf7153aeedbde51f799f3705c7442a3b9e",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2045,8 +1783,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 558,
-            "decoded_image_sha256": "9fa9fad4eb073b6bdb73adb3d4d4217539cb1e868a9879d7b841d1e4a1d712ea",
-            "decoded_raster_sha256": "dea6fa001ffd8f011de3b0a394618bd361d47e475068b5a26e312a88dd63bf61",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2057,8 +1793,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 559,
-            "decoded_image_sha256": "a2de4224c19c3d178336b9043b85ad66e2bee6dd44da89e8c07164440f0f121c",
-            "decoded_raster_sha256": "6388c40d1d81e3e84c6caa373ed39accb86d988ec1772ebfa32654f7a88a93a5",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2069,8 +1803,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 560,
-            "decoded_image_sha256": "1116ed82f0fe2522db1e4d356681af4f4e2dabc9e8039656d5e0a9657411e80f",
-            "decoded_raster_sha256": "8afbfefbd71c91145cdcb341b79b8c7360297ab2cbee73db9b0dcfe16d6f15c3",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2081,8 +1813,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 561,
-            "decoded_image_sha256": "3413e1074f4e9e6e8a30cefd43ca6326ffd317876388adbda33daa16a65a0321",
-            "decoded_raster_sha256": "28d2006c28384907d519bb0e0c163e8fe0005620357037aa0616a87606685a3c",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2093,8 +1823,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 562,
-            "decoded_image_sha256": "822eb1ec0682d21ef9cfa1a226669788593fb15b2a25720280f1e2cb4dde4547",
-            "decoded_raster_sha256": "6ba72ccccb50997b08c938bab8b880295fee3ca3e7feb17bc49bae880147c16c",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2105,8 +1833,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 563,
-            "decoded_image_sha256": "6d56bb79e5c3a23e542117d8d5450d47bfbd51f1320e2d30aa91e1eed79dfb10",
-            "decoded_raster_sha256": "28ecc6665f124ba75da619314d88a2fc9e94f15ef0545937d3ec192ea7911c37",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2117,8 +1843,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 564,
-            "decoded_image_sha256": "2e2c09c4f52aad137f21bf4f0cd02202debb305d12cb6fe45410110e4fa372a8",
-            "decoded_raster_sha256": "f6707607eb750247b919015e67b887b41cd3316c94e66f9d2f27c9151b99eb11",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2129,8 +1853,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 565,
-            "decoded_image_sha256": "0468e9f828bea02da7ccbcd5aae49698cccb53fbcb55d1a562626a833ecbee84",
-            "decoded_raster_sha256": "9c59b11189cfce42f5c528dd498793fa7d5d138cc1e20c22d0816d4af5837d2a",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2141,8 +1863,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 566,
-            "decoded_image_sha256": "8020be0999dc846f1ca363a6b06e51bfbf1f2d7e3e59f3a470dfbfa0e22bd505",
-            "decoded_raster_sha256": "05dc73c59e4317950479c5d397d5f3f76ad489d7b5ebbe4ce6a9c14f3585efae",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2153,8 +1873,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 567,
-            "decoded_image_sha256": "88794cd59b802d4ac25337a7fa1fae6e4325cf00fdea117a32a9f3a04b8087e6",
-            "decoded_raster_sha256": "7361c6250a96be9ea53846f1bf0ca14911c37585d7e6bacc40f2fe401a0644dd",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2165,8 +1883,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 568,
-            "decoded_image_sha256": "d947c3b522a8de82a7d7618858552e8489e3f959c1b24c951709e26715c48791",
-            "decoded_raster_sha256": "8d530eec5d04d2a50acd4e8199f742cdabbf16494461fcd35732dc1d02a588b4",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2177,8 +1893,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 569,
-            "decoded_image_sha256": "1b17f007c99612a1afee5336c6df59483d939920535419ce58be5571ba652a9f",
-            "decoded_raster_sha256": "b930564d6efc8e9c8a6871e0575d356faf7eac828718a461ebdc9fa4605c5cce",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2189,8 +1903,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 570,
-            "decoded_image_sha256": "7883ea61a10d490b4c3d8707fe1ddfde24a9235e43943f6ecc7a40fe6ecb0e4d",
-            "decoded_raster_sha256": "51ee4abb660aa1b2296701d7d4b92e327fd0f776b18e86a72593a6c243f04046",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2201,8 +1913,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 571,
-            "decoded_image_sha256": "77d9bc35f6d2f61f29c99a227f6803d3ec0f63de882cc371d344648a7fa01693",
-            "decoded_raster_sha256": "bbe6b4782b59e25d9618219b9cb81e39857e7cf11b8d069e8751bc946a3c6f52",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2213,8 +1923,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 572,
-            "decoded_image_sha256": "7f641ff4ba571af40619eca5d77a5f1bd6caff3fafe454d09ef486c42b3f4fa1",
-            "decoded_raster_sha256": "4aedfe5625624c7c6fbf2c4865a42c0b3ce5c8cb5f6416881160f28e01769da9",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2225,8 +1933,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 573,
-            "decoded_image_sha256": "028831dd3a4b0f126a5d4c849f5a07f3e1f9f090435160afdee2641cf9792d04",
-            "decoded_raster_sha256": "f1cc8b657b07e3d64b750315d6aa0ae2290c323d93d96dd5f16326a14a44bb0b",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2237,8 +1943,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 574,
-            "decoded_image_sha256": "a064d144b633a664bfbbb6dbfee30070d0b99218c13ffd505b1d08f35542d052",
-            "decoded_raster_sha256": "bcc43700d1e886c9c182593a274817d1dc705ce1be263d57fcedb8af9753d4f3",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2249,8 +1953,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 575,
-            "decoded_image_sha256": "c435da463118f9fc75ca9f206cb3f3057053aa392aa7346debc244d7a5a2edba",
-            "decoded_raster_sha256": "6822a327b97c1846f17e1f46f33a85699379b1f82f3568a212be09904975c76b",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2261,8 +1963,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 576,
-            "decoded_image_sha256": "1028109afe54b7b44a7651892ecb5ca0136f57aae2fc024e29b63b945d3005de",
-            "decoded_raster_sha256": "a494f30db7a72416181caffb38726534de97368626d1080f4e21da8d0b17f50e",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2273,8 +1973,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 577,
-            "decoded_image_sha256": "66566b207e4fb5a759739653cf1eca08817452f1e6ff74956447471b927bdea3",
-            "decoded_raster_sha256": "defe811bdbf75e15003e7987ee179b11f15948a9eb740e49921a64a00f380792",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2285,8 +1983,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 578,
-            "decoded_image_sha256": "4dbd1c0fb43e96cb65f5f27376e40dfcd4e4bff8c22282bd9511f5e6409a8e76",
-            "decoded_raster_sha256": "2bb6b46bb6e997c9d86188685d75948a59f1c28ce10a60bc2acee5e105f6579b",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2297,8 +1993,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 579,
-            "decoded_image_sha256": "4eaed87333d384a162a545077aec77e82df1938a1fa27517f1c83104215f0bf6",
-            "decoded_raster_sha256": "58407d18bb6827bd16160ef26dadd213033c83f19988ea526c40599833241865",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2309,8 +2003,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 580,
-            "decoded_image_sha256": "22bd24c4424d3e84fc293da539db51f616121c0587b80eed033abb99b8a94e92",
-            "decoded_raster_sha256": "1b34d0a5b02948a4003a27dd880736f2dedb320aff48842d82f8605dfab073ff",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2321,8 +2013,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 581,
-            "decoded_image_sha256": "6c89af325b4f3370c0ff0a53f3bbb93a0d94adaf3145101f14fcea99c6b75155",
-            "decoded_raster_sha256": "b4cd29e2ab2e83236b29bc7941d6ae1b6e6c2dcb7b1f2f5239c85e5483012619",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2333,8 +2023,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 582,
-            "decoded_image_sha256": "43825ee0e606c25f2863e944e85a0f83c61973a3c6188d6ab168cd2f48a815a7",
-            "decoded_raster_sha256": "3a71fd33068c08ee76cdf2b12842eb4e58cf5da0e440d511efdd451e10a9f6a4",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2345,8 +2033,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 583,
-            "decoded_image_sha256": "e1d2550cf8465bacc1b0ab379d7bdff8154007d5acfcf71c0d00c5ce78215d0d",
-            "decoded_raster_sha256": "d77adb0219779f8c3411e9635de687962e4bedb6136c97d2dc8292c0eb53d71a",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2357,8 +2043,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 584,
-            "decoded_image_sha256": "9152c0b4b7dcff9942e9e906260ffcca119945fc705b83934c797c308d124b4a",
-            "decoded_raster_sha256": "8803960e561aa7515b5f56f7bae9cd8984360ad4b3e3487c74556d2e7171fd39",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2369,8 +2053,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 585,
-            "decoded_image_sha256": "673edbdf42a3325dd2be80fb51108e168278abeca944f5c7b77c789f5eb31767",
-            "decoded_raster_sha256": "73ee0e68f12a35b0b75e26ef6d0f3a5251b8e57903458a5837e2e8cdfbd59771",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2381,8 +2063,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 586,
-            "decoded_image_sha256": "3a9a40275dc8adcbf0462089dcec6551093b04059c08a2dfbf730c8118d43e0c",
-            "decoded_raster_sha256": "0ebb663995ef7a36f4e729c8980d98bb530282fa49a2265e459f02136a4057f7",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2393,8 +2073,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 587,
-            "decoded_image_sha256": "527b163a63284b6578db0f708ccc9ceb27debeacb30c345c243789b10a6fee0a",
-            "decoded_raster_sha256": "7d32747e4b259e7b156fafb6b2b0cab512cd4ac986473d8635cedd2a7714a0db",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2405,8 +2083,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 588,
-            "decoded_image_sha256": "c07dcb1fb381f6bdb85c838c7f6eef352e31049182d59e993244ce6831f09f99",
-            "decoded_raster_sha256": "4064b9a0ba44d88b59f9cac557a39363369b1c10a03174a8db97da575edd51b8",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2417,8 +2093,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 589,
-            "decoded_image_sha256": "51c4021b0c2cb58b6e28ecdc82d11b957529ba4eaf655e019d690cb250f22e12",
-            "decoded_raster_sha256": "225c43168ff12d4e0718f705db38659b64418c2a095601f008f65ed550586694",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2429,8 +2103,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 590,
-            "decoded_image_sha256": "b2e7eb7f1efd93b432e52436c21a14daa675eeae415905fd177608a2b1878606",
-            "decoded_raster_sha256": "384df5840c63d9f569f204c727a9c377c368af02a0b3be2e9a2fc6eeb08fbc6b",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2441,8 +2113,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 591,
-            "decoded_image_sha256": "cac7ffe04ecc064760fe6034870641447a9b4b9f8259e7fd2520b1a88119eddb",
-            "decoded_raster_sha256": "ef025317f9f3f6151b6aa1a6fb9414604915152652dc98f0c8aea5b2cd3ae309",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2453,8 +2123,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 592,
-            "decoded_image_sha256": "43c694db95d42148de8ee7bab10d86f0d364d2b2e0afb4baaf062b962e853826",
-            "decoded_raster_sha256": "54437564e1d8221832194ab382fd64210e14d5a788721aeadaaa515e3715acfc",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2465,8 +2133,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 593,
-            "decoded_image_sha256": "a85f28c12dc47c5b50d5bf84e86176964268e062c0eaf1baf2e4f407d0e80fab",
-            "decoded_raster_sha256": "45790f907ec6b15934a5063ffe797e0dfd26cc73eed2d345cdfd26bbe2768570",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2477,8 +2143,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 594,
-            "decoded_image_sha256": "fcb5674a9fac320ddfb3cc5c8a68bfeb144ec29e0f5e8fa749d09cee177a7f26",
-            "decoded_raster_sha256": "88408be87b2e175198b8f1df104dd194783ab0a00439917e7c9920d2e4242b16",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2489,8 +2153,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 595,
-            "decoded_image_sha256": "b9616bbacbd79fb354d62e7609a07708d132ad94cd92caf34168908f5684e869",
-            "decoded_raster_sha256": "48e77bf276c5af97759c66ab3ec62c6b5a95ab15384e34dd89a9010f9fde9a90",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2501,8 +2163,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 596,
-            "decoded_image_sha256": "b4b602340c6ac518497beb0ae56056b731188faed8f7db2822f00bfdb655803f",
-            "decoded_raster_sha256": "a907f607684f6d6bd2e1d9653ea45ff0d45280ce5aa55041c88e014a1d7745e8",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2513,8 +2173,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 597,
-            "decoded_image_sha256": "21a3e6afc280403cca5a0595cdcd10ecc0cf0d529f5c6695f91b7be4c8bc265e",
-            "decoded_raster_sha256": "0be23676c331197247a616f3f5ce59c70657477be98e066eb70a8c10d5c50cec",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2525,8 +2183,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 598,
-            "decoded_image_sha256": "31e736bf43634f6f01d65732f368ce30ecdbf08015105e381f011dd5f007098f",
-            "decoded_raster_sha256": "f65c6f6bc9c9a37a9b9b9333959f9f68aeebd860635605662fbfa42cf686cdbe",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2537,8 +2193,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 599,
-            "decoded_image_sha256": "5fa25d3c5d1581e86cde414b47da38b5c73f620a861927f3afe9b3868870c89b",
-            "decoded_raster_sha256": "02a3948e9645d1eb1cddc3364c95f87167b0186a8998be3f72580ad6ce11197c",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2549,8 +2203,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 600,
-            "decoded_image_sha256": "cc137b20b518638f806228639ea5791b09aedc3c148989af78b15fb93bfcf2b6",
-            "decoded_raster_sha256": "e878c66be26216b8c2e5d351b16789ee1433641d998f675ad31ac2f1d167d133",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2561,8 +2213,6 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 601,
-            "decoded_image_sha256": "bd3ac986d54cb796fc69934dc856df40ba1d274789d3c41f0276dbe2e6c57cc5",
-            "decoded_raster_sha256": "0043a74dd52ad6ea8b6bed54ee16e08449a2cccee09854dd54b7b395fe4ef737",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
@@ -2573,16 +2223,12 @@
             "width": 1248,
             "height": 1712,
             "ntu_pdf_page": 602,
-            "decoded_image_sha256": "b30db74b4d0e841bf8195477bb4c8712255cbf1a0e2616b63f15288180a7dda9",
-            "decoded_raster_sha256": "83cee0b8c9a5e50ebc0763f853af970fc38e82f59afd059d7bf1a66fec39fe06",
             "raster_mode": "1",
             "raster_pixel_bytes": 267072,
             "mask_display_attributes_identical": true
           }
         ],
-        "pixel_identity_receipt_sha256": "a765a8c1c8acad07d9342f560fdb4404e0446889f4b90570f89d23d70b14c3c3",
         "initial_stream_identity_method_wording_corrected": true,
-        "primary_first_sha256": "be16c03a09d8671b6f6edc73a095f0a703eee1b66a3cb87c5624023461272549",
         "transcription_method": "Root visual reading of selected actual facsimile pages and local crops. Earlier electronic apparatus and other witnesses were already known; this is neither blind transcription nor independent human paleographic certification. No majority vote or OCR fill.",
         "accepted_mansion_readings": 21,
         "unaccepted_mansion_glyph_slots": 0,

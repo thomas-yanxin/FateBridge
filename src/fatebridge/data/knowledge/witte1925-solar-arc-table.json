@@ -5,8 +5,7 @@
     "author": "Alfred Witte",
     "title": "Der Lauf der Erde (Sonnenbogen) in Tagen vom Geburtstage an",
     "publication": "Astrologische Rundschau XVII/3, July1925, printed pp87-88",
-    "url": "https://www.astrax.de/pdf/45_Der%20Lauf%20der%20Erde_Sonnenbogen_in%20Tagen%20vom%20Gebtage%20an.pdf",
-    "source_pdf_sha256": "62c0c6414e478a35e68dbb8d044cbb663745e256fc0c2703a809868a5a10594a"
+    "url": "https://www.astrax.de/pdf/45_Der%20Lauf%20der%20Erde_Sonnenbogen_in%20Tagen%20vom%20Gebtage%20an.pdf"
   },
   "scope": "Complete raw printed table and one printed worked example, not a verified birth chart or a fully resolved date-to-arc model.",
   "transcription": "Manually read from enlarged hash-pinned original before implementation or any modern ephemeris comparison. Single-token cells are minutes only, with no missing degree silently inserted. The final January6 belongs to the next-year extension.",

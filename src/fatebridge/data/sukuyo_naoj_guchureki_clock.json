@@ -8,7 +8,6 @@
   ],
   "source_publisher": "国立天文台報 第20巻 1–32 (2019)",
   "source_url": "https://www.nao.ac.jp/contents/about/reports/report-naoj/20-1.pdf",
-  "source_sha256": "755a41d5f776e165e8fb4984388ec30a967a9a283c030bf3de0e5389bbdedfa6",
   "source_kind": "Named research interpretation and its selected Table 3 synthesis, not a new independently read original diary witness.",
   "selected_locations": {
     "units": "pp.1–2,5,10–12",
@@ -31,7 +30,6 @@
       543.486988,
       768.64557
     ],
-    "extracted_text_sha256": "65bb03b5cff836efcef845952fc193500d5dc9fc940961dca2756bc964a0c64b",
     "all_40_groups_and_both_half_variants_preserved": true
   },
   "original_diary_manuscripts_independently_collated": false,

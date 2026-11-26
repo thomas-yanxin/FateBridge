@@ -16,14 +16,14 @@
 如需启用 Swiss Ephemeris 星历分段数据（需覆盖设计盘前推及可选周期窗口年份）：
 
 ```bash
-uv run --locked --extra dev python -m fatebridge.fetch_ephe --profile human_design
-uv run --locked --extra dev python -m fatebridge.fetch_ephe --profile human_design --verify-only
+uv run --extra dev python -m fatebridge.fetch_ephe --profile human_design
+uv run --extra dev python -m fatebridge.fetch_ephe --profile human_design --verify-only
 ```
 
 CLI 摘要调用示例（使用 `evidence_views` 字段）：
 
 ```bash
-uv run --locked --extra dev fatebridge human_design \
+uv run --extra dev fatebridge human_design \
   --birth-year 1990 --birth-month 4 --birth-day 6 \
   --birth-hour 9 --birth-minute 33 --birth-timezone Asia/Shanghai \
   --fields type authority profile bodygraph interpretation

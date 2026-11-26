@@ -11,8 +11,8 @@ FateBridge 是面向 Agent 的泛心理领域统一计算引擎，目标是在�
 - 变更前检查实际代码、共享契约、相关测试和 Git 状态，保留无关改动。1.0 发布前不保留向后兼容。直接删除过时接口、字段和实现，同步更新调用方、测试和文档，不为旧行为编写迁移脚本、兼容别名或回退分支。
 - 每条计算规则由一个领域组件负责。REST、MCP 和 CLI 共用领域服务与契约。变更后分别验证算法结果和三端一致性，验收时区分本地协议、真实模型行为与部署结果。测试入口见[开发指南](docs/development-guide.md)。
 - 书目元数据按来源维护一份，规则引用来源与版本，结果保留核验所需的规则轨迹、精度与缺项。
-- 包管理统一使用 uv。用 `uv sync --locked --extra dev` 准备源码环境，用 `uv run --locked --extra dev` 运行命令。用 `uv add` / `uv remove` 变更依赖并同步提交 `uv.lock`，用 `uv build` 构建。
-- 用 `uv run --locked --extra dev python scripts/build_codex_call_contracts.py` 生成按需调用合同，加 `--check` 检查漂移。不得手改生成文件，完整 Schema 留在合同中。
+- 包管理统一使用 uv。用 `uv sync --extra dev` 准备源码环境，用 `uv run --extra dev` 运行命令。用 `uv add` / `uv remove` 变更依赖，用 `uv build` 构建。
+- 用 `uv run --extra dev python scripts/build_codex_call_contracts.py` 生成按需调用合同，加 `--check` 检查漂移。不得手改生成文件，完整 Schema 留在合同中。
 
 ## 代码审查
 

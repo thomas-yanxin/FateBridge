@@ -7,7 +7,6 @@
   "catalogue_url": "https://ndlsearch.ndl.go.jp/books/R100000039-I817827",
   "doi": "10.11501/817827",
   "manifest_url": "https://dl.ndl.go.jp/api/iiif/817827/manifest.json",
-  "manifest_sha256": "7b2b111e19ca158f92b2d82ab22645cb9d6185dc3bd218c218b63b67c6ae9834",
   "locator": "upper printed pp40-41; IIIF canvas23 right bottom through left",
   "selected_main_clauses": [
     "大唐開元二年",

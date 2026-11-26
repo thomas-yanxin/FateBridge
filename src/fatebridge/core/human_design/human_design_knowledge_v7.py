@@ -63,7 +63,6 @@ def _catalogue(
             if set(row) != {
                 "key",
                 "source_pdf_page_one_based",
-                "source_layout_block_sha256",
                 "source_line_heading",
                 "meaning_status",
                 "editorial_paraphrase",

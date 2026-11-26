@@ -3,7 +3,6 @@
   "ruleset_version": "13.0.0",
   "source": {
     "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
-    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
     "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
     "method": "Original PDF51,53-54 and59 visually read before implementation. Original PDF and frozen existing transcription bytes remain unchanged."
   },
@@ -41,12 +40,10 @@
     {
       "id": "page59-he-versus-ling",
       "source_pdf": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
-      "source_pdf_sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
       "pdf_page": 59,
       "scan_reading": "惟日月能生之尅之沖之合之",
       "frozen_transcription_reading": "惟日月能生之、克之、沖之、令之何也",
       "frozen_transcription_file": "tests/fixtures/liuyao-zengshan-depth-v2.json",
-      "frozen_transcription_sha256": "598653b9d0947f20426fb3cc0469b6d5b69bc58b31593dc9079f2cd122238335",
       "transcription_url": "https://zh.wikisource.org/w/index.php?title=增刪卜易/15&oldid=2100321",
       "method": "Rechecked original rendered region at 2600-page scale during final review; the character has an enclosed mouth: 合. No OCR inference.",
       "implemented_v12_quote_already_uses_scan": true,

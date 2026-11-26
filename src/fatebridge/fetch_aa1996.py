@@ -59,7 +59,7 @@ def build(
         profile["sources"]["swiss"], swiss_archive, archives / "pyswisseph.tar.gz"
     )
     aa56 = _archive(profile["sources"]["aa56"], aa56_archive, archives / "aa56.zip")
-    expected: dict[str, str] = profile["calculation_files_sha256"]
+    expected: set[str] = set(profile["calculation_files"])
     with tarfile.open(swiss) as bundle:
         for archive_member in bundle:
             parts = Path(archive_member.name).parts

@@ -4,13 +4,11 @@
   "holder": "国立国会図書館 特2-721",
   "source_url": "https://dl.ndl.go.jp/pid/14487241",
   "manifest_url": "https://dl.ndl.go.jp/api/iiif/14487241/manifest.json",
-  "manifest_sha256": "5f8772dccd5ba8366dec441020d3822a86e67ac2d5aeecfd953c4ff1ab52344d",
   "credit": "国立国会図書館 National Diet Library, JAPAN",
   "rights_manifest": "PDM",
   "source_image": {
     "frame": 6,
-    "url": "https://dl.ndl.go.jp/api/iiif/14487241/R0000006/full/full/0/default.jpg",
-    "sha256": "59af9bf9dadbfa82f5075fc5be73f92c486ca382b502b20d5f5c2cdea8be9285"
+    "url": "https://dl.ndl.go.jp/api/iiif/14487241/R0000006/full/full/0/default.jpg"
   },
   "locator": "帧6右页，轮图上方曜宿小表",
   "adjacent_literal": "二十八宿與七曜如是相尅名陵逼",
@@ -70,15 +68,12 @@
   },
   "cell_topology_or_order_accepted": false,
   "ring_yuan_automatically_normalized_to_kang": false,
-  "prior_curation_sha256": "ef85e421fb25f169cd84910248d021e055ca038ec8ad41f5a4f9fe862a659cb3",
   "model_reading_receipts": [
     {
-      "file": "generator-primary-first.json",
-      "sha256": "f4a9c87023c85204dc3aef63e2bca0c56f64585fbb460e2b96b2dd457435953e"
+      "file": "generator-primary-first.json"
     },
     {
-      "file": "reviewer-primary-first.json",
-      "sha256": "3bd8485c7bf0c791b8eea5981e6962b52876a7880500b846a89ac0d8b83b95e3"
+      "file": "reviewer-primary-first.json"
     }
   ],
   "source_identity": "NDL特2-721与NIJL100159236名古屋148.8-Ke为不同实物见证；版次、同版印次及传承身份未认证。",

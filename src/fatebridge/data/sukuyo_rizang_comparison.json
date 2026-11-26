@@ -4,12 +4,8 @@
   "juan": 42,
   "source_edition": "大正新脩大藏經第13冊／CBETA固定提交電子文本",
   "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T13/T13n0397.xml",
-  "source_sha256": "64d0dbf21d28e11d76488a2bf7ff0f651883f1f7d5d76392616b97da5d38ce17",
   "source_bytes": 6969939,
   "source_previously_acquired_in_v65": true,
-  "compared_xuanying_capture_sha256": "4bdef1f67c2980550795600bcf8b62993f106c1692bdbb5ba4319fe3fa95ff70",
-  "before_production_reference_sha256": "a9b29a300dea185d5a4539191585590c68a38c9f65e88cadca26b32afbfba4e0",
-  "context_reference_sha256": "5cfd0d9beb2ed8af7bb12b21184145d4953a184157018b83c7531a30bfd0bd47",
   "explicit_fortnight_paragraphs": [
     {
       "textual_month": 9,

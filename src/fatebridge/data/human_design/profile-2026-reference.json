@@ -5,12 +5,10 @@
   "sources": {
     "profile": {
       "url": "https://jovianarchive.com/pages/understanding-profile-in-human-design",
-      "capture_sha256": "0e437a4893a7bd8f1db8fb987a2595ac1bbc28cd2dcb2e43ec3f07f7ec251006",
       "facts": "12 profile headers, six archetype labels and their enclosing angle headings"
     },
     "six_lines": {
       "url": "https://jovianarchive.com/blogs/chart-interpretations-components/the-six-lines-of-the-hexagram",
-      "capture_sha256": "ca30fd29a5bb6da609436ef7252a46512bc662d4ed154adfbb32c3cdf899197a",
       "facts": "Lower/upper line groups and approximate Saturn/Kiron transition markers; only these compact facts adopted"
     }
   },

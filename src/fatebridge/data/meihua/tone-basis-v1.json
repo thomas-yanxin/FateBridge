@@ -23,7 +23,6 @@
       "id": "nlc_1925_today_tones",
       "title": "文明書局《梅花易數》今日動靜如何选段",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
-      "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
       "original_pdf_index": 24,
       "reading_method": "assistant visual selected span, not independent expert or full-book authentication"
     },
@@ -31,7 +30,6 @@
       "id": "moe_guangyun_dong",
       "title": "教育部異體字字典所列廣韻動字片段",
       "url": "https://dict.variants.moe.edu.tw/book_piece/025/24340.png",
-      "raw_sha256": "6cc1c8ef472e221445235305ce49c69666ce00989bac9855d299a2d5e8e43923",
       "selected_reading": {
         "character": "動",
         "category": "上",
@@ -44,7 +42,6 @@
       "id": "moe_guangyun_jing",
       "title": "教育部異體字字典所列廣韻靜字片段",
       "url": "https://dict.variants.moe.edu.tw/book_piece/025/189956.png",
-      "raw_sha256": "85630ed3c6493a95fbf42435b9568bedcc1685c52915b51b368c0e21f4a94075",
       "selected_reading": {
         "character": "靜",
         "category": "上",

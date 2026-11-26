@@ -10,7 +10,6 @@
     "bytes": 433167,
     "width": 2700,
     "height": 1999,
-    "sha256": "d4b273b59e954d52e0d63c7ff378446716ab390086ed2cc789d9beb7fa8f6329",
     "image_redistributed_in_this_bundle": false,
     "image_metadata_is_physical_print_date": false
   },
@@ -73,13 +72,11 @@
     {
       "role": "reviewer_pixel_first",
       "public_record": "tests/data/sukuyo_source_readings/sukuyo-semantic-continuation-v110-ARC-image-reviewer-first.json",
-      "sha256": "41ac11361196d66dae57b1296b30ea9d528f3d500955d7f8dc5a3c76508e0a6e",
       "scope": "First selected pixel reading by the existing readonly role; shared provider and history, not external blind validation."
     },
     {
       "role": "root_feedback_exposed_correction",
       "public_record": "tests/data/sukuyo_source_readings/sukuyo-semantic-continuation-v110-ARC-root-correction-first.json",
-      "sha256": "85eeafdb4ed422e83aa69a975e36a19284ca2ea391685b8726718e832622700e",
       "scope": "Correction after reading reviewer feedback; the old root first and uncertain glyph remain preserved."
     }
   ],

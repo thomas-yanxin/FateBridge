@@ -1,7 +1,6 @@
 {
   "format_id": "fengshui_host_guest_source_v1",
   "version": "1.0.0",
-  "source_reference_sha256": "4065bc975e47bfd583d302addfb55238177c2bce8a2546671abc73b3c54049a6",
   "ruleset": {
     "ruleset_id": "shen_2011_host_guest_v1",
     "version": "1.0.0",
@@ -26,7 +25,6 @@
       "locator": "PDF901为篇题；PDF909–910为主客出入定义、盘层关系与旁六宫范围",
       "scope": "只取主客、出入名词和盘层；不合并吉凶、疾病或现实应验断语",
       "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
-      "source_pdf_sha256": "b0c2a7af0a1b94f36cf1cc9f0d2ce4b65e8ea49bd793bc128b8fdc525b5ba847",
       "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
     },
     {
@@ -36,7 +34,6 @@
       "locator": "PDF452–453",
       "scope": "论山山主、论向向主；保留其他比较对象与克出吉凶争论",
       "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
-      "source_pdf_sha256": "b0c2a7af0a1b94f36cf1cc9f0d2ce4b65e8ea49bd793bc128b8fdc525b5ba847",
       "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
     },
     {
@@ -46,7 +43,6 @@
       "locator": "PDF283",
       "scope": "九星卦位和二十四山组；南上图位不认证现场北向",
       "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
-      "source_pdf_sha256": "b0c2a7af0a1b94f36cf1cc9f0d2ce4b65e8ea49bd793bc128b8fdc525b5ba847",
       "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
     },
     {
@@ -56,7 +52,6 @@
       "locator": "PDF859–860",
       "scope": "仅九星五行对应，不套用该篇八宅、层间与五子运的其他规则",
       "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
-      "source_pdf_sha256": "b0c2a7af0a1b94f36cf1cc9f0d2ce4b65e8ea49bd793bc128b8fdc525b5ba847",
       "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
     }
   ],

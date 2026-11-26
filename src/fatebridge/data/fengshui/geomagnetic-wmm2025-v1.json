@@ -795,9 +795,7 @@
   ],
   "origin": {
     "zip_url": "https://www.ncei.noaa.gov/sites/default/files/2024-12/WMM2025COF.zip",
-    "zip_sha256": "2e76569370d081f2cd7919490218bd094ca9afde347b198eff5621e0af460d03",
     "member": "WMM2025COF/WMM2025.COF",
-    "coefficient_sha256": "dfa8597825af4e0b87ff4198a5b4fb661b3c49f4cd090cd0164e0259b075582f",
     "retrieved_utc": "2026-10-21",
     "notice": "NOAA WMM US Government model data and original C code are public domain."
   }

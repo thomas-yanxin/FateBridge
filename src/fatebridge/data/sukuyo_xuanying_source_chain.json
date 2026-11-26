@@ -6,13 +6,11 @@
   "header_work_coverage": "第1卷-第15卷",
   "selected_juan": 8,
   "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/C/C056/C056n1163.xml",
-  "capture_sha256": "4bdef1f67c2980550795600bcf8b62993f106c1692bdbb5ba4319fe3fa95ff70",
   "capture_bytes": 2657169,
   "selected_locator": "C056n1163_p0945b10-14",
   "selected_entry": "沸星",
   "selected_literal": "沸星或云佛星或作孛星或言弗沙星皆音字訛也正音富沙依諸經云如来成道出家皆用二月八日鬼宿合時依日藏分經二月九日曙夜分属九日故也。",
   "T2216_context": {
-    "publisher_capture_sha256": "5c62eaa9078aef1b28e7e84e496296d327fe9ef569ff5590ead238a9888143f4",
     "direct_quotation_locator": "T2216_.59.0055c17-21",
     "direct_quote_name_variant": {
       "C1163_literal": "佛星",
@@ -37,7 +35,6 @@
     "title_on_selected_title_page": "玄應一切經音義",
     "editor_on_title_page": "周法高編製索引",
     "publisher_description": "弘教書院排印之高麗藏本影印；來源说明本身不证明谱系独立",
-    "actual_pdf_sha256": "e9a9f733fc2dfc7d316967c8ddd69f3c1b2141e81ad326ad3a456a68cd4803e4",
     "actual_pdf_bytes": 17537215,
     "pdf_pages": 302,
     "selected_pdf_page_one_based": 92,

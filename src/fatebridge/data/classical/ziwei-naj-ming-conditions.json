@@ -144,12 +144,6 @@
   "scope": "Source-conditioned natal geometry only; no complete traditional judgment or real-world outcome assertion",
   "source_revision": {
     "id": "naj_ming_conditions_revision_r25_v1",
-    "source_manifest_sha256": "a60c6ac465966d1a776a85a2aa212aa5ead9c69fea200a90914c0b9fb3c72352",
-    "first_reading_sha256": "40bc7eb1a72b2ee962626040a391fc724feb3ec33ba5c6bcb919834d5264a8a1",
-    "primary_review_sha256": "e4c8145d5460437a307acb5cbfba88d3ce9a5842e91e3f8dfd7ec135708e3c20",
-    "peer_review_sha256": "e53fcc8a95ab69bd63aadb40f031ff2ac868e47208e89f8df54316ff6539ff9a",
-    "prior_collation_sha256": "e4302448793691cbc4e5da6c2e6a2b722408f1dcb8867a8e57b34a73e22cb52f",
-    "prior_compiled_sha256": "a017d353ecaa4b4e648dd4ccca490a0bd9ffc699f012f3cf0ffe4438b2887b68",
     "changed_clause_ids": [
       "ziwei_fubi_conjunction",
       "kuiyue_flank_ming",

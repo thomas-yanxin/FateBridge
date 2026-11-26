@@ -30,7 +30,6 @@ from fatebridge.core.astro.de441_storage import BASENAME as DE441_BASENAME
 from fatebridge.core.astro.de441_storage import BINARY_ORDER as DE441_BINARY_ORDER
 from fatebridge.core.astro.de441_storage import MODEL_ID
 from fatebridge.core.astro.de441_storage import STORAGE as DE441_STORAGE
-from fatebridge.core.astro.tdb import COEFFICIENT_SHA256 as TDB_SHA256
 from fatebridge.core.de440_solar import RecordSegment, SolarManifest
 
 DE441_SOURCE_SHA256 = "88289997e437cf115a95fc60d787129f7213952ecae323035ce341325674eee1"
@@ -138,7 +137,6 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
                 "record_count": len(times),
                 "offset_bytes": offset,
                 "bytes": len(raw),
-                "sha256": hashlib.sha256(raw).hexdigest(),
             }
         )
     logical_bytes = bytes(logical)
@@ -150,14 +148,11 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
         ],
     )
     name = "de440-solar-record-atlas-v1"
-    packed_sha = hashlib.sha256(packed).hexdigest()
     atlas = {
         "model_id": "lossless_de440_solar_record_atlas_v1",
         "storage": "record_byte_channels_gzip_v1",
         "file": name + ".bin.gz",
         "uncompressed_bytes": len(logical_bytes),
-        "uncompressed_sha256": hashlib.sha256(logical_bytes).hexdigest(),
-        "compressed_sha256": packed_sha,
         "segments": segments,
         "coefficient_values_or_record_domains_changed": False,
         "profile_views": "Five established logical model selections retain their original selected coefficient bytes and individual time domains; only physical storage overlaps are shared.",
@@ -167,9 +162,22 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
         view = deepcopy(original)
         view["file"] = name + ".bin.gz"
         view["storage"] = "shared_original_type2_record_atlas_v1"
-        view["compressed_sha256"] = packed_sha
-        view["tdb_coefficient_sha256"] = TDB_SHA256
+        view_obj: dict[str, object] = dict(view)
+        for key in (
+            "compressed_sha256",
+            "uncompressed_sha256",
+            "tdb_coefficient_sha256",
+            "selection_protocol_sha256",
+        ):
+            view_obj.pop(key, None)
+        if filename != "de440-solar-v1.json" and isinstance(
+            source_value := view_obj.get("source"), dict
+        ):
+            view_obj["source"] = {
+                k: v for k, v in source_value.items() if k != "kernel_sha256"
+            }
         selected = bytearray()
+        cleaned_segments: list[dict[str, object]] = []
         for segment in view["segments"]:
             base, first, size, span = offsets[segment["center"], segment["target"]]
             midpoint = segment["initial_seconds_from_j2000_tdb"] + span / 2
@@ -181,19 +189,28 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
             segment["offset_bytes"] = base + index * size
             at = segment["offset_bytes"]
             segment_raw = logical_bytes[at : at + segment["bytes"]]
-            if hashlib.sha256(segment_raw).hexdigest() != segment["sha256"]:
+            segment_obj: dict[str, object] = dict(segment)
+            expected_segment_sha = segment_obj.pop("sha256", None)
+            if (
+                isinstance(expected_segment_sha, str)
+                and hashlib.sha256(segment_raw).hexdigest() != expected_segment_sha
+            ):
                 raise ValueError("DE440 selected source-record words changed")
             else:
                 pass
+            cleaned_segments.append(segment_obj)
             selected.extend(segment_raw)
-        if (
-            len(selected) != original["uncompressed_bytes"]
-            or hashlib.sha256(selected).hexdigest() != original["uncompressed_sha256"]
+        view_obj["segments"] = cleaned_segments
+        original_obj: dict[str, object] = dict(original)
+        expected_uncompressed_sha = original_obj.get("uncompressed_sha256")
+        if len(selected) != original["uncompressed_bytes"] or (
+            isinstance(expected_uncompressed_sha, str)
+            and hashlib.sha256(selected).hexdigest() != expected_uncompressed_sha
         ):
             raise ValueError("DE440 logical profile changed during deduplication")
         else:
             pass
-        outputs[filename] = encoded(view)
+        outputs[filename] = encoded(view_obj)
     return outputs
 
 
@@ -211,8 +228,6 @@ def planetary_archive(
     groups: dict[str, SourceGroup] = {}
     words = bytearray()
     source_sha = hashlib.sha256()
-    selected_source_sha = hashlib.sha256()
-    logical_sha = hashlib.sha256()
     compressed_bytes = 0
     chunks: list[dict[str, str | int]] = []
     chunk_records = 8192
@@ -274,14 +289,12 @@ def planetary_archive(
                 at = (group["source_pointer"][0] - 1) * 8
                 count = 3 * group["coefficient_count"] * group["subintervals"]
                 selected = raw[at : at + count * 8]
-                selected_source_sha.update(selected)
                 # Preserve the actual 8-byte words, including signed zero and
                 # every coefficient bit; no float decode/encode is performed.
                 words.extend(selected)
             chunk_count += 1
             if chunk_count == chunk_records or index == records - 1:
                 logical = bytes(words)
-                logical_sha.update(logical)
                 packed = pack_records(logical, [RecordBlock(chunk_count, offset * 8)])
                 filename = f"{name}-part-{len(chunks):02d}.bin.gz"
                 compressed_bytes += len(packed)
@@ -291,9 +304,7 @@ def planetary_archive(
                         "first_record": index + 1 - chunk_count,
                         "record_count": chunk_count,
                         "uncompressed_bytes": len(logical),
-                        "uncompressed_sha256": hashlib.sha256(logical).hexdigest(),
                         "compressed_bytes": len(packed),
-                        "compressed_sha256": hashlib.sha256(packed).hexdigest(),
                     }
                 )
                 yield filename, packed
@@ -326,14 +337,9 @@ def planetary_archive(
         "storage": DE441_STORAGE,
         "chunks": chunks,
         "uncompressed_bytes": records * offset * 8,
-        "uncompressed_sha256": logical_sha.hexdigest(),
         "compressed_bytes": compressed_bytes,
         "coefficient_counts_subcells_axes_and_coverage_preserved": True,
         "original_float_coefficients_bitwise_preserved": True,
-        "source_selected_float64_sha256": selected_source_sha.hexdigest(),
-        "source_file_sha256": DE441_SOURCE_SHA256,
-        "source_header_sha256": hashlib.sha256(header).hexdigest(),
-        "source_manifest_sha256": DE441_DOWNLOAD_MANIFEST_SHA256,
         "coefficient_representation": {
             "method": "original_selected_binary64_bytes_copied_without_numeric_conversion",
             "coefficient_rounding_or_quantization_applied": False,

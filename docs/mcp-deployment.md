@@ -32,13 +32,13 @@ fatebridge doctor --mcp
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
-uv sync --locked --extra dev
-uv run --locked --extra dev fatebridge doctor --mcp
+uv sync --extra dev
+uv run --extra dev fatebridge doctor --mcp
 ```
 
-源码环境由 `uv.lock` 锁定，默认 Python 3.12。接入配置使用 doctor 返回的 `executable`，例如 `/absolute/path/to/FateBridge/.venv/bin/python`。无需先激活环境，也无需在另一个终端启动 stdio 服务。
+源码环境默认使用 Python 3.12。接入配置使用 doctor 返回的 `executable`，例如 `/absolute/path/to/FateBridge/.venv/bin/python`。无需先激活环境，也无需在另一个终端启动 stdio 服务。
 
-两种方式均应检查 `ok=true` 和 `mcp.ok=true`。诊断从无关临时工作目录启动独立进程，执行初始化、工具列表检查、`discover_tools` 与一条虚构计算。失败时查看 `mcp.stage`、`error_type` 和 `server_stderr`，修复后在同一环境重试。
+两种方式均应检查 `ok=true` 和 `mcp.ok=true`。诊断从无关临时工作目录启动独立进程，执行初始化、工具列表检查与 `discover_tools`。失败时查看 `mcp.stage`、`error_type` 和 `server_stderr`，修复后在同一环境重试。
 
 ## 注册本地 stdio
 
@@ -90,8 +90,8 @@ Cursor 在 `fatebridge` 条目内另加 `"type": "stdio"`。Claude Desktop 通�
 ```powershell
 git clone https://github.com/thomas-yanxin/FateBridge.git
 Set-Location FateBridge
-uv sync --locked --extra dev
-uv run --locked --extra dev fatebridge doctor --mcp
+uv sync --extra dev
+uv run --extra dev fatebridge doctor --mcp
 ```
 
 独立工具安装仍使用 `uv tool install --python 3.12 fatebridge`，然后运行 `fatebridge doctor --mcp`。PowerShell 用户可直接使用下方配置。
@@ -130,7 +130,7 @@ Claude Desktop 的 JSON 要双写反斜杠；Cursor 使用同样结构并在条�
 CLI 虚构计算可用 PowerShell 续行符执行，反引号后不要留空格：
 
 ```powershell
-uv run --locked --extra dev fatebridge bazi_birth_chart `
+uv run --extra dev fatebridge bazi_birth_chart `
   --birth-year 1990 --birth-month 5 --birth-day 15 `
   --birth-hour 10 --birth-minute 30 --gender 男 `
   --birth-place 北京 --birth-timezone Asia/Shanghai `
@@ -144,7 +144,7 @@ uv run --locked --extra dev fatebridge bazi_birth_chart `
 默认两个工具（`discover_tools` 与 `run_calculation`）覆盖全部公开能力。在客户端的 `env` 中设置 `FATEBRIDGE_MCP_FAMILIES` 可限制能力范围，例如 `"bazi,knowledge"` 或 `"fengshui"`。多个 family 取并集，空值保留全量，错误分类阻止启动。以下命令可验证独立进程：
 
 ```bash
-uv run --locked --extra dev fatebridge doctor --mcp --family fengshui
+uv run --extra dev fatebridge doctor --mcp --family fengshui
 ```
 
 `fatebridge discover --surface mcp` 按实际目录查工具，可加 `--family`、`--q` 或 `--tool`。修改环境后重启连接，在新聊天中核对实际工具列表。
@@ -153,10 +153,10 @@ uv run --locked --extra dev fatebridge doctor --mcp --family fengshui
 
 ## HTTP 与远程部署
 
-以下使用**当前源码的锁定环境**。在服务器安装仓库后，从仓库根目录运行：
+以下使用**当前源码的开发环境**。在服务器安装仓库后，从仓库根目录运行：
 
 ```bash
-uv run --locked --extra dev fastmcp run src/fatebridge/mcp_server.py:app \
+uv run --extra dev fastmcp run src/fatebridge/mcp_server.py:app \
   --transport http --host 127.0.0.1 --port 8011 --path /mcp
 ```
 
@@ -167,7 +167,7 @@ uv run --locked --extra dev fastmcp run src/fatebridge/mcp_server.py:app \
 在同机另一个终端、仓库根目录运行以下脚本，验证初始化、工具发现与计算：
 
 ```bash
-uv run --locked --extra dev python - <<'PY'
+uv run --extra dev python - <<'PY'
 import asyncio
 import json
 from fastmcp import Client
@@ -283,7 +283,7 @@ WantedBy=multi-user.target
 升级前记录 doctor 的版本、包路径、当前 Git 提交和客户端配置，保存仍需要的结果交付文件。
 
 - PyPI 独立工具：执行 `uv tool upgrade fatebridge`；如需回退到已发布版本，使用 `uv tool install --force fatebridge==<version>`。
-- 源码：确认 `git status` 并保留本地修改，执行 `git pull --ff-only` 与 `uv sync --locked --extra dev`。
+- 源码：确认 `git status` 并保留本地修改，执行 `git pull --ff-only` 与 `uv sync --extra dev`。
 - 重新运行协议检查，重启 stdio 连接或 HTTP 服务，再在新聊天验证工具。若解释器或目录改变，更新配置中的绝对路径。
 
 停用 stdio 时删除或禁用客户端内对应条目并重载；手动 HTTP 服务用 Ctrl-C 结束，systemd 使用 `sudo systemctl disable --now fatebridge-mcp`。独立工具不再需要时可执行 `uv tool uninstall fatebridge`。

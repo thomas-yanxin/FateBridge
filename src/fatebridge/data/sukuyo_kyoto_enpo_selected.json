@@ -10,7 +10,6 @@
     "catalogue_publication_statement": "神京 延寶九年刊",
     "catalogue_statement_is_exact_impression_authentication": false,
     "manifest_url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/metadata_manifest/RB00017017/manifest.json",
-    "manifest_sha256": "f115c2497745862802d9a68998ecadeb6daa42c6820838b63b9843e9d0f02ec4",
     "manifest_canvas_count": 80,
     "image_attribution": "修註宿曜經（京都大学附属図書館所蔵）",
     "reuse_policy_url": "https://rmda.kulib.kyoto-u.ac.jp/license_icon/free-license",
@@ -20,7 +19,6 @@
         "canvas": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00017017/canvas/p71",
         "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00017017%2F02%2FRB00017017_00071_0.ptif/full/max/0/default.jpg",
         "bytes": 3284431,
-        "sha256": "58557afbddbe3b260e335dc8a805834aecda6471e8f5b8d3028f08561965ab8a",
         "file": "kyoto-RB00017017-frame71.jpg"
       },
       {
@@ -28,7 +26,6 @@
         "canvas": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00017017/canvas/p72",
         "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00017017%2F02%2FRB00017017_00072_0.ptif/full/max/0/default.jpg",
         "bytes": 3276493,
-        "sha256": "26f9471e140aa2089cf07259cb0ec47ff477d7c125d85bf32ba4d3a4912d4832",
         "file": "kyoto-RB00017017-frame72.jpg"
       },
       {
@@ -36,7 +33,6 @@
         "canvas": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00017017/canvas/p76",
         "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00017017%2F02%2FRB00017017_00076_0.ptif/full/max/0/default.jpg",
         "bytes": 3438217,
-        "sha256": "1c49ef07a88318a8fb493838bc4c85788dcac1cc6445ebc533d3fb313c3839dd",
         "file": "kyoto-RB00017017-frame76.jpg"
       },
       {
@@ -44,7 +40,6 @@
         "canvas": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00017017/canvas/p77",
         "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00017017%2F02%2FRB00017017_00077_0.ptif/full/max/0/default.jpg",
         "bytes": 3449703,
-        "sha256": "dd69b07981c3075b4ab1a7eeead9c2e08b499f8e1025ddcb26cb1a67143d8dc3",
         "file": "kyoto-RB00017017-frame77.jpg"
       },
       {
@@ -52,7 +47,6 @@
         "canvas": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00017017/canvas/p78",
         "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00017017%2F02%2FRB00017017_00078_0.ptif/full/max/0/default.jpg",
         "bytes": 3486983,
-        "sha256": "880b351bc7856c196d10a39516ad2c852ab3f91dbf8fa830314686ac74151780",
         "file": "kyoto-RB00017017-frame78.jpg"
       },
       {
@@ -60,7 +54,6 @@
         "canvas": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00017017/canvas/p79",
         "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00017017%2F02%2FRB00017017_00079_0.ptif/full/max/0/default.jpg",
         "bytes": 3530739,
-        "sha256": "0605fc1e5c3408c03080641097d6ede94ad35246a603f80e53fb662e8704723d",
         "file": "kyoto-RB00017017-frame79.jpg"
       }
     ],
@@ -72,13 +65,6 @@
     "source_independent_historical_observation": false,
     "source_relation": "Named Japanese printed witness; separate direct image evidence, not identified with Taisho Ming witness, not an independent historical observation.",
     "transcription_method": "Parent and two existing same-provider model roles read actual images. Generator first misread three clear cells, corrected after local reinspection; root and both roles retain unresolved clock and earth-peak glyphs. Shared context, provider and filesystem; not strict blind reading or human collation. Reviewer recheck subsequently reads earth-peak as 亢; the parent has not accepted a unique glyph, and the generator left 元/亢. This final disagreement remains unresolved; no vote selects a mansion.",
-    "raw_reading_files_sha256": {
-      "parent-primary-first.json": "7b584357259cf6552e8d229d57bfbd6db097f7d72c7f43a316acce9d48389315",
-      "generator-primary-first.json": "792a2c7618f9f2e6388cf54b9999bd22c6352129a6964d2bc5e784214c00cd7b",
-      "generator-primary-recheck.json": "d8e44d6b6e00f5b1710c5e992469c3108bc5775ff094d655e8e0f7c14379dfd4",
-      "reviewer-primary-first.json": "c6cf2039e493ff3cb35b23feab83285cd090ac1f5315adc180110452e84026d4",
-      "reviewer-primary-recheck.json": "2f7f33cef788c3d347fd5857f218534684021f57e5c1a7f933ed63048e2c77fd"
-    },
     "scope": "具名日本印本所选下卷21格及分时段；全部位置含疑字均保留。主表、事项、天文合宿、古代日界及闰月补配先后不据此更换。"
   },
   "witness": "lower_kyoto_enpo_selected",

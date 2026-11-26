@@ -11,11 +11,11 @@ FateBridge 使用 Python `src` 布局，通过共享执行层和中央目录统�
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
-uv sync --locked --extra dev
-uv run --locked --extra dev fatebridge doctor
+uv sync --extra dev
+uv run --extra dev fatebridge doctor
 ```
 
-变更依赖时使用 `uv add` / `uv remove`（开发依赖加 `--optional dev`），确保 `pyproject.toml` 与 `uv.lock` 同步，并通过 `uv lock --check` 校验。如需自定义端口、鉴权密钥或星历路径，可复制配置模板 `cp -n .env.example .env`，配置说明见[运行配置](configuration.md)。
+变更依赖时使用 `uv add` / `uv remove`（开发依赖加 `--optional dev`）更新 `pyproject.toml`。如需自定义端口、鉴权密钥或星历路径，可复制配置模板 `cp -n .env.example .env`，配置说明见[运行配置](configuration.md)。
 
 ## 项目结构概览
 
@@ -25,11 +25,11 @@ uv run --locked --extra dev fatebridge doctor
 
 ```bash
 # 启动 REST API（仅本机监听）
-API_HOST=127.0.0.1 uv run --locked --extra dev fatebridge-api
+API_HOST=127.0.0.1 uv run --extra dev fatebridge-api
 
 # 启动 FastMCP stdio 进程或验证连接
-uv run --locked --extra dev fatebridge-mcp
-uv run --locked --extra dev fatebridge doctor --mcp --family bazi
+uv run --extra dev fatebridge-mcp
+uv run --extra dev fatebridge doctor --mcp --family bazi
 ```
 
 ## 常用开发命令
@@ -47,13 +47,13 @@ uv run --locked --extra dev fatebridge doctor --mcp --family bazi
 运行自包含 CI 测试集、代码格式化与静态类型检查：
 
 ```bash
-uv run --locked --extra dev python scripts/run_ci_checks.py
-uv run --locked --extra dev black --check src/fatebridge scripts tests
-uv run --locked --extra dev isort --check-only src/fatebridge scripts tests
-uv run --locked --extra dev mypy src/fatebridge/
+uv run --extra dev python scripts/run_ci_checks.py
+uv run --extra dev black --check src/fatebridge scripts tests
+uv run --extra dev isort --check-only src/fatebridge scripts tests
+uv run --extra dev mypy src/fatebridge/
 ```
 
-需要外部星历数值参考时，按[星历安装说明](ephemeris.md)准备数据，或运行 `uv run --locked --extra dev python -m scripts.astronomy.prepare_reference_kernel`。
+需要外部星历数值参考时，按[星历安装说明](ephemeris.md)准备数据，或运行 `uv run --extra dev python -m scripts.astronomy.prepare_reference_kernel`。
 
 ## 推荐开发流程
 
@@ -90,23 +90,23 @@ uv run --locked --extra dev mypy src/fatebridge/
 修改文档后运行以下检查，确保零断链、计数准确且生成合同无漂移：
 
 ```bash
-uv run --locked --extra dev python scripts/check_docs.py
-uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py \
+uv run --extra dev python scripts/check_docs.py
+uv run --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py \
   tests/quality/test_doc_tool_counts.py tests/quality/test_interpretation_examples.py \
   tests/quality/test_codex_call_contracts.py
-uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
+uv run --extra dev python scripts/build_codex_call_contracts.py --check
 git diff --check
 ```
 
-`scripts/check_docs.py` 校验根目录文档、`docs/`（不含临时评审目录）以及脚本与测试索引中的本地链接、标题锚点、代码围栏、JSON 代码块和示例 JSON 文件。`test_doc_tool_counts.py` 核对核心文档与实时中央目录的工具、路由、family 数量及所有公开路线覆盖。`test_interpretation_examples.py` 提取并实际执行 `docs/interpretation/` 中的 CLI 示例。当工具参数或 `evidence_views` 变化时，先运行 `uv run --locked --extra dev python scripts/build_codex_call_contracts.py` 更新 `docs/contracts/`，再以 `--check` 复核。
+`scripts/check_docs.py` 校验根目录文档、`docs/`（不含临时评审目录）以及脚本与测试索引中的本地链接、标题锚点、代码围栏、JSON 代码块和示例 JSON 文件。`test_doc_tool_counts.py` 核对核心文档与实时中央目录的工具、路由、family 数量及所有公开路线覆盖。`test_interpretation_examples.py` 提取并实际执行 `docs/interpretation/` 中的 CLI 示例。当工具参数或 `evidence_views` 变化时，先运行 `uv run --extra dev python scripts/build_codex_call_contracts.py` 更新 `docs/contracts/`，再以 `--check` 复核。
 
 ## 仓库维护与打包发布
 
 ### 清理本地临时产物
 
 ```bash
-uv run --locked --extra dev python scripts/clean_repository.py
-uv run --locked --extra dev python scripts/clean_repository.py --apply
+uv run --extra dev python scripts/clean_repository.py
+uv run --extra dev python scripts/clean_repository.py --apply
 ```
 
 默认仅预览可再生成的构建缓存与临时产物，`--apply` 执行清理，不会删除虚拟环境、星历数据或 Git 跟踪文件。

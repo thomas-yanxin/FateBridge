@@ -5,7 +5,6 @@
   "study_kind": "retrospective_before_data_retrieval_not_prospective",
   "evaluated_base_ruleset": "meihua_weather_v1@1.0.0",
   "weather_controls_included": false,
-  "evaluated_source_manifest_sha256": "04dbae949f04b5fe691b9f99335a07e534c47d821458970e8b25b218a2a00d3c",
   "interpretation_policy": "rain_without_clear_sign_v1",
   "cohort_days": 365,
   "evaluable_days": 209,
@@ -21,7 +20,6 @@
   "current_ruleset_efficacy_established": false,
   "authority_certified": false,
   "official_observation_source": "https://data.weather.gov.hk/weatherAPI/cis/csvfile/HKO/ALL/daily_HKO_RF_ALL.csv",
-  "preserved_observation_sha256": "5b6681c148ed5312d5c4b1c479a213263a744f0777737d14d18a94bd6c0d0d08",
   "report": "docs/validation/meihua-weather-2025-pilot-v1.json",
   "additional_profile_audits": [
     {
@@ -30,7 +28,6 @@
       "evaluated_ruleset": "meihua_weather_v1@1.5.0",
       "weather_controls_included": true,
       "interpretation_policy": "qualified_unambiguous_rain_clear_v2",
-      "source_manifest_sha256": "d89e94e461d2fa4e40564ecd47963a360665bf1556587b231c1e3235a578a01e",
       "cohort_days": 366,
       "evaluable_days": 29,
       "correct": 16,
@@ -55,7 +52,6 @@
   "current_engine_ruleset": "meihua_weather_v1@1.7.0",
   "current_profile_study": {
     "primary_attainable_skill_bound": {
-      "vector_sha256": "6852bcd1686138fecbaeea5a7f467294cccda79c6ec0a76780705a161ce87115",
       "file_commitment_verified": true,
       "calculation_uses_only_cohort_ids_and_forecast_labels": true,
       "study_plan_or_timestamp_authenticated": false,
@@ -225,11 +221,6 @@
       "season_not_supplied": 0
     },
     "daypart_readings_observationally_validated_in_this_cohort": false,
-    "source_manifest_sha256": "8c88eb61b8df6d78b73652af94a3a5619af73343d272a9f9775c78358a39cc77",
-    "protocol_sha256": "99a84a98c4d0477e8e95b1e766dab96667ad0b7d7528a13957ff24099479f7c1",
-    "forecast_seal_sha256": "97b810c9c36e498b9db09f17f391a5f090a6525a1153abea46d0d5f01e3b8e13",
-    "evaluation_report_sha256": "179cbb119d3d1472dfff67d2f3890d7d9b01bc211fa08d833e9e7f7467c869c0",
-    "observation_sha256": "5b6681c148ed5312d5c4b1c479a213263a744f0777737d14d18a94bd6c0d0d08",
     "calendar_issue_date_checks": 1004,
     "calendar_selected_field_mismatches": 0,
     "research_assumptions": "Prior civil day Hong Kong noon cast; assign source scopes to next target civil day; unspecified clear to under0.1mm is an explicit proxy. Season maps the calculated issue-date solar month branch to four seasons; no prior-condition or 多 threshold filled.",
@@ -369,7 +360,6 @@
     ],
     "method_is_not_official_hko_scoring_or_classical_rule": true,
     "report": "docs/validation/meihua-weather-reference-baselines-v1.json",
-    "report_sha256": "ab2c724d63923f4023f565e5b0c0cdedee740c4fc00106cd8789a4076891ebdd",
     "actual_model_runs": 0,
     "new_prospective_observations": 0,
     "real_world_predictive_efficacy_established": false,

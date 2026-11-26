@@ -7,48 +7,37 @@
     "commit": "9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3",
     "files": {
       "epv00.c": {
-        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/epv00.c",
-        "sha256": "4568b28026cd83800b4a4f66d44f8f3451d7306f1c3fcf7e4cd6bfeb206dde57"
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/epv00.c"
       },
       "nut00b.c": {
-        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/nut00b.c",
-        "sha256": "a5246d525e987eb587bbe786b2846160e01be85b5d12af573870b89235695f49"
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/nut00b.c"
       },
       "pfw06.c": {
-        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/pfw06.c",
-        "sha256": "085f49861026fab98633d8479795090b3278a0d246a938ebdf10fde326ef1987"
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/pfw06.c"
       },
       "obl06.c": {
-        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/obl06.c",
-        "sha256": "550260874d5e5fa3be77296b85b92c54c726fee6fbb1bb44748d04c17ffb37c2"
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/obl06.c"
       },
       "ab.c": {
-        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/ab.c",
-        "sha256": "ff4bac5fc8a2ccb5d1f63404c96734fd125069382c7f7a29add598721a122527"
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/ab.c"
       },
       "fw2m.c": {
-        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/fw2m.c",
-        "sha256": "480d1ae7780566980b8f80f4c6daa2be330a80e99861d892dc5a9f7b11da47c0"
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/fw2m.c"
       },
       "rx.c": {
-        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/rx.c",
-        "sha256": "b740bba3cce0502620662f6e667369734f6adf56064919394ae1ae3ae3e70c64"
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/rx.c"
       },
       "rz.c": {
-        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/rz.c",
-        "sha256": "d4ef2eb4a9744617b510c2370ba5ff5f3c0acaafb07a0eb6138c6f2128005bcc"
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/rz.c"
       },
       "t_erfa_c.c": {
-        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/t_erfa_c.c",
-        "sha256": "8a92d0099c48df31ca566bea881c19497dc295dba58dba7136cc2f8443c31f15"
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/t_erfa_c.c"
       },
       "LICENSE": {
-        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/LICENSE",
-        "sha256": "b1858f9a263f22c438a455a32945da51a31a0ae25a21055da13bb7ed57cc3b51"
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/LICENSE"
       },
       "erfam.h": {
-        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/erfam.h",
-        "sha256": "0da6313033aacf9c64533a7e74be49ecda97b4aaa87e134f98287e4ff279886f"
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/erfam.h"
       }
     },
     "purpose": "Author-published astronomical coefficients and reference implementation only. No DE440 residuals or term roots enter runtime data. ERFA derived from SOFA; no IAU endorsement claimed."

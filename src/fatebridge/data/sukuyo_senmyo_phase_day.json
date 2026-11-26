@@ -9,7 +9,6 @@
       {
         "id": "phase-rule",
         "url": "https://db.history.go.kr/goryeo/level.do?types=o&levelId=kr_050_0010_0020_0040_0060",
-        "capture_sha256": "a9ad16934bcad6dbcdd7bbad9bc75425a8016738c88219480e75a91c3347ee8e",
         "capture_bytes": 259083,
         "literal_context": "求朔弦望定日及餘秒以入氣入曆日下, 脁朒定數, 同名相從, 異名相消, 乃以脁減朒加, 朔弦望經日小餘, 滿若不足, 退大餘, 命甲子算外, 各得其定日及餘秒也. 定朔幹名, 與後月同名者, 其月大, 不同名者小, 其月內, 無中氣者, 爲閏. 秋分後, 定朔小餘, 四分之三已上者, 進一日, 春分後, 定朔昏明小餘, 如春分初日者, 三約之, 減四分之三, 定朔小餘, 如此數已上者, 亦進一日. 朔或當交有蝕應見者, 其朔不進. 弦望定小餘, 不盈昏明小餘者, 退一日. 其望小餘, 雖滿此數, 若交有蝕, 虧初, 起在晨初已前者, 亦如之.又月行九道, 遲疾曆, 則三大二小月, 行盈縮, 累增損之, 則容有四大三小, 理數然也. 若俯修常議, 當察加時早晩, 隨其所近, 而進退, 使不通三大三小. 其正月朔, 若有交, 加時正見者, 消息, 如後一兩月, 以定大小, 令虧在晦二也. 四分之三, 六千三百, 四分之一, 二千一百.",
         "reading_kind": "institutional_original_language_electronic_transcription"
@@ -17,7 +16,6 @@
       {
         "id": "clock-units",
         "url": "https://db.history.go.kr/goryeo/level.do?types=o&levelId=kr_050_0010_0020_0050_0010",
-        "capture_sha256": "70f8b8d9394088b4e13e603b1c6cc120e627dac2f3d04f391680257f4ed48fa5",
         "capture_bytes": 257820,
         "literal_context": "宣明步晷漏術第五中統, 四千二百辰刻, 八,【二十八分.】昏明刻, 各二,【四十二分】刻法, 八十四 【度母同刻法.】北極出地, 三十四度,【四十七分半, 大述曆法.】距極度, 五十六,【八十二分, 小分五.】",
         "reading_kind": "institutional_original_language_electronic_transcription"
@@ -25,7 +23,6 @@
       {
         "id": "twilight",
         "url": "https://db.history.go.kr/goryeo/level.do?types=o&levelId=kr_050_0010_0020_0050_0080",
-        "capture_sha256": "1865a7caa6355ce844b329a712b33d4b6db545cf82027755d592230f0aeca530",
         "capture_bytes": 258090,
         "literal_context": "求昏明小餘以刻法, 通夜半定漏, 各以大小分, 從之, 卽所求也.",
         "reading_kind": "institutional_original_language_electronic_transcription"
@@ -33,7 +30,6 @@
     ],
     "day_unit_source": {
       "url": "https://db.history.go.kr/id/kr_050_0010_0020_0010_0010",
-      "capture_sha256": "81f713a4de8cb8106886553979b3d29d43cfa87a74f32f06abeac9d961dec838",
       "literal_selected": "宣明統法八千四百"
     },
     "facsimile": {
@@ -44,7 +40,6 @@
         "actual_url": "https://db.history.go.kr/common/imageProxy.do?filePath=/kr/050/kr_050_1057.jpg",
         "status": 200,
         "bytes": 337129,
-        "sha256": "08a3bcb7f2da0b0452875754a14d6c156e043f95404268a11b3d1bb00420e26f",
         "basis": "Actual renderer line2181 appends slash before imgArr path; earlier missing-slash 225px placeholder retained"
       },
       "selected_image_size": [
@@ -54,7 +49,6 @@
       "selected_original_clause_location": "kr_050_1057 right column3 lower to columns4-5",
       "normalized_selected_literal": "弦望定小餘不盈昏明小餘者退一日其望小餘雖滿此數若交有蝕虧初起在晨初已前者亦如之",
       "normalization": "Remove source punctuation and whitespace for clause comparison; not whole-page diplomatic transcription.",
-      "first_reading_sha256": "7259069009409c38184f647f47ebe978650f077fc01149f57783599b0ea775ce",
       "independent_human_collation": false
     },
     "unit_mapping_scope": "8400統法 and 刻法84 are in actual institutional original-language text. 子半 origin is not newly established here.",
@@ -101,7 +95,6 @@
       15,
       16
     ],
-    "pdf_sha256": "c30e59423343a2695264efc7213abed32f2ef57f04647c2632ac421d6a77b96c",
     "reported_1117_phase_remainder": 2557,
     "reported_1117_twilight_remainder": 2193,
     "reported_surplus": 364,
@@ -149,8 +142,6 @@
   "named_print_variant": {
     "recorded_at": "2026-10-24T16:00:11.137296+00:00",
     "catalogue_url": "https://rmda.kulib.kyoto-u.ac.jp/item/rb00028836",
-    "catalogue_sha256": "4c2f9a5d192d943dfbe558fdb08540d529bb01f60b4c816f0157071962066e62",
-    "manifest_sha256": "bfda5ab9078d66b5a2edb0f5b57508c5b990e0d3258217b746913b388b7be933",
     "title": "長慶宣明暦筭法 六巻",
     "attributed_author_as_catalogued": "安藤有益",
     "print_year_as_catalogued": 1676,
@@ -162,7 +153,6 @@
       "actual_url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00028836%2F01%2602%2603%2604%2FRB00028836_00052_0.ptif/full/max/0/default.jpg",
       "status": 200,
       "bytes": 1686223,
-      "sha256": "38d4854e14b0d0da35a024f4eaef2e079d140a6975dffb4999d1987d6d4558e8",
       "basis": "Named ImageService3 level2 from actual Kyoto manifest; full native raster for selected glyphs"
     },
     "native_size": [
@@ -185,7 +175,6 @@
       "root model visual inspection; Osada electronic article read before image inspection"
     ],
     "independent_human_collation": false,
-    "first_record_sha256": "e29147afffc149cea147cc7cd1b85a5333f0b3e3da3bd5758ab71f81ba26f436",
     "evaluation_scope": "selected_literal_comparison_only_not_full_ando_algorithm"
   }
 }

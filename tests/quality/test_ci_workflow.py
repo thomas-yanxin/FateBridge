@@ -31,26 +31,25 @@ def test_cloud_jobs_do_not_restore_external_test_data() -> None:
 
 def test_every_environment_keeps_the_full_suite_across_three_shards() -> None:
     jobs = WORKFLOW["jobs"]
-    assert set(jobs) == {"changes", "documentation", "locked", "quality", "test", "ci"}
+    assert set(jobs) == {"changes", "documentation", "quality", "test", "ci"}
     matrix = jobs["test"]["strategy"]["matrix"]
     assert matrix["shard"] == [0, 1, 2]
     assert {(e["python"], e["os"], e["resolution"]) for e in matrix["environment"]} == {
         (version, "ubuntu-24.04", "highest")
         for version in ("3.10", "3.11", "3.12", "3.13")
-    } | {("3.10", "ubuntu-24.04", "lowest-direct"), ("3.12", "windows-2022", "locked")}
+    } | {("3.10", "ubuntu-24.04", "lowest-direct"), ("3.12", "windows-2022", "highest")}
     assert jobs["test"]["strategy"]["fail-fast"] is False
     commands = "\n".join(s.get("run", "") for s in jobs["test"]["steps"])
     assert "scripts/run_ci_checks.py" in commands
     assert '--shard-index "$CI_SHARD" --shard-count 3' in commands
     assert "--selection-report ci-selection.json" in commands
-    for name in ("locked", "quality", "test"):
+    for name in ("quality", "test"):
         assert jobs[name]["needs"] == "changes"
         assert jobs[name]["if"] == "needs.changes.outputs.checks == 'true'"
     assert jobs["ci"]["if"] == "always()"
     assert set(jobs["ci"]["needs"]) == {
         "changes",
         "documentation",
-        "locked",
         "quality",
         "test",
     }
@@ -95,7 +94,6 @@ def test_passive_docs_skip_heavy_jobs_but_keep_a_completed_summary() -> None:
         ("DOCUMENTATION_RESULT", "failure"),
         ("DOCUMENTATION_RESULT", "cancelled"),
         ("DOCUMENTATION_RESULT", "skipped"),
-        ("LOCKED_RESULT", "failure"),
         ("QUALITY_RESULT", "failure"),
         ("TEST_RESULT", "failure"),
         ("TEST_RESULT", "cancelled"),
@@ -111,7 +109,6 @@ def test_summary_gate_requires_every_selected_job_to_succeed(
         for name in (
             "CHANGES_RESULT",
             "DOCUMENTATION_RESULT",
-            "LOCKED_RESULT",
             "QUALITY_RESULT",
             "TEST_RESULT",
         )
@@ -139,7 +136,6 @@ def test_docs_summary_accepts_only_the_explicit_skip_path(
         CHANGES_RESULT="success",
         DOCUMENTATION_RESULT=documentation_result,
         CHECKS_REQUIRED="false",
-        LOCKED_RESULT="skipped",
         QUALITY_RESULT="skipped",
         TEST_RESULT=test_result,
     )

@@ -25,7 +25,7 @@ MCP 仅公开 `discover_tools` 与 `run_calculation` 两个入口（无资源 UR
 本地 CLI 示例须使用已安装 FateBridge 的虚拟环境。在仓库中按以下方式准备；这属于安装／开发任务，已连接的普通咨询无需运行：
 
 ```bash
-uv sync --locked --extra dev
+uv sync --extra dev
 source .venv/bin/activate
 ```
 
@@ -34,7 +34,7 @@ source .venv/bin/activate
 在本仓库使用本地后备时，优先已存在且已安装 FateBridge 的 `.venv/bin/python`，例如 `.venv/bin/python -m fatebridge.cli discover <tool>`。下方 `python3` 是已安装环境的通用写法，不表示系统默认解释器可导入本包；咨询不因解释器缺包而安装依赖、接受系统许可或修改用户配置。解析软链接用 shell 内建 `pwd -P` 即可，不依赖 Python 或 Xcode。
 
 ```bash
-# 先通过 uv sync --locked 安装本仓库并激活 .venv
+# 先通过 uv sync 安装本仓库并激活 .venv
 # python3 必须来自该环境，src 布局不能仅靠切到仓库根目录导入
 python3 -m fatebridge.cli <tool> [参数...]
 

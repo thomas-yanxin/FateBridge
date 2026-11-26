@@ -1,12 +1,10 @@
 {
   "id": "t1299_lower_clock_special_transposition_v1",
   "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1299.xml",
-  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
   "publisher_commit": "dbdea41071e1e260ad84b72faefd4587333cf76d",
   "selected_base": "Taisho publisher main text with its own apparatus retained",
   "symbol_reference": {
     "url": "https://cbeta.org/variant-symbols",
-    "selected_capture_sha256": "0a47ac0ae556066200312bef01fbe1b4dbf70c2959889c27a2a82ff0cd5bffbf",
     "capture_kind": "selected_web_tool_text_not_full_HTML",
     "selected_explanation": "位置ノ轉換 (‘Interchange of position’)",
     "symbol": "∞",

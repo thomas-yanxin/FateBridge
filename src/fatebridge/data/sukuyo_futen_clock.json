@@ -4,7 +4,6 @@
   "source_author": "竹迫忍",
   "source_publication": "数学史研究223号 pp.1–33; author's list gives 2015",
   "source_url": "https://www.kotenmon.com/dld/papers/223.pdf",
-  "source_sha256": "4ebd396bd1e32d16b68a6acff56c0b18039430c4889feda38ad3f57b7beaac2c",
   "source_bytes": 8341940,
   "bibliography_url": "https://www.kotenmon.com/ronbun.html",
   "source_kind": "Named research interpretation of quoted historical material; original 1240 document not independently read or collated.",
@@ -42,14 +41,39 @@
     }
   ],
   "selected_1240_readings": [
-    {"id": "start", "literal": "未6刻31分", "printed_futen_units": 6047, "printed_alternative_senmyo_units": 5085, "printed_alternative_in_10000_units": 6054},
-    {"id": "middle", "literal": "酉初刻6分", "printed_futen_units": 7089, "printed_alternative_senmyo_units": 5956, "printed_alternative_in_10000_units": 7090},
-    {"id": "end", "literal": "戌2刻26分", "printed_futen_units": 8142, "printed_alternative_senmyo_units": 6844, "printed_alternative_in_10000_units": 8148}
+    {
+      "id": "start",
+      "literal": "未6刻31分",
+      "printed_futen_units": 6047,
+      "printed_alternative_senmyo_units": 5085,
+      "printed_alternative_in_10000_units": 6054
+    },
+    {
+      "id": "middle",
+      "literal": "酉初刻6分",
+      "printed_futen_units": 7089,
+      "printed_alternative_senmyo_units": 5956,
+      "printed_alternative_in_10000_units": 7090
+    },
+    {
+      "id": "end",
+      "literal": "戌2刻26分",
+      "printed_futen_units": 8142,
+      "printed_alternative_senmyo_units": 6844,
+      "printed_alternative_in_10000_units": 8148
+    }
   ],
-  "printed_futen_intervals": {"start_to_middle": 1042, "middle_to_end": 1053, "total": 2095},
+  "printed_futen_intervals": {
+    "start_to_middle": 1042,
+    "middle_to_end": 1053,
+    "total": 2095
+  },
   "author_asymmetry_interpretation": "The author suspects an incorrect time value because the two intervals differ; this is a research inference, not independently established manuscript error.",
   "unit_distinctions": {
-    "1164_calculation": {"parts_per_day": 100, "subparts_per_part": 100},
+    "1164_calculation": {
+      "parts_per_day": 100,
+      "subparts_per_part": 100
+    },
     "995_explanation_printed_parts_per_double_hour": "8分33",
     "995_explanation_parts_per_day": 100,
     "995_expression_certified_exact_ratio": false,

@@ -6,12 +6,8 @@
     "author": "竹迫忍",
     "version_literal": "2022/12/27版",
     "source_url": "https://www.kotenmon.com/dld/papers/%E5%A4%A7%E8%A1%8D%E6%9A%A6%E6%B3%95%E3%81%A7%E3%81%AE%E9%80%B2%E6%9C%94%E3%81%AE%E6%A4%9C%E8%A8%BC%E7%B5%90%E6%9E%9C.pdf",
-    "source_pdf_sha256": "a525ec784aa134734c7c2c64a179d3e394a01a1ddc6bae0f73ab886f3c8e9fc5",
     "page_count": 9,
-    "source_first_sha256": "7f401ac30b3d5a5d009cce7b7d3223106885068b50d0a2cbc8daf1ae99d39e7c",
-    "before_code_normalized_properties_sha256": "5f93a0caaf6ced3024aaf116dcc457bf99d139f44a5ba94c53402f546accd3a7",
     "publication_index_url": "https://www.kotenmon.com/ronbun.html",
-    "publication_index_sha256": "5bcfebe19fab535cd0ceac823132aff10155ff894bd5b8ddb0d53dfb14c8963c",
     "source_kind": "author-hosted dated research reconstruction table; primary historical records cited by author not independently acquired here",
     "scope": "Complete327 rows of the selected author table, not complete764-861 monthly calendar,327 observed records, Senmyo rules, original T1299 text or a new host calendar.",
     "method_note": "Author states a change from Uchida B to A;793-819 instead evaluates lunar influence at mean new moon plus solar correction. This is the table author method, not a FateBridge ephemeris recomputation.",
@@ -27,7 +23,6 @@
     "different_from_senmyo_8400": true,
     "modern_clock_or_t1299_daybreak_established": false
   },
-  "complete_numeric_row_projection_sha256": "3e614444f30cca15e7f288a59f8df58ba7de41bfa31d3ab22d1957a43044fd08",
   "rows": [
     {
       "row_number": 1,

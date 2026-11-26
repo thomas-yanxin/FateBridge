@@ -32,6 +32,8 @@ ENV/
 env/
 .venv
 .venv*/
+# Local uv lockfile
+uv.lock
 
 # Swiss Ephemeris data files (.se1) are Astrodienst's, dual-licensed
 # AGPL-3.0 / commercial. FateBridge is Apache-2.0; acquire the data separately;

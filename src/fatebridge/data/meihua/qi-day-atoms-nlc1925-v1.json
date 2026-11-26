@@ -6,7 +6,6 @@
     "id": "nlc_1925",
     "title": "文明書局《梅花易數》卷一八卦萬物屬類時序、卷二求名與求財",
     "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
-    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
     "original_pdf_indices": [
       33,
       35,
@@ -20,10 +19,6 @@
       68
     ],
     "reader": "assistant selected clear day-branch spans only; not independent human expert authentication or full text re-collation"
-  },
-  "comparison_source_hashes": {
-    "volume1.wikitext": "f5245837e94bf82420e619fa61644cac1a1242cc59e1c5da5f776dcfd985ac99",
-    "volume2.wikitext": "239523c6bb8b59d7ed3fe229c681cd1a1124a5216617e198f05dbf19cc6d2939"
   },
   "literal_day_branch_atoms": {
     "乾": {
@@ -182,7 +177,6 @@
     "Input civil-midnight/zi-start candidates are two labels of the input clock, not two future forecast dates",
     "No next/nearest-day search, dates, scores, horizon tuning, future observation window or real outcome"
   ],
-  "legacy_full_time_profile_sha256": "b73ec8c22c261c47673a0b89bfc3bc714da30806962a9883bf0c0c10ec03b26c",
   "legacy_numeric_and_other_full_spans_recollated_this_round": false,
   "full_original_conformance": false,
   "predictive_efficacy": false

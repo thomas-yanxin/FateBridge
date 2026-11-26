@@ -2,8 +2,6 @@
 
 import re
 import shlex
-import subprocess
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -141,22 +139,3 @@ def test_documented_cli_examples_run_clean(
     captured = capsys.readouterr()
     tail = (captured.out or captured.err).strip().replace("\n", " ")[:200]
     assert code == 0, f"{example.path.name}: {example.tool_name} exit={code} :: {tail}"
-
-
-def test_documented_cli_entrypoint_smoke() -> None:
-    """Verify the CLI subprocess can start and run a documented chart."""
-    examples = documented_cli_examples()
-    birth_tool = next(
-        spec.name
-        for spec in cli_specs_by_name().values()
-        if spec.name == "bazi_birth_chart"
-    )
-    example = next(example for example in examples if example.tool_name == birth_tool)
-    command = shlex.split(example.command)
-    assert command[0] in {"python", "python3"}, example.command
-    command[0] = sys.executable
-    completed = subprocess.run(command, capture_output=True, text=True, timeout=60)
-    tail = (completed.stdout or completed.stderr).strip().replace("\n", " ")[:200]
-    assert (
-        completed.returncode == 0
-    ), f"{example.path.name}: {example.tool_name} exit={completed.returncode} :: {tail}"

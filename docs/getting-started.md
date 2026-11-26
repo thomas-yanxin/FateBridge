@@ -27,10 +27,10 @@ uv tool install --python 3.12 fatebridge
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
-uv sync --locked --extra dev
+uv sync --extra dev
 ```
 
-同步后在 `.venv` 中安装源码与开发依赖。下文命令使用独立工具写法；源码用户在命令前加 `uv run --locked --extra dev`，无需激活环境。例如 `uv run --locked --extra dev fatebridge doctor`。未发布差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，开发流程见[开发指南](development-guide.md)，Windows 写法见[部署指南](mcp-deployment.md#windows-powershell)。
+同步后在 `.venv` 中安装源码与开发依赖。下文命令使用独立工具写法；源码用户在命令前加 `uv run --extra dev`，无需激活环境。例如 `uv run --extra dev fatebridge doctor`。未发布差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，开发流程见[开发指南](development-guide.md)，Windows 写法见[部署指南](mcp-deployment.md#windows-powershell)。
 
 ## 选择运行方式
 

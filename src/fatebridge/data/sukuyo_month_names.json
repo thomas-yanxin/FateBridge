@@ -1,17 +1,10 @@
 {
   "id": "T1299_Tang_named_month_and_rizang_comparison_v67",
-  "source_files_sha256": {
-    "T21n1299.xml": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
-    "T13n0397.xml": "64d0dbf21d28e11d76488a2bf7ff0f651883f1f7d5d76392616b97da5d38ce17",
-    "T2216-month-context.html": "fc85c38bfb778131b6834507218e0d80567ff141cfe4d28de48b6a049be71683"
-  },
   "source_urls": {
     "T1299": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1299.xml",
     "T0397": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T13/T13n0397.xml",
     "T2216_capture_request": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&nonum=&kaeri=&mode2=2&useid=2216_,59,0065a01"
   },
-  "before_production_reference_sha256": "0936b0f6716c21c4cabd47c83feb96b71218299619acc7e5e5eb259566811ef8",
-  "reference_plan_sha256": "cedd061602899c1f7ae076e761bf14fbc0cef7ccb9db045ed51b696b83aa59b1",
   "T1299_selected_passages": [
     {
       "paragraph_id": "pT21p0388a1001",

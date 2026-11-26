@@ -3,8 +3,6 @@
   "version": 6,
   "catalogue_id": "human_design_gate5_editorial_v6",
   "parent_version": 5,
-  "parent_catalogue_sha256": "2893e860a30de29b6b5438d8c60398424d916fb277e2aae8cd5be2f4b4f2b269",
-  "source_pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
   "curated_by": "FateBridge primary agent; bounded visual source reading, not independent review",
   "required_line_count": 384,
   "expected_local_paraphrase_count": 30,
@@ -17,7 +15,6 @@
     {
       "key": "5.1",
       "source_pdf_page_one_based": 15,
-      "source_layout_block_sha256": "c31c162352c9c3a72772788c026a3a70646fa65df8a681864a9a1979bc51fb5d",
       "source_line_heading": "Perseverance",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -57,7 +54,6 @@
     {
       "key": "5.2",
       "source_pdf_page_one_based": 15,
-      "source_layout_block_sha256": "8e549b6218eb30778b6a821d2aa08bece344b83a63ef14bcb39742ad7b9dcaeb",
       "source_line_heading": "Inner peace",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -96,7 +92,6 @@
     {
       "key": "5.3",
       "source_pdf_page_one_based": 15,
-      "source_layout_block_sha256": "be91b3423b4ee107813d63c9c17ab8dacf26bf10b2cecf5f3581754e8f15982a",
       "source_line_heading": "Compulsiveness",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -136,7 +131,6 @@
     {
       "key": "5.4",
       "source_pdf_page_one_based": 15,
-      "source_layout_block_sha256": "2e37f96bc32051d1194fd0e25bc058eb2fe31a560483d92f2027734533ebbfb4",
       "source_line_heading": "The hunter",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -176,7 +170,6 @@
     {
       "key": "5.5",
       "source_pdf_page_one_based": 15,
-      "source_layout_block_sha256": "13f54d6211cdd8873bed29d8850ae9decf820933a3faa2ef3f5cf6936705acc3",
       "source_line_heading": "Joy",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -215,7 +208,6 @@
     {
       "key": "5.6",
       "source_pdf_page_one_based": 15,
-      "source_layout_block_sha256": "f75c20f2cb08d9e0cce0291c4d6cf829a4b41fe0c8e880507ee13b3c2a08f20a",
       "source_line_heading": "Yielding",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {

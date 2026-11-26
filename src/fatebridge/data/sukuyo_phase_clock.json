@@ -9,7 +9,6 @@
       "format": "CBETA_TEI",
       "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T39/T39n1796.xml",
       "publisher_commit": "dbdea41071e1e260ad84b72faefd4587333cf76d",
-      "capture_sha256": "716a298b26545627baf773ac481933f7792df944a4693f106a97435cd6f11a92",
       "capture_bytes": 2990454,
       "selected_quotations": [
         {
@@ -36,7 +35,6 @@
       "publisher": "SAT electronic Taisho",
       "format": "SAT_HTML",
       "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&nonum=&kaeri=&mode2=2&useid=2216_,59,0049a01&cpos=",
-      "capture_sha256": "47dfbdebff129cf2abda059bf0e4ebe30e5cbcf1fdd9c972cb9cf07d37f460ba",
       "capture_bytes": 183568,
       "capture_line_extent": [
         "0042a01",

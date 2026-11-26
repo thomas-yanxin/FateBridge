@@ -63,7 +63,6 @@
       "scope": "仅核对原文八星五行及伏位属木；不采用今译、原文事件断言或据此认证整本",
       "locator": "印刷第022页，PDF第45页，原文星表",
       "retrieved_at": "2026-10-22",
-      "retrieved_sha256": "69d35cecd8373b59ce36d6c1e18f95887206d92fd55a3ae982dc15366202cb55",
       "source_version": "353-page modern typeset PDF; ancient quotation block inspected, exact publication imprint not authenticated"
     },
     "S11": {
@@ -72,7 +71,6 @@
       "kind": "primary_text_transcription",
       "scope": "画卦自下而上、变卦自上而下的56组非同卦关系；累计操作数不等于净变化爻数，不代表流年",
       "retrieved_at": "2026-10-22",
-      "retrieved_html_sha256": "19db40c0e8f5e0ec72e4ab1507e9cf1b2c58c26ca4ef45f12ffbdb9101cc8da6",
       "source_version": "2026-10-22 retrieved web transcription; not a collated print edition",
       "locator": "八宅生气等星吉凶之源 > 八卦九星吉凶之源，画卦自下而上至七变段"
     },
@@ -82,7 +80,6 @@
       "kind": "primary_text_transcription",
       "scope": "保留左辅右弼随门而化的原文段，与星煞吉凶的伏位木并列；本版本未据门自动改五行",
       "retrieved_at": "2026-10-22",
-      "retrieved_html_sha256": "b1ef0339bda46bb1534599eec2fc2aa3acf5ec70345c512b4f95fc3a21cbd32a",
       "source_version": "2026-10-22 retrieved web transcription; not a collated print edition",
       "locator": "九星五行，白话解读之前原文段最后一句"
     },
@@ -93,7 +90,6 @@
       "scope": "仅采用五行相生相克有向循环；不采用摆件功效、颜色处方或结果保证",
       "locator": "印刷第19、20页，PDF第36、37页；本次逐像核对",
       "retrieved_at": "2026-10-22",
-      "retrieved_sha256": "6ab5135060df281fd6a6e376e0516e660c185dd2af2f146a5f850df64cc3b024",
       "source_version": "Author-published PDF, SHA-256 verified unchanged on 2026-10-22"
     }
   },

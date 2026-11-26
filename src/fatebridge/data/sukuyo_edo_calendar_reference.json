@@ -2,12 +2,10 @@
   "id": "edo_calendar_methods_and_horeki_intercalation_v101",
   "sources": {
     "naoj_reforms": {
-      "source_url": "https://eco2.mtk.nao.ac.jp/koyomi/exhibition/030/",
-      "raw_sha256": "0ec5e04ecafd857899a765c687a964817a438a865c66e089d486f68b59f9adb3"
+      "source_url": "https://eco2.mtk.nao.ac.jp/koyomi/exhibition/030/"
     },
     "uchida1973": {
       "source_url": "https://www.asj.or.jp/geppou/archive_open/1973/pdf/19730306.pdf",
-      "raw_sha256": "439cf27a554697181dc20933e287aa229e5d379eb910bd192df291f8a1e97e42",
       "title": "宝暦暦法置閏の疑問",
       "author": "内田正男",
       "printed_pages": [
@@ -17,8 +15,7 @@
       "table": "第3表全10行；第2表三例分别保留"
     },
     "ndl_sizes": {
-      "source_url": "https://www.ndl.go.jp/koyomi/chapter2/s1.html",
-      "raw_sha256": "eca9199f17efdab59428d822c5001bddd61a53bcc19e529b88a18ed3ef1a6f40"
+      "source_url": "https://www.ndl.go.jp/koyomi/chapter2/s1.html"
     }
   },
   "calendar_periods": [

@@ -5,7 +5,6 @@
   "source": {
     "id": "nlc_1925",
     "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
-    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
     "original_pdf_indices": [
       69
     ],
@@ -15,7 +14,6 @@
   "lexical_reference": {
     "title": "教育部重編國語辭典修訂本 多",
     "url": "https://dict.revised.moe.edu.tw/dictView.jsp?ID=2316&la=0&powerMode=0",
-    "raw_sha256": "f1b62d54c38fbf56db503125ea0e5c83dd15528740bc57f86bc12cbb9d99b557",
     "support": "Adverbial senses are licensed; this does not authenticate the book reading."
   },
   "reading_status": "declared_scoped_grammatical_reading_not_independent_expert_adjudication",

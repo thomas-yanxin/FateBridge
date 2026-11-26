@@ -3,7 +3,6 @@
   "holding": "東京大学総合図書館 T30107",
   "catalogue_url": "https://da.dl.itc.u-tokyo.ac.jp/portal/assets/1cf6a35f-73cd-8598-57ce-f0706cd68972",
   "manifest_url": "https://da.dl.itc.u-tokyo.ac.jp/portal/repo/iiif/1cf6a35f-73cd-8598-57ce-f0706cd68972/manifest",
-  "manifest_sha256": "bf2f09b7bb5796084cd554f364ad379f501fc93c546d406f956ae35e98a1f548",
   "source_kind": "later_copied_composite_volume_with_recalculation_not_T1299_TEI_or_Tang_autograph",
   "general_formula": {
     "locator": "T30107 canvas p18 left; p19 right top",

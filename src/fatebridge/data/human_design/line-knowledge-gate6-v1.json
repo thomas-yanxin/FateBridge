@@ -3,8 +3,6 @@
   "version": 7,
   "catalogue_id": "human_design_gate6_editorial_v7",
   "parent_version": 6,
-  "parent_catalogue_sha256": "26023136d1135eefd98d1c6d3293d1d2dc6d654a33f497ff1bf595cfc55162df",
-  "source_pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
   "curated_by": "FateBridge primary agent; bounded visual source reading, not independent review",
   "required_line_count": 384,
   "expected_local_paraphrase_count": 36,
@@ -17,7 +15,6 @@
     {
       "key": "6.1",
       "source_pdf_page_one_based": 17,
-      "source_layout_block_sha256": "90cd795e484eaf5a2f23c1e597511fbd01682d2bf720f01b569bd8f14e03069b",
       "source_line_heading": "Retreat",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -56,7 +53,6 @@
     {
       "key": "6.2",
       "source_pdf_page_one_based": 17,
-      "source_layout_block_sha256": "f979b32ae0e7017bb1cc6c69bc126676b779053644d33c0e86def1a2b34c0033",
       "source_line_heading": "The guerilla",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -95,7 +91,6 @@
     {
       "key": "6.3",
       "source_pdf_page_one_based": 17,
-      "source_layout_block_sha256": "2bca38d50a8fa1e94fc7c9dcb49806275d54b432ab32e5f4dee200c66f5f8c1e",
       "source_line_heading": "Allegiance",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -135,7 +130,6 @@
     {
       "key": "6.4",
       "source_pdf_page_one_based": 17,
-      "source_layout_block_sha256": "db5fc700b92ed6309b7790b0796406a15715796532bb2ea8075b239cc192a089",
       "source_line_heading": "Triumph",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -174,7 +168,6 @@
     {
       "key": "6.5",
       "source_pdf_page_one_based": 17,
-      "source_layout_block_sha256": "6ab8c2d2820b1d317746e76a5f507e0768df376ea3bcb2b3605ef5fde1d21773",
       "source_line_heading": "Arbitration",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {
@@ -213,7 +206,6 @@
     {
       "key": "6.6",
       "source_pdf_page_one_based": 17,
-      "source_layout_block_sha256": "12e5129bff1cd708ba2c3a04513dbf4f4ab665ecf8a3f3d48c2aed251b4aea54",
       "source_line_heading": "The peacemaker",
       "meaning_status": "local_editorial_paraphrase_pending_independent_review",
       "editorial_paraphrase": {

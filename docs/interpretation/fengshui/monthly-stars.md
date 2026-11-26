@@ -38,7 +38,7 @@ MP1的六月节候栏原印“大暑、小暑”，与标准时间顺序相反�
 ## 调用
 
 ```bash
-uv run --locked --extra dev fatebridge fengshui_monthly_stars \
+uv run --extra dev fatebridge fengshui_monthly_stars \
   --query-at '2027-01-10T12:00:00+08:00' --timezone-name Asia/Shanghai
 ```
 

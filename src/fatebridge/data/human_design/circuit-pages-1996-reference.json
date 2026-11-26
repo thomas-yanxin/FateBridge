@@ -1,6 +1,5 @@
 {
   "catalogue_id": "letters_1996_archival_circuit_pages_v1",
-  "plan_sha256": "1a7696403a8339c6e3d044a9f722388e344de7add4dfcb0d74505c3252eb63f3",
   "source": {
     "title": "From the Book of Letters",
     "author": "Ra Uru Hu",
@@ -8,7 +7,6 @@
     "revision": "Chaitanyo, November1996",
     "publisher": "New Sun Services International",
     "url": "https://www.barlenoble.nl/_downloads/2d09d9adaf77b157456f399f0e067b41",
-    "pdf_sha256": "5f24e769126d8dd7f784751e1021fe938417b309f3fee9a19e72359a1dfae6e5",
     "page_count": 288,
     "source_kind": "author_attributed_archival_scan_from_public_mirror",
     "publisher_master_authenticity_certified": false,
@@ -428,6 +426,5 @@
       "resolved": false
     }
   ],
-  "scope": "Direct observations of 36 channel-to-topology assignments in this attributed scan. Separate from six current official direct classifications, 30 old endpoint inferences and modern group membership. No whole-book, semantic, publisher-master or reality certification.",
-  "observation_fixture_sha256": "84f474f27db707323e17ec397e423f6a2b1028d11bcd3abd27c5eda4de8410c7"
+  "scope": "Direct observations of 36 channel-to-topology assignments in this attributed scan. Separate from six current official direct classifications, 30 old endpoint inferences and modern group membership. No whole-book, semantic, publisher-master or reality certification."
 }

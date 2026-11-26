@@ -91,7 +91,7 @@ def test_doctor_real_stdio_and_invalid_family() -> None:
     result = diagnose(mcp=True, family="bazi")
     assert result["ok"], result
     assert result["mcp"]["tool_count"] == result["mcp_tool_count"]
-    assert result["mcp"]["smoke_tool"]
+    assert result["mcp"]["scope"] == "initialize, tools/list, discover_tools"
     assert Path(result["codex"]["config"]["command"]).is_absolute()
     empty = diagnose(family="missing-family")
     assert not empty["ok"] and empty["issues"][0]["code"] == "unknown_family"

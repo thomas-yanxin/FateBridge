@@ -331,7 +331,7 @@ curl -X POST http://localhost:8010/api/astrology/timing/solar-return \
 ### 6.1 启动
 
 ```bash
-uv run --locked --extra dev python -m fatebridge.mcp_server
+uv run --extra dev python -m fatebridge.mcp_server
 ```
 
 ### 6.2 MCP 工具分组

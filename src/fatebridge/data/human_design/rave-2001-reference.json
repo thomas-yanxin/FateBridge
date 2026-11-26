@@ -5,7 +5,6 @@
     "publisher": "Jovian Archive Corporation",
     "edition_year": 2001,
     "url": "https://www.myhumandesign.be/downloads/Rave-I%27Ching.pdf",
-    "pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
     "scope": "64 gate positions and centers, 36 channel endpoint pairs, 384 line angular ranges; gate circuit labels are not assumed to be identical to channel circuit taxonomy. No copyrighted readings or commentaries included.",
     "extraction": "pdftotext -layout; explicit zodiac font-symbol mapping; no calculator imported"
   },

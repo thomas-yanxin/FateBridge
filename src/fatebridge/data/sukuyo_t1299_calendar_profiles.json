@@ -1,7 +1,6 @@
 {
   "id": "t1299_lower_fullmoon27_v1",
   "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
-  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
   "edition": "大正藏T21 No.1299; CBETA TEI P5 header 2025-01-30",
   "author": "不空译；下卷二十七宿望日逆顺法",
   "fullmoon_anchors": [
@@ -93,16 +92,13 @@
       "windows": [
         {
           "locator": "T2465_.78.0030c13-21",
-          "text": "若有閏月時。其正月直宿即亦重直閏月。謂假令十二月有閏月。而其十二月一日直宿是虚宿。十五日直宿是星宿。乃至三十日直宿是星宿。如是閏十二月直宿亦同之。更無異也。先月是正十二月。閏月是傍十二月也。故傍月･直宿三十日皆用正十二月直宿更不異宿也。餘月聞月准之知耳。",
-          "normalized_excerpt_utf8_sha256": "9c25fa5ed2b28ac259ae4a4b0d1b4236698056232d31fe034187127c8a9d100b"
+          "text": "若有閏月時。其正月直宿即亦重直閏月。謂假令十二月有閏月。而其十二月一日直宿是虚宿。十五日直宿是星宿。乃至三十日直宿是星宿。如是閏十二月直宿亦同之。更無異也。先月是正十二月。閏月是傍十二月也。故傍月･直宿三十日皆用正十二月直宿更不異宿也。餘月聞月准之知耳。"
         },
         {
           "locator": "T2465_.78.0030c21-26",
-          "text": "取小月闕第三十日直宿之法。假令正月小闕第三十日。雖無其第三十日。而彼日分直宿猶有故。次二月初一日半已上者。正月闕日之分宿直也。半已下者即彼當日宿直。故雖大小異日有増減。而小月闕日直宿無日不得。次月初一日眞宿無改代也。",
-          "normalized_excerpt_utf8_sha256": "8ed3da93960d02b933f5eaebde0dff2f69359f6448cf279df22050f72ccfbfcd"
+          "text": "取小月闕第三十日直宿之法。假令正月小闕第三十日。雖無其第三十日。而彼日分直宿猶有故。次二月初一日半已上者。正月闕日之分宿直也。半已下者即彼當日宿直。故雖大小異日有増減。而小月闕日直宿無日不得。次月初一日眞宿無改代也。"
         }
       ],
-      "complete_original_source_bytes_sha256": null,
       "facsimile_collation_complete": false,
       "current_live_availability": "Publisher emergency-maintenance notice verified in browser; PHP functions temporarily suspended. Cached text is not a newly downloaded complete edition.",
       "scope": "Selected cached primary passages, not full T2465 bytes, a facsimile or an independent scholarly collation; half-clock mapping and leap/short-month precedence remain unestablished.",
@@ -115,7 +111,6 @@
     "active_primary_evidence": "downloaded_primary_edition",
     "cached_primary_excerpt_is_historical_snapshot": true,
     "downloaded_primary_edition": {
-      "publisher_html_response_sha256": "74c63f5151c2b8c3ac554f7a0acae0776e5247e740a712834e1b600a065050e6",
       "publisher_html_response_bytes": 166529,
       "publisher_response_line_anchor_count": 691,
       "publisher_response_line_extent": [
@@ -164,10 +159,6 @@
           "locator": "T2465_.78.0030c21-26",
           "text": "取小月闕第三十日直宿之法。假令正月小闕第三十日。雖無其第三十日。而彼日分直宿猶有故。次二月初一日半已上者。正月闕日之分宿直也。半已下者即彼當日宿直。故雖大小異日有増減。而小月闕日直宿無日不得。次月初一日眞宿無改代也｣"
         }
-      ],
-      "calendar_window_sha256": [
-        "9c25fa5ed2b28ac259ae4a4b0d1b4236698056232d31fe034187127c8a9d100b",
-        "1ccf7577124a4afcb307ba81ebc2938138d47b131bb5ed6a9e798015544cf102"
       ],
       "cached_calendar_windows_exactly_match_downloaded_quotations": false,
       "cached_quotation_discrepancies": [

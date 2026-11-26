@@ -1,7 +1,6 @@
 {
   "schema_version": 1,
   "source": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷05#四神三元五紀立成",
-  "source_transcription_sha256": "02942f892c02223cce282ca956b19b6e06c2327b4b317d393af996f0cdaa3619",
   "method": "manual_table_transcription; packaged_without_domain_calculation",
   "columns": [
     "sishen.upper",

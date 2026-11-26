@@ -6,7 +6,6 @@
     "title": "Berechnung einer Konstante fuer Tage des progressiven Horoskops",
     "publication": "Astrologische Blaetter V/8, November1923, pp183-184",
     "url": "https://www.astrax.de/pdf/24_Berechnung%20e%20Konstanten%20f%20Tage%20d%20progr%20Horoskops.pdf",
-    "source_pdf_sha256": "b528a8fe29af0914a9124a60525146a821bd21be597e04d17432637b6541815e",
     "transcription": "Read from hash-pinned scanned original pp183-184 before implementing the replayer or comparing a modern ephemeris. h/m/s are time-angle units, not zodiac longitude. The first RA sum includes an explicitly annotated implicit 24h reduction; all other terms are printed values.",
     "sections": [
       "printed p183: birth clock and sidereal correction",
