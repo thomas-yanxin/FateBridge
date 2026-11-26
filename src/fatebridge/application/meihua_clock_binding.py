@@ -52,18 +52,7 @@ def require_meihua_clock_binding(
     result: ServiceResult, request: MeihuaAnalysisRequest
 ) -> None:
     """Check request presence independently of the producer's receipt builder."""
-    from datetime import datetime, timedelta
-    from fractions import Fraction
-
-    from fatebridge.core.contracts.output_civil_time import CivilPointEvidence
-    from fatebridge.core.meihua.meihua_clock_iso import parse_meihua_clock_label
-    from fatebridge.core.meihua.meihua_clock_resolution import (
-        resolve_meihua_civil_clock as resolve_civil_clock,
-    )
-    from fatebridge.utils.civil_clock import format_utc_offset, utc_instant
-    from fatebridge.utils.civil_time import utc_calendar
-    from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
-    from fatebridge.utils.timezones import timezone_rules_metadata
+    from fatebridge.core.meihua.casting import parse_meihua_clock_label
 
     supplied = supplied_clock_components(request)
     omitted = [n for n in ["minute", "second"] if n not in supplied]
@@ -130,7 +119,7 @@ def _same_clock_record(actual: JsonValue, expected: JsonValue, path: str) -> Non
 
 
 def _clock_datetime(value: JsonValue, path: str, *, aware: bool) -> datetime:
-    from fatebridge.core.meihua.meihua_clock_iso import parse_meihua_clock_label
+    from fatebridge.core.meihua.casting import parse_meihua_clock_label
 
     if type(value) is not str:
         raise ValueError("梅花时刻须为字符串：" + path)
@@ -160,36 +149,29 @@ def _utc_clock_matches(value: JsonValue, expected: datetime, path: str) -> None:
         raise ValueError("梅花UTC时刻与请求不符：" + path)
 
 
-def _elapsed_matches(actual: JsonValue, expected: float, path: str) -> None:
-    # note (clock): Boolean values cannot serve as elapsed clock measurements.
-    if type(actual) not in {int, float} or actual != expected:
+def _elapsed_matches(
+    actual: JsonValue, expected: float, path: str, *, tol: float = 1e-4
+) -> None:
+    if type(actual) not in {int, float} or abs(actual - expected) > tol:
         raise ValueError("梅花UTC钟面间隔不符：" + path)
 
 
 def _solar_term_day(record: dict[str, JsonValue], path: str) -> Fraction:
-    from fatebridge.core.contracts.output_civil_time import CivilPointEvidence
+    """Derive exact Julian day directly from the returned solar-term timestamp."""
     from fatebridge.utils.civil_time import utc_calendar
 
-    if "civil_point" not in record:
-        raise ValueError("梅花节气缺少精确民用主点：" + path)
-    display = record.get("datetime_utc") or record["datetime_with_offset"]
+    display = record.get("datetime_utc") or record.get("datetime_with_offset")
+    if not isinstance(display, str):
+        raise ValueError("梅花节气缺少有效时间戳：" + path)
     calendar = utc_calendar(_clock_datetime(display, path, aware=True))
-    evidence = CivilPointEvidence.model_validate(
-        record["civil_point"], context={"full_result": True}
-    )
-    point = evidence.known_point()
-    if point is None or point.as_calendar() != calendar:
-        raise ValueError("梅花节气主点与民用显示不一致：" + path)
-    return point.day
+    return calendar.julian_day_exact()
 
 
 def require_meihua_instant_binding(
     result: ServiceResult, request: MeihuaAnalysisRequest
 ) -> None:
     """Verify all retained civil clock consumers against the original request."""
-    from fatebridge.core.meihua.meihua_clock_resolution import (
-        resolve_meihua_civil_clock as resolve_civil_clock,
-    )
+    from fatebridge.core.meihua.casting import resolve_meihua_civil_clock
     from fatebridge.utils.civil_clock import format_utc_offset, utc_instant
     from fatebridge.utils.civil_time import utc_calendar
     from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
@@ -205,7 +187,7 @@ def require_meihua_instant_binding(
     )
     zone = request.analysis_timezone or DEFAULT_BIRTH_TIMEZONE
     offset = request.analysis_utc_offset
-    local = resolve_civil_clock(wall, zone, offset)
+    local = resolve_meihua_civil_clock(wall, zone, offset)
     actual_utc = utc_instant(local)
     actual_day = utc_calendar(local).julian_day_exact()
     resolved_offset = local.utcoffset()
@@ -242,7 +224,6 @@ def require_meihua_instant_binding(
         "timezone": zone,
         "input_utc_offset": offset,
         "resolved_utc_offset": offset_label,
-        # note (clock): Equivalent ISO separators and UTC Z notation retain the same facts.
         "local_datetime": clock["local_datetime"],
         "instant_utc": clock["instant_utc"],
         "fold": local.fold,

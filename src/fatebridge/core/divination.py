@@ -1,29 +1,30 @@
 """
 I Ching and Mei Hua Yi Shu helper utilities.
 
-This module adds lightweight divination support around trigram/hexagram
-composition so FateBridge can expose contextual gua information without
-depending on an external runtime.
+Provides trigram/hexagram composition, gua_lookup (by name, binary code, or
+1-64 King Wen index with 互/错/综/京房八宫/世应), and Meihua interpretation.
 """
 
 from __future__ import annotations
 
+import re
 from functools import lru_cache
 from typing import Any, TypedDict
 
 from fatebridge.core.hexagram_relations import (
     ELEMENT_CONTROLS,
     ELEMENT_GENERATES,
+    HEXAGRAM_PALACE_LOOKUP,
     relationship_by_role,
 )
-from fatebridge.core.meihua.meihua import meihua_traditional_readings
-from fatebridge.core.meihua.meihua_countercontrol import build_internal_countercontrol
-from fatebridge.core.meihua.meihua_seasonal_reading import build_seasonal_qualification
-from fatebridge.core.meihua.meihua_text_reference import render_yaoci_text
-from fatebridge.core.meihua.meihua_topics import build_topic_interpretation
-from fatebridge.core.meihua.meihua_weather import build_weather_interpretation
+from fatebridge.core.meihua.relations import meihua_traditional_readings
+from fatebridge.core.meihua.texts import render_yaoci_text
+from fatebridge.core.meihua.topics import (
+    build_topic_interpretation,
+    build_weather_interpretation,
+)
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
-from fatebridge.core.zhouyi import classical_hexagram
+from fatebridge.core.zhouyi import _corpus, classical_hexagram
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 
@@ -172,10 +173,14 @@ HEXAGRAM_NAMES: dict[tuple[str, str], str] = {
     ("坤", "坤"): "坤为地",
 }
 
+_KING_WEN_INDEX_RE = re.compile(r"^(?:#(\d{1,3})|第(\d{1,3})卦|(\d{1,2}))$")
+
 
 def build_moving_line_oracle(
     hexagram: dict[str, Any],
     moving_line: int,
+    *,
+    include_classical: bool = True,
 ) -> dict[str, Any]:
     changed_hexagram = build_changed_hexagram(hexagram, moving_line)
     line_body_use = resolve_body_use(hexagram, moving_line)
@@ -185,7 +190,7 @@ def build_moving_line_oracle(
     display = rendering["display_text"]
     verse_text = display if display is not None else "〔转录标记未解析，原文另存〕"
     classical_judgement = f"《周易》{hexagram['name']}{verse['label']}：{verse_text}"
-    return {
+    payload: dict[str, Any] = {
         "line": moving_line,
         "judgement": classical_judgement,
         "moving_palace": line_body_use["moving_palace"],
@@ -196,9 +201,11 @@ def build_moving_line_oracle(
             "name": changed_hexagram["name"],
             "binary_code": changed_hexagram["binary_code"],
         },
-        "classical_yaoci": verse,
-        "classical_yaoci_rendering": rendering,
     }
+    if include_classical:
+        payload["classical_yaoci"] = verse
+        payload["classical_yaoci_rendering"] = rendering
+    return payload
 
 
 def build_line_oracles(
@@ -210,6 +217,7 @@ def build_line_oracles(
         oracle = build_moving_line_oracle(
             hexagram=hexagram,
             moving_line=line_number,
+            include_classical=(line_number == active_line),
         )
         oracle["is_active"] = line_number == active_line
         oracle["scenario"] = (
@@ -222,9 +230,9 @@ def build_line_oracles(
 
 
 def _bagua_from_lines(lines: list[int]) -> TrigramDefinition:
-    target = ",".join(str(bit) for bit in lines)
+    target = list(lines)
     for item in BAGUA_BY_NAME.values():
-        if ",".join(str(bit) for bit in item["lines"]) == target:
+        if item["lines"] == target:
             return item
     raise ValueError("未匹配到八卦爻序列")
 
@@ -267,9 +275,7 @@ def build_opposite_hexagram(hexagram: dict[str, Any]) -> dict[str, Any]:
 
 
 def build_inverted_hexagram(hexagram: dict[str, Any]) -> dict[str, Any]:
-    """综卦（倒颠卦）: 将原卦初爻与上爻、二爻与五爻、三爻与四爻对换 —
-    即整卦 180° 倒读。乾/坤/颐/大过/中孚/小过/坎/离倒读后不变，
-    其综卦即原卦。"""
+    """综卦（倒颠卦）: 将原卦初爻与上爻、二爻与五爻、三爻与四爻对换。"""
     inverted_lines = list(reversed(hexagram["lines"]))
     lower = _bagua_from_lines(inverted_lines[:3])
     upper = _bagua_from_lines(inverted_lines[3:])
@@ -343,10 +349,6 @@ def build_meihua_interpretation(
     if options.interpretation_topic == "weather":
         interpretation = build_weather_interpretation(meihua, weather_context)
         interpretation["topic_reading"] = None
-        interpretation["topic_ruleset"] = None
-        interpretation["internal_countercontrol"] = None
-        interpretation["seasonal_qualification"] = None
-        interpretation["wealth_components"] = None
         interpretation["classical_text_reference"] = None
         return interpretation
     if options.interpretation_topic != "general":
@@ -356,41 +358,21 @@ def build_meihua_interpretation(
     moving_line = meihua["seed"]["moving_line"]
     line_oracles = build_line_oracles(base, moving_line)
     moving_line_oracle = line_oracles[moving_line - 1]
-
     control_stages = meihua.get("stage_relations", [])
-    internal_control = (
-        build_internal_countercontrol(control_stages) if control_stages else None
-    )
-    seasonal_qualification = (
-        build_seasonal_qualification(
-            control_stages, meihua.get("seasonal_strength"), internal_control
-        )
-        if internal_control is not None
-        else None
-    )
-
     stage_readings, classical_reading = meihua_traditional_readings(
-        control_stages,
-        meihua.get("seasonal_strength"),
-        internal_countercontrol=internal_control,
-        seasonal_qualification=seasonal_qualification,
+        control_stages, meihua.get("seasonal_strength")
     )
     classical_reading = classical_reading or meihua["body_use_summary"]
     comprehensive = (
         f"本卦{base['name']}，动{moving_line}爻，变{changed['name']}。"
         f"经文参照：{moving_line_oracle['judgement']}。"
         f"传统体用解读：{classical_reading}"
-        "初中终指传统分析层次，不能据此认定现实阶段、具体事件或发生日期。"
     )
 
     return {
         "interpretation_topic": "general",
         "weather": None,
         "topic_reading": None,
-        "topic_ruleset": None,
-        "wealth_components": None,
-        "internal_countercontrol": internal_control,
-        "seasonal_qualification": seasonal_qualification,
         "line_oracles": line_oracles,
         "moving_line_oracle": moving_line_oracle,
         "traditional_stage_readings": stage_readings,
@@ -399,16 +381,32 @@ def build_meihua_interpretation(
             "moving_yaoci": moving_line_oracle.get("classical_yaoci"),
             "moving_yaoci_rendering": moving_line_oracle["classical_yaoci_rendering"],
             "selection_policy": "actual_moving_line_reference_only",
-            "scope": "按实际卦码和动爻引用《周易》经文；所选原法的经文参照不自动推导现实成败。",
         },
         "evidence_scope": {
             "traditional_rules": "meihua.ruleset",
-            "line_oracles_scope": "本次动爻以 is_active 标出，其余是各爻单独变化的卦图参照。",
-            "external_omens": "not_collected",
-            "event_timing": "not_computed",
         },
         "comprehensive_judgement": comprehensive,
     }
+
+
+def _hexagram_compact_ref(hexagram: dict[str, Any]) -> dict[str, str]:
+    return {
+        "name": hexagram["name"],
+        "binary_code": hexagram["binary_code"],
+        "symbol": hexagram["symbol"],
+    }
+
+
+def _enrich_hexagram_lookup(hexagram: dict[str, Any]) -> dict[str, Any]:
+    mutual = build_mutual_hexagram(hexagram)
+    cuo = build_opposite_hexagram(hexagram)
+    zong = build_inverted_hexagram(hexagram)
+    bagong = dict(HEXAGRAM_PALACE_LOOKUP[hexagram["binary_code"]])
+    hexagram["mutual_hexagram"] = _hexagram_compact_ref(mutual)
+    hexagram["cuo_hexagram"] = _hexagram_compact_ref(cuo)
+    hexagram["zong_hexagram"] = _hexagram_compact_ref(zong)
+    hexagram["bagong"] = bagong
+    return hexagram
 
 
 def lookup_hexagram_by_code(code: str) -> dict[str, Any]:
@@ -463,6 +461,20 @@ def _hexagram_name_index() -> tuple[dict[str, tuple[str, str]], dict[int, str]]:
     return index, {ord(source): target for source, target in variants.items()}
 
 
+@lru_cache(maxsize=1)
+def _hexagram_number_index() -> dict[int, str]:
+    """Map King Wen hexagram number 1..64 to 6-bit binary code."""
+    return {chapter["number"]: chapter["code"] for chapter in _corpus()["chapters"]}
+
+
+def lookup_hexagram_by_number(number: int) -> dict[str, Any]:
+    """Lookup a hexagram by 1-64 King Wen sequence number."""
+    if not 1 <= number <= 64:
+        raise ValueError("周易卦序必须为 1 至 64 的整数。")
+    code = _hexagram_number_index()[number]
+    return lookup_hexagram_by_code(code)
+
+
 def lookup_hexagram_by_name(name: str) -> dict[str, Any]:
     index, variants = _hexagram_name_index()
     pair = index.get(_gua_name_key(name).translate(variants))
@@ -482,7 +494,16 @@ def lookup_trigram_by_name(name: str) -> dict[str, Any]:
     return lookup_trigram_by_code("".join(str(bit) for bit in trigram["lines"]))
 
 
+def _parse_king_wen_index(query_text: str) -> int | None:
+    match = _KING_WEN_INDEX_RE.fullmatch(query_text)
+    if match is None:
+        return None
+    raw = next(g for g in match.groups() if g is not None)
+    return int(raw)
+
+
 def lookup_gua(query: str, lookup_mode: str = "auto") -> dict[str, Any]:
+    """Lookup a trigram or hexagram (by name, 3/6-bit code, or 1-64 King Wen index)."""
     normalized_mode = (lookup_mode or "auto").strip().lower()
     if normalized_mode not in {"auto", "hexagram", "trigram"}:
         raise ValueError("lookup_mode 必须是 auto、hexagram 或 trigram。")
@@ -492,19 +513,31 @@ def lookup_gua(query: str, lookup_mode: str = "auto") -> dict[str, Any]:
         raise ValueError("query 不能为空。")
 
     binary_digits = sum(ch in {"0", "1"} for ch in query_text)
-    if normalized_mode in {"auto", "hexagram"} and binary_digits == 6:
-        result = lookup_hexagram_by_code(query_text)
+    king_wen = _parse_king_wen_index(query_text)
+    if (
+        normalized_mode in {"auto", "hexagram"}
+        and binary_digits == 6
+        and len(query_text) == 6
+    ):
+        result = _enrich_hexagram_lookup(lookup_hexagram_by_code(query_text))
         lookup_type = "hexagram"
-    elif normalized_mode in {"auto", "trigram"} and binary_digits == 3:
+    elif (
+        normalized_mode in {"auto", "trigram"}
+        and binary_digits == 3
+        and len(query_text) == 3
+    ):
         result = lookup_trigram_by_code(query_text)
         lookup_type = "trigram"
+    elif normalized_mode in {"auto", "hexagram"} and king_wen is not None:
+        result = _enrich_hexagram_lookup(lookup_hexagram_by_number(king_wen))
+        lookup_type = "hexagram"
     elif normalized_mode == "trigram" or (
         normalized_mode == "auto" and _gua_name_key(query_text) in BAGUA_BY_NAME
     ):
         result = lookup_trigram_by_name(query_text)
         lookup_type = "trigram"
     else:
-        result = lookup_hexagram_by_name(query_text)
+        result = _enrich_hexagram_lookup(lookup_hexagram_by_name(query_text))
         lookup_type = "hexagram"
     result["lookup_type"] = lookup_type
     result["matched_query"] = query_text
