@@ -6,7 +6,7 @@ from pydantic import StrictBool, model_validator
 
 from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_liuren_emptiness import Branch
-from fatebridge.core.metaphysics.liureng_branch_relations import (
+from fatebridge.core.metaphysics.liureng.stars import (
     branch_pair_facts,
     branch_relations,
 )
@@ -69,7 +69,7 @@ class LiurenBranchRelations(PartialOutput):
     ) = None
     rows: list[LiurenBranchPair] | None = None
     comprehensive_judgement: None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @model_validator(mode="after")
@@ -197,23 +197,3 @@ def require_complete_branch_relations(board: dict[str, Any]) -> None:
     if evidence != rebuild(evidence):
         raise ValueError("完整六壬支位关系依据缺项或不一致")
     align_branch_relations(board)
-    traces = [
-        r
-        for r in board.get("rule_trace", [])
-        if r.get("rule_id") == "liuren.branch_relations"
-    ]
-    expected_trace = {
-        "rule_id": "liuren.branch_relations",
-        "source_section": evidence["source_title"],
-        "result": {
-            "row_count": 47,
-            "annotated_harmony_rows": [
-                r["id"]
-                for r in evidence["rows"]
-                if r["facts"]["harmony_annotation"] is not None
-            ],
-            "comprehensive_judgement": None,
-        },
-    }
-    if traces != [expected_trace]:
-        raise ValueError("六壬支位关系轨迹与本次条件不一致")

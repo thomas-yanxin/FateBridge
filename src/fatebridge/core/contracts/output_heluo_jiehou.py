@@ -5,9 +5,9 @@ from typing import Annotated, Literal
 from pydantic import BeforeValidator, Field, model_validator
 
 from fatebridge.core.contracts.output_base import PartialOutput
-from fatebridge.core.heluo.heluo import yao_name
-from fatebridge.core.heluo.heluo_hexagrams import _gua_tables, gua_lines
-from fatebridge.core.heluo.heluo_jiehou import _form, nominal_hou_day, term_assignment
+from fatebridge.core.heluo.judgment import _jiehou_form as _form
+from fatebridge.core.heluo.judgment import nominal_hou_day, term_assignment
+from fatebridge.core.heluo.texts import _gua_tables, gua_lines, yao_name
 
 
 def _bool(value: object) -> bool:

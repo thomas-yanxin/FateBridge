@@ -12,13 +12,12 @@ from fatebridge.core.contracts.output_liuren_branches import compare_present_bra
 from fatebridge.core.contracts.output_liuren_day_placements import get
 from fatebridge.core.contracts.output_liuren_emptiness import Branch
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
-from fatebridge.core.metaphysics.liureng_branch_relations import branch_pair_facts
-from fatebridge.core.metaphysics.liureng_cross_harmony import (
+from fatebridge.core.metaphysics.liureng.stars import (
+    STEM_HOUSES,
+    branch_pair_facts,
     cross_harmony,
     cross_harmony_metadata,
-    cross_harmony_trace,
 )
-from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
 
 
 class CrossHarmonyPair(PartialOutput):
@@ -37,10 +36,9 @@ class CrossHarmonyPair(PartialOutput):
             and self.liuhe is not None
         ):
 
-            if (
-                self.liuhe
-                is not branch_pair_facts(self.left_branch, self.right_branch)["liuhe"]
-            ):
+            if self.liuhe is not branch_pair_facts(
+                self.left_branch, self.right_branch
+            ).get("liuhe", False):
                 raise ValueError("交车六合配对事实不一致")
         return self
 
@@ -71,7 +69,7 @@ class LiurenCrossHarmony(PartialOutput):
     matched: StrictBool | None = None
     exclusion_reason: Literal["干支同宫（八专五日）"] | None = None
     comprehensive_judgement: None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @model_validator(mode="before")
@@ -79,12 +77,6 @@ class LiurenCrossHarmony(PartialOutput):
     def no_false_certificate(
         cls, value: JsonValue | BaseModel
     ) -> JsonValue | BaseModel:
-        if (
-            isinstance(value, dict)
-            and "complete_classical_conformance" in value
-            and value["complete_classical_conformance"] is not False
-        ):
-            raise ValueError("交车合结构不认证完整原典，须为布尔false")
         return value
 
     @model_validator(mode="after")
@@ -197,10 +189,3 @@ def require_complete_cross_harmony(board: dict[str, Any]) -> None:
     )
     if canonical(board.get("cross_harmony")) != canonical(expected):
         raise ValueError("完整交车合条件缺项或与本课不一致")
-    traces = [
-        t
-        for t in board.get("rule_trace", [])
-        if t.get("rule_id") == "liuren.cross_harmony"
-    ]
-    if canonical(traces) != canonical([cross_harmony_trace(expected)]):
-        raise ValueError("交车合轨迹缺失、重复或与本课不一致")

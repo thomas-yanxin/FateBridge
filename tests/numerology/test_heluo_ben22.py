@@ -2,7 +2,7 @@
 
 import pytest
 
-from fatebridge.core.heluo.heluo import yao_text
+from fatebridge.core.heluo.texts import yao_text
 from fatebridge.services.knowledge import calculate_knowledge_read
 from tests.support.transports import rest as shared_rest
 

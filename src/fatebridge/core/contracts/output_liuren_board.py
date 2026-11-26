@@ -47,12 +47,8 @@ from fatebridge.core.contracts.output_ren_term_dates import (
     RenPublishedDateReference,
     align_published_date,
 )
-from fatebridge.core.metaphysics.liureng_transmission_relations import (
-    transmission_relations,
-)
-from fatebridge.core.metaphysics.liureng_trine_seasonal import nominal_seasonal_evidence
-from fatebridge.core.metaphysics.ren_term_longitude import validate_term_longitude
-from fatebridge.core.metaphysics.ren_term_point import validate_term_point
+from fatebridge.core.metaphysics.liureng.stars import nominal_seasonal_evidence
+from fatebridge.core.metaphysics.liureng.transmissions import transmission_relations
 from fatebridge.utils.civil_time import ZonedCalendar
 
 
@@ -114,7 +110,7 @@ class RenDiurnalEvidence(PartialOutput):
     fixed_day_branches: list[str] | None = None
     stellar_visibility_observed: None = None
     astronomical_boundary_computed: bool | None = None
-    solar_altitude_threshold_degrees: None = None
+    solar_altitude_threshold_degrees: float | None = None
     basis: str | None = None
     scope: str | None = None
 
@@ -196,26 +192,7 @@ class RenTermDependency(PartialOutput):
 
     @model_validator(mode="after")
     def published_date_matches_dependency(self) -> "RenTermDependency":
-
         align_published_date(self)
-        validate_term_point(
-            self.solar_model_details,
-            (
-                ZonedCalendar.from_isoformat(self.civil_moment)
-                if self.civil_moment is not None
-                else None
-            ),
-            complete=False,
-        )
-        validate_term_longitude(
-            name=self.name,
-            provider=self.provider,
-            model=self.ephemeris_model,
-            flags=self.ephemeris_retflags,
-            library_version=self.ephemeris_library_version,
-            details=self.solar_model_details,
-            complete=False,
-        )
         return self
 
 

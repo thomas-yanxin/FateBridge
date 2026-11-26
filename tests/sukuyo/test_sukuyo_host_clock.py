@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo.sukuyo import calendar_mansion
+from fatebridge.core.sukuyo.calendar import calendar_mansion
 from tests.support.transports import (
     AS_OF,
     SPECS,

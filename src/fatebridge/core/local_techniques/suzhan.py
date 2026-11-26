@@ -10,12 +10,13 @@ from fatebridge.core.local_techniques.chart import (
     _normalize_date_text,
     _normalize_time_text,
 )
-from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence, rulesets
-from fatebridge.core.sukuyo.suzhan_astronomy import (
+from fatebridge.core.sukuyo.astronomy import (
     METHOD,
     apply_equatorial_mansions,
     build_equatorial_mansions,
 )
+from fatebridge.core.sukuyo.calendar import calendar_mansion, day_evidence, rulesets
+from fatebridge.core.sukuyo.sanjiu import DistanceRule
 from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.house_systems import InvalidHouseSystemError, house_system_fields
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
@@ -67,6 +68,10 @@ def build_suzhan_result(
     textual_pada: int | None = None,
     calendar_basis: str = "chinese_hko_utc08",
     chart_requested: bool = False,
+    distance_rule: DistanceRule = "symmetric",
+    birth_year: int | None = None,
+    target_year: int | None = None,
+    urgent: bool = False,
 ) -> dict[str, Any]:
     if time is not None and not time.strip():
         raise ValueError("钟时须为已知时间；未知请省略或用null，空字符串不能代替未知。")
@@ -111,6 +116,8 @@ def build_suzhan_result(
     }
     if calendar_basis != "chinese_hko_utc08":
         input_normalized["calendar_basis"] = calendar_basis
+    if distance_rule != "symmetric":
+        input_normalized["distance_rule"] = distance_rule
     if not compute_chart:
         clock_known = time is not None
         layer_status = (
@@ -138,6 +145,10 @@ def build_suzhan_result(
             activity=activity,
             activity_details=activity_details,
             textual_pada=textual_pada,
+            distance_rule=distance_rule,
+            birth_year=birth_year,
+            target_year=target_year,
+            urgent=urgent,
         )
         validation = {
             "calculation_layers": {
@@ -224,6 +235,10 @@ def build_suzhan_result(
         activity=activity,
         activity_details=activity_details,
         textual_pada=textual_pada,
+        distance_rule=distance_rule,
+        birth_year=birth_year,
+        target_year=target_year,
+        urgent=urgent,
     )
     response["params"]["su28Method"] = METHOD
     response["params"]["su28AstronomicalAccuracy"] = (

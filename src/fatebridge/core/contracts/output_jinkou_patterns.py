@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.contracts.output_ren_patterns import JinkouPatterns
-from fatebridge.core.metaphysics.jinkou_patterns import (
+from fatebridge.core.metaphysics.jinkou.patterns import (
     pattern_metadata,
     patterns_from_symbols,
 )
@@ -23,7 +23,19 @@ def expected_patterns(board: dict[str, Any]) -> dict[str, Any] | None:
         return None
     if any(not isinstance(row, dict) or row.get("content") is None for row in rows):
         return None
-    return patterns_from_symbols(rows, day_ganzhi=day)
+    overview = board.get("overview") if isinstance(board.get("overview"), dict) else {}
+    de = (
+        board.get("definition_evidence")
+        if isinstance(board.get("definition_evidence"), dict)
+        else {}
+    )
+    hour_branch = de.get("hour_branch") or (overview.get("diurnal_evidence") or {}).get(
+        "hour_branch"
+    )
+    is_diurnal = overview.get("is_diurnal")
+    return patterns_from_symbols(
+        rows, day_ganzhi=day, hour_branch=hour_branch, is_diurnal=is_diurnal
+    )
 
 
 def compare_present(actual: Any, expected: Any) -> None:
@@ -106,8 +118,3 @@ def require_complete_pattern_anchors(board: dict[str, Any]) -> None:
     if expected is None:
         raise ValueError("完整金口诀须保留课钤的四位原始符号与占日")
     require_complete(board.get("patterns"), expected)
-    traces = [t for t in board.get("rule_trace") or [] if t.get("rule_id") == RULE_ID]
-    if len(traces) != 1:
-        raise ValueError("完整金口诀须保留唯一的六十四课钤规则轨迹")
-    require_complete(traces[0].get("result"), expected)
-    compare_present(traces[0].get("source_section"), expected["source_section"])

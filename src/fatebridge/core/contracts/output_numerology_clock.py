@@ -10,14 +10,14 @@ from fatebridge.core.numerology.numerology_clock_input import (
     CLOCK_INPUT_SCOPE,
     clock_input_representation,
 )
-from fatebridge.core.numerology.numerology_clock_policy import require_birth_clock
-from fatebridge.core.numerology.numerology_inputs import normalize_numerology_utc_offset
-from fatebridge.core.numerology.numerology_pillars import (
+from fatebridge.core.numerology.numerology_inputs import (
     CYCLE,
     GAN,
     LINK_GROUPS,
     LINK_HEADS,
     ZHI,
+    normalize_numerology_utc_offset,
+    require_birth_clock,
 )
 from fatebridge.utils.civil_clock import format_utc_offset
 from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar

@@ -16,11 +16,17 @@ from fatebridge.core.local_techniques.chart import (
     _resolve_coordinates,
     parse_local_datetime,
 )
-from fatebridge.core.metaphysics.jinkou_year_fate import confirmed_natal_branch
-from fatebridge.core.metaphysics.liureng import _liureng_month_general_for_term
+from fatebridge.core.metaphysics.jinkou.year_fate import confirmed_natal_branch
+from fatebridge.core.metaphysics.ren_calendar import (
+    SIGN_TO_MONTH_GENERAL,
+)
+from fatebridge.core.metaphysics.ren_calendar import (
+    month_general_for_term as _liureng_month_general_for_term,
+)
 from fatebridge.core.metaphysics.ren_calendar import (
     resolve_runyear_birth_clock,
     resolve_runyear_birth_zone,
+    solar_longitude_at,
 )
 from fatebridge.core.metaphysics.ren_diurnal import resolve_diurnal
 from fatebridge.core.requests.divination import SanShiUnitedRequest
@@ -97,24 +103,34 @@ def require_request_binding(
             "liureng_is_diurnal": request.liureng_is_diurnal,
             "liureng_guiren_profile": request.liureng_guiren_profile,
             "use_true_solar_time": request.use_true_solar_time,
+            "corner_lodging": request.corner_lodging,
         }
         _same(result, "input_normalized", normalized)
         civil = parse_local_datetime(date_text, time_text, zone, validate_wall=True)
+        latitude: float | None
         longitude: float | None
-        _, longitude = _resolve_coordinates(
+        latitude, longitude = _resolve_coordinates(
             lat=request.latitude,
             lon=request.longitude,
         )
         applied_solar = request.use_true_solar_time
-        ren_result = _get(result, "subresults.liureng_gods")
+        ren_result = result
         profile = request.liureng_guiren_profile
         explicit = request.liureng_is_diurnal
         override = request.liureng_yue
         gender = "未知"
         offset = None
-        _same(result, "analysis_context", _get(ren_result, "analysis_context"))
+        diurnal_mode = "clock"
+        month_general_mode = "solar_term"
+        _same(
+            result,
+            "subresults.liureng_gods.four_pillars",
+            _get(result, "four_pillars"),
+        )
     else:
-        assert isinstance(request, (LiuRengGodsRequest, LiuRengRunyearRequest))
+        assert isinstance(
+            request, (LiuRengGodsRequest, LiuRengRunyearRequest, JinkouAnalysisRequest)
+        )
         zone = request.analysis_timezone or DEFAULT_BIRTH_TIMEZONE
         offset = request.analysis_utc_offset
         civil = resolve_civil_clock(
@@ -130,13 +146,13 @@ def require_request_binding(
             offset,
         )
         longitude = request.analysis_longitude
+        latitude = getattr(request, "analysis_latitude", None)
+        diurnal_mode = getattr(request, "diurnal_mode", "clock")
+        month_general_mode = getattr(request, "month_general_mode", "solar_term")
         if (
             request.use_true_solar_time
             and longitude is None
-            and (
-                key == "liuren_yearly_timing"
-                or "use_true_solar_time" in request.model_fields_set
-            )
+            and "use_true_solar_time" in request.model_fields_set
         ):
             raise ValueError("显式真太阳时请求需要经度")
         applied_solar = request.use_true_solar_time and longitude is not None
@@ -155,47 +171,65 @@ def require_request_binding(
         ),
         "analysis_context.",
     )
-    calendar = _get(ren_result, "calendar_context")
     policy = dict(
         civil_datetime=civil.isoformat(),
         civil_instant_utc=utc_calendar(civil).isoformat(),
         day_hour_clock="apparent_solar" if applied_solar else "civil",
         month_general_override=override,
     )
-    _mapping(calendar, policy, "ren_calendar_policy.")
-    clock = calendar["ren_calendar_policy"].get("civil_clock_resolution")
-    if offset is None:
-        if clock is not None:
-            raise ValueError("不能把未指定的起课UTC偏移改称显式选择")
+    if key == "sanshi_combined_chart":
+        board = _get(result, "liureng")
+        _mapping(board, policy, "calendar_policy.")
+        current_term = _get(board, "meta.current_term")
     else:
-        _mapping(
-            clock,
-            dict(
-                input_utc_offset=offset,
-                fold=civil.fold,
-                instant_utc=policy["civil_instant_utc"],
-            ),
-        )
-    board = _get(result, "liureng")
-    _mapping(board, policy, "calendar_policy.")
-    _same(board, "meta.guiren_profile", profile)
+        calendar = _get(ren_result, "calendar_context")
+        _mapping(calendar, policy, "ren_calendar_policy.")
+        clock = calendar["ren_calendar_policy"].get("civil_clock_resolution")
+        if offset is None:
+            if clock is not None:
+                raise ValueError("不能把未指定的起课UTC偏移改称显式选择")
+        else:
+            _mapping(
+                clock,
+                dict(
+                    input_utc_offset=offset,
+                    fold=civil.fold,
+                    instant_utc=policy["civil_instant_utc"],
+                ),
+            )
+        board = _get(result, "liureng")
+        current_term = calendar["current_solar_term"]["name"]
     hour = ren_result["four_pillars"]["hour"]["branch"]
-    diurnal = resolve_diurnal(hour, explicit)
-    _mapping(board, diurnal, "meta.diurnal_evidence.")
-    _gender(board, "meta.questioner_gender", gender)
-    current_term = calendar["current_solar_term"]["name"]
-    general = override or _liureng_month_general_for_term(current_term)
-    _same(board, "month_general.branch", general)
-    _same(
-        board,
-        "meta.month_general_basis",
-        "explicit_override" if override is not None else "中气换将",
+    diurnal = resolve_diurnal(
+        hour,
+        explicit,
+        diurnal_mode=diurnal_mode,
+        instant=civil,
+        latitude=latitude,
+        longitude=longitude,
     )
+    if override is not None:
+        general = override
+        mg_basis = "explicit_override"
+    elif month_general_mode == "true_solar_longitude":
+        general = SIGN_TO_MONTH_GENERAL[int(solar_longitude_at(civil) // 30.0) % 12]
+        mg_basis = "太阳过宫真黄经"
+    else:
+        general = _liureng_month_general_for_term(current_term)
+        mg_basis = "中气换将"
+    if board is not MISSING:
+        _mapping(board, policy, "calendar_policy.")
+        _same(board, "meta.guiren_profile", profile)
+        _mapping(board, diurnal, "meta.diurnal_evidence.")
+        _gender(board, "meta.questioner_gender", gender)
+        _same(board, "month_general.branch", general)
+        _same(board, "meta.month_general_basis", mg_basis)
 
     if key == "jinkou":
         assert isinstance(request, JinkouAnalysisRequest)
         jinkou = _get(result, "jinkou")
         _mapping(jinkou, policy, "calendar_policy.")
+        _same(jinkou, "overview.month_general.branch", general)
         _same(jinkou, "overview.di_fen", request.di_fen or hour)
         _same(
             jinkou,

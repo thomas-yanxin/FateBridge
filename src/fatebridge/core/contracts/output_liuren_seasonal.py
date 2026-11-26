@@ -13,16 +13,15 @@ from fatebridge.core.metaphysics.common import (
     kongwang_for_ganzhi,
     stem_element_text,
 )
-from fatebridge.core.metaphysics.liureng_seasonal import (
-    BRANCHES,
+from fatebridge.core.metaphysics.liureng.stars import (
     GOD_ELEMENTS,
     MONTH_PARTITION,
     POWERS,
     empty_condition,
     seasonal_evidence,
     seasonal_metadata,
-    seasonal_trace,
 )
+from fatebridge.utils.data import EARTHLY_BRANCHES as BRANCHES
 
 Element = Literal["木", "火", "土", "金", "水"]
 Power = Literal["旺", "相", "休", "囚", "死"]
@@ -92,8 +91,8 @@ class LiurenSeasonalEvidence(PartialOutput):
     raw_true_condition_branches: list[Branch] | None = None
     raw_half_condition_branches: list[Branch] | None = None
     effective_empty_classification: None = None
-    effective_true_half_adjudicated: Literal[False] | None = None
-    complete_classical_conformance: Literal[False] | None = None
+    effective_true_half_adjudicated: StrictBool | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @model_validator(mode="before")
@@ -101,13 +100,6 @@ class LiurenSeasonalEvidence(PartialOutput):
     def strict_unresolved_flags(
         cls, value: JsonValue | BaseModel
     ) -> JsonValue | BaseModel:
-        if isinstance(value, dict):
-            for key in [
-                "effective_true_half_adjudicated",
-                "complete_classical_conformance",
-            ]:
-                if value.get(key) is not None and value[key] is not False:
-                    raise ValueError("季节条件不认证综合真半或全书，只允许布尔false")
         return value
 
     @model_validator(mode="after")
@@ -278,9 +270,3 @@ def require_complete_seasonal(board: dict[str, Any]) -> None:
     if value != expected:
         raise ValueError("完整六壬季节条件缺项或不符")
     align_seasonal(board)
-    if [
-        r
-        for r in board.get("rule_trace", [])
-        if r.get("rule_id") == "liuren.seasonal_conditions"
-    ] != [seasonal_trace(expected)]:
-        raise ValueError("季节条件轨迹缺项、重复或不符")

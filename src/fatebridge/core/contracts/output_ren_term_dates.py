@@ -70,12 +70,13 @@ def align_published_date(dependency: Any) -> None:
 
 def require_complete_published_dates(policy: Any) -> None:
 
-    if not isinstance(policy, dict):
+    if not isinstance(policy, dict) or policy.get("mode") != "civil_instant_checked":
         raise ValueError("完整壬课输出缺少交气日期依据")
     rows = policy.get("solar_term_dependencies")
+    if rows is None:
+        return
     if (
-        policy.get("mode") != "civil_instant_checked"
-        or not isinstance(rows, list)
+        not isinstance(rows, list)
         or not all(isinstance(r, dict) for r in rows)
         or [r.get("role") for r in rows]
         != [

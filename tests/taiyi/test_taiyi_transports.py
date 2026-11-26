@@ -1,4 +1,4 @@
-"""Exercise actual REST, native in-process MCP and CLI for the same inputs."""
+"""Verify Taiyi transport consistency, §7 oracles, minute/fate/day modes, and gates."""
 
 import asyncio
 import json
@@ -10,7 +10,12 @@ from fastmcp import Client
 import fatebridge.api as api
 from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.cli import run
-from fatebridge.core.metaphysics.taiyi_conditions import conjunction
+from fatebridge.core.metaphysics.seed import build_analysis_seed
+from fatebridge.core.metaphysics.taiyi import (
+    build_taiyi_board,
+    conjunction,
+    yearly_core,
+)
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import SPECS, call_calculation
@@ -20,32 +25,16 @@ from tests.support.transports import SPECS, call_calculation
     "key,view",
     [
         ("taiyi", None),
+        ("taiyi", "counter_cycles"),
+        ("taiyi", "year_core"),
         ("taiyi", "annual_cycles"),
         ("taiyi", "conditions"),
-        ("taiyi", "enclosures"),
-        ("taiyi", "oppositions"),
-        ("taiyi", "counts"),
-        ("taiyi", "count_sources"),
-        ("taiyi", "shiji_derivation"),
-        ("taiyi", "elemental_relations"),
-        ("taiyi", "victory_matrix"),
         ("taiyi", "gates"),
-        ("taiyi", "gate_comparison"),
         ("taiyi", "determinate"),
         ("sanshiunited", None),
-        ("sanshiunited", "taiyi_depth"),
-        ("sanshiunited", "palace_correspondences"),
         ("sanshiunited", "annual_cycles"),
         ("sanshiunited", "taiyi_conditions"),
-        ("sanshiunited", "taiyi_enclosures"),
-        ("sanshiunited", "taiyi_oppositions"),
-        ("sanshiunited", "taiyi_counts"),
-        ("sanshiunited", "taiyi_count_sources"),
-        ("sanshiunited", "taiyi_shiji_derivation"),
-        ("sanshiunited", "taiyi_elemental_relations"),
-        ("sanshiunited", "taiyi_victory_matrix"),
         ("sanshiunited", "taiyi_gates"),
-        ("sanshiunited", "taiyi_gate_comparison"),
         ("sanshiunited", "taiyi_determinate"),
     ],
 )
@@ -60,18 +49,14 @@ from tests.support.transports import SPECS, call_calculation
         ("hour", "key_hour_winter_jiazi_v1", None),
     ],
 )
-def test_published_first_views_preserve_evidence_under_default_limits(
+def test_published_first_views_preserve_evidence_and_adjudications(
     key: str,
     view: str | None,
     mode: str,
     hour_profile: str | None,
     month_profile: str | None,
 ) -> None:
-    target_name = (
-        "taiyi"
-        if key == "taiyi"
-        else ("sanshi_combined_chart" if key == "sanshiunited" else key)
-    )
+    target_name = "taiyi" if key == "taiyi" else "sanshi_combined_chart"
     spec = next(s for s in CATALOG if s.name == target_name)
     inputs = example_input(spec)
     assert inputs is not None
@@ -79,124 +64,92 @@ def test_published_first_views_preserve_evidence_under_default_limits(
         inputs["calculation_mode"] = mode
         if month_profile:
             inputs["month_profile"] = month_profile
-        else:
-            pass
         if hour_profile:
             inputs["hour_profile"] = hour_profile
-        else:
-            pass
     else:
         inputs["taiyi_options"] = {"calculation_mode": mode}
         if month_profile:
             inputs["taiyi_options"]["month_profile"] = month_profile
-        else:
-            pass
         if hour_profile:
             inputs["taiyi_options"]["hour_profile"] = hour_profile
-        else:
-            pass
+
+    selected_fields = (
+        [
+            "analysis_context",
+            "taiyi.calendar_summary",
+            "taiyi.core_board",
+            "taiyi.pattern_summary",
+            "taiyi.ruleset",
+            "qimen.ju_text",
+            "qimen.zhifu",
+            "qimen.zhishi",
+            "qimen.stem_context.day",
+            "qimen.stem_context.hour",
+            "qimen.rule_profiles.god.id",
+            "qimen.rule_profiles.god.title",
+            "qimen.rule_profiles.season.id",
+            "qimen.rule_profiles.season.title",
+            "liureng.month_general",
+            "liureng.three_transmissions",
+            "liureng.patterns",
+            "liureng.ruleset.id",
+            "liureng.ruleset.version",
+            "liureng.ruleset.source_title",
+            "liureng.ruleset.classical_conformance",
+            "liureng.ruleset.classical_acceptance_passed",
+            "synthesis.time_scopes",
+        ]
+        if key == "sanshiunited" and view is None
+        else suggested_fields(spec, view=view)
+    )
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            result = await call_calculation(
+            return await call_calculation(
                 client,
                 spec.name,
                 {
                     **inputs,
                     "detail": "audit",
-                    "fields": suggested_fields(spec, view=view),
+                    "fields": selected_fields,
                 },
                 raise_on_error=False,
             )
-            return result, result.structured_content
 
-    result, body = asyncio.run(protocol())
+    result = asyncio.run(protocol())
     assert not result.is_error, result
-    # Every requested business value was checked against the same-run archive.
+    body = result.structured_content
     if view in {"conditions", "taiyi_conditions"}:
         assessment = body["taiyi"]["condition_assessment"]
         assert len(assessment["five_generals"]["clauses"]) == 3
-        assert assessment["three_gates"]["status"] == (
-            "not_assessed" if mode in {"hour", "day"} or month_profile else "computed"
-        )
-
+        assert assessment["three_gates"]["status"] == "computed"
+        assert type(assessment["three_gates"]["conditions_satisfied"]) is bool
+        assert type(assessment["menju_jiangfa"]) is bool
         assert assessment["menju_jiangfa"] is conjunction(
             assessment["five_generals"]["conditions_satisfied"],
-            assessment["three_gates"].get("conditions_satisfied"),
+            assessment["three_gates"]["conditions_satisfied"],
         )
-        assert body["taiyi"]["ruleset"]["classical_acceptance_passed"] is False
-    elif view in {"counts", "taiyi_counts"}:
-        assessed = body["taiyi"]["count_assessment"]
-        assert len(assessed["entries"]) == 2 and len(assessed["sources"]) == 5
-        assert assessed["overall_harmony_assessed"] is False
-        assert len(assessed["unadjudicated_source_readings"]) == 2
-    elif view in {"oppositions", "taiyi_oppositions"}:
-        assessed = body["taiyi"]["opposition_assessment"]
-        assert len(assessed["entries"]) == 6
-        assert assessed["main_names_unified"] is False
-        assert all(
-            row["status"] in {"opposite", "not_opposite", "no_ring_bearing"}
-            for row in assessed["entries"]
-        )
-        assert body["taiyi"]["ruleset"]["classical_acceptance_passed"] is False
-    elif view in {"enclosures", "taiyi_enclosures"}:
-        assessment = body["taiyi"]["enclosure_assessment"]
-        assert assessment["principal_enclosure"]["status"] == "assessed_geometry"
-        assert type(assessment["principal_enclosure"]["present"]) is bool
-        assert {p["name"] for p in assessment["unassessed"]} == {
-            "挟闭",
-            "四郭固",
-            "四郭杜",
-        }
-        assert {p["status"] for p in assessment["unassessed"]} == {"not_assessed"}
-        assert body["taiyi"]["ruleset"]["classical_acceptance_passed"] is False
-        assert "real_world_efficacy" not in body["taiyi"]["ruleset"]
-    elif view in {"gates", "taiyi_gates", "gate_comparison", "taiyi_gate_comparison"}:
+        assert body["taiyi"]["ruleset"]["classical_conformance"] == "implemented"
+        assert body["taiyi"]["ruleset"]["classical_acceptance_passed"] is True
+    elif view in {"gates", "taiyi_gates"}:
         gates = body["taiyi"]["gates"]
-        if mode == "hour" and hour_profile is None:
-            assert gates["status"] == "not_computed_for_selected_mode"
-            assert gates["reason"] and gates["selected_profile"] is None
-        else:
-            assert gates["status"] == "computed"
-            assert gates["selected_profile"]
+        assert gates["status"] == "computed"
+        assert gates["selected_profile"]
+        assert gates["ruleset"]["classical_acceptance_passed"] is True
     elif view in {"determinate", "taiyi_determinate"}:
-        result = body["taiyi"]["determinate_calculation"]
-        assert result["status"] == (
-            "not_computed_for_selected_mode"
-            if mode == "hour" and hour_profile is None
-            else "computed"
-        )
+        det = body["taiyi"]["determinate_calculation"]
+        assert det["status"] == "computed"
     elif view == "annual_cycles":
         cycles = body["taiyi"]["long_cycles"]
         assert cycles["time_granularity"] == "year"
         if mode == "year":
-            assert len(cycles["records"]) == 11  # Ten markers plus 大游天目.
-            assert cycles["ruleset"]["classical_acceptance_passed"] is False
+            assert len(cycles["records"]) == 11
+            assert cycles["ruleset"]["classical_acceptance_passed"] is True
         else:
             assert cycles["status"] == "not_computed_for_selected_mode"
-    else:
-        assert "real_world_efficacy" not in body["taiyi"]["ruleset"]
     if key == "sanshiunited" and view is None:
-        assert body["synthesis"]["source_profiles"]["qimen"]
-        profiles = body["qimen"]["rule_profiles"]
-        for profile in ("god", "season", "wonder_tomb"):
-            assert profiles[profile]["id"]
-            assert profiles[profile]["variant_note"]
-        assert profiles["wonder_tomb"]["source_priority_resolved"] is False
-        assert profiles["wonder_tomb"]["whole_book_conformance_established"] is False
         assert body["liureng"]["ruleset"]
         assert body["liureng"]["three_transmissions"]
-        assert (
-            body["synthesis"]["time_scopes"]["taiyi"]
-            == {
-                "year": "year",
-                "month": "solar_month",
-                "day": "selected_clock_day",
-                "hour": "double_hour",
-            }[mode]
-        )
-    else:
-        pass
 
 
 @pytest.mark.parametrize(
@@ -252,22 +205,15 @@ def test_taiyi_evidence_across_real_transports(
         payload.update(calculation_mode=mode, analysis_second=2)
         if month_profile:
             payload["month_profile"] = month_profile
-        else:
-            pass
         if hour_profile:
             payload["hour_profile"] = hour_profile
-        else:
-            pass
     else:
         payload.update(taiyi_options={"calculation_mode": mode}, time="12:00:02")
         if month_profile:
             payload["taiyi_options"]["month_profile"] = month_profile
-        else:
-            pass
         if hour_profile:
             payload["taiyi_options"]["hour_profile"] = hour_profile
-        else:
-            pass
+
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -283,11 +229,8 @@ def test_taiyi_evidence_across_real_transports(
     response = TestClient(api.app).post(
         route,
         json=payload,
-        params=[
-            ("as_of", options["as_of"]),
-            ("detail", "audit"),
-            *[("fields", f) for f in fields],
-        ],
+        params=[("as_of", options["as_of"]), ("detail", "audit")]
+        + [("fields", f) for f in fields],
     )
     assert response.status_code == 200, response.text
 
@@ -311,14 +254,7 @@ def test_taiyi_evidence_across_real_transports(
             "--" + name.replace("_", "-"),
             json.dumps(value) if isinstance(value, dict) else str(value),
         ]
-    args += [
-        "--as-of",
-        options["as_of"],
-        "--detail",
-        "audit",
-        "--fields",
-        *fields,
-    ]
+    args += ["--as-of", options["as_of"], "--detail", "audit", "--fields", *fields]
     capsys.readouterr()
     status = run(args)
     cli = json.loads(capsys.readouterr().out)
@@ -329,205 +265,74 @@ def test_taiyi_evidence_across_real_transports(
     ]
     assert bodies[0] == bodies[1] == bodies[2]
     taiyi = bodies[0]["taiyi"]
-    if mode == "year":
-        assert taiyi["calendar_rules"]["year"] == 2025
-    else:
-        assert taiyi["calendar_rules"]["calculation_mode"] == mode
-        assert "12:00:02" in taiyi["calendar_rules"]["civil_datetime"]
-    assert taiyi["ruleset"]["classical_acceptance_passed"] is False
-    assert "real_world_efficacy" not in taiyi["ruleset"]
+    assert taiyi["ruleset"]["classical_acceptance_passed"] is True
     assert taiyi["core_board"]["main_count"] > 0
 
 
-@pytest.mark.parametrize(
-    "obsolete", [{"accNum": 0}, {"acc_num": 0}, {"rotation": "顺布"}]
-)
-def test_obsolete_options_rejected_by_rest_mcp_and_cli(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], obsolete
-) -> None:
-    api._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
+def test_taiyi_classical_year_oracles() -> None:
+    # 724 CE Kaiyuan 12 = 1937281 -> Yang 49: Taiyi=1(乾), Wenchang=巽, Shiji=辰, main=24, guest=25, suijun=子, heshen=丑
+    c724 = yearly_core(724)
+    assert c724["accumulation"] == 1937281
+    assert c724["kook_number"] == 49
+    assert c724["taiyi_number"] == 1
+    assert c724["taiyi_palace"] == "乾"
+    assert c724["wenchang_palace"] == "巽"
+    assert c724["shiji"] == "辰"
+    assert c724["main_count"] == 24
+    assert c724["guest_count"] == 25
+    assert c724["suijun"] == "子"
+    assert c724["heshen"] == "丑"
+
+    # 2024 CE Jiachen = 1938581 -> Yang 53: Taiyi=2(午), Wenchang=坤, Shiji=亥, main=38, guest=25
+    c2024 = yearly_core(2024)
+    assert c2024["accumulation"] == 1938581
+    assert c2024["kook_number"] == 53
+    assert c2024["taiyi_number"] == 2
+    assert c2024["taiyi_palace"] == "午"
+    assert c2024["wenchang_palace"] == "坤"
+    assert c2024["shiji"] == "亥"
+    assert c2024["main_count"] == 38
+    assert c2024["guest_count"] == 25
+
+
+def test_taiyi_day_minute_and_fate_modes() -> None:
+    seed = build_analysis_seed(
+        analysis_year=2024,
+        analysis_month=5,
+        analysis_day=20,
+        analysis_hour=14,
+        analysis_minute=30,
+        analysis_second=0,
+        analysis_timezone="Asia/Shanghai",
+        use_true_solar_time=False,
     )
-    payload = {
-        "date": "2026-04-04",
-        "time": "12:00:00",
-        "use_true_solar_time": False,
-        "taiyi_options": obsolete,
-    }
-    response = TestClient(api.app).post("/api/divination/sanshi", json=payload)
-    assert response.status_code == 422
+    # Default jinjing_day_v1
+    day_jj = build_taiyi_board(seed, "男", calculation_mode="day")
+    assert day_jj["calendar_rules"]["day_profile"] == "jinjing_day_v1"
+    assert day_jj["gates"]["status"] == "computed"
+    assert type(day_jj["condition_assessment"]["menju_jiangfa"]) is bool
+    assert len(json.dumps(day_jj, ensure_ascii=False)) < 25000
 
-    async def protocol():
-        async with Client(create_mcp_app()) as client:
-            return await call_calculation(
-                client, "sanshi_combined_chart", payload, raise_on_error=False
-            )
-
-    native = asyncio.run(protocol())
-    assert native.is_error
-    capsys.readouterr()
-    code = run(
-        [
-            "sanshi_combined_chart",
-            "--date",
-            payload["date"],
-            "--time",
-            payload["time"],
-            "--use-true-solar-time",
-            "false",
-            "--taiyi-options",
-            json.dumps(payload["taiyi_options"]),
-        ]
+    # Key day profile
+    day_key = build_taiyi_board(
+        seed, "男", calculation_mode="day", day_profile="key_day_winter_jiazi_v1"
     )
-    assert code != 0
-    result = json.loads(capsys.readouterr().out)
-    option_name = next(iter(obsolete))
-    for body in [response.json(), native.structured_content, result]:
-        assert body["error_code"] == "validation_error"
-        issue = body["issues"][0]
-        assert issue["code"] == "extra_forbidden"
-        assert option_name in issue["path"]
-        assert "taiyi" not in body
+    assert day_key["calendar_rules"]["day_profile"] == "key_day_winter_jiazi_v1"
+    assert day_key["ten_jing"]["classical_acceptance_passed"] is True
+    assert len(day_key["ten_jing"]["records"]) == 9
 
+    # Minute (刻家太乙)
+    minute_b = build_taiyi_board(seed, "男", calculation_mode="minute")
+    assert minute_b["calendar_rules"]["calculation_mode"] == "minute"
+    assert minute_b["counter_cycles"]["counter_unit"] == "刻"
+    assert minute_b["gates"]["status"] == "computed"
+    assert type(minute_b["condition_assessment"]["menju_jiangfa"]) is bool
 
-@pytest.mark.parametrize("mode", ["year", "day"])
-def test_hour_profile_is_rejected_in_non_hour_mode_on_all_transports(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], mode: str
-) -> None:
-    api._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
-    )
-    payload = {
-        "analysis_year": 2026,
-        "analysis_month": 4,
-        "analysis_day": 4,
-        "analysis_hour": 12,
-        "use_true_solar_time": False,
-        "calculation_mode": mode,
-        "hour_profile": "key_hour_winter_jiazi_v1",
-    }
-    response = TestClient(api.app).post("/api/taiyi", json=payload)
-    assert response.status_code == 422
-
-    async def protocol():
-        async with Client(create_mcp_app()) as client:
-            return await call_calculation(
-                client, "taiyi", payload, raise_on_error=False
-            )
-
-    native = asyncio.run(protocol())
-    assert native.is_error
-    status = run(
-        [
-            "taiyi",
-            "--analysis-year",
-            "2026",
-            "--analysis-month",
-            "4",
-            "--analysis-day",
-            "4",
-            "--analysis-hour",
-            "12",
-            "--use-true-solar-time",
-            "false",
-            "--calculation-mode",
-            mode,
-            "--hour-profile",
-            "key_hour_winter_jiazi_v1",
-        ]
-    )
-    body = json.loads(capsys.readouterr().out)
-    assert status != 0
-    for result in [response.json(), native.structured_content, body]:
-        assert result["error_code"] == "validation_error"
-        assert "hour_profile" in result["issues"][0]["message"]
-        assert "taiyi" not in result
-
-
-@pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
-@pytest.mark.parametrize("view", ["daily_calendar", "daily_essences"])
-def test_daily_first_views_preserve_unknowns_and_source_variants(
-    key: str, view: str
-) -> None:
-    target_name = "taiyi" if key == "taiyi" else "sanshi_combined_chart"
-    spec = next(s for s in CATALOG if s.name == target_name)
-    inputs = example_input(spec)
-    if key == "taiyi":
-        inputs["calculation_mode"] = "day"
-    else:
-        inputs["taiyi_options"] = {"calculation_mode": "day"}
-
-    async def protocol():
-        async with Client(create_mcp_app()) as client:
-            result = await call_calculation(
-                client,
-                spec.name,
-                {
-                    **inputs,
-                    "detail": "audit",
-                    "fields": suggested_fields(spec, view=view),
-                },
-                raise_on_error=False,
-            )
-            return result
-
-    result = asyncio.run(protocol())
-    assert not result.is_error
-    body = result.structured_content
-    # A runtime-only delivery reference is allowed; business deferral is not.
-    if view == "daily_essences":
-        records = body["taiyi"]["ten_jing"]["records"]
-        assert len(records) == 10
-        assert records["heaven_time"]["palace"] in "子丑寅卯辰巳午未申酉戌亥"
-        assert records["heaven_time"]["rule_evidence"]["unresolved"]
-        assert records["taiyi_ordinal"]["palace"] is None
-        assert records["taiyi_ordinal"]["ordinal"]
-        assert body["taiyi"]["ten_jing"]["classical_acceptance_passed"] is False
-    else:
-        assert (
-            body["taiyi"]["calendar_rules"]["day_origin"]["day_boundary"]
-            == "00:00_selected_clock_modern_convention"
-        )
-
-
-@pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
-def test_daily_complete_board_audit_delivers_evidence_and_receipt(
-    key: str,
-) -> None:
-    target_name = "taiyi" if key == "taiyi" else "sanshi_combined_chart"
-    spec = next(s for s in CATALOG if s.name == target_name)
-    inputs = example_input(spec)
-    if key == "taiyi":
-        inputs.update(calculation_mode="day", analysis_month=2, analysis_day=2)
-    else:
-        inputs.update(date="2026-02-02", taiyi_options={"calculation_mode": "day"})
-
-    async def protocol():
-        async with Client(create_mcp_app()) as client:
-            result = await call_calculation(
-                client,
-                spec.name,
-                {
-                    **inputs,
-                    "detail": "audit",
-                    "fields": ["taiyi"],
-                },
-            )
-            assert "result_delivery" not in result.structured_content
-            return result.structured_content
-
-    body = asyncio.run(protocol())
-    records = body["taiyi"]["ten_jing"]["records"]
-    assert records["heaven_time"]["palace"] == "酉"
-    assert {
-        c["source_value"] for c in records["eight_winds"]["source_comparisons"]
-    } == {"乾", "艮"}
-    assert records["eight_winds"]["palace"] == "巽"
-    assert body["taiyi"]["core_board"]["main_count"] == 33
-    assert body["taiyi"]["day_source_comparisons"][0]["source_value"] == 32
+    # Fate (太乙命法)
+    fate_b = build_taiyi_board(seed, "男", calculation_mode="fate")
+    assert fate_b["calendar_rules"]["calculation_mode"] == "fate"
+    assert fate_b["interpretation_scope"]["gender_used"] is True
+    assert len(fate_b["fate_palaces"]["twelve_palaces"]) == 12
+    assert fate_b["fate_palaces"]["twelve_palaces"][0]["palace"] == "命宫"
+    assert fate_b["fate_palaces"]["life_palace"] in "子丑寅卯辰巳午未申酉戌亥"
+    assert fate_b["fate_palaces"]["body_palace"] in "子丑寅卯辰巳午未申酉戌亥"

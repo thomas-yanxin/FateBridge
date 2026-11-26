@@ -1,4 +1,4 @@
-"""Assemble Liuyao casting, Najia and conditional evidence."""
+"""Assemble Liuyao casting, Najia, Gua Shen, Shen Sha, and compact structural evidence."""
 
 from __future__ import annotations
 
@@ -8,8 +8,7 @@ from typing import Any
 from fatebridge.core.almanac import build_calendar_context
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.divination import lookup_hexagram_by_code
-from fatebridge.core.liuyao.liuyao_calendar_models import month_model_comparison
-from fatebridge.core.liuyao.liuyao_casting import (
+from fatebridge.core.liuyao.casting import (
     CoinToss,
     cast_hexagram_code,
     cast_lines_from_codes,
@@ -19,13 +18,22 @@ from fatebridge.core.liuyao.liuyao_casting import (
     random_coin_tosses,
     validate_hexagram_code,
 )
-from fatebridge.core.liuyao.liuyao_evidence import build_liuyao_evidence
-from fatebridge.core.liuyao.liuyao_fanfu import build_fanfu_evidence
-from fatebridge.core.liuyao.liuyao_najia import (
-    BAGONG_BASES,
-    build_sixyao_enrichment,
+from fatebridge.core.liuyao.evidence import (
+    build_liuyao_evidence,
+    month_model_comparison,
 )
-from fatebridge.core.liuyao.liuyao_patterns import detect_sixyao_patterns
+from fatebridge.core.liuyao.najia import (
+    build_sixyao_enrichment,
+    compute_gua_shen,
+    compute_hidden_spirits,
+    compute_shensha,
+)
+from fatebridge.core.liuyao.strength import (
+    SOURCES,
+    build_fanfu_evidence,
+    build_moving_focus_guidance,
+    detect_sixyao_patterns,
+)
 from fatebridge.core.local_techniques.chart import (
     _normalize_date_text,
     _normalize_time_text,
@@ -109,6 +117,7 @@ def build_sixyao_result(
     timing_days: int = 0,
     event_horizon: str | None = None,
 ) -> dict[str, Any]:
+    """Build deterministic Liuyao Najia, Gua Shen, Shen Sha, and structural evidence."""
     if event_horizon not in (None, "near", "long_term"):
         raise ValueError("event_horizon 必须是 near、long_term 或省略。")
     method = (method or "auto").strip().lower()
@@ -149,7 +158,6 @@ def build_sixyao_result(
     coin_tosses: list[CoinToss] | None = None
 
     if coins is not None:
-        # 摇钱起卦（用户提供六掷）：调用方报来真实摇出的铜钱结果。
         cast_method = "coin"
         coin_source = "provided"
         provided_cast = coin_cast(coins)
@@ -172,7 +180,6 @@ def build_sixyao_result(
         current_code = coin_current
         changed_hexagram_binary_code = coin_changed
     elif explicit_lines_provided or explicit_code_provided:
-        # 手动起卦：调用方已指定卦码 / 爻线。
         cast_method = "manual"
         current_code = validate_hexagram_code(gua_code) or cast_hexagram_code(
             normalized_lines
@@ -184,15 +191,11 @@ def build_sixyao_result(
         )
         if len(current_code) != 6 or len(changed_hexagram_binary_code) != 6:
             raise ValueError("六爻卦码必须是 6 位 0/1 字符串。")
-        # When the caller supplied codes but no explicit lines, derive the
-        # canonical line set from the authoritative codes so moving-line
-        # detection reflects the real request.
         if not explicit_lines_provided:
             normalized_lines = cast_lines_from_codes(
                 current_code, changed_hexagram_binary_code
             )
     elif method == "coin":
-        # 摇钱起卦（系统随机六掷）：真·铜钱筮法，seed 可复现。
         cast_method = "coin"
         coin_source = "random"
         seeded_cast = coin_cast(random_coin_tosses(random.Random(seed)))
@@ -201,8 +204,6 @@ def build_sixyao_result(
         current_code = cast_hexagram_code(normalized_lines)
         changed_hexagram_binary_code = changed_hexagram_code(normalized_lines)
     else:
-        # 时间起卦（method=auto/time）：按起卦时刻以梅花口径真实装卦
-        # （本卦 / 动爻 / 变卦取自同一时刻的农历上下文），而不是返回固定演示卦。
         cast_method = "time_meihua"
         meihua = (context.get("lunar") or {}).get("meihua")
         if not meihua:
@@ -242,16 +243,15 @@ def build_sixyao_result(
         changed_hexagram_binary_code: changed_payload,
     }
 
-    # 按起卦日干 + 卦码排纳甲、世应、六亲、六神，并写回每爻。
     day_ganzhi = context.get("nongli", {}).get("dayGanZi") or ""
-    day_gan = day_ganzhi[0] if day_ganzhi else None
+    day_gan = day_ganzhi[0] if len(day_ganzhi) >= 1 else ""
+    day_branch = day_ganzhi[1] if len(day_ganzhi) >= 2 else ""
     hexagram_info, enrichment = build_sixyao_enrichment(
         current_code=current_code,
         changed_code=changed_hexagram_binary_code,
-        day_gan=day_gan,
+        day_gan=day_gan or None,
     )
     for line_dict, extra in zip(normalized_lines, enrichment):
-        # 六神与 SIX_YAO_GODS 的固定位置不同——按日干重算 god。
         line_dict["god"] = extra["liushen"]
         line_dict["name"] = extra["position_label"]
         line_dict["position"] = extra["position"]
@@ -271,29 +271,24 @@ def build_sixyao_result(
                 line_dict["changed_liuqin"] = extra["liuqin"]
                 line_dict["is_fuyin_line"] = True
 
-    # Only missing kinship categories are candidates for 伏神, located at the
-    # same position of the original palace's pure hexagram.
-    palace_base = next(
-        code
-        for palace, code, _ in BAGONG_BASES
-        if palace == hexagram_info["current_palace"]
+    hexagram_info["gua_shen"] = compute_gua_shen(
+        lines=normalized_lines,
+        shi_line=hexagram_info["shi_line"],
+        palace_element=hexagram_info["current_palace_element"],
     )
-    _, palace_lines = build_sixyao_enrichment(palace_base, palace_base, day_gan)
-    present_kin = {line["liuqin"] for line in normalized_lines} | {
-        line["changed_liuqin"] for line in normalized_lines if line["change"]
-    }
-    hidden = [
-        {
-            "position": row["position"],
-            "branch": row["branch"],
-            "element": row["element"],
-            "liuqin": row["liuqin"],
-            "flying_branch": normalized_lines[i]["branch"],
-            "flying_liuqin": normalized_lines[i]["liuqin"],
-        }
-        for i, row in enumerate(palace_lines)
-        if row["liuqin"] not in present_kin
-    ]
+    hidden = compute_hidden_spirits(
+        normalized_lines=normalized_lines,
+        current_palace=hexagram_info["current_palace"],
+        day_gan=day_gan or None,
+    )
+    shensha_table, line_shensha = compute_shensha(
+        day_gan=day_gan,
+        day_branch=day_branch,
+        lines=normalized_lines,
+    )
+    moving_focus_guidance = build_moving_focus_guidance(
+        normalized_lines, shi_line=hexagram_info["shi_line"]
+    )
     evidence = build_liuyao_evidence(
         day_ganzhi=day_ganzhi,
         month_branch=context["pillars"]["month"][1],
@@ -304,6 +299,9 @@ def build_sixyao_result(
         palace_element=hexagram_info["current_palace_element"],
         moment=context["moment"],
         timezone_name=context["timezone_name"],
+        shensha=shensha_table,
+        line_shensha=line_shensha,
+        moving_focus_guidance=moving_focus_guidance,
         focus_line=focus_line,
         focus_kinship=focus_kinship,
         focus_kind=focus_kind,
@@ -323,27 +321,14 @@ def build_sixyao_result(
     if comparison is not None:
         evidence["calendar_conventions"]["month_model_comparison"] = comparison
 
-    # The full changed chart is a structural comparison. It must never
-    # populate changed_branch on an original static line.
     _, changed_chart = build_sixyao_enrichment(
-        changed_hexagram_binary_code, changed_hexagram_binary_code, day_gan
+        changed_hexagram_binary_code, changed_hexagram_binary_code, day_gan or None
     )
     evidence["fanfu"] = build_fanfu_evidence(
         current_code=current_code,
         changed_code=changed_hexagram_binary_code,
         base_branches=[r["branch"] for r in normalized_lines],
         changed_chart_branches=[r["branch"] for r in changed_chart],
-    )
-    evidence["rule_trace"].append(
-        {
-            "rule_id": "separate_body_region_and_active_line_fanfu",
-            "fact_path": "liuyao_evidence.fanfu",
-            "inputs": {
-                "current_code": current_code,
-                "changed_code": changed_hexagram_binary_code,
-            },
-            "sources": [evidence["fanfu"]["source_url"]],
-        }
     )
     text_evidence = moving_text_evidence(current_code, changed_hexagram_binary_code)
     evidence["rule_trace"].append(
@@ -354,7 +339,7 @@ def build_sixyao_result(
                 "current_code": current_code,
                 "changed_code": changed_hexagram_binary_code,
             },
-            "sources": [text_evidence["selection_policy"]],
+            "sources": [SOURCES["fanfu"]],
         }
     )
 
@@ -422,5 +407,11 @@ def build_sixyao_result(
         "descriptions": descriptions,
         "current_hexagram": current_payload["raw"],
         "changed_hexagram": changed_payload["raw"],
-        "summary": f"本卦{current_payload['name']}（{current_code}），之卦{changed_payload['name']}（{changed_hexagram_binary_code}），动爻{moving_lines or '无'}。已装世应、六亲、六神并列日月关系与原典动爻；尚未据用神旺衰断现实成败。",
+        "summary": (
+            f"本卦{current_payload['name']}（{current_code}），"
+            f"之卦{changed_payload['name']}（{changed_hexagram_binary_code}），"
+            f"动爻{moving_lines or '无'}。"
+            f"卦身{hexagram_info['gua_shen']['branch']}，"
+            f"伏神{len(hidden)}项。"
+        ),
     }

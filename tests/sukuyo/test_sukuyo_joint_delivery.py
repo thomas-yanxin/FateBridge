@@ -4,8 +4,9 @@ from copy import deepcopy
 
 import pytest
 
-from fatebridge.core.sukuyo import sukuyo_compatibility_text as delivery
-from fatebridge.core.sukuyo.sukuyo import calendar_mansion, candidate_relation_analysis
+from fatebridge.core.sukuyo import texts as delivery
+from fatebridge.core.sukuyo.calendar import calendar_mansion
+from fatebridge.core.sukuyo.sanjiu import candidate_relation_analysis
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 
@@ -84,16 +85,18 @@ def test_resolved_support_delivers_every_actual_model_date_half_tuple(hinoo) -> 
     resolved["calendar_day_part"] = "second_half"
     resolved["natal_su27"] = "毕"
     analysis = candidate_relation_analysis(resolved, resolved)
-    text = delivery.joint_reconstruction_reading(["甲方", "乙方"], analysis)
     contract = delivery.joint_reconstruction_contract(analysis)
     assert "not_needed" in contract and "有向关系" in contract
     assert "保留在unconstrained_rows" not in contract
     supports = analysis["shared_reconstruction_analysis"]["resolved_support"]
     assert len(supports) == 2
     for support in supports:
-        assert f"共同重建{support['reconstruction_id']}支持" in text
-    assert text.count("甲方1341-05-24、后半、宿毕") == 2
-    assert text.count("乙方1341-05-24、后半、宿毕") == 2
+        assert support["person1"]["calendar_date"] == "1341-05-24"
+        assert support["person1"]["calendar_day_part"] == "second_half"
+        assert support["person1"]["natal_su27"] == "毕"
+        assert support["person2"]["calendar_date"] == "1341-05-24"
+        assert support["person2"]["calendar_day_part"] == "second_half"
+        assert support["person2"]["natal_su27"] == "毕"
 
 
 def test_null_half_is_not_invented_from_model_independent_support(hinoo) -> None:
@@ -105,100 +108,12 @@ def test_null_half_is_not_invented_from_model_independent_support(hinoo) -> None
     other["calendar_day_part"] = None
     other["profile_calculation"]["short_month_assignment"] = None
     analysis = candidate_relation_analysis(resolved, other)
-    text = delivery.joint_reconstruction_reading(["甲方", "乙方"], analysis)
-    assert text.count("乙方1341-05-25、未以半日区分、宿毕") == 2
-    assert "乙方1341-05-25、后半" not in text
-
-
-def test_ordinary_envelope_has_positive_profile_evidence_and_actual_completeness(
-    ordinary,
-) -> None:
-    contexts = [ordinary, ordinary]
-    analysis = {
-        "status": "candidate_only",
-        "rows": [{"person1_su27": "危", "person2_su27": "室"}],
-        "candidate_set_complete_within_profile": True,
-    }
-    before = deepcopy((contexts, analysis))
-    text = delivery.ordinary_candidate_envelope_reading(contexts, analysis)
-    assert "t1299_fullmoon27" in text and "条件外包络" in text
-    assert "Hinoo共同重建筛选" in text and "本次档案内完整" in text
-    analysis["candidate_set_complete_within_profile"] = False
-    text = delivery.ordinary_candidate_envelope_reading(contexts, analysis)
-    assert "未穷尽" in text and "本次档案内完整" not in text
-    analysis["candidate_set_complete_within_profile"] = True
-    assert (contexts, analysis) == before
-
-
-@pytest.mark.parametrize(
-    "mutation",
-    ["missing_profile", "missing_method", "source", "assignment", "method", "leaf"],
-)
-def test_missing_or_conflicting_metadata_cannot_establish_ordinary_inapplicability(
-    ordinary, mutation: str
-) -> None:
-    context = deepcopy(ordinary)
-    profile = context["profile_calculation"]
-    if mutation == "missing_profile":
-        context.pop("calendar_profile")
-    elif mutation == "missing_method":
-        profile.pop("mansion_method_id")
-    elif mutation == "source":
-        (context.get("calendar_candidates") or [context])[0]["profile_calculation"].pop(
-            "hinoo_source"
-        )
-    elif mutation == "assignment":
-        (context.get("calendar_candidates") or [context])[0]["profile_calculation"][
-            "short_month_assignment"
-        ] = {"unknown": True}
-    elif mutation == "method":
-        profile["mansion_method_id"] = "unverified"
-    else:
-        context["calendar_candidates"] = [deepcopy(ordinary)]
-        context["calendar_candidates"][0]["calendar_profile"] = "hinoo_t1299_host27"
-    analysis = {"status": "candidate_only", "rows": [{}]}
-    assert (
-        delivery.ordinary_candidate_envelope_reading([ordinary, context], analysis)
-        == ""
-    )
-
-
-def test_hinoo_without_precedence_is_not_an_ordinary_profile(ordinary, hinoo) -> None:
-    context = deepcopy(hinoo)
-    context["profile_calculation"]["short_month_assignment"] = None
-    analysis = {"status": "candidate_only", "rows": [{}]}
-    assert (
-        delivery.ordinary_candidate_envelope_reading([ordinary, context], analysis)
-        == ""
-    )
-
-
-@pytest.mark.parametrize("bad_candidates", [{}, "unverified", [None]])
-def test_malformed_branch_structure_cannot_establish_profile_scope(
-    ordinary, bad_candidates
-) -> None:
-    context = deepcopy(ordinary)
-    context["calendar_candidates"] = bad_candidates
-    assert (
-        delivery.ordinary_candidate_envelope_reading(
-            [ordinary, context], {"status": "candidate_only", "rows": [{}]}
-        )
-        == ""
-    )
-
-
-def test_explicit_but_null_shared_object_is_not_silently_overridden(ordinary) -> None:
-    assert (
-        delivery.ordinary_candidate_envelope_reading(
-            [ordinary, ordinary],
-            {
-                "status": "candidate_only",
-                "rows": [{}],
-                "shared_reconstruction_analysis": None,
-            },
-        )
-        == ""
-    )
+    supports = analysis["shared_reconstruction_analysis"]["resolved_support"]
+    assert len(supports) == 2
+    for support in supports:
+        assert support["person2"]["calendar_date"] == "1341-05-25"
+        assert support["person2"]["calendar_day_part"] is None
+        assert support["person2"]["natal_su27"] == "毕"
 
 
 def test_unknown_shared_status_is_not_treated_as_applied() -> None:
@@ -220,7 +135,14 @@ def test_service_uses_state_specific_contract_and_resolved_support() -> None:
         person2_calendar_day_part="second_half",
     )
     assert "not_needed" in result["interpretation_contract"]["joint_reconstruction"]
-    assert "共同重建adjacent_month_short_day_assignment支持" in result["summary"]
+    supports = result["candidate_relation_analysis"]["shared_reconstruction_analysis"][
+        "resolved_support"
+    ]
+    assert len(supports) == 2
+    assert any(
+        item["reconstruction_id"] == "adjacent_month_short_day_assignment"
+        for item in supports
+    )
     assert (
         result["pair"] == "命" and result["candidate_relation_analysis"]["rows"] == []
     )

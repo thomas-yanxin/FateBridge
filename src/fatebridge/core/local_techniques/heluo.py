@@ -4,26 +4,23 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.heluo.heluo import calculate as _heluo_calculate
-from fatebridge.core.heluo.heluo import da_yun as _heluo_da_yun
-from fatebridge.core.heluo.heluo import judge as _heluo_judge
-from fatebridge.core.heluo.heluo_clock import attach_clock_evidence
-from fatebridge.core.heluo.heluo_jiehou import (
-    attach_jiehou_evidence,
-    jiehou_evidence,
-)
-from fatebridge.core.heluo.heluo_months import (
+from fatebridge.core.heluo.chart import calculate as _heluo_calculate
+from fatebridge.core.heluo.chart import da_yun as _heluo_da_yun
+from fatebridge.core.heluo.judgment import (
     DEFAULT_MONTH_ASSIGNMENT,
     MonthAssignmentMethod,
-)
-from fatebridge.core.heluo.heluo_solar_context import (
+    attach_jiehou_evidence,
     attach_solar_context,
     bind_seasonal_context,
     bind_solar_context,
+    heluo_evidence,
+    jiehou_evidence,
 )
-from fatebridge.core.heluo.heluo_solar_context import solar_term as _heluo_solar_term
-from fatebridge.core.heluo.heluo_timing import (
+from fatebridge.core.heluo.judgment import judge as _heluo_judge
+from fatebridge.core.heluo.judgment import solar_term as _heluo_solar_term
+from fatebridge.core.heluo.timing import (
     HeluoYearContextError,
+    attach_clock_evidence,
     build_heluo_timing,
 )
 from fatebridge.core.local_techniques.chart import (
@@ -31,18 +28,15 @@ from fatebridge.core.local_techniques.chart import (
     _build_metaphysics_seed,
     _normalize_date_text,
 )
-from fatebridge.core.numerology.numerology_clock_policy import parse_birth_clock
-from fatebridge.core.numerology.numerology_evidence import heluo_evidence
 from fatebridge.core.numerology.numerology_inputs import (
     attach_birth_clock,
+    attach_pillar_links,
     normalize_numerology_utc_offset,
     numerology_birth_clock,
     numerology_seed_time,
+    parse_birth_clock,
     resolve_numerology_longitude,
     resolve_numerology_timezone,
-)
-from fatebridge.core.numerology.numerology_pillars import (
-    attach_pillar_links,
     verified_computed_pillars,
 )
 from fatebridge.utils.birth_input import normalize_gender
@@ -144,7 +138,10 @@ def build_heluo_result(
     chart["yuantang_derivation"]["half_year"].update(
         basis="solstice_instant", birth_instant_utc=st["anchor_utc"]
     )
-    dayun = _heluo_da_yun(chart["xian"], chart["hou"], chart["cycleYear"])
+    dayun_raw = _heluo_da_yun(chart["xian"], chart["hou"], chart["cycleYear"])
+    dayun = {
+        "all": [{k: v for k, v in p.items() if k != "lines"} for p in dayun_raw["all"]]
+    }
     try:
         timing = build_heluo_timing(
             chart,
@@ -152,6 +149,7 @@ def build_heluo_result(
             analysis_year=analysis_year,
             month_index=month_index,
             day_index=day_index,
+            timezone=seed.timezone,
         )
     except HeluoYearContextError as exc:
         raise NumerologySourceError("runtime_heluo_year_context_conflict") from exc
@@ -164,6 +162,9 @@ def build_heluo_result(
         birth_datetime=seed.input_datetime,
     )
     bind_seasonal_context(st, judgment["seasonal_numbers"])
+    judgment["seasonal_numbers"]["seasonal_windows"] = [
+        w for w in judgment["seasonal_numbers"]["seasonal_windows"] if w.get("active")
+    ]
     analysis_context = _build_metaphysics_analysis_context(seed)
     analysis_context["longitude"] = parsed_longitude
     clock = numerology_birth_clock(
@@ -177,16 +178,32 @@ def build_heluo_result(
     attach_solar_context(evidence, st)
     attach_birth_clock(evidence, clock)
     attach_pillar_links(evidence, pillar_links)
-    attach_clock_evidence(evidence, timing["source_clock"], timing["year_context"])
     jiehou = jiehou_evidence(st)
     attach_jiehou_evidence(evidence, jiehou)
+    # Slim solar boundary_context dependencies after cross-validation
+    st["boundary_context"]["dependencies"] = [
+        {
+            "role": dep["role"],
+            "instant_utc": dep["instant_utc"],
+            "record": {
+                k: dep["record"][k]
+                for k in (
+                    "name",
+                    "datetime_with_offset",
+                    "timezone",
+                    "resolution_provider",
+                )
+                if k in dep["record"]
+            },
+        }
+        for dep in st["boundary_context"]["dependencies"]
+    ]
 
     return {
         "analysis_type": "河洛理数",
         "input_normalized": input_normalized,
         "analysis_context": analysis_context,
         "four_pillars": create_pillar_dict(seed.pillars),
-        "calendar_context": seed.calendar_context,
         "chart": chart,
         "dayun": dayun,
         "heluo_timing": timing,

@@ -1,8 +1,7 @@
-"""Build Canping results from calculated pillars and source evidence."""
+"""Build Canping results from calculated pillars and compact evidence."""
 
 from __future__ import annotations
 
-from copy import deepcopy
 from typing import Any
 
 from fatebridge.core.almanac import get_bazi_year
@@ -12,32 +11,27 @@ from fatebridge.core.local_techniques.chart import (
     _normalize_date_text,
 )
 from fatebridge.core.numerology.canping import calculate as _canping_calculate
+from fatebridge.core.numerology.canping import canping_evidence
 from fatebridge.core.numerology.canping import liunian_series as _canping_liunian_series
-from fatebridge.core.numerology.canping_schedule_basis import (
-    POLICY_ID,
-    build_schedule_basis,
-)
-from fatebridge.core.numerology.canping_timing import (
-    APPENDIX,
-    CONTINUOUS,
-    LEGACY,
-    build_canping_timing,
-)
-from fatebridge.core.numerology.numerology_clock_policy import parse_birth_clock
-from fatebridge.core.numerology.numerology_evidence import canping_evidence
 from fatebridge.core.numerology.numerology_inputs import (
     attach_birth_clock,
+    attach_pillar_links,
     normalize_numerology_utc_offset,
     numerology_birth_clock,
     numerology_seed_time,
+    parse_birth_clock,
     resolve_numerology_longitude,
     resolve_numerology_timezone,
-)
-from fatebridge.core.numerology.numerology_pillars import (
-    attach_pillar_links,
     verified_computed_pillars,
 )
-from fatebridge.core.numerology.numerology_solar_sources import attach_solar_sources
+from fatebridge.core.numerology.timing import (
+    APPENDIX,
+    CONTINUOUS,
+    LEGACY,
+    POLICY_ID,
+    build_canping_timing,
+    build_schedule_basis,
+)
 from fatebridge.utils.birth_input import normalize_gender
 from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.formatting import create_pillar_dict
@@ -131,12 +125,10 @@ def build_canping_result(
         gender=normalized_gender,
         method=normalized_method,
         include_luck=dayun_method == LEGACY,
+        compact_verses=True,
     )
     timing: dict[str, Any]
     if dayun_method == LEGACY:
-        # The inherited age table has no verified UTC interval mapping, but
-        # its first Tai Sui must still agree with the actual birth year pillar.
-        # A January/early-February civil year is not its Li Chun year label.
         birth_year = get_bazi_year(seed.input_datetime, seed.timezone)
         series = _canping_liunian_series(
             year_gz=year_gz,
@@ -183,28 +175,19 @@ def build_canping_result(
     )
     basis = build_schedule_basis(dayun_method, timing, clock)
     timing["schedule_basis"] = basis
-    # The legacy row carries age labels and text, even though it has no dated
-    # interval. Keep that actual row distinct from a mapped first period.
-    timing["first_row"] = deepcopy(result["dayun"][0])
-    timing["first_period"] = (
-        deepcopy(result["dayun"][0]) if dayun_method != LEGACY else None
-    )
+    if dayun_method == LEGACY:
+        timing["first_row"] = dict(result["dayun"][0])
+        timing["first_period"] = None
     evidence = canping_evidence(result)
     evidence["rule_trace"].append(
         {
             "rule_id": POLICY_ID,
-            "source_section": "卷七附法原句、另书子平十年背景与本次软件日期映射",
+            "source_section": "卷七附法、子平十年背景与日期映射",
             "fact_path": "canping_timing.schedule_basis",
         }
     )
     attach_birth_clock(evidence, clock)
     attach_pillar_links(evidence, pillar_links)
-    if dayun_method != LEGACY:
-        attach_solar_sources(
-            evidence,
-            timing["solar_year_context"]["policy_id"],
-            series["year_boundaries"],
-        )
     four_pillars = create_pillar_dict(seed.pillars)
 
     return {
@@ -212,7 +195,6 @@ def build_canping_result(
         "input_normalized": input_normalized,
         "analysis_context": analysis_context,
         "four_pillars": four_pillars,
-        "calendar_context": seed.calendar_context,
         "element": result["element"],
         "part_name": result["partName"],
         "day_palace_branch": result["dayPalaceBranch"],
@@ -223,8 +205,8 @@ def build_canping_result(
         "canping_timing": timing,
         "numerology_evidence": evidence,
         "summary": (
-            f"已生成邵子参评数 / 金锁银匙输出。年纳音：{result['element']}部，"
+            f"年纳音：{result['element']}部，"
             f"取法：{'原典日支' if normalized_method == 'gu' else '月支变法'}，"
-            f"配运政策：{dayun_method}。"
+            f"配运：{dayun_method}。"
         ),
     }

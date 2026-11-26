@@ -6,36 +6,42 @@ from datetime import datetime
 from typing import Any
 
 from fatebridge.core.almanac import get_lunar_context, localize_datetime
-from fatebridge.core.local_techniques.qimen import build_qimen_with_options
-from fatebridge.core.metaphysics.jinkou import build_jinkou_board
-from fatebridge.core.metaphysics.jinkou_natal_course import (
+from fatebridge.core.metaphysics.jinkou import (
+    build_jinkou_board,
+    build_jinkou_year_fate,
     build_natal_course,
+    confirmed_natal_branch,
     natal_course_trace,
 )
-from fatebridge.core.metaphysics.jinkou_year_fate import (
-    build_jinkou_year_fate,
-    confirmed_natal_branch,
-)
 from fatebridge.core.metaphysics.liureng import (
+    ShehaiMethod,
+    add_year_fate_membership,
+    apply_year_fate_emptiness,
     build_liureng_board,
     build_liureng_runyear,
+    build_year_fate,
 )
-from fatebridge.core.metaphysics.liureng_emptiness import apply_year_fate_emptiness
-from fatebridge.core.metaphysics.liureng_god_yin import add_year_fate_membership
-from fatebridge.core.metaphysics.liureng_year_fate import build_year_fate
 from fatebridge.core.metaphysics.ren_calendar import (
+    MonthGeneralMode,
     require_ren_calendar,
     resolve_runyear_birth_clock,
     resolve_runyear_birth_zone,
 )
+from fatebridge.core.metaphysics.ren_diurnal import DiurnalMode
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
 from fatebridge.core.metaphysics.seed import (
     _analysis_context_payload,
     build_analysis_seed,
 )
-from fatebridge.core.metaphysics.taiyi import build_taiyi_board
-from fatebridge.core.metaphysics.taiyi_clock import civil_clock_resolution
-from fatebridge.core.metaphysics.taiyi_shiji import TaiyiShijiProfile
+from fatebridge.core.metaphysics.taiyi import (
+    DEFAULT_TABLE_POLICY,
+    TaiyiDayProfile,
+    TaiyiShijiProfile,
+    TaiyiTablePolicy,
+    build_taiyi_board,
+    civil_clock_resolution,
+)
+from fatebridge.core.qimen import build_qimen_with_options
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.civil_clock import format_utc_offset
 from fatebridge.utils.civil_time import utc_calendar, utc_ordering_key
@@ -55,10 +61,15 @@ def calculate_liureng_gods(
     analysis_timezone: str | None = None,
     analysis_utc_offset: str | None = None,
     analysis_longitude: float | None = None,
+    analysis_latitude: float | None = None,
     gender: str = "未知",
     use_true_solar_time: bool = True,
     true_solar_explicit: bool = True,
     is_diurnal: bool | None = None,
+    diurnal_mode: DiurnalMode = "clock",
+    month_general_mode: MonthGeneralMode = "solar_term",
+    shehai_method: ShehaiMethod = "depth_first",
+    harm_include_terminal: bool = False,
     guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
 ) -> dict[str, Any]:
     seed = build_analysis_seed(
@@ -75,13 +86,20 @@ def calculate_liureng_gods(
         true_solar_explicit=true_solar_explicit,
     )
     seed.calendar_context["ren_calendar_policy"] = require_ren_calendar(
-        seed, analysis_utc_offset=analysis_utc_offset
+        seed,
+        month_general_mode=month_general_mode,
+        analysis_utc_offset=analysis_utc_offset,
     )
     liureng = build_liureng_board(
         seed,
         gender=gender,
         is_diurnal_override=is_diurnal,
         guiren_profile=guiren_profile,
+        shehai_method=shehai_method,
+        harm_include_terminal=harm_include_terminal,
+        diurnal_mode=diurnal_mode,
+        month_general_mode=month_general_mode,
+        latitude=analysis_latitude,
     )
     liureng["engine"] = "fatebridge-offline"
     return {
@@ -107,9 +125,14 @@ def calculate_liureng_runyear(
     analysis_timezone: str | None = None,
     analysis_utc_offset: str | None = None,
     analysis_longitude: float | None = None,
-    use_true_solar_time: bool = True,
-    true_solar_explicit: bool = True,
+    analysis_latitude: float | None = None,
+    use_true_solar_time: bool = False,
+    true_solar_explicit: bool = False,
     is_diurnal: bool | None = None,
+    diurnal_mode: DiurnalMode = "clock",
+    month_general_mode: MonthGeneralMode = "solar_term",
+    shehai_method: ShehaiMethod = "depth_first",
+    harm_include_terminal: bool = False,
     guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
 ) -> dict[str, Any]:
     # 大六壬行年以「分析时刻」起课，不依赖出生四柱；
@@ -156,13 +179,20 @@ def calculate_liureng_runyear(
     if not isinstance(birth_lunar_year, int):
         raise ValueError("行年需要出生日期的农历年")
     seed.calendar_context["ren_calendar_policy"] = require_ren_calendar(
-        seed, analysis_utc_offset=analysis_utc_offset
+        seed,
+        month_general_mode=month_general_mode,
+        analysis_utc_offset=analysis_utc_offset,
     )
     liureng = build_liureng_board(
         seed,
         gender=person.gender or "未知",
         is_diurnal_override=is_diurnal,
         guiren_profile=guiren_profile,
+        shehai_method=shehai_method,
+        harm_include_terminal=harm_include_terminal,
+        diurnal_mode=diurnal_mode,
+        month_general_mode=month_general_mode,
+        latitude=analysis_latitude,
     )
     liureng["engine"] = "fatebridge-offline"
     runyear = build_liureng_runyear(
@@ -279,7 +309,9 @@ def calculate_taiyi_analysis(
     hour_profile: str | None = None,
     month_profile: str | None = None,
     year_profile: str | None = None,
+    day_profile: TaiyiDayProfile | None = None,
     shiji_profile: TaiyiShijiProfile | None = None,
+    table_policy: TaiyiTablePolicy = DEFAULT_TABLE_POLICY,
     use_true_solar_time: bool = False,
     true_solar_explicit: bool = True,
 ) -> dict[str, Any]:
@@ -303,7 +335,9 @@ def calculate_taiyi_analysis(
         hour_profile=hour_profile,
         month_profile=month_profile,
         year_profile=year_profile,
+        day_profile=day_profile,
         shiji_profile=shiji_profile,
+        table_policy=table_policy,
     )
     if analysis_utc_offset is not None:
         resolution = civil_clock_resolution(seed, analysis_utc_offset)
@@ -331,6 +365,7 @@ def calculate_jinkou_analysis(
     analysis_timezone: str | None = None,
     analysis_utc_offset: str | None = None,
     analysis_longitude: float | None = None,
+    analysis_latitude: float | None = None,
     gender: str = "未知",
     di_fen: str | None = None,
     natal_branch: str | None = None,
@@ -339,8 +374,11 @@ def calculate_jinkou_analysis(
     use_true_solar_time: bool = True,
     true_solar_explicit: bool = True,
     is_diurnal: bool | None = None,
+    diurnal_mode: DiurnalMode = "clock",
+    month_general_mode: MonthGeneralMode = "solar_term",
     guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
 ) -> dict[str, Any]:
+    del guiren_profile
     natal = confirmed_natal_branch(birth_year_ganzhi, natal_branch, year_fate_age)
     seed = build_analysis_seed(
         analysis_year=analysis_year,
@@ -356,19 +394,13 @@ def calculate_jinkou_analysis(
         true_solar_explicit=true_solar_explicit,
     )
     seed.calendar_context["ren_calendar_policy"] = require_ren_calendar(
-        seed, analysis_utc_offset=analysis_utc_offset
-    )
-    local_liureng = build_liureng_board(
         seed,
-        gender=gender,
-        is_diurnal_override=is_diurnal,
-        guiren_profile=guiren_profile,
+        month_general_mode=month_general_mode,
+        analysis_utc_offset=analysis_utc_offset,
     )
-    local_liureng["engine"] = "fatebridge-offline"
-    liureng = local_liureng
     jinkou = build_jinkou_board(
         seed,
-        local_liureng,
+        None,
         gender=gender,
         di_fen=di_fen,
         natal_branch=natal,
@@ -378,23 +410,32 @@ def calculate_jinkou_analysis(
             else "explicit_birth_year_ganzhi" if birth_year_ganzhi is not None else None
         ),
         is_diurnal_override=is_diurnal,
+        diurnal_mode=diurnal_mode,
+        month_general_mode=month_general_mode,
+        latitude=analysis_latitude,
     )
     jinkou["natal_course"] = build_natal_course(
         seed,
-        local_liureng,
+        None,
         birth_year_ganzhi=birth_year_ganzhi,
         natal_branch=natal_branch,
         gender=gender,
         is_diurnal=is_diurnal,
+        diurnal_mode=diurnal_mode,
+        month_general_mode=month_general_mode,
+        latitude=analysis_latitude,
     )
     jinkou["year_fate"] = build_jinkou_year_fate(
         seed,
-        local_liureng,
+        None,
         birth_year_ganzhi=birth_year_ganzhi,
         age=year_fate_age,
         gender=gender,
         natal_branch=natal_branch,
         is_diurnal=is_diurnal,
+        diurnal_mode=diurnal_mode,
+        month_general_mode=month_general_mode,
+        latitude=analysis_latitude,
     )
     jinkou["rule_trace"].append(
         {
@@ -410,6 +451,5 @@ def calculate_jinkou_analysis(
         "analysis_context": _analysis_context_payload(seed),
         "four_pillars": create_pillar_dict(seed.pillars),
         "calendar_context": seed.calendar_context,
-        "liureng": liureng,
         "jinkou": jinkou,
     }

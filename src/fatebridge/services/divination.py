@@ -4,17 +4,18 @@ FateBridge divination services.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Literal
 
 from fatebridge.core.almanac import (
     LUNAR_SUPPORTED_SOLAR_END,
     LUNAR_SUPPORTED_SOLAR_START,
     build_calendar_context,
+    get_day_ganzhi,
 )
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.divination import build_meihua_interpretation, lookup_gua
-from fatebridge.core.heluo.heluo_months import (
+from fatebridge.core.heluo.judgment import (
     DEFAULT_MONTH_ASSIGNMENT,
     MonthAssignmentMethod,
 )
@@ -25,55 +26,79 @@ from fatebridge.core.local_techniques.sanshi import build_sanshiunited_result
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.local_techniques.suzhan import build_suzhan_result
 from fatebridge.core.local_techniques.tongshefa import build_tongshefa_result
-from fatebridge.core.meihua.meihua import build_meihua_evidence
-from fatebridge.core.meihua.meihua_calendar_precision import calendar_label_precision
-from fatebridge.core.meihua.meihua_clock import resolve_meihua_clock
-from fatebridge.core.meihua.meihua_clock_input import (
+from fatebridge.core.meihua.casting import (
+    MeihuaUnspecifiedClockError,
     apply_clock_input_notice,
     clock_components,
+    resolve_meihua_cast_datetime,
+    resolve_meihua_clock,
 )
-from fatebridge.core.meihua.meihua_clock_resolution import MeihuaUnspecifiedClockError
-from fatebridge.core.meihua.meihua_day_qi import apply_day_qi, civil_day_qi_context
-from fatebridge.core.meihua.meihua_external import apply_external_omens
-from fatebridge.core.meihua.meihua_motion import apply_motion_context
-from fatebridge.core.meihua.meihua_observation import apply_observation_context
-from fatebridge.core.meihua.meihua_qi_branches import (
-    apply_qi_branch_timing_references,
-)
-from fatebridge.core.meihua.meihua_qi_days import apply_qi_day_timing_references
-from fatebridge.core.meihua.meihua_reputation import apply_reputation_supplement
-from fatebridge.core.meihua.meihua_situational import apply_situational_responses
-from fatebridge.core.meihua.meihua_solar_reference import (
+from fatebridge.core.meihua.relations import build_meihua_evidence
+from fatebridge.core.meihua.texts import (
+    calendar_label_precision,
     solar_reference_notice,
     solar_term_date_reference,
 )
-from fatebridge.core.meihua.meihua_stage_emphasis import apply_stage_emphasis
-from fatebridge.core.meihua.meihua_timing import apply_postheaven_count_reference
-from fatebridge.core.meihua.meihua_trigram_symbols import (
+from fatebridge.core.meihua.topics import (
+    apply_day_qi,
+    apply_external_omens,
+    apply_motion_context,
+    apply_observation_context,
+    apply_postheaven_count_reference,
+    apply_qi_branch_timing_references,
+    apply_qi_day_timing_references,
+    apply_reputation_supplement,
+    apply_situational_responses,
+    apply_stage_emphasis,
     apply_trigram_relation_symbols,
 )
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
-from fatebridge.core.sukuyo.sukuyo import (
-    calendar_mansion,
+from fatebridge.core.sukuyo.calendar import _basis_parameters as basis_parameters
+from fatebridge.core.sukuyo.calendar import calendar_mansion, rulesets
+from fatebridge.core.sukuyo.sanjiu import (
+    DistanceRule,
     candidate_relation_analysis,
-    rulesets,
+    relation_between_su27,
 )
-from fatebridge.core.sukuyo.sukuyo_calendar_basis import basis_parameters
-from fatebridge.core.sukuyo.sukuyo_compatibility_text import (
-    candidate_compatibility_reading,
+from fatebridge.core.sukuyo.texts import (
     joint_reconstruction_contract,
+    palace_reference,
 )
-from fatebridge.core.sukuyo.sukuyo_dayan_advance import research_scope, scope_lines
-from fatebridge.core.sukuyo.sukuyo_historical_calendar import (
-    compatibility_reference_notes,
-)
-from fatebridge.core.sukuyo.sukuyo_padas import palace_reference
-from fatebridge.core.sukuyo.sukuyo_relations import relation_between_su27
 from fatebridge.core.zhouyi import classical_hexagram
 from fatebridge.utils.errors import ParameterError, calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
+
+
+def _civil_day_qi_context(moment: datetime, *, bazi_day_ganzhi: str) -> dict[str, Any]:
+    """Build civil midnight vs. 23:00 zi-hour day-ganzhi candidates for Meihua."""
+    civil = moment.date()
+    selected = get_day_ganzhi(civil.year, civil.month, civil.day)
+    zi_date = civil + timedelta(days=int(moment.hour == 23))
+    zi = get_day_ganzhi(zi_date.year, zi_date.month, zi_date.day)
+    candidates = [
+        {
+            "id": "local_midnight",
+            "date": civil.isoformat(),
+            "ganzhi": selected,
+            "day_branch": selected[1],
+        }
+    ]
+    if moment.hour == 23:
+        candidates.append(
+            {
+                "id": "zi_start",
+                "date": zi_date.isoformat(),
+                "ganzhi": zi,
+                "day_branch": zi[1],
+            }
+        )
+    return {
+        "selected_candidate_id": "local_midnight",
+        "candidates": candidates,
+        "bazi_day_ganzhi": bazi_day_ganzhi,
+    }
 
 
 @calculation_guard("梅花时卦分析")
@@ -87,6 +112,8 @@ def calculate_meihua_analysis(
     analysis_second: int | None = None,
     analysis_timezone: str | None = None,
     analysis_utc_offset: str | None = None,
+    analysis_longitude: float | None = None,
+    use_true_solar_time: bool = False,
     question: str | None = None,
     interpretation_topic: str = "general",
     weather_context: dict[str, Any] | None = None,
@@ -176,12 +203,18 @@ def calculate_meihua_analysis(
             "issues": [{"path": "analysis_date", "code": "unsupported_calendar_date"}],
         }
 
-    pillars = BaZiCalendar.get_four_pillars(
+    cast_datetime, solar_meta = resolve_meihua_cast_datetime(
         analysis_datetime,
+        timezone_name=timezone_name,
+        longitude=analysis_longitude,
+        use_true_solar_time=use_true_solar_time,
+    )
+    pillars = BaZiCalendar.get_four_pillars(
+        cast_datetime,
         timezone_name=timezone_name,
     )
     calendar_context = build_calendar_context(
-        analysis_datetime,
+        cast_datetime,
         timezone_name=timezone_name,
         pillars=pillars,
     )
@@ -211,9 +244,6 @@ def calculate_meihua_analysis(
     for key in (
         "base_hexagram",
         "changed_hexagram",
-        "mutual_hexagram",
-        "cuo_hexagram",
-        "zong_hexagram",
     ):
         meihua[key]["classical"] = classical_hexagram(meihua[key]["binary_code"])
     meihua.update(
@@ -225,6 +255,9 @@ def calculate_meihua_analysis(
             month_branch=calendar_context["bazi_month_boundary"]["branch"],
         )
     )
+    meihua["calendar_policy"]["true_solar_time_applied"] = solar_meta[
+        "true_solar_time_applied"
+    ]
     meihua["calendar_policy"]["civil_clock_resolution"] = clock_resolution
     meihua["rule_trace"].append(
         {
@@ -321,7 +354,7 @@ def calculate_meihua_analysis(
         meihua,
         interpretation,
         (
-            civil_day_qi_context(
+            _civil_day_qi_context(
                 analysis_datetime, bazi_day_ganzhi=str(lunar_calendar["day_ganzhi"])
             )
             if interpretation_topic != "weather"
@@ -589,6 +622,10 @@ def calculate_suzhan_analysis(
     textual_pada: int | None = None,
     calendar_basis: str = "chinese_hko_utc08",
     chart_requested: bool = False,
+    distance_rule: DistanceRule = "symmetric",
+    birth_year: int | None = None,
+    target_year: int | None = None,
+    urgent: bool = False,
 ) -> dict[str, Any]:
     """宿占 / 宿盘分析工具。"""
     return build_suzhan_result(
@@ -612,6 +649,10 @@ def calculate_suzhan_analysis(
         textual_pada=textual_pada,
         calendar_basis=calendar_basis,
         chart_requested=chart_requested,
+        distance_rule=distance_rule,
+        birth_year=birth_year,
+        target_year=target_year,
+        urgent=urgent,
     )
 
 
@@ -633,6 +674,7 @@ def calculate_sukuyo_compatibility(
     person1_textual_pada: int | None = None,
     person2_textual_pada: int | None = None,
     calendar_basis: str = "chinese_hko_utc08",
+    distance_rule: DistanceRule = "symmetric",
 ) -> dict[str, Any]:
     """按显式宿主历法月日定本命宿，依T1299三九法返回双向关系。"""
     contexts = [
@@ -673,52 +715,40 @@ def calculate_sukuyo_compatibility(
 
     calendar_label = basis_parameters(calendar_basis)[3]
     resolved = first is not None and second is not None
-    forward = relation_between_su27(first, second) if resolved else None
-    reverse = relation_between_su27(second, first) if resolved else None
-    candidate_analysis = candidate_relation_analysis(contexts[0], contexts[1])
+    forward = (
+        relation_between_su27(first, second, distance_rule=distance_rule)
+        if resolved
+        else None
+    )
+    reverse = (
+        relation_between_su27(second, first, distance_rule=distance_rule)
+        if resolved
+        else None
+    )
+    candidate_analysis = candidate_relation_analysis(
+        contexts[0], contexts[1], distance_rule=distance_rule
+    )
     if forward is not None and reverse is not None:
+        dist = f"（{forward['distance']}）" if forward.get("distance") else ""
         summary = (
-            f"{person1_name}本命宿{first}，{person2_name}本命宿{second}，配对类别{forward['pair']}。"
-            f"{person1_name}以自身为命数至{person2_name}为{forward['relation']}；"
-            f"反向为{reverse['relation']}。双方须分别解读，类别不是关系成败预测。"
+            f"{person1_name}（{first}）与{person2_name}（{second}）"
+            f"为{forward['pair']}{dist}：正{forward['relation']}、反{reverse['relation']}。"
         )
-        if any(c.get("calendar_candidates") for c in contexts):
-            summary += f"当地日期仍有多个{calendar_label}历日候选，但完整候选均得到同一本命宿；未确定出生时刻或唯一历日。"
+    elif any(c.get("calendar_candidates") for c in contexts):
+        summary = (
+            f"所选{calendar_label}历日存在候选，双向关系见candidate_relation_analysis。"
+        )
     else:
-        summary = (
-            f"出生当地日期对应多个可能{calendar_label}历日；已交付各日期的历法候选及双向条件关系，未补造出生时刻，也未据候选作确定相性。"
-            if any(c.get("calendar_candidates") for c in contexts)
-            else "所选历法档案的闰月政策、小月半日或规则次序尚未确定；已交付双方农历及已列候选的条件组合，未据候选作确定相性。"
-        )
-    if (
-        not resolved
-        or any(c.get("calendar_candidates") for c in contexts)
-        or candidate_analysis.get("shared_reconstruction_analysis")
-        or calendar_profile == "hinoo_t1299_host27"
-        or any(c.get("printed_edition_reference") for c in contexts)
-    ):
-        if forward is not None and reverse is not None:
-            summary += f"前向含义：{forward['meaning']}反向含义：{reverse['meaning']}"
-        summary += candidate_compatibility_reading(
-            contexts,
-            [person1_name, person2_name],
-            candidate_analysis,
-            [p["palace_reference"] for p in people],
-        )
-    if calendar_basis == "japanese_naoj_historical_utc09":
-        summary += compatibility_reference_notes(contexts, [person1_name, person2_name])
+        summary = "闰月/半日或规则次序未定，候选关系见candidate_relation_analysis。"
 
-    fixed_research_scope = research_scope()
-    # Only the first item is the full-table overview. Later items describe a
-    # selected single month and cannot be attached to two different people.
-    summary += scope_lines(fixed_research_scope, None)[0]
-    unknown_rows = "、".join(
-        str(row) for row in fixed_research_scope["unknown_direction_rows"]
-    )
-    summary += (
-        f"未知行号为{unknown_rows}，作者横杠未补成不进；"
-        "这份全表参考与双方本次历日分别交付，未覆盖任何一方的宿主、配宿或原典半日。"
-    )
+    contract: dict[str, Any] = {
+        "calendar_basis": calendar_basis,
+        "distance_rule": distance_rule,
+    }
+    if candidate_analysis.get("shared_reconstruction_analysis"):
+        contract["joint_reconstruction"] = joint_reconstruction_contract(
+            candidate_analysis
+        )
     result: dict[str, Any] = {
         "analysis_type": "宿曜双人相性 / T1299三九法",
         "status": "computed" if resolved else "partial",
@@ -729,20 +759,10 @@ def calculate_sukuyo_compatibility(
         "person1_to_person2": forward,
         "person2_to_person1": reverse,
         "candidate_relation_analysis": candidate_analysis,
-        "fixed_host_research_scope": fixed_research_scope,
         "rulesets": rulesets(calendar_profile, calendar_basis),
-        "interpretation_contract": {
-            "basis": "仅引用本次calendar档案、完整候选和双向relation；不能把sequence_group解释为近中远距离，也不把原典半日自动当民用12:00。",
-            "pair_labels": "六类配对标签只归类有向结果，不是原典六级吉凶或成功概率。",
-            "palace_reference": "双方宫名仅按历日宿名和显式textual_pada查原典分足表；未定实际出生足位或本命宫，也未据此合成宫位相性或分数。",
-            "research_reference": "fixed_host_research_scope是具名研究全表与固定NAOJ月首方向比较，不是双方本月选行、历日算法或关系预测；未知及不利行完整保留。",
-        },
+        "interpretation_contract": contract,
         "summary": summary,
     }
-    if candidate_analysis.get("shared_reconstruction_analysis"):
-        result["interpretation_contract"]["joint_reconstruction"] = (
-            joint_reconstruction_contract(candidate_analysis)
-        )
     if calendar_basis != "chinese_hko_utc08":
         result["calendar_basis"] = calendar_basis
     return result
@@ -797,6 +817,9 @@ def calculate_sanshiunited_analysis(
     liureng_is_diurnal: bool | None = None,
     liureng_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
     use_true_solar_time: bool = True,
+    corner_lodging: Literal[
+        "unassessed", "first_branch", "second_branch", "both"
+    ] = "both",
 ) -> dict[str, Any]:
     """三式合一本地聚合工具。"""
     return build_sanshiunited_result(
@@ -811,4 +834,5 @@ def calculate_sanshiunited_analysis(
         liureng_is_diurnal=liureng_is_diurnal,
         liureng_guiren_profile=liureng_guiren_profile,
         use_true_solar_time=use_true_solar_time,
+        corner_lodging=corner_lodging,
     )

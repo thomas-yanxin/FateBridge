@@ -1,10 +1,10 @@
 """Projection-compatible contracts for the actual Heluo solar dependencies."""
 
-from typing import Annotated, Literal
+from typing import Literal
 
 from pydantic import model_validator
 
-from fatebridge.core.contracts.output_base import FULL_FACT, PartialOutput
+from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_civil_time import (
     CivilPointEvidence,
     CivilPointLabelEvidence,
@@ -80,11 +80,9 @@ class HeluoSolarTermEvidence(PartialOutput):
     tuyong_policy: str | None = None
     tuyong_start_utc: str | None = None
     tuyong_end_utc: str | None = None
-    comparison_policy: Annotated[
-        Literal["retained_nominal_civil_point_v1"] | None, FULL_FACT
-    ] = None
-    tuyong_start_point: Annotated[CivilPointEvidence | None, FULL_FACT] = None
-    tuyong_end_point: Annotated[CivilPointEvidence | None, FULL_FACT] = None
+    comparison_policy: Literal["retained_nominal_civil_point_v1"] | None = None
+    tuyong_start_point: CivilPointEvidence | None = None
+    tuyong_end_point: CivilPointEvidence | None = None
     boundary_context: HeluoSolarContext | None = None
 
     @model_validator(mode="after")

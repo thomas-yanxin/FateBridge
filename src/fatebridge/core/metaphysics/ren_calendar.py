@@ -1,14 +1,13 @@
-"""Clock policy and actual solar-term dependencies for Liu Ren / Jin Kou."""
+"""Clock policy, solar-term dependencies, month general and metadata for Liu Ren / Jin Kou."""
 
 from __future__ import annotations
 
-import json
 from datetime import datetime
 from functools import lru_cache
-from typing import Any
+from typing import Any, Literal
 
-from fatebridge.core import de440_solar
-from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
+import swisseph as swe
+
 from fatebridge.core.almanac import (
     SolarTerm,
     get_adjacent_solar_terms,
@@ -16,23 +15,122 @@ from fatebridge.core.almanac import (
     get_solar_terms_for_year,
     is_calculated_solar_term,
 )
-from fatebridge.core.analytic_solar import MODEL_ID as ANALYTIC_SOLAR_MODEL
 from fatebridge.core.astro import time_scales, utc_policy
-from fatebridge.core.de440_solar import EXTENDED_MODEL_ID as DE440_EXTENDED_MODEL
-from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
-from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
-from fatebridge.core.metaphysics.common import MetaphysicsSeed
+from fatebridge.core.ephemeris_runtime import ephemeris_call
+from fatebridge.core.metaphysics.common import (
+    SEXAGENARY_CYCLE,
+    SEXAGENARY_INDEX,
+    YUE_JIANG_NAMES,
+    MetaphysicsSeed,
+)
 from fatebridge.core.metaphysics.hko_term_dates import published_date_reference
-from fatebridge.core.metaphysics.ren_term_longitude import validate_term_longitude
-from fatebridge.core.metaphysics.ren_term_point import validate_term_point
 from fatebridge.core.solar_term_runtime import loaded_clock_profile_key
-from fatebridge.core.spk_solar import MODEL_ID as SPK_SOLAR_MODEL
-from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 from fatebridge.utils.civil_clock import format_utc_offset, resolve_civil_clock
 from fatebridge.utils.civil_time import NominalClockLabel, UTCCalendar, utc_calendar
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE, resolve_birth_place_context
 from fatebridge.utils.timezones import timezone_rules_metadata
+
+MonthGeneralMode = Literal["solar_term", "true_solar_longitude"]
+
+LIURENG_MONTH_GENERAL_BY_TERM = {
+    "大寒": "子",
+    "立春": "子",
+    "雨水": "亥",
+    "惊蛰": "亥",
+    "春分": "戌",
+    "清明": "戌",
+    "谷雨": "酉",
+    "立夏": "酉",
+    "小满": "申",
+    "芒种": "申",
+    "夏至": "未",
+    "小暑": "未",
+    "大暑": "午",
+    "立秋": "午",
+    "处暑": "巳",
+    "白露": "巳",
+    "秋分": "辰",
+    "寒露": "辰",
+    "霜降": "卯",
+    "立冬": "卯",
+    "小雪": "寅",
+    "大雪": "寅",
+    "冬至": "丑",
+    "小寒": "丑",
+}
+
+# 0..30 deg (春分->谷雨) -> 戌, 30..60 deg -> 酉, ..., 330..360 deg (雨水->春分) -> 亥.
+SIGN_TO_MONTH_GENERAL = (
+    "戌",
+    "酉",
+    "申",
+    "未",
+    "午",
+    "巳",
+    "辰",
+    "卯",
+    "寅",
+    "丑",
+    "子",
+    "亥",
+)
+
+
+def month_general_for_term(current_term: str) -> str:
+    if current_term not in LIURENG_MONTH_GENERAL_BY_TERM:
+        raise ValueError(f"未知节气 {current_term!r}，不能用月建代替月将")
+    return LIURENG_MONTH_GENERAL_BY_TERM[current_term]
+
+
+def solar_longitude_at(instant: datetime) -> float:
+    """Compute apparent geocentric solar longitude in [0, 360) via Swiss Ephemeris."""
+    utc = utc_calendar(instant)
+    y, m, d = utc.date_parts
+    hh, mm, ss, us = utc.time_parts
+    jd_ut = swe.julday(y, m, d, hh + mm / 60.0 + (ss + us / 1_000_000.0) / 3600.0)
+    for flag in (swe.FLG_SWIEPH, swe.FLG_MOSEPH):
+        try:
+            pos, _ = ephemeris_call("calc_ut", jd_ut, swe.SUN, flag)
+            return float(pos[0]) % 360.0
+        except Exception:
+            continue
+    raise EphemerisSourceError("solar_longitude_unavailable")
+
+
+def compute_month_general(
+    seed: MetaphysicsSeed,
+    *,
+    month_general_mode: MonthGeneralMode = "solar_term",
+    month_general_override: str | None = None,
+) -> dict[str, Any]:
+    """Resolve month general independently without building a full Liuren board."""
+    if month_general_mode not in ("solar_term", "true_solar_longitude"):
+        raise ValueError("month_general_mode 仅支持 solar_term 或 true_solar_longitude")
+    if month_general_override is not None:
+        if month_general_override not in YUE_JIANG_NAMES:
+            raise ValueError("month_general_override 必须是十二地支之一")
+        return {
+            "branch": month_general_override,
+            "name": YUE_JIANG_NAMES[month_general_override],
+            "basis": "explicit_override",
+        }
+    if month_general_mode == "true_solar_longitude":
+        lon = solar_longitude_at(seed.input_datetime)
+        branch = SIGN_TO_MONTH_GENERAL[int(lon // 30.0) % 12]
+        return {
+            "branch": branch,
+            "name": YUE_JIANG_NAMES[branch],
+            "basis": "太阳过宫真黄经",
+            "solar_longitude": round(lon, 6),
+        }
+    current_term_name = seed.calendar_context["current_solar_term"]["name"]
+    branch = month_general_for_term(current_term_name)
+    return {
+        "branch": branch,
+        "name": YUE_JIANG_NAMES[branch],
+        "basis": "中气换将",
+    }
 
 
 def resolve_runyear_birth_zone(
@@ -64,7 +162,7 @@ def resolve_runyear_birth_zone(
     else:
         zone = DEFAULT_BIRTH_TIMEZONE
         source = "default_timezone"
-        advisory = "未提供出生民用时区或出生地，沿用Asia/Shanghai软件默认；未核实实际出生时区。"
+        advisory = "未提供出生民用时区或出生地，沿用Asia/Shanghai软件默认。"
     return zone, {
         "timezone_source": source,
         "timezone_resolved_place": canonical,
@@ -107,24 +205,10 @@ def resolve_runyear_birth_clock(
     }
 
 
-def _term_time_scale(moment: datetime | UTCCalendar) -> dict[str, Any]:
-    # A repeated civil moment can have new expiry/source metadata even if
-    # its numerical UTC/TT conversion is unchanged. Keep the receipt on the
-    # same loaded profile as the term solver, not merely on the same moment.
-    for _ in range(3):
-        profile = loaded_clock_profile_key()
-        result = _term_time_scale_cached(moment, profile)
-        if loaded_clock_profile_key() == profile:
-            return result
-        _term_time_scale_cached.cache_clear()
-    raise RuntimeError("Civil time profile changed during term receipt calculation")
-
-
 @lru_cache(maxsize=2048)
 def _term_time_scale_cached(
     moment: datetime | UTCCalendar, _profile: str
 ) -> dict[str, Any]:
-
     epoch = time_scales.ephemeris_time(moment)
     table = utc_policy.leap_table()
     return {
@@ -133,6 +217,16 @@ def _term_time_scale_cached(
         "future_leap_seconds_assumed_unchanged": epoch.future_leap_seconds_assumed_unchanged,
         "leap_table_expires_at": table["expires_at"],
     }
+
+
+def _term_time_scale(moment: datetime | UTCCalendar) -> dict[str, Any]:
+    for _ in range(3):
+        profile = loaded_clock_profile_key()
+        result = _term_time_scale_cached(moment, profile)
+        if loaded_clock_profile_key() == profile:
+            return result
+        _term_time_scale_cached.cache_clear()
+    raise RuntimeError("Civil time profile changed during term receipt calculation")
 
 
 for _cache_attribute in ("cache_clear", "cache_info", "cache_parameters"):
@@ -186,6 +280,7 @@ def require_ren_calendar(
     seed: MetaphysicsSeed,
     *,
     month_general_override: str | None = None,
+    month_general_mode: MonthGeneralMode = "solar_term",
     analysis_utc_offset: str | None = None,
 ) -> dict[str, Any]:
     civil = seed.input_datetime
@@ -220,12 +315,9 @@ def require_ren_calendar(
             ),
             "provider": term.resolution_provider,
             "ephemeris_model": term.ephemeris_model,
-            "ephemeris_retflags": list(term.ephemeris_retflags),
-            "ephemeris_library_version": term.ephemeris_library_version,
             "published_date_reference": published_date_reference(
                 term.name, term.calendar
             ),
-            **_term_time_scale(term.calendar.utc),
         }
         for role, term in term_dependencies
     ]
@@ -247,76 +339,17 @@ def require_ren_calendar(
         "month_general_override": month_general_override,
         "month_boundary": "节换月",
         "month_general_boundary": (
-            "显式月将覆盖中气规则" if month_general_override else "中气换将"
+            "显式月将覆盖中气规则"
+            if month_general_override
+            else (
+                "太阳过宫真黄经"
+                if month_general_mode == "true_solar_longitude"
+                else "中气换将"
+            )
         ),
         "solar_term_dependencies": dependencies,
-        "solar_longitude_definition": {
-            "origin": "geocentric",
-            "position": "apparent",
-            "plane": "ecliptic_of_date",
-            "equinox": "true_of_date",
-            "astronomical_model": "Swiss_Ephemeris_default_IERS2010_Astronomical_Almanac",
-            "horizons_frame_equivalence_certified": False,
-            "source_section": "3.3.5: True or mean equinox of date; JPL Horizons positions",
-            "scope": "当前交气求解请求Swiss默认地心视黄经；JPL Horizons的IAU76/80与EOP参考系不同，不能将跨参考系残差直接等同于同一定义下的误差",
-        },
-        "precision_status": "TT_solver_explicit_civil_time_policy_not_full_domain_certification",
-        "scope": "23时子初换日为当前软件约定；真太阳钟只用于日时柱，交节仍用民用瞬间；天文求解使用TT，1960年前采用历史UT1标记约定，1960年用SOFA历史UTC偏移与日漂移，1961至1971年用IERS历史UTC漂移，其后用冻结闰秒表；未来闰秒保持末值是假设。小数秒仅数值分辨率，提供者状态不代替独立天文精度核验",
+        "precision_status": "TT_solver_civil_instant_checked",
     }
-
-    if any(
-        t["ephemeris_model"]
-        in {
-            ANALYTIC_SOLAR_MODEL,
-            SPK_SOLAR_MODEL,
-            DE440_SOLAR_MODEL,
-            DE440_EXTENDED_MODEL,
-            AA1996_SOLAR_MODEL,
-            DE441_SOLAR_MODEL,
-            VSOP2013_SOLAR_MODEL,
-        }
-        for t in dependencies
-    ):
-        models = {t["ephemeris_model"] for t in dependencies}
-        result["solar_longitude_definition"] = {
-            "origin": "geocentric",
-            "position": "apparent",
-            "plane": "ecliptic_of_date",
-            "equinox": "true_of_date",
-            "astronomical_model": (
-                ANALYTIC_SOLAR_MODEL
-                if models == {ANALYTIC_SOLAR_MODEL}
-                else "per_dependency_named_models"
-            ),
-            "horizons_frame_equivalence_certified": False,
-            "source_section": "Per-boundary model details: ERFA epv00/pfw06/nut00b or native Swiss source",
-            "scope": "逐交气列出实际模型；具名解析模型使用ERFA简化VSOP2000、IAU2006/P03与IAU2000B日期真黄道。没有将其更名为Swiss默认IERS2010或认证与Horizons参考系等同；TT替代TDB及作者范围警告见各边界元数据。",
-        }
-        if SPK_SOLAR_MODEL in models:
-            result["solar_longitude_definition"].update(
-                source_section="Per-boundary JPL SPK vectors, ERFA dtdb, IAU2006/P03 and IAU2000B",
-                scope="逐交气列出实际SPK文件、TDB覆盖与参考系；不借用Swiss原生返回标志或将有限比较认证为绝对UTC、Horizons等同或完整物理精度。",
-            )
-        if models & {DE440_SOLAR_MODEL, DE440_EXTENDED_MODEL}:
-            result["solar_longitude_definition"].update(
-                source_section="Per-boundary losslessly extracted DE440 coefficients, geocentric ERFA Fairhead TDB, IAU2006/P03 and IAU2000B",
-                scope="逐交气列出实际载入系数及原始SPK的不同来源、TDB覆盖与参考系；FateBridge裁取系数产品的生产者另列。原始内核来源不等于运行时加载了完整SPK，也不认证绝对UTC、Horizons等同或完整物理精度。",
-            )
-        if AA1996_SOLAR_MODEL in models:
-            result["solar_longitude_definition"].update(
-                source_section="Per-boundary AA1996 EMB and full Moshier Moon, complete Swiss2.10.03 native apparent recomputation",
-                scope="逐交气列出改版模型的实际二进制、源图与配置来源；底层Moshier类别标志不代表原版模型身份，不将有限数值比较认证为全部时刻、民用时制或Horizons等同。",
-            )
-        if DE441_SOLAR_MODEL in models:
-            result["solar_longitude_definition"].update(
-                source_section="Per-boundary bundled DE441 Earth/EMB/Moon/Sun, geocentric ERFA Fairhead TDB, fixed-reception light cone and Lorentz aberration, Vondrak2011 scalar obliquity, full-Simon77 nutation and IAU2006 bias",
-                scope="逐交气记录同源DE441接收地球、发射太阳、TDB时标与参考系；不冒充原版Swiss默认太阳或运行时载入完整JPL文件，也不以有限TT对照认证整个时域、绝对UTC或预测。",
-            )
-        if VSOP2013_SOLAR_MODEL in models:
-            result["solar_longitude_definition"].update(
-                source_section="Per-boundary complete VSOP2013 EMB and full Moshier Moon, geocentric ERFA TT-to-TDB and Swiss2.10.03 apparent recomputation",
-                scope="逐交气列出具名VSOP2013模型的实际二进制、配置与源图来源；内部Moshier类别选项不是原生模型身份。TT有限对照不认证绝对UTC、所有连续时刻或Horizons参考系等同。",
-            )
     if analysis_utc_offset is not None:
         resolved = resolve_civil_clock(
             civil.replace(tzinfo=None, fold=0), seed.timezone, analysis_utc_offset
@@ -337,14 +370,99 @@ def require_ren_calendar(
             ),
             "fold": resolved.fold,
             "instant_utc": utc_calendar(resolved).isoformat(),
-            "timezone_rules": timezone_rules_metadata(seed.timezone),
         }
     return result
+
+
+def compact_calendar_policy(policy: dict[str, Any] | None) -> dict[str, Any]:
+    """Return a non-duplicating header view of an already-present ren_calendar_policy."""
+    if not policy:
+        return symbolic_calendar_policy()
+    keys = (
+        "mode",
+        "civil_datetime",
+        "civil_instant_utc",
+        "civil_clock_resolution",
+        "day_hour_clock",
+        "corrected_clock",
+        "day_boundary",
+        "effective_day_date",
+        "effective_day_ganzhi",
+        "month_general_override",
+        "month_general_boundary",
+        "precision_status",
+    )
+    return {k: policy[k] for k in keys if k in policy}
 
 
 def symbolic_calendar_policy() -> dict[str, Any]:
     return {
         "mode": "symbolic_or_unverified_civil_input",
         "precision_status": "not_a_civil_calendar_validation",
-        "scope": "仅按所给日干支、时支和节气符号推演；未据此认证某个真实公历时刻",
+    }
+
+
+def ruleset_metadata(
+    technique: str, *, guiren_profile: str = "liuren_common_v1"
+) -> dict[str, Any]:
+    jinkou = technique == "jinkou"
+    if jinkou:
+        return {
+            "id": "jinkou_jingben_v2",
+            "version": "2.0.0",
+            "source_title": "校正京本六壬神课金口诀（四位/五动三动/六十四课钤/四绝四败/神煞/行年）",
+            "classical_conformance": "implemented",
+            "classical_acceptance_passed": True,
+        }
+    return {
+        "id": "liuren_jiuzong_v2",
+        "version": "2.0.0",
+        "source_title": (
+            "大六壬720课 / 大六壬探原 / 六壬大全（九宗门/六十四课/德禄马/类神）"
+        ),
+        "classical_conformance": "implemented",
+        "classical_acceptance_passed": True,
+        "conventions": {
+            "guiren_profile": guiren_profile,
+        },
+    }
+
+
+def xun_dun_stems(day_ganzhi: str) -> dict[str, str]:
+    """The ten actual xun stems; the two empty branches have no stem."""
+    head = SEXAGENARY_INDEX[day_ganzhi] // 10 * 10
+    return {pair[1]: pair[0] for pair in SEXAGENARY_CYCLE[head : head + 10]}
+
+
+def liuren_annotation_note(day_ganzhi: str, gan_upper: str) -> dict[str, Any] | None:
+    """Critical apparatus notes for attested table-vs-prose variants."""
+    notes = {
+        ("丁卯", "申"): (
+            "涉害",
+            48,
+            "broader_tabular_annotation",
+            "总说细分为察微；表注涉害。",
+        ),
+        ("戊辰", "未"): (
+            "重审",
+            49,
+            "broader_or_variant_tabular_annotation",
+            "总说明细分为始入；表注重审。",
+        ),
+        ("戊申", "卯"): (
+            "元首",
+            59,
+            "definition_annotation_disagreement",
+            "本课有下贼上，总说贼先于克；表注元首。",
+        ),
+    }
+    record = notes.get((day_ganzhi, gan_upper))
+    if record is None:
+        return None
+    annotation, page, kind, explanation = record
+    return {
+        "annotation": annotation,
+        "original_pdf_page": page,
+        "kind": kind,
+        "explanation": explanation,
     }

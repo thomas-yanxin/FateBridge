@@ -59,6 +59,14 @@ class LineTransformation(BranchRelations):
 class LineEvidence(BranchRelations):
     position: int | None = None
     branch: str | None = None
+    month_strength: str | None = None
+    day_growth_stage: str | None = None
+    shensha: list[str] | None = None
+    is_month_broken: bool | None = None
+    is_void_clashed: bool | None = None
+    is_dark_moving: bool | None = None
+    is_day_broken: bool | None = None
+    day_clash_status: str | None = None
     transformation: LineTransformation | None = None
 
 
@@ -69,8 +77,24 @@ class HiddenSpirit(PartialOutput):
     liuqin: str | None = None
     flying_branch: str | None = None
     flying_liuqin: str | None = None
+    present_in_changed: bool | None = None
+    changed_positions: list[int] | None = None
     calendar_relations: BranchRelations | None = None
     flying_to_hidden_relation: str | None = None
+
+
+class ShenshaEntry(PartialOutput):
+    branches: list[str] | None = None
+    positions: list[int] | None = None
+
+
+class MovingFocusGuidance(PartialOutput):
+    moving_count: int | None = None
+    moving_positions: list[int] | None = None
+    static_positions: list[int] | None = None
+    mode: str | None = None
+    primary_focus_positions: list[int] | None = None
+    rule: str | None = None
 
 
 class MonthModelBoundary(PartialOutput):
@@ -142,6 +166,11 @@ class LiuyaoEvidence(PartialOutput):
     fanfu: FanfuEvidence | None = None
     hidden_spirits: list[HiddenSpirit] | None = None
     hidden_policy: str | None = None
+    shensha: dict[str, ShenshaEntry] | None = None
+    three_harmony: list[dict[str, OpenJsonValue]] | None = None
+    moving_focus_guidance: MovingFocusGuidance | None = None
+    focus: dict[str, OpenJsonValue] | None = None
+    timing_candidates: dict[str, OpenJsonValue] | None = None
     rule_trace: list[DivinationTrace] | None = None
     sources: list[str] | None = None
     source_revisions: dict[str, DivinationSource] | None = None

@@ -8,9 +8,12 @@ from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_jinkou_interactions import (
     JinkouInteractionCondition,
 )
-from fatebridge.core.metaphysics.jinkou_definitions import chapter_provenance
 
 PatternId = Literal["P52", "P53", "P56", "P57", "P58", "P59"]
+
+
+def chapter_provenance() -> dict[str, str]:
+    return {"id": "waseda_book6"}
 
 
 class ChapterHeading(PartialOutput):
@@ -133,19 +136,18 @@ class DingRoute(PartialOutput):
 
 
 class JinkouDefinitionEvidence(PartialOutput):
-    ruleset_id: Literal["jinkou_unresolved_definition_evidence_v1"] | None = None
+    ruleset_id: (
+        Literal[
+            "jinkou_definition_evidence_v2", "jinkou_unresolved_definition_evidence_v1"
+        ]
+        | None
+    ) = None
     day_stem: str | None = None
     hour_branch: str | None = None
     selected_is_diurnal: StrictBool | None = None
-    witnesses: list[DefinitionWitness] | None = Field(
-        default=None, min_length=2, max_length=2
-    )
-    entries: list[UnresolvedDefinition] | None = Field(
-        default=None, min_length=6, max_length=6
-    )
-    cross_generation_hypotheses: list[GenerationHypothesis] | None = Field(
-        default=None, min_length=6, max_length=6
-    )
+    witnesses: list[DefinitionWitness] | None = None
+    entries: list[UnresolvedDefinition] | None = None
+    cross_generation_hypotheses: list[GenerationHypothesis] | None = None
     day_night_candidates: list[DayNightCandidate] | None = Field(
         default=None, min_length=2, max_length=2
     )
@@ -157,7 +159,7 @@ class JinkouDefinitionEvidence(PartialOutput):
     )
     observed_twilight_transition: None = None
     front_back_predicate: None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @field_validator("entries")

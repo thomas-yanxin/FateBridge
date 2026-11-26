@@ -12,7 +12,7 @@ from pydantic import (
     model_validator,
 )
 
-from fatebridge.core.heluo.heluo_months import (
+from fatebridge.core.heluo.judgment import (
     DEFAULT_MONTH_ASSIGNMENT,
     MonthAssignmentMethod,
 )
@@ -35,8 +35,9 @@ from fatebridge.core.requests.base import (
 from fatebridge.core.requests.calendar import LocalLocationFields
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
 from fatebridge.core.requests.sanshi import GuirenProfile, QimenOptions, TaiyiOptions
+from fatebridge.core.sukuyo.sanjiu import DistanceRule
 from fatebridge.core.sukuyo.sukuyo_calendar_basis import SukuyoCalendarBasis
-from fatebridge.core.sukuyo.sukuyo_lower import (
+from fatebridge.core.sukuyo.texts import (
     SukuyoActivityDetail,
     validate_activity_details,
 )
@@ -73,6 +74,14 @@ class MeihuaAnalysisRequest(MeihuaInterpretationOptions):
     analysis_utc_offset: str | None = Field(
         default=None,
         description="Optional explicit UTC offset, ±HH:MM or ±HH:MM:SS. Verified jointly with analysis_timezone at the supplied local clock; selects a fold without replacing the named calendar zone. Cannot rescue a DST gap or skipped date. Omit to keep rejecting ambiguous clocks. An offset cannot certify an unspecified regional time type; a confirmed fixed offset belongs in analysis_timezone.",
+    )
+    analysis_longitude: float | None = Field(
+        default=None,
+        description="Optional longitude in decimal degrees; required when use_true_solar_time is True.",
+    )
+    use_true_solar_time: bool = Field(
+        default=False,
+        description="Apply true solar time correction before resolving the lunar cast hour (default False).",
     )
     question: str | None = Field(
         default=None, description="Question or topic for the divination context"
@@ -323,6 +332,10 @@ class SuZhanRequest(_LocalChartSystemFields):
     doubing_su28: bool = Field(
         default=True,
         description="是否按当日视赤经和已声明现代距星标注七曜的不等宽天文宿位；历日本命宿单独计算",
+    )
+    distance_rule: DistanceRule = Field(
+        default="symmetric",
+        description="三九法近/中/远距离规则：symmetric（对称折半，默认）/cyclic（循环序）/none（不分级）",
     )
 
     @property
@@ -602,4 +615,10 @@ class SanShiUnitedRequest(LocalLocationFields):
     use_true_solar_time: bool = Field(
         default=True,
         description="Enable local true solar time correction before sanshi aggregation (default on — 式占 keys off the apparent-solar 时辰)",
+    )
+    corner_lodging: Literal["unassessed", "first_branch", "second_branch", "both"] = (
+        Field(
+            default="both",
+            description="四维及中宫对应六壬地支寄支方式：both（默认并列同宫两支）、first_branch、second_branch 或 unassessed。",
+        )
     )
