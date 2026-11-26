@@ -88,10 +88,10 @@ async def test_mcp_case_map_covers_all_discovered_capabilities() -> None:
 def test_renamed_tool_accepts_only_the_public_name_on_all_surfaces(
     rest: TestClient, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    new_path = "/api/divination/gua/meanings"
-    old_path = "/api/cn/gua/meiyi"
-    new_name = "gua_meanings"
-    old_name = "gua_meiyi"
+    new_path = "/api/divination/gua"
+    old_path = "/api/divination/gua/meanings"
+    new_name = "gua_lookup"
+    old_name = "gua_meanings"
     routes_by_path = {
         r.path: r
         for r in api_module.app.routes
@@ -99,7 +99,7 @@ def test_renamed_tool_accepts_only_the_public_name_on_all_surfaces(
     }
     assert routes_by_path[new_path].operation_id == new_name
     assert old_path not in routes_by_path
-    args = {"name": ["111111"]}
+    args = {"queries": ["111111"]}
     http = rest.post(new_path, json=args)
     assert http.status_code == 200
     assert rest.post(old_path, json=args).status_code == 404
@@ -128,13 +128,13 @@ def test_renamed_tool_accepts_only_the_public_name_on_all_surfaces(
                 results.append(result.structured_content)
         return results
 
-    assert run([old_name, "--name", "111111"]) == 2
+    assert run([old_name, "--queries", "111111"]) == 2
     assert json.loads(capsys.readouterr().out)["error_code"] == "usage_error"
     assert run(["discover", old_name]) == 2
     err = json.loads(capsys.readouterr().out)
     assert err["error_code"] == "validation_error"
     assert err["issues"][0]["code"] == "unknown_tool"
-    assert run([new_name, "--name", "111111", "--detail", "audit"]) == 0
+    assert run([new_name, "--queries", "111111", "--detail", "audit"]) == 0
     results = [
         http.json(),
         json.loads(capsys.readouterr().out),
@@ -293,7 +293,7 @@ async def test_all_published_schemas_keep_valid_shared_references() -> None:
     representatives = (
         "bazi_birth_chart",
         "astrology_chart",
-        "gua_meanings",
+        "gua_lookup",
         "fengshui_xuankong_house_chart",
         "ziwei_birth_chart",
     )
@@ -333,7 +333,7 @@ def test_rest_reserved_field_guard_rejects_clashing_model() -> None:
     class ConflictingRequest(BaseModel):
         fields: str = ""
 
-    catalog_spec = next(spec for spec in CATALOG if spec.name == "gua_meanings")
+    catalog_spec = next(spec for spec in CATALOG if spec.name == "gua_lookup")
     spec = replace(catalog_spec, request_model=ConflictingRequest)
 
     app = FastAPI()

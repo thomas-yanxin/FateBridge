@@ -145,8 +145,10 @@ def test_all_published_schemas_preserve_object_projection_compatibility(
     rest: TestClient, capsys: pytest.CaptureFixture[str]
 ) -> None:
     manifest = {
-        tool["tool"]: tool["output_schema"]
-        for tool in rest.get("/api/tools", params={"detail": "full"}).json()["tools"]
+        spec.name: rest.get(
+            "/api/tools", params={"tool": spec.name, "detail": "full"}
+        ).json()["tools"][0]["output_schema"]
+        for spec in CATALOG
     }
     openapi = rest.get("/openapi.json").json()
 

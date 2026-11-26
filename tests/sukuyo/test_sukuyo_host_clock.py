@@ -96,7 +96,7 @@ def test_historical_half_candidates_and_directed_relations_across_three_surfaces
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     if tool_name == "suzhan":
-        payload = {"date": "0806-09-20", "zone": "+09:00"}
+        payload = {"date": "0806-09-20", "timezone": "+09:00"}
         fields = ["sukuyo.calendar", "rulesets", "validation"]
     else:
         payload = {
@@ -194,7 +194,7 @@ def test_unknown_leap_boundary_date_candidates_across_three_surfaces(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     if tool_name == "suzhan":
-        payload = {"date": "2023-03-21", "zone": "UTC"}
+        payload = {"date": "2023-03-21", "timezone": "UTC"}
         fields = ["sukuyo.calendar"]
     else:
         payload = {
@@ -269,7 +269,7 @@ def test_known_clock_without_coordinates_stays_calendar_only() -> None:
     from fatebridge.core.local_techniques.suzhan import build_suzhan_result
     from fatebridge.core.sukuyo.suzhan_clock_input import require_clock_input_binding
 
-    result = build_suzhan_result(date="2025-01-28", time="16:00:00", zone="UTC")
+    result = build_suzhan_result(date="2025-01-28", time="16:00:00", timezone="UTC")
     require_clock_input_binding(result)
     assert result["sukuyo"]["calendar"]["calendar_date"] == "2025-01-29"
     assert result["params"]["calculationMode"] == "calendar_with_clock"
@@ -278,8 +278,8 @@ def test_known_clock_without_coordinates_stays_calendar_only() -> None:
         result["validation"]["calculation_layers"]["chart"]
         == "not_computed_missing_coordinates"
     )
-    for chart_options in ({"chart_requested": True}, {"gps_lat": 0}):
+    for chart_options in ({"chart_requested": True}, {"latitude": 0}):
         with pytest.raises(ValueError, match="完整经纬度"):
             build_suzhan_result(
-                date="2025-01-28", time="16:00:00", zone="UTC", **chart_options
+                date="2025-01-28", time="16:00:00", timezone="UTC", **chart_options
             )

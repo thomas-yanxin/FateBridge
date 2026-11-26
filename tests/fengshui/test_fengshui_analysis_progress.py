@@ -14,7 +14,7 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import assess as _assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import call_calculation, rest_client
 from tests.unit_test.fixtures.fengshui_layout import (

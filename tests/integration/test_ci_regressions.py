@@ -327,7 +327,7 @@ def test_resolve_runtime_engine_still_detects_engine() -> None:
 
 def test_native_response_preserves_the_tool_receipt_without_duplicate_text() -> None:
     spec = SPECS["gua_lookup"]
-    result = asyncio.run(native(spec, {"query": "111111"}))
+    result = asyncio.run(native(spec, {"queries": ["111111"]}))
     assert not result.is_error
     payload = result.structured_content
     assert payload["run_metadata"]["tool_name"] == spec.name
@@ -338,15 +338,15 @@ def test_native_response_preserves_the_tool_receipt_without_duplicate_text() -> 
 @pytest.mark.parametrize(
     "arguments",
     [
-        {"name": ["111", "000"]},
-        {"name": ["111"], "fields": ["missing"]},
+        {"queries": ["111", "000"]},
+        {"queries": ["111"], "fields": ["missing"]},
     ],
 )
 def test_native_success_and_error_use_structured_content(arguments) -> None:
     async def run():
         async with Client(cached_mcp_app(families="divination")) as client:
             result = await call_calculation(
-                client, "gua_meanings", arguments, raise_on_error=False
+                client, "gua_lookup", arguments, raise_on_error=False
             )
             payload = result.structured_content
             assert result.is_error is ("error_code" in payload)

@@ -150,7 +150,7 @@ def test_actual_rest_mcp_cli_keep_both_editions(
         payload = {
             "date": f"2026-06-{day}",
             "time": f"{hour:02d}:00:00",
-            "zone": "+08:00",
+            "timezone": "+08:00",
             "taiyi_options": {"calculation_mode": "hour"},
             "use_true_solar_time": False,
         }

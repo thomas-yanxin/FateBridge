@@ -28,7 +28,7 @@ def rest(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
         yield client
 
 
-SKY = {"date": "2024-06-21", "time": "12:00", "zone": "UTC"}
+SKY = {"date": "2024-06-21", "time": "12:00", "timezone": "UTC"}
 
 
 def singular_sky_inputs(
@@ -60,6 +60,6 @@ def singular_sky_inputs(
     return {
         **SKY,
         "date": date_text,
-        "lat": hemisphere * (90 - obliquity_degrees) + latitude_offset,
-        "lon": math.remainder(target - sidereal_degrees, 360),
+        "latitude": hemisphere * (90 - obliquity_degrees) + latitude_offset,
+        "longitude": math.remainder(target - sidereal_degrees, 360),
     }

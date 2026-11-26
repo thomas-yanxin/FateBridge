@@ -106,8 +106,8 @@ def test_beijing_lichun_birth_and_metaphysics_paths_keep_civil_year_month() -> N
     nongli = calculate_nongli_time(
         date="2024-02-04",
         time="16:30",
-        zone="Asia/Shanghai",
-        gps_lon=116.4074,
+        timezone="Asia/Shanghai",
+        longitude=116.4074,
         time_alg=0,
     )
     assert nongli["yearGanZi"] == "甲辰"

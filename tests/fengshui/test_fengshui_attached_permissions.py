@@ -3,7 +3,7 @@
 import pytest
 
 from fatebridge.core.fengshui.models import AssessRequest
-from fatebridge.services.fengshui import assess as _assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from tests.support.transports import SPECS, business, rest, surface_calls
 from tests.unit_test.fixtures.fengshui_measured import rotation_payload as payload_for
 

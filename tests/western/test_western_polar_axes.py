@@ -35,7 +35,7 @@ POLAR_BIRTH = dict(
 
 def test_service_summary_keeps_an_actual_geographic_pole_qualification() -> None:
     result = calculate_core_chart_analysis(
-        **{**BIRTH, "birth_latitude": 90.0}, chart_variant="chart", hsys=0
+        **{**BIRTH, "birth_latitude": 90.0}, chart_variant="chart", house_system=0
     )
     note = result["chart_profile"]["angle_definition"]["note_zh"]
     assert note in result["summary"]
@@ -50,21 +50,26 @@ def test_service_summary_keeps_an_actual_partial_orbital_fallback(
         return None if planet == "Venus" else original(planet, *args, **kwargs)
 
     monkeypatch.setattr(ephemeris, "_swisseph_planet_state", without_venus)
-    result = calculate_core_chart_analysis(**BIRTH, chart_variant="chart", hsys=0)
+    result = calculate_core_chart_analysis(
+        **BIRTH, chart_variant="chart", house_system=0
+    )
     note = result["chart_profile"]["orbital_fallback"]["note_zh"]
     assert note in result["summary"]
 
 
-@pytest.mark.parametrize("hsys", [2, 6])
-@pytest.mark.parametrize("zodiacal", [0, 1])
+@pytest.mark.parametrize("house_system", [2, 6])
+@pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])
 def test_public_polar_mc_is_common_sky_point_while_tenth_cusp_retains_branch(
-    hsys: int, zodiacal: int
+    house_system: int, zodiac_type: str
 ) -> None:
     result = calculate_core_chart_analysis(
-        **POLAR_BIRTH, chart_variant="chart", hsys=hsys, zodiacal=zodiacal
+        **POLAR_BIRTH,
+        chart_variant="chart",
+        house_system=house_system,
+        zodiac_type=zodiac_type,
     )
     equal = calculate_core_chart_analysis(
-        **POLAR_BIRTH, chart_variant="chart", hsys=0, zodiacal=zodiacal
+        **POLAR_BIRTH, chart_variant="chart", house_system=0, zodiac_type=zodiac_type
     )
     assert result["angles"] == equal["angles"]
     convention = result["chart_profile"]["house_axis_convention"]

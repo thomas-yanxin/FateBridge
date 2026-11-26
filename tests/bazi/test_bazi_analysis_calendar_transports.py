@@ -109,7 +109,7 @@ def test_natal_and_analysis_calendars_own_their_pillars_on_three_protocols(
         {
             "date": expected_date,
             "time": "00:00",
-            "zone": "Asia/Shanghai",
+            "timezone": "Asia/Shanghai",
             "time_alg": 1,
         },
         projection=controls,

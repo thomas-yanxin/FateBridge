@@ -299,7 +299,10 @@ def test_native_india_uses_proleptic_gregorian_and_subsecond_instants() -> None:
 
 def test_legacy_explicit_tropical_override_does_not_fabricate_vargas() -> None:
     result = calculate_core_chart_analysis(
-        chart_variant="india_chart", zodiacal=0, hsys=3, **astro_payload()
+        chart_variant="india_chart",
+        zodiac_type="Tropic",
+        house_system=3,
+        **astro_payload(),
     )
     assert result["india"]["status"] == "configuration_not_supported"
     assert "charts" not in result["india"]

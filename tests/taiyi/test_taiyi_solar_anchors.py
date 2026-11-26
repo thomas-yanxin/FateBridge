@@ -67,7 +67,7 @@ def inputs(tool, mode, profile):
     return dict(
         date="2026-10-25",
         time="12:00:00",
-        zone="+08:00",
+        timezone="+08:00",
         use_true_solar_time=False,
         taiyi_options=selected,
     )

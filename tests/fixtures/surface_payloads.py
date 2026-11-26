@@ -193,8 +193,8 @@ def relationship_payload() -> dict:
         "outer_name": "乙",
         "outer_birth_place": "北京",
         "relative_mode": "Composite",
-        "hsys": 0,
-        "zodiacal": 0,
+        "house_system": 0,
+        "zodiac_type": "Tropic",
     }
 
 
@@ -202,9 +202,9 @@ def _local_base() -> dict:
     return {
         "date": "2028-04-06",
         "time": "09:33:00",
-        "zone": "+08:00",
-        "lat": "31n13",
-        "lon": "121e28",
+        "timezone": "+08:00",
+        "latitude": "31n13",
+        "longitude": "121e28",
     }
 
 
@@ -289,24 +289,21 @@ REST_POST_CASES = {
         "analysis_year": 2028,
     },
     "/api/divination/gua": lambda: {
-        "query": "111111",
+        "queries": ["111111"],
         "lookup_mode": "hexagram",
     },
     "/api/calendar/solar-terms": lambda: {
         "year": 2028,
-        "zone": "Asia/Shanghai",
-        "lat": "31n13",
-        "lon": "121e28",
+        "timezone": "Asia/Shanghai",
+        "latitude": "31n13",
+        "longitude": "121e28",
         "jieqis": ["春分", "冬至"],
     },
     "/api/calendar/lunar-time": lambda: {
         "date": "2028-04-01",
         "time": "09:00:00",
-        "zone": "Asia/Shanghai",
-        "lon": "121e28",
-    },
-    "/api/divination/gua/meanings": lambda: {
-        "name": ["111", "000"],
+        "timezone": "Asia/Shanghai",
+        "longitude": "121e28",
     },
     "/api/knowledge/catalog": lambda: {
         "domain": "astro",
@@ -344,8 +341,8 @@ REST_POST_CASES = {
     },
     "/api/divination/liuyao": lambda: {
         **_local_base(),
-        "gps_lat": 31.2,
-        "gps_lon": 121.4,
+        "latitude": 31.2,
+        "longitude": 121.4,
     },
     "/api/divination/canping": lambda: {
         **_local_base(),
@@ -646,9 +643,9 @@ MCP_CASES = {
         "solar_terms_for_year",
         lambda: {
             "year": 2028,
-            "zone": "Asia/Shanghai",
-            "lat": "31n13",
-            "lon": "121e28",
+            "timezone": "Asia/Shanghai",
+            "latitude": "31n13",
+            "longitude": "121e28",
             "jieqis": ["春分", "冬至"],
         },
     ),
@@ -657,18 +654,14 @@ MCP_CASES = {
         lambda: {
             "date": "2028-04-01",
             "time": "09:00:00",
-            "zone": "Asia/Shanghai",
-            "lon": "121e28",
+            "timezone": "Asia/Shanghai",
+            "longitude": "121e28",
         },
-    ),
-    "gua_meanings": (
-        "gua_meanings",
-        lambda: {"name": ["111", "000"]},
     ),
     "gua_lookup": (
         "gua_lookup",
         lambda: {
-            "query": "111111",
+            "queries": ["111111"],
             "lookup_mode": "hexagram",
         },
     ),
@@ -704,7 +697,7 @@ MCP_CASES = {
             "shaoyin": "震",
         },
     ),
-    "liuyao": ("liuyao", lambda: {**_local_base(), "gps_lat": 31.2, "gps_lon": 121.4}),
+    "liuyao": ("liuyao", lambda: {**_local_base(), "latitude": 31.2, "longitude": 121.4}),
     "canping": (
         "canping",
         lambda: {**_local_base(), "gender": "男", "method": "ming"},
@@ -722,8 +715,8 @@ MCP_CASES = {
         "suzhan",
         lambda: {
             **_local_base(),
-            "gps_lat": 31.2,
-            "gps_lon": 121.4,
+            "latitude": 31.2,
+            "longitude": 121.4,
             "szchart": 1,
             "szshape": 1,
             "house_start_mode": 2,
@@ -743,8 +736,8 @@ MCP_CASES = {
         "interpret_astrology_dice",
         lambda: {
             **_local_base(),
-            "gps_lat": 31 + 13 / 60,
-            "gps_lon": 121 + 28 / 60,
+            "latitude": 31 + 13 / 60,
+            "longitude": 121 + 28 / 60,
             "sign": "Aries",
             "house": 6,
             "planet": "Sun",
@@ -755,8 +748,8 @@ MCP_CASES = {
         "sanshi_combined_chart",
         lambda: {
             **_local_base(),
-            "gps_lat": 31.2,
-            "gps_lon": 121.4,
+            "latitude": 31.2,
+            "longitude": 121.4,
             "qimen_options": {"layout": "direct"},
             "taiyi_options": {},
             "liureng_yue": "申",

@@ -12,12 +12,12 @@ def chart(**changes):
     )
 
 
-@pytest.mark.parametrize("zodiacal", [0, 1])
+@pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])
 @pytest.mark.parametrize("hour", [0, 9, 18])
 def test_whole_sign_cusps_and_planet_houses_obey_the_sign_definition(
-    zodiacal: int, hour: int
+    zodiac_type: str, hour: int
 ) -> None:
-    result = chart(hsys=0, zodiacal=zodiacal, birth_hour=hour)
+    result = chart(house_system=0, zodiac_type=zodiac_type, birth_hour=hour)
     asc_sign = int(result["angles"]["ascendant"]["longitude"] // 30)
     expected = [((asc_sign + i) % 12) * 30.0 for i in range(12)]
     assert [h["cusp_longitude"] for h in result["houses"]] == expected
@@ -27,7 +27,7 @@ def test_whole_sign_cusps_and_planet_houses_obey_the_sign_definition(
 
 
 def test_sidereal_fix_corrects_the_previously_wrong_fixture_planet_houses() -> None:
-    result = chart(hsys=0, zodiacal=1)
+    result = chart(house_system=0, zodiac_type="Sidereal")
     planets = {p["id"]: p for p in result["planets"]}
     assert 60 < planets["Jupiter"]["longitude"] < 90
     assert planets["Jupiter"]["house"] == 1  # previously 2
@@ -36,22 +36,23 @@ def test_sidereal_fix_corrects_the_previously_wrong_fixture_planet_houses() -> N
     assert planets["Mars"]["house"] == 8  # previously 9
 
 
-@pytest.mark.parametrize("zodiacal", [0, 1])
-@pytest.mark.parametrize("hsys", range(1, 9))
+@pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])
+@pytest.mark.parametrize("house_system", range(1, 9))
 def test_reference_house_choice_cannot_change_source_functional_palaces(
-    hsys, zodiacal: int
+    house_system, zodiac_type: str
 ) -> None:
-    whole = chart(hsys=0, zodiacal=zodiacal)
-    unequal = chart(hsys=hsys, zodiacal=zodiacal)
+    whole = chart(house_system=0, zodiac_type=zodiac_type)
+    unequal = chart(house_system=house_system, zodiac_type=zodiac_type)
     assert "error" not in whole and "error" not in unequal
-    assert unequal["chart_profile"]["house_system_code"] == hsys
+    assert unequal["chart_profile"]["house_system_code"] == house_system
     profile = unequal["guolao"]["profile"]
+    is_sidereal = zodiac_type == "Sidereal"
     assert profile["astronomical_house_frame"] == (
-        "selected_lahiri_sidereal_zodiac" if zodiacal else "tropical_zodiac"
+        "selected_lahiri_sidereal_zodiac" if is_sidereal else "tropical_zodiac"
     )
     assert profile["astronomical_house_method"] == (
         "swisseph_houses_ex_sidereal_lahiri"
-        if zodiacal
+        if is_sidereal
         else "swisseph_houses_ex_tropical"
     )
     assert whole["guolao"]["bodies"] == unequal["guolao"]["bodies"]

@@ -27,7 +27,7 @@ ATTITUDE = analytic_earth_attitude(JD, TT)
 EPS = ATTITUDE.true_obliquity
 LATITUDES = [-89.9999, -80, -66.6, -40, 0, 40, 66.6, 80, 89.9999]
 FACES = {"planet": "Jupiter", "sign": "Aries", "house": 0}
-SKY = {"date": "2024-06-21", "time": "12:00", "zone": "UTC", "lon": 0}
+SKY = {"date": "2024-06-21", "time": "12:00", "timezone": "UTC", "longitude": 0}
 
 
 def geographic_longitude(armc, *, julian_day_tt=TT):
@@ -92,9 +92,9 @@ def test_offline_high_latitude_context_recomputes_houses_and_fortune(
     tt = utc_clock(datetime(2024, 6, 21, 12, tzinfo=timezone.utc)).tt
     result = build_otherbu_result(
         **FACES,
-        **{**SKY, "lon": geographic_longitude(270, julian_day_tt=tt)},
-        lat=80,
-        hsys=0,
+        **{**SKY, "longitude": geographic_longitude(270, julian_day_tt=tt)},
+        latitude=80,
+        house_system=0,
         fortune_method="ptolemy_iii10",
     )
     sky = result["chart"]["chart"]
@@ -117,7 +117,7 @@ def test_exact_pole_keeps_computable_sky_and_declares_meridian_convention(
         monkeypatch.setattr(runtime, "swe", None)
     else:
         pass
-    result = build_otherbu_result(**FACES, **SKY, lat=latitude, hsys=0)
+    result = build_otherbu_result(**FACES, **SKY, latitude=latitude, house_system=0)
     sky = result["chart"]
     profile = sky["params"]["chart_profile"]
     definition = profile["angle_definition"]

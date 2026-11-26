@@ -21,7 +21,7 @@ PAYLOAD = dict(
     birth_minute=0,
     birth_timezone="UTC",
     birth_time_uncertainty_minutes=1,
-    hsys=1,
+    house_system=1,
 )
 # The original locations are ill-conditioned under the current source equator.
 # Keep their input values and add truly unresolved controls for the same clock.
@@ -52,14 +52,15 @@ def assert_ill_conditioned_ascendant(definition, actual, expected):
 
 @pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris required")
 @pytest.mark.parametrize("longitude,latitude", LOCATIONS)
-@pytest.mark.parametrize("zodiacal", [0, 1])
+@pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])
 def test_native_germany_qualifies_only_dependent_geometry(
-    longitude, latitude, zodiacal: int
+    longitude, latitude, zodiac_type: str
 ) -> None:
     site = LOCATIONS.index((longitude, latitude))
+    zodiac_index = 1 if zodiac_type == "Sidereal" else 0
     analysis = dict(
         **PAYLOAD,
-        zodiacal=zodiacal,
+        zodiac_type=zodiac_type,
         analysis_datetime=datetime(2050, 1, 1, tzinfo=timezone.utc),
     )
     resolved = calculate_germany_chart_analysis(
@@ -72,7 +73,7 @@ def test_native_germany_qualifies_only_dependent_geometry(
         next(
             row["longitude"] for row in resolved["factors"] if row["id"] == "Ascendant"
         ),
-        RESOLVED_ASCENDANTS[site][zodiacal],
+        RESOLVED_ASCENDANTS[site][zodiac_index],
     )
     assert "status" not in resolved["time_sensitivity"]["factor_spans"]["Ascendant"]
 
@@ -162,12 +163,13 @@ def test_native_germany_qualifies_only_dependent_geometry(
 
 @pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris required")
 @pytest.mark.parametrize("longitude,latitude", LOCATIONS)
-@pytest.mark.parametrize("zodiacal", [0, 1])
+@pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])
 def test_equal13_keeps_unknown_samples_and_replay_conventions(
-    longitude, latitude, zodiacal: int
+    longitude, latitude, zodiac_type: str
 ) -> None:
     site = LOCATIONS.index((longitude, latitude))
-    analysis = dict(**PAYLOAD, zodiacal=zodiacal, chart_variant="chart13")
+    zodiac_index = 1 if zodiac_type == "Sidereal" else 0
+    analysis = dict(**PAYLOAD, zodiac_type=zodiac_type, chart_variant="chart13")
     resolved = calculate_core_chart_analysis(
         **analysis,
         birth_longitude=longitude,
@@ -177,7 +179,7 @@ def test_equal13_keeps_unknown_samples_and_replay_conventions(
     assert_ill_conditioned_ascendant(
         resolved["sector_profile"]["angle_definition"],
         resolved["sector_profile"]["anchor_longitude"],
-        RESOLVED_ASCENDANTS[site][zodiacal],
+        RESOLVED_ASCENDANTS[site][zodiac_index],
     )
     assert len(resolved["thirteen_sectors"]) == 13
     assert all(
@@ -323,9 +325,9 @@ def test_unknown_and_zero_uncertainty_do_not_resolve_the_nominal_ascendant(
         )
 
 
-@pytest.mark.parametrize("hsys,known_houses", [(None, False), (8, True)])
+@pytest.mark.parametrize("house_system,known_houses", [(None, False), (8, True)])
 def test_hellenistic_derived_facts_respect_singular_ascendant(
-    hsys: int | None, known_houses: bool
+    house_system: int | None, known_houses: bool
 ) -> None:
     chart = calculate_core_chart_analysis(
         birth_year=2000,
@@ -336,7 +338,7 @@ def test_hellenistic_derived_facts_respect_singular_ascendant(
         birth_timezone="UTC",
         use_true_solar_time=False,
         **J2000_UNRESOLVED_ASC_SITE,
-        hsys=hsys,
+        house_system=house_system,
         chart_variant="hellen_chart",
     )
     assert "error" not in chart, chart

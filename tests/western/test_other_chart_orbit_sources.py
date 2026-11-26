@@ -190,7 +190,7 @@ def test_malformed_first_fictitious_table_is_a_native_calculation_failure(
         birth_timezone="UTC",
         birth_longitude=0,
         birth_latitude=30,
-        zodiacal=0,
+        zodiac_type="Tropic",
     )
 
     assert result["error_code"] == "ephemeris_calculation_failed"

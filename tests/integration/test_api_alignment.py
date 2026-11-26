@@ -157,7 +157,7 @@ def _relative_request(mode: str = "Composite") -> AstroRelativeFlatRequest:
             for key, value in party.items()
             if key != "gender"
         }
-        | {"relative_mode": mode, "hsys": 0, "zodiacal": 0}
+        | {"relative_mode": mode, "house_system": 0, "zodiac_type": "Tropic"}
     )
 
 

@@ -120,7 +120,7 @@ def test_online_quadrant_request_is_untouched() -> None:
         pytest.skip("swisseph not installed")
     else:
         pass
-    chart = calculate_core_chart_analysis(**_SYNTH, hsys=3)
+    chart = calculate_core_chart_analysis(**_SYNTH, house_system=3)
     profile = chart["chart_profile"]
     assert profile["house_system"] == "placidus"
     assert profile["house_system_source"] == "explicit"

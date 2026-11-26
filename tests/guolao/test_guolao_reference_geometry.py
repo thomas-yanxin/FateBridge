@@ -108,7 +108,7 @@ def polar_payload(**changes):
         "birth_longitude": 18.96,
         "birth_latitude": 69.65,
         "use_true_solar_time": False,
-        "hsys": 3,
+        "house_system": 3,
         **changes,
     }
 
@@ -120,12 +120,12 @@ def chart(**changes):
 
 
 @pytest.mark.parametrize("latitude", [69.65, -69.65, 80.0, -80.0])
-@pytest.mark.parametrize("zodiacal", [0, 1])
+@pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])
 def test_real_polar_placidus_error_retains_core_and_independent_angles(
-    latitude, zodiacal: int
+    latitude, zodiac_type: str
 ) -> None:
-    result = chart(birth_latitude=latitude, zodiacal=zodiacal)
-    reference = chart(birth_latitude=latitude, zodiacal=zodiacal, hsys=1)
+    result = chart(birth_latitude=latitude, zodiac_type=zodiac_type)
+    reference = chart(birth_latitude=latitude, zodiac_type=zodiac_type, house_system=1)
     assert "error" not in result
     g = result["guolao"]
     for key in [
@@ -157,9 +157,9 @@ def test_real_polar_placidus_error_retains_core_and_independent_angles(
 
 
 @pytest.mark.parametrize("latitude", [90.0, -90.0])
-@pytest.mark.parametrize("zodiacal", [0, 1])
+@pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])
 def test_exact_geographic_poles_have_no_assigned_rising_point_or_houses(
-    latitude, zodiacal: int, monkeypatch: pytest.MonkeyPatch
+    latitude, zodiac_type: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     original = runtime.ephemeris_call
 
@@ -173,7 +173,7 @@ def test_exact_geographic_poles_have_no_assigned_rising_point_or_houses(
         return original(operation, *args, **kwargs)
 
     monkeypatch.setattr(runtime, "ephemeris_call", no_house_call)
-    result = chart(birth_latitude=latitude, zodiacal=zodiacal)
+    result = chart(birth_latitude=latitude, zodiac_type=zodiac_type)
     assert "error" not in result
     assert len(result["guolao"]["bodies"]) == 11
     assert result["houses"] == []
@@ -194,8 +194,8 @@ def test_target_sky_and_small_limit_are_independent_of_reference_house_availabil
     None
 ):
     target = datetime.fromisoformat("2027-06-01T00:00:00+08:00")
-    unavailable = chart(analysis_datetime=target, zodiacal=1)
-    available = chart(analysis_datetime=target, zodiacal=1, hsys=0)
+    unavailable = chart(analysis_datetime=target, zodiac_type="Sidereal")
+    available = chart(analysis_datetime=target, zodiac_type="Sidereal", house_system=0)
     assert unavailable["guolao"]["timing"] == available["guolao"]["timing"]
 
 
@@ -254,7 +254,7 @@ def test_essential_or_unexpected_errors_are_not_hidden_as_optional_geometry(
         monkeypatch.setattr(runtime.swe, "get_ayanamsa_ex", lambda *args: (-1, 0.0))
     else:
         monkeypatch.setattr(runtime.swe, operation, fail)
-    result = chart(zodiacal=1)
+    result = chart(zodiac_type="Sidereal")
     assert "error" in result
     assert "guolao" not in result
 
@@ -269,7 +269,7 @@ def test_partial_reference_geometry_across_native_mcp_rest_cli_and_projection(
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    payload = polar_payload(birth_latitude=latitude, zodiacal=1)
+    payload = polar_payload(birth_latitude=latitude, zodiac_type="Sidereal")
     fields = ["guolao", "planets", "angles", "houses"]
     options = {
         "as_of": "2026-10-22T12:00:00+08:00",
@@ -334,7 +334,7 @@ def test_sidereal_only_house_error_preserves_selected_angles_and_core(
 ) -> None:
     original = runtime.ephemeris_call
     injected = []
-    expected = chart(birth_latitude=31.22, zodiacal=1, hsys=1)
+    expected = chart(birth_latitude=31.22, zodiac_type="Sidereal", house_system=1)
 
     def fail_sidereal(operation, *args, **kwargs):
         if operation != "houses_ex":
@@ -350,7 +350,7 @@ def test_sidereal_only_house_error_preserves_selected_angles_and_core(
         return original(operation, *args, **kwargs)
 
     monkeypatch.setattr(runtime, "ephemeris_call", fail_sidereal)
-    actual = chart(birth_latitude=31.22, zodiacal=1)
+    actual = chart(birth_latitude=31.22, zodiac_type="Sidereal")
     assert injected
     assert "error" not in actual
     assert actual["guolao"]["bodies"] == expected["guolao"]["bodies"]

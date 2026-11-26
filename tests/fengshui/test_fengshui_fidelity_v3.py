@@ -8,8 +8,8 @@ import pytest
 
 from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest, BazhaiRequest
-from fatebridge.services.fengshui import assess as _assess
 from fatebridge.services.fengshui import calculate_bazhai as _calculate_bazhai
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client

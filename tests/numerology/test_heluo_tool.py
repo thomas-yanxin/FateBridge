@@ -31,7 +31,11 @@ def test_heluo_documented_anchors() -> None:
 
 def test_heluo_service_shape() -> None:
     result = calculate_heluo_analysis(
-        date="2000-05-15", time="09:33:00", zone="+08:00", gender="男", lon="121e28"
+        date="2000-05-15",
+        time="09:33:00",
+        timezone="+08:00",
+        gender="男",
+        longitude="121e28",
     )
     assert result["analysis_type"] == "河洛理数"
     assert result["chart"]["xian"]["name"] and result["chart"]["hou"]["name"]

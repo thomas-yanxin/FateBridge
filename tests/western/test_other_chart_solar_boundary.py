@@ -28,13 +28,13 @@ HAS_SWE = pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris requir
 @pytest.mark.parametrize(
     "key_years,missing_offsets", [(0, [30, 60]), (150, [-60, -30])]
 )
-@pytest.mark.parametrize("zodiacal", [0, 1])
+@pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])
 def test_nominal_and_all_samples_survive_both_model_range_edges(
-    key_years: int, missing_offsets, zodiacal: int
+    key_years: int, missing_offsets, zodiac_type: str
 ) -> None:
     target = BIRTH + timedelta(days=key_years * 365.25)
     result = calculate_germany_chart_analysis(
-        **PAYLOAD, analysis_datetime=target, zodiacal=zodiacal
+        **PAYLOAD, analysis_datetime=target, zodiac_type=zodiac_type
     )
     assert "error" not in result
     natal = result["midpoint_analysis"]

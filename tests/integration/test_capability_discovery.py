@@ -43,15 +43,15 @@ def test_tools_endpoint_records_are_well_formed() -> None:
     for record in payload["tools"]:
         assert record["summary"]
         assert record["family"]
-        assert {"cli", "rest_path", "mcp_name"} <= record["surfaces"].keys()
+        assert set(record["surfaces"]) == {"cli", "rest", "mcp"}
 
 
 def test_every_tool_declares_the_same_public_name_across_surfaces() -> None:
     for spec in CATALOG:
         surfaces = describe_spec(spec)["surfaces"]
-        assert surfaces["rest_path"]
-        assert surfaces["mcp_name"] == spec.name
-        assert surfaces["cli"]
+        assert surfaces["rest"] == spec.rest_path
+        assert surfaces["mcp"] is spec.expose_mcp
+        assert surfaces["cli"] is True
 
 
 def test_mcp_transport_flags_are_self_describing() -> None:
@@ -80,7 +80,8 @@ def test_reference_discovery_uses_public_names(
         )
         assert response.status_code == 200, response.text
         (record,) = response.json()["tools"]
-        assert record["tool"] == record["surfaces"]["mcp_name"] == name
+        assert record["tool"] == name
+        assert record["surfaces"]["mcp"] is True
         assert (
             run(["discover", "--tool", name, "--surface", "mcp", "--detail", "summary"])
             == 0

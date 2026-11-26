@@ -314,8 +314,8 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
     assert [t["tool"] for t in tools_manifest["tools"]] == ["ipip_big_five"]
     record = tools_manifest["tools"][0]
     assert record["surfaces"]["cli"] is True
-    assert record["surfaces"]["rest_path"] == "/api/psychometrics/ipip-big-five"
-    assert record["surfaces"]["mcp_name"] == "ipip_big_five"
+    assert record["surfaces"]["rest"] == "/api/psychometrics/ipip-big-five"
+    assert record["surfaces"]["mcp"] is True
 
     score_payload = {
         "responses": {str(i): 3 for i in range(1, 51)},

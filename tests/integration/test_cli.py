@@ -140,7 +140,7 @@ def test_discover_flat_tool_emits_schema_and_example(
     (info,) = payload["tools"]
     assert info["tool"] == "bazi_wealth"
     assert info["surfaces"]["cli"] is True
-    assert info["surfaces"]["rest_path"] == "/api/bazi/wealth"
+    assert info["surfaces"]["rest"] == "/api/bazi/wealth"
     by = next(p for p in info["parameters"] if p["name"] == "birth_year")
     assert by["required"] is True
     assert by["type"] == "int"
@@ -159,7 +159,7 @@ def test_discover_relationship_tool_lists_shared_surface(
     assert code == 0
     (info,) = payload["tools"]
     assert info["tool"] == "relationship_chart"
-    assert info["surfaces"]["rest_path"] == "/api/astrology/relationship-chart"
+    assert info["surfaces"]["rest"] == "/api/astrology/relationship-chart"
     assert info["surfaces"]["cli"] is True
     assert info["cli_example"].startswith("fatebridge relationship_chart")
 
@@ -544,14 +544,14 @@ def test_request_file_rejects_tool_options_not_in_selected_contract(
     subject_path = _full_subject(tmp_path)
     with open(subject_path, encoding="utf-8") as stream:
         subject = json.load(stream)
-    subject["hsys"] = 8
+    subject["house_system"] = 8
     _write(tmp_path / "request.json", json.dumps(subject))
     code = run(["bazi_birth_chart", "--request-file", subject_path])
     payload = json.loads(capsys.readouterr().out)
     assert code == 1
     assert payload["issues"] == [
         {
-            "path": "hsys",
+            "path": "house_system",
             "code": "extra_forbidden",
             "message": "Extra inputs are not permitted",
         }

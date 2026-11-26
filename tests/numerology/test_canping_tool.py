@@ -148,10 +148,10 @@ def test_canping_service_full_shape() -> None:
     result = calculate_canping_analysis(
         date="1990-06-15",
         time="09:33:00",
-        zone="+08:00",
+        timezone="+08:00",
         gender="男",
         method="ming",
-        lon="121e28",  # Fictional test coordinate, now supplied explicitly.
+        longitude="121e28",  # Fictional test coordinate, now supplied explicitly.
     )
     assert result["analysis_type"] == "邵子参评数 / 金锁银匙"
     assert result["element"] in {"金", "木", "水", "火", "土"}
