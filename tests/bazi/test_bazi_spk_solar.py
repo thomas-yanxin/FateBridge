@@ -22,10 +22,6 @@ rest = _shared_rest
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/data/bazi_boundary_decisions_v1"
 KERNEL = ROOT / "ephe/solar-de440.bsp"
-if not KERNEL.exists():
-    KERNEL = Path("/tmp/fatebridge-fengshui-calendar-v10/de440.bsp")
-else:
-    pass
 KERNEL_SHA = "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5"
 
 

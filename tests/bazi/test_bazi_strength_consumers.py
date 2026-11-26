@@ -47,9 +47,6 @@ def assess(values):
     pillars = dict(zip(("year", "month", "day", "hour"), map(tuple, values)))
     return pillars, ElementAnalysis.analyze_day_master_strength(pillars)
 
-    # These three receipts contain hashes, not complete old result objects.
-    # Pin their envelope and provenance; do not forge v11 metadata into an old
-
 
 @pytest.mark.parametrize("row", BODY, ids=lambda r: str(r["index"]))
 def test_current_v11_all_187_budgets_match_independent_literal_season_arithmetic(
