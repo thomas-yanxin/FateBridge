@@ -86,12 +86,6 @@ def _precision_label_zh(engine_precision: str) -> str:
     return "离线近似"
 
 
-def _precision_label_from_profiles(
-    *profiles: dict[str, Any] | None,
-) -> str:
-    return _precision_label_zh(_derive_engine_profile(*profiles)["engine_precision"])
-
-
 def _coerce_house_system_code(hsys: object) -> int | None:
     """Translate a user-facing house-system identifier into the internal 0-8 code.
 

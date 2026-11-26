@@ -4,13 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Dict, Literal, Optional
+from typing import Any, Dict, Literal, Optional
 
+from fatebridge.core.astro.physical_epoch import PhysicalEpoch
 from fatebridge.core.astro.time_scales import EphemerisTime, ephemeris_time
-
-if TYPE_CHECKING:
-    from fatebridge.core.astro.physical_epoch import PhysicalEpoch
-
 from fatebridge.utils.civil_time import UTCCalendar, utc_calendar
 from fatebridge.utils.places import resolve_birth_place_context
 from fatebridge.utils.solar_time import (

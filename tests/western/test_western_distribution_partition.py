@@ -1,9 +1,4 @@
-"""Bound walks partition the supplied zodiacal arc without epsilon jumps.
-
-Expected Aries boundaries are the unchanged selected Egyptian table. The exposed
-ordinary birth case and independent 100-place Decimal intersection reference
-are retained under /tmp/fatebridge-unmet-audit-20261103/astrology/.
-"""
+"""Bound walks partition the supplied zodiacal arc without epsilon jumps."""
 
 import math
 from fractions import Fraction

@@ -18,6 +18,7 @@ from fatebridge.core.astro.time_scales import ephemeris_time, leap_table
 from fatebridge.core.classical_western import compute_lot
 from fatebridge.core.predictive._common import build_natal_subject, determine_sect
 from fatebridge.services.astrology import calculate_core_chart_analysis
+from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -28,9 +29,6 @@ def test_lot_just_before_zero_stays_on_the_previous_side_of_the_circle() -> None
         {"asc": 0.0, "moon": 0.0, "sun": math.nextafter(0.0, 1.0)},
     )
     assert result == math.nextafter(360.0, 0.0)
-
-
-from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
 
 
 @pytest.mark.parametrize("hsys", [0, 2, 3, 5, 8])
@@ -142,38 +140,52 @@ def test_geometric_horizon_fallback_matches_coordinate_rotation(
 
 
 @pytest.mark.parametrize(
-    "reference",
-    json.loads((FIXTURES / "western-horizons.json").read_text())["references"],
+    "utc_timestamp",
+    sorted(
+        {
+            row["utc"]
+            for reference in json.loads(
+                (FIXTURES / "western-horizons.json").read_text()
+            )["references"]
+            for row in reference["rows"]
+        }
+    ),
 )
 def test_public_western_planets_against_frozen_jpl(
-    reference, monkeypatch: pytest.MonkeyPatch
+    utc_timestamp: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     fixture = json.loads((FIXTURES / "western-horizons.json").read_text())
-    assert (
-        hashlib.sha256(reference["response"]["result"].encode()).hexdigest()
-        == reference["response_sha256"]
-    )
     # Exercise the package's guaranteed file-free Moshier baseline explicitly.
-    monkeypatch.setattr(
-        ephemeris_runtime, "_configured_path", "/tmp/fatebridge-western-empty-ephemeris"
-    )
+    empty_ephemeris_path = str(tmp_path)
+    monkeypatch.setenv("SE_EPHE_PATH", empty_ephemeris_path)
+    monkeypatch.setattr(ephemeris_runtime, "_configured_path", empty_ephemeris_path)
+    moment = datetime.fromisoformat(utc_timestamp)
     with ephemeris_runtime.preserve_ephemeris_path():
-        runtime.swe.set_ephe_path("/tmp/fatebridge-western-empty-ephemeris")
+        runtime.swe.set_ephe_path(empty_ephemeris_path)
+        result = calculate_core_chart_analysis(
+            **{
+                **BIRTH,
+                "birth_year": moment.year,
+                "birth_month": moment.month,
+                "birth_day": moment.day,
+                "birth_hour": moment.hour,
+                "birth_minute": moment.minute,
+            },
+            chart_variant="chart",
+        )
+    assert "error" not in result
+    assert result["chart_profile"]["ephemeris_model"] == "moshier"
+    for reference in fixture["references"]:
+        assert (
+            hashlib.sha256(reference["response"]["result"].encode()).hexdigest()
+            == reference["response_sha256"]
+        )
+        point = next(p for p in result["planets"] if p["id"] == reference["body"])
         for row in reference["rows"]:
-            moment = datetime.fromisoformat(row["utc"])
-            result = calculate_core_chart_analysis(
-                **{
-                    **BIRTH,
-                    "birth_year": moment.year,
-                    "birth_month": moment.month,
-                    "birth_day": moment.day,
-                    "birth_hour": moment.hour,
-                    "birth_minute": moment.minute,
-                },
-                chart_variant="chart",
-            )
-            assert "error" not in result
-            point = next(p for p in result["planets"] if p["id"] == reference["body"])
+            if row["utc"] != utc_timestamp:
+                continue
+            else:
+                pass
             delta = (
                 abs(
                     (point["longitude"] - row["apparent_ecliptic_longitude"] + 180)

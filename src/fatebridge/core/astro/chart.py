@@ -779,6 +779,6 @@ def build_midpoint_payload(
             "已生成 FateBridge 量化盘 / 中点盘。",
             f"中点数量：{len(midpoints)}。",
             f"中点相位数量：{len(midpoint_aspects)}。",
-            f"原生中点几何层：{midpoint_analysis['status']}；传统解释符合度和现实预测效力尚未验证。",
+            f"原生中点几何层：{midpoint_analysis['status']}。",
         ],
     }

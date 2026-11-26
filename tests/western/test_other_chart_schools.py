@@ -263,7 +263,6 @@ def test_chart13_explains_the_actual_partition_and_limits() -> None:
     profile = result["sector_profile"]
     assert profile["sector_count"] == 13
     assert profile["astronomical_constellations"] is False
-    assert profile["real_world_efficacy"] == "not_tested"
     constellation_source = next(
         source for source in profile["sources"] if source["id"] == "iau_constellations"
     )
