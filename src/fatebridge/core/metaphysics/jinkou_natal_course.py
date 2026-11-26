@@ -6,10 +6,12 @@ from typing import Any
 
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.jinkou import build_jinkou_board
-from fatebridge.core.metaphysics.jinkou_year_fate import (
-    SOURCE_SHA256,
-    SOURCE_URL,
-    confirmed_natal_branch,
+from fatebridge.core.metaphysics.jinkou_year_fate import confirmed_natal_branch
+from fatebridge.core.metaphysics.ren_sources import (
+    JINKOU_RELATIONS_SCAN_SHA256 as SOURCE_SHA256,
+)
+from fatebridge.core.metaphysics.ren_sources import (
+    JINKOU_RELATIONS_SOURCE as SOURCE_URL,
 )
 
 

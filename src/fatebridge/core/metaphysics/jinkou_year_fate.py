@@ -10,6 +10,12 @@ from typing import Any
 
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.jinkou import build_jinkou_board
+from fatebridge.core.metaphysics.ren_sources import (
+    JINKOU_RELATIONS_SCAN_SHA256 as SOURCE_SHA256,
+)
+from fatebridge.core.metaphysics.ren_sources import (
+    JINKOU_RELATIONS_SOURCE as SOURCE_URL,
+)
 from fatebridge.utils.birth_input import normalize_gender
 
 CYCLE = tuple(
@@ -24,8 +30,6 @@ STARTS = {
     "甲辰": ("丙午", "壬子"),
     "甲寅": ("丙辰", "壬戌"),
 }
-SOURCE_URL = "https://upload.wikimedia.org/wikipedia/commons/e/e1/CNTS-00047981961_1_六壬神課金口訣.pdf"
-SOURCE_SHA256 = "dfa4b039f30100eb75a8fe21904256bc4e47c04538c8602d08aec9e7f7646364"
 
 
 def confirmed_natal_branch(

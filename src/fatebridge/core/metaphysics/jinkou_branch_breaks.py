@@ -6,6 +6,7 @@ from typing import Any
 
 from fatebridge.core.metaphysics.jinkou_break_witnesses import break_pair_witnesses
 from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.core.metaphysics.ren_sources import JINKOU_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 # The scan also prints 寅破巳, omitted by the online transcription.
@@ -27,7 +28,7 @@ def metadata() -> dict[str, Any]:
         source_sha256=SCAN_SHA256,
         original_pdf_page=113,
         written_pairs=[list(p) for p in WRITTEN_PAIRS],
-        transcription_url="https://divinehere.com/classic/0905011.html",
+        transcription_url=JINKOU_SOURCE,
         transcription_written_pairs=[list(p) for p in WRITTEN_PAIRS if p != "寅巳"],
         scan_extra_pairs=[["寅", "巳"]],
         extra_pair_author_intent=None,
