@@ -130,16 +130,16 @@
       ]
     },
     "jinsuo_basic_fixed_v1": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "method": "jinsuo",
       "source_ids": [
         "S5"
       ],
-      "scope": "八宫基础偏好：1234砂、6789水；逐个已确认特征比较",
+      "scope": "八宫及二十四山基础砂水偏好：1234宫(坎坤震巽12山)喜砂、6789宫(乾兑艮离12山)喜水；逐个已确认特征比较",
       "conventions": [
         "不由道路/镜子/高楼等名称自动归类",
         "mixed/unknown保持无法判定；缺水不能推断有砂",
-        "不含形态距离组合、24山、元运、疾病死亡财富断语"
+        "支持八宫direction或二十四山mountain精确归属，二者同时传入须一致"
       ]
     },
     "annual_zibai_lichun_v1": {
@@ -345,7 +345,6 @@
   ],
   "unavailable_layers": [
     "xuankong_natal",
-    "jinsuo_24_mountains",
     "jinsuo_forms_and_periods",
     "automatic_floorplan_geometry"
   ]

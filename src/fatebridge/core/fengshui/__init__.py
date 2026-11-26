@@ -1,1 +1,1 @@
-"""Versioned, deterministic residential Feng Shui foundation calculations."""
+"""Consolidated Feng Shui calculation package."""

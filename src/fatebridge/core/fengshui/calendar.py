@@ -1,13 +1,17 @@
-"""Civil time and explicitly selected year boundaries, independent of BaZi."""
+"""Civil time, Lichun year boundaries, 12-Jie solar months, and ZiBai term brackets."""
+
+from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import date, datetime, timedelta, timezone, tzinfo
 from fractions import Fraction
 from typing import Any
 
-from fatebridge.core import almanac
+from fatebridge.core import almanac, de440_solar
 from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
 from fatebridge.core.analytic_solar import MODEL_ID as ANALYTIC_SOLAR_MODEL
+from fatebridge.core.astro.time_scales import ephemeris_time, utc_point_from_tt
+from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.utc_policy import leap_table
 from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
 from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
@@ -15,9 +19,10 @@ from fatebridge.core.ephemeris_runtime import (
     ephemeris_call,
     ephemeris_model_from_retflag,
 )
-from fatebridge.core.fengshui.historical_solar import MODEL_ID as HISTORICAL_SOLAR_MODEL
-from fatebridge.core.fengshui.historical_solar import historical_solar_resolution
+from fatebridge.core.jpl_ephemeris import configured_jpl_file
+from fatebridge.core.solar_model_policy import solar_model_policy
 from fatebridge.core.solar_term_clock import native_solar_root_time_policy
+from fatebridge.core.solar_term_runtime import solar_term_cache_context
 from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 from fatebridge.utils.civil_time import (
     CivilPoint,
@@ -27,11 +32,16 @@ from fatebridge.utils.civil_time import (
     utc_calendar,
 )
 from fatebridge.utils.clock_events import clock_offset_changes
+from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.timezones import (
     format_local_time_or_utc,
     is_unspecified_local_time,
     parse_timezone_name,
 )
+
+HISTORICAL_SOLAR_MODEL = de440_solar.HISTORICAL_MODEL_ID
+SOFTWARE_YEARS = (1784, 2204)
+BASE_SOFTWARE_YEARS = (1800, 2200)
 
 MOSHIER_BOUNDARY_GUARD_SECONDS = 5.0
 MODEL_GUARD_NAMES = {
@@ -44,15 +54,123 @@ MODEL_GUARD_NAMES = {
     HISTORICAL_SOLAR_MODEL: "de440_historical_solar",
 }
 
+JIE = (
+    "立春",
+    "惊蛰",
+    "清明",
+    "立夏",
+    "芒种",
+    "小暑",
+    "立秋",
+    "白露",
+    "寒露",
+    "立冬",
+    "大雪",
+    "小寒",
+)
+MONTH_BRANCHES = tuple("寅卯辰巳午未申酉戌亥子丑")
+
+
+def _aa1996_resolution(year: int, term_name: str, timezone_name: str) -> dict[str, Any]:
+    context = solar_term_cache_context(almanac.swe)
+    index = almanac.SOLAR_TERM_NAMES.index(term_name)
+    moment, provenance = almanac._solar_term_utc_via_analytic(
+        year,
+        index,
+        aa1996=True,
+        expected_aa1996_key=context[-1][2],
+    )
+    receipt = almanac.aa1996_solar.source_receipt()
+    if receipt["qualified_solar_term_years"] != list(SOFTWARE_YEARS):
+        raise EphemerisSourceError("solar_aa1996_range")
+    try:
+        unchanged = solar_model_policy() == "aa1996" and (
+            solar_term_cache_context(almanac.swe) == context
+        )
+    except ValueError as error:
+        raise EphemerisSourceError("solar_configuration_changed") from error
+    if not unchanged:
+        raise EphemerisSourceError("solar_configuration_changed")
+    calendar = ZonedCalendar(moment, parse_timezone_name(timezone_name))
+    clock = ephemeris_time(calendar.utc)
+    return {
+        "moment": calendar.isoformat(),
+        "civil_point": provenance["resolved_civil_point"].to_record(),
+        "provider": "moshier_aa1996",
+        "approximate": False,
+        "ephemeris_model": provenance["ephemeris_model"],
+        "time_basis": {
+            "root_time_scale": "TT",
+            "civil_policy": clock.method,
+            "historical_ut1_convention": clock.method == "pre_1972_swiss_UT1_delta_t",
+            "future_leap_seconds_assumed_unchanged": clock.future_leap_seconds_assumed_unchanged,
+            "leap_table_expires_at": leap_table()["expires_at"],
+        },
+    }
+
+
+def historical_solar_resolution(
+    year: int, term_name: str, timezone_name: str
+) -> dict[str, Any] | None:
+    """Resolve DE440/AA1996 crossings only outside the base software years."""
+    if not SOFTWARE_YEARS[0] <= year <= SOFTWARE_YEARS[1] or (
+        BASE_SOFTWARE_YEARS[0] <= year <= BASE_SOFTWARE_YEARS[1]
+    ):
+        return None
+    mode = solar_model_policy()
+    if mode == "aa1996":
+        return _aa1996_resolution(year, term_name, timezone_name)
+    if mode not in {"auto", "de440"}:
+        return None
+    jpl_file = configured_jpl_file()
+    if mode == "auto" and jpl_file is not None:
+        return None
+    source_key = de440_solar.cache_key(HISTORICAL_SOLAR_MODEL)
+    index = almanac.SOLAR_TERM_NAMES.index(term_name)
+    month = index // 2 + 1
+    low_day, high_day = (1, 12) if index % 2 == 0 else (12, 28)
+    low = date(year, month, low_day).toordinal() + 1721424.5
+    high = date(year, month, high_day).toordinal() + 1721424.5
+    root = de440_solar.longitude_crossing_tt(
+        float(almanac.SOLAR_TERM_LONGITUDES[index]),
+        low,
+        high,
+        profile_id=HISTORICAL_SOLAR_MODEL,
+    )
+    point = utc_point_from_tt(TTInstant.from_float(root["jd_tt"]))
+    calendar = ZonedCalendar(point.as_calendar(), parse_timezone_name(timezone_name))
+    moment = calendar.require_datetime()
+    clock = ephemeris_time(moment)
+    try:
+        current_configuration = (
+            solar_model_policy(),
+            configured_jpl_file(),
+            de440_solar.cache_key(HISTORICAL_SOLAR_MODEL),
+        )
+    except ValueError as error:
+        raise EphemerisSourceError("solar_configuration_changed") from error
+    if current_configuration != (mode, jpl_file, source_key):
+        raise EphemerisSourceError("solar_configuration_changed")
+    return {
+        "moment": moment.isoformat(),
+        "civil_point": point.to_record(),
+        "provider": "jpl_de440",
+        "approximate": False,
+        "ephemeris_model": HISTORICAL_SOLAR_MODEL,
+        "time_basis": {
+            "root_time_scale": "TT",
+            "civil_policy": clock.method,
+            "historical_ut1_convention": clock.method == "pre_1972_swiss_UT1_delta_t",
+            "future_leap_seconds_assumed_unchanged": clock.future_leap_seconds_assumed_unchanged,
+            "leap_table_expires_at": leap_table()["expires_at"],
+        },
+    }
+
 
 def boundary_model_policy(
     resolution: Mapping[str, object], *, date_only: bool = False
 ) -> dict[str, Any] | None:
-    """Identify a named numerical guard without turning it into an error bound.
-
-    Keep the established five-second operational policy and one-second numeric
-    acceptance gate separate. Neither is a claim about real-world prediction.
-    """
+    """Identify a named numerical guard without turning it into an error bound."""
     model = resolution.get("ephemeris_model")
     if not isinstance(model, str) or resolution.get("approximate") is True:
         return None
@@ -72,7 +190,6 @@ def boundary_model_policy(
 
 
 def resolution_point(record: CivilPointRecord | None, moment: str) -> CivilPoint:
-    """Read the retained event, or the label precision of a saved old receipt."""
     if record is None:
         return CivilPoint(ZonedCalendar.from_isoformat(moment).utc.julian_day_exact())
     cap = record["excluded_before"]
@@ -85,12 +202,6 @@ def resolution_point(record: CivilPointRecord | None, moment: str) -> CivilPoint
 def boundary_uncertainty_reason(
     local: datetime, resolution: dict[str, Any]
 ) -> str | None:
-    """Preserve candidates for a weak solver; never relax the raw TT gate.
-
-    The fixed 4812-crossing comparison retained 569 Moshier failures at the
-    one-second gate, maximum 2.455s. Five seconds is a conservative operational
-    guard, not an asserted error bound or a new accuracy acceptance threshold.
-    """
     policy = boundary_model_policy(resolution)
     if policy is None:
         return None
@@ -104,14 +215,12 @@ def boundary_uncertainty_reason(
 def boundary_dates(
     resolution: dict[str, Any], timezone_name: str
 ) -> tuple[date, set[date]] | None:
-    """Project a defined event date and dates touched by its closed guard."""
     if resolution.get("local_clock_status") == "undefined":
         return None
     tz = parse_timezone_name(timezone_name)
     point = resolution_point(resolution.get("civil_point"), resolution["moment"])
 
     def local_date(day: Fraction) -> date:
-        # Zone transitions and offsets are on the representable clock grid.
         lower, _ = nominal_calendar_bracket(day)
         return date(*ZonedCalendar(lower, tz).local_parts[:3])
 
@@ -137,14 +246,12 @@ def lichun(year: int, timezone_name: str) -> datetime:
 
 
 def lichun_resolution(year: int, timezone_name: str) -> dict[str, Any]:
-    """Report the actual per-term provider, not just Swiss import availability."""
     return solar_term_resolution(year, "立春", timezone_name)
 
 
 def solar_term_resolution(
     year: int, term_name: str, timezone_name: str
 ) -> dict[str, Any]:
-    """Keep every selected term's actual clock and ephemeris provenance."""
     historical = historical_solar_resolution(year, term_name, timezone_name)
     if historical is not None:
         return historical
@@ -152,14 +259,12 @@ def solar_term_resolution(
 
 
 def solar_term_receipt(term: almanac.SolarTerm) -> dict[str, Any]:
-    """Present the selected boundary without fetching another year grid."""
     defined = term.has_defined_local_clock
     result: dict[str, Any] = {
         "moment": (
             term.calendar.isoformat() if defined else term.calendar.utc.isoformat()
         ),
         "civil_point": term.point.to_record(),
-        "comparison_policy": "retained_nominal_civil_point_v1",
         "provider": term.resolution_provider,
         "approximate": False,
         "precision_scope": "engine_computed_not_independently_certified_to_seconds",
@@ -169,22 +274,13 @@ def solar_term_receipt(term: almanac.SolarTerm) -> dict[str, Any]:
     if term.tt_instant is None:
         raise ValueError("Solar source probe requires the retained TT boundary")
     clock_policy = native_solar_root_time_policy(term.calendar.utc)
-    # The API name does not prove .se1 files were used. Inspect the actual
-    # return flag at the selected root, not its re-encoded civil display.
     if term.resolution_provider == "swisseph":
         _, returned = ephemeris_call(
             "calc", term.tt_instant.as_float(), almanac.swe.SUN, almanac.swe.FLG_SWIEPH
         )
         result["ephemeris_model"] = ephemeris_model_from_retflag(returned)
-        result["ephemeris_model_scope"] = "sun_position_at_reported_TT"
     else:
-        # A native probe here would describe a different Sun model.
         result["ephemeris_model"] = term.ephemeris_model
-        result["ephemeris_model_scope"] = (
-            "named_analytic_solar_crossing"
-            if term.resolution_provider == "fatebridge_analytic"
-            else "named_ephemeris_solar_crossing"
-        )
     result["time_basis"] = {
         "root_time_scale": "TT",
         "civil_policy": clock_policy["civil_time_policy"],
@@ -198,7 +294,6 @@ def solar_term_receipt(term: almanac.SolarTerm) -> dict[str, Any]:
 
 
 def seasonal_query_clock(local: datetime | None) -> dict[str, str | None]:
-    """Preserve the actual instant when the selected local clock is undefined."""
     if local is not None and is_unspecified_local_time(local):
         return {
             "local_moment": None,
@@ -225,7 +320,6 @@ def _uncertain_year_fields(
 def _january_query_interval(
     local: datetime, zone: tzinfo, start: datetime, end: datetime
 ) -> tuple[str | None, str | None]:
-    """Find the query's connected interval between defined January year cuts."""
     query = local.astimezone(timezone.utc)
     year = local.year
     starts: list[tuple[datetime, str]] = []
@@ -242,8 +336,6 @@ def _january_query_interval(
             )
             continue
         lower, upper = sorted((first, last))
-        # The fold coordinates bracket the relevant offset change. Some
-        # coordinates are synthetic in a gap, so check both sides on UTC.
         cuts = {lower, upper}
         cuts.update(at for at, _, _ in clock_offset_changes(zone, lower, upper))
         for at in cuts:
@@ -324,11 +416,6 @@ def year_context(
             "timezone_name": timezone_name,
             "valid_from": None,
             "valid_until": None,
-            "interval_scope": (
-                "not_needed_for_confirmed_effective_birth_year"
-                if effective_year is not None
-                else "year_interval_resolution_not_requested"
-            ),
         }
         if uncertain_boundary is not None:
             assert local is not None
@@ -343,11 +430,16 @@ def year_context(
         valid_until = datetime.fromisoformat(end_resolution["moment"]).isoformat()
         timing = {
             "provider": "fatebridge.core.almanac.get_solar_term",
-            "runtime_swiss_available": almanac.swe is not None,
-            "start_resolution": start_resolution,
-            "end_resolution": end_resolution,
-            "independent_precision_verification": "no_arbitrary_year_second_certification",
-            "source_ids": ["S7", "S8", "S9"],
+            "start_resolution": {
+                k: v
+                for k, v in start_resolution.items()
+                if k not in {"civil_point", "time_basis"}
+            },
+            "end_resolution": {
+                k: v
+                for k, v in end_resolution.items()
+                if k not in {"civil_point", "time_basis"}
+            },
         }
     else:
         start, end = (
@@ -378,7 +470,6 @@ def year_context(
     if uncertain_boundary is not None:
         assert local is not None
         result.update(_uncertain_year_fields(year, local, uncertain_boundary))
-        result["interval_scope"] = "candidate_years_only_no_confirmed_year_validity"
         result["timing"] = {**timing, "interval_basis": "provisional_effective_year"}
         intervals = []
         for candidate in (local.year - 1, local.year):
@@ -395,3 +486,206 @@ def year_context(
             )
         result["candidate_year_intervals"] = intervals
     return result
+
+
+def _next_month(year: int, month: int, step: int) -> tuple[int, int]:
+    index = year * 12 + month - 1 + step
+    y, m = divmod(index, 12)
+    return y, m + 1
+
+
+def _month_boundary(
+    year: int, month: int, zone: str, *, term: almanac.SolarTerm | None = None
+) -> dict[str, Any]:
+    name = JIE[month - 1]
+    civil_year = year + int(month == 12)
+    resolution = (
+        solar_term_receipt(term)
+        if term is not None
+        else solar_term_resolution(civil_year, name, zone)
+    )
+    return {
+        "term_name": name,
+        "civil_year": civil_year,
+        **resolution,
+    }
+
+
+def solar_month_context(
+    effective_year: int | None,
+    month_number: int | None,
+    moment: datetime | None,
+    zone: str,
+) -> dict[str, Any]:
+    tz = parse_timezone_name(zone)
+    local = moment.astimezone(tz) if moment is not None else None
+    result: dict[str, Any] = {
+        "effective_solar_year": None,
+        "solar_month_number": None,
+        "month_branch": None,
+        "timezone_name": zone,
+        **seasonal_query_clock(local),
+        "year_boundary": "lichun",
+        "month_boundary": "twelve_jie_instants",
+        "interval_policy": "start_inclusive_end_exclusive",
+    }
+    if effective_year is None and local is None:
+        return {**result, "input_basis": "missing"}
+    start_term = end_term = None
+    if local is not None:
+        start_term, end_term = almanac.get_jie_boundaries(local, zone)
+        month_number = JIE.index(start_term.name) + 1
+        source_year = start_term.source_grid_year
+        if source_year is None:
+            assert start_term.has_defined_local_clock
+            source_year = start_term.calendar.local_parts[0]
+        effective_year = source_year - int(month_number == 12)
+    assert effective_year is not None and month_number is not None
+    next_year, next_month = _next_month(effective_year, month_number, 1)
+    start = _month_boundary(effective_year, month_number, zone, term=start_term)
+    end = _month_boundary(next_year, next_month, zone, term=end_term)
+    result.update(
+        effective_solar_year=effective_year,
+        solar_month_number=month_number,
+        month_branch=MONTH_BRANCHES[month_number - 1],
+        input_basis="aware_datetime" if local is not None else "confirmed_solar_month",
+        valid_from=start["moment"],
+        valid_until=end["moment"],
+        timing={
+            "provider": (
+                "fatebridge.core.almanac.get_jie_boundaries"
+                if local is not None
+                else "fatebridge.core.almanac.get_solar_terms_for_year"
+            ),
+            "start_resolution": start,
+            "end_resolution": end,
+        },
+        precision_policy={
+            "moshier_guard_seconds": MOSHIER_BOUNDARY_GUARD_SECONDS,
+            "numeric_acceptance_gate_seconds": 1.0,
+        },
+    )
+    model_policies = []
+    for name, resolution in (("start", start), ("end", end)):
+        policy = boundary_model_policy(resolution)
+        if policy is not None:
+            model_policies.append({"boundary": name, **policy})
+    if model_policies:
+        result["precision_policy"]["boundary_model_policies"] = model_policies
+    if local is not None:
+        candidates = {(effective_year, month_number)}
+        uncertain = []
+        for resolution, neighbor in (
+            (start, _next_month(effective_year, month_number, -1)),
+            (end, (next_year, next_month)),
+        ):
+            reason = boundary_uncertainty_reason(local, resolution)
+            if reason is not None:
+                candidates.add(neighbor)
+                uncertain.append({**resolution, "uncertainty_reason": reason})
+        if uncertain:
+            resolutions = {
+                (effective_year, month_number): start,
+                (next_year, next_month): end,
+            }
+
+            def endpoint(y: int, m: int) -> dict[str, Any]:
+                key = (y, m)
+                if key not in resolutions:
+                    resolutions[key] = _month_boundary(y, m, zone)
+                return {
+                    **resolutions[key],
+                    "full_resolution_path": (
+                        f"layers.monthly_stars.time_context.candidate_boundary_resolutions.{y}_{m}"
+                    ),
+                }
+
+            intervals = []
+            for y, m in sorted(candidates):
+                left = endpoint(y, m)
+                right = endpoint(*_next_month(y, m, 1))
+                intervals.append(
+                    {
+                        "effective_solar_year": y,
+                        "solar_month_number": m,
+                        "month_branch": MONTH_BRANCHES[m - 1],
+                        "candidate_only": True,
+                        "valid_from": left["moment"],
+                        "valid_until": right["moment"],
+                        "start_resolution": left,
+                        "end_resolution": right,
+                    }
+                )
+            provisional = {
+                key: result[key]
+                for key in (
+                    "effective_solar_year",
+                    "solar_month_number",
+                    "month_branch",
+                    "valid_from",
+                    "valid_until",
+                )
+            }
+            result["timing"]["interval_basis"] = "provisional_solar_month"
+            result.update(
+                month_status="requires_confirmation",
+                provisional_effective_solar_year=effective_year,
+                provisional_solar_month_number=month_number,
+                effective_solar_year=(
+                    effective_year if len({y for y, _ in candidates}) == 1 else None
+                ),
+                solar_month_number=None,
+                month_branch=None,
+                valid_from=None,
+                valid_until=None,
+                provisional_interval=provisional,
+                candidate_months=intervals,
+                candidate_boundary_resolutions={
+                    f"{y}_{m}": resolution for (y, m), resolution in resolutions.items()
+                },
+                uncertain_boundary_resolutions=uncertain,
+            )
+    return result
+
+
+# Six ZiBai seasonal anchor segments: (term_name, jiazi_anchor, direction_sign, half)
+ZIBAI_DAY_SEGMENTS: tuple[tuple[str, int, int, str], ...] = (
+    ("冬至", 1, 1, "yang_dun"),
+    ("雨水", 7, 1, "yang_dun"),
+    ("谷雨", 4, 1, "yang_dun"),
+    ("夏至", 9, -1, "yin_dun"),
+    ("处暑", 3, -1, "yin_dun"),
+    ("霜降", 6, -1, "yin_dun"),
+)
+_ZIBAI_ANCHOR_NAMES = frozenset(seg[0] for seg in ZIBAI_DAY_SEGMENTS)
+_ZIBAI_SEGMENT_BY_TERM = {seg[0]: seg for seg in ZIBAI_DAY_SEGMENTS}
+
+
+def zibai_solar_segment(moment: datetime, timezone_name: str) -> dict[str, Any]:
+    """Locate the ZiBai anchor segment (冬至/雨水/谷雨/夏至/处暑/霜降) for moment."""
+    local = almanac.localize_datetime(moment, timezone_name)
+    key = utc_calendar(local).julian_day_exact()
+    year = local.year
+    terms: list[almanac.SolarTerm] = []
+    for y in (year - 1, year):
+        for term in almanac.get_solar_terms_for_year(y, timezone_name):
+            if term.name in _ZIBAI_ANCHOR_NAMES:
+                terms.append(term)
+    terms.sort(key=lambda t: t.point.day)
+    active = None
+    for term in terms:
+        if term.point.day <= key:
+            active = term
+        else:
+            break
+    if active is None:
+        raise ValueError("Unable to locate ZiBai solstice/jieqi segment")
+    term_name, jiazi_anchor, step, dun_half = _ZIBAI_SEGMENT_BY_TERM[active.name]
+    return {
+        "anchor_term": term_name,
+        "anchor_moment": active.calendar.isoformat(),
+        "jiazi_anchor_star": jiazi_anchor,
+        "progression_direction": "ascending" if step > 0 else "descending",
+        "step": step,
+        "dun_half": dun_half,
+    }

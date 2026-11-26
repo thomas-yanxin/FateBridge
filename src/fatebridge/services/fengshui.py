@@ -1,19 +1,24 @@
-"""Composition only: preserve method, person, observation and time scopes."""
+"""Feng Shui services: clean multi-layer structural calculation and source composition."""
+
+from __future__ import annotations
 
 from itertools import combinations
 from typing import Any
 
-from pydantic import JsonValue, TypeAdapter
+from pydantic import JsonValue
 
-from fatebridge.core.fengshui.annual import annual_stars
+from fatebridge.core.fengshui.assess import analyze_layout
 from fatebridge.core.fengshui.bazhai import bazhai, minggua
-from fatebridge.core.fengshui.directions import bearing_context, provenance, rule_data
-from fatebridge.core.fengshui.geomagnetic import geomagnetic_reference
-from fatebridge.core.fengshui.host_guest import validate as validate_host_guest
+from fatebridge.core.fengshui.directions import (
+    bearing_context,
+    provenance,
+    raw_rule_data,
+)
+from fatebridge.core.fengshui.geomagnetic import (
+    geomagnetic_provenance,
+    geomagnetic_reference,
+)
 from fatebridge.core.fengshui.jinsuo import jinsuo
-from fatebridge.core.fengshui.layout import analyze_layout
-from fatebridge.core.fengshui.method_details import method_details
-from fatebridge.core.fengshui.method_policy import method_policy
 from fatebridge.core.fengshui.models import (
     AnnualRequest,
     AssessRequest,
@@ -25,19 +30,211 @@ from fatebridge.core.fengshui.models import (
     Placement,
     XuankongRequest,
 )
-from fatebridge.core.fengshui.monthly import monthly_stars
-from fatebridge.core.fengshui.mutual_geometry import validate_author_geometries
-from fatebridge.core.fengshui.natal_interpretation import analyze_natal_interpretation
-from fatebridge.core.fengshui.planning import evaluate_alternatives
-from fatebridge.core.fengshui.spatial_delivery import merge_measured_layout
-from fatebridge.core.fengshui.spatial_layout import prepare_spatial_request
-from fatebridge.core.fengshui.surface import summarize_analysis_progress
-from fatebridge.core.fengshui.xuankong import natal_provenance, xuankong_natal
-from fatebridge.services.fengshui_composition import compose_fengshui_result
+from fatebridge.core.fengshui.xuankong import (
+    analyze_natal_interpretation,
+    interpretation_provenance,
+    natal_provenance,
+    xuankong_natal,
+)
+from fatebridge.core.fengshui.zibai import (
+    annual_stars,
+    build_palace_overlay,
+    monthly_stars,
+)
+
+_BIBLIOGRAPHY_FIELDS = (
+    "title",
+    "url",
+    "kind",
+    "author",
+    "author_identity_url",
+    "edition",
+    "isbn",
+)
+_CITATION_FIELDS = (
+    "source_version",
+    "published",
+    "retrieved_at",
+    "locator",
+    "pages",
+    "scope",
+    "evidence_excerpt",
+    "boundary",
+    "source_disagreements",
+    "verification_note",
+)
 
 
 def _layer(result: dict[str, Any], ruleset_id: str) -> dict[str, Any]:
     return {**result, "ruleset": provenance(ruleset_id)}
+
+
+def _collect_sources(result: dict[str, Any]) -> None:
+    """Register bibliographic facts once in source_catalog and keep per-ruleset citations."""
+    catalog: dict[str, dict[str, JsonValue]] = {}
+    registered_sources = {
+        record["ruleset_id"]: record.get("sources") for record in result["rulesets"]
+    }
+
+    def visit(value: Any, *, registry_record: bool = False) -> Any:
+        if isinstance(value, list):
+            return [visit(row) for row in value]
+        if not isinstance(value, dict):
+            return value
+        shaped = {name: visit(child) for name, child in value.items()}
+        if "ruleset_id" in value and "sources" in value:
+            sources = value["sources"]
+            ruleset_id = value["ruleset_id"]
+            assert isinstance(sources, list) and isinstance(ruleset_id, str)
+            shaped.pop("sources")
+            if not registry_record and sources == registered_sources.get(ruleset_id):
+                return shaped
+            citations: dict[str, JsonValue] = {}
+            for source in sources:
+                assert isinstance(source, dict)
+                source_id = source["source_id"]
+                assert isinstance(source_id, str)
+                catalog.setdefault(source_id, {}).update(
+                    {key: source[key] for key in _BIBLIOGRAPHY_FIELDS if key in source}
+                )
+                citations[source_id] = {
+                    key: source[key] for key in _CITATION_FIELDS if key in source
+                }
+            if citations:
+                shaped["source_citations"] = citations
+        return shaped
+
+    result["rulesets"] = [
+        visit(record, registry_record=True) for record in result["rulesets"]
+    ]
+    for name in list(result):
+        if name != "rulesets":
+            result[name] = visit(result[name])
+    result["source_catalog"] = catalog
+
+
+def _trace_entry(method: str, record: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "method": method,
+        "ruleset_id": record["ruleset_id"],
+        "version": record["version"],
+        "source_ids": record["source_ids"],
+        "scope": record["scope"],
+    }
+
+
+def compose_fengshui_result(
+    layers: dict[str, Any],
+    conflicts: list[dict[str, Any]],
+    layout: dict[str, Any] | None = None,
+    palace_overlay: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    missing = [m for layer in layers.values() for m in layer["missing_inputs"]]
+    status = "partial" if missing else "complete"
+    summary = "；".join(f"{name}: {layer['status']}" for name, layer in layers.items())
+    natal_selected = "xuankong_natal" in layers
+
+    rulesets = [layer["ruleset"] for layer in layers.values()]
+    rule_trace = [
+        _trace_entry(name, layer["ruleset"]) for name, layer in layers.items()
+    ]
+
+    coverage: dict[str, Any] = {
+        "implemented_layers": list(layers),
+        "missing_inputs": missing,
+        "unavailable_layers": [
+            n
+            for n in raw_rule_data("unavailable_layers")
+            if n not in {"xuankong_natal", "monthly_stars"}
+        ],
+        "not_requested_layers": [
+            n
+            for n in (
+                "bazhai",
+                "jinsuo",
+                "annual_stars",
+                "monthly_stars",
+                "xuankong_natal",
+            )
+            if n not in layers
+        ],
+    }
+
+    result: dict[str, Any] = {
+        "analysis_type": "家居风水分层计算" if natal_selected else "家居风水基础计算",
+        "engine": (
+            "fatebridge-fengshui-natal-v1"
+            if natal_selected
+            else "fatebridge-fengshui-foundation-v1"
+        ),
+        "status": status,
+        "layers": layers,
+        "rulesets": rulesets,
+        "coverage": coverage,
+        "conflicts": conflicts,
+        "rule_trace": rule_trace,
+        "summary": summary,
+    }
+    if palace_overlay is not None:
+        result["palace_overlay"] = palace_overlay
+    if layout is not None:
+        result["layout_analysis"] = layout
+        coverage["requested_analysis_status"] = (
+            "partial"
+            if status == "partial" or layout["status"] == "partial"
+            else "complete"
+        )
+        result["summary"] = (
+            f"{summary}；layout: {layout['status']}"
+            if layers
+            else f"layout: {layout['status']}"
+        )
+
+    interpretation = layers.get("xuankong_natal", {}).get("interpretation")
+    if interpretation is not None:
+        interp_prov = interpretation_provenance()
+        rulesets.append(interp_prov)
+        rule_trace.append(_trace_entry("xuankong_interpretation", interp_prov))
+        for key, trace_name in (
+            ("timeliness_ruleset", "wang_timeliness"),
+            ("host_guest_analysis", "host_guest"),
+            ("fixed_lingzheng_analysis", "fixed_lingzheng"),
+        ):
+            sub = interpretation.get(key)
+            if sub is not None:
+                rec = sub if key == "timeliness_ruleset" else sub["ruleset"]
+                rulesets.append(rec)
+                rule_trace.append(_trace_entry(trace_name, rec))
+        coverage["natal_interpretation_status"] = interpretation["status"]
+        coverage["requested_analysis_status"] = (
+            "partial"
+            if interpretation["status"] == "partial"
+            or coverage.get("requested_analysis_status", status) == "partial"
+            else "complete"
+        )
+
+    city_gate = layers.get("xuankong_natal", {}).get("city_gate_analysis")
+    if city_gate is not None:
+        result["summary"] += f"；city_gate: {city_gate['status']}"
+        rec = city_gate["ruleset"]
+        rulesets.append(rec)
+        rule_trace.append(_trace_entry("city_gate", rec))
+        coverage["city_gate_status"] = city_gate["status"]
+        coverage["requested_analysis_status"] = (
+            "partial"
+            if city_gate["status"] == "partial"
+            or coverage.get("requested_analysis_status", status) == "partial"
+            else "complete"
+        )
+
+    geomagnetic = layers.get("directions", {}).get("geomagnetic_reference")
+    if geomagnetic is not None:
+        rec = geomagnetic_provenance(geomagnetic["selected_model_id"])
+        rulesets.append(rec)
+        rule_trace.append(_trace_entry("geomagnetic", rec))
+
+    _collect_sources(result)
+    return result
 
 
 def calculate_directions(request: DirectionsRequest) -> dict[str, Any]:
@@ -45,12 +242,11 @@ def calculate_directions(request: DirectionsRequest) -> dict[str, Any]:
     if request.bearing_degrees is not None:
         assert request.north_reference is not None
         bearing = bearing_context(request.bearing_degrees, request.north_reference)
-    result = {
+    result: dict[str, Any] = {
         "status": "complete",
-        "directions": rule_data("directions"),
+        "directions": raw_rule_data("directions"),
         "missing_inputs": [],
         "bearing": bearing,
-        "division_scope": "confirmed_angular_sectors_no_automatic_geometry",
     }
     if request.geomagnetic_reference is not None:
         result["geomagnetic_reference"] = geomagnetic_reference(
@@ -98,29 +294,11 @@ def _natal_layer(
         layer["interpretation"] = analyze_natal_interpretation(
             request.interpretation, layer, placements or []
         )
-        validate_author_geometries(
-            layer["interpretation"],
-            layer,
-            current=request.interpretation.current_period_number,
-            expected_selected=request.interpretation.timeliness_ruleset_id is not None,
-        )
-        validate_host_guest(
-            layer["interpretation"],
-            layer,
-            expected_selected=request.interpretation.host_guest_ruleset_id is not None,
-        )
     return layer
 
 
 def calculate_xuankong_natal(request: XuankongRequest) -> dict[str, Any]:
-    return compose_fengshui_result(
-        {"xuankong_natal": _natal_layer(request)},
-        [],
-        include_calculation_reading=bool(
-            request.interpretation
-            and request.interpretation.include_calculation_reading
-        ),
-    )
+    return compose_fengshui_result({"xuankong_natal": _natal_layer(request)}, [])
 
 
 def _differences(layers: dict[str, Any]) -> list[dict[str, Any]]:
@@ -131,8 +309,6 @@ def _differences(layers: dict[str, Any]) -> list[dict[str, Any]]:
         house = bazhai_layer["house"]
         charts.append((house["object_id"], "house", house["sectors"]))
     for occupant in bazhai_layer.get("occupants", []):
-        # Unknown birth convention produces alternatives, never a confirmed
-        # conflict between imaginary residents.
         if occupant["status"] == "complete":
             charts.append(
                 (
@@ -141,8 +317,9 @@ def _differences(layers: dict[str, Any]) -> list[dict[str, Any]]:
                     occupant["candidates"][0]["sectors"],
                 )
             )
+    directions = raw_rule_data("directions")
     for a, b in combinations(charts, 2):
-        for direction in rule_data("directions"):
+        for direction in directions:
             first, second = a[2][direction]["star"], b[2][direction]["star"]
             if first["polarity"] != second["polarity"]:
                 differences.append(
@@ -156,55 +333,18 @@ def _differences(layers: dict[str, Any]) -> list[dict[str, Any]]:
                         "entries": [
                             {
                                 "subject_id": c[0],
-                                "subject_kind": c[1],
-                                "star": c[2][direction]["star"],
+                                "star": c[2][direction]["star"]["name"],
+                                "polarity": c[2][direction]["star"]["polarity"],
                             }
                             for c in (a, b)
                         ],
-                        "resolution": "keep_each_subject_result_no_household_override",
-                        "rule_id": "bazhai_sitting_v1.dayounian_xor",
-                        "source_ids": ["S3"],
                     }
                 )
-    if (
-        all(name in layers for name in ("bazhai", "jinsuo", "annual_stars"))
-        and bazhai_layer.get("house")
-        and layers["annual_stars"].get("palaces")
-    ):
-        for direction in rule_data("directions"):
-            differences.append(
-                {
-                    "kind": "distinct_scope_overlay",
-                    "direction": direction,
-                    "bazhai_house_star": bazhai_layer["house"]["sectors"][direction][
-                        "star"
-                    ],
-                    "jinsuo_preference": layers["jinsuo"]["preferences"][direction][
-                        "preferred_classification"
-                    ],
-                    "annual_star_number": layers["annual_stars"]["palaces"][direction][
-                        "annual_star_number"
-                    ],
-                    "resolution": "different_conditions_and_time_scopes_no_combined_score",
-                    "rule_ids": [
-                        "bazhai_sitting_v1.dayounian_xor",
-                        "jinsuo_basic_fixed_v1.palace_preference",
-                        "annual_zibai_lichun_v1.forward_flight",
-                    ],
-                    "source_ids": ["S3", "S4", "S5"],
-                }
-            )
     return differences
 
 
 def calculate_fengshui_assessment(request: AssessRequest) -> dict[str, Any]:
-    original = request
-    geometry = None
-    if request.workstation_layout is not None:
-        request, geometry = prepare_spatial_request(
-            request, request.workstation_layout.scene
-        )
-    layers = {}
+    layers: dict[str, Any] = {}
     if "bazhai" in request.selected_methods:
         layers["bazhai"] = _layer(bazhai(request), request.ruleset_id)
     if "jinsuo" in request.selected_methods:
@@ -221,7 +361,9 @@ def calculate_fengshui_assessment(request: AssessRequest) -> dict[str, Any]:
             annual_stars(
                 AnnualRequest(
                     effective_year=request.effective_year,
-                    query_at=request.query_at,
+                    query_at=(
+                        None if request.effective_year is not None else request.query_at
+                    ),
                     timezone_name=request.timezone_name,
                     ruleset_id=request.annual_ruleset_id,
                 )
@@ -232,10 +374,10 @@ def calculate_fengshui_assessment(request: AssessRequest) -> dict[str, Any]:
         if request.xuankong is None:
             natal = XuankongRequest(house=request.house)
         elif request.xuankong.house is None and request.house is not None:
-            # note (house): Inheriting a house applies Xuankong's magnetic-bearing constraints.
             natal = XuankongRequest(
                 house=request.house,
                 period=request.xuankong.period,
+                current_period_number=request.xuankong.current_period_number,
                 ruleset_id=request.xuankong.ruleset_id,
                 interpretation=request.xuankong.interpretation,
                 city_gate=request.xuankong.city_gate,
@@ -248,139 +390,10 @@ def calculate_fengshui_assessment(request: AssessRequest) -> dict[str, Any]:
             query_at=request.query_at, timezone_name=request.timezone_name
         )
         layers["monthly_stars"] = monthly_stars(monthly)
+
     layers = {name: layers[name] for name in request.selected_methods}
-    layout = (
-        analyze_layout(request, layers)
-        if request.analyze_layout
-        # A scene also labels method-reference queries. It does not by itself
-        # request a site assessment or create missing physical observations.
-        or (
-            request.scene
-            and (request.selected_methods or request.placements or request.features)
-        )
-        or request.layout_constraints
-        or request.layout_alternatives
-        or request.form_observations
-        or request.environmental_context is not None
-        or request.surface_layouts
-        or request.element_adjustments
-        or request.annual_remedy_ruleset_id is not None
-        or request.workstation_layout is not None
-        else None
-    )
-    if layout is not None and geometry is not None:
-        layout = merge_measured_layout(
-            original,
-            request,
-            geometry,
-            TypeAdapter(dict[str, JsonValue]).validate_python(layers),
-            TypeAdapter(dict[str, JsonValue]).validate_python(layout),
-        )
-    if layout is not None and request.layout_alternatives:
-        alternatives = evaluate_alternatives(request, layers)
-        layout["alternatives_analysis"] = alternatives
-        registered = {r["ruleset_id"] for r in layout["supplemental_rulesets"]}
-        for proposal in alternatives["findings"]:
-            for ruleset in proposal["supplemental_rulesets"]:
-                if ruleset["ruleset_id"] not in registered:
-                    layout["supplemental_rulesets"].append(ruleset)
-                    registered.add(ruleset["ruleset_id"])
-        previous = layout["analysis_progress"]
-        states = {
-            "ready": "ready",
-            "conditional": "conditional_option",
-            "candidate": "candidate_only",
-            "blocked": "blocked",
-        }
-        existing_actions = [
-            {"status": states[key], "optional": False}
-            for key, count in previous["action_counts"].items()
-            for _ in range(count)
-        ]
-        progress = summarize_analysis_progress(
-            layout["missing_inputs"],
-            previous["rule_coverage_counts"],
-            [*existing_actions, *alternatives["findings"]],
-            [
-                *previous["pending_confirmations"],
-                *(
-                    p
-                    for f in alternatives["findings"]
-                    for p in f["pending_confirmations"]
-                ),
-            ],
-            count_unit=previous["rule_coverage_count_unit"],
-            limited=previous["rule_coverage_status"] == "limited",
-        )
-        # Optional proposals cannot reopen or close the review of current facts.
-        for key in (
-            "calculation_status",
-            "rule_coverage_status",
-            "assessment_complete",
-            "interpretation_status",
-        ):
-            progress[key] = previous[key]
-        progress["optional_action_count"] = previous["optional_action_count"] + len(
-            alternatives["findings"]
-        )
-        layout["analysis_progress"] = progress
-    scene_scope = None
-    if request.scene is not None:
-        scene_scope = {
-            "scene": request.scene,
-            "selected_methods": request.selected_methods,
-            "selection_policy": "explicit_methods_override_input_driven_default",
-            "scope": "supplied_objects_and_selected_rules_not_whole_property_certification",
-            "indoor_forms": (
-                "selected_modern_authored_rules"
-                if request.form_observations
-                else "not_provided"
-            ),
-            "geometry": (
-                "measured_planar_scene_with_explicit_chart_binding"
-                if request.workstation_layout
-                else "user_confirmed_house_sectors_no_automatic_floorplan_geometry"
-            ),
-            "natal_interpretation": (
-                "conditioned_element_pairs_current_star_external_forms_and_bed_door_roles"
-                if layers.get("xuankong_natal", {}).get("interpretation") is not None
-                else (
-                    "three_star_roles_without_complete_combination_or_external_form_judgment"
-                    if "xuankong_natal" in layers
-                    else "not_selected"
-                )
-            ),
-            "unsupported_methods": [
-                "yangzhai_sanyao_structural_rules",
-                "sanhe_water_formulas",
-                "xuankong_dagua",
-                "complete_classical_landforms",
-            ],
-        }
-    policy_selected = (
-        request.scene is not None or request.environmental_context is not None
-    )
+    layout = analyze_layout(request, layers) if request.analyze_layout else None
+    palace_overlay = build_palace_overlay(layers)
     return compose_fengshui_result(
-        layers,
-        _differences(layers),
-        layout,
-        scene_scope,
-        (
-            method_policy(
-                request,
-                explicit_methods=request.methods is not None,
-                layer_results=layers,
-                candidate_results=(layout or {})
-                .get("alternatives_analysis", {})
-                .get("findings", []),
-            )
-            if policy_selected
-            else None
-        ),
-        method_details(request.selected_methods) if policy_selected else None,
-        include_calculation_reading=bool(
-            request.xuankong
-            and request.xuankong.interpretation
-            and request.xuankong.interpretation.include_calculation_reading
-        ),
+        layers, _differences(layers), layout=layout, palace_overlay=palace_overlay
     )
