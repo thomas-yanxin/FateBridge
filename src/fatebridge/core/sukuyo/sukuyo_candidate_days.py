@@ -8,21 +8,21 @@ choosing a clock, reconstruction, candidate, or real-world action.
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
 from fatebridge.core.sukuyo.sukuyo_activities import assess_activity
 from fatebridge.core.sukuyo.sukuyo_clothing import clothing_reference
 from fatebridge.core.sukuyo.sukuyo_directions import travel_direction_evidence
 from fatebridge.core.sukuyo.sukuyo_lower import lower_mansion_evidence
 from fatebridge.core.sukuyo.sukuyo_lower_methods import lower_methods_evidence
-from fatebridge.core.sukuyo.sukuyo_relations import TEXT_URL, relation_between_su27
+from fatebridge.core.sukuyo.sukuyo_relations import relation_between_su27
 from fatebridge.core.sukuyo.sukuyo_sanjiu_days import personal_day_witnesses
 from fatebridge.core.sukuyo.sukuyo_special_days import special_day_evidence
 
 
 def personal_day_evidence(
-    natal_mansion: Optional[str], mansion: Optional[str]
-) -> Optional[dict[str, Any]]:
+    natal_mansion: str | None, mansion: str | None
+) -> dict[str, Any] | None:
 
     if natal_mansion is not None:
         # Validate even when the target day's mansion remains unresolved.
@@ -55,21 +55,18 @@ def personal_day_evidence(
             "upper_volume": {
                 "meaning": upper[label],
                 "locator": "T21n1299_p0391b19-25",
-                "source": TEXT_URL,
             },
             "textual_conflict": label in {"業", "危"},
             "lower_volume_variant": (
                 {
                     "meaning": "下卷称业宿日所作善恶亦不成就，与上卷不同。",
                     "locator": "T21n1299_p0398a07-08",
-                    "source": TEXT_URL,
                 }
                 if label == "業"
                 else (
                     {
                         "meaning": "下卷0398a02称危日宜定婚姻，0398a09-10又称危坏日不宜婚姻，保留两条。",
                         "locator": "T21n1299_p0398a02; p0398a09-10",
-                        "source": TEXT_URL,
                     }
                     if label == "危"
                     else None
@@ -80,7 +77,7 @@ def personal_day_evidence(
     return personal_day
 
 
-def mansion_nature(mansion: Optional[str]) -> Optional[str]:
+def mansion_nature(mansion: str | None) -> str | None:
     groups = {
         "安重": "毕翼斗壁",
         "和善": "觜角房奎",
@@ -146,9 +143,9 @@ def _conditions(calendar: dict[str, Any], name: str) -> list[dict[str, Any]]:
 
 def candidate_mansion_days(
     day: dict[str, Any],
-    natal_mansion: Optional[str],
-    activity: Optional[str],
-    activity_details: Optional[Sequence[str]],
+    natal_mansion: str | None,
+    activity: str | None,
+    activity_details: Sequence[str] | None,
 ) -> list[dict[str, Any]]:
 
     calendar = day["calendar"]

@@ -25,14 +25,12 @@ class _Table:
     rows: tuple[tuple[int, int, bool, int], ...]
     first: date
     last: date
-    sha256: str
     metadata_json: str
 
 
 @lru_cache(maxsize=4)
 def _table(path: Path) -> _Table:
-    record = load_source(path)
-    bundle = record.data
+    bundle = load_source(path)
     rows, starts = [], []
     previous_end = None
     previous_label = None
@@ -80,7 +78,6 @@ def _table(path: Path) -> _Table:
         tuple(rows),
         first,
         last,
-        record.sha256,
         json.dumps(metadata, ensure_ascii=False),
     )
 
@@ -92,7 +89,8 @@ def supported_range() -> tuple[date, date]:
 
 def reference_metadata() -> dict[str, Any]:
     table = _table(SOURCE)
-    return {**json.loads(table.metadata_json), "source_bundle_sha256": table.sha256}
+    metadata: dict[str, Any] = json.loads(table.metadata_json)
+    return metadata
 
 
 def lunar_fields(civil: date) -> tuple[int, int, int, bool]:
@@ -122,10 +120,8 @@ def date_reference(civil: date) -> dict[str, Any]:
             )
         )
     )
-    jd = 2451544.5 + (civil - date(2000, 1, 1)).days
     return {
         **metadata,
-        "date_source_uri": f"http://datetime.hutime.org/calendar/1002.1/date/{jd:.1f}",
         "date_provenance": origin,
         "lunar_year_is_gregorian_era_year": False,
         "printed_lunar_year": year,

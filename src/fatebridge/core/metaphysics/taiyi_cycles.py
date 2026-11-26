@@ -6,7 +6,6 @@ from collections.abc import Mapping
 from typing import TypedDict
 
 UNITS = {"year": "年", "month": "节月", "day": "日", "hour": "时辰"}
-SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷01"
 
 
 class CounterGroup(TypedDict):
@@ -18,7 +17,6 @@ class CounterGroup(TypedDict):
 class CounterCycles(TypedDict):
     ruleset_id: str
     version: str
-    source: str
     paths_relative_to: str
     counter_path: str
     actual_ju_path: str
@@ -57,7 +55,6 @@ def counter_cycles(
     return {
         "ruleset_id": "taiyi_selected_counter_cycles_v1",
         "version": "1.0.0",
-        "source": SOURCE,
         "paths_relative_to": "taiyi_board",
         "counter_path": "core_board.accumulation",
         "actual_ju_path": "core_board.kook_number",

@@ -17,18 +17,11 @@ from fatebridge.core.human_design.human_design_depth import (
     line_fixings,
 )
 from fatebridge.core.human_design.human_design_mechanics import VALID_PROFILES
-from fatebridge.core.human_design.human_design_references import (
-    reference_data,
-    reference_sha256,
-)
+from fatebridge.core.human_design.human_design_references import reference_data
 
 
 def variant_reference() -> dict[str, Any]:
     return reference_data("source-variants-2026-reference.json")
-
-
-def variant_reference_sha256() -> str:
-    return reference_sha256("source-variants-2026-reference.json")
 
 
 def printed_lines() -> dict[int, list[dict[str, Any]]]:
@@ -38,11 +31,6 @@ def printed_lines() -> dict[int, list[dict[str, Any]]]:
         (gate, line) for gate in range(1, 65) for line in range(1, 7)
     }:
         raise ValueError("Incomplete source line arcs")
-    if (
-        reference["printed_source"]["pdf_sha256"]
-        != depth_reference()["source"]["pdf_sha256"]
-    ):
-        raise ValueError("Different original source edition")
     for row in rows:
         if any(
             type(row[k]) is not int or not 0 <= row[k] < 1296000
@@ -96,7 +84,6 @@ def cross_name_evidence(chart: dict[str, Any]) -> dict[str, Any]:
         "observed_labels": [compare_name(cross["name"], n) for n in names],
         "observations": deepcopy(matches),
         "observed_sources": deepcopy(reference["observed_cross_label_sources"]),
-        "catalog_sha256": variant_reference_sha256(),
         "disagreement_resolved": bool(matches)
         and all(compare_name(cross["name"], n)["literal_match"] for n in names),
         "scope": "只报告冻结官方样本中相同四门及角度的标签；不推断未观测交叉，不替换2001版名称或忽略编号，不把版本差异当作原典整本通过。",
@@ -128,7 +115,6 @@ def source_variant_audit() -> dict[str, Any]:
         )
     return {
         "method_id": "human_design_source_variant_audit_v1",
-        "catalog_sha256": variant_reference_sha256(),
         "printed_line_count": sum(map(len, arcs.values())),
         "line_width_disagreements": disagreements,
         "dictionary_rule": deepcopy(reference["dictionary_source"]),

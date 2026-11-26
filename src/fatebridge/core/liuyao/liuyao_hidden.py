@@ -74,7 +74,6 @@ def qualify_hidden_reception(
         if hidden_moving is not None:
             hidden_moving.update(
                 application_source_url=PROFILE["source"]["url"] + "#page=110",
-                application_source_sha256=PROFILE["source"]["sha256"],
                 application_interpretation="将同版第110页伏神得动爻生与第97页金逢巳条款合用；这是明示的跨章适用，不是原文逐字描述本开发结构，也不等于已出伏或全局受益。",
             )
         hidden_growth = metal_si_growth_supported(
@@ -417,7 +416,6 @@ def qualify_hidden_reception(
             ),
             source_path=f"liuyao_evidence.conditional_analysis.hidden_conditions.{i}.reception",
             source_url=PROFILE["source"]["url"] + "#page=110",
-            source_sha256=PROFILE["source"]["sha256"],
             clauses=deepcopy(PROFILE["clauses"]),
             textual_issues=deepcopy(PROFILE["textual_issues"]),
             flying_generation=flying,

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from fractions import Fraction
-from typing import Any, Dict, Optional
+from typing import Any
 
 from fatebridge.core.astro.astrology_tables import SIGN_LABELS_ZH, SIGNS
 from fatebridge.core.jyotish.jyotish_longitude_motion import (
@@ -47,7 +47,7 @@ EXALTATION = {
 ASPECT_OFFSETS = {"Mars": [4, 7, 8], "Jupiter": [5, 7, 9], "Saturn": [3, 7, 10]}
 
 
-def dignity(planet: str, sign: int) -> Dict[str, Any]:
+def dignity(planet: str, sign: int) -> dict[str, Any]:
     if planet not in EXALTATION:
         state = "not_assigned"
     elif sign == EXALTATION[planet]:
@@ -68,12 +68,12 @@ def dignity(planet: str, sign: int) -> Dict[str, Any]:
 
 def point_record(
     planet: str,
-    longitude: Optional[float],
+    longitude: float | None,
     asc_sign: int,
     *,
     sign_index: int,
-    degree_in_sign: Optional[float],
-) -> Dict[str, Any]:
+    degree_in_sign: float | None,
+) -> dict[str, Any]:
     """Keep both independently rendered coordinates from the same varga result."""
     sign = sign_index
     return {
@@ -88,7 +88,7 @@ def point_record(
     }
 
 
-def partition_longitudes(raw: Dict[str, Any]) -> Dict[str, float | Fraction]:
+def partition_longitudes(raw: dict[str, Any]) -> dict[str, float | Fraction]:
     """Keep the exact antipode through partitions of ephemeris-derived Ketu."""
     longitudes: dict[str, float | Fraction] = raw["longitudes"]
     if (
@@ -100,11 +100,11 @@ def partition_longitudes(raw: Dict[str, Any]) -> Dict[str, float | Fraction]:
 
 
 def divisional_chart(
-    raw: Dict[str, Any],
+    raw: dict[str, Any],
     division: int,
     *,
-    partition_longitudes: Optional[Dict[str, float | Fraction]] = None,
-) -> Dict[str, Any]:
+    partition_longitudes: dict[str, float | Fraction] | None = None,
+) -> dict[str, Any]:
     longitudes = (
         raw["longitudes"] if partition_longitudes is None else partition_longitudes
     )

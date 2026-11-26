@@ -13,7 +13,7 @@ from fatebridge.core.sukuyo.sukuyo_koya_preface import (
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_koya_1736_month_table.json"
-_ALIASES = str.maketrans("虛婁畢參張軫", "虚娄毕参张轸")
+ALIASES = str.maketrans("虛婁畢參張軫", "虚娄毕参张轸")
 
 
 def printed_month_reference(
@@ -24,8 +24,7 @@ def printed_month_reference(
     A first-half assignment can differ from that host cell. Return both identities
     and never label the ordinary printed table as an observed leap-month result.
     """
-    loaded = load_source(SOURCE)
-    bundle = loaded.data
+    bundle = load_source(SOURCE)
     month, day = host["lunar_month"], host["lunar_day"]
     columns = bundle["day_columns"]
     if (
@@ -45,12 +44,11 @@ def printed_month_reference(
     )
     candidates = disputed["candidate_literals"] if disputed else [literal]
     image = next(r for r in bundle["source_images"] if r["frame"] == column["frame"])
-    normalized = literal.translate(_ALIASES) if not disputed else None
+    normalized = literal.translate(ALIASES) if not disputed else None
     source = {k: deepcopy(v) for k, v in bundle.items() if k != "day_columns"}
 
     return {
         "ruleset_id": bundle["id"],
-        "source_bundle_sha256": loaded.sha256,
         "source_reference": source,
         "preface_scholarly_reference": preface_reference(bundle),
         "lunar_month": month,
@@ -80,10 +78,10 @@ def printed_month_reference(
         "candidate_comparisons": [
             {
                 "literal": candidate,
-                "normalized": candidate.translate(_ALIASES),
-                "matches_unsplit_host": candidate.translate(_ALIASES)
+                "normalized": candidate.translate(ALIASES),
+                "matches_unsplit_host": candidate.translate(ALIASES)
                 == host["direct_mansion"],
-                "matches_taisho_upper_literal": candidate.translate(_ALIASES)
+                "matches_taisho_upper_literal": candidate.translate(ALIASES)
                 == upper["table_mansion_28"],
             }
             for candidate in candidates

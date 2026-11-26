@@ -2,11 +2,6 @@
 
 from __future__ import annotations
 
-from fatebridge.core.metaphysics.ren_sources import JINKOU_SCAN_URL as JINKOU_SCAN_URL
-
-JINKOU_SCAN_SHA256 = "ee80bf68c7f87570540c88f073814af7adcd142b22ae71f6679253f59387785b"
-
-
 TRINES = {
     frozenset(s): e
     for s, e in (("寅午戌", "火"), ("申子辰", "水"), ("亥卯未", "木"), ("巳酉丑", "金"))

@@ -10,10 +10,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Iterable, Sequence
 
-from fatebridge.core.human_design.human_design_references import (
-    reference_data,
-    reference_sha256,
-)
+from fatebridge.core.human_design.human_design_references import reference_data
 
 NAMES = {
     "individual_knowing": "个体知晓回路",
@@ -28,10 +25,6 @@ NAMES = {
 
 def topology_reference() -> dict[str, Any]:
     return reference_data("circuit-pages-1996-reference.json")
-
-
-def topology_reference_sha256() -> str:
-    return reference_sha256("circuit-pages-1996-reference.json")
 
 
 def topology_completion(channels: Sequence[dict[str, Any]]) -> dict[str, Any]:
@@ -68,8 +61,6 @@ def topology_completion(channels: Sequence[dict[str, Any]]) -> dict[str, Any]:
         "integration_all_four_defined": next(
             r["all_channels_defined"] for r in result if r["id"] == "integration"
         ),
-        "source_catalog_sha256": topology_reference_sha256(),
-        "source_url": topology_reference()["source"]["url"],
         "source_author": topology_reference()["source"]["author"],
         "source_revision": topology_reference()["source"]["revision"],
         "source_kind": topology_reference()["source"]["source_kind"],
@@ -147,11 +138,8 @@ def audit_archival_channel_pages(
                 == disagreement["endpoint_implied_motor_centers"],
             }
         ],
-        "source_url": reference["source"]["url"],
         "source_author": reference["source"]["author"],
         "source_revision": reference["source"]["revision"],
         "source_kind": reference["source"]["source_kind"],
-        "source_pdf_sha256": reference["source"]["pdf_sha256"],
-        "source_catalog_sha256": topology_reference_sha256(),
         "scope": "36项扫描页门对观察，另列 OCR 与运动中心标签分歧，保留早期6项官方分类及30项端点推断。",
     }

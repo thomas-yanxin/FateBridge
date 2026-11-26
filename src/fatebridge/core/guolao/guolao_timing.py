@@ -261,7 +261,6 @@ def enrich_guolao_timing(
                 "id": monthly["model_id"],
                 "edition_id": monthly["source_id"],
                 "title": monthly["source_title"],
-                "source_url": monthly["source_url"],
                 "verified_subset": "影像十二月序逆转；现代月制、年界和闰月未验收",
             }
         )

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import copy
-import hashlib
 import json
 import re
 from functools import lru_cache
@@ -12,7 +11,6 @@ from typing import Any
 
 from fatebridge.core.metaphysics.taiyi_geometry import PALACES, RING
 
-CATALOG_SHA256 = "a7ed6774b748742e4fc44649ad171057d8f61d8c4fd3a577189784f46940e41d"
 GEOMETRY_CLAUSE = re.compile(r"^(天目|大將|參將|小將|大小將)(內迫|外迫|迫|囚|格)$")
 OUTCOME_CLAUSE = re.compile(
     r"^(?:(?:主人?|客)(?:大|小)?[勝敗])+$|^(?:不利|利)?先起(?:敗)?$|^(?:先勝後[敗負]|客先起|後敗)$"
@@ -32,10 +30,7 @@ def source_catalog() -> dict[str, Any]:
         Path(__file__).resolve().parents[2]
         / "data/classical/taiyi-victory-matrix-v1.json"
     )
-    raw = p.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != CATALOG_SHA256:
-        raise ValueError("胜败钤资料指纹不符")
-    data: dict[str, Any] = json.loads(raw)
+    data: dict[str, Any] = json.loads(p.read_text(encoding="utf-8"))
     if len(data["cells"]) != 128:
         raise ValueError("胜败钤须保留全部128格")
     return data
@@ -159,19 +154,14 @@ def victory_matrix_assessment(
     data = source_catalog()
     result: dict[str, Any] = {
         "ruleset": {
-            **{
-                k: data[k]
-                for k in [
-                    "id",
-                    "version",
-                    "author",
-                    "classical_author",
-                    "source_title",
-                    "source_manifest_sha256",
-                    "source_urls",
-                ]
-            },
-            "catalog_sha256": CATALOG_SHA256,
+            k: data[k]
+            for k in [
+                "id",
+                "version",
+                "author",
+                "classical_author",
+                "source_title",
+            ]
         },
         "calculation_mode": calculation_mode,
         "role_scope": data["role_scope"],

@@ -87,19 +87,14 @@ def _clock(literal: str, model: dict[str, Any]) -> dict[str, Any]:
 
 def decode_clock(literal: str, *, model: str) -> dict[str, Any]:
     """Decode only a selected research model, never infer one from a date."""
-    loaded = load_source(SOURCE)
-    models = _models(loaded.data)
+    models = _models(load_source(SOURCE))
     if model not in models:
         raise ValueError("须明确选择符天研究所列的时制模型")
-    return {
-        **_clock(literal, models[model]),
-        "source_bundle_sha256": loaded.sha256,
-    }
+    return _clock(literal, models[model])
 
 
 def futen_clock_reference() -> dict[str, Any]:
-    loaded = load_source(SOURCE)
-    bundle = loaded.data
+    bundle = load_source(SOURCE)
     models = _models(bundle)
     readings = bundle["selected_1240_readings"]
     if [row["id"] for row in readings] != ["start", "middle", "end"]:
@@ -150,7 +145,6 @@ def futen_clock_reference() -> dict[str, Any]:
         }
     return {
         **bundle,
-        "source_bundle_sha256": loaded.sha256,
         "exact_units_per_double_hour": {
             name: _ratio(Fraction(row["day_units"], 12)) for name, row in models.items()
         },

@@ -13,7 +13,7 @@ from fatebridge.core.metaphysics.taiyi_enclosures import (
     principal_enclosures,
 )
 from fatebridge.core.metaphysics.taiyi_eye_relations import eye_general_relations
-from fatebridge.core.metaphysics.taiyi_geometry import PALACES, RING, SOURCES
+from fatebridge.core.metaphysics.taiyi_geometry import PALACES, RING
 from fatebridge.core.metaphysics.taiyi_oppositions import (
     opposition_assessment,
     opposition_summary,
@@ -79,7 +79,6 @@ def structural_patterns(core: dict[str, Any]) -> list[dict[str, Any]]:
                 "variant": variant or name,
                 "basis": [fact(subject), fact(other)],
                 "traditional_meaning": meaning,
-                "source": SOURCES["3"] + "#" + section,
                 "scope": "原典空间条件；尚需全盘条件，不能单条推出事件成败",
             }
         )
@@ -223,7 +222,6 @@ def assemble_board(
                 {key: p[key] for key in ("name", "subject", "variant")}
                 for p in patterns
             ],
-            "source": SOURCES["3"],
             "scope": "仅所核空间条件，含将目关掩；主方对宫几何及格/对异称另见opposition_assessment。逐项事实与版本范围保留，不单条断成败。",
         },
     }

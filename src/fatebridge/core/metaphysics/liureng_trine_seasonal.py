@@ -5,12 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.liureng_seasonal import MONTH_PARTITION, POWERS
-from fatebridge.core.metaphysics.ren_sources import (
-    JINGWEI_SCAN_SHA256,
-    JINGWEI_SOURCE,
-    TANYUAN_SCAN_SHA256,
-    TANYUAN_SOURCE,
-)
 
 COMPONENTS = {"旺": "得势", "相": "将来", "休": "既往", "囚": "失时", "死": "失时"}
 
@@ -18,11 +12,7 @@ COMPONENTS = {"旺": "得势", "相": "将来", "休": "既往", "囚": "失时"
 def nominal_seasonal_metadata() -> dict[str, Any]:
     return dict(
         method_id="tanyuan_nominal_trine_seasonal_component_v1",
-        source_url=TANYUAN_SOURCE,
-        source_sha256=TANYUAN_SCAN_SHA256,
         original_pdf_pages=[113],
-        corroborating_source_url=JINGWEI_SOURCE,
-        corroborating_source_sha256=JINGWEI_SCAN_SHA256,
         corroborating_pdf_pages=[159],
         month_partition_profile="declared_seasonal_month_branches_v1",
         full_named_course_adjudicated=False,

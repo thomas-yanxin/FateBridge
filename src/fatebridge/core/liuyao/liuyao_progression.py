@@ -193,7 +193,6 @@ def build_progress_conditions(
         "ruleset_version": PROFILE["ruleset_version"],
         "adjudication": "progression_conditions_only",
         "source_url": source_url,
-        "source_sha256": PROFILE["source"]["sha256"],
         "textual_issues": deepcopy(PROFILE["textual_issues"]),
         "scope": "四法可同时匹配，空破优先保留待填；condition_now只表示已列进退条件，不是向外生克效力或事件成败。未给近事久远则不从天数推断。季节无扶与全局无用不同。",
     }

@@ -9,6 +9,7 @@ from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.utc_policy import leap_table
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.core.solar_model_policy import solar_model_policy
+from fatebridge.core.solar_term_runtime import solar_term_cache_context
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.timezones import parse_timezone_name
@@ -100,8 +101,6 @@ def historical_solar_resolution(
 
 def _aa1996_resolution(year: int, term_name: str, timezone_name: str) -> dict[str, Any]:
     """Resolve a qualified internal endpoint with the explicitly selected model."""
-    from fatebridge.core.solar_term_runtime import solar_term_cache_context
-
     # No invented in-range input year: this internal range was independently
     # qualified before extending v1.1's working interval. Public year grids
     # continue to enforce their original input range.

@@ -2,7 +2,6 @@
 
 from typing import Any
 
-from fatebridge.core.heluo.heluo_seasonal import SOURCE_SHA256, SOURCE_URL
 from fatebridge.utils.data import get_nayin
 
 RULESET_ID = "heluo_wenming_nayin_body_relations_v1"
@@ -88,8 +87,6 @@ def body_evidence(
     return {
         "ruleset_id": RULESET_ID,
         "version": "1.0.0",
-        "source_url": SOURCE_URL,
-        "source_pdf_sha256": SOURCE_SHA256,
         "source_pdf_pages": [32, 46, 51, 87],
         "assessment_status": "partial_nayin_body_relations",
         "year_ganzhi": year_ganzhi,

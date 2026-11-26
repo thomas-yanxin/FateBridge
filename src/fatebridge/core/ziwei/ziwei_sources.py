@@ -5,13 +5,13 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 
 @lru_cache(maxsize=1)
-def _ming_sihua_source() -> Dict[str, Any]:
+def _ming_sihua_source() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             files("fatebridge")
             .joinpath("data/classical/ziwei-naj-ming-sihua.json")
@@ -21,9 +21,9 @@ def _ming_sihua_source() -> Dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
-def _ming_day_source() -> Dict[str, Any]:
+def _ming_day_source() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             files("fatebridge")
             .joinpath("data/classical/ziwei-naj-ming-days.json")
@@ -33,9 +33,9 @@ def _ming_day_source() -> Dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
-def _ming_day_review() -> Dict[str, Any]:
+def _ming_day_review() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             files("fatebridge")
             .joinpath("data/classical/ziwei-naj-ming-days-review-r22.json")
@@ -45,9 +45,9 @@ def _ming_day_review() -> Dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
-def _ming_targeted_day_review() -> Dict[str, Any]:
+def _ming_targeted_day_review() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             files("fatebridge")
             .joinpath("data/classical/ziwei-naj-ming-targeted-review-r24.json")
@@ -57,9 +57,9 @@ def _ming_targeted_day_review() -> Dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
-def _ming_prerequisite_source() -> Dict[str, Any]:
+def _ming_prerequisite_source() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             files("fatebridge")
             .joinpath("data/classical/ziwei-naj-ming-prerequisites.json")
@@ -76,10 +76,10 @@ def ziwei_prerequisite_source_evidence(
     hour_branch: str,
     year_stem: str,
     shen_branch: str,
-    palaces: List[Dict[str, Any]],
+    palaces: list[dict[str, Any]],
     nayin: str,
     bureau: int,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Compare prerequisites with Ming prose without applying the compared rules.
 
     A matching day-table position cannot certify its upstream bureau. This
@@ -172,7 +172,7 @@ def ziwei_prerequisite_source_evidence(
 
 def ziwei_day_source_evidence(
     *, bureau: int, lunar_day: int, actual_branch: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Compare the computed 紫微 position with a separately transcribed source.
 
     Water-two day 21 is derived from the prose, not credited as a grid reading.
@@ -217,8 +217,6 @@ def ziwei_day_source_evidence(
     unresolved = list(reading.get("candidate_branches_from_unresolved_labels", []))
     result["independent_review"] = {
         "method_id": review["id"],
-        "source_report_sha256": review["source_report_sha256"],
-        "erratum_sha256": review["erratum_sha256"],
         "status": reading["status"],
         "direct_label_branches": direct,
         "unresolved_label_candidates": unresolved,
@@ -249,7 +247,6 @@ def ziwei_day_source_evidence(
         result["targeted_rereading"] = {
             **{k: v for k, v in later.items() if k not in {"bureau", "day"}},
             "method_id": targeted["id"],
-            "source_report_sha256": targeted["source_report_sha256"],
             "reviewed_input_count": targeted["reviewed_input_count"],
             "matches_unique_direct_branch": (
                 actual_branch == branches[0] if len(branches) == 1 else None
@@ -263,10 +260,10 @@ def ziwei_day_source_evidence(
 
 
 def sihua_source_comparison(
-    selected_rules: Dict[str, Dict[str, str]],
+    selected_rules: dict[str, dict[str, str]],
     *,
     compared_assignments_applied: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Compare all 40 cells and disclose an explicit table selection."""
     source = _ming_sihua_source()
     differences = []
@@ -301,12 +298,12 @@ def sihua_source_comparison(
 
 
 def natal_sihua_source_comparison(
-    palaces: List[Dict[str, Any]],
+    palaces: list[dict[str, Any]],
     *,
     year_stem: str,
-    selected_sihua: Dict[str, str],
+    selected_sihua: dict[str, str],
     compared_assignments_applied: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Show where a differing natal table would assign a marker, not a new chart.
 
     Position paths point to existing stars. In particular the compared star's
@@ -315,7 +312,7 @@ def natal_sihua_source_comparison(
     source = _ming_sihua_source()
     row = next(row for row in source["rows"] if row["stem"] == year_stem)
 
-    def position(name: str) -> Dict[str, Any]:
+    def position(name: str) -> dict[str, Any]:
         matches = [
             (i, j, palace, star)
             for i, palace in enumerate(palaces)

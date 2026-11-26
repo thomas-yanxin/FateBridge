@@ -71,17 +71,14 @@ class _Table:
     rows: tuple[tuple[int, int, bool, int], ...]
     first: date
     last: date
-    sha256: str
     metadata_json: str
-    query_hashes: tuple[str, ...]
     difference_starts: tuple[int, ...]
     differences_json: tuple[str, ...]
 
 
 @lru_cache(maxsize=4)
 def _table(path: Path) -> _Table:
-    record = load_source(path)
-    bundle = record.data
+    bundle = load_source(path)
     starts, rows = [], []
     previous_end = None
     previous_label = None
@@ -122,27 +119,14 @@ def _table(path: Path) -> _Table:
         != bundle["reference_day_count"]
     ):
         raise ValueError("NAOJ historical table does not cover its declared domain")
-    query_hashes = bundle["source_query_response_sha256"]
-    if set(query_hashes) != {str(year) for year in range(1873)} or any(
-        not re.fullmatch(r"[0-9a-f]{64}", value) for value in query_hashes.values()
-    ):
-        raise ValueError("Historical source query fingerprints are incomplete")
     anchor = bundle["day_cycle_anchor"]
     if (
         not isinstance(anchor, dict)
-        or set(anchor)
-        != {
-            "civil_ordinal",
-            "day_ganzhi",
-            "source_lunar_year_query",
-            "source_response_sha256",
-        }
         or type(anchor["civil_ordinal"]) is not int
         or anchor["civil_ordinal"] != starts[0]
         or anchor["day_ganzhi"] not in DAY_CYCLE
         or type(anchor["source_lunar_year_query"]) is not int
         or anchor["source_lunar_year_query"] != rows[0][0]
-        or anchor["source_response_sha256"] != query_hashes[str(rows[0][0])]
     ):
         raise ValueError("Historical day-cycle anchor is not bound to its source month")
     differences = bundle["cross_source_disagreement_intervals"]
@@ -177,9 +161,7 @@ def _table(path: Path) -> _Table:
         tuple(rows),
         first,
         last,
-        record.sha256,
         json.dumps(metadata, ensure_ascii=False),
-        tuple(query_hashes[str(year)] for year in range(1873)),
         tuple(difference_starts),
         tuple(serialized),
     )
@@ -194,15 +176,13 @@ def reference_metadata() -> dict[str, Any]:
     table = _table(SOURCE)
     return {
         **json.loads(table.metadata_json),
-        "source_bundle_sha256": table.sha256,
         "source_independence_reference": source_independence_reference(),
     }
 
 
 def source_independence_reference() -> dict[str, Any]:
     """Carry the actual declared overlap, without claiming identical editions."""
-    loaded = load_source(LINEAGE_SOURCE)
-    data = loaded.data
+    data = load_source(LINEAGE_SOURCE)
     rows = data["provider_statements"]
     if len(rows) != 2 or {row["provider"] for row in rows} != {"NAOJ", "HuTime"}:
         raise ValueError("历日来源关系须保留两家提供方的具名说明")
@@ -212,7 +192,7 @@ def source_independence_reference() -> dict[str, Any]:
     )
     if shared != data["shared_bibliographic_titles"]:
         raise ValueError("共同书目未绑定两家提供方的实际声明")
-    return {**data, "source_bundle_sha256": loaded.sha256}
+    return data
 
 
 def _fields(table: _Table, civil: date) -> tuple[int, int, int, bool, int]:
@@ -241,7 +221,7 @@ def compatibility_reference_notes(
     for context, name in zip(contexts, names):
         for branch in context.get("calendar_candidates") or [context]:
             source = branch["calendar_reference"]
-            source_id = source["source_bundle_sha256"]
+            source_id = source.get("id", "naoj")
             if source_id not in seen_sources:
                 seen_sources.add(source_id)
                 start, end = source["supported_range_inclusive"]
@@ -360,7 +340,7 @@ def date_reference(civil: date) -> dict[str, Any]:
         "gen": "1",
         "csv": "CSV",
     }
-    metadata = {**json.loads(table.metadata_json), "source_bundle_sha256": table.sha256}
+    metadata = json.loads(table.metadata_json)
     lineage = source_independence_reference()
     anchor = metadata["day_cycle_anchor"]
     elapsed = civil.toordinal() - anchor["civil_ordinal"]
@@ -389,7 +369,6 @@ def date_reference(civil: date) -> dict[str, Any]:
         **metadata,
         "source_independence_reference": lineage,
         "date_source_uri": metadata["source_url"] + "?" + urlencode(params),
-        "source_response_sha256": table.query_hashes[year],
         "source_month_start_ordinal": table.starts[index],
         "source_month_length_days": table.rows[index][3],
         "day_ganzhi_reference": {

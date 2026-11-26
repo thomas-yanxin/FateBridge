@@ -18,7 +18,6 @@ from fatebridge.core.metaphysics.taiyi_geometry import (
     BRANCHES,
     PALACES,
     RING,
-    SOURCES,
     count_to_taiyi,
     general_for_count,
 )
@@ -179,7 +178,6 @@ def build_year_board(
                 "classical_author": "唐·王希明",
                 "source_title": "太乙金镜式经（四库全书本）",
                 "source_kind": "public_domain_transcription_with_selected_facsimile_checks",
-                "sources": SOURCES,
                 "time_granularity": "year",
                 "classical_conformance": "partial_with_unresolved_rule_table_disagreements",
                 "classical_acceptance_passed": False,

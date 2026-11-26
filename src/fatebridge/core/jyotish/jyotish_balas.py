@@ -278,7 +278,6 @@ def aspect_strength(longitudes: dict[str, float]) -> dict[str, Any]:
         "source_section": "53 and113-120, printed38,82-88/PDF43,87-93; fixed primary page images checked; worked-table conflicts retained",
         "source_witness": {
             "status": "stated_rules_checked_worked_tables_conflicted",
-            "sha256": RAMAN_SOURCE["sha256"],
             "pdf_pages_checked": [43, 87, 88, 89, 90, 91, 92, 93],
             "complete_single_original_accepted": False,
             "scope": "Section113 direction,114 ordinary formula,115 additive specials and120 signed quarter sum; printed examples are counterevidence, not silently amended target values.",
@@ -329,7 +328,6 @@ def aspect_strength(longitudes: dict[str, float]) -> dict[str, Any]:
         "alternative_source_witnesses": {
             "santhanam_26_27_19": {
                 "source_id": SOURCE_ID,
-                "source_sha256": "13609f1af89541e070c798b8c70c6bfd74a8b9a71a71388913bf898e9f9ddf3f",
                 "status": "selected_english_witness_not_uniquely_adjudicated",
                 "applied_to_native_drik": False,
                 "native_method_unchanged": ASPECT_METHOD,
@@ -360,7 +358,6 @@ def aspect_strength(longitudes: dict[str, float]) -> dict[str, Any]:
                     "Special-rule endpoint inclusion",
                     "27.19 entire Mercury/Jupiter aspect clause",
                 ],
-                "primary_transcription_sha256": "ab77bddd393fe930824c1080f39d0f1b6507b9424952c88b3106e90bbf1e2eba",
                 "scope": "Non-applied source witness, not another computed native profile, consensus source, full Shadbala or real-world evidence.",
             }
         },

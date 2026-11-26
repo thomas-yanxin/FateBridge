@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
@@ -123,10 +122,7 @@ def build_month_limit(
     result: dict[str, Any] = {
         "model_id": source["model_id"],
         "source_id": source["source_id"],
-        "source_url": source["source_url"],
         "source_title": source["title"],
-        "source_data_sha256": hashlib.sha256(raw).hexdigest(),
-        "source_image_sha256": source["source_image_sha256"],
         "locator": source["locator"],
         "month_basis": basis,
         "method": "birth_month_on_annual_small_limit_reverse_to_target_month",

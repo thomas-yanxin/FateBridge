@@ -6,8 +6,6 @@ classify. No additional runtime JSON reader or post-import file hashing is used.
 
 from __future__ import annotations
 
-import hashlib
-import json
 from collections.abc import Iterable
 from typing import Any
 
@@ -25,22 +23,16 @@ def source_records() -> list[dict[str, str]]:
     return [
         {
             "id": "dictionary",
-            "url": "https://jovianarchive.com/pages/human-design-dictionary",
-            "html_sha256": "4b1d7b2f6cf63b94259cc7e59f975e928f5125296d077b0dcd95c20b6c78e755",
             "attribution": "Jovian Archive current public glossary; undated, not a2001manuscript",
             "captured_date": "2026-10-25",
         },
         {
             "id": "broad_hanging",
-            "url": "https://jovianarchive.com/blogs/chart-interpretations-components/the-64-gates-in-human-design-what-they-represent-in-your-chart",
-            "html_sha256": "d1543c22a11d85a436840979e8bb1c8c4a02f7099e9c5ab8dd7a10c786185e0d",
             "attribution": "Ryan Hanna,2025-11-12; author bio describes AI-assisted writing and analyst review; not Ra's original manuscript",
             "captured_date": "2026-10-25",
         },
         {
             "id": "narrow_hanging",
-            "url": "https://jovianarchive.com/blogs/human-design-basics/centers-gates-and-channels",
-            "html_sha256": "a1d6b30d0cb1197ef202dce8456b8ed895446fd368efa63e92fa19cd753e894c",
             "attribution": "Ryan Hanna,2026-09-28; author bio describes AI-assisted writing and analyst review; not Ra's original manuscript",
             "captured_date": "2026-10-25",
         },
@@ -53,7 +45,6 @@ def ruleset() -> dict[str, Any]:
         "version": "1.0.0",
         "author": "FateBridge implementation of source-qualified public definitions",
         "source_kind": "current_official_public_glossary_and_reviewed_articles",
-        "sources": {r["id"]: r["url"] for r in source_records()},
         "source_records": source_records(),
         "scope": SCOPE,
     }
@@ -142,19 +133,8 @@ def _context(value: dict[str, Any], path: str) -> dict[str, Any]:
         "bodygraph.channels" if "bodygraph" in value else "channels"
     )
     basis.append({"path": channel_path, "value": graph["channels"]})
-    projection = {
-        "gate_sides": {
-            s: [a["gate"] for a in sides[s]] for s in ("personality", "design")
-        },
-        "completed_channel_pairs": actual_pairs,
-    }
     return {
         "source_snapshot_path": path or "$",
-        "source_projection_sha256": hashlib.sha256(
-            json.dumps(
-                projection, sort_keys=True, separators=(",", ":"), allow_nan=False
-            ).encode()
-        ).hexdigest(),
         **context,
         "basis": basis,
     }

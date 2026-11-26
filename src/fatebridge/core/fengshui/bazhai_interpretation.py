@@ -6,8 +6,8 @@ from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERAT
 
 # Cumulative top, middle, bottom, middle, top, middle, bottom changes.
 # The operation count is different from the count of net changed lines.
-_FLIPS = (3, 2, 1, 2, 3, 2, 1)
-_MASKS = (0, 4, 6, 7, 5, 1, 3, 2)
+FLIPS = (3, 2, 1, 2, 3, 2, 1)
+MASKS = (0, 4, 6, 7, 5, 1, 3, 2)
 
 
 def fuwei_element_context() -> dict[str, Any]:
@@ -23,14 +23,14 @@ def fuwei_element_context() -> dict[str, Any]:
 
 def you_nian_trace(base_bits: int, target_bits: int) -> dict[str, Any]:
     mask = base_bits ^ target_bits
-    step = _MASKS.index(mask)
+    step = MASKS.index(mask)
     changed = [line for line in (1, 2, 3) if mask & (1 << (line - 1))]
     return {
         "rule_id": "bazhai_sitting_v1.cumulative_you_nian_changes",
         "source_ids": ["S11"],
         "operation_count": step,
         "line_numbering": "bottom_1_middle_2_top_3",
-        "cumulative_flip_sequence": list(_FLIPS[:step]),
+        "cumulative_flip_sequence": list(FLIPS[:step]),
         "net_changed_lines": changed,
         "net_changed_line_count": len(changed),
         "changed_line_mask": mask,

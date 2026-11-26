@@ -34,11 +34,11 @@ from fatebridge.core.solar_term_runtime import solar_term_cache_context
 from fatebridge.utils.errors import EphemerisSourceError
 
 TARGETS = dict(zip(SOLAR_TERM_NAMES, SOLAR_TERM_LONGITUDES))
-_REASON = "ren_solar_term_longitude_inconsistent"
+REASON = "ren_solar_term_longitude_inconsistent"
 
 
 def _fail() -> EphemerisSourceError:
-    return EphemerisSourceError(_REASON)
+    return EphemerisSourceError(REASON)
 
 
 def _present_matches(observed: Any, expected: Any) -> bool:

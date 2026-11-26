@@ -7,9 +7,8 @@ blank, and a gender column that was not selected are distinct facts.
 import json
 from copy import deepcopy
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from fatebridge.utils.errors import NumerologySourceError
 
@@ -18,34 +17,6 @@ INHERITED_PATH = DATA_ROOT / "canpingTiaowen.json"
 COLLATION_PATH = DATA_ROOT / "text-collation-v1.json"
 WITNESSES_PATH = DATA_ROOT / "text-witnesses-v1.json"
 KINDS = {"male": "upper_male", "female": "middle_female", "luck": "lower_shared_luck"}
-TEXT_CONTENT_SHA256 = "ca8fc561e948fc1c9e2db219cadf82fbd655c5471984839c4de0c5606301b45b"
-WITNESS_CONTENT_SHA256 = (
-    "a42cde9985fbdeb6b3142e4b7e0ba50717a23b5caeffc21215bb3f5ec440e9e4"
-)
-_VERIFIED_COLLATION: Optional[tuple[dict[str, Any], str]] = None
-_VERIFIED_WITNESS: Optional[tuple[dict[str, Any], str]] = None
-
-
-def _pin_reviewed_content(data: dict[str, Any], expected: str, reason: str) -> None:
-    """Bind reviewed literal text AND metadata, independent of JSON formatting.
-
-    A loaded-file hash records what was read; it cannot by itself establish
-    that arbitrary new words were part of the reviewed partial collation.
-    """
-    try:
-        digest = sha256(
-            json.dumps(
-                data,
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-                allow_nan=False,
-            ).encode()
-        ).hexdigest()
-        if digest != expected:
-            raise ValueError("参评所载原文或来源身份与已核修订不符。")
-    except (TypeError, ValueError) as exc:
-        raise NumerologySourceError(reason) from exc
 
 
 @lru_cache(maxsize=3)
@@ -57,7 +28,7 @@ def _loaded(path: Path) -> dict[str, Any]:
             raise ValueError("参评来源须为结构化对象。")
     except (OSError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_canping_text_source") from exc
-    return {"data": data, "sha256": sha256(raw).hexdigest()}
+    return {"data": data}
 
 
 def inherited_corpus() -> dict[str, Any]:
@@ -67,14 +38,7 @@ def inherited_corpus() -> dict[str, Any]:
 
 
 def _collation() -> dict[str, Any]:
-    global _VERIFIED_COLLATION
     data: dict[str, Any] = _loaded(COLLATION_PATH)["data"]
-    if (
-        _VERIFIED_COLLATION is not None
-        and _VERIFIED_COLLATION[0] is data
-        and _VERIFIED_COLLATION[1] == TEXT_CONTENT_SHA256
-    ):
-        return data
     additional = data.get("additional_rereading_witnesses", [])
     if not isinstance(additional, list):
         raise ValueError("参评复读见证须分别登记，不能覆盖先前见证。")
@@ -153,8 +117,6 @@ def _collation() -> dict[str, Any]:
             for kind, text in entry["cells"].items()
         ):
             raise ValueError("参评编辑方框必须明确标为疑读，不能冒充原页圈空。")
-    _pin_reviewed_content(data, TEXT_CONTENT_SHA256, "invalid_canping_text_collation")
-    _VERIFIED_COLLATION = (data, TEXT_CONTENT_SHA256)
     return data
 
 
@@ -200,8 +162,6 @@ def collation_summary() -> dict[str, Any]:
                 "corpus_id",
                 "version",
                 "source_title",
-                "source_url",
-                "source_pdf_sha256",
                 "review_status",
                 "transcription_policy",
                 "scope",
@@ -210,8 +170,6 @@ def collation_summary() -> dict[str, Any]:
                 "direction_rule_pdf_page",
             )
         },
-        "sha256": _loaded(COLLATION_PATH)["sha256"],
-        "inherited_corpus_sha256": _loaded(INHERITED_PATH)["sha256"],
         "collated_cells": count,
         "pending_cells": data["total_cells"] - count,
         "visually_examined_cells": examined,
@@ -252,14 +210,7 @@ def text_available(text: str) -> bool:
 
 
 def _witness_corpus() -> dict[str, Any]:
-    global _VERIFIED_WITNESS
     data: dict[str, Any] = _loaded(WITNESSES_PATH)["data"]
-    if (
-        _VERIFIED_WITNESS is not None
-        and _VERIFIED_WITNESS[0] is data
-        and _VERIFIED_WITNESS[1] == WITNESS_CONTENT_SHA256
-    ):
-        return data
     keys = [(e["element"], e["number"], e["kind"]) for e in data["entries"]]
     unmatched = data.get("unmatched_observations", [])
     if not isinstance(unmatched, list):
@@ -317,10 +268,6 @@ def _witness_corpus() -> dict[str, Any]:
         for e in unmatched
     ):
         raise ValueError("参评未匹配观察须保留实际编号、原页及未绑定原因。")
-    _pin_reviewed_content(
-        data, WITNESS_CONTENT_SHA256, "invalid_canping_witness_collation"
-    )
-    _VERIFIED_WITNESS = (data, WITNESS_CONTENT_SHA256)
     return data
 
 
@@ -373,7 +320,6 @@ def witness_summary() -> dict[str, Any]:
     return deepcopy(
         {
             **{k: v for k, v in data.items() if k != "entries"},
-            "sha256": _loaded(WITNESSES_PATH)["sha256"],
             "cells_examined": len(observed),
             "registered_counterpart_cells": len(registered),
             "registered_counterpart_keys": len(grouped),
@@ -455,7 +401,7 @@ def _comparisons(
     return result
 
 
-def lookup_record(element: str, number: int, kind: Optional[str]) -> dict[str, Any]:
+def lookup_record(element: str, number: int, kind: str | None) -> dict[str, Any]:
     if (
         not isinstance(element, str)
         or element not in {"水", "火", "木", "金", "土"}

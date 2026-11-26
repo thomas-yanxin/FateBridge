@@ -12,7 +12,7 @@ from typing import Any
 from fatebridge.core.meihua.meihua_qualified_motion import build_qualified_motion
 
 JOURNEY_TOPICS = ("travel", "meeting")
-_RELATIONS = ("体克用", "用克体", "体生用", "用生体", "体用比和")
+RELATIONS = ("体克用", "用克体", "体生用", "用生体", "体用比和")
 
 
 @lru_cache(maxsize=1)
@@ -27,7 +27,7 @@ def _profile() -> dict[str, Any]:
         or profile["version"] != "1.0.0"
         or len(profile["rules"]) != 10
         or {(r["topic"], r["relation"]) for r in profile["rules"]}
-        != {(t, r) for t in JOURNEY_TOPICS for r in _RELATIONS}
+        != {(t, r) for t in JOURNEY_TOPICS for r in RELATIONS}
     ):
         raise ValueError("Unknown or incomplete selected journey chapter profile")
     return profile

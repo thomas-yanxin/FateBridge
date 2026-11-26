@@ -42,7 +42,6 @@ def qualification_evidence() -> dict[str, Any]:
     return dict(
         ruleset_id=PROFILE["ruleset_id"],
         ruleset_version=PROFILE["ruleset_version"],
-        source_sha256=PROFILE["source"]["sha256"],
         source_urls=[
             PROFILE["source"]["url"] + "#page=" + str(c["pdf_page"])
             for c in PROFILE["clauses"]

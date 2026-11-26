@@ -24,9 +24,8 @@ def printed_lower_comparison(
     *,
     source_path: Path = SOURCE,
 ) -> dict[str, Any]:
-    loaded = load_source(source_path)
     return _printed_comparison(
-        loaded.data, loaded.sha256, mansion, weekday, primary_labels
+        load_source(source_path), mansion, weekday, primary_labels
     )
 
 
@@ -34,16 +33,15 @@ def ntu_yongle_comparisons(
     mansion: str | None, weekday: int, primary_labels: list[str]
 ) -> list[dict[str, Any]]:
     """The named Chinese print's two volumes retain their own tables."""
-    loaded = load_source(NTU_YONGLE_SOURCE)
+    data = load_source(NTU_YONGLE_SOURCE)
     return [
-        _printed_comparison(bundle, loaded.sha256, mansion, weekday, primary_labels)
-        for bundle in loaded.data["witnesses"]
+        _printed_comparison(bundle, mansion, weekday, primary_labels)
+        for bundle in data["witnesses"]
     ]
 
 
 def _printed_comparison(
     bundle: dict[str, Any],
-    digest: str,
     mansion: str | None,
     weekday: int,
     primary_labels: list[str],
@@ -67,8 +65,5 @@ def _printed_comparison(
         "labels_complete_for_selected_day": complete,
         "applied_to_primary": False,
         "disagrees_with_primary": labels != primary_labels if complete else None,
-        "source_reference": {
-            **deepcopy(bundle["source_reference"]),
-            "source_bundle_sha256": digest,
-        },
+        "source_reference": deepcopy(bundle["source_reference"]),
     }

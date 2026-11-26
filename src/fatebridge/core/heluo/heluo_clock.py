@@ -4,7 +4,6 @@ import json
 from copy import deepcopy
 from fractions import Fraction
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +13,6 @@ RULESET_ID = "heluo_wenming_baike_clock_v1"
 SOURCE_PATH = Path(__file__).resolve().parents[2] / "data/heluo/clock-v1.json"
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 LONG_BRANCHES = ("寅", "申", "巳", "亥")
-PDF_SHA256 = "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c"
 
 
 @lru_cache(maxsize=1)
@@ -39,7 +37,6 @@ def _source() -> dict[str, Any]:
         if (
             data["ruleset_id"] != RULESET_ID
             or data["version"] != "1.0.0"
-            or data["source_pdf_sha256"] != PDF_SHA256
             or data["source_pdf_pages"] != [41]
             or data["extra_branches_in_printed_order"] != list(LONG_BRANCHES)
             or data["source_fen_per_ke"] is not None
@@ -48,12 +45,11 @@ def _source() -> dict[str, Any]:
             )
         ):
             raise ValueError("所选百刻原句或未定分制被改写。")
-        for key in ("source_title", "source_url", "review_status", "scope"):
+        for key in ("source_title", "review_status", "scope"):
             if not isinstance(data[key], str) or not data[key].strip():
                 raise ValueError("百刻来源元数据缺失。")
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_heluo_clock_source") from exc
-    data["loaded_sha256"] = sha256(raw).hexdigest()
     return data
 
 
@@ -190,14 +186,11 @@ def source_clock_evidence() -> dict[str, Any]:
                 "ruleset_id",
                 "version",
                 "source_title",
-                "source_url",
-                "source_pdf_sha256",
                 "review_status",
                 "scope",
             )
         },
         "source_pdf_pages": source["source_pdf_pages"][:],
-        "loaded_sha256": source["loaded_sha256"],
         "day_ke": source["day_ke"],
         "base_ke": source["twelve_base_total_ke"],
         "extra_ke": source["day_ke"] - source["twelve_base_total_ke"],
@@ -261,8 +254,6 @@ def attach_clock_evidence(
                 "ruleset_id",
                 "version",
                 "source_title",
-                "source_url",
-                "source_pdf_sha256",
             )
         }
     )

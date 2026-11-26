@@ -3,7 +3,6 @@
 The public swephexp.h bits are stable: JPL=1, Swiss=2, Moshier=4, SPEED=256.
 Other bits change the requested coordinate, target or speed convention and
 are not part of this ruleset. A valid flag is not proof of celestial accuracy.
-Source: https://www.astro.com/swisseph/swephprg.htm, sections 3.3 and 3.5.
 """
 
 from typing import Literal

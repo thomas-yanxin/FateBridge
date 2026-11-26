@@ -52,8 +52,6 @@ def build_equatorial_mansions(birth: AstroBirthInfo) -> dict[str, Any]:
         "julian_day_ut1": raw["julian_day_ut1"],
         "ephemeris_models": raw["models"],
         "lunar_phase_reference": lunar_phase_reference(raw),
-        "catalogue_sha256": raw["catalogue_sha256"],
-        "catalogue_sources_sha256": raw["catalogue_sources_sha256"],
         "catalogue_source": "bundled data/guolao/sources.json; CDS SIMBAD astrometry",
         "bodies": bodies,
         "boundaries": raw["boundaries"],

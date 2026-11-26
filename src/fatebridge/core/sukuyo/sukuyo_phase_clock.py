@@ -107,12 +107,10 @@ def validate_selected_claims(data: dict[str, Any]) -> None:
 def phase_clock_reference(day: int) -> dict[str, Any]:
     if type(day) is not int or not 1 <= day <= 30:
         raise ValueError("历日命名只支持1..30整数日号")
-    loaded = load_source(SOURCE)
-    reference = loaded.data
+    reference = load_source(SOURCE)
     validate_selected_claims(reference)
     return {
         **reference,
-        "source_bundle_sha256": loaded.sha256,
         "host_day_number_reference": {
             "lunar_day": day,
             "named_half": "白" if day <= 15 else "黑",

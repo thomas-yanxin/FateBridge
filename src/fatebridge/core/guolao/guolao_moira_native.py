@@ -36,8 +36,8 @@ class MoiraNativeProvider:
 
 # The original signs array order after excluding the three modern planets.
 # It also defines stable ties in EvalRule.setSign's longitude-only comparator.
-_SOURCE_PLANETS = tuple("日月金木水火土计罗炁孛")
-_FULL_PALACES = (
+SOURCE_PLANETS = tuple("日月金木水火土计罗炁孛")
+FULL_PALACES = (
     "戌火",
     "酉金",
     "申水",
@@ -51,7 +51,7 @@ _FULL_PALACES = (
     "子土",
     "亥木",
 )
-_YEAR_PALACES = (
+YEAR_PALACES = (
     "命宫",
     "相貌",
     "福德",
@@ -65,7 +65,7 @@ _YEAR_PALACES = (
     "兄弟",
     "财帛",
 )
-_SOURCE_GODS = (
+SOURCE_GODS = (
     "天贵",
     "玉贵",
     "紫微",
@@ -129,19 +129,19 @@ def native_source_facts(
     mansions: dict[str, str] = {}
     strings: dict[str, str | tuple[str, ...]] = {
         "e": (),
-        "宫位": _FULL_PALACES,
+        "宫位": FULL_PALACES,
     }
     booleans = {"t": True, "昼": is_day, "夜": not is_day}
     unavailable: dict[str, str] = {}
     coordinates = {
         name: Fraction(longitudes[name])
-        for name in _SOURCE_PLANETS
+        for name in SOURCE_PLANETS
         if name in longitudes
     }
-    for name in _SOURCE_PLANETS:
+    for name in SOURCE_PLANETS:
         if name in palace_indices:
             index = palace_indices[name]
-            palaces[name] = _FULL_PALACES[index]
+            palaces[name] = FULL_PALACES[index]
             for direction_index, direction in enumerate("西南东北"):
                 booleans[name + direction] = index // 3 == direction_index
         else:
@@ -158,8 +158,8 @@ def native_source_facts(
         )
         unavailable["?" + name + "宿歧"] = "Source mansion boundaries unavailable"
 
-    for offset, name in enumerate(_YEAR_PALACES):
-        palace = _FULL_PALACES[(life_sign_index - offset) % 12]
+    for offset, name in enumerate(YEAR_PALACES):
+        palace = FULL_PALACES[(life_sign_index - offset) % 12]
         palaces[name] = palace
         strings[palace[0] + "宫"] = name
     palaces["命"] = palaces["命宫"]
@@ -184,36 +184,36 @@ def native_source_facts(
         }
     )
     for name, index in god_sign_indices.items():
-        palaces[name] = _FULL_PALACES[index]
-    for name in _SOURCE_GODS:
+        palaces[name] = FULL_PALACES[index]
+    for name in SOURCE_GODS:
         if name not in god_sign_indices:
             unavailable["@" + name] = "No selected source god position supplied"
     for source_season in "春夏秋冬":
         booleans[source_season] = season == source_season
 
-    complete_palaces = all(name in palace_indices for name in _SOURCE_PLANETS)
+    complete_palaces = all(name in palace_indices for name in SOURCE_PLANETS)
     if complete_palaces:
-        for index, palace in enumerate(_FULL_PALACES):
+        for index, palace in enumerate(FULL_PALACES):
             strings[palace[0] + "宫星"] = tuple(
-                name for name in _SOURCE_PLANETS if palace_indices[name] == index
+                name for name in SOURCE_PLANETS if palace_indices[name] == index
             )
-        for name in _SOURCE_PLANETS:
+        for name in SOURCE_PLANETS:
             booleans["孤" + name] = all(
                 other == name or palace_indices[other] != palace_indices[name]
-                for other in _SOURCE_PLANETS
+                for other in SOURCE_PLANETS
             )
     else:
-        for palace in _FULL_PALACES:
+        for palace in FULL_PALACES:
             unavailable["$" + palace[0] + "宫星"] = (
                 "Complete eleven-body palaces required"
             )
-        for name in _SOURCE_PLANETS:
+        for name in SOURCE_PLANETS:
             unavailable["?孤" + name] = "Complete eleven-body palaces required"
 
-    complete_coordinates = len(coordinates) == len(_SOURCE_PLANETS)
+    complete_coordinates = len(coordinates) == len(SOURCE_PLANETS)
     if complete_coordinates:
         # sorted() is stable; iteration starts in the original source body order.
-        ordered = sorted(_SOURCE_PLANETS, key=coordinates.__getitem__)
+        ordered = sorted(SOURCE_PLANETS, key=coordinates.__getitem__)
         if complete_palaces:
             for index, name in enumerate(ordered):
                 previous = ordered[(index - 1) % 11]
@@ -273,7 +273,7 @@ def native_source_facts(
                 "Complete eleven-body longitudes required"
             )
     if not (complete_coordinates and complete_palaces):
-        for name in _SOURCE_PLANETS:
+        for name in SOURCE_PLANETS:
             unavailable["$" + name + "前"] = (
                 "Complete eleven-body coordinates and palaces required"
             )

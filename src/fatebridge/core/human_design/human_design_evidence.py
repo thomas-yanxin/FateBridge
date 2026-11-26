@@ -1,6 +1,6 @@
 """Source scope and field-grounded paraphrases, not licensed line readings."""
 
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.core.human_design.human_design_birth_clock import birth_clock_reading
 from fatebridge.core.human_design.human_design_bridging import (
@@ -44,7 +44,6 @@ from fatebridge.core.human_design.human_design_mechanics import (
     RULESET_VERSION,
 )
 from fatebridge.core.human_design.human_design_node_comparisons import (
-    NODE_SOURCE,
     node_comparison_reading,
 )
 from fatebridge.core.human_design.human_design_personality_color import (
@@ -73,34 +72,12 @@ from fatebridge.core.human_design.human_design_source_variants import (
     source_variant_audit,
 )
 
-SOURCE_URLS = {
-    "rave_2001": "https://www.myhumandesign.be/downloads/Rave-I%27Ching.pdf",
-    "solar_arc": "https://jovianarchive.com/blogs/human-design-basics/introduction-to-the-human-design-system",
-    "mandala": "https://jovianarchive.com/pages/the-mandala-and-the-bodygraph-in-human-design",
-    "dictionary": "https://jovianarchive.com/pages/human-design-dictionary",
-    "definition": "https://jovianarchive.com/pages/understanding-definition-in-human-design",
-    "profile": "https://jovianarchive.com/pages/understanding-profile-in-human-design",
-    "ego_manifested": "https://jovianarchive.com/pages/ego-manifested-authority-in-human-design-the-will-that-speaks",
-    "ego_projected": "https://jovianarchive.com/pages/ego-projected-authority-in-human-design-willpower-and-invitations",
-    "mental": "https://jovianarchive.com/pages/mental-authority-in-human-design-a-projector-process",
-    "substructure": "https://jovianarchive.com/pages/the-basics-of-substructure-in-human-design",
-    "ephemeris": "https://www.astro.com/swisseph/swephprg.htm",
-    "node_mechanics": "https://www.astro.com/swisseph/swisseph.htm",
-    "historical_utc": "https://hpiers.obspm.fr/eoppc/bul/bulc/UTC-TAI.history",
-    "historical_utc_1960": "https://www.iausofa.org/2023-10-11c",
-    "fixing": "https://jovianarchive.com/blogs/chart-interpretations-components/line-fixing-in-human-design-exaltation-detriment-and-juxtaposition",
-    "ra_1997": "https://humandesignsystem.com/archive/newsletters/0402.pdf",
-    "circuitry": "https://jovianarchive.com/pages/what-is-circuitry-in-human-design",
-    "integration": "https://jovianarchive.com/blogs/chart-interpretations-components/keynoting-stephen-kings-design-part-2",
-    "variable": "https://jovianarchive.com/blogs/deeper-mechanics-system-theory/a-simple-guide-to-variable",
-}
 
-
-def source_reference() -> Dict[str, Any]:
+def source_reference() -> dict[str, Any]:
     return reference_data("rave-2001-reference.json")
 
 
-def reference_table_audit() -> Dict[str, Any]:
+def reference_table_audit() -> dict[str, Any]:
     """Compare implementation tables to independently transcribed source facts.
 
     Keep discrepancies, including printed internal inconsistencies, visible.
@@ -181,8 +158,6 @@ def reference_table_audit() -> Dict[str, Any]:
         "line_ranges_matched": lines_passed,
         "line_ranges_checked": line_count,
         "discrepancies": discrepancies,
-        "source_pdf_sha256": reference["source"]["pdf_sha256"],
-        "source_url": SOURCE_URLS["rave_2001"],
         "full_text_acceptance_passed": False,
         "numeric_table_acceptance_passed": structural_match
         and lines_passed == line_count == 384,
@@ -208,7 +183,7 @@ AUTHORITY_MEANINGS = {
 }
 
 
-def source_activation_impacts(chart: Dict[str, Any]) -> Dict[str, Any]:
+def source_activation_impacts(chart: dict[str, Any]) -> dict[str, Any]:
     """Locate actual activations affected by the unchanged printed line table.
 
     This compares numerical interval membership only. An unaffected chart does
@@ -218,8 +193,8 @@ def source_activation_impacts(chart: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def evidence(
-    chart: Dict[str, Any],
-) -> Dict[str, Any]:
+    chart: dict[str, Any],
+) -> dict[str, Any]:
     graph = chart["bodygraph"]
     bridges = definition_bridging(graph)
     profile = profile_evidence(chart)
@@ -243,8 +218,6 @@ def evidence(
         "version": RULESET_VERSION,
         "author": "FateBridge implementation; source author Ra Uru Hu; publisher Jovian Archive Corporation",
         "source_kind": "primary_2001_numeric_tables_and_official_public_teaching",
-        "primary_source_url": SOURCE_URLS["rave_2001"],
-        "official_observations_url": "https://jovianarchive.com/pages/get-your-human-design-chart",
         "scope": "2001原典的门位、中心、通道、线界仅局部核对；29.1/29.2印刷界未决，保留等分。完整解释与官方整盘符合性未验收。",
         "full_source_acceptance_passed": False,
         "complete_source_list_path": "rulesets",
@@ -272,7 +245,6 @@ def evidence(
                 "author": "FateBridge implementation; source author Ra Uru Hu; publisher Jovian Archive Corporation",
                 "version": RULESET_VERSION,
                 "source_kind": "primary_2001_numeric_tables_and_official_public_teaching",
-                "sources": dict(SOURCE_URLS),
                 "scope": "2001原典的门位、中心、通道、线界仅局部核对；29.1/29.2印刷界未决，保留等分。完整解释与官方整盘符合性未验收。",
             }
         ],
@@ -282,7 +254,6 @@ def evidence(
                 "ruleset_id": RULESET_ID,
                 "inputs": {"birth_utc": chart["birth_utc"]},
                 "result": {"design_utc": chart["design_utc"], **chart["design_solver"]},
-                "source_url": SOURCE_URLS["solar_arc"],
             },
             {
                 "rule_id": "definition_from_completed_channels",
@@ -292,7 +263,6 @@ def evidence(
                     "channels": [c["id"] for c in graph["channels"]],
                     "components": graph["definition"]["components"],
                 },
-                "source_url": SOURCE_URLS["definition"],
             },
             {
                 "rule_id": "type_and_authority_priority",
@@ -313,7 +283,6 @@ def evidence(
                     "authority": graph["authority"],
                     "classification_evidence": graph["classification_evidence"],
                 },
-                "source_url": SOURCE_URLS["dictionary"],
             },
             {
                 "rule_id": "profile_personality_then_design_sun_line",
@@ -323,7 +292,6 @@ def evidence(
                     for side, values in chart["activations"].items()
                 },
                 "result": {"profile": chart["profile"]},
-                "source_url": SOURCE_URLS["profile"],
             },
             {
                 "rule_id": "primary_2001_cross_identifier",
@@ -336,7 +304,6 @@ def evidence(
                     key: chart["incarnation_cross"][key]
                     for key in ("name", "name_status", "source_pdf_page_one_based")
                 },
-                "source_url": SOURCE_URLS["rave_2001"],
             },
             {
                 "rule_id": "natal_line_fixing_same_gate_and_harmonic",
@@ -356,7 +323,6 @@ def evidence(
                         )
                     },
                 },
-                "source_url": SOURCE_URLS["fixing"],
             },
             {
                 "rule_id": "four_variable_arrows_from_paired_activation_tones",
@@ -367,7 +333,6 @@ def evidence(
                     "status": chart["variables"]["status"],
                     "evidence_path": "variables.arrows",
                 },
-                "source_url": SOURCE_URLS["variable"],
             },
             {
                 "rule_id": "completed_channel_circuitry_and_separate_integration",
@@ -377,7 +342,6 @@ def evidence(
                     "group_channel_counts": graph["circuitry"]["group_channel_counts"],
                     "integration": graph["circuitry"]["integration"],
                 },
-                "source_url": SOURCE_URLS["dictionary"],
             },
             {
                 "rule_id": "minimum_distinct_gate_bridge_sets",
@@ -392,7 +356,6 @@ def evidence(
                     "minimum_solution_count": bridges["minimum_solution_count"],
                     "evidence_path": "definition_bridging",
                 },
-                "source_url": SOURCE_URLS["definition"],
             },
         ],
         "interpretation": {
@@ -489,7 +452,7 @@ def evidence(
     return result
 
 
-def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
+def reading_statements(chart: dict[str, Any]) -> list[dict[str, Any]]:
     """Bound each returned interpretation to exact calculation fields.
 
     Fixed templates are explicitly scoped; this is not a free-text LLM grader.
@@ -527,14 +490,11 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
         "quadruple_split": "四分定义",
     }
 
-    def statement(
-        key: str, text: str, facts: Dict[str, Any], sources: list[str]
-    ) -> Dict[str, Any]:
+    def statement(key: str, text: str, facts: dict[str, Any]) -> dict[str, Any]:
         return {
             "id": key,
             "text": text,
             "basis": [{"path": path, "value": value} for path, value in facts.items()],
-            "source_urls": sources,
         }
 
     node_statements = []
@@ -554,7 +514,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                     "node_backend_comparison.status": backend["status"],
                     "node_backend_comparison.rows": backend["rows"],
                 },
-                [NODE_SOURCE],
             )
         )
     interval_statements = []
@@ -565,7 +524,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                 "birth_interval",
                 interval_reading(summary),
                 {"time_sensitivity.summary": summary},
-                [],
             )
         )
     return (
@@ -581,7 +539,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                             "personality"
                         ]["jd_tt"],
                     },
-                    [chart["birth_clock_evidence"]["source_url"]],
                 )
             ]
             if chart.get("birth_clock_evidence") is not None
@@ -595,7 +552,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                     "bodygraph.type": graph["type"],
                     "bodygraph.subtype": graph["subtype"],
                 },
-                [SOURCE_URLS["dictionary"]],
             ),
             statement(
                 "authority",
@@ -607,16 +563,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                         "classification_evidence"
                     ],
                 },
-                [SOURCE_URLS["dictionary"]]
-                + (
-                    [SOURCE_URLS[graph["authority"]]]
-                    if graph["authority"] in {"ego_manifested", "ego_projected"}
-                    else (
-                        [SOURCE_URLS["mental"]]
-                        if graph["authority"] == "environment_no_inner_authority"
-                        else []
-                    )
-                ),
             ),
             statement(
                 "definition",
@@ -637,7 +583,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                         )
                     },
                 },
-                [SOURCE_URLS["definition"]],
             ),
             statement(
                 "circuitry",
@@ -646,18 +591,11 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                     "bodygraph.channels": graph["channels"],
                     "bodygraph.circuitry": graph["circuitry"],
                 },
-                [
-                    SOURCE_URLS["circuitry"],
-                    SOURCE_URLS["integration"],
-                    SOURCE_URLS["dictionary"],
-                    topology_reference()["source"]["url"],
-                ],
             ),
             statement(
                 "profile",
                 profile_reading(profile),
                 {"profile": chart["profile"], "profile_evidence": profile},
-                profile["source_urls"],
             ),
             statement(
                 "variables",
@@ -667,7 +605,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                     "variables.status": chart["variables"]["status"],
                     "variables.arrows": chart["variables"]["arrows"],
                 },
-                [SOURCE_URLS["variable"], SOURCE_URLS["substructure"]],
             ),
             statement(
                 "cross",
@@ -679,7 +616,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                         chart["incarnation_cross"]["gates"]
                     ),
                 },
-                [SOURCE_URLS["rave_2001"]],
             ),
             statement(
                 "source_discrepancies",
@@ -688,7 +624,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                     "source_consistency.activation_impacts": source_impacts,
                     "source_consistency.cross_name_comparison": source_names,
                 },
-                [SOURCE_URLS["rave_2001"], SOURCE_URLS["dictionary"]],
             ),
         ]
         + node_statements
@@ -707,12 +642,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
                         "incarnation_cross.gates": chart["incarnation_cross"]["gates"],
                         "incarnation_cross.angle": chart["incarnation_cross"]["angle"],
                     },
-                    [
-                        row["source_url"]
-                        for row in chart["source_consistency"][
-                            "primary_transcript_diagrams"
-                        ]["observations"]
-                    ],
                 )
             ]
             if chart["source_consistency"]["primary_transcript_diagrams"][
@@ -723,7 +652,7 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
     )
 
 
-def design_time_reading(chart: Dict[str, Any]) -> str:
+def design_time_reading(chart: dict[str, Any]) -> str:
     solver = chart["design_solver"]
     precision = solver["numerical_precision"]
     changes = precision["observed_solar_changed_levels"]
@@ -784,7 +713,7 @@ def design_time_reading(chart: Dict[str, Any]) -> str:
     )
 
 
-def variable_reading(variables: Dict[str, Any]) -> str:
+def variable_reading(variables: dict[str, Any]) -> str:
     if variables["status"] != "computed":
         return "四组日地／交点的Tone缺失或对点不一致，本次不生成Variable编码；未确定的箭头不可自行补齐。"
     return (
@@ -793,7 +722,7 @@ def variable_reading(variables: Dict[str, Any]) -> str:
     )
 
 
-def circuitry_reading(graph: Dict[str, Any]) -> str:
+def circuitry_reading(graph: dict[str, Any]) -> str:
     summary = graph["circuitry"]
     if not summary["defined_channel_count"]:
         return "本次没有完整定义通道，故没有固定通道回路可解读；已激活的单门仍保留，不能据此说缺少能力或人生主题。"

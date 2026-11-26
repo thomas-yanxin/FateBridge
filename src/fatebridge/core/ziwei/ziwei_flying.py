@@ -2,7 +2,7 @@
 
 from collections.abc import Iterable, Mapping
 
-_SIHUA_ORDER = ("化禄", "化权", "化科", "化忌")
+SIHUA_ORDER = ("化禄", "化权", "化科", "化忌")
 
 
 def palace_sihua_relations(
@@ -19,7 +19,7 @@ def palace_sihua_relations(
     target_stars = {star for row in selected_rules.values() for star in row.values()}
     occurrences: dict[str, list[dict[str, str]]] = {}
     origins: dict[str, dict[str, list[tuple[str, str]]]] = {
-        transformation: {} for transformation in _SIHUA_ORDER
+        transformation: {} for transformation in SIHUA_ORDER
     }
     for palace_index, (palace_name, ganzhi, stars) in enumerate(palaces):
         stem, branch = ganzhi[0], ganzhi[1]

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from functools import lru_cache
 from pathlib import Path
@@ -18,7 +17,6 @@ from fatebridge.core.metaphysics.taiyi_geometry import (
     count_to_taiyi,
 )
 
-CATALOG_SHA256 = "e3da8f35487b57146dcec7e2ef5e599d6254d808841dbfed87599d483e27868a"
 FIELDS = ("taiyi_number", "wenchang_palace", "shiji", "jishen")
 LITERAL_FIELDS = {
     "wenchang_palace": "wenchang_literal",
@@ -33,10 +31,7 @@ def source_catalog() -> tuple[dict[str, Any], dict[tuple[bool, int], Any]]:
         Path(__file__).resolve().parents[2]
         / "data/classical/taiyi-jinjing-source-alignment-v1.json"
     )
-    raw = path.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != CATALOG_SHA256:
-        raise ValueError("太乙原表位置资料指纹不符")
-    data = json.loads(raw)
+    data = json.loads(path.read_text(encoding="utf-8"))
     rows = {(r["yin"], r["ju"]): r for r in data["rows"]}
     if len(rows) != 144:
         raise ValueError("太乙原表须保留完整阴阳144局")
@@ -57,13 +52,8 @@ def count_source_assessment(core: dict[str, Any]) -> dict[str, Any]:
             "facsimile_source",
             "source",
             "count_rule_source",
-            "source_manifest_sha256",
-            "transcription_collation_manifest_sha256",
-            "facsimile_collation_manifest_sha256",
-            "facsimile_correction_manifest_sha256",
         )
     }
-    ruleset["catalog_sha256"] = CATALOG_SHA256
     required = (*FIELDS, "main_count", "guest_count")
     valid = (
         type(core.get("yin_dun")) is bool

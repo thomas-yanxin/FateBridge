@@ -10,15 +10,12 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.common import ELEMENT_GENERATES, branch_element_text
-from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
-from fatebridge.core.metaphysics.ren_sources import JINKOU_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 
 def qi_metadata() -> dict[str, Any]:
     return {
         "ruleset_id": "jinkou_yuejian_richen_excerpt_v1",
-        "source_url": JINKOU_SOURCE,
         "source_section": "月建旺相 / 月破休囚",
         "scope": "月建进退、四位相生及日支生将三类证据；日生将原文称随日辰旺，不换算日下五态，不替代季节旺衰或综合取用",
     }
@@ -70,8 +67,6 @@ def qi_basis(month: str, general: str, day: str) -> str:
 
 def month_building_metadata() -> dict[str, Any]:
     return {
-        "month_building_scan_url": SCAN_URL,
-        "month_building_scan_sha256": SCAN_SHA256,
         "month_building_pdf_page": 111,
         "month_building_scope": (
             "京本神将建旺：分别核对贵神固有支、将神本支与月建同支；"

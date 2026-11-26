@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, cast
+from typing import Any, Iterable, cast
 
 from fatebridge.core.fengshui.bazhai_interpretation import fuwei_element_context
 from fatebridge.core.fengshui.directions import rule_data
@@ -14,7 +14,7 @@ from fatebridge.core.fengshui.materials import material_reference
 @lru_cache(maxsize=1)
 def _bundle() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data" / "fengshui" / "expert-methods-v1.json"
-    return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
 @lru_cache(maxsize=1)
@@ -25,7 +25,7 @@ def _supplement() -> dict[str, Any]:
         / "fengshui"
         / "method-reference-supplement-v1.json"
     )
-    return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
 def reference_data(key: str) -> Any:

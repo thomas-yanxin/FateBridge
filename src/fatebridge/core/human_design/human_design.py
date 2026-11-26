@@ -10,7 +10,7 @@ import math
 from collections.abc import Mapping
 from datetime import datetime, timezone
 from fractions import Fraction
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.time_scales import ephemeris_time
@@ -50,7 +50,7 @@ from fatebridge.core.human_design.human_design_variables import (
 # Gate pairs and circuit. Integration is kept distinct from Individual circuits.
 
 
-def activation_longitude_fraction(activation: Dict[str, Any]) -> Fraction:
+def activation_longitude_fraction(activation: dict[str, Any]) -> Fraction:
     """Recover the classification coordinate, including a displayed opposition.
 
     The display float alone can round across a boundary. Complete-run checks
@@ -71,7 +71,7 @@ def activation_longitude_fraction(activation: Dict[str, Any]) -> Fraction:
     return Fraction(longitude) % 360
 
 
-def solar_root_subdivisions(solver: Mapping[str, Any]) -> Dict[str, Any]:
+def solar_root_subdivisions(solver: Mapping[str, Any]) -> dict[str, Any]:
     """Classify the root function endpoints without implying physical bounds."""
     witness = solver["numerical_precision"]
     rows = [
@@ -108,8 +108,8 @@ def planetary_positions(
     node_mode: str = "true",
     *,
     require_swiss_files: bool = False,
-    source_observer: Optional[Callable[[str, float, Dict[str, Any]], None]] = None,
-) -> Dict[str, Any]:
+    source_observer: Callable[[str, float, dict[str, Any]], None] | None = None,
+) -> dict[str, Any]:
     """Use actual Swiss return flags; refuse failure or coarse orbital fallback."""
     if runtime.swe is None:
         raise RuntimeError("人类图需要 Swiss Ephemeris，未启用近似轨道回退")
@@ -151,11 +151,9 @@ def chart_at(
     node_mode: str = "true",
     *,
     require_swiss_files: bool = False,
-    source_observer: Optional[Callable[[str, float, Dict[str, Any]], None]] = None,
-    design_source_observer: Optional[
-        Callable[[str, float, Dict[str, Any]], None]
-    ] = None,
-) -> Dict[str, Any]:
+    source_observer: Callable[[str, float, dict[str, Any]], None] | None = None,
+    design_source_observer: Callable[[str, float, dict[str, Any]], None] | None = None,
+) -> dict[str, Any]:
     if birth.utcoffset() is None:
         raise ValueError("出生瞬间必须带时区")
     birth = birth.astimezone(timezone.utc)
@@ -182,11 +180,9 @@ def chart_at_tt(
     *,
     require_swiss_files: bool = False,
     backend: str = "swieph",
-    source_observer: Optional[Callable[[str, float, Dict[str, Any]], None]] = None,
-    design_source_observer: Optional[
-        Callable[[str, float, Dict[str, Any]], None]
-    ] = None,
-) -> Dict[str, Any]:
+    source_observer: Callable[[str, float, dict[str, Any]], None] | None = None,
+    design_source_observer: Callable[[str, float, dict[str, Any]], None] | None = None,
+) -> dict[str, Any]:
     """TT instants, including leap-second births, avoid rounding via datetime."""
     if not math.isfinite(birth_jd_tt):
         raise ValueError("出生 TT 必须为有限数值")
@@ -216,17 +212,15 @@ def chart_at_tt(
 
 
 def _assemble_chart(
-    birth_utc: Optional[str],
+    birth_utc: str | None,
     solved: SolvedDesignEpoch,
-    personality: Dict[str, Any],
+    personality: dict[str, Any],
     node_mode: str,
     require_swiss_files: bool,
     backend: str = "swieph",
     *,
-    design_source_observer: Optional[
-        Callable[[str, float, Dict[str, Any]], None]
-    ] = None,
-) -> Dict[str, Any]:
+    design_source_observer: Callable[[str, float, dict[str, Any]], None] | None = None,
+) -> dict[str, Any]:
     sides = {}
     batch_refs = {}
     times = {}

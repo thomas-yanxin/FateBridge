@@ -3,7 +3,6 @@
 from itertools import combinations
 from typing import Literal, Mapping, TypedDict
 
-from fatebridge.core.source_identity import DITIAN_SUI_CHANWEI_SCAN_URL
 from fatebridge.utils.data import (
     BRANCH_CONFLICTS,
     BRANCH_ELEMENTS,
@@ -32,7 +31,6 @@ class PatternSource(TypedDict):
     title: str
     edition: str
     locator: str
-    url: str
 
 
 SOURCES: tuple[PatternSource, ...] = (
@@ -42,7 +40,6 @@ SOURCES: tuple[PatternSource, ...] = (
         "title": "三命通会·论支元六合、论支元三合",
         "edition": "四库全书本，维基文库固定转录 oldid=761691",
         "locator": "卷二；广录五组禄位藏干往来与三合缺字条文",
-        "url": "https://zh.wikisource.org/w/index.php?oldid=761691",
     },
     {
         "id": "sanming_siku_arch",
@@ -50,7 +47,6 @@ SOURCES: tuple[PatternSource, ...] = (
         "title": "三命通会·拱禄拱贵",
         "edition": "景印文渊阁四库全书第810册",
         "locator": "卷六；扫描304–305／影印299–300页",
-        "url": "https://zh.wikisource.org/wiki/Page:文淵閣四庫全書_0810冊.djvu/304",
     },
     {
         "id": "sanming_siku_special_days",
@@ -58,7 +54,6 @@ SOURCES: tuple[PatternSource, ...] = (
         "title": "三命通会·日贵、魁罡、四位纯全、一气生成",
         "edition": "景印文渊阁四库全书第810册及固定转录 oldid=657375",
         "locator": "卷六；扫描310–312、324–326；只取名单、分类，不采用人生断语",
-        "url": "https://zh.wikisource.org/w/index.php?oldid=657375",
     },
     {
         "id": "sanming_siku_noble_time_variants",
@@ -66,7 +61,6 @@ SOURCES: tuple[PatternSource, ...] = (
         "title": "三命通会·论天乙贵人",
         "edition": "四库全书本，维基文库固定转录 oldid=657369",
         "locator": "卷三；冬夏阴阳、寅申及日出入等读法并列，不据此认证6–18时",
-        "url": "https://zh.wikisource.org/w/index.php?oldid=657369",
     },
 )
 
@@ -75,9 +69,8 @@ PILLAR_SOURCES: tuple[PatternSource, ...] = (
         "id": "lunar_python_literal_pillar_tables",
         "author": "6tail",
         "title": "lunar-python LunarUtil 五行、藏干、地支冲与天干四冲表",
-        "edition": "1.4.9，固定提交1645ad3b3653635e5cb31b0c6df22b5e4298f8ce",
+        "edition": "1.4.9",
         "locator": "WU_XING_GAN、WU_XING_ZHI、ZHI_HIDE_GAN、CHONG、CHONG_GAN_4；非其他冲表",
-        "url": "https://github.com/6tail/lunar-python/blob/1645ad3b3653635e5cb31b0c6df22b5e4298f8ce/lunar_python/util/LunarUtil.py",
     },
     {
         "id": "ditian1947_column_relation_scope",
@@ -85,7 +78,6 @@ PILLAR_SOURCES: tuple[PatternSource, ...] = (
         "title": "任注滴天髓闡微·干支總論、順局、歲運",
         "edition": "上海大東書局經售，1947年4月初版",
         "locator": "PDF101、391、503–504；盖头可涉及支中藏干，天覆地载不等于两类单柱生助",
-        "url": DITIAN_SUI_CHANWEI_SCAN_URL,
     },
 )
 

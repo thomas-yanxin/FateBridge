@@ -6,7 +6,6 @@ old book column, and from an independently established historical calendar.
 
 from __future__ import annotations
 
-import hashlib
 import json
 from bisect import bisect_left
 from dataclasses import dataclass
@@ -24,9 +23,6 @@ SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_dayan_advance_2022.j
 HOST_SOURCE = (
     Path(__file__).resolve().parents[2] / "data/sukuyo_japanese_historical_v1.json"
 )
-ROW_PROJECTION_SHA256 = (
-    "3e614444f30cca15e7f288a59f8df58ba7de41bfa31d3ab22d1957a43044fd08"
-)
 DAY_CYCLE = tuple(
     "甲乙丙丁戊己庚辛壬癸"[n % 10] + "子丑寅卯辰巳午未申酉戌亥"[n % 12]
     for n in range(60)
@@ -35,15 +31,7 @@ DAY_CYCLE = tuple(
 
 def validate_bundle(data: dict[str, Any]) -> None:
     rows = data["rows"]
-    projection = json.dumps(
-        rows, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode()
-    if (
-        data["complete_numeric_row_projection_sha256"] != ROW_PROJECTION_SHA256
-        or hashlib.sha256(projection).hexdigest() != ROW_PROJECTION_SHA256
-        or len(rows) != 327
-        or [r["row_number"] for r in rows] != list(range(1, 328))
-    ):
+    if len(rows) != 327 or [r["row_number"] for r in rows] != list(range(1, 328)):
         raise ValueError("大衍所选327行数值与原始源预期的绑定已改变")
     if (
         data["units"]["day_units"] != 3040
@@ -72,13 +60,11 @@ class _Table:
     keys: tuple[tuple[int, int, bool], ...]
     row_json: tuple[str, ...]
     metadata_json: str
-    sha256: str
 
 
 @lru_cache(maxsize=4)
 def _table(path: Path) -> _Table:
-    loaded = load_source(path)
-    data = loaded.data
+    data = load_source(path)
     validate_bundle(data)
     ordered = sorted(
         data["rows"],
@@ -93,15 +79,13 @@ def _table(path: Path) -> _Table:
         keys,
         tuple(json.dumps(r, ensure_ascii=False) for r in ordered),
         json.dumps({k: v for k, v in data.items() if k != "rows"}, ensure_ascii=False),
-        loaded.sha256,
     )
 
 
 @lru_cache(maxsize=4)
 def _scope_json(source_path: Path, host_path: Path) -> str:
     table = _table(source_path)
-    host_source = load_source(host_path)
-    host = host_source.data
+    host = load_source(host_path)
     anchor = host["day_cycle_anchor"]
     starts = {
         (year, month, leap): (
@@ -131,8 +115,6 @@ def _scope_json(source_path: Path, host_path: Path) -> str:
         states[state].append(row["row_number"])
     return json.dumps(
         {
-            "research_source_bundle_sha256": table.sha256,
-            "host_source_bundle_sha256": host_source.sha256,
             "complete_selected_research_rows": len(table.keys),
             "same_direction_rows": sorted(states["same"]),
             "different_direction_rows": sorted(states["different"]),
@@ -219,7 +201,6 @@ def month_comparison(
     agrees = None if proposal is None else proposal == host_month_start_index
     return {
         **json.loads(table.metadata_json),
-        "source_bundle_sha256": table.sha256,
         "selected_row": row,
         "host_month_start_index": host_month_start_index,
         "host_month_start_ganzhi": DAY_CYCLE[host_month_start_index],

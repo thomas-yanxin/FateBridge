@@ -12,7 +12,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
 from fractions import Fraction
-from typing import Any, Optional
+from typing import Any
 
 from dateutil.relativedelta import relativedelta
 
@@ -39,10 +39,6 @@ from fatebridge.utils.timezones import parse_timezone_name
 APPENDIX = "bazi_appendix_v1"
 CONTINUOUS = "bazi_continuous_v1"
 LEGACY = "legacy_minggong_v1"
-SOURCE_URL = (
-    "https://www.digital.archives.go.jp/DAS/contents/pdf/lossy/03050271000050/0001.pdf"
-)
-SOURCE_SHA256 = "199c7c1100a86857bc6973da4f0cfb27be473fdd5ede7b0241fc8cdb101877ea"
 COMPARISON_POLICY = "retained_nominal_civil_point_v1"
 
 
@@ -194,7 +190,7 @@ def luck_timeline(
 
 
 def _active_segment(
-    period: Optional[dict], element: str, taisui: str
+    period: dict | None, element: str, taisui: str
 ) -> dict[str, object]:
     if period is None:
         return {"status": "not_started"}
@@ -341,7 +337,7 @@ def build_canping_timing(
     month_pillar: tuple[str, str],
     calculation: dict,
     method: str = APPENDIX,
-    analysis_datetime: Optional[str] = None,
+    analysis_datetime: str | None = None,
 ) -> tuple[dict, list[dict], dict]:
     timeline = luck_timeline(birth, gender, month_pillar, zone, method)
     element = calculation["element"]
@@ -405,8 +401,6 @@ def build_canping_timing(
             "ruleset_id": "canping_ziping_appendix_bridge_v1",
             "ruleset_version": "1.0.0",
             "source_title": "河洛理數 史應選校訂 卷六及卷七附子平起運法",
-            "source_url": SOURCE_URL,
-            "source_pdf_sha256": SOURCE_SHA256,
             "source_pdf_pages": [50, 105, 106],
             "source_status": "named_appendix_schedule; volume_six_does_not_uniquely_identify_schedule",
             "calendar_scope": "Modern Jie instants, civil-date rounding or continuous extension, Lichun year boundary and civil date addition are explicitly named conventions.",

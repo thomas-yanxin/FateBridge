@@ -6,7 +6,6 @@ from fatebridge.core.heluo.heluo_opposition import (
     opposition_evidence,
     opposition_snapshot,
 )
-from fatebridge.core.heluo.heluo_seasonal import SOURCE_SHA256, SOURCE_URL
 
 RULESET_ID = "heluo_wenming_phase_qi_v1"
 LABELS = {
@@ -89,8 +88,6 @@ def phase_qi_evidence(
     return {
         "ruleset_id": RULESET_ID,
         "version": "1.0.0",
-        "source_url": SOURCE_URL + "#page=34",
-        "source_pdf_sha256": SOURCE_SHA256,
         "source_pdf_pages": [32, 33, 34, 35, 50, 51, 63],
         "candidate_basis": (
             solar.get("precision", "explicit_candidates_without_birth_instant")

@@ -8,10 +8,7 @@ from typing import Any, Iterable, Sequence
 from fatebridge.core.human_design.human_design_circuit_topology import (
     topology_completion,
 )
-from fatebridge.core.human_design.human_design_references import (
-    reference_data,
-    reference_sha256,
-)
+from fatebridge.core.human_design.human_design_references import reference_data
 
 INTEGRATION_PAIRS = {(10, 20), (10, 57), (20, 34), (34, 57)}
 INTEGRATION_GATES = {10, 20, 34, 57}
@@ -42,10 +39,6 @@ def circuit_reference() -> dict[str, Any]:
 
 def circuit_group_reference() -> dict[str, Any]:
     return reference_data("circuit-group-2026-reference.json")
-
-
-def circuit_group_reference_sha256() -> str:
-    return reference_sha256("circuit-group-2026-reference.json")
 
 
 def circuitry_summary(
@@ -83,8 +76,6 @@ def circuitry_summary(
         },
         "group_membership": {
             "method_id": circuit_group_reference()["method_id"],
-            "source_url": circuit_group_reference()["sources"]["dictionary"]["url"],
-            "source_catalog_sha256": circuit_group_reference_sha256(),
             "integration_group": "individual",
             "integration_is_separately_reported_subset": True,
             "scope": "整合四通道属于个体回路群，同时保留单独拓扑。三群计数构成完整通道的互斥划分；整合小计已含在individual中，不能再次相加。",
@@ -142,8 +133,6 @@ def audit_circuit_groups(channels: Sequence[tuple[int, int, str]]) -> dict[str, 
             group: counts[group] for group in reference["groups"]
         },
         "group_counts_partition_complete_channels": partitioned,
-        "source_catalog_sha256": circuit_group_reference_sha256(),
-        "source_url": reference["sources"]["dictionary"]["url"],
         "scope": "只核对回路至回路群归属。36通道的群计数以当前通道分类为条件；其中30条回路分类仍是两端门标签推断，不升级为独立通道原页认证。",
     }
 
@@ -211,7 +200,5 @@ def audit_channel_circuits(
         "endpoint_inferences_checked": inferred_checked,
         "channel_pair_sets_equal": pair_sets_equal,
         "discrepancies": discrepancies,
-        "direct_source_url": circuit_reference()["source"]["url"],
-        "direct_source_sha256": circuit_reference()["source"]["download_sha256"],
         "scope": "6条由官方文章直接列明；其余30条仅以原典两端门标签作一致性推断，不能冒称36条全部获得独立通道分类原页复核。",
     }

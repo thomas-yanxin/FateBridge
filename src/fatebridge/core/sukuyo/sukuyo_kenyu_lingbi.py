@@ -49,19 +49,17 @@ def _lookup(
 def lookup_lingbi_interval(
     month: int, month_start_luminary: str, day: int
 ) -> dict[str, Any]:
-    loaded = load_source(SOURCE)
+    bundle = load_source(SOURCE)
     return {
-        "ruleset_id": loaded.data["id"],
-        "source_bundle_sha256": loaded.sha256,
-        **_lookup(loaded.data, month, month_start_luminary, day),
+        "ruleset_id": bundle["id"],
+        **_lookup(bundle, month, month_start_luminary, day),
     }
 
 
 def conditional_lingbi_reference(
     calendar: dict[str, Any], personal_relation: str | None
 ) -> dict[str, Any]:
-    loaded = load_source(SOURCE)
-    source = loaded.data
+    source = load_source(SOURCE)
     missing = [
         field
         for field in ("lunar_month", "is_leap_month")
@@ -72,7 +70,6 @@ def conditional_lingbi_reference(
         # infer a month/leap policy or interrupt those independent facts.
         return {
             **source,
-            "source_bundle_sha256": loaded.sha256,
             "lookup_status": "not_evaluated_missing_calendar_context",
             "missing_context_fields": missing,
             "civil_month_start_reference": None,
@@ -119,7 +116,6 @@ def conditional_lingbi_reference(
     )
     return {
         **source,
-        "source_bundle_sha256": loaded.sha256,
         "civil_month_start_reference": civil_reference,
         "selected_civil_month_start_lookup": selected,
         "conditional_month_start_lookups": lookups,

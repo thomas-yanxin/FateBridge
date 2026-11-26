@@ -6,7 +6,6 @@ from typing import Any
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
 from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 # Printed pairs, not a day-polarity algorithm inferred from the prose.
@@ -139,8 +138,6 @@ def branch_relations(
     return dict(
         ruleset_id="tanyuan_branch_relations_v1",
         source_title="大六壬探原·论合、破、害、刑、冲（支位条件）",
-        source_url=TANYUAN_SOURCE,
-        source_sha256=TANYUAN_SCAN_SHA256,
         original_pdf_pages=[91, 92, 95, 96, 97],
         day_ganzhi=day_ganzhi,
         calendar_branches=calendar_branches,

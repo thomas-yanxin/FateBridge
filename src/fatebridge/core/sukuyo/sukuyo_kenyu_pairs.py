@@ -6,7 +6,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.sukuyo.sukuyo_profiles import source_bundle, source_digest
+from fatebridge.core.sukuyo.sukuyo_profiles import source_bundle
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_kenyu_ndl_pairs.json"
@@ -18,11 +18,10 @@ def conditional_pair_comparison(
     lookups: list[dict[str, Any]],
     selected_lookup: dict[str, Any] | None,
 ) -> dict[str, Any]:
-    loaded = load_source(SOURCE)
-    source = loaded.data
+    source = load_source(SOURCE)
     host = calendar.get("profile_calculation", {}).get("host_calculation")
     result: dict[str, Any] = {
-        "source_reference": {**source, "source_bundle_sha256": loaded.sha256},
+        "source_reference": source,
         "status": "not_evaluated_missing_or_inconsistent_fullmoon27_basis",
         "baseline_fullmoon27_calculation": None,
         "conditional_month_start_comparisons": [],
@@ -49,7 +48,6 @@ def conditional_pair_comparison(
         or host.get("lunar_month") != month
         or host.get("lunar_day") != day
         or host.get("ruleset_id") != source_bundle()["id"]
-        or host.get("source_bundle_sha256") != source_digest()
         or host.get("methods_agree") is not True
         or host.get("direct_mansion") != host.get("shortcut_mansion")
         or not isinstance(host.get("direct_mansion"), str)

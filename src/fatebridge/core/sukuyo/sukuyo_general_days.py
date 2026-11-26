@@ -13,8 +13,7 @@ SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_general_day_lists.js
 def general_day_evidence(day: int) -> dict[str, Any]:
     if type(day) is not int or not 1 <= day <= 30:
         raise ValueError("一般日类入月日须为1至30的整数")
-    loaded = load_source(SOURCE)
-    reference = loaded.data
+    reference = load_source(SOURCE)
     classifications = []
     for witness in reference["witnesses"]:
         favorable = set(witness["favorable_lunar_days"])
@@ -38,5 +37,4 @@ def general_day_evidence(day: int) -> dict[str, Any]:
                 "locator": witness["classification_locator"],
             }
         )
-    reference["source_bundle_sha256"] = loaded.sha256
     return {"reference": reference, "classifications": classifications}

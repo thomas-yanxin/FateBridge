@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 from fatebridge.core.fengshui.mutual_geometry import (
     describe_mutual_geometry,
@@ -15,7 +15,7 @@ from fatebridge.core.fengshui.mutual_geometry import (
 @lru_cache(maxsize=1)
 def _data() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data/fengshui/wang-timeliness-v1.json"
-    return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
 def timeliness_provenance() -> dict[str, Any]:

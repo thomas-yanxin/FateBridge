@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import re
 from copy import deepcopy
-from hashlib import sha256
 from pathlib import Path
 from typing import Any, NoReturn
 
@@ -19,14 +18,10 @@ from fatebridge.core.numerology.canping_schedule_basis import (
 )
 from fatebridge.core.numerology.canping_texts import lookup_record
 from fatebridge.utils.errors import NumerologySourceError
-from fatebridge.utils.json_digest import canonical_bytes
 
 DOMAINS = ("heluo", "canping")
 DATA_ROOT = Path(__file__).resolve().parents[2] / "data"
 CATALOGUE_PATH = DATA_ROOT / "knowledge/numerology-sources-v1.json"
-CATALOGUE_CONTENT_SHA256 = (
-    "dcc46cebfe95a4217cef446918d7eac1a57c96734baf02821e4f1bf6429be892"
-)
 SOURCE = "fatebridge_numerology_references"
 POLICY_ID = "numerology_source_reference_v1"
 SCOPE = (
@@ -103,8 +98,6 @@ def _heluo_reference_notes(record: dict[str, Any]) -> list[str]:
 def _catalogue() -> dict[str, Any]:
     try:
         data: dict[str, Any] = json.loads(CATALOGUE_PATH.read_bytes())
-        if sha256(canonical_bytes(data)).hexdigest() != CATALOGUE_CONTENT_SHA256:
-            raise ValueError("Reference catalogue identity changed")
         return data
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_numerology_knowledge_sources") from exc
@@ -123,17 +116,13 @@ def _source(domain: str, key: str) -> tuple[dict[str, Any], dict[str, Any]]:
         path = DATA_ROOT / entry["source_path"]
         raw = path.read_bytes()
         data = json.loads(raw)
-        digest = sha256(canonical_bytes(data)).hexdigest()
-        if digest != entry["canonical_content_sha256"]:
-            raise ValueError(
-                "Source words or identity differ from reviewed reference revision"
-            )
         meta = {
-            **deepcopy(entry),
-            "loaded_file_sha256": sha256(raw).hexdigest(),
+            **{
+                k: deepcopy(v)
+                for k, v in entry.items()
+                if k != "canonical_content_sha256"
+            },
             "source_title": data.get("source_title"),
-            "source_url": data.get("source_url"),
-            "source_pdf_sha256": data.get("source_pdf_sha256"),
             "source_revision": data.get("version"),
             "review_status": data.get(
                 "review_status", "inherited_transcription_unverified"
@@ -170,7 +159,6 @@ def _provenance(
         "key": key,
         "reference_policy_id": POLICY_ID,
         "source_catalogue_version": _catalogue()["version"],
-        "source_catalogue_content_sha256": CATALOGUE_CONTENT_SHA256,
         "source_records": [deepcopy(meta) for _, meta in snapshots.values()],
         "reference_only": True,
         "personal_applicability_assessed": False,
@@ -464,7 +452,7 @@ def read_reference(
                 )
         tips.append(SCOPE)
         meta = snapshots["text_collation"][1]
-        citation = f"{meta['source_title']}；{meta['source_url']}；PDF页{selection.get('source_pdf_page', '未定位')}；另本对读身份另列，不替主本认证。"
+        citation = f"{meta['source_title']}；PDF页{selection.get('source_pdf_page', '未定位')}；另本对读身份另列，不替主本认证。"
     elif domain == "canping" and category in {"schedule_clauses", "schedule_profiles"}:
 
         data = source_readings()

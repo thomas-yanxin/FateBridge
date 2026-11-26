@@ -11,7 +11,6 @@ from typing_extensions import NotRequired
 
 from fatebridge.core.metaphysics.taiyi_geometry import PALACES
 
-SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷05"
 RULESET_ID = "jinjing_annual_ten_markers_v1"
 BRANCH_SEQUENCE = tuple("戌亥子丑寅卯辰巳午未申酉")
 TWELVE_PALACES = tuple("123456789") + ("绛", "明", "玉")
@@ -87,7 +86,6 @@ class AnnualRuleset(TypedDict):
     version: str
     author: str
     classical_author: str
-    source: str
     classical_conformance: str
     classical_acceptance_passed: bool
 
@@ -166,16 +164,10 @@ def four_spirit_records(accumulation: int) -> dict[str, AnnualMarker]:
             else "prose_rule_compared_to_raw_table"
         )
         if name == "diyi":
-            record["source_reference"] = (
-                "https://upload.wikimedia.org/wikipedia/commons/8/81/NCL-06604_%E5%A4%AA%E4%B9%99%E9%87%91%E9%8F%A1%E5%BC%8F%E7%B6%93.pdf#page=74"
-            )
             record["source_edition"] = (
                 "四库积年及三元表；明钞本地乙推法补证起九行序，未替换积年"
             )
         elif name == "zhifu":
-            record["source_reference"] = (
-                "https://commons.wikimedia.org/wiki/File:CADAL06056495_太乙金鏡式經·卷五~卷十.djvu?page=15"
-            )
             record["source_edition"] = (
                 "四库全书本卷五正文起五顺行；第16图表头下中元33格分歧未裁定，原表另列"
             )
@@ -237,7 +229,6 @@ def annual_long_cycles(year: int) -> AnnualLongCycles:
             "version": "1.0.0",
             "author": "FateBridge contributors",
             "classical_author": "唐·王希明",
-            "source": SOURCE,
             "classical_conformance": "partial_with_unresolved_table_disagreements",
             "classical_acceptance_passed": False,
         },
@@ -305,7 +296,6 @@ def attach_long_cycles(board: dict[str, Any], year: int) -> None:
         "time_granularity": "year",
         "year": year,
         "ruleset_id": RULESET_ID,
-        "source": SOURCE,
         "positions": {
             r["label"]: f"{r['palace']}／第{r['year_in_palace']}年"
             for r in cycles["records"].values()

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from fatebridge.core.sukuyo.sukuyo_relations import normalize_mansion
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
@@ -11,10 +11,9 @@ from fatebridge.core.sukuyo.sukuyo_sources import load_source
 SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_t1299_six_palaces.json"
 
 
-def six_palace_reference(natal_mansion: Optional[str]) -> dict[str, Any]:
+def six_palace_reference(natal_mansion: str | None) -> dict[str, Any]:
 
-    record = load_source(SOURCE)
-    source = record.data
+    source = load_source(SOURCE)
     order = source["mansion_order"]
     if natal_mansion is not None:
         if not isinstance(natal_mansion, str) or len(natal_mansion) != 1:
@@ -40,8 +39,6 @@ def six_palace_reference(natal_mansion: Optional[str]) -> dict[str, Any]:
         ),
         "counting_basis": source["counting_basis"],
         "source_url": source["source_url"],
-        "source_sha256": source["source_sha256"],
-        "source_bundle_sha256": record.sha256,
         "locator": source["locator"],
         "counting_excerpt": source["counting_excerpt"],
         "joint_reading_requirement": source["joint_reading_requirement"],

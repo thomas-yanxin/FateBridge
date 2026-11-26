@@ -6,20 +6,6 @@ import html
 import re
 from typing import Any
 
-from fatebridge.core.sukuyo.sukuyo_hinoo_catalog import catalogue_lines
-from fatebridge.core.sukuyo.sukuyo_hinoo_context import context_lines
-from fatebridge.core.sukuyo.sukuyo_hinoo_meanings import calendar_clause_meaning_lines
-from fatebridge.core.sukuyo.sukuyo_hinoo_natal_scope import natal_scope_lines
-from fatebridge.core.sukuyo.sukuyo_kyoto_layers import layered_reading_lines
-from fatebridge.core.sukuyo.sukuyo_printed_pages import hinoo_printed_page_lines
-from fatebridge.core.sukuyo.sukuyo_seibunkan import seibunkan_lines
-from fatebridge.core.sukuyo.sukuyo_witness_research import (
-    native_completion_lines,
-    native_followup_lines,
-    research_lines,
-)
-from fatebridge.core.sukuyo.sukuyo_zentsuji_later import later_reading_lines
-
 
 def _plain(value: str) -> str:
     return html.unescape(re.sub(r"<[^>]+>", "", value))
@@ -74,21 +60,6 @@ def hinoo_source_lines(source: dict[str, Any]) -> list[str]:
         )
     critical = source.get("critical_calendar_reference")
     if critical:
-        if meanings := critical.get("calendar_clause_meanings"):
-            lines.extend(calendar_clause_meaning_lines(meanings))
-        if natal := critical.get("natal_half_application"):
-            lines.extend(natal_scope_lines(natal))
-        if later := critical.get("later_seibunkan_comparison"):
-            lines.extend(seibunkan_lines(later))
-        lines.extend(catalogue_lines(critical["witness_catalogue_candidates"]))
-        if research := critical.get("image_witness_research"):
-            lines.extend(research_lines(research))
-        if native := critical.get("image_witness_native_followup"):
-            lines.extend(native_followup_lines(native))
-        if completed := critical.get("image_witness_native_completion"):
-            lines.extend(native_completion_lines(completed))
-        if context := critical.get("image_witness_context_followup"):
-            lines.extend(context_lines(context))
         primary = critical["selected_primary"]
         for glyph in primary["unaccepted_glyphs"]:
             if not glyph["accepted_as_a_normalized_variant"]:
@@ -98,19 +69,12 @@ def hinoo_source_lines(source: dict[str, Any]) -> list[str]:
                 )
         if not primary["independent_human_transcription_accepted"]:
             lines.append("所选归一化工作录未获独立人工验收；红校层未据此合成完整版本。")
-        if layered := primary.get("later_layered_reading"):
-            lines.extend(layered_reading_lines(layered))
         for witness in critical.get("supplemental_witnesses", []):
             lines.append(
                 f"补充直接见证：{witness['holding_institution']}"
                 f"{witness['call_number']}《{witness['title']}》，"
-                f"{witness['catalogue_url']}；所用第{witness['canvas_one_based']}帧。"
+                f"所用第{witness['canvas_one_based']}帧。"
             )
-            if witness.get("later_reading_followup"):
-                lines.append(
-                    "以下善通寺原文为既有首录；后续校读的未决分歧另列，"
-                    "不得将旧片段当作已统一定字。"
-                )
             for row in witness["observations"]:
                 lines.append(f"善通寺所选原文：{row['normalized_transcription']}。")
             for row in witness["selected_example_comparisons"]:
@@ -129,15 +93,9 @@ def hinoo_source_lines(source: dict[str, Any]) -> list[str]:
                 "未独立确定现存实物年代、传承关系或底本／甲本身份。"
             )
             lines.append(
-                "摄影卡所列平成16年7月是摄影记录，不能当作抄写日期；"
-                "本轮读录沿用了已知算法的历史上下文，并非对预期宿名设盲。"
-            )
-            lines.append(
                 "本件不是善通寺109-5《护摩法略抄》；所选见证未获独立人工读录验收或全本校勘，"
                 "不由多数、与算法相合或单宿结果裁定闰小月优先，也未确定古代平明或半日钟时。"
             )
-            if followup := witness.get("later_reading_followup"):
-                lines.extend(later_reading_lines(followup))
         collation = primary.get("supplemental_model_collation")
         if collation:
             for row in collation["conflicts"]:
@@ -235,7 +193,6 @@ def _hinoo_critical_lines(reference: dict[str, Any]) -> list[str]:
     if "current_scope_qualification" in span:
         lines.append(span["scope"])
 
-    lines.extend(hinoo_printed_page_lines())
     return lines
 
 

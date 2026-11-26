@@ -16,7 +16,6 @@ from fatebridge.core.metaphysics.ren_gods import (
     GuirenProfile,
     noble_start,
 )
-from fatebridge.core.metaphysics.ren_sources import JINGWEI_SCAN_SHA256, JINGWEI_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 LIURENG_MONTH_GENERAL_BY_TERM = {
@@ -125,30 +124,23 @@ BASIS = {
     "unresolved_authorial_intent_ids": ["S05"],
     "authorial_intent_adjudicated": None,
     "original_conditions_rewritten": False,
-    "source_reference_sha256": "08bb40a3de13ad607f3ceb059fa00bac322ecd15b77a83ef359e25845f52d245",
     "witnesses": [
         {
             "id": "zhuji_zhuji-1",
             "source_title": "毛志道《六壬经纬》",
             "edition": "清金阊书业堂刻本，诸暨图书馆藏",
-            "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/ZJSLib-FLDB-2457-1_%E5%85%AD%E5%A3%AC%E7%B6%93%E7%B7%AF%E5%85%AD%E5%8D%B7_%E7%AC%AC%E4%B8%80%E5%86%8A.pdf",
-            "source_sha256": "99f4362c0bee35adc3be6eb3a872aa24e418660ba9b7db57bcdca186463dab80",
             "original_pdf_pages": [31, 32, 33],
         },
         {
             "id": "zhuji_zhuji-2",
             "source_title": "毛志道《六壬经纬》",
             "edition": "清金阊书业堂刻本，诸暨图书馆藏",
-            "source_url": "https://upload.wikimedia.org/wikipedia/commons/2/20/ZJSLib-FLDB-2457-2_%E5%85%AD%E5%A3%AC%E7%B6%93%E7%B7%AF%E5%85%AD%E5%8D%B7_%E7%AC%AC%E4%BA%8C%E5%86%8A.pdf",
-            "source_sha256": "cc14c2876507f1a59e2fecfe6f5c7cd930d99b01f2ae13a9815f3cd3b709082d",
             "original_pdf_pages": [37, 38, 39, 40, 41, 79, 80, 81],
         },
         {
             "id": "gugong_gugong-419",
             "source_title": "毛志道《六壬经纬》",
             "edition": "故宫珍本丛刊419所收六壬经纬，目录标雍正刊本",
-            "source_url": JINGWEI_SOURCE,
-            "source_sha256": JINGWEI_SCAN_SHA256,
             "original_pdf_pages": [10, 11, 53, 54, 55, 65, 66],
         },
     ],

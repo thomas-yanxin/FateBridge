@@ -35,7 +35,6 @@ BODIES = {
 }
 ROLES = {"activation", "solar_root", "node_reference", "root_bracket_activation"}
 METHOD = "human_design_natal_native_file_contexts_v1"
-SOURCE = "https://www.astro.com/swisseph/swephprg.htm"
 SCOPE = "逐次本命、设计根、生时范围、交点及整盘后端对照的原生位置求值后观察文件上下文；周期搜索另读cycle_context.source_evidence，历法与DeltaT调用不在此计数。固定路径策略、文件身份、同天体同后端同slot的DE版本，并在结束重核已识别文件哈希。未能识别的辅助slot单列，整体身份不完整；解析平交点与Moshier内置算法不伪造文件依赖；观察次数不是独立样本、覆盖率或概率。不是完整原子读取集合、原生执行真实性、星历物理精度或连续区间认证。"
 
 
@@ -132,7 +131,6 @@ class NatalSourceTrace(CycleSourceTrace):
                 else "observed_contexts_endpoint_verified"
             ),
             "has_unidentified_sources": unidentified,
-            "source_url": SOURCE,
             "observed_native_position_evaluations": sum(
                 c["observed_evaluation_count"] for c in self._contexts
             ),
@@ -144,7 +142,6 @@ class NatalSourceTrace(CycleSourceTrace):
 def natal_source_summary(source: dict[str, Any]) -> dict[str, Any]:
     return {
         **cycle_source_summary(source),
-        "source_url": SOURCE,
         "scope": SCOPE,
         "context_count": len(source["contexts"]),
         "unidentified_context_count": sum(
@@ -158,7 +155,7 @@ def natal_source_summary(source: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-_ACTIVE: ContextVar[NatalSourceTrace | None] = ContextVar(
+ACTIVE: ContextVar[NatalSourceTrace | None] = ContextVar(
     "human_design_natal_source_trace", default=None
 )
 
@@ -166,7 +163,7 @@ _ACTIVE: ContextVar[NatalSourceTrace | None] = ContextVar(
 def observe_native_source(
     body: str, tt: float, flags: int, *, role: str, analytical: bool = False
 ) -> None:
-    trace = _ACTIVE.get()
+    trace = ACTIVE.get()
     if trace is not None:
         trace.observe_native(body, tt, flags, role, analytical)
 
@@ -179,7 +176,7 @@ def guard_natal_sources(
         trace = NatalSourceTrace(
             require_swiss_files=kwargs.get("require_swiss_files", False)
         )
-        token = _ACTIVE.set(trace)
+        token = ACTIVE.set(trace)
         try:
             result = function(*args, **kwargs)
             result["ephemeris_source_evidence"] = trace.finish()
@@ -188,6 +185,6 @@ def guard_natal_sources(
             )
             return result
         finally:
-            _ACTIVE.reset(token)
+            ACTIVE.reset(token)
 
     return guarded

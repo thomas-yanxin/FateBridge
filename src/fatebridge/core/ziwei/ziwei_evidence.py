@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from copy import deepcopy
-from typing import Any, Dict, List
+from typing import Any
 
 from fatebridge.utils.data import ZIWEI_BRANCH_SEQUENCE
 
@@ -28,7 +28,7 @@ ZIWEI_MAJOR_STARS = frozenset(
 )
 
 
-def horoscope_natal_prerequisites(chart: Dict[str, Any]) -> Dict[str, Any]:
+def horoscope_natal_prerequisites(chart: dict[str, Any]) -> dict[str, Any]:
     """Carry the actual natal derivation used by this horoscope, without reruns.
 
     A horoscope's bureau/starting age depends on natal inputs. Expose their
@@ -71,7 +71,7 @@ def horoscope_natal_prerequisites(chart: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def natal_reading_view(palaces: List[Dict[str, Any]]) -> Dict[str, Any]:
+def natal_reading_view(palaces: list[dict[str, Any]]) -> dict[str, Any]:
     """Lossless star facts and geometry references for a bounded first response.
 
     Null star attributes have one explicit encoding policy; related stars are
@@ -112,8 +112,8 @@ def natal_reading_view(palaces: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def palace_structural_evidence(
-    palace: Dict[str, Any], palaces: List[Dict[str, Any]]
-) -> Dict[str, Any]:
+    palace: dict[str, Any], palaces: list[dict[str, Any]]
+) -> dict[str, Any]:
     """本宫 + 两个三合宫 + 对宫；空宫不搬移或复制对宫星曜。"""
     by_branch = {p["ganzhi"][1]: p for p in palaces}
     index = ZIWEI_BRANCH_SEQUENCE.index(palace["ganzhi"][1])
@@ -143,9 +143,9 @@ def palace_structural_evidence(
 
 def scope_palace_map(
     ming_branch: str,
-    palaces: List[Dict[str, Any]],
+    palaces: list[dict[str, Any]],
     palace_sequence: Sequence[str],
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Rotate functional names from this scope's Ming; retain natal stems/stars.
 
     This does not calculate flowing auxiliary stars, new palace stems, flying

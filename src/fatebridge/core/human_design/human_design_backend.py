@@ -14,8 +14,6 @@ from fatebridge.core.human_design.human_design_sensitivity import (
 )
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 
-SOURCE = "https://www.astro.com/swisseph/swisseph.htm"
-
 
 def backend_report_base(chart: dict[str, Any], node_mode: str) -> dict[str, Any]:
     return {
@@ -45,7 +43,6 @@ def backend_report_base(chart: dict[str, Any], node_mode: str) -> dict[str, Any]
         "selected_provenance": position_provenance(chart),
         "independent_astronomy_certified": False,
         "subdivision_accuracy_certified": False,
-        "source_url": SOURCE,
         "target_scope": "太阳和月亮的地心视位置；火星至冥王星采用行星系统质心，非卫星分辨后的星体中心；地球和南交点仍为体系对点。",
         "rows": [],
         "changed_levels": [],

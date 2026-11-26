@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from fractions import Fraction
-from typing import Any, Dict, List, Protocol
+from typing import Any, Protocol
 
 from fatebridge.core.astro.astrology_tables import SIGNS
 from fatebridge.core.astro.birth import AstroBirthInfo
@@ -62,7 +62,7 @@ def birth_sensitivity(
     sample_observer: PositionSampleObserver | None,
     dasha_grid: DashaGridObserver | None,
 ) -> dict[str, Any]:
-    sensitivity: Dict[str, Any] = {
+    sensitivity: dict[str, Any] = {
         "status": "not_assessed",
         "uncertainty_minutes": birth_time_uncertainty_minutes,
         "scope": "birth instant uncertainty; coordinates and ruleset held fixed",
@@ -77,27 +77,27 @@ def birth_sensitivity(
             sensitivity["scope"] = (
                 "Recorded solar-wall endpoints on the physical TT axis; coordinates and ruleset held fixed"
             )
-        seen: Dict[str, Dict[str, set]] = {
+        seen: dict[str, dict[str, set]] = {
             name: {p: set() for p in ["Ascendant", *GRAHAS]} for name in charts
         }
-        condition_samples: Dict[str, set] = {p: set() for p in GRAHAS[:7]}
-        bala_samples: Dict[str, List[float]] = {p: [] for p in GRAHAS[:7]}
+        condition_samples: dict[str, set] = {p: set() for p in GRAHAS[:7]}
+        bala_samples: dict[str, list[float]] = {p: [] for p in GRAHAS[:7]}
         sampled_fallback = set(raw["ephemeris_quality"]["fallback_bodies"])
         sampled_future_time_assumption = raw["time_scale_context"][
             "future_leap_seconds_assumed_unchanged"
         ]
-        strength_samples: Dict[str, Dict[str, List[float]]] = {
+        strength_samples: dict[str, dict[str, list[float]]] = {
             p: {key: [] for key in values}
             for p, values in sthana_resolution.summary.items()
         }
-        dig_samples: Dict[str, List[float]] = {p: [] for p in GRAHAS[:7]}
-        drik_samples: Dict[str, Dict[str, List[float]]] = {}
-        temporal_samples: Dict[str, Dict[str, Dict[str, List[float]]]] = {
+        dig_samples: dict[str, list[float]] = {p: [] for p in GRAHAS[:7]}
+        drik_samples: dict[str, dict[str, list[float]]] = {}
+        temporal_samples: dict[str, dict[str, dict[str, list[float]]]] = {
             "kala_bala": {},
             "cheshta_bala": {},
             "yuddha_bala": {},
         }
-        time_lord_samples: Dict[str, set[str]] = {
+        time_lord_samples: dict[str, set[str]] = {
             key: set()
             for key in (
                 "tribhaga_bala",
@@ -108,10 +108,10 @@ def birth_sensitivity(
             )
         }
         moon_nature_samples = set()
-        solar_bracket_states: Dict[tuple[str, str], int] = {}
+        solar_bracket_states: dict[tuple[str, str], int] = {}
         motion_model_samples = set()
         war_state_samples = set()
-        nak_samples: Dict[str, Dict[tuple, int]] = {
+        nak_samples: dict[str, dict[tuple, int]] = {
             p: {} for p in ["Ascendant", *GRAHAS]
         }
         moon_samples = []

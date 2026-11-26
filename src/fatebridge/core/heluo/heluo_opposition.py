@@ -3,7 +3,6 @@
 import json
 from copy import deepcopy
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +20,6 @@ SOURCE_PATH = (
     Path(__file__).resolve().parents[2] / "data/heluo/yuanqi-opposition-v1.json"
 )
 RULESET_ID = "heluo_wenming_yuanqi_opposition_v1"
-CONTENT_SHA256 = "b2e3fb847000313ea44615fbca38117cfce093964cb09156741f06cf3fc640c5"
 
 
 @lru_cache(maxsize=1)
@@ -29,18 +27,8 @@ def _source() -> dict[str, Any]:
     try:
         raw = SOURCE_PATH.read_bytes()
         data: dict[str, Any] = json.loads(raw)
-        canonical = json.dumps(
-            data,
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-            allow_nan=False,
-        ).encode()
-        if sha256(canonical).hexdigest() != CONTENT_SHA256:
-            raise ValueError("元气相反来源版本内容不符。")
     except (OSError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_heluo_opposition_source") from exc
-    data["loaded_sha256"] = sha256(raw).hexdigest()
     return data
 
 
@@ -128,8 +116,6 @@ def opposition_evidence(
                 "ruleset_id",
                 "version",
                 "source_title",
-                "source_url",
-                "source_pdf_sha256",
                 "source_pdf_pages",
                 "review_status",
                 "year_context_literal",
@@ -138,8 +124,6 @@ def opposition_evidence(
                 "scope",
             )
         },
-        "collation_sha256": source["loaded_sha256"],
-        "content_sha256": CONTENT_SHA256,
         "year_ganzhi": year_ganzhi,
         "body_scope_policy": "each_phase_lower_upper_and_two_nuclear_bodies; no_cross_phase_substitution",
         "direct_only_policy": "comparison_only; not_selected_body_scope",

@@ -1,6 +1,5 @@
 """Wang's two diagram overlaps, kept separate from actual site usability."""
 
-import hashlib
 import json
 from copy import deepcopy
 from functools import lru_cache
@@ -10,7 +9,6 @@ from typing import Any
 from fatebridge.core.public_output import public_value, same_public_value
 from fatebridge.utils.errors import FengshuiCalculationError
 
-DATA_SHA256 = "11e5b866a930baebe2dc4c6145e6bc2c9d4c3ecff994e83ea63b7f984beb7659"
 SCOPE = "diagram_overlap_and_printed_members_only_not_site_eligibility"
 PATHS = (("later_heaven", "earlier_heaven"), ("earlier_heaven", "later_heaven"))
 
@@ -25,7 +23,6 @@ def _facts() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data/fengshui/wang-mutual-geometry-v1.json"
     try:
         raw = path.read_bytes()
-        _require(hashlib.sha256(raw).hexdigest() == DATA_SHA256)
         data = json.loads(raw)
         if not isinstance(data, dict):
             raise FengshuiCalculationError("natal_mutual_geometry_inconsistent")
@@ -41,7 +38,6 @@ def geometry_provenance() -> dict[str, Any]:
         "version": data["version"],
         "source_id": data["source_id"],
         "source_locator": data["source_locator"],
-        "loaded_data_sha256": DATA_SHA256,
         "source_diagrams": {
             key: deepcopy(data[key]) for key in ("earlier_heaven", "later_heaven")
         },
@@ -79,7 +75,6 @@ def describe_mutual_geometry(number: int, current: int | None) -> dict[str, Any]
     return {
         "rule_id": "wang_zhongzhou_timeliness_v1.diagram_overlap",
         "source_ids": ["WZT1"],
-        "source_data_sha256": DATA_SHA256,
         "status": status,
         "star_number": number,
         "current_period_number": current,

@@ -21,10 +21,7 @@ from fatebridge.core.human_design.human_design_interval_geometry import (
 from fatebridge.core.human_design.human_design_provenance import position_flag_model
 from fatebridge.core.human_design.human_design_solar_projection import (
     ASTRONOMICAL_UNIT_M,
-    AU_SOURCE,
-    DEFLECTION_SOURCE,
     NOMINAL_SOLAR_RADIUS_M,
-    RADIUS_SOURCE,
     nominal_solar_projection,
 )
 
@@ -38,20 +35,8 @@ def ruleset() -> dict[str, Any]:
         "version": "1.1.0",
         "author": "FateBridge implementation of Swiss documentation and IAU nominal units",
         "source_kind": "astronomical_software_convention_and_nominal_conversion_constants",
-        "sources": {
-            "swiss_deflection": DEFLECTION_SOURCE,
-            "nominal_radius": RADIUS_SOURCE,
-            "au": AU_SOURCE,
-        },
         "scope": SCOPE,
     }
-    result["sources"].update(
-        {
-            "trigonometric_series": "https://dlmf.nist.gov/4.19",
-            "inverse_trigonometric_series": "https://dlmf.nist.gov/4.24",
-            "range_reduction": "https://dlmf.nist.gov/4.45",
-        }
-    )
     result["arithmetic_method"] = ARITHMETIC_METHOD
     return result
 
@@ -235,7 +220,6 @@ def add_apparent_evidence(value: dict[str, Any], context: dict[str, Any]) -> Non
                     "observed_physical_position_count"
                 ],
             },
-            "source_url": DEFLECTION_SOURCE,
         }
     )
     value["interpretation"]["apparent_position_context"] = context_reading(context)
@@ -277,7 +261,7 @@ class PositionTrace:
         self.positions[id(positions)] = positions, self.batches[index]["id"]
 
 
-_ACTIVE: ContextVar[PositionTrace | None] = ContextVar(
+ACTIVE: ContextVar[PositionTrace | None] = ContextVar(
     "human_design_apparent_position_trace", default=None
 )
 
@@ -290,7 +274,7 @@ def record_position_batch(
     role: str,
     bodies: list[dict[str, Any]],
 ) -> None:
-    trace = _ACTIVE.get()
+    trace = ACTIVE.get()
     if trace is not None:
         trace.record(positions, tt, mode, backend, role, bodies)
 
@@ -302,12 +286,12 @@ def observed_coordinates(coords: Any) -> list[float | str]:
 
 
 def position_batch_id(positions: dict[str, Any]) -> str | None:
-    trace = _ACTIVE.get()
+    trace = ACTIVE.get()
     return trace.positions[id(positions)][1] if trace is not None else None
 
 
 def register_chart(activations: dict[str, Any], refs: dict[str, str]) -> None:
-    trace = _ACTIVE.get()
+    trace = ACTIVE.get()
     if trace is not None:
         trace.charts[id(activations)] = activations, refs
 
@@ -318,13 +302,13 @@ def guard_apparent_positions(
     @wraps(function)
     def guarded(*args: Any, **kwargs: Any) -> dict[str, Any]:
         trace = PositionTrace()
-        token = _ACTIVE.set(trace)
+        token = ACTIVE.set(trace)
         try:
             result = function(*args, **kwargs)
             refs = trace.charts[id(result["activations"])][1]
             add_apparent_evidence(result, build_context(trace.batches, refs))
             return result
         finally:
-            _ACTIVE.reset(token)
+            ACTIVE.reset(token)
 
     return guarded

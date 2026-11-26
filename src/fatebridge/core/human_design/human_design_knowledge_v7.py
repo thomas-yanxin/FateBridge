@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -13,11 +12,9 @@ from fatebridge.core.human_design.human_design_references import (
     coherent_human_design_references,
 )
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.utils.json_digest import canonical_bytes
 
 CATEGORY = "lines_v7"
 CATALOGUE_PATH = base.CATALOGUE_PATH.with_name("line-knowledge-gate6-v1.json")
-CATALOGUE_SHA256 = "35be688a9d86b51655197c62d77394d979ccaf077bac798b222c629ef5803c8d"
 HEADINGS = [
     "Retreat",
     "The guerilla",
@@ -43,8 +40,6 @@ def _catalogue(
     data, snapshot, provenance = parent._catalogue() if previous is None else previous
     try:
         raw = CATALOGUE_PATH.read_bytes()
-        if hashlib.sha256(raw).hexdigest() != CATALOGUE_SHA256:
-            raise ValueError("Gate6 editorial catalogue changed")
         supplement = json.loads(
             raw, object_pairs_hook=base._object, parse_constant=base._nonfinite
         )
@@ -53,8 +48,6 @@ def _catalogue(
             or supplement["version"] != 7
             or supplement["catalogue_id"] != "human_design_gate6_editorial_v7"
             or supplement["parent_version"] != data["version"]
-            or supplement["parent_catalogue_sha256"] != parent.CATALOGUE_SHA256
-            or supplement["source_pdf_sha256"] != data["source"]["pdf_sha256"]
             or supplement["required_line_count"] != 384
             or supplement["expected_local_paraphrase_count"] != 36
             or supplement["independently_accepted_line_count"] != 0
@@ -106,8 +99,6 @@ def _catalogue(
                 or original["editorial_paraphrase"] is not None
                 or row["source_pdf_page_one_based"]
                 != original["source_pdf_page_one_based"]
-                or row["source_layout_block_sha256"]
-                != original["source_layout_block_sha256"]
                 or row["source_line_heading"] != HEADINGS[i]
                 or row["meaning_status"]
                 != "local_editorial_paraphrase_pending_independent_review"
@@ -153,9 +144,6 @@ def _catalogue(
         snapshot[CATALOGUE_PATH] = raw
         provenance.update(
             source_catalogue_version=7,
-            source_catalogue_content_sha256=hashlib.sha256(
-                canonical_bytes(data)
-            ).hexdigest(),
             scope=base._scope(data) + parent.SCOPE + SCOPE,
         )
         provenance["source_records"].append(
@@ -163,8 +151,6 @@ def _catalogue(
                 "domain": base.DOMAIN,
                 "key": CATALOGUE_PATH.stem,
                 "source_path": "human_design/" + CATALOGUE_PATH.name,
-                "loaded_file_sha256": CATALOGUE_SHA256,
-                "source_pdf_sha256": supplement["source_pdf_sha256"],
                 "source_kind": "versioned_local_gate6_editorial_reference",
                 "source_revision": 7,
                 "review_status": "six_additional_local_paraphrases_pending_independent_review",

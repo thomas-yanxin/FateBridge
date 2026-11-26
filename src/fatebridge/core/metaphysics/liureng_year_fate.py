@@ -1,6 +1,6 @@
 """Place 年命 on the earth plate, then read the existing heaven plate."""
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from fatebridge.core.almanac import get_lunar_context, localize_datetime
 from fatebridge.core.metaphysics.common import (
@@ -14,7 +14,6 @@ from fatebridge.core.metaphysics.common import (
     stem_element_text,
 )
 from fatebridge.core.metaphysics.ren_evidence import xun_dun_stems
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 from fatebridge.utils.birth_input import normalize_gender
 
 
@@ -26,13 +25,13 @@ def natal_year_ganzhi(birth_lunar_year: int) -> str:
 
 
 def build_year_fate(
-    board: Dict[str, Any],
+    board: dict[str, Any],
     *,
     day_ganzhi: str,
     birth_lunar_year: int,
-    runyear_ganzhi: Optional[str],
-    runyear_reason: Optional[str] = None,
-) -> Dict[str, Any]:
+    runyear_ganzhi: str | None,
+    runyear_reason: str | None = None,
+) -> dict[str, Any]:
     """Never invert earth/heaven lookup or reuse 年命 stems as 旬遁 stems."""
     if day_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("年命上神需要有效的占日干支")
@@ -47,7 +46,7 @@ def build_year_fate(
     dun = xun_dun_stems(day_ganzhi)
     day_element = stem_element_text(day_ganzhi[0])
 
-    def placement(subject: Optional[str]) -> Dict[str, Any]:
+    def placement(subject: str | None) -> dict[str, Any]:
         if subject is None:
             return {
                 "status": "not_calculated",
@@ -85,8 +84,6 @@ def build_year_fate(
     return {
         "ruleset_id": "tanyuan_year_fate_v1",
         "source_title": "袁树珊大六壬探原·卷上推演篇·年命",
-        "source_url": TANYUAN_SOURCE,
-        "source_sha256": TANYUAN_SCAN_SHA256,
         "original_pdf_pages": [70, 71, 72, 73],
         "birth_year_basis": "出生民用日期的农历年；沿用既有换岁口径，不取出生四柱年柱",
         "placement_basis": "本命与行年干支均书地盘，以其支读取同一课天盘上神及所乘天将",
@@ -128,7 +125,6 @@ def build_liureng_runyear(
         "gender": gender,
         "age_basis": "农历年差加一；正月初一换岁",
         "rule_id": "liuren.runyear_bingyin_renshen",
-        "source_url": TANYUAN_SOURCE,
         "source_section": "大六壬探原·卷上推演篇·年命",
         "birth_lunar_year": birth_lunar_year,
         "age_calendar": {

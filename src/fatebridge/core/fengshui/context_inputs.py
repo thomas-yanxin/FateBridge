@@ -32,14 +32,14 @@ Zodiac = Literal["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", 
 # Query scope and object identities alone are not environmental observations.
 # Share this list with the validator so schema publication cannot omit the
 # aggregate fact gate or accidentally count a metadata-only context as facts.
-_CONTEXT_FACT_LIST_FIELDS = (
+CONTEXT_FACT_LIST_FIELDS = (
     "household_members",
     "floors",
     "observations",
     "interior_relations",
     "material_facts",
 )
-_CONTEXT_FACT_SCHEMA: dict[str, Any] = {
+CONTEXT_FACT_SCHEMA: dict[str, Any] = {
     "anyOf": [
         {
             "required": ["workstation_review"],
@@ -54,7 +54,7 @@ _CONTEXT_FACT_SCHEMA: dict[str, Any] = {
                 "required": [field],
                 "properties": {field: {"type": "array", "minItems": 1}},
             }
-            for field in _CONTEXT_FACT_LIST_FIELDS
+            for field in CONTEXT_FACT_LIST_FIELDS
         ],
     ]
 }
@@ -322,7 +322,7 @@ class EnvironmentalObject(ContextFact):
 
 
 class EnvironmentalContext(_DeferredModel):
-    model_config = ConfigDict(json_schema_extra=_CONTEXT_FACT_SCHEMA)
+    model_config = ConfigDict(json_schema_extra=CONTEXT_FACT_SCHEMA)
 
     ruleset_id: Literal["expert_environment_2026_10_v1"] = (
         "expert_environment_2026_10_v1"
@@ -361,7 +361,7 @@ class EnvironmentalContext(_DeferredModel):
         if (
             self.orientation is None
             and self.workstation_review is None
-            and not any(getattr(self, field) for field in _CONTEXT_FACT_LIST_FIELDS)
+            and not any(getattr(self, field) for field in CONTEXT_FACT_LIST_FIELDS)
         ):
             raise ValueError(
                 "环境上下文至少提供方向核对、家庭成员、楼层或具体观察；对象定义本身不是完成审查"

@@ -5,9 +5,7 @@ there are at most three, then borrow opposite lines; pure Qian/Kun have their
 own sex/half-year directions. Month-pillar Zi/Wu alone cannot resolve a half.
 """
 
-from typing import Any, Optional
-
-from fatebridge.core.heluo.heluo_seasonal import SOURCE_SHA256, SOURCE_URL
+from typing import Any
 
 RULESET_ID = "heluo_yuantang_nlc_v1"
 YANG_HOURS = list("子丑寅卯辰巳")
@@ -17,9 +15,7 @@ PURE_HOUR_TO_YAO = dict(
 )
 
 
-def resolve_half_year(
-    month_zhi: str, explicit: Optional[bool]
-) -> tuple[Optional[bool], str]:
+def resolve_half_year(month_zhi: str, explicit: bool | None) -> tuple[bool | None, str]:
     """A sexagenary month pillar spans its Jie boundaries, not a solstice."""
     if month_zhi not in YANG_HOURS + YIN_HOURS:
         raise ValueError("月支须为十二地支。")
@@ -33,7 +29,7 @@ def resolve_half_year(
 
 
 def placement(
-    lines: list[int], hour_zhi: str, is_male: bool, yang_ling: Optional[bool]
+    lines: list[int], hour_zhi: str, is_male: bool, yang_ling: bool | None
 ) -> dict[str, Any]:
     if (
         not isinstance(lines, list)
@@ -103,8 +99,6 @@ def source_profile() -> dict[str, Any]:
     return {
         "ruleset_id": RULESET_ID,
         "version": "1.0.0",
-        "source_url": SOURCE_URL,
-        "source_pdf_sha256": SOURCE_SHA256,
         "source_pdf_pages": list(range(26, 33)),
         "review_status": "single_visual_collation; independent_second_review_pending",
     }

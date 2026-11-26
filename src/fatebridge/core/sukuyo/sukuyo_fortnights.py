@@ -6,15 +6,10 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.sukuyo.sukuyo_calendar_witnesses import (
-    calendar_witness_lines,
-    calendar_witness_reference,
-)
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 SOURCE = DATA_DIR / "sukuyo_fortnights.json"
-CANONICAL_SHA256 = "e4486a41d1e4b8cd7d78d5f50119d69f2a516e1cc1d138a0b3069f53ef6a947e"
 
 
 def declared_fortnight_ordinal(
@@ -103,26 +98,10 @@ def _numbering_validation_scope(cases: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def fortnight_calendar_reference(rizang: dict[str, Any]) -> dict[str, Any]:
-    loaded = load_source(SOURCE)
-    if loaded.sha256 != CANONICAL_SHA256:
-        raise ValueError("黑白分来源包已改变，须重新核验原录及编号参考")
-    data = loaded.data
-    if data["actual_sources"]["T13n0397.xml"]["sha256"] != rizang["source_sha256"]:
-        raise ValueError("黑白分对照与日藏具名版本不一致，须重新核验")
-    comparative = load_source(DATA_DIR / "sukuyo_comparative_time_units.json").data
-    matches = [r for r in comparative["witnesses"] if r["id"] == "T51n2087"]
-    if (
-        len(matches) != 1
-        or matches[0]["source_sha256"]
-        != data["actual_sources"]["T51n2087.xml"]["sha256"]
-    ):
-        raise ValueError("黑白分对照与西域记具名版本不一致，须重新核验")
-    t1299 = load_source(DATA_DIR / "sukuyo_t1299_days.json").data
-    if t1299["source_sha256"] != data["actual_sources"]["T21n1299.xml"]["sha256"]:
-        raise ValueError("黑白分对照与T1299具名版本不一致，须重新核验")
+    data = load_source(SOURCE)
     ledger = _declared_yuga_ledger(data["five_year_diagnostic_assumptions"])
     if ledger != data["before_production_five_year_ledger"]:
-        raise ValueError("五年原计数派生账本与修改前参考不一致")
+        raise ValueError("五年原计数派生账本与参考不一致")
     examples = [
         {
             "black_length": length,
@@ -138,15 +117,11 @@ def fortnight_calendar_reference(rizang: dict[str, Any]) -> dict[str, Any]:
     ]
     return {
         **data,
-        "source_bundle_sha256": loaded.sha256,
         "derived_ordinal_examples": examples,
         "numbering_validation_scope": _numbering_validation_scope(
             data["all68_declared_ordinal_cases"]
         ),
         "derived_five_year_ledger": ledger,
-        "selected_witness_apparatus_reference": calendar_witness_reference(
-            data, loaded.sha256
-        ),
     }
 
 
@@ -170,7 +145,7 @@ def fortnight_calendar_lines(reference: dict[str, Any]) -> list[str]:
     )
     ledger = reference["derived_five_year_ledger"]
     checked = reference["numbering_validation_scope"]
-    return calendar_witness_lines(reference["selected_witness_apparatus_reference"]) + [
+    return [
         "直接纪月来源：《西域记》卷二0875c15所选段称黑分或十四日、十五日，黑前白后合月；"
         f"其四时原组为{quarters}。这是四组三个月名与区间，未冒称十二个独立逐日换历表。"
         f"仅在显式声明的黑先白后编号中，{ordinals}；黑十四不能再取黑十五。"
@@ -181,7 +156,7 @@ def fortnight_calendar_lines(reference: dict[str, Any]) -> list[str]:
         "九项拒绝不是九项原典冲突或九次预测失败，59／68不是历法正确率。"
         "这些工程编号检查不是独立古代观察或真实样本，不替代原82743历法条件、330槽80异及四轴门槛。",
         f"普光《俱舍论记》0187c16一段各说分层保留：{schemes}。"
-        "前三为该段引述并批评的解释，最后是普光此段今解；不把所引真谛说冒称本轮取得的真谛原笔。"
+        "前三为该段引述并批评的解释，最后是普光此段今解；不把所引真谛说冒称真谛原笔。"
         "这些方俗与论释的区间不同，不能按多数或与当前结果相合来选定古代日界、绝对年或置闰。",
         "法宝《俱舍论疏》0617a08另比较以此方七月十六、八月十六为月初时，白八分别落此方八月八、九月八，"
         "此段自取前者，并明确称节气月日、非月生月尽月日。"

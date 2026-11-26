@@ -17,8 +17,6 @@ BAV_TOTALS = dict(zip((*PLANETS, "Ascendant"), (48, 49, 39, 54, 56, 52, 39, 49))
 SOURCE = {
     "id": "pvr_2000_pinda_1cafa828",
     "title": "P.V.R. Narasimha Rao, Vedic Astrology: An Integrated Approach (2000; 2010 update)",
-    "url": "https://www.vedicastrologer.org/articles/vedic_astro_textbook.pdf",
-    "sha256": "1cafa828f34764ed5e85816882df2e8f0bc014c5c57ccdb27169416e117fd4db",
     "sections": ["3.1; 12.7.1-12.7.3; Tables28-29; printed157-160/PDF169-172"],
     "scope": "Trinal reduction, all five coowned pairs and Pinda under an explicitly selected seven-classical-graha occupancy reading. Single-occupied equal nonzero counts have no supplied rule and stay unknown. Not unique whole-book acceptance or event forecasting.",
 }

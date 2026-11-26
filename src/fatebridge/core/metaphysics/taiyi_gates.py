@@ -5,11 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.taiyi_conditions import update_conjunction
-from fatebridge.core.metaphysics.taiyi_gate_frames import (
-    SECTOR_SOURCE,
-)
 from fatebridge.core.metaphysics.taiyi_gate_frames import SECTORS as SECTORS
-from fatebridge.core.metaphysics.taiyi_gate_frames import TONGZONG
 from fatebridge.core.metaphysics.taiyi_gate_frames import (
     check_three_gates as check_three_gates,
 )
@@ -29,11 +25,6 @@ from fatebridge.core.metaphysics.taiyi_geometry import (
 )
 from fatebridge.core.metaphysics.taiyi_hour import KEY_HOUR_PROFILE
 from fatebridge.core.metaphysics.taiyi_month import KEY_MONTH_PROFILE, month_source_data
-
-JINJING = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷01#推八門占嵗計法"
-KEY = (
-    "https://www.shidianguji.com/zh/book/NGJ89241199902106666022/chapter/1lq8dkylq3yn8"
-)
 
 
 def determinate_calculation(board: dict[str, Any], mode: str) -> dict[str, Any]:
@@ -67,7 +58,6 @@ def determinate_calculation(board: dict[str, Any], mode: str) -> dict[str, Any]:
             "wenchang": eyes,
             "forward_steps": shift,
         },
-        "source": KEY,
         "scope": "定计是原典所称为客重审之算，不是新的独立证据或实际成功概率。",
     }
     if mode == "hour" and core["taiyi_number"] == 9 and eyes == "乾" and ruler == "戌":
@@ -78,7 +68,6 @@ def determinate_calculation(board: dict[str, Any], mode: str) -> dict[str, Any]:
             for field, value in (("count", 33), ("general", 3), ("vice_general", 9))
             if result[field] != value
         ]
-        result["source_comparison_source"] = KEY
         result["source_comparison_scope"] = (
             "图45/46庚戌课例同一时计相位的定计数值参照；日期匹配另见calendar_rules.historical_date_reference，不认证完整古历、门盘或应验。"
         )
@@ -128,9 +117,7 @@ def attach_gate_board(
         "version": "1.1.0",
         "author": "FateBridge contributors",
         "classical_author": "唐·王希明；旧法记李淳风；后本补证分别标注",
-        "sources": [JINJING, TONGZONG],
         "sector_rule_id": "jinjing_four_cardinals_four_corners_v1",
-        "sector_sources": [SECTOR_SOURCE],
         "classical_conformance": "partial_source_scoped_gate_rules_not_full_classical_judgment",
         "classical_acceptance_passed": False,
         "open_issues": [
@@ -199,9 +186,7 @@ def attach_gate_board(
                 "version": "1.1.0",
                 "author": "FateBridge contributors",
                 "classical_author": "《太乙金钥匙续集》底本题署，作者未独立考定",
-                "sources": [KEY],
                 "sector_rule_id": "jinjing_four_cardinals_four_corners_v1",
-                "sector_sources": [SECTOR_SOURCE],
                 "classical_conformance": (
                     "partial_day_counter_door_sequence_and_determinate_anchor_only"
                     if is_day
@@ -228,7 +213,6 @@ def attach_gate_board(
                 else "金钥匙时计的太乙主客核对主体及课例门具语尚未裁定；已布门不等于门具。"
             ),
             "frame_source_path": "taiyi.gates.moving_frame",
-            "source": KEY,
         }
         if is_key_month:
             gates["ruleset"].update(
@@ -238,7 +222,6 @@ def attach_gate_board(
             gates.update(
                 source_comparisons=[],
                 source_counter_alternatives=[],
-                source_comparison_source=KEY,
                 source_comparison_scope="仅与金钥匙月例同一720月数值相位比较；不是同一历史月份或全盘断法认证。",
             )
             board["condition_assessment"]["three_gates"][
@@ -253,7 +236,6 @@ def attach_gate_board(
                         "source_value": value,
                         "rule_derived_value": actual,
                         "scope": "图38原门段读数；本盘沿前段天地二正完整积月通则。",
-                        "source": KEY,
                     }
                     for field, value, actual in (
                         (
@@ -400,7 +382,6 @@ def attach_gate_board(
             "taiyi.core_board.dingmu",
             determinate["marker"],
         )
-        gates["dingmu_comparison_source"] = KEY
     board["gates"] = gates
     assessment = board["condition_assessment"]
     assessment["three_gates"] = selected_check

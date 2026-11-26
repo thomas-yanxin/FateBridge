@@ -11,7 +11,6 @@ This is exhaustive enumeration, not hourly sampling or a noon assumption.
 
 from __future__ import annotations
 
-import hashlib
 from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from io import BytesIO
@@ -35,8 +34,8 @@ from fatebridge.utils.timezones import (
 
 METHOD = "complete_local_date_preimage_tzif_seconds_v1"
 CHINA = timezone(timedelta(hours=8))
-_SECOND_MICROSECONDS = 1000000
-_DAY_MICROSECONDS = 86400 * _SECOND_MICROSECONDS
+SECOND_MICROSECONDS = 1000000
+DAY_MICROSECONDS = 86400 * SECOND_MICROSECONDS
 
 
 def input_timezone_context(zone_text: str) -> dict[str, str]:
@@ -47,7 +46,7 @@ def input_timezone_context(zone_text: str) -> dict[str, str]:
         assert offset is not None
         ticks = (
             offset.days * 86400 + offset.seconds
-        ) * _SECOND_MICROSECONDS + offset.microseconds
+        ) * SECOND_MICROSECONDS + offset.microseconds
         rules["effective_offset_microseconds"] = str(ticks)
     return rules
 
@@ -59,7 +58,7 @@ def input_timezone_reading(context: dict[str, Any]) -> str:
     represented = ""
     if "effective_offset_microseconds" in rules:
         ticks = int(rules["effective_offset_microseconds"])
-        seconds, fraction = divmod(abs(ticks), _SECOND_MICROSECONDS)
+        seconds, fraction = divmod(abs(ticks), SECOND_MICROSECONDS)
         hours, rest = divmod(seconds, 3600)
         minutes, seconds = divmod(rest, 60)
         suffix = f".{fraction:06d}" if fraction else ""
@@ -83,17 +82,17 @@ def support_interval_duration_reading(interval: dict[str, Any]) -> str:
     elif "start_utc_epoch_seconds" in interval:
         ticks = (
             interval["end_utc_epoch_seconds"] - interval["start_utc_epoch_seconds"]
-        ) * _SECOND_MICROSECONDS
+        ) * SECOND_MICROSECONDS
     else:
         elapsed = datetime.fromisoformat(
             interval["end_utc_exclusive"]
         ) - datetime.fromisoformat(interval["start_utc_inclusive"])
         ticks = (
             elapsed.days * 86400 + elapsed.seconds
-        ) * _SECOND_MICROSECONDS + elapsed.microseconds
+        ) * SECOND_MICROSECONDS + elapsed.microseconds
     if ticks <= 0:
         raise ValueError("历日支持区间须有正长度")
-    seconds, fraction = divmod(ticks, _SECOND_MICROSECONDS)
+    seconds, fraction = divmod(ticks, SECOND_MICROSECONDS)
     number = f"{seconds}.{fraction:06d}" if fraction else str(seconds)
     return f"该区间长{number}秒，长度不是出生概率。"
 
@@ -218,31 +217,31 @@ def _fixed_offset_support(
     assert offset is not None
     offset_us = (
         offset.days * 86400 + offset.seconds
-    ) * _SECOND_MICROSECONDS + offset.microseconds
-    start = (civil.toordinal() - 1) * _DAY_MICROSECONDS - offset_us
-    end = start + _DAY_MICROSECONDS
-    reference_us = reference_hours * 3600 * _SECOND_MICROSECONDS
-    epoch_us = (date(1970, 1, 1).toordinal() - 1) * _DAY_MICROSECONDS
+    ) * SECOND_MICROSECONDS + offset.microseconds
+    start = (civil.toordinal() - 1) * DAY_MICROSECONDS - offset_us
+    end = start + DAY_MICROSECONDS
+    reference_us = reference_hours * 3600 * SECOND_MICROSECONDS
+    epoch_us = (date(1970, 1, 1).toordinal() - 1) * DAY_MICROSECONDS
     lower = civil.year == 1 and civil.month == 1 and civil.day <= 2
 
     def label(ordinal: int) -> str:
         return UTCCalendar(ordinal, 0).isoformat().split("T")[0]
 
     def utc_label(microseconds: int) -> str:
-        day, within_day = divmod(microseconds, _DAY_MICROSECONDS)
+        day, within_day = divmod(microseconds, DAY_MICROSECONDS)
         return UTCCalendar(day + 1, within_day).isoformat()
 
     intervals = []
     opened = start
     while opened < end:
-        reference_ordinal = (opened + reference_us) // _DAY_MICROSECONDS + 1
-        finish = min(end, reference_ordinal * _DAY_MICROSECONDS - reference_us)
+        reference_ordinal = (opened + reference_us) // DAY_MICROSECONDS + 1
+        finish = min(end, reference_ordinal * DAY_MICROSECONDS - reference_us)
         row: dict[str, Any] = {
             "calendar_date": label(reference_ordinal),
             "start_utc_inclusive": utc_label(opened),
             "end_utc_exclusive": utc_label(finish),
         }
-        if opened % _SECOND_MICROSECONDS or finish % _SECOND_MICROSECONDS:
+        if opened % SECOND_MICROSECONDS or finish % SECOND_MICROSECONDS:
             row.update(
                 # Ancient epochs exceed JSON's common IEEE integer range.
                 start_utc_epoch_microseconds=str(opened - epoch_us),
@@ -250,8 +249,8 @@ def _fixed_offset_support(
             )
         elif lower:
             row.update(
-                start_utc_epoch_seconds=(opened - epoch_us) // _SECOND_MICROSECONDS,
-                end_utc_epoch_seconds=(finish - epoch_us) // _SECOND_MICROSECONDS,
+                start_utc_epoch_seconds=(opened - epoch_us) // SECOND_MICROSECONDS,
+                end_utc_epoch_seconds=(finish - epoch_us) // SECOND_MICROSECONDS,
             )
         intervals.append(row)
         opened = finish
@@ -282,7 +281,7 @@ def _support(date_text: str, zone_text: str, calendar_offset_hours: int = 8) -> 
     zone = parse_timezone_name(zone_text)
     metadata = {"provider": "datetime.timezone", "database": "explicit_fixed_offset"}
     if isinstance(zone, ZoneInfo):
-        # Compute and fingerprint the very same bytes. The shared parser may
+        # Read ZoneInfo from the exact pytz resource bytes. The shared parser may
         # already hold an older cached ZoneInfo if files changed in-process.
         with pytz.open_resource(zone.key) as resource:
             raw = resource.read()
@@ -292,7 +291,6 @@ def _support(date_text: str, zone_text: str, calendar_offset_hours: int = 8) -> 
             "database": "pytz",
             "package_version": pytz.__version__,
             "iana_version": pytz.OLSON_VERSION,
-            "tzif_sha256": hashlib.sha256(raw).hexdigest(),
             "future_policy": "extrapolate_pinned_rules_subject_to_legal_changes",
         }
         if civil.year == 1 and civil.month == 1 and civil.day <= 2:

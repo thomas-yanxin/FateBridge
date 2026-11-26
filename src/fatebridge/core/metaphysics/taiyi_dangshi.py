@@ -6,13 +6,10 @@ evening boundary nor a license to replace the actual twelve-god board.
 
 from __future__ import annotations
 
-import hashlib
 import json
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
-
-CATALOG_SHA256 = "6ba03f108abd0e490079e434c2d1718ec15fbf40c2cc919c03ae255d18df94bb"
 
 
 @lru_cache(maxsize=1)
@@ -21,10 +18,7 @@ def _catalog() -> dict[str, Any]:
         Path(__file__).resolve().parents[2]
         / "data/classical/taiyi-dangshi-nobles-v1.json"
     )
-    raw = path.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != CATALOG_SHA256:
-        raise ValueError("太乙当时法贵人来源目录指纹不符")
-    result: dict[str, Any] = json.loads(raw)
+    result: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
     return result
 
 
@@ -37,7 +31,6 @@ def noble_source_assessment(
         "status": "not_assessed",
         "ruleset_id": catalog["id"],
         "ruleset_version": catalog["version"],
-        "source_freeze_sha256": catalog["source_freeze_sha256"],
         "scope": catalog["scope"],
         "taiyi_mode": taiyi_mode,
         "applicability": (
@@ -80,9 +73,7 @@ def noble_source_assessment(
             {
                 "source_id": table["id"],
                 "source_edition": table["edition"],
-                "source_url": table["url"],
                 "facsimile_page": table["page"],
-                "facsimile_sha256": table["facsimile_sha256"],
                 "source_branch": expected,
                 "matches": start == expected,
             }

@@ -5,16 +5,16 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 from fatebridge.core.ziwei.ziwei_rulesets import QUANSHU_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 
 @lru_cache(maxsize=1)
-def _symbolic_source() -> Dict[str, Any]:
+def _symbolic_source() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             files("fatebridge")
             .joinpath("data/classical/ziwei-quanshu-v2-stars.json")
@@ -23,7 +23,7 @@ def _symbolic_source() -> Dict[str, Any]:
     )
 
 
-def symbolic_properties(palaces: List[Dict[str, Any]]) -> Dict[str, Any]:
+def symbolic_properties(palaces: list[dict[str, Any]]) -> dict[str, Any]:
     """Quote the selected text separately from the actual natal 四化 marker.
 
     For example, 武曲「化财」and 天相「化印」are textual symbolic phrases,
@@ -66,8 +66,8 @@ def symbolic_properties(palaces: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def annual_text_stars(
-    scope_palaces: List[Dict[str, Any]], *, year_branch: str
-) -> List[Dict[str, Any]]:
+    scope_palaces: list[dict[str, Any]], *, year_branch: str
+) -> list[dict[str, Any]]:
     """Annual virtues/four flying stars, not the natal same-name stars."""
     year_index = EARTHLY_BRANCHES.index(year_branch)
     result = []
@@ -98,7 +98,7 @@ def annual_text_stars(
     return result
 
 
-def annual_three_sha(year_branch: str) -> Dict[str, Any]:
+def annual_three_sha(year_branch: str) -> dict[str, Any]:
     """The text gives a branch set; it does not pair each named sha to it."""
     groups = (
         ("寅午戌", ["亥", "卯", "未"]),

@@ -5,9 +5,6 @@ are independent claims. In particular, a corpus hash is not a collation.
 """
 
 from copy import deepcopy
-from functools import lru_cache
-from hashlib import sha256
-from pathlib import Path
 from typing import Any
 
 from fatebridge.core.heluo.heluo import GAN_NUM, ZHI_PAIR
@@ -22,37 +19,11 @@ from fatebridge.core.heluo.heluo_texts import (
     collation_summary,
     commentary_collation_summary,
 )
-from fatebridge.core.heluo.heluo_timing import (
-    RULESET_ID,
-)
-from fatebridge.core.heluo.heluo_timing import (
-    SOURCE_SHA256 as HELUO_TIMING_SOURCE_SHA256,
-)
-from fatebridge.core.heluo.heluo_timing import SOURCE_URL as HELUO_TIMING_SOURCE_URL
+from fatebridge.core.heluo.heluo_timing import RULESET_ID
 from fatebridge.core.numerology.canping_texts import (
     collation_summary as canping_collation_summary,
 )
-from fatebridge.core.numerology.canping_timing import (
-    SOURCE_SHA256 as CANPING_TIMING_SOURCE_SHA256,
-)
-from fatebridge.core.numerology.canping_timing import (
-    SOURCE_URL as CANPING_TIMING_SOURCE_URL,
-)
 from fatebridge.core.zhouyi import classical_hexagram
-
-VOLUME_ONE = "https://www.shidianguji.com/book/NA09030/chapter/1m8od60nhc1me"
-VOLUME_SIX = "https://www.shidianguji.com/zh/book/NA09030/chapter/1m8od6rwizt4b"
-
-
-@lru_cache(maxsize=2)
-def _corpus_sha(technique: str) -> str:
-    path = (
-        Path(__file__).resolve().parents[2]
-        / "data"
-        / technique
-        / f"{technique}Tiaowen.json"
-    )
-    return sha256(path.read_bytes()).hexdigest()
 
 
 def _base(technique: str, method_id: str) -> dict[str, Any]:
@@ -62,12 +33,10 @@ def _base(technique: str, method_id: str) -> dict[str, Any]:
                 "ruleset_id": method_id,
                 "version": "1.0.0",
                 "source_title": "河洛理數（史應選校訂本）",
-                "source_url": VOLUME_ONE if technique == "heluo" else VOLUME_SIX,
                 "source_status": "digital_transcription_with_ocr_errors; full_scan_collation_pending",
                 "authorship_status": "traditional_attribution_not_independently_established",
             }
         ],
-        "corpus_sha256": _corpus_sha(technique),
         "corpus_status": "inherited_transcription_not_fully_collated",
         "validation_status": {
             "calendar": "instant_based_shared_calendar; external_reference_tests_have_limited_coverage",
@@ -97,8 +66,6 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": line_evidence["ruleset_id"],
             "version": line_evidence["version"],
             "source_title": "河洛理數卷一·论六爻位序、二五位、众宗与主本有援原句",
-            "source_url": line_evidence["source_url"] + "#page=45",
-            "source_pdf_sha256": line_evidence["source_pdf_sha256"],
             "source_status": line_evidence["review_status"],
         }
     )
@@ -108,8 +75,6 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": yuantang["ruleset_id"],
             "version": yuantang["version"],
             "source_title": "河洛理數（上海文明書局印行本）卷一·元堂爻位图式与换后天",
-            "source_url": yuantang["source_url"] + "#page=26",
-            "source_pdf_sha256": yuantang["source_pdf_sha256"],
             "source_status": yuantang["review_status"],
         }
     )
@@ -119,10 +84,7 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": commentary["corpus_id"],
             "version": commentary["version"],
             "source_title": f"河洛理數（上海文明書局印行本）卷二上·已核逐爻注文（{commentary['collated_line_commentaries']}条）",
-            "source_url": commentary["source_url"] + "#page=119",
-            "source_pdf_sha256": commentary["source_pdf_sha256"],
             "source_status": commentary["review_status"],
-            "source_content_sha256": commentary["content_sha256"],
         }
     )
     poems = result["poem_collation"]
@@ -131,10 +93,7 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": poems["corpus_id"],
             "version": poems["version"],
             "source_title": poems["source_title"],
-            "source_url": poems["source_url"] + "#page=2",
-            "source_pdf_sha256": poems["source_pdf_sha256"],
             "source_status": poems["review_status"],
-            "source_content_sha256": poems["content_sha256"],
         }
     )
     result["interpretation_constraints"].append(
@@ -147,9 +106,6 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": opposition["ruleset_id"],
             "version": opposition["version"],
             "source_title": opposition["source_title"],
-            "source_url": opposition["source_url"] + "#page=33",
-            "source_pdf_sha256": opposition["source_pdf_sha256"],
-            "source_content_sha256": opposition["content_sha256"],
             "source_status": opposition["review_status"],
         }
     )
@@ -158,8 +114,6 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": qi["ruleset_id"],
             "version": qi["version"],
             "source_title": "河洛理數卷一·元气化工、反化工重叠及先后天得失",
-            "source_url": qi["source_url"],
-            "source_pdf_sha256": qi["source_pdf_sha256"],
             "source_status": "selected_sections_PDF_32_33_34_35_50_51_63_visually_read; two_printings; independent_second_review_pending",
         }
     )
@@ -169,8 +123,6 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": bodies["ruleset_id"],
             "version": bodies["version"],
             "source_title": "河洛理數卷一·得体、合理、纳音相生及互体",
-            "source_url": bodies["source_url"],
-            "source_pdf_sha256": bodies["source_pdf_sha256"],
             "source_status": "PDF_32_46_51_87_visually_read; year_nayin_and_directed_relations_named; full_deti_pending",
         }
     )
@@ -180,8 +132,6 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": month_evidence["ruleset_id"],
             "version": month_evidence["version"],
             "source_title": "河洛理數（上海文明書局印行本）卦属月与另述得时窗口",
-            "source_url": month_evidence["source_url"],
-            "source_pdf_sha256": month_evidence["source_pdf_sha256"],
             "source_status": "64_introductions_and_volume_one_table_reviewed; 63_intro_and_64_table_months; five_source_conflicts_retained; thirteen_month_najia_connectors_and_boundary_convention_pending; independent_second_review_pending",
         }
     )
@@ -191,8 +141,6 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": seasonal["ruleset_id"],
             "version": seasonal["version"],
             "source_title": "河洛理數（上海文明書局印行本）卷一天地数与时损益",
-            "source_url": seasonal["source_url"],
-            "source_pdf_sha256": seasonal["source_pdf_sha256"],
             "source_status": "PDF_pages_64_to_74_visually_collated; literal_conditions_and_overlaps_retained",
         }
     )
@@ -201,8 +149,6 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": RULESET_ID,
             "version": "1.0.0",
             "source_title": "河洛理數（上海文明書局印行本）卷一小象年月日定式",
-            "source_url": HELUO_TIMING_SOURCE_URL + "#page=37",
-            "source_pdf_sha256": HELUO_TIMING_SOURCE_SHA256,
             "source_status": "PDF_pages_37_to_40_visually_collated; full_book_collation_pending",
             "authorship_status": "traditional_attribution_not_independently_established",
         }
@@ -212,8 +158,6 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": "heluo_hexagram_najia_qiankun_borrowed_v2",
             "version": "2.2.0",
             "source_title": "河洛理數（上海文明書局印行本）纳甲及借用",
-            "source_url": HELUO_TIMING_SOURCE_URL + "#page=119",
-            "source_pdf_sha256": HELUO_TIMING_SOURCE_SHA256,
             "source_status": f"{result['najia_collation']['directly_collated_hexagrams']}_hexagram_entries; {result['najia_collation']['pure_trigram_tables']}_pure_tables; {result['najia_collation']['direct_assignment_observations']}_direct_and_{result['najia_collation']['borrowed_assignment_observations']}_borrowed_observations; {result['najia_collation']['other_hexagrams_not_individually_collated']}_other_entries_not_individually_collated; independent_second_review_pending",
             "authorship_status": "traditional_attribution_not_independently_established",
         }
@@ -360,12 +304,7 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "source_section": "本次实际先后天元堂；卷二标题注文与另件卷三诗诀分别记录",
             "facts": {
                 "commentary_corpus_id": commentary["corpus_id"],
-                "commentary_sha256": commentary["sha256"],
-                "commentary_content_sha256": commentary["content_sha256"],
-                "header_content_sha256": result["yaoci_collation"]["content_sha256"],
                 "poem_corpus_id": poems["corpus_id"],
-                "poem_sha256": poems["sha256"],
-                "poem_content_sha256": poems["content_sha256"],
                 "automatic_branch_selection": False,
                 "selections": [
                     {
@@ -396,9 +335,7 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
         selected["zhouyi_reference"] = {
             "corpus_id": reference["corpus_id"],
             "edition_status": reference["edition_status"],
-            "source_url": reference["source_url"],
             "source_revision": reference["source_revision"],
-            "source_wikitext_sha256": reference["source_wikitext_sha256"],
             "verse": deepcopy(verse),
             "scope": "周易经文参照；不替代河洛注文版本校勘。",
         }
@@ -426,7 +363,7 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
         "yuanTang.heLi只比较用爻阴阳与所用阴阳令是否同类，不表示完整合理或综合顺逆时。"
     )
     result["interpretation_constraints"].append(
-        "corpus_sha256仅标识继承语料；yaoci_collation.sha256标识实际载入字节，content_sha256锁定该版标题正文、标签与来源元数据的规范JSON身份，不受排版空白影响。每条text_provenance分别说明爻辞、注文与诗歌状态；内容身份不证明原典读法或预测有效，局部目校不能当作全书完成。"
+        "每条text_provenance分别说明爻辞、注文与诗歌状态；局部目校不能当作全书完成。"
     )
     result["interpretation_constraints"].append(
         f"commentary_collation单独标识本版{commentary['collated_line_commentaries']}条注文单次目校层；内部校验载入字节、正文、条件标签和元数据，不能交换正文后沿用已目校身份。commentary_sections只按原文分段，applicability=null不表示不匹配。阳月、阴命、字兆等嵌套条件仍须保留。隨、蠱、臨三卦保留原印叶字，不机械改作葉；字典异体说明不选定命局叶否。诗歌未见于这些已核爻解段落，另件卷三取文查poem_collation；旧verdict标签不是底本对当前输入的条件分支裁定。"
@@ -455,8 +392,6 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
             "ruleset_id": structure["ruleset_id"],
             "version": structure["version"],
             "source_title": "河洛理數卷一·论互体四体八体渐卦例",
-            "source_url": structure["source_url"] + "#page=77",
-            "source_pdf_sha256": structure["source_pdf_sha256"],
             "source_status": structure["review_status"],
         }
     )
@@ -479,14 +414,11 @@ def canping_evidence(calculation: dict) -> dict:
     )
     collation = canping_collation_summary()
     result["canping_text_collation"] = collation
-    result["corpus_sha256"] = collation["inherited_corpus_sha256"]
     result["rulesets"].append(
         {
             "ruleset_id": collation["corpus_id"],
             "version": collation["version"],
             "source_title": collation["source_title"],
-            "source_url": collation["source_url"],
-            "source_pdf_sha256": collation["source_pdf_sha256"],
             "source_status": collation["review_status"],
         }
     )
@@ -542,10 +474,7 @@ def canping_evidence(calculation: dict) -> dict:
             "source_section": "卷六·三层栏目例、顺冲有无说明及所用编号",
             "facts": {
                 "collation_id": collation["corpus_id"],
-                "collation_sha256": collation["sha256"],
                 "comparison_witness_id": collation["comparison_witness"]["corpus_id"],
-                "comparison_witness_sha256": collation["comparison_witness"]["sha256"],
-                "inherited_corpus_sha256": collation["inherited_corpus_sha256"],
                 "kind": calculation["kindMain"],
                 "selectionShun": deepcopy(
                     calculation["benming"]["verses"]["selectionShun"]
@@ -575,8 +504,6 @@ def canping_evidence(calculation: dict) -> dict:
             "ruleset_id": "canping_luck_substitution_v1",
             "version": "1.0.0",
             "source_title": "河洛理數 史應選校訂 卷六逐句釋明起大運／推流年",
-            "source_url": CANPING_TIMING_SOURCE_URL,
-            "source_pdf_sha256": CANPING_TIMING_SOURCE_SHA256,
             "source_status": "two_bounded_excerpts_single_visual_reading; independent_second_review_pending",
         }
     )
@@ -586,7 +513,6 @@ def canping_evidence(calculation: dict) -> dict:
             "source_section": "所选NAJDA本PDF64；诗诀另见PDF50",
             "facts": {
                 "source_pdf_page": 64,
-                "source_pdf_sha256": CANPING_TIMING_SOURCE_SHA256,
                 "bounded_excerpts": {
                     "dayun": "只將人八字時支棄去不用以大運地支逐運對日地支算",
                     "liunian": "不用日時地支打算只將流年太歲地支與大運地支",
@@ -613,7 +539,6 @@ def canping_evidence(calculation: dict) -> dict:
                 "ruleset_id": timing["solar_year_context"]["policy_id"],
                 "version": "1.0.0",
                 "source_title": "Modern bounded Canping Lichun projection context",
-                "source_url": None,
                 "source_status": "actual_selected_solar_model_and_clock; not_classical_authorship_or_prediction_certification",
             }
         )
@@ -629,8 +554,6 @@ def canping_evidence(calculation: dict) -> dict:
                 "ruleset_id": timing["ruleset_id"],
                 "version": timing["ruleset_version"],
                 "source_title": timing["source_title"],
-                "source_url": timing["source_url"],
-                "source_pdf_sha256": timing["source_pdf_sha256"],
                 "source_status": timing["source_status"],
                 "authorship_status": "volume_seven_is_explicitly_an_appendix; not_attributed_to_Chen_Tuan",
             }

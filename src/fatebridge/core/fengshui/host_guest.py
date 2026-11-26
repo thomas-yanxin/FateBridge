@@ -1,6 +1,5 @@
 """Explicit axis host/guest definitions, separate from fortune interpretation."""
 
-import hashlib
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
@@ -13,7 +12,6 @@ from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERAT
 from fatebridge.core.public_output import same_public_value as _same
 from fatebridge.utils.errors import FengshuiCalculationError
 
-DATA_SHA256 = "476bbec41149a8ade4e47586618a18e3091d65513e0cb02eb9063267e0470449"
 KINDS = ("earth_period", "period_mountain", "period_facing", "axis_pair")
 LABELS = {
     "same_element": "比和",
@@ -43,7 +41,6 @@ class HostGuestClause(TypedDict):
 class HostGuestSource(TypedDict):
     ruleset: dict[str, JsonValue]
     sources: list[dict[str, JsonValue]]
-    source_reference_sha256: str
     source_policy_notes: list[str]
     star_elements: dict[str, str]
     fixed_earth_numbers: dict[str, int]
@@ -57,7 +54,6 @@ def _facts() -> HostGuestSource:
     try:
         path = Path(__file__).parents[2] / "data/fengshui/host-guest-v1.json"
         raw = path.read_bytes()
-        _check(hashlib.sha256(raw).hexdigest() == DATA_SHA256)
         return TypeAdapter(HostGuestSource).validate_json(raw, strict=True)
     except (OSError, ValueError) as error:
         raise FengshuiCalculationError("natal_host_guest_inconsistent") from error
@@ -71,8 +67,6 @@ def provenance() -> dict[str, JsonValue]:
             {"kind": "primary_facsimile", **deepcopy(source)}
             for source in data["sources"]
         ],
-        "loaded_data_sha256": DATA_SHA256,
-        "source_reference_sha256": data["source_reference_sha256"],
         "source_policy_notes": list[JsonValue](data["source_policy_notes"]),
     }
 

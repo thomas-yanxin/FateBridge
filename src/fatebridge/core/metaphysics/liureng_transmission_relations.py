@@ -20,7 +20,6 @@ from fatebridge.core.metaphysics.liureng_ordered_patterns import (
 )
 from fatebridge.core.metaphysics.liureng_relation_tables import GOD_ELEMENTS
 from fatebridge.core.metaphysics.liureng_trine_seasonal import nominal_seasonal_evidence
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 # Literal phase attributes in PDF86. Do not borrow Jin Kou's inherent stems:
@@ -138,8 +137,6 @@ def transmission_relations(
             )
     return dict(
         ruleset_id="liuren_tanyuan_transmission_relations_v1",
-        source_url=TANYUAN_SOURCE,
-        source_sha256=TANYUAN_SCAN_SHA256,
         original_pdf_pages=[80, 81, 82, 86, 92],
         day_ganzhi=day_ganzhi,
         day_element=day,

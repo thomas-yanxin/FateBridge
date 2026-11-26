@@ -12,12 +12,11 @@ SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_t1299_sanjiu_days.js
 
 
 def source_bundle() -> dict[str, Any]:
-    return load_source(SOURCE).data
+    return load_source(SOURCE)
 
 
 def personal_day_witnesses(relation: str) -> dict[str, Any]:
-    captured = load_source(SOURCE)
-    bundle = captured.data
+    bundle = load_source(SOURCE)
     record = next(
         (row for row in bundle["relation_witnesses"] if row["relation"] == relation),
         None,
@@ -27,8 +26,6 @@ def personal_day_witnesses(relation: str) -> dict[str, Any]:
     return {
         "ruleset_id": bundle["id"],
         "source_url": bundle["source_url"],
-        "source_sha256": bundle["source_sha256"],
-        "source_bundle_sha256": captured.sha256,
         **deepcopy(record),
         "priority_clause": deepcopy(bundle["priority_clause"]),
         "priority_clause_applied_to_aggregate": False,

@@ -138,7 +138,6 @@ def publish_penalty_conditions(
         ruleset_id=PROFILE["ruleset_id"],
         ruleset_version=PROFILE["ruleset_version"],
         source_url=PROFILE["source"]["url"] + "#page=98",
-        source_sha256=PROFILE["source"]["sha256"],
         clauses=deepcopy(PROFILE["clauses"]),
         precedence=deepcopy(PROFILE["precedence"]),
         lines=rows,

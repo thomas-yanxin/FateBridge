@@ -15,7 +15,6 @@ from fatebridge.core.metaphysics.liureng_course_layout import (
 )
 from fatebridge.core.metaphysics.liureng_life_stages import life_stage_cycle
 from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 STAGE_PAIRS = (
@@ -147,8 +146,6 @@ def course_conditions(day_ganzhi: str, transmissions: dict[str, Any]) -> dict[st
     return dict(
         ruleset_id="tanyuan_course_conditions_v1",
         source_title="大六壬探原·卷下集说篇·课体纲要",
-        source_url=TANYUAN_SOURCE,
-        source_sha256=TANYUAN_SCAN_SHA256,
         original_pdf_pages=[112, 114, 115],
         stage_basis_pdf_pages=[93, 94],
         day_ganzhi=day_ganzhi,
@@ -195,7 +192,6 @@ def course_conditions(day_ganzhi: str, transmissions: dict[str, Any]) -> dict[st
 def course_conditions_trace(evidence: dict[str, Any]) -> dict[str, Any]:
     return dict(
         rule_id="liuren.course_conditions",
-        source_url=evidence["source_url"],
         source_section=evidence["source_title"],
         result=evidence,
     )

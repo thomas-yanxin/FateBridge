@@ -33,7 +33,6 @@ __all__ = [
     "profile_calculation_lines",
     "render_day_reading",
     "source_bundle",
-    "source_digest",
 ]
 
 SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_t1299_days.json"
@@ -44,11 +43,7 @@ COMPARATIVE_TIME_SOURCE = (
 
 
 def source_bundle() -> dict[str, Any]:
-    return load_source(SOURCE).data
-
-
-def source_digest() -> str:
-    return load_source(SOURCE).sha256
+    return load_source(SOURCE)
 
 
 def month_table_variant(
@@ -74,7 +69,6 @@ def month_table_variant(
         "differs_from_selected_27": mansion != selected,
         "source_url": bundle["source_url"],
         "locator": row["locator"],
-        "source_sha256": bundle["source_sha256"],
         "applied_to_sanjiu": False,
         "scope": "大正藏上卷大唐月建图的字面28宿表，含牛；保留与27宿例题差异，不当作物理天文宿位或唐历复原。",
     }
@@ -149,10 +143,7 @@ def calendar_day_evidence(
         "dayan_reconstruction_scope_reference": reconstruction_scope_reference(),
         "phase_and_time_reference": phase_clock_reference(day),
         "senmyo_phase_annotation_reference": phase_annotation_reference(),
-        "comparative_time_systems": {
-            **comparative.data,
-            "source_bundle_sha256": comparative.sha256,
-        },
+        "comparative_time_systems": comparative,
         "arc_printed_reference": arc_clock_reference(),
     }
     return {
@@ -175,8 +166,6 @@ def calendar_day_evidence(
         "prose_verse_time_semantic_conflict": semantic_conflict,
         "verse_abbreviation_resolution": resolution,
         "source_url": bundle["source_url"],
-        "source_sha256": bundle["source_sha256"],
-        "source_bundle_sha256": source_digest(),
         "clock_evaluation_status": "not_computed",
         "clock_doctrine": clock_doctrine,
         "clock_scope": "保留原文昼夜、日中与夜半条件；未确定古代日界及太阳时换算政策，不将民用12:00或00:00自动认作原典边界。",

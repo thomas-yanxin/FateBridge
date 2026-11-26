@@ -190,7 +190,6 @@ def build_growth_conditions(
         ruleset_id=active_profile["ruleset_id"],
         ruleset_version=active_profile["ruleset_version"],
         source_url=PROFILE["source"]["url"] + "#page=97",
-        source_sha256=PROFILE["source"]["sha256"],
         clauses=deepcopy(
             MOVING_SI_PROFILE["clauses"] if moving_si_applicable else PROFILE["clauses"]
         ),

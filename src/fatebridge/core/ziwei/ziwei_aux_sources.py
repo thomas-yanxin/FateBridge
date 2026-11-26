@@ -5,13 +5,13 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 
 @lru_cache(maxsize=1)
-def _source() -> Dict[str, Any]:
+def _source() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             files("fatebridge")
             .joinpath("data/classical/ziwei-naj-ming-auxiliaries.json")
@@ -21,7 +21,7 @@ def _source() -> Dict[str, Any]:
 
 
 def auxiliary_placement_source_evidence(
-    palaces: List[Dict[str, Any]],
+    palaces: list[dict[str, Any]],
     *,
     lunar_month: int,
     lunar_day: int,
@@ -29,7 +29,7 @@ def auxiliary_placement_source_evidence(
     hour_branch: str,
     year_branch: str,
     rule_profile: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Compare actual star objects with the scope the cited passage supports.
 
     Monthly rules are unresolved for leap inputs; the Ming/Shen leap clause
@@ -41,7 +41,7 @@ def auxiliary_placement_source_evidence(
     if not 1 <= lunar_month <= 12 or not 1 <= lunar_day <= 30:
         raise ValueError("辅星来源比较要求有效的农历月日")
     hour_index, year_index = branches.index(hour_branch), branches.index(year_branch)
-    objects: Dict[str, Dict[str, Any]] = {}
+    objects: dict[str, dict[str, Any]] = {}
     for i, palace in enumerate(palaces):
         for j, star in enumerate(palace["stars_detail"]):
             # The source batch excludes 旬空, which may have two placements.
@@ -51,9 +51,9 @@ def auxiliary_placement_source_evidence(
                 "actual_branch": palace["ganzhi"][1],
                 "calculation_path": f"ziwei_birth.palaces.{i}.stars_detail.{j}",
             }
-    methods: Dict[str, Dict[str, Any]] = {}
-    rows: List[Dict[str, Any]] = []
-    expected_positions: Dict[str, str] = {}
+    methods: dict[str, dict[str, Any]] = {}
+    rows: list[dict[str, Any]] = []
+    expected_positions: dict[str, str] = {}
     for method in source["methods"]:
         mid, axis = method["id"], method["input_axis"]
         methods[mid] = {key: method[key] for key in ("frame", "section", "quote")}

@@ -32,8 +32,6 @@ from fatebridge.core.human_design.human_design_variables import (
 )
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 
-NODE_SOURCE = "https://www.astro.com/swisseph/swisseph.htm"
-
 
 def node_backend_base(chart: dict[str, Any], node_mode: str) -> dict[str, Any]:
     """Retain selected results and expose an actual Moshier node comparison.
@@ -47,7 +45,6 @@ def node_backend_base(chart: dict[str, Any], node_mode: str) -> dict[str, Any]:
         "method_id": "human_design_observed_node_backend_comparison_v1",
         "node_mode": node_mode,
         "reference_backend": "moshier",
-        "source_url": NODE_SOURCE,
         "published_difference": {
             "jpl_vs_moshier_true_node_approximate_max_arcseconds": 70,
             "jpl_vs_swiss_true_node_approximate_max_arcseconds": 0.1,

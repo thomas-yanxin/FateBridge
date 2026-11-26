@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
 from fatebridge.core.sukuyo.sukuyo_documentary import clock_position_reference
 from fatebridge.core.sukuyo.sukuyo_printed_special import (
@@ -23,11 +23,7 @@ MANSIONS = frozenset("角亢氐房心尾箕斗女虚危室壁奎娄胃昴毕觜�
 
 
 def source_bundle() -> dict[str, Any]:
-    return load_source(SOURCE).data
-
-
-def source_digest() -> str:
-    return load_source(SOURCE).sha256
+    return load_source(SOURCE)
 
 
 def scope_for_weekday_basis(scope: str, weekday_basis: str) -> str:
@@ -45,7 +41,7 @@ def scope_for_weekday_basis(scope: str, weekday_basis: str) -> str:
 
 
 def special_day_evidence(
-    mansion: Optional[str],
+    mansion: str | None,
     weekday: int,
     candidates: Sequence[str] = (),
     *,
@@ -64,7 +60,7 @@ def special_day_evidence(
         raise ValueError("特殊日查表只支持27宿（不含牛）")
     bundle = source_bundle()
 
-    def evaluate(witness: dict[str, Any], name: Optional[str]) -> dict[str, Any]:
+    def evaluate(witness: dict[str, Any], name: str | None) -> dict[str, Any]:
         rows = [r for r in witness["rows"] if r["weekday_index"] == weekday]
         matched = [r for r in rows if name is not None and r["mansion"] == name]
         unresolved = [r for r in rows if r["mansion"] is None]
@@ -125,8 +121,6 @@ def special_day_evidence(
             else []
         ),
         "source_url": bundle["source_url"],
-        "source_sha256": bundle["source_sha256"],
-        "source_bundle_sha256": source_digest(),
         "textual_position_reference": clock_position_reference(),
         "selected_primary": bundle["selected_primary"],
         "selected_lower_activity_witness": bundle["selected_lower_activity_witness"],

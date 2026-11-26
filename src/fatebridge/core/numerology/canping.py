@@ -64,7 +64,7 @@ PART_NAMES: dict[str, str] = {
     "土": "土部",
 }
 
-_GANS: tuple[str, ...] = (
+GANS: tuple[str, ...] = (
     "甲",
     "乙",
     "丙",
@@ -88,10 +88,10 @@ class LegacyLuckStep(TypedDict):
 def nayin_element(year_gz: str) -> str:
     """年干支 → 纳音五行（金/木/水/火/土）。
 
-    Reuses FateBridge's ``get_nayin`` (verified to match horosa's
-    ``NAYIN_ELEMENT`` over all 60 ganzhi) and takes its last char.
+    Reuses FateBridge's get_nayin (matching horosa's NAYIN_ELEMENT over all 60
+    ganzhi) and takes its last char.
     """
-    cycle = {_GANS[i % 10] + BRANCHES[i % 12] for i in range(60)}
+    cycle = {GANS[i % 10] + BRANCHES[i % 12] for i in range(60)}
     if not isinstance(year_gz, str) or year_gz not in cycle:
         return ""
     nayin = get_nayin(year_gz[0], year_gz[1])
@@ -229,7 +229,7 @@ def dayun_sequence(
 
 
 def _year_ganzhi(year: int) -> str:
-    return _GANS[((year - 4) % 10 + 10) % 10] + BRANCHES[((year - 4) % 12 + 12) % 12]
+    return GANS[((year - 4) % 10 + 10) % 10] + BRANCHES[((year - 4) % 12 + 12) % 12]
 
 
 def calculate(
@@ -345,7 +345,7 @@ def liunian_series(
     element = result["element"]
     # 年干支本身足以确定相对太岁。公历纪年未知不能退回出生日支，
     # 也不能从六十年循环任意选择一个公历甲子年。
-    cycle = tuple(_GANS[i % 10] + BRANCHES[i % 12] for i in range(60))
+    cycle = tuple(GANS[i % 10] + BRANCHES[i % 12] for i in range(60))
     birth_cycle_index = cycle.index(year_gz)
     # 不将九步以后的流年钳制在最后一运；按请求年龄实际展开。
     count = max(9, (end_age - qiyun_age) // 10 + 1)

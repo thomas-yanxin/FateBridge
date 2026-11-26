@@ -8,8 +8,8 @@ from functools import lru_cache
 from importlib.resources import files
 from typing import Any
 
-_VARIANT = re.compile(r"\{\{另\|([^{}|=<>\[\]]+)\|([^{}|=<>\[\]]+)\}\}")
-_UNRESOLVED = ("{{", "}}", "[[", "]]", "<", ">", "-{", "}-")
+VARIANT_PATTERN = re.compile(r"\{\{另\|([^{}|=<>\[\]]+)\|([^{}|=<>\[\]]+)\}\}")
+UNRESOLVED_MARKERS = ("{{", "}}", "[[", "]]", "<", ">", "-{", "}-")
 
 
 @lru_cache(maxsize=1)
@@ -34,7 +34,7 @@ def render_yaoci_text(raw: str) -> dict[str, Any]:
     remainder = []
     variants: list[dict[str, Any]] = []
     offset = display_length = 0
-    for match in _VARIANT.finditer(raw):
+    for match in VARIANT_PATTERN.finditer(raw):
         preceding = raw[offset : match.start()]
         pieces.append(preceding)
         remainder.append(preceding)
@@ -57,7 +57,7 @@ def render_yaoci_text(raw: str) -> dict[str, Any]:
         offset = match.end()
     pieces.append(raw[offset:])
     remainder.append(raw[offset:])
-    unresolved = any(marker in "".join(remainder) for marker in _UNRESOLVED)
+    unresolved = any(marker in "".join(remainder) for marker in UNRESOLVED_MARKERS)
     if unresolved:
         for variant in variants:
             variant["display_start"] = variant["display_end"] = None
@@ -65,7 +65,6 @@ def render_yaoci_text(raw: str) -> dict[str, Any]:
         "ruleset_id": profile["id"],
         "version": profile["version"],
         "template_source_url": profile["source"]["url"],
-        "template_wikitext_sha256": profile["source"]["wikitext_sha256"],
         "raw_text": raw,
         "display_text": None if unresolved else "".join(pieces),
         "status": (

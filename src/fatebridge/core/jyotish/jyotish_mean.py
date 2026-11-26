@@ -25,8 +25,6 @@ LOWER_TT, UPPER_TT = 2415020.5, 2470172.5  # 1900-01-01 through2050-12-31
 SOURCE = {
     "id": "simon1994_mean_j2000_1730fe5b",
     "title": "Simon et al.(1994), Numerical expressions for precession formulae and mean elements for the Moon and the planets, A&A282,663-683",
-    "url": "https://articles.adsabs.harvard.edu/pdf/1994A%26A...282..663S",
-    "sha256": "1730fe5bb60e03d5e3a70f76b82f97dfd07bccc67a077da636a5428343e3a503",
     "sections": ["5.2.3 and5.4-5.8; printed673-676; full secular mean longitudes"],
     "scope": "Secular mean elements, not approximate true ephemerides, osculating elements or Raman1900 table values. Formal paper interval is not an empirical accuracy certificate.",
 }

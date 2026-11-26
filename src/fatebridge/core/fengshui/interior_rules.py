@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, Sequence, cast
+from typing import Any, Iterable, Sequence, cast
 
 from fatebridge.core.fengshui.interior_inputs import InteriorRelation
 from fatebridge.core.fengshui.models import LayoutConstraint
@@ -16,7 +16,7 @@ def _bundle() -> dict[str, Any]:
     path = (
         Path(__file__).parents[2] / "data" / "fengshui" / "interior-relations-v1.json"
     )
-    return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
 def interior_relation_provenance() -> dict[str, Any]:
@@ -27,7 +27,7 @@ def interior_relation_provenance() -> dict[str, Any]:
         {"source_id": source_id, **deepcopy(data["sources"][source_id])}
         for source_id in result["source_ids"]
     ]
-    return cast(Dict[str, Any], result)
+    return cast(dict[str, Any], result)
 
 
 def _action(

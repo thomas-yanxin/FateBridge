@@ -9,7 +9,7 @@ from fatebridge.core.sukuyo.sukuyo_documentary import text_placement_label
 from fatebridge.core.sukuyo.sukuyo_kenyu_lingbi import lingbi_reading_lines
 from fatebridge.core.sukuyo.sukuyo_padas import render_palace_reference
 
-_ACTIVITY_DETAIL_LABELS = {
+ACTIVITY_DETAIL_LABELS = {
     "tailoring_garments": "裁衣",
     "making_garments": "制作衣服",
     "repairing_garments": "修补衣服",
@@ -238,7 +238,7 @@ def activity_day_reading_lines(
             lines.append(
                 "本次已确认事项细节："
                 + "、".join(
-                    _ACTIVITY_DETAIL_LABELS[detail]
+                    ACTIVITY_DETAIL_LABELS[detail]
                     for detail in activity["activity_details"]
                 )
                 + "；只呈现已声明输入，推导分类另列，不补其他事实。"

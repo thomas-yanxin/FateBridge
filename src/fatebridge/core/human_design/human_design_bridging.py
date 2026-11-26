@@ -21,7 +21,6 @@ from fatebridge.core.human_design.human_design_mechanics import (
     _components,
 )
 
-SOURCE_URL = "https://jovianarchive.com/pages/understanding-definition-in-human-design"
 METHOD_ID = "human_design_distinct_missing_gate_uniform_cost_v1"
 
 
@@ -157,13 +156,10 @@ def definition_bridging(graph: dict[str, Any]) -> dict[str, Any]:
             "distinct_generated_states": len(seen) if best is not None else 0,
             "cost": "distinct_added_gates",
         },
-        "source_url": SOURCE_URL,
         "ruleset": {
             "id": RULESET_ID,
             "version": RULESET_VERSION,
             "author": "FateBridge graph algorithm; graph source: Ra Uru Hu / Jovian Archive, 2001",
-            "source_url": SOURCE_URL,
-            "graph_source_url": "https://www.myhumandesign.be/downloads/Rave-I%27Ching.pdf",
         },
         "source_scope": "官方页面支持定义分组及门/通道桥接概念；最少不同门数及全部等量最小方案是FateBridge图论分析，不是原典的事件或择伴规则。",
         "scope": "固定本命激活与36通道表下的假设连接；允许经原来未定义的中心连接，按不同新增门数求全部等量最小方案。原单门列表可仅合并部分分组。新增门不是本命激活、他人资料、未来行运或心理需要，不改变原类型、权威或定义。",

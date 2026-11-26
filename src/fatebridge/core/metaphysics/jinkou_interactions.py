@@ -10,7 +10,6 @@ from itertools import combinations
 from typing import Any
 
 from fatebridge.core.metaphysics.common import ELEMENT_CONTROLS, ELEMENT_GENERATES
-from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
 
 POSITIONS = ("人元", "贵神", "将神", "地分")
 # Each condition keeps its direction. The battle clauses permit either one;
@@ -139,8 +138,6 @@ def position_interactions(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "ruleset_id": "jinkou_jingben_position_interactions_v1",
         "source_title": "校正京本金口诀·五比同类、四位相生、四位相克、四爻生克颂",
-        "source_url": SCAN_URL,
-        "source_sha256": SCAN_SHA256,
         "original_pdf_pages": [62, 67, 68, 69, 70, 71, 72],
         "position_order": list(POSITIONS),
         "pairs": pairs,
