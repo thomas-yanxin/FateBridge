@@ -1,8 +1,6 @@
 # FateBridge 故障排除
 
-安装失败、工具不可见、请求报错或结果不完整时，可先按现象定位问题所在的环节。环境、客户端连接、请求输入与结果交付各有检查方式，修复后再继续计算或咨询。
-
-先保存原始错误和退出码，再进入下表对应章节；参数错误应修正输入，依赖错误应修复当前进程环境。接口字段与返回合同见 [API 参考](api-reference.md)，配置见 [快速入门](getting-started.md)。
+安装失败、工具不可见、请求报错或结果不完整时，可先按现象定位问题所在的环节。保存原始错误和退出码后再排查；参数错误应修正输入，依赖错误应修复当前进程环境。接口字段与返回合同见 [API 参考](api-reference.md)，配置见[快速入门](getting-started.md)。
 
 ## 按现象定位
 
@@ -15,7 +13,6 @@
 | 时刻、地点或命盘字段不符 | [出生信息与返回字段](#出生信息与返回字段) |
 | 星历降级或西占后端错误 | [占星与推运](#占星与推运) |
 | 只收到部分结果、引用失效 | [快照与结果交付](#快照导出) |
-| 旧路由、字段或 Python 导入失效 | [接口合同](api-reference.md) |
 
 ## 先检查当前环境
 
@@ -26,15 +23,13 @@ uv run --locked --extra dev python -c "import sys, fatebridge; print(sys.executa
 uv run --locked --extra dev fatebridge doctor
 ```
 
-若问题只出现在 MCP host，再用相同环境运行 `fatebridge doctor --mcp --family bazi`，将分类替换为实际范围。这会检查独立 stdio 进程；通过后仍需在 host 的新聊天确认工具已加载。REST 问题还应检查实际端口的 `/health` 与 `/ready`。
-
-下文中的 `python` / `fatebridge` 简写假设已激活正确环境；源码用户可加 `uv run --locked --extra dev` 前缀。
+若问题只出现在 MCP host，再用相同环境运行 `fatebridge doctor --mcp --family bazi`，将分类替换为实际范围。REST 问题还应检查实际端口的 `/health` 与 `/ready`。
 
 ## 安装和导入
 
 ### `ModuleNotFoundError: No module named 'fatebridge'`
 
-当前项目使用 `src/` 布局，切到仓库根目录不会自动把包放入导入路径。激活环境并安装，用实际加载路径判断是否装到了另一个解释器：
+当前项目使用 `src/` 布局，切到仓库根目录不会自动把包放入导入路径。在仓库目录执行同步并核对加载路径：
 
 ```bash
 cd /path/to/FateBridge
@@ -42,18 +37,18 @@ uv sync --locked --extra dev
 uv run --locked --extra dev python -c "import sys, fatebridge; print(sys.executable); print(fatebridge.__version__, fatebridge.__file__)"
 ```
 
-输出中的 `fatebridge.__file__` 应指向当前 checkout 的 `src/fatebridge/`。若仍来自其他安装，确认启动器和 host 使用的是本次 `.venv` 中的解释器。Windows 路径与激活命令见 [快速入门](getting-started.md#安装)。
+`fatebridge.__file__` 应指向当前 checkout 的 `src/fatebridge/`。若仍来自其他安装，确认启动器和 host 使用的是本次 `.venv` 中的解释器。
 
 ### 安装失败或异步测试不能执行
 
-保存完整的 uv 错误和 Python 版本，确认满足 Python 3.10+；当前 CI 为 3.10–3.13。先检查锁文件并同步开发环境：
+确认满足 Python 3.10+（CI 覆盖 3.10–3.13），并检查锁文件与开发环境同步：
 
 ```bash
 uv lock --check
 uv sync --locked --extra dev
 ```
 
-`async def functions are not natively supported` 通常说明当前测试解释器没有 `pytest-asyncio`，检查是否安装了 dev 依赖。缺少 `swisseph` 时核对的是 Python 包依赖；缺 `.se1` 时核对的是星历数据，二者不同。
+`async def functions are not natively supported` 说明当前测试解释器缺少 `pytest-asyncio`，需使用 `--extra dev` 环境。缺少 `swisseph` 是 Python 依赖问题，缺 `.se1` 则是星历数据文件未配置。
 
 ## 服务启动与连接
 
@@ -65,148 +60,97 @@ macOS / Linux 可用 `lsof -i :8010` 查看占用者。临时改端口后请求�
 API_HOST=127.0.0.1 API_PORT=8011 python -m fatebridge.api
 ```
 
-在另一个终端执行 `curl http://localhost:8011/health`。环境变量优先于源码目录 `.env`，改配置后重启进程。默认 `0.0.0.0` 会监听所有网卡，访问时用 `localhost` 或服务主机地址。
+在另一个终端执行 `curl http://localhost:8011/health`。环境变量优先于源码目录 `.env`，改配置后重启进程。
 
 ### `/ready` 为 ready，西占仍报错
 
-`/ready` 只用必需检查决定总状态，西占 runtime 是可选项。查看 `checks.western_predictive_runtime`，再核对具体工具的依赖、数据与输入。健康/就绪接口不是全工具验证。
+`/ready` 只用必需检查决定总状态，西占 runtime 是可选项。查看 `checks.western_predictive_runtime`，再核对具体工具的依赖、数据与输入。
 
 ### MCP host 连不上
 
-先用同一安装环境执行 `fatebridge doctor --mcp`，或加 `--family bazi` 验证所选分类；它会从无关工作目录启动独立进程。Codex 的原生配置与检查步骤见 [Codex 使用指南](codex-guide.md)。
+先用同一安装环境执行 `fatebridge doctor --mcp` 验证独立 stdio 进程。默认 MCP 不创建 HTTP URL，host 配置应使用已安装本仓库的解释器绝对路径和 `-m fatebridge.mcp_server` 参数，见 [MCP 部署指南](mcp-deployment.md#注册本地-stdio)。
 
-默认 MCP 是 stdio 进程，不创建 HTTP URL。host 配置应使用已安装本仓库的解释器绝对路径，例如 `/absolute/path/to/FateBridge/.venv/bin/python` 和参数 `-m fatebridge.mcp_server`。不要依赖 GUI host 继承 shell 的环境激活状态。确认 host 的进程日志、解释器和包路径，配置结构见 [接入指南](agent-guide.md#fastmcpagent-host)。
-
-需要 URL 时，使用 [HTTP MCP 部署](mcp-deployment.md#http-与远程部署)中的 FastMCP runner，并通过 MCP Client 验证协议；REST 的 `8010` 地址不提供 MCP。SSH 隧道、Windows 配置和升级步骤同见该指南。
+需要 URL 时，使用 [HTTP MCP 部署](mcp-deployment.md#http-与远程部署)中的 FastMCP runner；REST 的 `8010` 地址不提供 MCP。
 
 ### 工具已连接但列表不完整
 
-查看 host 启动环境中的 `FATEBRIDGE_MCP_FAMILIES`。先用相同分类运行 doctor，再检查当前连接的 `tools/list`；读取单工具资源不能使隐藏工具恢复公开。扩大范围后重启连接，并在新聊天确认工具列表。
+查看 host 启动环境中的 `FATEBRIDGE_MCP_FAMILIES`。先用相同分类运行 doctor，再检查当前连接的 `tools/list`。扩大范围后重启连接，并在新聊天确认工具列表。
 
 ### Codex 桌面版与终端 CLI 的模型不一致
 
-若终端 CLI 报模型不受 ChatGPT 账号支持，而桌面聊天可正常使用，先用 `fatebridge doctor` 查看 `codex.cli`。桌面版的 `CODEX_CLI_PATH` 和 PATH 中的 CLI 可能是不同版本；按 doctor 返回的完整 `codex.add_command` 注册，不必为此修改用户模型。保存配置不代表当前聊天已经重载 MCP，请在新聊天检查连接。
+先用 `fatebridge doctor` 查看 `codex.cli`。桌面版的 `CODEX_CLI_PATH` 和 PATH 中的 CLI 可能是不同版本；按 doctor 返回的完整 `codex.add_command` 注册，保存后在新聊天检查连接。
 
 ## REST 鉴权与错误
 
 ### 401 `authentication_required`
 
-检查已配置的 `FATEBRIDGE_API_KEYS` 与 `API_KEY_HEADER_NAME`。配置 `agent:replace-me` 时，请求头发送 `X-API-Key: replace-me`；不发送名称前缀。`/api/tools` 也受鉴权保护，运维/文档路径和 `OPTIONS` 免检。
-
-非空配置出现空条目、缺名称/密钥或重复名称，会在启动时失败；不要把删除全部密钥作为恢复步骤。无需在报告中输出密钥值。
+检查已配置的 `FATEBRIDGE_API_KEYS` 与 `API_KEY_HEADER_NAME`。配置 `agent:replace-me` 时，请求头发送 `X-API-Key: replace-me`，不发送名称前缀。`/api/tools` 也受鉴权保护，运维/文档路径和 `OPTIONS` 免检。
 
 ### 400 与 422 `validation_error`
 
-例如 `birth_month=13` 会产生以下 REST 校验错误。
+- `422`：请求字段缺失、类型或取值错误、未知字段、无效日期、非法 JSON，以及梅花时卦钟时校验失败。遇到回拨重复钟时，`analysis_utc_offset` 的 `constraints.expected` 列出该时区允许的偏移。
+- `400`：请求进入领域计算后被拒绝，例如显式要求真太阳时却无经度。
 
-```json
-{
-  "error": "请求参数无效",
-  "error_code": "validation_error",
-  "retryable": false,
-  "issues": [
-    {"path": "birth_month", "code": "less_than_equal",
-     "message": "Input should be less than or equal to 12", "constraints": {"le": 12}}
-  ]
-}
-```
-
-- 422：请求字段缺失、类型或取值错误、未知字段、无效日期或 JSON。梅花时卦的钟时校验也返回 422。遇到回拨造成的重复钟时，`analysis_utc_offset` 的 `constraints.expected` 列出该时区实际允许的偏移，核实当时使用的偏移后再提交。
-- 400：请求进入领域计算后被拒绝，例如未由模型限制的未知模式，或显式要求太阳时却无经度。
-
-先查看 `issues[].path`；若路径是 `fields` 中的输出路径，修正投影。`fields`、`strict_fields`、`include_snapshot_text`、`as_of` 等 REST 控制项应放在查询参数，放入业务 JSON 会作为未知字段失败。多个 `fields` 重复写参数，CLI 则用空格分隔。
-
-读 `issues[].message` 和 `constraints` 确认违反的规则。领域错误的具体原因见顶层 `error`，例如哪个地名未能解析出唯一经度。确认正确的参数后重新提交。若需排查内部异常，用服务端日志中的操作、异常类型和代码位置定位。
-
-项目自带的 REST 启动命令关闭 Uvicorn 的访问日志，调用量和状态码可从 `/metrics` 查询。
+先查看 `issues[].path`；若路径指向 `fields` 中的输出路径，修正投影。`fields`、`strict_fields`、`include_snapshot_text`、`as_of` 等 REST 控制项应放在查询参数，放入 JSON 请求体会作为未知字段失败。
 
 ### MCP / CLI 返回错误的位置
 
-MCP 已知工具的模型或业务失败返回 `isError=true` 与结构化错误包络。FastMCP Client 默认抛出 `ToolError`。读取 `issues` 时设置 `raise_on_error=False`，再读取 `structured_content`。未知工具、非法 RPC 等协议错误单独处理。CLI 工具结果与错误均写 stdout，日志写 stderr。退出码 0 表示成功，1 表示计算或模型校验失败，2 表示用法错误或不支持。`list` 和 `--help` 输出文本。仅在 `retryable=true` 时考虑原参数重试。
+MCP 已知工具失败返回原生 `isError=true` 与结构化错误包络；FastMCP Client 读取 `issues` 时需设置 `raise_on_error=False`。CLI 工具结果与错误写 stdout，日志写 stderr；退出码 `0` 表示成功，`1` 表示计算或模型校验失败，`2` 表示用法错误或不支持。仅在 `retryable=true` 时原参数重试。
 
 ### 浏览器 CORS 错误
 
-`ALLOWED_ORIGINS` 是逗号分隔的精确来源（协议、域名、端口），例如 `http://localhost:3000,http://localhost:5173`。修改后重启。CORS 不代替 API Key；自定义密钥请求头应与服务的 `API_KEY_HEADER_NAME` 一致。浏览器看到跨域错误时，也要检查服务端是否先返回了 401。
+`ALLOWED_ORIGINS` 是逗号分隔的精确来源（协议、域名、端口），修改后重启。CORS 不代替 API Key；浏览器看到跨域错误时，也要检查服务端是否先返回了 401。
 
 ## 出生信息与返回字段
 
 ### 地点没命中或太阳时未生效
 
-地点解析使用有限静态目录，不做联网地理编码。中式模型默认太阳时 true：缺省开启且无经度时使用钟表时间并附提示；显式 true 且无经度返回错误。补可解析城市或明确的 `birth_longitude`，同时传 IANA 时区。占星还应提供纬度。
-
-核对 `person_info.time_adjustment` 的 `resolved_place`、`resolution_level`、`longitude_source`、`resolution_advisory` 与 `applied`。省级中心点只是近似，不等于实际县市位置。
+地点解析使用有限内置静态目录，不做联网地理编码。中式模型默认真太阳时 `true`：缺省开启且无经度时使用钟表时间并附提示；显式 `true` 且无经度返回错误。可补传可解析城市或 `birth_longitude`，并显式传 IANA 时区。核对 `person_info.time_adjustment` 的解析详情。
 
 ### 太阳时和原时间不同
 
-经度、均时差与夏令时修正会改变用于相应规则的钟表读数。查看 `person_info.normalized_birth_datetime` 和 `time_adjustment`。年/月柱、节气与起运以实际民用时刻判断，不应因修正后跨过节气边界而提前换柱。
+经度、均时差与夏令时修正会改变用于相应规则的钟表读数，可查看 `person_info.normalized_birth_datetime` 和 `time_adjustment`。年/月柱、节气与起运以实际民用时刻判断，不因修正后跨过节气边界而提前换柱。
 
 ### 命盘字段层级不同或无时盘报错
 
-新独立八字入口 `/api/bazi/birth-chart` 的业务字段在 `bazi_birth` 下；旧 `/api/calculate` 已移除。MCP / CLI `bazi_overview` 执行综合分析。
-
-当前出生类模型要求小时，不能省略 `birth_hour` 来生成无时盘，也不能无依据填 0。字段投影的点号路径从响应根开始，不会深搜同名字段；无效路径默认附 `projection_warnings`，使用 `strict_fields=true` / `--strict-fields` 可明确拒绝。
+独立八字入口 `/api/bazi/birth-chart` 的业务字段位于 `bazi_birth` 下；综合分析使用 `bazi_overview`。出生类模型当前要求小时，不能省略 `birth_hour`。字段投影的点号路径从响应根开始；无效路径默认附 `projection_warnings`，启用 `strict_fields=true` / `--strict-fields` 可明确拒绝。
 
 ## 占星与推运
 
 ### 本地 runtime 可用但精度仍降级
 
-同时检查 `chart_profile.engine_backend`、`engine_precision`、`ephemeris_model` 与 `run_metadata.engine_is_approximate`。运行时可用但缺 `.se1` 时可能使用 Moshier；仅看 backend 名称会遗漏降级。数据获取与 `SE_EPHE_PATH` 配置见 [星历安装](ephemeris.md)。
-
-CLI 不自动读取 `.env`，`SE_EPHE_PATH` 应在启动前设进程环境。GUI MCP host 也需传入相同路径。选择一致的版本、数据路径和日期后重试，并保存结果的实际模型标识。
+同时检查 `chart_profile.engine_backend`、`engine_precision`、`ephemeris_model` 与 `run_metadata.engine_is_approximate`。运行时可用但缺 `.se1` 时可能使用 Moshier。数据获取与 `SE_EPHE_PATH` 配置见[星历安装](ephemeris.md)。CLI 不自动读取 `.env`，应在启动前设进程环境。
 
 ### 显式 `hsys` 覆盖报依赖错误
 
-核心/关系盘的 `hsys` 是整数 `0..8`，不是 `P`；西占推运的 `house_system` 支持 `P` 等字符串。显式 `hsys=1..8` 缺 `swisseph` 会报错，可安装/修复运行时，或在接受宫制变化的前提下使用可运行的 `hsys=0`。不要把去掉覆盖当作保持同一宫制精度。
+核心/关系盘的 `hsys` 是整数 `0..8`，西占推运的 `house_system` 支持 `P` 等字符串。显式 `hsys=1..8` 缺 `swisseph` 时会报错，需安装或修复运行时，或按需使用 `hsys=0`。
 
 ### 西占推运 `dependency_missing`
 
-`astro/timing*`、事件与生命周期工具缺 backend 会直接失败，不使用 FateBridge 的轨道近似替代。正常安装已声明 `pyswisseph`；核对实际进程的解释器及依赖版本。核心 chart 的回退能力不能推广到所有西占工具。
+`astro/timing*`、事件与生命周期工具缺 `swisseph` 后端会直接失败，不回退到轨道近似。正常安装已声明 `pyswisseph`，请核对当前进程的 Python 解释器与依赖。
 
 ### 关系盘与 `synastry` 预期不同
 
-`relative_mode="synastry"` 映射 `influence`，比较盘使用 `relative_mode="compare"`。三端均使用 `inner_birth_*` / `outer_birth_*`。旧字段 `relationship_mode` 和旧 REST 嵌套对象会返回输入校验错误。
+`relative_mode="synastry"` 映射为 `influence`，比较盘使用 `relative_mode="compare"`。三端均使用 `inner_birth_*` / `outer_birth_*`。
 
 ## 快照导出
 
 ### `selected_sections` 没生效或导出为空
 
-先确认模型支持该字段（八字九大专项不支持输入此字段），再查看 `snapshot_export.section_titles_detected` 与 `missing_selected_sections`。显式非空选择没有命中时导出为空，不回退全文；未知标题或旧别名需按实际检测结果修正。CLI 用空格分隔多个标题，不能逗号拼接；紫微命盘检测的是 `起盘信息` / `宫位总览`，`命宫` / `夫妻宫` 等不是导出 section。
-
-`selected_sections` 只作用于导出层，完整 payload 与 `snapshot_text` 仍保留。若要控制整体体积，用三端 `fields` 投影和 `include_snapshot_text=false`。保留 `snapshot_export` 时，其中的 `export_text` 也可能很大。
+先确认模型支持该字段（八字九大专项不支持），再查看 `snapshot_export.section_titles_detected` 与 `missing_selected_sections`。显式非空选择没有命中时导出为空。CLI 用空格分隔多个标题；紫微命盘的导出 section 是 `起盘信息` / `宫位总览`，单个宫名并非 section。
 
 ### 只返回部分字段或出现 `result_delivery`
 
-先检查首次调用的 `fields`、`include_snapshot_text` 与 `selected_sections`，再检查响应预算。MCP 默认 8192 字符，超限时通过交付引用提供同一 run 的保留结果，响应仍是合法 JSON。读取 `manifest_uri`，从 `first_page_uri` 跟随 `next_uri` 拼接每页 `text`，拼接完成后解析全文；需要存储完整性核验时使用原 run 的校验读取接口。资源返回的外层 JSON 与其中的正文片段需要分别解析，不能直接解析单页片段。
-
-交付发生在投影之后：首轮只选了摘要，文件也只有所选范围。完整导出首次使用 `fields=null`，需要快照时保留相应选项。引用过期或被容量回收后无法继续读取；不要通过重复计算声称恢复了原 run。完整操作见 [同次导出](agent-guide.md#完整结果交付与同次导出)。
+MCP 默认预算为 8192 字符，超限时返回 `result_delivery` 指向同一次运行的结果。读取 `manifest_uri` 后，从 `first_page_uri` 跟随 `next_uri` 拼接每页 `text` 再解析完整 JSON；需要完整导出时首次调用应使用 `detail=audit` 和 `fields=null`。详见[完整结果交付](agent-guide.md#完整结果交付与同次导出)。
 
 ### 西占推运采用了出生钟时
 
-推运省略 `analysis_hour` 或 `analysis_minute` 时，分别沿用出生小时或分钟。只传分析日期或 `as_of` 不代表指定了目标钟时；需要某日某时的结果，应显式传这两项，零点传 `0`。输入按 `birth_timezone` 解释，`return_timezone` 只转换同一时刻。核对聚合结果的 `analysis_context.analysis_datetime`，以及行运分支实际采用的时刻。
+推运省略 `analysis_hour` 或 `analysis_minute` 时，分别沿用出生小时或分钟。需要某日某时结果时应显式传入这两项（零点传 `0`）。输入按 `birth_timezone` 解释，`return_timezone` 只转换同一时刻。
 
 ### 结果引用过期或首轮没有保留字段
 
-`result_delivery` 是临时交付引用，可能过期或因容量回收失效；`file_path` 位于运行服务的机器，远程客户端应使用资源或 HTTP 分页。还未失效时尽快保存原结果，读取方法见[完整结果交付](agent-guide.md#完整结果交付与同次导出)。
-
-若首次 `fields` 未选择某字段，分页与文件都不能补回；这与引用过期是不同问题。说明这一次实际保留的范围，不能以新计算冒充旧 run。需要再次计算时明确它是新运行。
+`result_delivery` 是临时交付引用，可能过期或因容量回收失效；未失效时应尽快保存。若首次 `fields` 未选择某字段，分页与文件都不能补回，需明确按需重新调用。
 
 ## 最小复现材料
 
-先用虚构输入复现，再到[项目 Issues](https://github.com/thomas-yanxin/FateBridge/issues)报告。记录以下信息，便于维护者在相同入口重现问题：
-
-```text
-预期行为：
-实际行为：
-版本或 Git 提交：
-Python 版本和解释器路径：
-入口与命令或路由：
-脱敏请求及相关查询参数：
-HTTP 状态 / CLI 退出码 / MCP isError：
-error_code、retryable 与 issues：
-相关配置：端口、鉴权是否开启、MCP family 范围
-运行凭据：run_id、trace_id（若有）
-```
-
-日期或精度问题另附时区、坐标来源、太阳时策略、分析日期与实际星历模型。清除密钥和真实个人资料，保留错误发生所需的字段与结构；避免只粘贴解读文本或截图。
-
-文档漂移优先核对 `services/tool_catalog.py` 的装配、`services/catalog/` 的领域声明、`core/requests/` 的模型与实际 OpenAPI/MCP schema，再按 [文档维护流程](development-guide.md#文档维护与验证) 同步修正。
+提交问题前请先使用虚构输入复现，并附版本/提交、Python 路径、脱敏请求、HTTP 状态/CLI 退出码/MCP `isError`、`error_code` 与 `issues` 到 [GitHub Issues](https://github.com/thomas-yanxin/FateBridge/issues)。

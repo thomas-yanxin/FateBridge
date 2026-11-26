@@ -1,12 +1,12 @@
 # 星历数据安装与运行模型
 
-[文档中心](README.md) · [快速入门](getting-started.md) · [太阳后端](solar-backends.md) · [分项精度验收](precision-acceptance.md)
+[文档中心](README.md) · [快速入门](getting-started.md) · [运行配置](configuration.md)
 
-准备数据前先完成[安装](getting-started.md#安装)。普通计算不会自动下载外部星历；以下操作需要网络，`--verify-only` 除外。下载、文件校验、实际运行模型与独立数值验收分别确认。
+准备数据前先完成[安装](getting-started.md#安装)。普通计算不会自动下载外部星历；以下操作需要网络（`--verify-only` 除外）。
 
 ## 选择与准备数据
 
-计算能运行，还需要知道它实际用了什么数据。`swisseph` 可导入，只能证明运行时可用。缺少相应 `.se1` 文件时，它可能使用内置 Moshier 模型；原生不可用的核心星盘天体采用带明确时标／来源说明的[有界DE441同源地球、月球与行星及具名光路回退](western-astrology.md#离线轨道近似的来源与差距)。月球源明确由TT转换到地心TDB，同源地球／太阳原网格状态在本地TT延迟上求光锥；逐体定义见`orbital_fallback.factor_light_time_methods`。缺少原生库的恒星盘用完整均Lahiri原点加77项章动，日速使用同一原点的解析TT导数，与轨道共用TT选择。其他源和显示日速保留各自声明的TT约定；仍有已知年代和精度限制。显式复杂宫制与西占推运缺 backend 时会报错。
+`swisseph` 可导入仅表明运行时可用；缺少 `.se1` 数据文件时，核心星盘可能使用内置 Moshier 模型或离线近似轨道，显式复杂宫制与西占推运缺运行时则会报错。
 
 ### Swiss 分段文件
 
@@ -16,56 +16,38 @@
 uv run --locked --extra dev python -m fatebridge.fetch_ephe
 ```
 
-默认下载 `sepl_18.se1`、`semo_18.se1`、`seas_18.se1` 到源码仓库 `ephe/`；所需年代/天体的数据可能不同。
+默认下载 `sepl_18.se1`、`semo_18.se1`、`seas_18.se1` 到源码仓库 `ephe/`。
 
 ### 按年份下载与离线校验
 
-按所需公历年份选择行星和月球分段，可用 `--years 1500 9999`；连续范围用 `--year-range 2399 2401`。这些选项与 `--files` 互斥，并在600年分段交界包含相邻年份可能需要的文件，以覆盖民用时、TT/UT与历史历法换年边界。年份选择不下载主小行星文件，也不证明所有输入的星历精度；实际计算模型仍以回执为准。例如：
+按所需公历年份选择行星和月球分段，可用 `--years 1500 9999`；连续范围用 `--year-range 2399 2401`。这些选项与 `--files` 互斥，并在 600 年分段交界包含相邻年份可能需要的文件。例如：
 
 ```bash
 uv run --locked --extra dev python -m fatebridge.fetch_ephe --years 9999
 ```
 
-这会选择 `sepl_96.se1`、`semo_96.se1`，对应官方文件表的9600–10199年分段。直接提供文件名的旧入口继续可用。下载到自定义目录后，须设置运行服务的 `SE_EPHE_PATH`；下载成功本身不代表服务已读取该目录。
-
-下载器按随包的 `ephemeris-manifest-v1.json` 固定官方提交，并核验文件长度及完整SHA-256；当前清单包含153份官方 `.se1` 文件的指纹，不包含数据文件本身。已有缓存也须校验；需要替换的旧内容先保存到目标目录的 `.fatebridge-ephemeris-backups/<旧SHA-256>/<文件名>`，下载或写入失败时保留原文件。并发修改会中止替换，不能把只有 `SW` 前缀或错放的分段误报为可用。
-
-可离线检查已有文件：
+下载到自定义目录后，须设置运行服务的 `SE_EPHE_PATH`；下载成功本身不代表服务已读取该目录。可用 `--verify-only` 离线检查已有文件，`--base-url` 指定镜像，`--manifest` 指定自定义文件清单：
 
 ```bash
-uv run --locked --extra dev python -m fatebridge.fetch_ephe \
-  --year-range 1 9999 --verify-only
+uv run --locked --extra dev python -m fatebridge.fetch_ephe --year-range 1 9999 --verify-only
 ```
-
-`--base-url` 可选择镜像，但仍须匹配所选清单。不同版本或自定义文件可传 `--manifest /absolute/path/catalog.json`；清单使用 `schema_version=1`、`base_url` 以及 `files` 映射，每份文件须有 `bytes` 和64位小写 `sha256`。自定义指纹仅证明字节符合该清单。文件校验不认证天文误差，也不会持续监控服务运行期间的数据修改。
 
 ### 独立安装与自定义路径
 
-使用已安装包的虚拟环境时，可显式指定可写目录：
+使用已安装包的虚拟环境或独立工具环境时，可显式指定可写目录并配置 `SE_EPHE_PATH`：
 
 ```bash
 python -m fatebridge.fetch_ephe --dest /absolute/path/to/ephe
 export SE_EPHE_PATH=/absolute/path/to/ephe
 ```
 
-通过 `uv tool install` 安装的用户可用独立运行环境下载到同一目录，无需寻找工具环境中的 Python：
+通过 `uv tool install` 安装的用户可执行 `uv run --no-project --with fatebridge python -m fatebridge.fetch_ephe --dest /absolute/path/to/ephe`。Windows PowerShell 使用 `$env:SE_EPHE_PATH="C:\path\to\ephe"`。
 
-```bash
-uv run --no-project --with fatebridge python -m fatebridge.fetch_ephe \
-  --dest /absolute/path/to/ephe
-```
-
-在各服务启动前设置 `SE_EPHE_PATH` 指向该目录；上面的 `export` 为 macOS / Linux 写法，Windows PowerShell 使用 `$env:SE_EPHE_PATH="C:\path\to\ephe"`。
-
-非空 `SE_EPHE_PATH` 在 Swiss 底层优先于代码传入的显式路径，回执记录实际选择。当前接口的路径总长须在 242 个编码字节内，避免底层静默回退；可以使用更短的挂载路径。按单目录安装时，路径不得含底层解释为搜索分隔符的字符或换行。macOS 和 Linux 的分隔符为 `;` 与 `:`，Windows 允许盘符冒号。显式 `SE_EPHE_PATH` 仍可指定有序搜索列表。242 字节上限适用于整条列表。离线核验成功后，若现有列表超限，安装命令会提示改设可用目录。 原生打开文件时另核目录和文件名的拼接字节数。达到 256 字节即停止搜索该文件名，备用名独立搜索。来源候选回执和节气缓存沿用这条边界。德国盘的 `seorbel.txt` 可能覆盖假设点轨道，即使物理星体仍使用 Moshier；查看 `midpoint_analysis.profile.hypothetical_element_source` 的来源说明。库的默认搜索路径还可能含当前工作目录。外部数据应在服务运行期间保持不变，更新后重启并复核实际模型及回执。
-
-需要固定版本时，将 `--with fatebridge` 改为当前服务使用的 `fatebridge==<version>`。
-
-重启服务后，检查核心盘的 `chart_profile.ephemeris_model`（如 `swieph`、`jpl`、`moshier`、`mixed`）和 `run_metadata.engine_is_approximate`，确认本次实际使用的模型。仅凭 `engine_backend` / `engine_precision` 不能证明加载了数据文件。数据路径、版本和算法限制见 [算法覆盖矩阵](algorithm-coverage.md)。
+非空 `SE_EPHE_PATH` 在 Swiss 底层优先于代码传入的显式路径。整条 `SE_EPHE_PATH` 列表须在 242 个编码字节以内（单个文件拼接路径须小于 256 字节），否则底层可能静默回退；Unix 使用 `:` 或 `;` 分隔多目录，Windows 保留盘符冒号。更新目录后请重启进程，并检查返回结果的 `chart_profile.ephemeris_model`（`swieph`、`jpl`、`moshier`、`mixed`）与 `run_metadata.engine_is_approximate`。
 
 ## 严格 JPL DE441
 
-跨年代精度核对可显式安装完整原始 DE441（2,788,676,624 字节），再选择已有的严格 JPL 后端：
+跨年代精度核对可显式安装完整原始 DE441 文件，并设置环境变量：
 
 ```bash
 uv run --locked --extra dev python -m fatebridge.fetch_jpl --dest /absolute/path/to/jpl-de441
@@ -74,18 +56,10 @@ export SE_EPHE_PATH=/absolute/path/to/jpl-de441
 export FATEBRIDGE_JPL_FILE=linux_m13000p17000.441
 ```
 
-省略 `--dest` 时使用当前用户星历缓存下的 `jpl-de441/`，命令会打印实际目录。Swiss 2.10.03 要求完整文件路径最多 255 个编码字节。使用默认的 22 字节文件名时，下载目录最多 232 个编码字节。下载器会在联网前检查完整路径的长度和单目录资格，再从 JPL 官方地址流式下载，检查固定字节数、完整 SHA-256 和 DE441 文件头，校验后原子安装；已有不匹配文件会报错并保留。指纹来自本项目历史独立读取器核对记录，并非 NASA 发布的校验和。`--verify-only` 不联网。若已验证文件的目录超出原生限制，命令仍报告内容校验成功，并指引将文件复制到可用目录。自定义 CA 可用 `--ca-file /absolute/path/to/ca.pem`，仍须通过 TLS 证书验证。下载不会自动切换后端，也不修改服务配置；在启动环境设置上述两个变量并重启客户端／服务后，检查实际模型及 `physical_ephemeris_source.files` 中的文件名、覆盖范围与 DE 版本。
+省略 `--dest` 时默认写入当前用户星历缓存下的 `jpl-de441/`。由于 Swiss 2.10.03 限制完整文件路径不超过 255 字节，下载目录建议控制在 232 字节以内。自定义 CA 可传 `--ca-file /absolute/path/to/ca.pem`。设置上述环境变量并重启服务后，可查看结果中的实际模型与 `physical_ephemeris_source.files`。
 
-DE441 的长时间覆盖不代表各年代精度一致；[JPL 原论文](https://ssd.jpl.nasa.gov/doc/de440_de441.html)明确说明 DE440 在当前世纪更准确。原始文件头采用 TDB，现有原生调用入口采用 TT；文件校验不认证时标换算、视位置模型或预测效力。固定样本的误差线和仍未通过的项目见[当前算法状态](algorithm-status.md)。
+## DE441 系数分片与共享太阳系数
 
-需要连续 DE441 系数子集时，按[精确月球来源](precision-acceptance.md#使用精确月球来源)准备；该路径与完整文件下载分别校验。太阳交节默认使用随包 DE440，模型选择、数据身份及年份边界见[太阳后端](solar-backends.md)。
+Python 分发包（wheel / sdist）默认不内置约 600 MiB 的 DE441 连续行星系数分片；源码检出可直接读取 `src/fatebridge/data/astronomy/`。使用 wheel 或 sdist 安装且需要离线连续冥王星／DE441 系数时，从对应版本的源码归档提取 `de441-planetary-*-part-*.bin.gz`，并将 `FATEBRIDGE_DE441_DIR` 设为该目录的绝对路径后启动服务；缺少所需分片时引擎返回 `de441_archive_missing`。
 
-## 连续冥王星源与共享太阳系数
-
-离线冥王星使用原始 DE441 冥王星系统质心与太阳多项式，在同一 TDB 历元相减为日心位置，再按声明框架接入观测者。运行时按需读取分片并核对压缩文件与解压后系数的固定 SHA-256。模型、时标和速度方法的精度范围见[分项验收](precision-acceptance.md)。
-
-Python 分发包保留 DE441 的固定清单，约 600 MiB 的系数分片独立供应。源码检出可直接读取 `src/fatebridge/data/astronomy`。使用 wheel 或 sdist 安装时，从匹配版本的 GitHub 源码归档中提取该目录下的 `de441-planetary-*-part-*.bin.gz`，将 `FATEBRIDGE_DE441_DIR` 设为分片目录的绝对路径，再启动 REST、MCP 或 CLI。缺少所需分片时，引擎返回 `de441_archive_missing`。这套分片使用项目固定布局，严格原生 JPL 模式所用的完整内核另行配置。
-
-太阳的五个DE440逻辑模型共用`de440-solar-record-atlas-v1`，每个模型保留原记录选择、系数字节、适用年份和源身份；相同记录只存一次。两个数据所有者共用可逆的记录字节通道压缩，没有降低系数位数、拟合修正或改变太阳计算。源码中的元数据身份及解压后原始系数身份在加载边界核对。
-
-维护者重建时，先用以下提取器的`--output`写入仓库外的同一个暂存目录：`astronomy/build_de440_solar_profile.py`、`fengshui/build_fengshui_historical_solar.py`、`astronomy/build_de440_extended_profile.py`、`numerology/build_canping_projection_profile.py`的`original`与`extended`。提取器读取其声明的原始DE440源；后续运行[共享档案生成器](../scripts/astronomy/build_coefficient_archives.py)，同时提供连续DE441源及其下载清单。最终以`--check`核对分发档案。独立参考数据不写回运行时系数；原NASA数据和ERFA的作者、版本与条件见[NOTICE](../NOTICE)。
+太阳交节在 1700–2300 年默认使用随包发布的 DE440 共享系数。若需重建或校验系数档案，请使用 [astronomy/build_coefficient_archives.py](../scripts/astronomy/build_coefficient_archives.py) 并加 `--check` 参数；外部数据与三方许可条件见 [NOTICE](../NOTICE)。

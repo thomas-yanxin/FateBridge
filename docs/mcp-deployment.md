@@ -25,7 +25,7 @@ uv tool install --python 3.12 fatebridge
 fatebridge doctor --mcp
 ```
 
-命令找不到时，执行 `uv tool update-shell` 并重开终端。doctor 的 `version` 是实际安装版本，`executable` 是该工具环境的 Python 绝对路径。wheel 包含计算代码和规则数据。已发布包的文档以[对应 Git 标签](https://github.com/thomas-yanxin/FateBridge/tags)为准。
+命令找不到时，执行 `uv tool update-shell` 并重开终端。doctor 的 `version` 是实际安装版本，`executable` 是该工具环境的 Python 绝对路径。wheel 包含计算代码和规则数据，已发布包的文档以[对应 Git 标签](https://github.com/thomas-yanxin/FateBridge/tags)为准。
 
 ### 当前源码
 
@@ -38,7 +38,7 @@ uv run --locked --extra dev fatebridge doctor --mcp
 
 源码环境由 `uv.lock` 锁定，默认 Python 3.12。接入配置使用 doctor 返回的 `executable`，例如 `/absolute/path/to/FateBridge/.venv/bin/python`。无需先激活环境，也无需在另一个终端启动 stdio 服务。
 
-两种方式均应检查 `ok=true` 和 `mcp.ok=true`。诊断从无关临时工作目录启动独立进程，执行初始化、工具发现、资源读取与一条虚构计算。失败时查看 `mcp.stage`、`error_type` 和 `server_stderr`，修复后在同一环境重试。该诊断不修改客户端配置，也不验证 HTTP 连接或当前聊天加载状态。
+两种方式均应检查 `ok=true` 和 `mcp.ok=true`。诊断从无关临时工作目录启动独立进程，执行初始化、工具发现、资源读取与一条虚构计算。失败时查看 `mcp.stage`、`error_type` 和 `server_stderr`，修复后在同一环境重试。
 
 ## 注册本地 stdio
 
@@ -60,7 +60,7 @@ FATEBRIDGE_MCP_FAMILIES = ""
 PYTHONUTF8 = "1"
 ```
 
-也可执行 doctor 返回的 `codex.add_command`，二选一。完整首次对话见 [Codex 指南](codex-guide.md#2-注册到-codex)。
+也可直接执行 `fatebridge doctor --mcp` 输出的 `codex.add_command`。
 
 ### Claude Desktop 与 Cursor
 
@@ -81,12 +81,7 @@ PYTHONUTF8 = "1"
 }
 ```
 
-Cursor 在 `fatebridge` 条目内另加 `"type": "stdio"`。
-
-- Claude Desktop：通过客户端的开发者设置打开 MCP 配置，合并 `mcpServers.fatebridge`；配置位置见 [MCP 官方本地接入说明](https://modelcontextprotocol.io/docs/develop/connect-local-servers)。
-- Cursor：项目 `.cursor/mcp.json` 或用户 `~/.cursor/mcp.json`，条目使用 `"type": "stdio"`、`command`、`args` 和 `env`，见 [Cursor 官方说明](https://cursor.com/docs/context/mcp)。
-
-不要将 TOML 粘进 JSON，或把整个 shell 命令塞进 `command`；参数分别放在 `args`。已有同名条目时修改该条目，保留其他 MCP 服务。
+Cursor 在 `fatebridge` 条目内另加 `"type": "stdio"`。Claude Desktop 通过客户端开发者设置打开配置，见 [MCP 官方本地接入说明](https://modelcontextprotocol.io/docs/develop/connect-local-servers)；Cursor 位于 `.cursor/mcp.json` 或 `~/.cursor/mcp.json`，见 [Cursor 官方说明](https://cursor.com/docs/context/mcp)。不要将 TOML 粘进 JSON，或把整个 shell 命令塞进 `command`。
 
 ### Windows PowerShell
 
@@ -99,7 +94,7 @@ uv sync --locked --extra dev
 uv run --locked --extra dev fatebridge doctor --mcp
 ```
 
-独立工具安装仍使用 `uv tool install --python 3.12 fatebridge`，然后运行 `fatebridge doctor --mcp`。doctor 的注册命令使用 POSIX shell 引号；PowerShell 用户应使用下方配置，或按 PowerShell 语法分别传参。
+独立工具安装仍使用 `uv tool install --python 3.12 fatebridge`，然后运行 `fatebridge doctor --mcp`。PowerShell 用户可直接使用下方配置。
 
 Codex TOML 可使用单引号保留 Windows 路径，不需要双写反斜杠：
 
@@ -146,17 +141,15 @@ uv run --locked --extra dev fatebridge bazi_birth_chart `
 
 ## 工具筛选与运行环境
 
-默认四个工具覆盖全部公开能力。在客户端的 `env` 中设置 `FATEBRIDGE_MCP_FAMILIES` 可限制能力范围，例如 `"bazi,knowledge"` 或 `"fengshui"`。多个 family 取并集，空值保留全量，错误分类阻止启动。以下命令可验证独立进程。
+默认四个工具覆盖全部公开能力。在客户端的 `env` 中设置 `FATEBRIDGE_MCP_FAMILIES` 可限制能力范围，例如 `"bazi,knowledge"` 或 `"fengshui"`。多个 family 取并集，空值保留全量，错误分类阻止启动。以下命令可验证独立进程：
 
 ```bash
 uv run --locked --extra dev fatebridge doctor --mcp --family fengshui
 ```
 
-`fatebridge discover --surface mcp` 按实际目录查工具，可加 `--family`、`--q` 或 `--tool`。MCP 注册筛选只影响该连接，不限制 REST／CLI 业务调用，也不提供用户权限管理。修改环境后重启连接，在新聊天中核对实际工具列表。
+`fatebridge discover --surface mcp` 按实际目录查工具，可加 `--family`、`--q` 或 `--tool`。修改环境后重启连接，在新聊天中核对实际工具列表。
 
-源码 MCP 启动时读取仓库根目录 `.env`，已有进程环境优先。GUI 客户端应通过 `env` 注入设置，独立工具安装不要依赖当前工作目录的 `.env`。自定义星历目录可加 `SE_EPHE_PATH`，下载步骤与精度检查见[星历说明](ephemeris.md)。日志写 stderr，stdout 留给 stdio 协议；启动包装脚本也应遵守此约定。
-
-Codex 使用本仓库作为项目时读取 `AGENTS.md`；其他客户端按自身机制使用工具说明，方法参考位于 `docs/interpretation/`。
+源码 MCP 启动时读取仓库根目录 `.env`，已有进程环境优先。GUI 客户端应通过 `env` 注入设置，独立工具安装不要依赖当前工作目录的 `.env`。自定义星历目录可加 `SE_EPHE_PATH`，下载步骤与检查见[星历说明](ephemeris.md)。日志写 stderr，stdout 留给 stdio 协议。Codex 使用本仓库作为项目时读取 `AGENTS.md`，方法参考位于 `docs/interpretation/`。
 
 ## HTTP 与远程部署
 
@@ -167,11 +160,11 @@ uv run --locked --extra dev fastmcp run src/fatebridge/mcp_server.py:app \
   --transport http --host 127.0.0.1 --port 8011 --path /mcp
 ```
 
-保持进程运行，MCP URL 为 `http://127.0.0.1:8011/mcp`。这是 FastMCP 的 Streamable HTTP transport，不是 REST。`fatebridge-mcp --transport http` 不是本项目入口支持的写法。runner 参数见 [FastMCP 官方文档](https://gofastmcp.com/deployment/running-server)。PowerShell 用户将命令写成一行，或将续行 `\` 改为反引号。
+保持进程运行，MCP URL 为 `http://127.0.0.1:8011/mcp`。这是 FastMCP 的 Streamable HTTP transport，不是 REST；`fatebridge-mcp --transport http` 不是本项目支持的写法。runner 参数见 [FastMCP 官方文档](https://gofastmcp.com/deployment/running-server)。
 
 ### 验证协议与计算
 
-在同机另一个终端、仓库根目录运行以下脚本；它同时验证初始化、工具发现、资源读取与计算：
+在同机另一个终端、仓库根目录运行以下脚本，验证初始化、工具发现、资源读取与计算：
 
 ```bash
 uv run --locked --extra dev python - <<'PY'
@@ -206,17 +199,17 @@ asyncio.run(main())
 PY
 ```
 
-成功时退出码 `0`，输出日主 `庚 / 金 / 阳` 与回执。Windows 将 `import asyncio` 到 `asyncio.run(main())` 的 Python 内容保存为 `verify_mcp.py`，执行 `uv run --locked --extra dev python verify_mcp.py`。该脚本要求公开 `bazi_birth_chart`；筛选其他工具族时换成其可用工具。浏览器 GET `/mcp` 或普通 `curl` 的响应不能替代 MCP 协议验证。
+成功时退出码 `0`，输出日主 `庚 / 金 / 阳` 与回执。Windows 可将脚本保存为 `.py` 文件执行。该脚本要求公开 `bazi_birth_chart`；筛选其他工具族时换成其可用工具。
 
 ### 远程接入
 
-受信任用户可通过 SSH 转发访问服务器的回环监听。在**客户端机器**运行，替换登录名与服务器地址并保持终端打开：
+受信任用户可通过 SSH 转发访问服务器的回环监听。在**客户端机器**运行并保持终端打开：
 
 ```bash
 ssh -N -L 8011:127.0.0.1:8011 user@server.example.com
 ```
 
-此时客户端仍填写 `http://127.0.0.1:8011/mcp`。Codex 的 URL 条目如下，与 stdio 配置二选一；用单独名称可保留现有本地连接：
+此时客户端仍填写 `http://127.0.0.1:8011/mcp`。Codex 的 URL 条目如下，与 stdio 配置二选一：
 
 ```toml
 [mcp_servers.fatebridge_remote]
@@ -225,7 +218,7 @@ startup_timeout_sec = 30
 tool_timeout_sec = 60
 ```
 
-也可执行 `codex mcp add fatebridge_remote --url http://127.0.0.1:8011/mcp`。支持 URL 的 JSON 客户端使用如下结构；以客户端当前格式为准：
+也可执行 `codex mcp add fatebridge_remote --url http://127.0.0.1:8011/mcp`。支持 URL 的 JSON 客户端使用如下结构：
 
 ```json
 {
@@ -237,11 +230,11 @@ tool_timeout_sec = 60
 }
 ```
 
-服务器端的进程环境决定公开工具与星历；客户端 URL 条目的 `env` 不会设置远程服务环境。云端客户端无法通过自己的 `127.0.0.1` 访问你电脑的隧道，需部署其可达且经过鉴权的 HTTPS MCP 服务。
+服务器端的进程环境决定公开工具与星历；客户端 URL 条目的 `env` 不会设置远程服务环境。
 
 ### 常驻与公网边界
 
-需要常驻时，由 systemd 等服务管理器运行安装环境的 `fastmcp` 绝对路径。例如 Linux 安装于 `/opt/FateBridge` 时，以下为 unit 模板，需先创建有权读取仓库、写入私有临时目录的 `fatebridge` 运行用户：
+需要常驻时，由 systemd 等服务管理器运行安装环境的 `fastmcp` 绝对路径。例如 Linux 安装于 `/opt/FateBridge` 时：
 
 ```ini
 [Unit]
@@ -262,17 +255,15 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-将审查并调整后的 unit 保存为 `/etc/systemd/system/fatebridge-mcp.service`，运行 `sudo systemctl daemon-reload`、`sudo systemctl enable --now fatebridge-mcp`。用 `systemctl status fatebridge-mcp` 与 `journalctl -u fatebridge-mcp` 查看状态及日志。源码环境需在部署前创建，运行用户必须能访问该环境的实际 Python 路径；不要让 uv 管理的解释器仅能被部署管理员读取。macOS / Windows 可使用本机服务管理器运行同等命令。
+保存为 `/etc/systemd/system/fatebridge-mcp.service` 后运行 `sudo systemctl daemon-reload` 与 `sudo systemctl enable --now fatebridge-mcp`。用 `systemctl status fatebridge-mcp` 与 `journalctl -u fatebridge-mcp` 查看状态及日志。
 
-上述服务没有 MCP 网络鉴权，保持回环监听并通过 SSH 使用。若要开放公网，需在 FastMCP 或前置网关实现客户端兼容的鉴权、TLS 与访问限制，并验证 MCP POST / GET / DELETE 和流式响应可通过；不能只转发普通 REST POST。**`FATEBRIDGE_API_KEYS` 只保护 REST，不保护此 MCP 服务。** 当前共享结果存储不提供多租户结果所有权隔离；不同信任边界应隔离运行用户与实例，详见[安全策略](../SECURITY.md)。
+上述服务没有 MCP 网络鉴权，请保持回环监听并通过 SSH 使用。若要开放公网，需在 FastMCP 或前置网关实现鉴权、TLS 与访问限制；**`FATEBRIDGE_API_KEYS` 只保护 REST，不保护此 MCP 服务**。多租户场景应隔离运行用户与实例，详见[安全策略](../SECURITY.md)。
 
 ## 客户端验收与排错
 
-1. 本地 stdio 运行 doctor；HTTP 使用上面的协议脚本，确认服务本身可用。
+1. 本地 stdio 运行 doctor；HTTP 使用协议脚本确认服务本身可用。
 2. 保存客户端配置，重新加载连接；必要时重启客户端并打开新聊天。
-3. 确认实际工具可见，用以下虚构提示完成一次真实调用；看到工具成功返回才表示客户端接入完成：
-
-   > 请使用 FateBridge，计算男、公历 1990 年 5 月 15 日上午 10:30、北京出生的八字，只解释日主的传统含义。
+3. 确认工具可见，并用一条虚构资料完成实际试调。
 
 | 失败现象 | 检查 |
 | --- | --- |
@@ -284,14 +275,14 @@ WantedBy=multi-user.target
 | HTTP 404 | 是否使用完整 `/mcp` 路径，是否误连 REST 的 `8010` |
 | CLI 成功、聊天仍失败 | 当前聊天是否实际加载新连接；客户端工具调用错误与超时日志 |
 
-日志与回执可能含个人资料，分享前脱敏。更多领域或输入错误见[故障排除](troubleshooting.md)。
+更多领域或输入错误见[故障排除](troubleshooting.md)。
 
 ## 升级、回退与停用
 
 升级前记录 doctor 的版本、包路径、当前 Git 提交和客户端配置，保存仍需要的结果交付文件。
 
-- PyPI 独立工具：执行 `uv tool upgrade fatebridge`；如需固定或回退到某个已发布版本，使用 `uv tool install --force fatebridge==<version>`，将占位符替换为确认过的版本。
-- 源码：先确认 `git status` 并保留本地修改；跟踪主分支时执行 `git pull --ff-only`，再执行 `uv sync --locked --extra dev`。回退优先在独立目录检出已确认 tag / commit，并为该目录创建锁定环境，保留当前工作区。
-- 重新运行对应协议检查，重启 stdio 连接或 HTTP 服务，再在新聊天验证工具。若解释器或目录改变，更新配置中的绝对路径。
+- PyPI 独立工具：执行 `uv tool upgrade fatebridge`；如需回退到已发布版本，使用 `uv tool install --force fatebridge==<version>`。
+- 源码：确认 `git status` 并保留本地修改，执行 `git pull --ff-only` 与 `uv sync --locked --extra dev`。
+- 重新运行协议检查，重启 stdio 连接或 HTTP 服务，再在新聊天验证工具。若解释器或目录改变，更新配置中的绝对路径。
 
-停用 stdio 时删除或禁用客户端内对应服务条目并重载；手动 HTTP 服务用 Ctrl-C 结束，systemd 使用 `sudo systemctl disable --now fatebridge-mcp`，SSH 隧道用 Ctrl-C 结束。独立工具不再需要时可执行 `uv tool uninstall fatebridge`。停用和卸载不会代替你管理已导出的文件与客户端聊天记录。
+停用 stdio 时删除或禁用客户端内对应条目并重载；手动 HTTP 服务用 Ctrl-C 结束，systemd 使用 `sudo systemctl disable --now fatebridge-mcp`。独立工具不再需要时可执行 `uv tool uninstall fatebridge`。

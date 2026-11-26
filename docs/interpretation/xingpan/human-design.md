@@ -24,7 +24,7 @@
 
 地球／南交点的细分使用同侧来源黄经加180°后的精确有理坐标，显示`longitude`可能舍入到边界。需要重放或核验时同时读取`derived_from`与`derivation_source_longitude`，不能仅凭显示角度改判Tone／Base；生时见证也沿用其实际派生来源。138,239个边界算术探针不表示真实出生人群或星历误差率。
 
-普通答复先解释用户所问类型／权威的体系内含义，再接实际门、通道或角色依据，给可自愿记录和对照的生活观察。计算、体系解释和现实证据分开；没有实证样本就保留 `validation.prediction=not_validated`。规则来源与四项验收范围见[专业能力与审计](../../human-design.md)。
+普通答复先解释用户所问类型／权威的体系内含义，再接实际门、通道或角色依据，给可自愿记录和对照的生活观察。计算、体系解释和现实证据分开，方法边界见[人类图参考](../../human-design.md)。
 
 ## 固定解释与同次依据
 
@@ -91,6 +91,6 @@
 
 ## 周期补探与摘要约定
 
-周期规则1.6.0的`station_witnesses[*].coordinate_probe`保留有限坐标补探：原生速度零点不直接当作返回黄经极值，原扫描完成后才补探；目标进入严格扩展的已观察极值范围时才追加分段。网格端点零速度和连续已观察零值分别处理，不把零值段两端当作两次物理交会。`motion`仍取原生返回速度符号，对照`motion_evidence.search_segment_phase_trend`及`native_speed_agrees_with_segment_trend`；不一致时分别说明，不把搜索段方向说成已认证的瞬时导数。缺失的motion_evidence为未知，不能补造；完整新回执核验仍要求实际依据。新增数值候选不等于新增公转轮数，极窄括区也不证明物理时刻精度。原一秒参考分歧和连续根数未认证状态继续保留，检查入口见[周期坐标极值测试](../../../tests/human_design/test_human_design_cycle_coordinate_extrema.py)。
+周期规则 `station_witnesses[*].coordinate_probe` 保留有限坐标补探：原生速度零点不直接当作返回黄经极值，原扫描完成后才补探；目标进入严格扩展的已观察极值范围时才追加分段。网格端点零速度和连续已观察零值分别处理，不把零值段两端当作两次物理交会。`motion` 仍取原生返回速度符号，对照 `motion_evidence.search_segment_phase_trend` 及 `native_speed_agrees_with_segment_trend`；不一致时分别说明，缺失时保留未知。
 
-`summary_format=human_design_cycle_summary_compact_v1`的周期卡将重复状态放在`contact_defaults`，方向约定放在`motion_evidence_defaults`。必须连同这些声明读取：每条显式例外优先，`segment_phase_trend=null`仍是未知；非空例外可与原生`motion`相反，不得说二者一致。省略完整分段端点只表示摘要投影，实际见证与原有范围说明在同次`cycle_context`及`summary_conventions`，需要时读取同一run，不重算替代。没有格式声明或默认表时不能猜省略值，也不能把默认映射当作瞬时坐标导数认证。完整接触日期、TT、运动、区间宽度及残差保留；原典取舍和第六线阶段未定状态不变。检查入口见[周期摘要测试](../../../tests/human_design/test_human_design_cycle_summary.py)及[坐标三端测试](../../../tests/human_design/test_human_design_cycle_coordinate_transports.py)。
+`summary_format=human_design_cycle_summary_compact_v1` 的周期卡将重复状态放在 `contact_defaults`，方向约定放在 `motion_evidence_defaults`。每条显式例外优先，`segment_phase_trend=null` 仍为未知，非空例外可与原生 `motion` 相反。省略完整分段端点仅表示摘要投影，完整见证与区间说明在同次 `cycle_context` 及 `summary_conventions` 中读取，不重算替代。

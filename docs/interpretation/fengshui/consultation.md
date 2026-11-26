@@ -30,7 +30,7 @@
 
 本表供助手按问题选用，不是请用户填完的问卷。需要精确方位时说明该数值会影响哪项判断，以及最简取得方法；方位与图纸中心尚无法核对，就先交付独立形态或方法解释。落实动作时另记能否搬转、新增、预算、共用范围与不可用区域，物理观察仍按实际证据记录。
 
-年星和命卦遇到实际星历模型的立春护栏时，保留可能的有效年并请求确认。仅给出生日期时，核对 `time_context.boundary_resolution` 的交节来源及 `boundary_precision_policy` 的实际模型和候选日期。明确的有效生年或分析年可按所给值计算。历史宅运由宅盘自己的时间依据确定。 [候选日期口径](../../fengshui.md#输入语义和边界)
+年星和命卦遇到实际星历模型的立春护栏时，保留可能的有效年并请求确认。仅给出生日期时，核对 `time_context.boundary_resolution` 的交节来源及 `boundary_precision_policy` 的实际模型和候选日期。明确的有效生年或分析年可按所给值计算，历史宅运由宅盘自己的时间依据确定，参见[家居风水参考](../../fengshui.md#分层状态与覆盖边界)。
 
 `entrance_position`、`passage_position`、`window_position` 使用 `front/front_left/front_right/left/right/back/back_left/back_right` 这八种相对位置，未知省略；中文“左侧”不能自行拼成 `left_side_of_bed` 等值。定义仍以当前 schema 为准，校验失败按 issues 的路径和允许值修正一次，不重复失败输入。
 
@@ -131,6 +131,6 @@
 
 方法细节先按 `mapping_boundaries` 选表：固定宫看 `palaces`，实际临宫年／运／山／向星看 `flying_star_references`，八宅游年看 `bazhai_you_nian_references`。`cross_text_trigram_symbols` 的人物／器物是本卦词类；`object_observation_references` 是待核事实提示，不能从词类绑定实际人或家具。逐星主题与有限职业例保留作者页码、组合及用途；其他职业不补造。砂水看 `form_condition_references`，各法门床灶／星角色细节看 `application_references`，材料／器形参考看 `material_shape_reference`，均不自动产生摆位处方。
 
-来源分层：九条专家口径标注为用户提供的 `user_expert_policy_v1`（2026-10-15，未提供专家署名／原始访谈稿，不冒充经典共识）；八宅／金锁／年度与历史玄空引用[基础规则与来源](rule-sources.md)和[历史宅盘资料与来源](xuankong.md)的原典／作者版本；旧室内形态、元素及年度处方引用[证据审查](layout-rules.md)；具体室内关系引用[Joey Yap／Ci Yuan／WOFS 及镜面 Cho 异议](sourced-interior-rules.md#室内规则的来源与分歧)，材料／颜色与器形分别引用 AFSI／FSI。用户明确另选的桌面现代 BTB 引用[作者规则](surface-rules.md)的 Anjie Cho、Tori McBrien。卦象及九星教学引用实际返回的古文转录／作者教材，生肖索引引用已登记二十四山表及生肖对应来源；这些索引不证明人物必然受影响。每条行动采用实际返回的来源，不把另一流派文章当这条规则的证明。来源按实际返回的版本、定位和检索信息交付；文件散列仅用于内部资料校验。AFSI 教材已保存经散列核对的 PDF，材料定位以印刷23、25／PDF40、42页为准；用途与施用条件按[工位作者规则](workstation-authored.md)分别署名。来源可追溯不等于现实效力已验证。
+来源分层：九条专家口径标注为用户提供的 `user_expert_policy_v1`；八宅／金锁／年度与历史玄空引用[基础规则与来源](rule-sources.md)和[历史宅盘资料与来源](xuankong.md)的原典／作者版本；旧室内形态、元素及年度处方引用[证据审查](layout-rules.md)；具体室内关系引用[Joey Yap／Ci Yuan／WOFS 及镜面 Cho 异议](sourced-interior-rules.md#室内规则的来源与分歧)，材料／颜色与器形分别引用 AFSI／FSI。用户明确另选的桌面现代 BTB 引用[作者规则](surface-rules.md)的 Anjie Cho、Tori McBrien。来源按实际返回的版本、定位和检索信息交付；AFSI 教材材料定位以印刷 23、25／PDF 40、42 页为准，用途与施用条件按[工位作者规则](workstation-authored.md)分别署名。
 
 交付后保留未解决项目、缺失事实和复核点。后续更正更新输入，维护同一 trace 与父 run；只解释不重算。物理调整是否落实、能否看见入口、是否有遮挡等可以核验，事业或财富改善不能由布局引擎确认。

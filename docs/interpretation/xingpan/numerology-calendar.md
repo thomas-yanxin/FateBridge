@@ -1,6 +1,6 @@
 # 数术日期与钟时
 
-[取证入口](numerology.md) · [计算口径与复核](../../numerology-audit.md)
+[取证入口](numerology.md)
 
 按本次输入及返回的`birth_clock`核对。历史算例、至点与源钟问题才展开对应历史段；不为普通已知现代钟时读取或套用古历假设。
 

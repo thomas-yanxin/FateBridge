@@ -26,7 +26,7 @@ MCP 默认响应字符预算为8192；超限返回 `result_delivery`，原结果
 
 需要校验同run长结果时，优先使用确定性校验读取：资源模板为 `fatebridge://results/{result_id}/verified/{run_id}/fields/{path}/{offset}`，全文模板省去 `fields/{path}/`。结果ID和run ID必须来自原回执，offset从0起；接口先核对**完整保留payload**的内部存储完整性和原run，再从同一读取对象选页。客户端不能读资源时，使用已安装环境的CLI：`fatebridge result-read RESULT_ID --run-id ORIGINAL_RUN_ID --path FIELD_PATH --offset 0`；源码环境可用`PYTHONPATH=src python -m fatebridge.cli result-read ...`，沿用已有依赖环境，不为咨询安装依赖。校验失败须停止使用该结果，不重新计算冒充旧run。
 
-返回的 `verification.run_id`、`scope` 与 `calculation_repeated=false` 说明本次核验对象；不公开哈希或指纹。`text` 仍至多2048字符，需要完整字段时继续 `next_offset` 直到 null；核验通过不表示已经读取全部业务事实。没有 `result_delivery` 的小响应无需虚构结果引用。
+返回的 `verification.run_id`、`scope` 与 `calculation_repeated=false` 说明本次核验对象。`text` 仍至多 2048 字符，需要完整字段时继续 `next_offset` 直到 null；核验通过不表示已经读取全部业务事实。没有 `result_delivery` 的小响应无需虚构结果引用。
 
 REST/CLI 默认继续完整交付，可显式设置 `response_char_limit` / `--response-char-limit` 获得同一限量合同。MCP 的 `response_char_limit=0` 仅供可保存完整 JSON 的程序客户端；聊天咨询不要用它规避分页，否则宿主仍可能截断。
 
@@ -370,7 +370,7 @@ python3 -m fatebridge.cli --no-metadata astrology_chart \
 | `fengshui_xuankong_house_chart` | `layers.xuankong_natal` | 磁北宅向、历史定运依据；中州派运山向／兼向替星；角度不明返回候选 |
 | `fengshui_assess` | 三个独立基础层及显式选定的宅盘 | 住宅请求 JSON；逐人差异、规则来源／版本、覆盖缺失 |
 
-这组工具不需要完整八字生辰；组合 CLI 用 `--request-file`，文件合同与 REST/MCP 请求一致。完整字段、可复制住宅请求和来源边界见 [家居风水](../../fengshui.md)。合法缺失资料为 `partial`，不是引擎失败。三层的条件和时间范围不同，禁止合成总分、让户主覆盖其他住户，或把年盘说成完整玄空山向盘。玄空宅盘须显式选择 `methods` 的 `xuankong_natal` 并提供 `xuankong.period`，以历史事件定运，不用当前元运覆盖宅运。详见 [玄空合同及版本](../../fengshui-xuankong.md)。金锁24山／形态元运、月盘和自动户型几何未实现。
+这组工具不需要完整八字生辰；组合 CLI 用 `--request-file`，文件合同与 REST/MCP 请求一致。完整字段、可复制住宅请求和来源边界见 [家居风水](../../fengshui.md)。合法缺失资料为 `partial`，不是引擎失败。三层的条件和时间范围不同，禁止合成总分、让户主覆盖其他住户，或把年盘说成完整玄空山向盘。玄空宅盘须显式选择 `methods` 的 `xuankong_natal` 并提供 `xuankong.period`，以历史事件定运，不用当前元运覆盖宅运。金锁 24 山／形态元运和自动户型几何未实现。
 
 ```bash
 python3 -m fatebridge.cli --no-metadata fengshui_minggua --effective-birth-year 1990 --gender-convention female
@@ -378,4 +378,4 @@ python3 -m fatebridge.cli --no-metadata fengshui_annual_stars --effective-year 2
 fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json --compact
 ```
 
-太乙 `calculation_mode=day` 明确采用金钥匙积日法，见 [日计依据](../../taiyi-sanshi-audit.md)。先设day再取 `daily_calendar` / `daily_essences`，零时日界不可套时计23时子初；天时和太乙数宫位未知、正文/课式异数需忠实解释。返回分页时校验读取同一run载荷，不凭被延后字段作否定。
+太乙 `calculation_mode=day` 采用金钥匙积日法。先设 `day` 再取 `daily_calendar` / `daily_essences`，零时日界不可套时计 23 时子初；天时和太乙数宫位未知、正文/课式异数需忠实解释。返回分页时校验读取同一 run 载荷，不凭被延后字段作否定。

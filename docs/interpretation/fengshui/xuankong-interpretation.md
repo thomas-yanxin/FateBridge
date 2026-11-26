@@ -1,6 +1,6 @@
 # 玄空宅盘条件解读：来源、覆盖与限制
 
-[资料与来源](consultation.md) · [历史宅盘规则](xuankong.md) · [启用示例](../../fengshui-xuankong.md#有限解释调用与复现) · [工位用途](workstation-authored.md)
+[资料与来源](consultation.md) · [历史宅盘规则](xuankong.md) · [家居风水参考](../../fengshui.md) · [工位用途](workstation-authored.md)
 
 `xuankong_conditioned_v1@1.0.0` 是显式启用的有限解读层，读取已有运山向宅盘，不更改 `xuankong_zhongzhou_v1` 的起盘规则。它补充山向星的五行关系、评价时运、外局存在条件及床／门的取用角色；不把排盘结果升级为完整住宅吉凶判断。
 
@@ -16,7 +16,7 @@
 | [Kartar Diamond：Excerpt from the Mountain Dragons and Water Dragons Case Study](https://fengshuisolutions.net/excerpt-from-the-mountain-dragons-and-water-dragons-case-study-by-kartar-diamond/) | 作者本人网站，2025-04-26 | 山星／向星是盘中角色，不能与星自身五行混淆；先核时令，再看形态与用途；作者明确不同学校有不同处理方法 |
 | [Kartar Diamond：Feng Shui Interpretation of Yin Rooms and Yang Rooms](https://fengshuisolutions.net/feng-shui-interpretation-of-yin-rooms-and-yang-rooms-by-kartar-diamond/) | 作者本人网站，2024-05-05 | 睡眠与入口等活动用途应区分；当运山星和向星分别作为睡眠、入口取用的依据。本版本只采用床和门，不扩展为所有工作桌规则；文中九运“2024–2044”的端点不用于定运 |
 | [American Feng Shui Institute：FS351—Day Selection, Class 2](https://www.amfengshui.com/wp-content/uploads/2014/09/fs351.pdf) | 出版方 PDF，2006；Larry Sang 传授、Lorraine Wilcox 撰写、Hermann Urkauf 编辑；印刷第56页／PDF第56页 | 星数与五行的对应表；不采用该节求子、疾病及吉凶断语 |
-| [Larry Sang／American Feng Shui Institute：The Principles of Feng Shui](https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf) | 已有规则来源 E1；第三章，印刷第19–28页／PDF第36–45页；原始 PDF 已保存并核对散列，五行材料重点印刷23、25／PDF40、42页 | 五行生、克及泄的机械关系，不由“相生”自动推论吉利 |
+| [Larry Sang／American Feng Shui Institute：The Principles of Feng Shui](https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf) | 已有规则来源 E1；第三章，印刷第 19–28 页／PDF 第 36–45 页（五行材料重点印刷 23、25／PDF 40、42 页） | 五行生、克及泄的机械关系，不由“相生”自动推论吉利 |
 
 第一项与现有中州网页选版相连；后两位作者／出版方提供独立核对，不代表他们的全部理论与中州派相同。实现采用明确标注来源的共同有限条件，不混入其他作者的换运、摆件、疾病或灾害结论。
 
@@ -38,7 +38,7 @@
 
 `interpretation.current_period_number` 与非空 `period_evidence` 成对输入。当前评价时运不能由历史竣工运、年星入中数或系统日期暗中补齐。星数与明确评价时运相同，标记 `current`；其余标记 `not_current`，只表示不是本运当令星，不等于凶星。
 
-基础层继续只判 `current/not_current`。可另行显式选择 `interpretation.timeliness_ruleset_id="wang_zhongzhou_timeliness_v1"`，读取王亭之上卷基本时令与互用数字；见[作者时令规则](wang-timeliness.md)。没有选择该版本时不能把 `not_current` 擅自细分为衰死；选择后也不能据基本标签拒用一个房间。网页另传的辅星／难星表有内部冲突，本版本不采用。
+基础层继续只判 `current/not_current`。可另行显式选择 `interpretation.timeliness_ruleset_id="wang_zhongzhou_timeliness_v1"`，读取王亭之上卷基本时令（旺、生、衰、死）与先后天互用数字。没有选择该版本时不能把 `not_current` 擅自细分为衰死；选择后也不能据基本标签拒用一个房间。网页另传的辅星／难星表有内部冲突，本版本不采用。
 
 作者子版本1.1.0返回互用数字的两条先后天图位来源，按同次候选与角色读取。五运保留原表`[5,2,8]`，没有第五卦的图位推导；未知评价运保持未知。图位数字、基本时令和现场取用各自解释，详见[图位证据与内部校验](../../fengshui.md)。
 
@@ -68,17 +68,17 @@
 
 ## 带完整上下文的固定释义
 
-请求本解释层时默认提供可核验的中文计算释义，可用 `interpretation.include_calculation_reading=false` 关闭；读取 [固定释义与同次核验](calculation-reading.md)。它保留全部候选和反面条件，不认证任意自由模型正文。
+请求本解释层时默认提供结构化中文计算释义 `calculation_reading`（可用 `interpretation.include_calculation_reading=false` 关闭），它保留全部候选、目标路径与反面条件，不认证任意自由模型正文。
 
-未关闭固定释义时，在摘要的 `fields` 中追加顶层 `calculation_reading`，避免投影丢掉这份结果。摘要可供解释，但整包核验必须按上述参考保留并回读原始完整响应；不能用投影摘要冒充完整原run。
+未关闭固定释义时，在摘要的 `fields` 中追加顶层 `calculation_reading`，避免投影丢掉这份结果。摘要可供解释，完整数据须按首次 `fields=null` 读取同 run 交付结果。
 
 ## 固定零正的独立规则
 
-可通过 `interpretation.fixed_lingzheng` 显式启用 [沈氏固定零正](fixed-lingzheng.md)。它与山向飞星分别计算，五运分段未知保留两组候选；高实、低洼及河流事实逐项核对，不能用一般有水或无山替代。
+可通过 `interpretation.fixed_lingzheng` 显式启用固定零正规则（《沈氏玄空学》卷一“论阴阳零正”），读取 `layers.xuankong_natal.interpretation.fixed_lingzheng_analysis`。它与山向飞星分别计算，五运分段未知时保留两组候选；高实、低洼及河流事实逐项核对，不能用一般有水或无山替代。
 
 ## 证据边界与后续范围
 
-独立的 `shen_city_gate_v1` 已可按[沈氏城门](city-gate.md)显式启用，读取 `layers.xuankong_natal.city_gate_analysis`。它不属于本页 `xuankong_conditioned_v1` 的覆盖，也不改变本层评价时运或历史宅盘。
+独立的 `shen_city_gate_v1` 可通过 `city_gate`（独立宅盘）或 `xuankong.city_gate`（合参）显式启用，读取 `layers.xuankong_natal.city_gate_analysis`（解释向首旁两宫同元龙、运星阴阳顺逆与门位）。它不属于本页 `xuankong_conditioned_v1` 的覆盖，也不改变本层评价时运或历史宅盘。
 
 每项结果保留规则 ID、来源 ID、输入事实及作用域，供规则核对和后续解释。完整宅盘、年盘、个人匹配、室内形态和本层条件分别呈现；不会相互抵消、合成分数或自动生成补救处方。
 

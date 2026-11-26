@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>Inspectable Chinese metaphysics and astrology calculations for AI applications</strong>
+  <strong>Inspectable Chinese metaphysics, astrology, and psychometrics calculations for AI applications</strong>
 </p>
 
 <p align="center">
@@ -20,21 +20,20 @@
   <a href="https://www.modelscope.cn/mcp/servers/thomas/FateBridge"><img src="https://img.shields.io/badge/ModelScope-MCP%20Server-624AFF.svg" alt="ModelScope MCP Server"></a>
 </p>
 
-FateBridge provides local metaphysics and astrology calculations for AI applications through **MCP, REST API, and CLI**. Results include structured data, time conventions, and execution receipts. [Method references](docs/interpretation/README.md) document result reading, sources, and limitations. Your application supplies the model conversation and interface.
-
-The calculation service requires no LLM API key. It serves application developers, MCP clients, and researchers checking calendar calculations and selected traditional rules. Reproducibility, source conformity, and predictive validity are evaluated separately.
+FateBridge provides local Chinese metaphysics, astrology, and psychometrics calculations for AI applications through **MCP, REST API, and CLI**. Results include structured facts, time conventions, and execution receipts. [Method references](docs/interpretation/README.md) document result reading, sources, and scope. Your application supplies the model conversation and interface; no LLM API key is required by the calculation service.
 
 ## Capabilities
 
 | Domain | Implemented scope | Details and limits |
 | --- | --- | --- |
-| BaZi and relationships | Four pillars, nine topics, cross-chart contacts, luck periods through hourly timing | [Assessment](docs/bazi-assessment.md) · [Timing](docs/bazi-timing.md) · [Pair evidence](docs/compatibility-scoring.md) |
-| Chinese systems and divination | Zi Wei, Qi Men, Liu Ren, Jin Kou, Tai Yi, Mei Hua, Liu Yao, He Luo, and Canping | [Topic index](docs/README.md#计算原理与专题) |
-| Astrology | Western natal, relationship, timing, and event charts; Jyotish, Guolao, Sukuyo, and other schools | [Western](docs/western-astrology.md) · [Jyotish](docs/jyotish.md) · [Coverage](docs/algorithm-coverage.md) |
-| Human Design | Dual moments separated by 88° solar longitude, gates and lines, channels, type, and authority | [Calculation and acceptance](docs/human-design.md) |
-| Feng Shui | Eight Mansions, basic sand/water rules, annual/monthly stars, historical Xuan Kong charts, layouts, and measured workstations | [Home assessment](docs/fengshui.md) · [Workstations](docs/fengshui-workstation-layout.md) |
+| BaZi and relationships | Four pillars, nine topics, cross-chart contacts, luck periods through hourly timing | [Coverage](docs/algorithm-coverage.md) · [Method reference](docs/interpretation/README.md) |
+| Chinese systems and divination | Zi Wei, Qi Men, Liu Ren, Jin Kou, Tai Yi, Mei Hua, Liu Yao, He Luo, and Canping | [Zi Wei](docs/ziwei.md) · [Coverage](docs/algorithm-coverage.md) |
+| Astrology | Western natal, relationship, timing, and event charts; Jyotish, Guolao, Sukuyo, and other schools | [Sukuyo](docs/sukuyo.md) · [Astrodice](docs/astrodice.md) · [Coverage](docs/algorithm-coverage.md) |
+| Human Design | Dual moments separated by 88° solar longitude, gates and lines, channels, type, and authority | [Human Design reference](docs/human-design.md) |
+| Feng Shui | Eight Mansions, basic sand/water rules, annual/monthly stars, historical Xuan Kong charts, layouts, and measured workstations | [Home assessment](docs/fengshui.md) · [Consultation guide](docs/interpretation/fengshui/consultation.md) |
+| Psychometrics | IPIP 50-item Big Five factor markers (Goldberg 1992 public domain) | [Coverage](docs/algorithm-coverage.md#212-psychometrics--心理测量量表implemented) |
 
-The current source exposes **93 business REST routes**. Four MCP tools provide access to **93 capabilities** across **14 families**. The central catalog contains 93 entries, with 93 available through the CLI. All three interfaces share the same domain calculations. See [interface boundaries](docs/api-reference.md#24-三端能力边界) for names and request shapes, and [algorithm status](docs/algorithm-status.md) for method versions, source disagreements, and outstanding acceptance work.
+The current source exposes **93 business REST routes**. Four MCP tools provide access to **93 capabilities** across **14 families**. The central catalog contains 93 entries, with 93 available through the CLI. All three interfaces share the same domain calculations; see [interface boundaries](docs/api-reference.md#24-三端能力边界) and the [algorithm coverage matrix](docs/algorithm-coverage.md).
 
 ## Quick start
 
@@ -76,7 +75,7 @@ fatebridge bazi_birth_chart \
   --response-char-limit 8192
 ```
 
-On success, the command exits with `0` and returns the day master `庚 / 金 / 阳` (Geng / Metal / Yang) plus `run_metadata`. Large execution evidence is deferred through `result_delivery`; see [reading results](#read-and-verify-results). This verifies this calculation in the installed environment. Discover other tools and their inputs with:
+On success, the command exits with `0` and returns the day master `庚 / 金 / 阳` (Geng / Metal / Yang) plus `run_metadata`. Large execution evidence is deferred through `result_delivery`; see [reading results](#read-and-verify-results). Discover other tools and their inputs with:
 
 ```bash
 fatebridge discover --family bazi
@@ -87,7 +86,7 @@ fatebridge describe bazi_birth_chart --detail input
 
 | Goal | Connection | Guide |
 | --- | --- | --- |
-| Local Codex, Claude Desktop, or Cursor | Client-managed MCP stdio process | [MCP setup](docs/mcp-deployment.md#注册本地-stdio) · [First Codex conversation](docs/codex-guide.md) |
+| Local Codex, Claude Desktop, or Cursor | Client-managed MCP stdio process | [MCP setup](docs/mcp-deployment.md#注册本地-stdio) |
 | MCP client accepting a URL | Independent Streamable HTTP service | [HTTP and remote deployment](docs/mcp-deployment.md#http-与远程部署) |
 | Web, mobile, or backend application | Independent REST service | [Start REST](docs/getting-started.md#启动-rest-并检查状态) · [Integration guide](docs/agent-guide.md) |
 | Scripts and batch jobs | One-shot CLI execution | [Getting started](docs/getting-started.md) · [Requests](docs/examples/README.md) |
@@ -100,8 +99,8 @@ Start REST locally with `API_HOST=127.0.0.1 fatebridge-api`. The default port is
 
 - **Inputs and time:** use confirmed information, including time zone, location, and analysis time. Do not fill an unknown birth hour with a default or example. Read the actual time convention returned by each method.
 - **Summary and full output:** project task-specific `fields` for a summary. For complete JSON, retain all fields on the first call and follow `result_delivery` to read the same run. See [full-result delivery](docs/agent-guide.md#完整结果交付与同次导出).
-- **Ephemeris and precision:** an installed Python library does not establish that external data files were used. Check the actual model, source, and approximation flag. See [ephemeris setup](docs/ephemeris.md) and [solar backends](docs/solar-backends.md).
-- **Evidence and limits:** software regression, independent numerical references, classical sources, model explanations, and real-world validity have separate acceptance criteria. A `partial` status limits its own layer. See [core concepts](docs/concepts.md).
+- **Ephemeris and precision:** an installed Python library does not establish that external data files were used. Check the actual model, source, and approximation flag. See [ephemeris setup](docs/ephemeris.md).
+- **Evidence and limits:** software regression, classical sources, and runtime dependencies are reported separately. A `partial` status limits its own layer. See [core concepts](docs/concepts.md).
 
 ## Development and contributions
 
@@ -116,10 +115,8 @@ uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation
 
 [Documentation maintenance](docs/development-guide.md#文档维护与验证) covers interface and generated-contract synchronization. Include the version, a minimal fictional reproduction, and the actual error in bug reports. Report vulnerabilities privately under [SECURITY.md](SECURITY.md).
 
-## Documentation and scope
+## Documentation and licensing
 
-The [documentation index](docs/README.md) organizes installation, integration, domain references, and development. [Troubleshooting](docs/troubleshooting.md) starts from symptoms. Platform listings: [ModelScope MCP Server](https://www.modelscope.cn/mcp/servers/thomas/FateBridge).
-
-Traditional interpretations and rule scores are cultural references. Scores are not real-world success probabilities. Consultations exclude lifespan/death prediction, assertions of disasters, clinical diagnosis/treatment, and medical timing; see [consultation boundaries](docs/interpretation/shared/safety-boundaries.md). Agent clients, model providers, chat histories, and exports have their own personal-data handling boundaries beyond local calculation.
+The [documentation index](docs/README.md) organizes installation, integration, domain references, and development. [Troubleshooting](docs/troubleshooting.md) starts from symptoms. Platform listings: [ModelScope MCP Server](https://www.modelscope.cn/mcp/servers/thomas/FateBridge). Consultation scope boundaries are defined in [safety boundaries](docs/interpretation/shared/safety-boundaries.md).
 
 Project code is licensed under [Apache-2.0](LICENSE). Third-party components and materials appear in [NOTICE](NOTICE). Check the separate licenses of dependencies, downloaded ephemerides, and source materials before redistribution or commercial integration.
