@@ -837,7 +837,7 @@ def extract_primary_direction_coordinate_payload(
     }
 
     if "Ascendant" not in coordinate_map:
-        del diagnostics["Ascendant"]
+        diagnostics.pop("Ascendant")
 
     for point_name in diagnostics:
         right_ascension, declination = point_equatorial_position(

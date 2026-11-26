@@ -5,7 +5,7 @@ from copy import deepcopy
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 from fatebridge.core.fengshui.calendar import lichun_resolution, year_context
 from fatebridge.core.fengshui.city_gate import analyze_city_gate
@@ -21,7 +21,7 @@ from fatebridge.utils.timezones import parse_timezone_name
 @lru_cache(maxsize=1)
 def _bundle() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data" / "fengshui" / "xuankong-v1.json"
-    bundle = cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    bundle = cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
     validate_replacement_catalog(bundle)
     return bundle
 
@@ -72,7 +72,7 @@ def natal_provenance() -> dict[str, Any]:
         dict(source_id=s, **bundle["sources"][s]) for s in selected["source_ids"]
     ]
     selected["bundle_version"] = bundle["bundle_version"]
-    return cast(Dict[str, Any], selected)
+    return cast(dict[str, Any], selected)
 
 
 def _period_interval(index: int, timezone_name: str) -> dict[str, Any]:

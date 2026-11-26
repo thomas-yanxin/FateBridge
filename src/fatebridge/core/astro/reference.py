@@ -131,7 +131,7 @@ TRADITIONAL_PLANETS = list(PHYSICAL_BODIES[:7])
 
 # 顺序敏感的 ``TRADITIONAL_PLANETS`` 用于 ``list(...)`` 与有序推导；成员判断
 # (``x in ...``) 另用此 frozenset，避免对 list 做线性扫描。两者内容一致。
-_TRADITIONAL_PLANET_IDS = frozenset(TRADITIONAL_PLANETS)
+TRADITIONAL_PLANET_IDS = frozenset(TRADITIONAL_PLANETS)
 
 
 ASPECTS = [
@@ -304,7 +304,7 @@ RELATIONSHIP_FOCUS_DEFS: dict[str, dict[str, Any]] = {
 }
 
 
-_RELATIONSHIP_FOCUS_ALIASES = {
+RELATIONSHIP_FOCUS_ALIASES = {
     "marriage": "marriage",
     "marry": "marriage",
     "婚姻": "marriage",

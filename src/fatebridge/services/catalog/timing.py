@@ -61,7 +61,7 @@ calculate_nongli_time = lazy_service(
 )
 
 
-_TERM_VIEW = {
+TERM_VIEW = {
     "name",
     "datetime_with_offset",
     "datetime_utc",
@@ -83,7 +83,7 @@ def _compact_jieqi_year(result: ServiceResult) -> ServiceResult:
             if key not in {"jieqi_year", "selected_jieqi"}
         },
         field: [
-            {key: value for key, value in term.items() if key in _TERM_VIEW}
+            {key: value for key, value in term.items() if key in TERM_VIEW}
             for term in result[field]
         ],
     }
@@ -98,7 +98,7 @@ def _compact_jieqi_timeline(result: ServiceResult) -> ServiceResult:
                 "jieqi": {
                     key: value
                     for key, value in node["jieqi"].items()
-                    if key in _TERM_VIEW
+                    if key in TERM_VIEW
                 },
                 **(
                     {

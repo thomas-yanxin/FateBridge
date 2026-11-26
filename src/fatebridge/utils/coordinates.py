@@ -5,7 +5,7 @@ from decimal import Decimal
 from fractions import Fraction
 from typing import Literal
 
-_COORDINATE = re.compile(
+COORDINATE = re.compile(
     r"\s*(?P<degrees>[+-]?\d+(?:\.\d+)?)(?:(?P<direction>[NSEW])(?P<minutes>\d+(?:\.\d+)?))?\s*",
     re.IGNORECASE,
 )
@@ -24,7 +24,7 @@ def parse_geo_coordinate(
     if isinstance(value, (int, float)):
         coordinate = value
     else:
-        match = _COORDINATE.fullmatch(str(value))
+        match = COORDINATE.fullmatch(str(value))
         if match is None:
             raise ValueError(f"无效的{axis}坐标")
         degrees = Decimal(match["degrees"])

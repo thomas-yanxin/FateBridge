@@ -59,7 +59,6 @@ class LiurenYearFateEarthBranches(PartialOutput):
 class LiurenEmptinessEvidence(PartialOutput):
     ruleset_id: Literal["liuren_tanyuan_empty_scope_v3"] | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     source_title: str | None = None
     original_pdf_pages: list[int] | None = None
     year_fate_placement_pdf_pages: list[int] | None = None

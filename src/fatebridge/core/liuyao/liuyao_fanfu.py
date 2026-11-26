@@ -91,7 +91,6 @@ def build_fanfu_evidence(
         "ruleset_id": PROFILE["ruleset_id"],
         "ruleset_version": PROFILE["ruleset_version"],
         "source_url": source + "#page=88",
-        "source_sha256": PROFILE["source"]["sha256"],
         "regions": regions,
         "moving_line_relations": relations,
         "explicit_body_example": explicit,

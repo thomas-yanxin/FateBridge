@@ -7,7 +7,6 @@ Delta T, which is replayable evidence and is not independently authenticated.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 import re
@@ -47,12 +46,7 @@ def civil_jd(moment: datetime) -> Fraction:
 def _source(name: str) -> tuple[dict[str, Any], dict[str, str]]:
     raw = files("fatebridge.data").joinpath(f"knowledge/{name}.json").read_bytes()
     table = json.loads(raw)
-    return table, {
-        "table": name,
-        "table_sha256": hashlib.sha256(raw).hexdigest(),
-        "source_url": table["source_url"],
-        "source_document_sha256": table["source_sha256"],
-    }
+    return table, {"table": name}
 
 
 def _finite(value: Any) -> float:
@@ -184,7 +178,6 @@ def _axis(
             exact = civil_jd(moment) + delta
             proof["source"] = {
                 "method": "historical_UT1_plus_observed_native_Delta_T",
-                "source_url": "https://www.astro.com/swisseph/swephprg.htm",
                 "native_observation": observed,
             }
         _close(exact, physical_tt)

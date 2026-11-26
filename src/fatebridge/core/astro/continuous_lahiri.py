@@ -9,10 +9,6 @@ The pole coefficients use Vondrak, Capitaine & Wallace (2011/2012), as in
 ERFA2.0.1 ltp/ltpecl/ltpequ. The separate scalar obliquity and Lahiri anchor
 follow the inspected Swiss2.10.03 convention; scalar and coupled-vector
 ecliptics are distinct approximations, not interchangeable reference frames.
-Sources: https://doi.org/10.1051/0004-6361/201117274
-https://doi.org/10.1051/0004-6361/201117274e
-https://github.com/liberfa/erfa/tree/v2.0.1/src
-https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swephlib.c
 """
 
 from __future__ import annotations
@@ -24,7 +20,6 @@ from typing import Sequence, TypedDict
 
 from fatebridge.core.astro.nutation import nutation
 from fatebridge.core.astro.reference_frames import (
-    COEFFICIENT_SHA256,
     DATA,
     Matrix,
     Vector,
@@ -54,7 +49,6 @@ class FrameState(TypedDict):
     origin_degrees: float
     origin_rate_degrees_per_TT_day: float
     model_id: str
-    coefficient_sha256: str
 
 
 class SphericalState(TypedDict):
@@ -68,7 +62,6 @@ class SphericalState(TypedDict):
 
 class ProjectedState(TypedDict):
     model_id: str
-    coefficient_sha256: str
     epoch_jd_tt: float
     vector_rate_scale: float
     position: list[float]
@@ -152,7 +145,6 @@ def frame_state(tt: float | TTInstant) -> FrameState:
         "origin_degrees": origin * DEG,
         "origin_rate_degrees_per_TT_day": origin_d * DEG,
         "model_id": METHOD_ID,
-        "coefficient_sha256": COEFFICIENT_SHA256,
     }
 
 
@@ -230,7 +222,6 @@ def project_state(
     dq = add(vector_term, frame_term)
     return {
         "model_id": METHOD_ID,
-        "coefficient_sha256": COEFFICIENT_SHA256,
         "epoch_jd_tt": frame["epoch_jd_tt"],
         "vector_rate_scale": vector_rate_scale,
         "position": list(q),

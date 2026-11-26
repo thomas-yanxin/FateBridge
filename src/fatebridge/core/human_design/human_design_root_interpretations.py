@@ -14,7 +14,6 @@ from fatebridge.core.human_design.human_design_joint import (
     joint_changes,
 )
 from fatebridge.core.human_design.human_design_mechanics import bodygraph
-from fatebridge.utils.json_digest import digest
 
 METHOD = "human_design_root_endpoint_interpretations_v1"
 SCOPE = "每个端点固定同一人格激活，使用该端点全部13项设计激活，独立核对双侧26项固定机制、桥接完整门集、回路拓扑和角色依据。calculation_path与basis均相对于该候选盘（人格来自外层原盘，设计由同索引evaluations重建），不指所选主盘；before/after分别指较早/较晚TT。固定记录SHA绑定完整26项含reading记录，可由原始位置纯重建；不是签名或原生真实性证明。不把固定机制核验当完整384线线义验收，不拼接端点，不认证物理误差、连续稳定或预测。"
@@ -117,7 +116,6 @@ def root_interpretations(
         depth = snapshot["depth_evidence"]
         candidates.append(
             {
-                "line_fixings_sha256": digest(depth["line_fixings"]),
                 "fixing_state_columns": ["side", "body", "status", "fixing_state"],
                 "fixing_states": [
                     [row[k] for k in ("side", "body", "status", "fixing_state")]
@@ -129,10 +127,6 @@ def root_interpretations(
                         "fixing_summary",
                         "fixing_policy",
                         "channel_identifiers",
-                        "source_url",
-                        "source_pdf_sha256",
-                        "fixing_rule_source",
-                        "node_fixing_exclusion_source",
                     )
                 },
                 **{

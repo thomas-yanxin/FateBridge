@@ -1,70 +1,33 @@
 # 可运行请求示例
 
-[文档中心](../README.md) · [家居风水](../fengshui.md) · [玄空宅盘](../fengshui-xuankong.md)
+[文档中心](../README.md) · [家居风水](../fengshui.md)
 
-从基础盘到工位活动与候选布局比较，这组可运行的虚构请求演示空间事实如何进入计算、产生分层结果。按下表选择任务，再运行请求、查看规则来源与覆盖状态，即可学习输入结构或核对应用集成。
+本目录提供最小的可运行虚构请求示例，用于快速核对输入结构、字段投影与结果交付。实际使用时请替换为已确认事实。
 
-示例 JSON 中的日期、方位、许可与可行性只属于虚构输入。实际使用时替换为已确认事实；未知项按模型允许的方式省略，示例结果不能直接套用为住宅方案。
+## 示例清单
 
-## 选择请求
-
-| 示例文件 | 调用工具 | 用来理解什么 |
+| 示例文件 | 适用工具 | 用途说明 |
 | --- | --- | --- |
-| [住宅合参](fengshui-home.json) | `fengshui_assess` | 八宅、金锁、年星与历史宅盘分层输出 |
-| [八宅候选与布局证据](fengshui-bazhai-candidate-proof.json) | `fengshui_assess` | 未确认男女起法的两套结果；备选方向保留生克与变爻依据 |
-| [独立室内形态](fengshui-forms.json) | `fengshui_assess` | 无生辰、无罗盘的入口视野与实体背靠 |
-| [元素目标](fengshui-elements.json) | `fengshui_assess` | 对实际计算目标按作用域提出生 / 泄候选 |
-| [年度作者规则](fengshui-annual-remedy.json) | `fengshui_assess` | 显式选择限定年份与作者的补充规则 |
-| [住宅候选比较](fengshui-home-alternatives.json) | `fengshui_assess` | 现状、候选独立事实与分层差异 |
-| [工位候选规划](fengshui-workstation-planning.json) | `fengshui_assess` | 场景选法、搬转许可与物理可行性 |
-| [实测工位与完整有限搜索](fengshui-workstation-measured.json) | `fengshui_assess` | 多边形/高度几何、入口与背靠、独立BTB/WOFS规则、逐组合拒绝回执与取舍方案 |
-| [自动网格与屏幕视线](fengshui-workstation-grid-screen.json) | `fengshui_assess` | 明确网格自动生成中心候选、整面透视遮挡、候选独立重算及算法覆盖状态 |
-| [玄空历史宅盘](fengshui-xuankong.json) | `fengshui_xuankong_natal` | 历史事件定运、宅向与候选角区 |
-| [宅向误差支持角区](fengshui-bearing-support.json) | `fengshui_xuankong_natal` | 同一个宅盘由哪些测量角区与选盘理由支持 |
-| [WMM2025地磁参考](fengshui-geomagnetic.json) | `fengshui_directions` | NOAA数值测试例；原始方位与模型换算候选分别保留 |
-| [独立沈氏城门](fengshui-city-gate.json) | `fengshui_xuankong_natal` | 显式参考运、同元龙门位、顺逆；无需编造历史宅运 |
-| [沈氏主客规则](fengshui-host-guest.json) | `fengshui_xuankong_natal` | 显式选择主客生克；历史宅运、评价运及来源条件分别核对 |
-| [玄空有限解释](fengshui-xuankong-interpretation.json) | `fengshui_assess` | 显式启用有来源的有限解释条件 |
-| [工位活动](fengshui-workstation-activity.json) | `fengshui_assess` | 书桌工作 / 学习用途与宅盘向星 |
-| [入口隔挡](fengshui-entry-barrier.json) | `fengshui_assess` | 入口、桌与隔挡的明确关系和执行条件 |
-| [材料施用条件](fengshui-material-application.json) | `fengshui_assess` | 材料资格、施用条件与目标绑定分别核对 |
+| [demo-subject.json](../../examples/demo-subject.json) | 支持 `--subject-file` 的 CLI 工具 | 通用虚构人物出生档案模板 |
+| [fengshui-home.json](fengshui-home.json) | `fengshui_assess` | 八宅、砂水、年星与玄空分层住宅合参 |
+| [fengshui-xuankong.json](fengshui-xuankong.json) | `fengshui_xuankong_house_chart` | 中州派历史定运与宅向候选盘 |
+| [fengshui-workstation-measured.json](fengshui-workstation-measured.json) | `fengshui_assess` | 实测工位几何、入口背靠与有限候选搜索 |
+| [fengshui-workstation-activity.json](fengshui-workstation-activity.json) | `fengshui_assess` | 工位用途活动与宅盘向星关联 |
+| [fengshui-entry-barrier.json](fengshui-entry-barrier.json) | `fengshui_assess` | 入口、书桌与隔挡空间条件 |
+| [fengshui-material-application.json](fengshui-material-application.json) | `fengshui_assess` | 材质资格与目标绑定条件 |
+| [liuyao-conditional-demo.json](liuyao-conditional-demo.json) | `sixyao` (`liuyao`) | 旬空、动静与日级条件示例输入 |
 
-## 回归与研究资料
+## 运行示例
 
-八宅变爻、早期宅运、原书差异、事件年及节月边界由[八宅完整原典对照](../../tests/fengshui/test_fengshui_classical_depth_v2.py)、[历史宅运](../../tests/fengshui/test_fengshui_historical_solar.py)、[下卦来源比较](../../tests/fengshui/test_fengshui_source_comparison.py)、[替卦来源比较](../../tests/fengshui/test_fengshui_replacement_source_comparison.py)、[事件年候选](../../tests/fengshui/test_fengshui_event_year_fidelity.py)和[节月区间](../../tests/fengshui/test_fengshui_month_interval_fidelity.py)维护完整输入与断言，不另存单点请求副本。原始来源和分歧继续保留在这些测试读取的资料中。
-
-研究流程统一使用[预测研究示例](prediction-study/plan.json)，运行方法及占位资料的限制见[计算与预测验收](../prediction-validation.md)。
-
-## 未解析ASC与13扇区
-
-[原生角度退化请求](chart13-unresolved-ascendant.json)是构造的虚构几何反例。未解析的实际落区返回null，后端约定值和全部生时样点分别保留；计算范围见[其他星盘流派](../other-chart-schools.md)。
-
-## 德国盘生时区间
-
-[太阳弧边界请求](germany-solar-arc-boundary.json)以明确的虚构出生、目标时刻及±1分钟区间，演示名义结果有效而部分推运样点未计算的返回。生时区间的读取见[其他星盘流派](../other-chart-schools.md)。全部样点须保留，未计算项不算作条件未成立或概率。
-
-## 六爻教学输入
-
-[旬空、动静与日级条件](liuyao-conditional-demo.json)和[需之讼装卦](liuyao-need-to-song.json)用于 `sixyao`。它们是构造的教学资料，不代表历史占例的真实日期或现实问事。JSON 可作为 MCP 参数或发送至 REST `/api/divination/liuyao`；CLI 按 `describe sixyao --detail input` 转成对应字段参数，不套用风水的 `--request-file`。
-
-## 历法核对示例
-
-[梅花节气日标签对照](meihua-solar-date-reference.json)是明确指定的历史日期与合成正午输入，用于核对官方日标签和实际月令锚点。它未记录现实问事或结果；运行方式及返回字段见[梅花历法说明](../meihua.md)。
-
-## 运行并查看结果
-
-按[快速入门](../getting-started.md)安装后，从仓库根目录执行：
+按[快速入门](../getting-started.md)安装后，在仓库根目录执行 CLI：
 
 ```bash
 uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json \
   --fields status layers coverage rulesets rule_trace --strict-fields --compact
 uv run --locked --extra dev fatebridge fengshui_xuankong_house_chart --request-file docs/examples/fengshui-xuankong.json --compact
+uv run --locked --extra dev fatebridge bazi_birth_chart --subject-file examples/demo-subject.json --compact
 ```
 
-两个命令分别演示原始分层结果和独立数字宅盘。查看布局规则时，投影另加实际请求对应的 `layout_analysis` 分支；例如 `fengshui-forms.json` 应读取 `layout_analysis.form_analysis`，`fengshui-home-alternatives.json` 应读取 `layout_analysis.alternatives_analysis`。不要把只投影 `layers` 的输出当成布局审查结果。
+REST 可用 `--data-binary @docs/examples/fengshui-home.json` 发送到对应 POST 路由；MCP 直接将文件内容作为 `arguments` 参数对象传递。六爻示例 JSON 可作为 MCP 参数或 REST `/api/divination/liuyao` 请求体，CLI 请按 `fatebridge describe liuyao --detail input` 传入对应命令行参数。
 
-REST 将同一文件用 `--data-binary @docs/examples/fengshui-home.json` 发送到对应 POST 路由，MCP 使用文件内容作为参数对象。命令与客户端用法见[三端例子](../fengshui.md#三端例子)。CLI 请求文件未知字段仍会被拒绝，显式字段参数覆盖文件中的同名顶层字段。
-
-先检查协议是否成功，再查看各层 `status`、`coverage`、实际 `rulesets` 与 `rule_trace`。`partial` 可包含可解释结果；`complete` 表示相应请求范围完成。布局请求还要分别看 `layout_analysis.analysis_progress` 中的计算、审查和执行状态，候选未 ready 不阻止解释已有依据。
-
-人物示例另见 [demo-subject.json](../../examples/demo-subject.json)，用于支持 `--subject-file` 的工具；它与完整嵌套 `--request-file` 用途不同。需要完整结果时不要使用上面的字段裁剪，按[完整结果交付](../agent-guide.md#完整结果交付与同次导出)操作。
+先检查协议状态，再查看各层 `status`、`coverage`、`rulesets` 与 `rule_trace`；`partial` 表示对应层范围受限但已有部分事实可解释。需要完整结果时请省略字段裁剪并采用 `detail=audit`，参见[完整结果交付](../agent-guide.md#完整结果交付与同次导出)。

@@ -42,12 +42,9 @@ class KnowledgeSourceRecord(PartialOutput):
     domain: str | None = None
     key: str | None = None
     source_path: str | None = None
-    canonical_content_sha256: str | None = None
-    loaded_file_sha256: str | None = None
     source_kind: str | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_revision: JsonValue | None = None
     review_status: str | None = None
     scope: str | None = None
@@ -82,7 +79,6 @@ class KnowledgeProvenance(PartialOutput):
         | None
     ) = None
     source_catalogue_version: int | None = None
-    source_catalogue_content_sha256: str | None = None
     source_records: list[KnowledgeSourceRecord] | None = None
     reference_only: ReferenceTrue | None = None
     personal_applicability_assessed: ReferenceFalse | None = None

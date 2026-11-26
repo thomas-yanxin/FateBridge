@@ -20,7 +20,7 @@ from fatebridge.core.meihua.meihua_seasonal_reading import (
     build_seasonal_qualification,
 )
 
-_TENDENCIES = {
+TENDENCIES = {
     "体用比和": ("比和", "体用同气，传统取协调之意"),
     "体生用": ("耗泄", "体生外卦，传统提示主体有所耗泄，不能据此承诺日后回报"),
     "体克用": ("制用", "体制外卦，传统取可以制用之意，仍须结合体气与互变"),
@@ -88,7 +88,7 @@ def meihua_stage_relations(
         ),
     ):
         relation = relationship_by_role(body["element"], trigram["element"])
-        tendency, meaning = _TENDENCIES[relation]
+        tendency, meaning = TENDENCIES[relation]
         stages.append(
             {
                 "role": role,

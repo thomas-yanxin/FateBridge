@@ -36,7 +36,7 @@ def _independent_sources(
 ) -> dict[int, list[dict[str, Any]]]:
     """Trace qualified support to anchors without the queried line or Si loop.
 
-    Reusing a final `source_grounded` bit alone would permit a multi-step
+    Reusing a final source_grounded bit alone would permit a multi-step
     generation cycle whose sole anchor was the queried earth's own changed Si.
     This is a dependency proof over existing qualifications, not new strength.
     """
@@ -210,7 +210,6 @@ def build_cessation_conditions(
         ruleset_id=PROFILE["ruleset_id"],
         ruleset_version=PROFILE["ruleset_version"],
         source_url=PROFILE["source"]["url"] + "#page=98",
-        source_sha256=PROFILE["source"]["sha256"],
         clauses=deepcopy(PROFILE["clauses"]),
         lines=rows,
         focus=(

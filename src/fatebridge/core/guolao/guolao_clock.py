@@ -17,13 +17,11 @@ from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.core.guolao.guolao_classical import BRANCHES
 
 METHOD_ID = "guolao_same_sky_apparent_solar_hour_v1"
-SOURCE_URL = "https://aa.usno.navy.mil/faq/eqtime"
-_MICROSECONDS_PER_DAY = 86_400_000_000
+MICROSECONDS_PER_DAY = 86_400_000_000
 
 
 class SolarClockFacts(TypedDict):
     method_id: str
-    source_url: str
     display: str | None
     display_status: str
     display_basis: str
@@ -105,7 +103,7 @@ def apparent_solar_clock(
     ordinal = int(solar_day) - 1721425
     display = None
     if 1 <= ordinal <= datetime.max.toordinal():
-        microseconds = int(day_fraction * _MICROSECONDS_PER_DAY)
+        microseconds = int(day_fraction * MICROSECONDS_PER_DAY)
         display = (
             datetime.fromordinal(ordinal) + timedelta(microseconds=microseconds)
         ).isoformat()
@@ -116,12 +114,11 @@ def apparent_solar_clock(
         + Fraction(
             ((local.hour * 60 + local.minute) * 60 + local.second) * 1_000_000
             + local.microsecond,
-            _MICROSECONDS_PER_DAY,
+            MICROSECONDS_PER_DAY,
         )
     )
     return {
         "method_id": METHOD_ID,
-        "source_url": SOURCE_URL,
         "display": display,
         "display_status": "available" if display else "outside_datetime_year_range",
         "display_basis": "naive_local_solar_label_not_a_civil_timezone",

@@ -8,7 +8,7 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 from fatebridge.core.fengshui.city_gate_inputs import (
     CityGateObservation,
@@ -20,7 +20,7 @@ from fatebridge.core.fengshui.directions import rule_data, wrap9
 @lru_cache(maxsize=1)
 def _bundle() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             (Path(__file__).parents[2] / "data/fengshui/city-gate-v1.json").read_text()
         ),

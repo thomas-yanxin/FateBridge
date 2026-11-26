@@ -11,7 +11,7 @@ import pytest
 from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro import birth_clock
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.astro.physical_sources import _file_digest
+from fatebridge.core.astro.physical_sources import _file_stat
 from fatebridge.core.astro.solar_sources import SunSourceCohort
 from fatebridge.core.astro.source_session import current_source_session
 from fatebridge.core.jyotish.jyotish import build_india
@@ -234,9 +234,9 @@ def test_clock_iteration_grid_and_replay_share_one_endpoint_verified_file_trace(
 
     def counted(path):
         calls.append(path.name)
-        return _file_digest(path)
+        return _file_stat(path)
 
-    monkeypatch.setattr(physical, "_file_digest", counted)
+    monkeypatch.setattr(physical, "_file_stat", counted)
     solar_solves = []
     original = birth_clock.resolve_solar_epoch
 
@@ -251,9 +251,9 @@ def test_clock_iteration_grid_and_replay_share_one_endpoint_verified_file_trace(
     result = invoke("periods")
     assert "error" not in result, result
     assert Counter(calls) == {"sepl_18.se1": 2, "semo_18.se1": 2}
-    # One original, one nominal replay and two interval endpoints, not a
+    # One original and two interval endpoints, not a
     # complete clock inversion for every native sample.
-    assert len(solar_solves) == 4
+    assert len(solar_solves) == 3
     grid = result["india"]["birth_time_sensitivity"]
     assert (
         len(grid["source_comparison"]["sample_source_indices"]) == grid["sample_count"]
@@ -281,7 +281,7 @@ def test_every_actual_LAT_sun_call_including_roundtrip_has_source_evidence(
         assert source["by_factor"]["equatorial_Sun"]["model"] == "swieph"
         assert source["atomic_file_read_proven"] is False
         assert source["accuracy_certified"] is False
-        assert all("sha256" in f and f["de_number"] == 441 for f in source["files"])
+        assert all("bytes" in f and f["de_number"] == 441 for f in source["files"])
 
 
 def test_legacy_identity_is_not_fabricated_and_old_library_is_not_silently_certified(
@@ -327,7 +327,7 @@ def test_source_switch_smaller_than_numeric_tolerance_is_still_not_the_same_sour
     assert error.value.reason == "birth_clock_source_mismatch"
 
 
-@pytest.mark.parametrize("predicate", ["edition", "hash"])
+@pytest.mark.parametrize("predicate", ["edition", "bytes"])
 def test_sun_context_comparison_handles_new_auxiliary_slots_without_rewriting_earlier_reads(
     data18, predicate: str
 ) -> None:
@@ -344,8 +344,8 @@ def test_sun_context_comparison_handles_new_auxiliary_slots_without_rewriting_ea
     assert len(cohort.sources[0]["files"]) == 1
     changed = copy.deepcopy(original)
     target = next(f for f in changed["files"] if f["slot"] == 0)
-    target["de_number" if predicate == "edition" else "sha256"] = (
-        440 if predicate == "edition" else "different-content"
+    target["de_number" if predicate == "edition" else "bytes"] = (
+        440 if predicate == "edition" else 12345
     )
     with pytest.raises(EphemerisSourceError) as error:
         cohort.add(changed)

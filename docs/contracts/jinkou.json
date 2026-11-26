@@ -102,7 +102,6 @@
         "four_pillars",
         "jinkou.rows",
         "jinkou.relations.si_jue",
-        "jinkou.relations.source_url",
         "jinkou.ruleset"
       ],
       "purpose": "已确认本命支与本次将神的京本大绝配对；省略本命支时保留未知，不从占时或行年替代，不据结构断言现实结局。"
@@ -424,7 +423,7 @@
         "guiren_profile"
       ],
       "source_refs": [
-        "docs/liuren-jinkou-audit.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "categorical",
       "validation_scope": {

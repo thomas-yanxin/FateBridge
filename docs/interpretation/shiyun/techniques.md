@@ -25,7 +25,7 @@
 | --- | --- | --- |
 | 想看粗粒度传统人生阶段 | `planetary_ages`：可选 `analysis_year/month/day` 标当前段；读 `planetary_ages.bands/active_planet/current_age_years`、各段 natal_condition | 七分期年龄带与主星条件；不是个体事件时间表。追问当前段时复用已返回 bands，不重新生成整表 |
 | 点名三分主星、比较三阶段 | `triplicity_ruler_periods`：`division/lifespan`；读 `triplicity_rulers.sect/sect_light/element/stages/lifespan_years` | 昼夜光体所据三分主星及阶段年龄、角色与本命条件。`lifespan` 仅人为划分参数，绝不答能活多久；默认75年也不是命定寿命。三阶段相同长度来自口径，不当个案验证 |
-| 想看月相周期的阶段转换 | `lunar_phase_progressions`：`max_age_years`；读 `lunation_phase.method_id/natal_phase/progression_options/phase_ingresses`，核对 `physical_ephemeris_source/solver/age_basis` | 当前模型搜索出生后实际日月星历的八相交点，以一名义UTC日对应一象征年龄年，保留原始交点及年龄显示精度。旧 run 的固定平均速度模型须按原版本解释，不能套入新结果；推运星历日期不是现实事件发生日期。同表覆盖范围内追问直接复用。见[计算与来源](../../western-astrology.md#实际星历月相推运) |
+| 想看月相周期的阶段转换 | `lunar_phase_progressions`：`max_age_years`；读 `lunation_phase.method_id/natal_phase/progression_options/phase_ingresses`，核对 `physical_ephemeris_source/solver/age_basis` | 当前模型搜索出生后实际日月星历的八相交点，以一名义 UTC 日对应一象征年龄年，保留原始交点及年龄显示精度；推运星历日期不是现实事件发生日期。同表覆盖范围内追问直接复用 |
 | 点名界推运／分配法 | `bounds_directions`：`time_key/max_age_years`；读 `distributions.direction_model/rate_deg_per_year/periods`、段内 participants | 目前为黄道上升按时间钥经过埃及界的分段及星体接触年龄；不是赤道／地方半弧主限的替代。时间钥不改来挑好答案；已保留段可继续解释其分配星与参与星 |
 | 点名调波或某阶共振 | `harmonic_chart`：`harmonic/orb`；读 `harmonic_chart.harmonic/positions/resonant_conjunctions` | 本命黄经乘阶数得到的配置及合相。调波是结构转换，本身不返回人生阶段，不因默认9阶就编九年周期；追问相同阶数复用，改变阶数才新增计算 |
 | 点名 Balbillus 分期 | `balbillus_periods`：`start_planet/mode/max_age_years`；读 `balbillus.mode/start_planet/zodiacal_order/periods` 及 sub_periods | 读取本版本起星、距离模式和大小段年龄，不与另一种129系统混同。表的上限是取数范围，不是寿命；先说明新增机制，普通年运无需默认加入 |

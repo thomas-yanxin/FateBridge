@@ -10,6 +10,6 @@
 fatebridge result-read RESULT_ID --run-id ORIGINAL_RUN_ID --path numerology_evidence.birth_clock --offset 0
 ```
 
-结果ID与run ID取自原回执。接口以内部清单检查完整保留payload，再返回所选字段页；公开响应不提供哈希或指纹。其他所需事实继续读取同run，直到所需字段的 `next_offset=null`。核验成功不表示已经读取全部业务事实。摘要调用的文件只保留实际投影范围，完整业务须首次 `fields=null`。
+结果 ID 与 run ID 取自原回执。接口以内部清单检查完整保留 payload，再返回所选字段页。其他所需事实继续读取同 run，直到所需字段的 `next_offset=null`。核验成功不表示已经读取全部业务事实。摘要调用的文件只保留实际投影范围，完整业务须首次 `fields=null`。
 
 客户端不能读取资源且没有已安装的引擎环境时，保留该项核验缺口，交付已有可答部分；不猜解释器位置、不为咨询安装依赖、不重算冒充原run。结果读取只维护引擎的共享实现。

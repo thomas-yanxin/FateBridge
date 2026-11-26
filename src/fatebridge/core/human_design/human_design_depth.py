@@ -7,7 +7,7 @@ readings. A fixing is a traditional polarity, never a quality or health score.
 from __future__ import annotations
 
 from collections import Counter
-from typing import Any, Dict, List
+from typing import Any
 
 from fatebridge.core.human_design.human_design_additional_polarities import (
     evidence as additional_polarity_evidence,
@@ -18,8 +18,6 @@ from fatebridge.core.human_design.human_design_additional_polarities import (
 )
 from fatebridge.core.human_design.human_design_references import reference_data
 
-FIXING_SOURCE = "https://jovianarchive.com/blogs/chart-interpretations-components/line-fixing-in-human-design-exaltation-detriment-and-juxtaposition"
-NODE_SOURCE = "https://humandesignsystem.com/archive/newsletters/0402.pdf"
 NODES = {"NorthNode", "SouthNode"}
 SIDES = ("personality", "design")
 BODY_NAMES = dict(
@@ -58,7 +56,7 @@ BODY_NAMES = dict(
 )
 
 
-def fixing_reading(record: Dict[str, Any]) -> str:
+def fixing_reading(record: dict[str, Any]) -> str:
     """Explain this activation's actual mechanism, without inventing line prose."""
     side = {"personality": "人格", "design": "设计"}[record["side"]]
     text = f"{side}{BODY_NAMES[record['body']]}位于{record['gate']}.{record['line']}。"
@@ -101,7 +99,7 @@ def fixing_reading(record: Dict[str, Any]) -> str:
     )
 
 
-def fixing_summary_reading(depth: Dict[str, Any]) -> str:
+def fixing_summary_reading(depth: dict[str, Any]) -> str:
     summary = depth["fixing_summary"]
     counts = summary["fixing_state_counts"]
     labels = {
@@ -120,11 +118,11 @@ def fixing_summary_reading(depth: Dict[str, Any]) -> str:
     )
 
 
-def depth_reference() -> Dict[str, Any]:
+def depth_reference() -> dict[str, Any]:
     return reference_data("rave-2001-depth.json")
 
 
-def cross_identifier(personality_sun_gate: int, angle: str) -> Dict[str, Any]:
+def cross_identifier(personality_sun_gate: int, angle: str) -> dict[str, Any]:
     row = depth_reference()["gates"][personality_sun_gate - 1]
     if row["gate"] != personality_sun_gate or angle not in row["cross_identifiers"]:
         raise ValueError("轮回交叉目录的门号或角度无效")
@@ -132,12 +130,11 @@ def cross_identifier(personality_sun_gate: int, angle: str) -> Dict[str, Any]:
         "name": row["cross_identifiers"][angle],
         "name_status": "primary_2001_angle_identifier",
         "source_pdf_page_one_based": row["pdf_pages_one_based"][0],
-        "source_url": depth_reference()["source"]["url"],
         "interpretation_scope": "原典名称索引；不把名称解释为事件预言、职业定命或医学含义。",
     }
 
 
-def line_fixings(activations: Dict[str, List[Dict[str, Any]]]) -> List[Dict[str, Any]]:
+def line_fixings(activations: dict[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
     reference = depth_reference()
     result = []
     side_items = [(side, activations[side]) for side in SIDES if side in activations]
@@ -155,7 +152,7 @@ def line_fixings(activations: Dict[str, List[Dict[str, Any]]]) -> List[Dict[str,
                 b if a == gate else a
                 for a, b in (c["gates"] for c in row["channel_identifiers"])
             }
-            triggers: Dict[str, List[Dict[str, Any]]] = {
+            triggers: dict[str, list[dict[str, Any]]] = {
                 "exaltation": [],
                 "detriment": [],
             }
@@ -241,7 +238,7 @@ def line_fixings(activations: Dict[str, List[Dict[str, Any]]]) -> List[Dict[str,
     return result
 
 
-def depth_evidence(chart: Dict[str, Any]) -> Dict[str, Any]:
+def depth_evidence(chart: dict[str, Any]) -> dict[str, Any]:
     reference = depth_reference()
     channels = []
     for actual in chart["bodygraph"]["channels"]:
@@ -314,9 +311,5 @@ def depth_evidence(chart: Dict[str, Any]) -> Dict[str, Any]:
             "scope": "仅本命双侧指定星体的同门或谐振门触发；保留所有触发位置。完整线义、行运及合盘不在本次固定机制解释范围。",
         },
         "channel_identifiers": channels,
-        "source_url": reference["source"]["url"],
-        "source_pdf_sha256": reference["source"]["pdf_sha256"],
-        "fixing_rule_source": FIXING_SOURCE,
-        "node_fixing_exclusion_source": NODE_SOURCE,
         "scope": "64门、36通道、192交叉名称和384线的极性星体事实索引；不包含原典全部线义。",
     }

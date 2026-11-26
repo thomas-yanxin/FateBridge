@@ -1910,7 +1910,7 @@
       "role": "calculation",
       "selector_fields": [],
       "source_refs": [
-        "docs/meihua.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "categorical",
       "validation_scope": {

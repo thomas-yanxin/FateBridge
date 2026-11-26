@@ -10,8 +10,6 @@ from fatebridge.core.metaphysics.taiyi_elemental_relations import (
     elemental_relations_text,
 )
 from fatebridge.core.metaphysics.taiyi_enclosures import enclosures_text
-from fatebridge.core.metaphysics.taiyi_gate_frames import TONGZONG
-from fatebridge.core.metaphysics.taiyi_gates import JINJING, KEY
 from fatebridge.core.metaphysics.taiyi_month import jinjing_month_origin_text
 from fatebridge.core.metaphysics.taiyi_oppositions import oppositions_text
 from fatebridge.core.metaphysics.taiyi_origin_selection import (
@@ -91,7 +89,7 @@ def evidence_text(board: dict[str, Any]) -> str:
                     f"时计配置：{calendar['hour_profile']}；冬至前甲子锚{origin['origin_effective_date']}，本次所属日{origin['target_effective_date']}（{origin['target_day_ganzhi']}）。"
                 )
                 lines.append(
-                    f"完整积时：({origin['day_number']} - 1) × 12 + {origin['hour_number']} = {origin['accumulation']}；23时子初为现代约定；来源：{origin['source']}。"
+                    f"完整积时：({origin['day_number']} - 1) × 12 + {origin['hour_number']} = {origin['accumulation']}；23时子初为现代约定。"
                 )
         elif mode == "day":
             origin = calendar["day_origin"]
@@ -180,7 +178,7 @@ def evidence_text(board: dict[str, Any]) -> str:
         lines.append(ten_jing_text(board["ten_jing"]))
     for comparison in board.get("day_source_comparisons", []):
         lines.append(
-            f"{comparison['scope']} {comparison['field']}原文{comparison['source_value']}，本盘规则推算{comparison['rule_derived_value']}；来源：{comparison['source']}。"
+            f"{comparison['scope']} {comparison['field']}原文{comparison['source_value']}，本盘规则推算{comparison['rule_derived_value']}。"
         )
     lines.append("原典符合范围：部分，底本表文与通则分歧待裁定；现实预测效力：未检验。")
     return "\n".join(lines)
@@ -203,9 +201,9 @@ def gates_text(board: dict[str, Any]) -> str:
         gates["calculation_mode"], "本计八门"
     )
     lines.append(
-        f"所选门法来源：金钥匙{label}（{KEY}），直门加定计目。"
+        f"所选门法：金钥匙{label}，直门加定计目。"
         if is_key
-        else f"所选门法来源：王希明卷一新术（{JINJING}）；三门主体补证：统宗卷二（{TONGZONG}）。"
+        else "所选门法：王希明卷一新术；三门主体补证：统宗卷二。"
     )
     lines.append(
         "；".join(
@@ -236,7 +234,7 @@ def gates_text(board: dict[str, Any]) -> str:
         lines.append(
             f"定计目{result['marker']}：{path} = {result['count']}；定计大/参将{result['general']}/{result['vice_general']}。"
         )
-        lines.append(f"定计补证：金钥匙续集（{KEY}），不把重审之算当另一份独立证据。")
+        lines.append("定计补证：金钥匙续集，不把重审之算当另一份独立证据。")
         for item in result.get("source_disagreements", []):
             lines.append(
                 f"定计原文分歧：{item['field']}原文{item['source_value']}，按本盘算路{item['rule_derived_value']}；两值保留，未据程序改原文。"

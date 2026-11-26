@@ -13,9 +13,6 @@ TaiyiHourProfile = Literal["jinjing_hour_solstice_v1", "key_hour_winter_jiazi_v1
 DEFAULT_HOUR_PROFILE = "jinjing_hour_solstice_v1"
 KEY_HOUR_PROFILE = "key_hour_winter_jiazi_v1"
 HOUR_PROFILES = {DEFAULT_HOUR_PROFILE, KEY_HOUR_PROFILE}
-KEY_SOURCE = (
-    "https://www.shidianguji.com/zh/book/NGJ89241199902106666022/chapter/1lq8dkylq3yn8"
-)
 
 
 def double_hour_slot(clock: NominalClockLabel) -> int:
@@ -42,7 +39,6 @@ def key_hour_origin(
     accumulation = (day_number - 1) * 12 + branch_index + 1
     effective_day = NominalClockLabel(target_slot // 12, 0)
     return {
-        "source": KEY_SOURCE,
         "winter_clock": winter_clock.isoformat(),
         "winter_effective_date": winter_day.date_isoformat(),
         "winter_day_ganzhi": winter_ganzhi,

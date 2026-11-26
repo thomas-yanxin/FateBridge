@@ -13,7 +13,7 @@
 - [Anjie Cho的植物文章](https://www.anjiecho.com/holistic-spaces-blog/best-feng-shui-plants)要求已有或新添植物健康且得到照料；实现保留这一状态条件，不引入叶形禁忌或效果承诺。
 - [Tori McBrien的事业文章](https://www.ifsguild.org/nine-tips-to-support-your-career/)明确坐者桌沿定位、近中事业区及深色/水景象征；实现选不新增实际水装置的图案或用品。
 
-原始页面获取时间、SHA-256 和字节数记录在 [`desktop-bagua-v1.json`](../../../src/fatebridge/data/fengshui/desktop-bagua-v1.json)。只采用分区、目标、代表物和条件，不采纳健康、财富或事业结果承诺。
+规则数据记录在 [`desktop-bagua-v1.json`](../../../src/fatebridge/data/fengshui/desktop-bagua-v1.json)。只采用分区、目标、代表物和条件，不采纳健康、财富或事业结果承诺。
 
 [WOFS的办公室作者指引](https://www.wofs.com/7-quick-tips-career-success/)支持书桌避开已确认直走道、裸露横梁正下方和朝向使用者的家具尖角。版本记录于 [`layout-supplements-v1.json`](../../../src/fatebridge/data/fengshui/layout-supplements-v1.json) 的 F4；这三项是可选观察，未提供时不推断，不把灯带当横梁或屏幕框当实体尖角，不外推到床/灶。其有线电话接线方向、硬性左右高低、物件数量和健康/财富断语未采用。
 

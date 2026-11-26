@@ -8,7 +8,6 @@ no Python ERFA/JPL dependency and never silently changes orbital providers.
 from __future__ import annotations
 
 import ctypes
-import hashlib
 import json
 import math
 import os
@@ -24,7 +23,7 @@ from fatebridge.fetch_vsop2013 import MODEL_ID, source_profile
 from fatebridge.utils.errors import EphemerisSourceError
 
 MANIFEST_ENV = "FATEBRIDGE_VSOP2013_MANIFEST"
-_LOCK = RLock()
+LOCK = RLock()
 
 
 def _finite(value: Any) -> bool:
@@ -68,7 +67,7 @@ class _ImageInfo(ctypes.Structure):
     ]
 
 
-def _loaded_image(function: Any, expected: Path, digest: str) -> str:
+def _loaded_image(function: Any, expected: Path) -> None:
     lookup = ctypes.CDLL(None).dladdr
     lookup.argtypes = [ctypes.c_void_p, ctypes.POINTER(_ImageInfo)]
     lookup.restype = ctypes.c_int
@@ -79,19 +78,15 @@ def _loaded_image(function: Any, expected: Path, digest: str) -> str:
     ):
         raise ValueError("Actual VSOP2013 coordinate entry could not be observed")
     actual = Path(os.fsdecode(info.filename)).resolve()
-    if (
-        actual != expected.resolve()
-        or hashlib.sha256(actual.read_bytes()).hexdigest() != digest
-    ):
+    if actual != expected.resolve():
         raise ValueError("Actual VSOP2013 calculation image differs")
-    return digest
 
 
 class _Source:
     def __init__(self, path: Path, signature: tuple[int, ...]) -> None:
         self.path, self.signature = path, signature
         try:
-            self.profile, self.profile_sha256 = source_profile()
+            self.profile = source_profile()
         except (OSError, ValueError, TypeError) as profile_error:
             raise EphemerisSourceError("solar_vsop2013_invalid") from profile_error
         self._temporary: tempfile.TemporaryDirectory[str] | None = None
@@ -104,9 +99,6 @@ class _Source:
                 model_id=MODEL_ID,
                 version=self.profile["version"],
                 abi_version=1,
-                source_profile_sha256=self.profile_sha256,
-                calculation_source_sha256=self.profile["calculation_source_sha256"],
-                embedded_series_sha256=self.profile["embedded_series_sha256"],
                 system=platform.system(),
                 machine=platform.machine(),
             )
@@ -126,28 +118,18 @@ class _Source:
             self.binary_path = binary
             self.binary_signature = _signature(binary)
             data = binary.read_bytes()
-            self.binary_sha256 = hashlib.sha256(data).hexdigest()
-            if self.binary_sha256 != manifest.get("binary_sha256"):
-                raise ValueError("VSOP2013 binary does not match its receipt")
-            self.manifest_sha256 = hashlib.sha256(raw).hexdigest()
             # dlopen must not silently return an old image for a replaced name.
             self._temporary = tempfile.TemporaryDirectory(
                 prefix="fatebridge-vsop2013-loaded-"
             )
             loaded = Path(self._temporary.name) / name
             loaded.write_bytes(data)
-            if hashlib.sha256(loaded.read_bytes()).hexdigest() != self.binary_sha256:
-                raise ValueError("VSOP2013 private loaded bytes differ")
             self.library = ctypes.CDLL(str(loaded))
-            for symbol, value in (
-                ("fatebridge_vsop2013_model_id", MODEL_ID),
-                ("fatebridge_vsop2013_profile_sha256", self.profile_sha256),
-            ):
-                function = getattr(self.library, symbol)
-                function.argtypes = []
-                function.restype = ctypes.c_char_p
-                if function() != value.encode("ascii"):
-                    raise ValueError("Loaded VSOP2013 identity marker differs")
+            function = getattr(self.library, "fatebridge_vsop2013_model_id")
+            function.argtypes = []
+            function.restype = ctypes.c_char_p
+            if function() != MODEL_ID.encode("ascii"):
+                raise ValueError("Loaded VSOP2013 identity marker differs")
             self.library.fatebridge_vsop2013_abi_version.argtypes = []
             self.library.fatebridge_vsop2013_abi_version.restype = ctypes.c_int
             if self.library.fatebridge_vsop2013_abi_version() != 1:
@@ -165,9 +147,7 @@ class _Source:
                 ctypes.c_char_p,
             ]
             self.library.fatebridge_vsop2013_solar.restype = ctypes.c_int
-            self.loaded_image_sha256 = _loaded_image(
-                self.library.fatebridge_vsop2013_solar, loaded, self.binary_sha256
-            )
+            _loaded_image(self.library.fatebridge_vsop2013_solar, loaded)
             # Verify the required failure before enabling any calculations.
             values = (ctypes.c_double * 6)()
             error = ctypes.create_string_buffer(1024)
@@ -232,12 +212,6 @@ class _Source:
         return dict(
             model_id=MODEL_ID,
             version=self.profile["version"],
-            source_profile_sha256=self.profile_sha256,
-            calculation_source_sha256=self.profile["calculation_source_sha256"],
-            embedded_series_sha256=self.profile["embedded_series_sha256"],
-            build_manifest_sha256=self.manifest_sha256,
-            binary_sha256=self.binary_sha256,
-            loaded_image_sha256=self.loaded_image_sha256,
             binary_filename=self.binary_path.name,
             native_core_version=self.native_version,
             system=platform.system(),
@@ -247,7 +221,6 @@ class _Source:
             time_argument="TT, converted internally to TDB by full geocentric ERFA dtdb",
             position_frame="Geocentric apparent ecliptic/equinox of date; VSOP2013 full EMB, full Moshier Moon, Swiss2.10.03 reduction",
             calculation_flags_requested=260,
-            source_url=self.profile["reference"],
             sources=deepcopy(self.profile["sources"]),
             software_input_years=list(self.profile["software_input_years"]),
             qualified_solar_term_years=list(self.profile["qualified_solar_term_years"]),
@@ -261,10 +234,7 @@ class _Source:
         return (
             str(self.path),
             self.signature,
-            self.manifest_sha256,
             self.binary_signature,
-            self.binary_sha256,
-            self.profile_sha256,
         )
 
 
@@ -291,19 +261,19 @@ def _selected() -> _Source:
 
 
 def cache_key() -> tuple[Any, ...]:
-    with _LOCK:
+    with LOCK:
         return _selected().key()
 
 
 def source_receipt() -> dict[str, Any]:
-    with _LOCK:
+    with LOCK:
         return _selected().receipt()
 
 
 def solar_longitudes_tt(jd_tts: list[float]) -> dict[str, Any]:
     if not all(_finite(value) for value in jd_tts):
         raise ValueError("VSOP2013 observations require finite numeric TT points")
-    with _LOCK:
+    with LOCK:
         source = _selected()
         observed = [source.position(float(value))[0] for value in jd_tts]
         source.check_unchanged()
@@ -324,7 +294,7 @@ def longitude_crossing_tt(
             "VSOP2013 crossing requires finite target and increasing TT bracket"
         )
     target, low, high = float(target), float(low), float(high)
-    with _LOCK:
+    with LOCK:
         source = _selected()
         if expected_source_key is not None and source.key() != expected_source_key:
             raise EphemerisSourceError("solar_configuration_changed")

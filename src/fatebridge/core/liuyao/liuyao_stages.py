@@ -17,12 +17,11 @@ PROFILE: dict[str, Any] = json.loads(
 PHASES = ("长生", "帝旺", "墓", "绝")
 RULESET_ID = "zengshan_four_stage_cycle_v16"
 RULESET_VERSION = "16.0.0"
-FIRE_CYCLE_SOURCE = "https://www.shidianguji.com/zh/book/NA06416/chapter/1m7f91uq9we1f"
 PHASE_OFFSETS = dict(zip(PHASES, (0, 4, 8, 9)))
 STAGES: dict[str, dict[str, str]] = deepcopy(PROFILE["known_stages"])
-_fire_start = BRANCHES.index(next(b for b, p in STAGES["火"].items() if p == "长生"))
+FIRE_START = BRANCHES.index(next(b for b, p in STAGES["火"].items() if p == "长生"))
 STAGES["火"] = {
-    BRANCHES[(_fire_start + offset) % len(BRANCHES)]: phase
+    BRANCHES[(FIRE_START + offset) % len(BRANCHES)]: phase
     for phase, offset in PHASE_OFFSETS.items()
 }
 
@@ -71,13 +70,11 @@ def stage_knowledge() -> dict[str, Any]:
         ruleset_version=RULESET_VERSION,
         literal_ruleset_version=PROFILE["ruleset_version"],
         source_url=PROFILE["source"]["url"] + "#page=97",
-        source_sha256=PROFILE["source"]["sha256"],
         literal_source_stages=deepcopy(PROFILE["known_stages"]),
         fire_cycle_derivation={
-            "source_url": FIRE_CYCLE_SOURCE,
             "source_section": "易冒·卷四·長生章第三十一",
             "stage_order_url": PROFILE["source"]["url"] + "#page=96",
-            "start_branch": BRANCHES[_fire_start],
+            "start_branch": BRANCHES[FIRE_START],
             "branch_direction": "forward",
             "offsets_from_growth": PHASE_OFFSETS.copy(),
             "derived_positions": {
@@ -167,7 +164,6 @@ def attach_hidden_stage_conditions(
             ruleset_id=RULESET_ID,
             ruleset_version=RULESET_VERSION,
             source_url=PROFILE["source"]["url"] + "#page=101",
-            source_sha256=PROFILE["source"]["sha256"],
             source_path=root,
             hidden_tomb_cessation=target,
             flying_tomb_cessation=flying,

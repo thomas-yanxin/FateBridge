@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 RECORD = (
     Path(__file__).resolve().parents[2]
     / "data/knowledge/witte1923-constant-source.json"
 )
-RECORD_SHA256 = "ccfdbaf79be14b5f5a4fef04728584c2b48175ca66382962d29ac5dffd1b5256"
 
 
 def _time_seconds(parts: list[int]) -> int:
@@ -23,7 +21,7 @@ def _time_seconds(parts: list[int]) -> int:
     return hours * 3600 + minutes * 60 + seconds
 
 
-def progression_key_source_comparison() -> Dict[str, Any]:
+def progression_key_source_comparison() -> dict[str, Any]:
     """Audit printed operands; never adjust a present chart to the printed sum.
 
     The source's arithmetic residuals are measured in seconds of time angle.
@@ -31,8 +29,6 @@ def progression_key_source_comparison() -> Dict[str, Any]:
     ecliptic longitude. The actual 365.25-day key remains a FateBridge choice.
     """
     raw = RECORD.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != RECORD_SHA256:
-        raise RuntimeError("Witte1923 progression-constant source checksum mismatch")
     record = json.loads(raw)
     operations = []
     for row in record["operations"]:
@@ -63,13 +59,10 @@ def progression_key_source_comparison() -> Dict[str, Any]:
         "selected_key_from_compared_source": False,
         "computed_for_current_chart": False,
         "comparison_unit": "seconds of time angle; not ecliptic arcseconds or measured birth-clock error",
-        "source_record_sha256": RECORD_SHA256,
         "source": {
             "id": source["id"],
             "author": source["author"],
             "title": source["title"],
-            "url": source["url"],
-            "source_sha256": source["source_pdf_sha256"],
             "sections": source["sections"],
             "scope": record["scope"],
         },

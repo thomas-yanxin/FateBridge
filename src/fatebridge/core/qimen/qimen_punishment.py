@@ -1,6 +1,6 @@
 """Explicit six-instrument identities with an unadjudicated source scope.
 
-The legacy broad reading is retained provisionally. A narrower current-zhifu
+The broad reading is retained provisionally. A narrower current-zhifu
 reading is also calculated; the printed mao example distinguishes them.
 Neither silently shrinking the rule nor claiming the broader reading is
 certified resolves the wording's scope.
@@ -9,9 +9,7 @@ certified resolves the wording's scope.
 from typing import Any
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, xun_head_for_ganzhi
-from fatebridge.core.qimen.qimen_sources import YANYI_VOLUMES
 
-SOURCE = YANYI_VOLUMES[2]
 PROFILE_ID = "yanyi_vol2_six_instrument_scope_v1"
 # head: (concealed instrument, punished branch, Wang Zhang's named palace)
 PUNISHMENT_BY_HEAD = {
@@ -28,7 +26,6 @@ def describe_punishment() -> dict[str, Any]:
     return {
         "id": PROFILE_ID,
         "title": "六仪落所刑宫广义暂定；并列本时直符候选",
-        "source": SOURCE,
         "section": "卷二·六仪击刑·葛洪定义及王璋列宫",
         "scan_pages": [33, 34],
         "scope": "all_six_instruments_geometry_provisional",
@@ -41,8 +38,8 @@ def describe_punishment() -> dict[str, Any]:
             }
             for head, (stem, branch, gua) in PUNISHMENT_BY_HEAD.items()
         ],
-        "other_instrument_geometry": "legacy_broad_matches_retained_provisionally",
-        "selection_policy": "retain_legacy_broad_rule_pending_scope_adjudication_not_selected_by_outcome",
+        "other_instrument_geometry": "broad_matches_retained_provisionally",
+        "selection_policy": "retain_broad_rule_pending_scope_adjudication_not_selected_by_outcome",
         "unresolved_example": {
             "id": "vol2-yang1-mao-punishment-scope",
             "source_branch": "卯",
@@ -101,7 +98,6 @@ def palace_punishment(
         ],
         "other_instrument_geometry_is_formal_match": True,
         "scope": "all_six_instruments_geometry_provisional",
-        "source": SOURCE,
         "source_scan_pages": [33, 34],
         "whole_section_reconciled": False,
         "interpretation_limit": "暂定保留广义六仪落刑宫匹配，并列本时直符窄读。正文未明写仅本旬，卯时印例区分两种读法；范围未定，不认证任一读法为全书原法，不据击刑断现实灾祸。",

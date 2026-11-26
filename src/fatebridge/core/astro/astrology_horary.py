@@ -529,7 +529,6 @@ def build_horary_payload(
             "rule_id": "horary_lilly_consideration_review_v9",
             "sign_relationship_policy": LILLY_SIGN_RAYS_METHOD,
             "source_edition": "William Lilly, Christian Astrology, London 1647",
-            "source_url": "https://wellcomecollection.org/works/s7z7c46y",
             "chapter_pages": [
                 33,
                 48,

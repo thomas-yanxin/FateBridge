@@ -7,11 +7,8 @@ Source differentiation is not physical ephemeris or TT/TDB qualification.
 from __future__ import annotations
 
 import math
-from typing import Any, Dict
+from typing import Any
 
-from fatebridge.core.astro.continuous_lahiri import (
-    COEFFICIENT_SHA256,
-)
 from fatebridge.core.astro.continuous_lahiri import METHOD_ID as FRAME_METHOD_ID
 from fatebridge.core.astro.continuous_lahiri import (
     decode_native_fixed_reception_state,
@@ -29,15 +26,14 @@ SOURCE_STATE_METHOD_ID = "continuous_lahiri_lunar_source_state_v1"
 
 
 def source_derivative_state_evidence(
-    julian_day_tt: float, continuous: Dict[str, Any], source: Dict[str, Any]
-) -> Dict[str, Any]:
+    julian_day_tt: float, continuous: dict[str, Any], source: dict[str, Any]
+) -> dict[str, Any]:
     """Reframe qualified source vectors, preserving the earlier native state."""
     if isinstance(julian_day_tt, bool) or not math.isfinite(julian_day_tt):
         raise EphemerisSourceError("coordinate_values_unavailable")
     policy = {
         "model_id": SOURCE_STATE_METHOD_ID,
         "frame_model_id": FRAME_METHOD_ID,
-        "coefficient_sha256": COEFFICIENT_SHA256,
         "epoch_jd_tt": julian_day_tt,
         "source_method_id": METHOD_ID,
         "position_basis": "declared_lunar_source_formula_in_held_reception_frame",
@@ -68,7 +64,6 @@ def source_derivative_state_evidence(
     if (
         continuous.get("status") != "partial"
         or continuous.get("model_id") != FRAME_METHOD_ID
-        or continuous.get("coefficient_sha256") != COEFFICIENT_SHA256
         or (continuous.get("native_version"), continuous.get("binding_version"))
         != SOURCE_VERSION
         or continuous.get("epoch_jd_tt") != julian_day_tt

@@ -13,7 +13,6 @@ class BreakPairWitness(PartialOutput):
     id: str | None = None
     title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     source_bytes: StrictInt | None = None
     source_pdf_pages: StrictInt | None = None
     reviewed_pdf_pages: list[StrictInt] | None = None

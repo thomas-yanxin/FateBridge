@@ -121,7 +121,7 @@ class _DeferredModel(BaseModel):
 
 
 class AstroHouseValidatorMixin:
-    """Mixin for request models that accept ``house_system`` or numeric ``hsys``."""
+    """Mixin for request models that accept house_system or numeric hsys."""
 
     @field_validator("house_system", mode="before", check_fields=False)
     @classmethod

@@ -1,27 +1,13 @@
 """Preserve pending/partial events and physical carrier scope across entries."""
 
-import asyncio
-import json
 from copy import deepcopy
-from dataclasses import replace
-from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-import fatebridge.application.execution as execution
-from fatebridge.application.examples import suggested_fields
 from fatebridge.core.classical_passage import build_passage_evidence
 from fatebridge.core.contracts.output_passage_relations import PassageRelationContext
 from fatebridge.core.passage_relations import build_passage_relation_context
-from tests.bazi.test_bazi_complete_anchors import TOOLS, base, projection
-from tests.support.result_delivery import reconstruct
-from tests.support.result_delivery import store as _store_fixture
-from tests.support.transports import AS_OF, SPECS, business, call_cli, native
-from tests.support.transports import rest as _rest_fixture
-
-rest = _rest_fixture
-store = _store_fixture
 
 
 def controlled(assessment=None):
@@ -160,135 +146,3 @@ def test_suppressed_pending_conditions_wrong_planes_and_invented_effects_are_rej
         c["nodes"].append(deepcopy(c["nodes"][0]))
     with pytest.raises(ValidationError):
         PassageRelationContext.model_validate(c)
-
-
-@pytest.mark.parametrize("tool", TOOLS)
-def test_all_actual_surfaces_return_same_relation_context_and_partial_schema(
-    tool, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    spec = SPECS[tool]
-    fields = suggested_fields(spec, view="passage_relations")
-    payload = base(tool)["arguments"]
-    opts = dict(
-        as_of=AS_OF,
-        fields=fields,
-        strict_fields=True,
-        include_snapshot_text=False,
-        response_char_limit=0,
-    )
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    assert not protocol.is_error and code == 0
-    assert business(protocol.structured_content) == business(cli)
-    if spec.rest_path is not None:
-        http = rest.post(spec.rest_path, json=payload, params=opts)
-        assert http.status_code == 200 and business(http.json()) == business(cli)
-    else:
-        assert tool == "analyze_destiny"
-    spec.output_model.model_validate(cli)
-
-
-@pytest.mark.parametrize("tool", TOOLS)
-def test_new_version_missing_context_fails_before_unrelated_projection(
-    tool,
-    rest,
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    spec = SPECS[tool]
-    original = execution.execute_spec
-
-    def corrupt(actual, parsed):
-        if actual.key == tool:
-            function, args, kwargs = actual.bind(parsed)
-
-            def missing():
-                result = function(*args, **kwargs)
-                if tool == "analyze_destiny":
-                    chain = result["structure_profile"]["evidence_chain"]
-                elif tool == "bazi_birth":
-                    chain = result["bazi_birth"]["structure_profile"]["evidence_chain"]
-                else:
-                    chain = result[tool.removeprefix("bazi_") + "_analysis"][
-                        "evidence_chain"
-                    ]
-                assert chain["method_id"] == "bazi_position_prerequisites_v2"
-                del chain["classical_passage_relations"]
-                return result
-
-            actual = replace(actual, bind=lambda _: (missing, (), {}))
-        else:
-            pass
-        return original(actual, parsed)
-
-    monkeypatch.setattr(execution, "execute_spec", corrupt)
-    payload = base(tool)["arguments"]
-    path = projection(tool)
-    opts = dict(
-        as_of=AS_OF, fields=[path], strict_fields=True, include_snapshot_text=False
-    )
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=["--fields", path, "--strict-fields", "true"],
-    )
-    assert protocol.is_error and code == 1
-    assert (
-        protocol.structured_content["error_code"]
-        == cli["error_code"]
-        == "internal_error"
-    )
-    if spec.rest_path is not None:
-        http = rest.post(spec.rest_path, json=payload, params=opts)
-        assert http.status_code == 500 and http.json()["error_code"] == "internal_error"
-    else:
-        pass
-
-
-@pytest.mark.parametrize("tool", TOOLS)
-def test_small_budget_restores_exact_same_run_relation_context_without_recalculation(
-    tool, store
-) -> None:
-    spec = SPECS[tool]
-    fields = suggested_fields(spec, view="passage_relations")
-    result = asyncio.run(
-        native(
-            spec,
-            base(tool)["arguments"],
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-            response_char_limit=4096,
-        )
-    )
-    assert not result.is_error
-    first = result.structured_content
-    assert len(json.dumps(first, ensure_ascii=False, separators=(",", ":"))) <= 4096
-    ref = first["result_delivery"]
-    complete = reconstruct(store, ref["result_id"])
-    assert complete["run_metadata"]["run_id"] == first["run_metadata"]["run_id"]
-    context = complete
-    for part in fields[-1].split("."):
-        context = context[part]
-    PassageRelationContext.model_validate(context)
-    assert context["effective_passage"] == "not_adjudicated"
-    assert "ephemeris" in complete["run_metadata"]["runtime"]

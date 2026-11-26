@@ -30,7 +30,7 @@ def preserve_operator_ephemeris_configuration():
 def profile(tmp_path, monkeypatch):
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
     monkeypatch.delenv("SE_EPHE_PATH", raising=False)
-    monkeypatch.setattr(ephemeris_runtime, "_PROJECT_ROOT", tmp_path / "checkout")
+    monkeypatch.setattr(ephemeris_runtime, "PROJECT_ROOT", tmp_path / "checkout")
     payloads = {
         name: b"SW-test-human-design-" + name.encode()
         for name in install.HUMAN_DESIGN_FILES

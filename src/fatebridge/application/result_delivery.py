@@ -1,6 +1,5 @@
 """Retain a single immutable JSON artifact when the selected response overflows."""
 
-import hashlib
 import json
 import math
 import os
@@ -43,7 +42,6 @@ def invalid_parameter(message: str, path: str, code: str) -> ParameterError:
 class RetainedResult:
     path: Path
     payload_text: str | None
-    payload_digest: str
     payload: dict[str, JsonValue]
 
 
@@ -133,12 +131,10 @@ class ResultStore:
         if not isinstance(record, dict):
             raise invalid_parameter("结果引用已损坏", "result_id", "result_unavailable")
         expires_at = record.get("expires_at")
-        payload_digest = record.get("sha256")
         payload = record.get("payload")
         if (
             not isinstance(expires_at, (int, float))
             or not math.isfinite(expires_at)
-            or not isinstance(payload_digest, str)
             or not isinstance(payload, dict)
         ):
             raise invalid_parameter("结果引用已损坏", "result_id", "result_unavailable")
@@ -151,18 +147,14 @@ class ResultStore:
             tool_name = receipt.get("tool_name") if isinstance(receipt, dict) else None
             if not isinstance(tool_name, str) or tool_name not in allowed_tools:
                 raise ValueError("结果所属工具未在当前 MCP 配置中公开")
-        prefix = format_json_response(
-            {"expires_at": expires_at, "sha256": payload_digest}
-        )[:-1]
+        prefix = format_json_response({"expires_at": expires_at})[:-1]
         prefix += PAYLOAD_MEMBER
         text = (
             raw[len(prefix) : -1]
             if raw.startswith(prefix) and raw.endswith("}")
             else None
         )
-        return RetainedResult(
-            path=path, payload_text=text, payload_digest=payload_digest, payload=payload
-        )
+        return RetainedResult(path=path, payload_text=text, payload=payload)
 
     def put(self, payload: dict[str, JsonValue]) -> dict[str, JsonValue]:
         payload = public_payload(payload)
@@ -187,12 +179,9 @@ class ResultStore:
         )
 
     def _publish(self, reference: ResultReference, body: bytes) -> None:
-        header = format_json_response(
-            {
-                "expires_at": reference.expires_at,
-                "sha256": hashlib.sha256(body).hexdigest(),
-            }
-        ).encode("utf-8")
+        header = format_json_response({"expires_at": reference.expires_at}).encode(
+            "utf-8"
+        )
         record = header[:-1] + PAYLOAD_MEMBER.encode("ascii") + body + b"}"
         if len(record) > MAX_STORED_BYTES:
             raise invalid_parameter(
@@ -308,16 +297,6 @@ class ResultStore:
             raise invalid_parameter(
                 "需要原回执的 run_id", "expected_run_id", "invalid_run_id"
             )
-        if verify_integrity or expected_run_id is not None:
-            if text is None:
-                text = format_json_response(payload)
-            if (
-                hashlib.sha256(text.encode("utf-8")).hexdigest()
-                != retained_result.payload_digest
-            ):
-                raise invalid_parameter(
-                    "原结果完整性核验失败", "result_id", "result_digest_mismatch"
-                )
         if expected_run_id is not None:
             run = payload.get("run_metadata") or {}
             if not isinstance(run, dict) or run.get("run_id") != expected_run_id:

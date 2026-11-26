@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import (
@@ -49,7 +49,7 @@ def _swisseph_angles(
     latitude: float,
     *,
     julian_day_tt: float | TTInstant | None = None,
-) -> Optional[Dict[str, Any]]:
+) -> dict[str, Any] | None:
     if runtime.swe is None:
         return None
     try:
@@ -83,7 +83,7 @@ def _swisseph_angles(
             longitude=longitude,
             armc=float(ascmc[2]),
         )
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "ascendant": normalize_angle(float(ascmc[0])),
         "midheaven": normalize_angle(float(ascmc[1])),
     }
@@ -94,7 +94,7 @@ def _swisseph_angles(
     return result
 
 
-def _planet_set(chart_variant: str) -> List[str]:
+def _planet_set(chart_variant: str) -> list[str]:
     if chart_variant in {"hellen_chart", "guolao_chart"}:
         return list(TRADITIONAL_PLANETS)
     return list(PLANET_SEQUENCE)
@@ -102,14 +102,14 @@ def _planet_set(chart_variant: str) -> List[str]:
 
 def _swisseph_planet_state(
     planet: str,
-    julian_day: Optional[float] = None,
+    julian_day: float | None = None,
     *,
     julian_day_tt: float | TTInstant | None = None,
-    source_trace: Optional[PhysicalEphemerisTrace] = None,
-    motion_metadata: Optional[Dict[str, Any]] = None,
+    source_trace: PhysicalEphemerisTrace | None = None,
+    motion_metadata: dict[str, Any] | None = None,
     correct_motion: bool = True,
     include_declination: bool = True,
-) -> Optional[Tuple[Dict[str, float], str]]:
+) -> tuple[dict[str, float], str] | None:
     """One coherent physical state, with optional shared batch file tracing.
 
     Explicit TT needs no Earth-rotation epoch. The default includes
@@ -260,11 +260,11 @@ def _swisseph_planet_state(
 
 @dataclass(frozen=True)
 class PlanetStateBatch:
-    states: Dict[str, Dict[str, float]]
+    states: dict[str, dict[str, float]]
     precision: str
     backend: str
     physical_model: str
-    models: Dict[str, str]
+    models: dict[str, str]
     fallback: ApproximateEphemeris | None
 
 
@@ -273,8 +273,8 @@ def _build_planet_states(
     julian_day: float,
     *,
     julian_day_tt: float | TTInstant | None = None,
-    source_trace: Optional[PhysicalEphemerisTrace] = None,
-    motion_metadata: Optional[Dict[str, Any]] = None,
+    source_trace: PhysicalEphemerisTrace | None = None,
+    motion_metadata: dict[str, Any] | None = None,
 ) -> PlanetStateBatch:
     """Build one batch; a caller-supplied trace keeps its outer endpoint owner."""
     if configured_jpl_file() is not None and runtime.swe is None:
@@ -282,8 +282,8 @@ def _build_planet_states(
             "Swiss Ephemeris is required for explicitly selected JPL mode"
         )
     planet_names = _planet_set(chart_variant)
-    ephemeris_states: Dict[str, Dict[str, float]] = {}
-    models: Dict[str, str] = {}
+    ephemeris_states: dict[str, dict[str, float]] = {}
+    models: dict[str, str] = {}
     native_count = 0
     fallback = None
     trace = source_trace if source_trace is not None else PhysicalEphemerisTrace()

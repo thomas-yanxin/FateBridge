@@ -3,45 +3,32 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
 from fatebridge.core.sukuyo.sukuyo_calendar_text import (
     source_bundle as day_source_bundle,
 )
-from fatebridge.core.sukuyo.sukuyo_calendar_text import (
-    source_digest as day_source_digest,
-)
-from fatebridge.core.sukuyo.sukuyo_clothing import SOURCE as CLOTHING_SOURCE
 from fatebridge.core.sukuyo.sukuyo_clothing import (
     source_bundle as clothing_source_bundle,
 )
 from fatebridge.core.sukuyo.sukuyo_directions import (
     source_bundle as direction_source_bundle,
 )
-from fatebridge.core.sukuyo.sukuyo_directions import (
-    source_digest as direction_source_digest,
-)
 from fatebridge.core.sukuyo.sukuyo_documentary import with_text_layers
 from fatebridge.core.sukuyo.sukuyo_lower import (
     activity_detail_closure,
 )
 from fatebridge.core.sukuyo.sukuyo_lower import source_bundle as lower_source_bundle
-from fatebridge.core.sukuyo.sukuyo_lower import source_digest as lower_source_digest
 from fatebridge.core.sukuyo.sukuyo_lower import validate_activity_details
-from fatebridge.core.sukuyo.sukuyo_lower_methods import SOURCE as METHOD_SOURCE
 from fatebridge.core.sukuyo.sukuyo_lower_methods import (
     source_bundle as method_source_bundle,
 )
-from fatebridge.core.sukuyo.sukuyo_sanjiu_days import SOURCE as SANJIU_SOURCE
 from fatebridge.core.sukuyo.sukuyo_sanjiu_days import (
     source_bundle as sanjiu_source_bundle,
 )
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
 from fatebridge.core.sukuyo.sukuyo_special_days import (
     source_bundle as special_source_bundle,
-)
-from fatebridge.core.sukuyo.sukuyo_special_days import (
-    source_digest as special_source_digest,
 )
 
 ACTIVITIES = (
@@ -57,14 +44,14 @@ SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_t1299_activities.jso
 
 
 def source_bundle() -> dict[str, Any]:
-    return load_source(SOURCE).data
+    return load_source(SOURCE)
 
 
 def assess_activity(
     day: dict[str, Any],
-    activity: Optional[str],
-    activity_details: Optional[Sequence[str]] = None,
-) -> Optional[dict[str, Any]]:
+    activity: str | None,
+    activity_details: Sequence[str] | None = None,
+) -> dict[str, Any] | None:
     validate_activity_details(
         activity, activity_details if activity_details is not None else []
     )
@@ -267,13 +254,6 @@ def assess_activity(
             ),
         ],
         "ruleset_id": bundle["id"],
-        "source_bundle_sha256": load_source(SOURCE).sha256,
-        "named_day_source_bundle_sha256": day_source_digest(),
-        "lower_mansion_source_bundle_sha256": lower_source_digest(),
-        "lower_methods_source_bundle_sha256": load_source(METHOD_SOURCE).sha256,
-        "travel_direction_source_bundle_sha256": direction_source_digest(),
-        "special_day_source_bundle_sha256": special_source_digest(),
-        "sanjiu_day_source_bundle_sha256": load_source(SANJIU_SOURCE).sha256,
         "unresolved_source_rules_present": any(
             r.get("requires_textual_review") for r in conditional
         ),
@@ -286,11 +266,6 @@ def assess_activity(
             sanjiu_source_bundle()["id"],
             *([clothing_source_bundle()["id"]] if activity == "clothing" else []),
         ],
-        **(
-            {"clothing_source_bundle_sha256": load_source(CLOTHING_SOURCE).sha256}
-            if activity == "clothing"
-            else {}
-        ),
         "time_evaluation_status": day["calendar_day"]["clock_evaluation_status"],
         "aggregation": "No weights, score, majority vote or tie breaking; preserve every matched clause.",
         "scope": "文献事项证据；未列事项不等于禁忌，冲突不改成综合吉日；conditional_rules为缺适用细节或文本读法未校定的条件文，不代入汇总；昼夜例外另见calendar_day，未完成钟时判定，不能当作全天适宜；不代表现实结果或行动许可。",

@@ -10,12 +10,6 @@ from typing import Any
 
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.jinkou import build_jinkou_board
-from fatebridge.core.metaphysics.ren_sources import (
-    JINKOU_RELATIONS_SCAN_SHA256 as SOURCE_SHA256,
-)
-from fatebridge.core.metaphysics.ren_sources import (
-    JINKOU_RELATIONS_SOURCE as SOURCE_URL,
-)
 from fatebridge.utils.birth_input import normalize_gender
 
 CYCLE = tuple(
@@ -95,8 +89,6 @@ def ordinal_year_fate(
         age_boundary_classically_verified=False,
         birth_year_calendar_boundary_verified=False,
         comprehensive_year_fate_adjudicated=False,
-        source_url=SOURCE_URL,
-        source_sha256=SOURCE_SHA256,
         source_section="推行年法 / 論人行年吉凶",
         original_pdf_pages=[170, 171, 172, 173],
         relation_adjudication="unresolved_course_stem_reference",

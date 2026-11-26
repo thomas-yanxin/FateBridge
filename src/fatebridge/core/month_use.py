@@ -3,7 +3,6 @@
 from copy import deepcopy
 from typing import Literal, Mapping, Sequence, TypedDict
 
-from fatebridge.core.source_identity import ZIPING_ZHENQUAN_NLC_SCAN_URL
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
     BRANCH_TRIPLE_COMBINATIONS,
@@ -46,8 +45,6 @@ class MonthUseSource(TypedDict):
     author: str
     title: str
     edition: str
-    url: str
-    source_sha256: str
     claims: dict[str, MonthUseClaim]
 
 
@@ -55,11 +52,7 @@ SOURCE: MonthUseSource = {
     "id": "ziping_month_use_text_v1",
     "author": "沈孝瞻（所选著录）",
     "title": "秘本子平真诠·杂气及既有有限月令取用",
-    "edition": ("国家图书馆藏NLC416-11jh010455-35296，上海世界图书馆发行"),
-    "url": (ZIPING_ZHENQUAN_NLC_SCAN_URL),
-    "source_sha256": (
-        "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620"
-    ),
+    "edition": "国家图书馆藏NLC416-11jh010455-35296，上海世界图书馆发行",
     "claims": {
         "Q03": {
             "pdf_pages": [41],
@@ -84,7 +77,7 @@ SOURCE: MonthUseSource = {
     },
 }
 
-_CHEN_REN_CLAIMS: dict[str, MonthUseClaim] = {
+CHEN_REN_CLAIMS: dict[str, MonthUseClaim] = {
     "甲": {
         "pdf_pages": [42, 43, 44],
         "text": "论杂气与论墓库刑冲均列甲日辰月明壬为印。",
@@ -159,8 +152,8 @@ def build_month_use_resolution(
         revelations: list[tuple[str, MonthUseClaim | None]] = [
             (stem, None) for stem in BRANCH_HIDDEN_STEMS[month]
         ]
-        if month == "辰" and day in _CHEN_REN_CLAIMS:
-            revelations.append(("壬", _CHEN_REN_CLAIMS[day]))
+        if month == "辰" and day in CHEN_REN_CLAIMS:
+            revelations.append(("壬", CHEN_REN_CLAIMS[day]))
         for stem, store_claim in revelations:
             positions = [p for p in ("year", "month", "hour") if pillars[p][0] == stem]
             if not positions:

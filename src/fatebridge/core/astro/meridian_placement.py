@@ -18,8 +18,6 @@ SOURCE = {
     "id": "witte1924_meridian_houses",
     "author": "Alfred Witte",
     "title": "Die Haeuser des Geburtsmeridians, Astrologische Blaetter6, May1924, pp55-60",
-    "url": "https://www.astrax.de/pdf/38_Die%20Haeuser%20des%20Geburtsmeridians_1924_AstrBlaetter_55-60.pdf",
-    "source_sha256": "eaa50014a2ded967292e352dd8cde0faf3c13ce9ddf280868c681b0f8411095b",
     "sections": [
         "p.56: equatorial divisions",
         "p.58: RA relation",

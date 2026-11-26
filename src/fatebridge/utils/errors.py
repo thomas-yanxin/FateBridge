@@ -12,7 +12,7 @@ from pydantic import BaseModel, ValidationError
 from pydantic_core import ErrorDetails, PydanticCustomError
 
 logger = logging.getLogger(__name__)
-_P = ParamSpec("_P")
+P = ParamSpec("P")
 
 DEPENDENCY_ERROR_CODE = "dependency_missing"
 INTERNAL_ERROR_CODE = "internal_error"
@@ -473,14 +473,14 @@ def handle_calculation_error(error: Exception, operation: str) -> dict[str, Any]
 
 def calculation_guard(
     operation: str,
-) -> Callable[[Callable[_P, dict[str, Any]]], Callable[_P, dict[str, Any]]]:
+) -> Callable[[Callable[P, dict[str, Any]]], Callable[P, dict[str, Any]]]:
     """Return the shared error envelope for direct service callers."""
 
     def decorator(
-        func: Callable[_P, dict[str, Any]],
-    ) -> Callable[_P, dict[str, Any]]:
+        func: Callable[P, dict[str, Any]],
+    ) -> Callable[P, dict[str, Any]]:
         @wraps(func)
-        def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> dict[str, Any]:
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> dict[str, Any]:
             try:
                 return func(*args, **kwargs)
             except (

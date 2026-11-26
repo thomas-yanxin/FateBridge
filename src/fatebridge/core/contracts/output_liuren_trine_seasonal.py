@@ -16,10 +16,8 @@ from fatebridge.core.metaphysics.liureng_trine_seasonal import (
 class LiurenNominalTrineSeasonal(PartialOutput):
     method_id: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[int] | None = None
     corroborating_source_url: str | None = None
-    corroborating_source_sha256: str | None = None
     corroborating_pdf_pages: list[int] | None = None
     month_partition_profile: str | None = None
     month_branch: (

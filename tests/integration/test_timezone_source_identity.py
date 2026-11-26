@@ -45,9 +45,9 @@ def test_same_bytes_determine_rules_and_provenance(source) -> None:
     at = datetime(1980, 7, 1, 12, tzinfo=zone)
     assert at.astimezone(timezone.utc).isoformat() == "1980-07-01T16:00:00+00:00"
     metadata = timezones.timezone_rules_metadata(ZONE)
-    assert metadata["tzif_sha256"] == hashlib.sha256(source["ny"]).hexdigest()
-    metadata["tzif_sha256"] = "caller-mutated"
-    assert timezones.timezone_rules_metadata(ZONE)["tzif_sha256"] != "caller-mutated"
+    assert metadata["iana_version"] == timezones.pytz.OLSON_VERSION
+    metadata["iana_version"] = "caller-mutated"
+    assert timezones.timezone_rules_metadata(ZONE)["iana_version"] != "caller-mutated"
     assert timezones.parse_timezone_name(ZONE) is zone
 
 

@@ -12,7 +12,7 @@ sys.path[:0] = [str(root / "src"), str(root)]
 
 from fatebridge.core.astro import native_execution  # noqa: E402
 
-native_execution._WORKER_ACTIVE = True
+native_execution.WORKER_ACTIVE = True
 
 import pytest  # noqa: E402
 

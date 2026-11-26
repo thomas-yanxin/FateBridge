@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.surface_inputs import PLANT_REPRESENTATIONS, SurfaceItem
@@ -13,12 +13,12 @@ from fatebridge.core.fengshui.surface_inputs import PLANT_REPRESENTATIONS, Surfa
 @lru_cache(maxsize=1)
 def _data() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data/fengshui/desktop-bagua-v1.json"
-    return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
 def surface_provenance() -> dict[str, Any]:
     data = _data()
-    rule = cast(Dict[str, Any], deepcopy(data["ruleset"]))
+    rule = cast(dict[str, Any], deepcopy(data["ruleset"]))
     rule["sources"] = [
         {"source_id": key, **deepcopy(data["sources"][key])}
         for key in rule["source_ids"]

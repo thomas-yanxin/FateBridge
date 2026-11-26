@@ -21,8 +21,7 @@ def month_header_reference(
 ) -> dict[str, Any] | None:
     if year not in (1345, 1346, 1347):
         return None
-    record = load_source(SOURCE)
-    bundle = record.data
+    bundle = load_source(SOURCE)
     row = next(
         (
             r
@@ -36,11 +35,6 @@ def month_header_reference(
     return {
         "id": bundle["id"],
         "source_url": bundle["source_url"],
-        "publisher_pdf_sha256": bundle["publisher_pdf_sha256"],
-        "source_bundle_sha256": record.sha256,
-        "pre_comparison_transcription_sha256": bundle[
-            "pre_comparison_transcription_sha256"
-        ],
         "authors": deepcopy(bundle["authors"]),
         "title": bundle["title"],
         "publication": bundle["publication"],

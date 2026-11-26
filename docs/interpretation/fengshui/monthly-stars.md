@@ -21,7 +21,7 @@
 
 ## 来源与差异
 
-- MP1：《沈氏玄空学》玄空辑要，沈竹礽编、王则先辑要，姚国华与柯誉整理；中央编译出版社2011年版、2016年重印，ISBN978-7-5117-0801-4。完整PDF的SHA-256固定，PDF731三组年支的36个入中数逐项核对，原表图像与独立转录一并保留。
+- MP1：《沈氏玄空学》玄空辑要，沈竹礽编、王则先辑要，姚国华与柯誉整理；中央编译出版社 2011 年版、2016 年重印，ISBN 978-7-5117-0801-4（核对三组年支的 36 个入中数）。
 - MP2：[Sean Chan署名网页](https://www.masterseanchan.com/fengshui-2026-flying-star-chart/)，2026-09-24更新、2026-10-22读取；核对节瞬间换月、立春前归前一有效年及2026年十二张月盘，不采用其中事件与处方断语。
 - MP3：[香港天文台节气时刻表](https://www.hko.gov.hk/en/gts/astronomy/Solar_Term.htm)，只核对冻结年份的节气与公布分钟，不证明风水规则或任意年份秒精度。
 
@@ -31,11 +31,9 @@ MP1的六月节候栏原印“大暑、小暑”，与标准时间顺序相反�
 
 读取 `layers.monthly_stars`，保留 `rulesets/rule_trace`。`center_star_number` 和 `palaces.*.monthly_star_number` 是本节月飞星，`palace_number` 是固定宫数。月星名称和五行共享固定数的身份，不继承基础年星表中的通用吉凶标签。
 
-`position_reading@1.0.0` 包含一条年／月／有效期说明和九条逐宫固定文本。每条有精确 `target_path`、完整时间与来源的 `basis_paths/basis`；只消费同次返回值，不重算月份或星盘。资料缺失或交节待确认时，仅说明缺项／候选，不给唯一月盘。完整原始响应与从执行端另外保管的完整回执，可交给 `validation.fengshui_monthly.verify_monthly_reading` 核验。通过须先满足月表数字、逐宫数式和区间上下文的内部一致性，再核对固定文本与原run；不表示历法独立精度、自由模型改写或现实预测通过。
+`position_reading@1.0.0` 包含一条年／月／有效期说明和九条逐宫固定文本。每条有精确 `target_path`、完整时间与来源的 `basis_paths/basis`；只消费同次返回值，不重算月份或星盘。资料缺失或交节待确认时，仅说明缺项／候选，不给唯一月盘。
 
 布局只按物件已确认的**位置**读取月星；朝向不能替代位置。`usage_interpretation=not_covered_not_inauspicious` 表示本版没有月星用途与行动规则，不判该宫不利，不生成搬动、摆水、施工或物件处方。候选方案在各自新位置重新读取同一时间月盘，不能沿用旧位置星数。
-
-`derived_monthly_numeric_consistency_verified`只给实际完整月盘；内部矛盾停止交付。保存的旧错误回执、新独立检查及完整公开年份分支验收见[月盘数式与历法消费端](../../fengshui.md)。候选保护通过仍不能抵消Moshier的数值超差，也不认证额外自由文字或现实效果。
 
 ## 调用
 
@@ -44,16 +42,6 @@ uv run --locked --extra dev fatebridge fengshui_monthly_stars \
   --query-at '2027-01-10T12:00:00+08:00' --timezone-name Asia/Shanghai
 ```
 
-REST为 `POST /api/fengshui/monthly-stars`，请求体可用 `{"effective_solar_year":2026,"solar_month_number":12}`。MCP名称为 `fengshui_monthly_stars`，参数以当前工具Schema为准。完整原始响应按初次请求范围读取同run交付，不能重算旧输入来替代原始回执。
+REST 为 `POST /api/fengshui/monthly-stars`，请求体可用 `{"effective_solar_year":2026,"solar_month_number":12}`。MCP 名称为 `fengshui_monthly_stars`，参数以当前工具 Schema 为准。完整原始响应按初次请求范围读取同 run 交付，不能重算旧输入来替代原始回执。
 
-三端比较须使用同一星历配置。由客户端启动stdio MCP子进程时，自定义 `SE_EPHE_PATH` 应显式写入该服务器的 `env`；标准MCP客户端只继承有限环境变量，不能假定它会转发宿主的自定义星历路径。核对实际返回的 `ephemeris_model` 和文件回执：Moshier与完整Swiss配置可能给出不同交节时刻，工具同名本身不证明后端一致。
-
-完整TT实现对照可离线复核：
-
-```bash
-uv run --locked --extra dev python -m scripts.fengshui.audit_fengshui_monthly_calendar \
-  --reference tests/data/fengshui_monthly_v1/jie-de440-tt.json.gz \
-  --output /tmp/fengshui-monthly-tt-audit.json
-```
-
-该命令按实际选中的星历配置运行；Moshier失败仍非零退出。参考文件散列、全部4,812行和固定一秒门槛均核对，不能删失败年份、替换参考数据或加宽门槛取得通过。参考由独立环境中的收集脚本生成，不导入FateBridge；内核与工具版本固定，不包含于运行wheel。
+三端比较须使用同一星历配置。由客户端启动 stdio MCP 子进程时，自定义 `SE_EPHE_PATH` 应显式写入该服务器的 `env`，并核对实际返回的 `ephemeris_model` 与文件回执。

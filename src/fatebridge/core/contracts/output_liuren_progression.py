@@ -17,7 +17,6 @@ class LiurenProgression(PartialOutput):
     ruleset_id: Literal["tanyuan_transmission_progression_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[StrictInt] | None = None
     day_ganzhi: str | None = None
     branches: list[Branch] | None = None

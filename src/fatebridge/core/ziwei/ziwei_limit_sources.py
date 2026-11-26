@@ -5,13 +5,13 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 
 @lru_cache(maxsize=1)
-def _source() -> Dict[str, Any]:
+def _source() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             files("fatebridge")
             .joinpath("data/classical/ziwei-naj-ming-limits.json")
@@ -21,15 +21,15 @@ def _source() -> Dict[str, Any]:
 
 
 def limit_source_evidence(
-    chart: Dict[str, Any],
-    scopes: List[Dict[str, Any]],
+    chart: dict[str, Any],
+    scopes: list[dict[str, Any]],
     *,
     nominal_age: int,
     gender: str,
     natal_year_branch: str,
     target_year_branch: str,
     actual_doujun_branch: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Show literal start differences and the adopted year-only fire reading.
 
     Age ordinals/bureau age are conditional inputs; no claim of a uniquely

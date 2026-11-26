@@ -39,7 +39,6 @@ class RelativeSourceTiming(PartialOutput):
 
 class SourcePageAnchor(PartialOutput):
     pdf_page: int | None = Field(default=None, ge=1)
-    image_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
 
     @field_validator("pdf_page", mode="before")
     @classmethod
@@ -51,7 +50,6 @@ class SourcePageAnchor(PartialOutput):
 
 class SourceConditionProvenance(PartialOutput):
     method_id: Literal["registered_source_conditions_v1"] | None = None
-    condition_layer_sha256: str | None = None
 
 
 class SourceConditionReview(PartialOutput):
@@ -80,7 +78,6 @@ class SourceConditionReview(PartialOutput):
         ]
         | None
     ) = None
-    source_pdf_sha256: str | None = None
     source_pdf_url: str | None = None
     source_page_anchors: list[SourcePageAnchor] | None = None
     reading_excerpt: str | None = None

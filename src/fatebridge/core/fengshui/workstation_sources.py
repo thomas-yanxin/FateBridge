@@ -4,13 +4,13 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 
 @lru_cache(maxsize=1)
 def bundle() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             (
                 Path(__file__).parents[2] / "data/fengshui/workstation-authored-v1.json"
@@ -26,11 +26,11 @@ def provenance(key: str) -> dict[str, Any]:
         dict(source_id=s, **deepcopy(data["sources"][s])) for s in record["source_ids"]
     ]
     record["bundle_version"] = data["bundle_version"]
-    return cast(Dict[str, Any], record)
+    return cast(dict[str, Any], record)
 
 
 def disagreement(key: str) -> dict[str, Any]:
-    return cast(Dict[str, Any], deepcopy(bundle()["disagreements"][key]))
+    return cast(dict[str, Any], deepcopy(bundle()["disagreements"][key]))
 
 
 def desktop_reference() -> dict[str, Any]:
@@ -39,4 +39,4 @@ def desktop_reference() -> dict[str, Any]:
         dict(source_id=s, **deepcopy(bundle()["sources"][s]))
         for s in result["source_ids"]
     ]
-    return cast(Dict[str, Any], result)
+    return cast(dict[str, Any], result)

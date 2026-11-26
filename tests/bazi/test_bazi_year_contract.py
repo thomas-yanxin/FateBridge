@@ -115,7 +115,7 @@ def test_invalid_year_is_rejected_before_computation_on_three_surfaces(
     ]
     protocol = asyncio.run(native(spec, args))
     assert protocol.is_error
-    assert "birth_year" in str(protocol.content)
+    assert protocol.structured_content["issues"] == envelope["issues"]
     code, result = call_cli(spec, args, tmp_path, capsys)
     assert code != 0
     assert result["issues"] == envelope["issues"]

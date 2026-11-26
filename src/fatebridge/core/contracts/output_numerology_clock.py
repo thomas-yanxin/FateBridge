@@ -31,8 +31,6 @@ class NumerologyRuleset(PartialOutput):
     source_url: str | None = None
     source_status: str | None = None
     authorship_status: str | None = None
-    source_pdf_sha256: str | None = None
-    source_content_sha256: str | None = None
 
 
 class NumerologyValidation(PartialOutput):
@@ -149,7 +147,7 @@ class NumerologyBirthClock(PartialOutput):
 
         Revalidating a stored receipt against today's IANA rules would change
         its historical meaning. Compare its recorded offsets and UTC instant;
-        the separately recorded TZif digest identifies the rules used then.
+        the separately recorded TZif rules identify the rules used then.
         """
 
         offsets = [
@@ -196,9 +194,7 @@ class NumerologyBirthClock(PartialOutput):
 class HeluoNajiaCollation(PartialOutput):
     ruleset_id: str | None = None
     version: str | None = None
-    sha256: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     review_status: str | None = None
     pure_trigram_tables: int | None = Field(default=None, ge=0, le=8)
     pure_table_assignment_slots: int | None = Field(default=None, ge=0, le=48)
@@ -306,11 +302,9 @@ class NumerologyPillarLinks(PartialOutput):
     version: str | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     review_status: str | None = None
     authorship_status: str | None = None
-    collation_sha256: str | None = None
     pillars: dict[str, str] | None = None
     links: list[NumerologyPillarLink] | None = None
     all_links_match: bool | None = None
@@ -357,7 +351,6 @@ class NumerologyPillarLinks(PartialOutput):
 
 class NumerologyEvidence(PartialOutput):
     rulesets: list[NumerologyRuleset] | None = None
-    corpus_sha256: str | None = None
     corpus_status: str | None = None
     najia_collation: HeluoNajiaCollation | None = None
     yaoci_collation: dict[str, JsonValue] | None = None

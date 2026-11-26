@@ -401,7 +401,7 @@
         "method"
       ],
       "source_refs": [
-        "docs/liuyao-depth-audit.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "categorical",
       "validation_scope": {

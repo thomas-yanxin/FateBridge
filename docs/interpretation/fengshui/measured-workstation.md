@@ -1,6 +1,6 @@
 # 实测工位：条件解释与可行方案
 
-[资料与来源](consultation.md) · [完整字段与算法范围](../../fengshui-workstation-layout.md) · [虚构请求](../../examples/fengshui-workstation-measured.json)
+[资料与来源](consultation.md) · [家居风水参考](../../fengshui.md) · [虚构请求](../../examples/fengshui-workstation-measured.json)
 
 已有人工标注边界、家具/物件尺寸、坐者和门窗位置，或明确要求生成可行方案时，用 `fengshui_assess.workstation_layout`。资料不足时可先走原形态/活动入口解释已有依据，不猜米数、眼高、头顶高度、方位、立极或许可。
 

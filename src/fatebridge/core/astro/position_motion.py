@@ -36,7 +36,6 @@ from fatebridge.core.astro.solar_decimal import (
 from fatebridge.core.astro.solar_decimal import METHOD_ID as DECIMAL_REDUCTION_ID
 from fatebridge.core.astro.solar_decimal import (
     PRECISION,
-    PROFILE_SHA256,
     ReductionReceipt,
     reduced_longitude,
 )
@@ -372,8 +371,6 @@ def complete_position_rate(
         "selection_policy": "first_two_converged_pairs_and_parent_directional_joint_range",
         "directional_guard_method_id": DIRECTIONAL_GUARD_ID,
         "convergence_line_arcsec_per_day": CONVERGENCE_LINE_ARCSEC_PER_DAY,
-        "source_url": "https://www.astro.com/swisseph/swephprg.htm",
-        "numerical_source_url": "https://www.colorado.edu/amath/sites/default/files/attached-files/mathcomp_88_fd_formulas.pdf",
         "scope": "Derivative of complete apparent longitude; displayed native positions are unchanged. Previously successful sampling paths retain their order. A witnessed compressed-file switch can use an exactly replayed center-file derivative with three agreeing homogeneous-side fit levels, additionally retaining the solar interpolation cell for planets. An unresolved Sun can extend central refinement within its numerical representability budget. Unresolved finite-Sun planetary samples can use a separately reported decimal reduction of checked shared compressed or JPL geometric states. Its stable cross-product source cell, three-level and convergence guards remain required. Internal step agreement is not an independent accuracy bound, continuous-interval proof or prediction validation.",
     }
     if planet not in TARGETS or model not in {"swieph", "jpl"}:
@@ -793,7 +790,6 @@ def complete_position_rate(
                         "ephemeris_model": model,
                         "center_interpolation_branch": decimal_branch(0.0),
                         "precision_decimal_digits": PRECISION,
-                        "solar_mass_profile_sha256": PROFILE_SHA256,
                         "frame_basis_bodies": list(FRAME_BODIES),
                         "sample_count": len(decimal_samples),
                         "maximum_frame_orthogonality_error": max(

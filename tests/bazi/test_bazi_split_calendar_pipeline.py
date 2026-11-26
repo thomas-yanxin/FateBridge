@@ -96,8 +96,10 @@ def test_actual_parts_and_same_business_result_on_rest_mcp_cli(
         "birth_timezone": "Asia/Shanghai",
         "use_true_solar_time": False,
     }
-    opts = dict(include_snapshot_text=False, response_char_limit=0)
+    opts = dict(detail="audit", include_snapshot_text=False, response_char_limit=0)
     flags = [
+        "--detail",
+        "audit",
         "--as-of",
         AS_OF,
         "--include-snapshot-text",

@@ -154,8 +154,8 @@ def birth_clock_receipt(
         advisories=advisories,
         precision_scope="conditional_on_resolved_inputs_not_verified_birthplace_or_historical_clock",
         source_basis={
-            "civil_time": "https://www.iana.org/time-zones/theory",
-            "solar_time": "https://aa.usno.navy.mil/faq/eqtime",
+            "civil_time": "IANA Time Zone Database",
+            "solar_time": "USNO Equation of Time",
         },
     )
     return result

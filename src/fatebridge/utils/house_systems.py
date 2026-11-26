@@ -13,7 +13,7 @@ INVALID_HOUSE_CODE_MESSAGE = (
 )
 OFFLINE_HOUSE_CODE_NOTE = " Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected."
 GAUQUELIN_UNSUPPORTED_MESSAGE = "Gauquelin (G) uses 36 clockwise sectors and is unavailable in the twelve-house interface."
-_GAUQUELIN_IDENTIFIERS = frozenset(
+GAUQUELIN_IDENTIFIERS = frozenset(
     {
         "g",
         "gauquelin",
@@ -45,14 +45,14 @@ def reject_gauquelin_house_system(value: object) -> None:
         return
     token = "".join(normalize("NFKC", value).casefold().split())
     token = token.replace("_", "").replace("-", "")
-    if token in _GAUQUELIN_IDENTIFIERS:
+    if token in GAUQUELIN_IDENTIFIERS:
         raise UnsupportedGauquelinError(GAUQUELIN_UNSUPPORTED_MESSAGE)
 
 
 # Swiss Ephemeris 宫位系统代码 ↔ 常见英文/中文别名
 # Keys normalized via casefold + strip for lookup. Values are the
 # single-letter codes accepted by Swiss Ephemeris.
-_HOUSE_SYSTEM_ALIASES: dict[str, str] = {
+HOUSE_SYSTEM_ALIASES: dict[str, str] = {
     # Placidus (default)
     "placidus": "P",
     "placidian": "P",
@@ -119,7 +119,7 @@ _HOUSE_SYSTEM_ALIASES: dict[str, str] = {
 # chart family) mapped to the Swiss Ephemeris letters the western family uses.
 # Mirrors RELATIVE_HOUSE_SYSTEM_SPECS in core/astrology.py so a single integer
 # code means the same system on every surface.
-_HOUSE_SYSTEM_CODE_TO_LETTER: dict[int, str] = {
+HOUSE_SYSTEM_CODE_TO_LETTER: dict[int, str] = {
     0: "W",  # whole_sign
     1: "B",  # Alcabitus
     2: "R",  # Regiomontanus
@@ -136,7 +136,7 @@ _HOUSE_SYSTEM_CODE_TO_LETTER: dict[int, str] = {
 # tools report a house system the same way the core/relative charts do. Letters
 # without a 0..8 code (Campanus, Porphyry, ...) still get a readable key+label
 # with code=None.
-_HOUSE_SYSTEM_LETTER_INFO: dict[str, tuple[int | None, str, str]] = {
+HOUSE_SYSTEM_LETTER_INFO: dict[str, tuple[int | None, str, str]] = {
     "W": (0, "whole_sign", "整宫制"),
     "B": (1, "alcabitus", "Alcabitus"),
     "R": (2, "regiomontanus", "Regiomontanus"),
@@ -172,15 +172,15 @@ class HouseSystemFields(TypedDict):
 def house_system_fields(house_system: object, default: str = "P") -> HouseSystemFields:
     """Describe a house system the same way on every surface.
 
-    Returns a dict with the resolved Swiss Ephemeris ``house_system`` letter plus
-    a numeric ``house_system_code`` (0..8, or ``None`` for letters outside that
-    set) and a Chinese ``house_system_label_zh`` — mirroring the core/relative
-    chart ``chart_profile`` keys so an agent reading any western result knows
+    Returns a dict with the resolved Swiss Ephemeris house_system letter plus
+    a numeric house_system_code (0..8, or None for letters outside that
+    set) and a Chinese house_system_label_zh — mirroring the core/relative
+    chart chart_profile keys so an agent reading any western result knows
     exactly which system produced it, regardless of how it was requested
     (integer code, SE letter, or key).
     """
     letter = normalize_house_system(house_system, default=default)
-    code, _key, label_zh = _HOUSE_SYSTEM_LETTER_INFO.get(letter, (None, letter, letter))
+    code, _key, label_zh = HOUSE_SYSTEM_LETTER_INFO.get(letter, (None, letter, letter))
     return {
         "house_system": letter,
         "house_system_code": code,
@@ -189,7 +189,7 @@ def house_system_fields(house_system: object, default: str = "P") -> HouseSystem
 
 
 # Swiss Ephemeris single-letter house identifiers.
-_VALID_HOUSE_SYSTEM_CODES = frozenset(
+VALID_HOUSE_SYSTEM_CODES = frozenset(
     {
         "A",
         "B",
@@ -227,8 +227,8 @@ def _alias_key(value: str) -> str:
 
 
 def _build_alias_index() -> dict[str, str]:
-    entries = list(_HOUSE_SYSTEM_ALIASES.items())
-    for code, (_, key, label) in _HOUSE_SYSTEM_LETTER_INFO.items():
+    entries = list(HOUSE_SYSTEM_ALIASES.items())
+    for code, (_, key, label) in HOUSE_SYSTEM_LETTER_INFO.items():
         entries.extend([(key, code), (label, code)])
     result: dict[str, str] = {}
     for name, code in entries:
@@ -239,7 +239,7 @@ def _build_alias_index() -> dict[str, str]:
     return result
 
 
-_NORMALIZED_HOUSE_ALIASES = _build_alias_index()
+NORMALIZED_HOUSE_ALIASES = _build_alias_index()
 
 
 def parse_house_code(value: object) -> int:
@@ -253,7 +253,7 @@ def parse_house_code(value: object) -> int:
             raise InvalidHouseCodeError(INVALID_HOUSE_CODE_MESSAGE) from None
     else:
         raise InvalidHouseCodeError(INVALID_HOUSE_CODE_MESSAGE)
-    if code not in _HOUSE_SYSTEM_CODE_TO_LETTER:
+    if code not in HOUSE_SYSTEM_CODE_TO_LETTER:
         raise InvalidHouseCodeError(INVALID_HOUSE_CODE_MESSAGE)
     return code
 
@@ -261,7 +261,7 @@ def parse_house_code(value: object) -> int:
 def _resolve_house_identifier(value: object) -> str:
     if type(value) is int:
         try:
-            return _HOUSE_SYSTEM_CODE_TO_LETTER[parse_house_code(value)]
+            return HOUSE_SYSTEM_CODE_TO_LETTER[parse_house_code(value)]
         except InvalidHouseCodeError:
             raise InvalidHouseSystemError(INVALID_HOUSE_SYSTEM_MESSAGE) from None
     if not isinstance(value, str):
@@ -272,16 +272,16 @@ def _resolve_house_identifier(value: object) -> str:
     if token in {"E", "e"}:
         return "A"
     # Preserve the backend's distinct Sunshine I and alternative i definitions.
-    if token in _VALID_HOUSE_SYSTEM_CODES:
+    if token in VALID_HOUSE_SYSTEM_CODES:
         return token
-    if len(token) == 1 and token.upper() in _VALID_HOUSE_SYSTEM_CODES:
+    if len(token) == 1 and token.upper() in VALID_HOUSE_SYSTEM_CODES:
         return token.upper()
     if re.fullmatch(r"[+-]?[0-9]+", token):
         try:
-            return _HOUSE_SYSTEM_CODE_TO_LETTER[parse_house_code(token)]
+            return HOUSE_SYSTEM_CODE_TO_LETTER[parse_house_code(token)]
         except InvalidHouseCodeError:
             raise InvalidHouseSystemError(INVALID_HOUSE_SYSTEM_MESSAGE) from None
-    resolved = _NORMALIZED_HOUSE_ALIASES.get(_alias_key(token))
+    resolved = NORMALIZED_HOUSE_ALIASES.get(_alias_key(token))
     if resolved is None:
         raise InvalidHouseSystemError(INVALID_HOUSE_SYSTEM_MESSAGE)
     return resolved

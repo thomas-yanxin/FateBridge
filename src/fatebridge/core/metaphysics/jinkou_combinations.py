@@ -14,12 +14,6 @@ from fatebridge.core.metaphysics.common import (
     ELEMENT_GENERATES,
     SIX_CLASH_BRANCHES,
 )
-from fatebridge.core.metaphysics.ren_sources import (
-    JINKOU_RELATIONS_SCAN_SHA256 as SOURCE_SHA256,
-)
-from fatebridge.core.metaphysics.ren_sources import (
-    JINKOU_RELATIONS_SOURCE as SOURCE_URL,
-)
 from fatebridge.utils.data import HEAVENLY_STEMS
 
 TRINES = (
@@ -129,8 +123,6 @@ def trine_evidence(
         )
     return {
         "ruleset_id": "jinkou_jingben_trine_conditions_v1",
-        "source_url": SOURCE_URL,
-        "source_sha256": SOURCE_SHA256,
         "source_section": "卷上·三合全身 / 虚一待用",
         "day_branch": day_branch,
         "month_branch": month_branch,

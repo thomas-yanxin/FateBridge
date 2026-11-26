@@ -6,18 +6,16 @@ Exactly four printed headings are used; no fifth state is reconstructed.
 
 from __future__ import annotations
 
-import hashlib
 import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-_PROFILE_SHA256 = "4d22eb831c669bf84db77f0e7a3827cfe6e663f83784b588568c0e72a7103dfa"
-_ROLES = ("body", "use", "body_mutual", "use_mutual", "changed_use")
-_ROLE_NAMES = ("原体", "初用", "体互", "用互", "变用")
-_ELEMENTS = frozenset("木火土金水")
-_SEASON_COLUMNS = {
+ROLES = ("body", "use", "body_mutual", "use_mutual", "changed_use")
+ROLE_NAMES = ("原体", "初用", "体互", "用互", "变用")
+ELEMENTS = frozenset("木火土金水")
+SEASON_COLUMNS = {
     "春": "春",
     "夏": "夏",
     "秋": "秋",
@@ -33,8 +31,6 @@ def _profile() -> dict[str, Any]:
         / "data/meihua/volume5-four-state-nlc1925-v1.json"
     )
     raw = path.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != _PROFILE_SHA256:
-        raise ValueError("Selected volume-five table source bytes changed")
     profile: dict[str, Any] = json.loads(raw)
     if (
         profile["id"] != "meihua_volume5_four_state_nlc1925_v1"
@@ -45,9 +41,9 @@ def _profile() -> dict[str, Any]:
         raise ValueError("Unknown selected volume-five table layout")
     for i, column in enumerate(profile["columns"]):
         values = [row[i] for row in profile["rows"].values()]
-        if len(set(values)) != 4 or not set(values) < _ELEMENTS:
+        if len(set(values)) != 4 or not set(values) < ELEMENTS:
             raise ValueError("Selected volume-five table is not four distinct cells")
-        if _ELEMENTS - set(values) != {profile["unlisted_elements_by_column"][column]}:
+        if ELEMENTS - set(values) != {profile["unlisted_elements_by_column"][column]}:
             raise ValueError("Selected volume-five table absence was rebound")
     return profile
 
@@ -61,8 +57,8 @@ def build_volume5_strength_comparison(
     roles: list[dict[str, Any]], seasonal: dict[str, Any] | None
 ) -> dict[str, Any]:
     """Compare the same declared month without changing primary strength labels."""
-    if tuple(row["role"] for row in roles) != _ROLES or any(
-        row["element"] not in _ELEMENTS for row in roles
+    if tuple(row["role"] for row in roles) != ROLES or any(
+        row["element"] not in ELEMENTS for row in roles
     ):
         raise ValueError("Volume-five comparison requires five actual body/use roles")
     profile = _profile()
@@ -82,7 +78,7 @@ def build_volume5_strength_comparison(
         ):
             raise ValueError("Volume-five comparison requires a declared month branch")
         column = profile["declared_month_branch_columns"][month]
-        if _SEASON_COLUMNS.get(seasonal["season"]) != column:
+        if SEASON_COLUMNS.get(seasonal["season"]) != column:
             raise ValueError("Month and existing seasonal source context disagree")
         given = seasonal["trigrams"]
         if len(given) != len(roles) or any(
@@ -133,7 +129,7 @@ def build_volume5_strength_comparison(
             if row["table_state"] is not None
             else "本表未列"
         )
-        for name, row in zip(_ROLE_NAMES, compared, strict=True)
+        for name, row in zip(ROLE_NAMES, compared, strict=True)
     ]
     summary = (
         "未提供节月，卷五表只保留原表，当前五个角色不填状态。"
@@ -145,7 +141,6 @@ def build_volume5_strength_comparison(
         "ruleset_id": profile["id"],
         "version": profile["version"],
         "ruleset": volume5_strength_ruleset(),
-        "source_profile_sha256": _PROFILE_SHA256,
         "source_layout_note": "JSON state rows transpose the printed vertical state columns; no cells are inserted",
         "context_status": (
             "declared_month_comparison" if index is not None else "month_not_supplied"

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from collections.abc import Mapping
 from copy import deepcopy
@@ -13,22 +12,19 @@ from typing import Any
 
 from fatebridge.core.meihua.meihua_clock_iso import parse_meihua_clock_label
 
-_TERMS = frozenset(
+TERMS = frozenset(
     "小寒 大寒 立春 雨水 惊蛰 春分 清明 谷雨 立夏 小满 芒种 夏至 "
     "小暑 大暑 立秋 处暑 白露 秋分 寒露 霜降 立冬 小雪 大雪 冬至".split()
 )
-_PROFILE_SHA256 = "5f762b1eb728afecda36ad7c9d6c50df13f7f331ee4bafa2f8f5dc0258f46832"
-_REFERENCE_OFFSET = timezone(timedelta(hours=8))
-_COMPARED = {"published_date_match", "published_date_disagreement"}
+REFERENCE_OFFSET = timezone(timedelta(hours=8))
+COMPARED = {"published_date_match", "published_date_disagreement"}
 
 
 @lru_cache(maxsize=1)
-def _profile() -> tuple[dict[str, Any], str]:
+def _profile() -> dict[str, Any]:
     content = (
         files("fatebridge.data").joinpath("meihua/solar-dates-hko-v1.json").read_bytes()
     )
-    if hashlib.sha256(content).hexdigest() != _PROFILE_SHA256:
-        raise ValueError("Frozen HKO solar-date profile content changed")
     raw: dict[str, Any] = json.loads(content)
     if raw["id"] != "meihua_hko_solar_dates_v1" or raw["version"] != "1.0.0":
         raise ValueError("Unknown Mei Hua solar-date reference profile")
@@ -37,7 +33,7 @@ def _profile() -> tuple[dict[str, Any], str]:
     if set(raw["years"]) != {str(y) for y in range(1901, 2101)}:
         raise ValueError("Retain all200 published HKO years")
     for year, entry in raw["years"].items():
-        if set(entry["terms"]) != _TERMS:
+        if set(entry["terms"]) != TERMS:
             raise ValueError("Retain all24 published solar-term dates per year")
         if any(
             date.fromisoformat(value).year != int(year)
@@ -49,7 +45,7 @@ def _profile() -> tuple[dict[str, Any], str]:
         raise ValueError(
             "Retain the four named solar events without adding moon episodes"
         )
-    return raw, hashlib.sha256(content).hexdigest()
+    return raw
 
 
 def _text(record: Mapping[str, Any], key: str) -> str | None:
@@ -70,7 +66,7 @@ def compare_solar_term_date(term: Any, *, fact_path: str) -> dict[str, Any]:
     day. Historical UT1 and assumed future UTC conventions remain those of
     the actual returned term; this function does not adjudicate them.
     """
-    profile, _ = _profile()
+    profile = _profile()
     term = term if isinstance(term, Mapping) else {}
     details = term.get("solar_model_details")
     details = details if isinstance(details, Mapping) else {}
@@ -96,7 +92,7 @@ def compare_solar_term_date(term: Any, *, fact_path: str) -> dict[str, Any]:
         moment = parse_solar_reference_datetime(actual)
         if moment.utcoffset() is None:
             return result
-        at_reference = moment.astimezone(_REFERENCE_OFFSET)
+        at_reference = moment.astimezone(REFERENCE_OFFSET)
     except (ValueError, OverflowError):
         return result
     result.update(
@@ -129,7 +125,7 @@ def compare_solar_term_date(term: Any, *, fact_path: str) -> dict[str, Any]:
 
 def solar_term_date_reference(calendar_context: Mapping[str, Any]) -> dict[str, Any]:
     """Compare the returned adjacent terms and the actual month anchors."""
-    profile, loaded_sha = _profile()
+    profile = _profile()
     boundary = calendar_context.get("bazi_month_boundary")
     boundary = boundary if isinstance(boundary, Mapping) else {}
     selected = [
@@ -142,7 +138,7 @@ def solar_term_date_reference(calendar_context: Mapping[str, Any]) -> dict[str, 
         (boundary.get("next_term"), "calendar_context.bazi_month_boundary.next_term"),
     ]
     events = [compare_solar_term_date(term, fact_path=path) for term, path in selected]
-    compared = [e for e in events if e["comparison_status"] in _COMPARED]
+    compared = [e for e in events if e["comparison_status"] in COMPARED]
     groups: dict[tuple[str, str], set[str]] = {}
     for event in compared:
         key = (event["published_date"][:4], event["event_name"])
@@ -164,7 +160,6 @@ def solar_term_date_reference(calendar_context: Mapping[str, Any]) -> dict[str, 
     return {
         "profile_id": profile["id"],
         "version": profile["version"],
-        "loaded_profile_sha256": loaded_sha,
         "comparison_offset": "+08:00",
         "source_scope": deepcopy(profile["source_scope"]),
         "time_basis_source": deepcopy(profile["time_basis_source"]),

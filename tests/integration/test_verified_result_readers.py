@@ -35,7 +35,7 @@ def stored(store: delivery.ResultStore) -> StoredResult:
     return StoredResult(store, payload, store.put(payload))
 
 
-@pytest.mark.parametrize("bad", ["digest", "run"])
+@pytest.mark.parametrize("bad", ["corrupt", "run"])
 def test_all_transports_reject_storage_corruption_or_wrong_run(
     stored: StoredResult,
     monkeypatch: pytest.MonkeyPatch,
@@ -50,11 +50,9 @@ def test_all_transports_reject_storage_corruption_or_wrong_run(
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
     run_id = "other-run" if bad == "run" else "original-run"
-    if bad == "digest":
+    if bad == "corrupt":
         path = Path(ref["file_path"])
-        record = json.loads(path.read_text(encoding="utf-8"))
-        record["payload"]["ziwei_birth"]["flag"] = True
-        path.write_text(json.dumps(record), encoding="utf-8")
+        path.write_text("{corrupt", encoding="utf-8")
     else:
         pass
     response = TestClient(api.app).get(

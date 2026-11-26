@@ -53,9 +53,9 @@ OUTER_PLANETS = {"Uranus", "Neptune", "Pluto"}
 def _normalize_date_text(date_text: str) -> str:
     """Normalize YYYY/M/D or YYYY-M-D (potentially unpadded) into YYYY-MM-DD.
 
-    Callers then feed the result to ``datetime.fromisoformat`` which rejects
+    Callers then feed the result to datetime.fromisoformat which rejects
     non-zero-padded month/day components, so we must pad here rather than let
-    a natural ``"2026/4/23"`` input crash the endpoint.
+    a natural "2026/4/23" input crash the endpoint.
     """
     raw = (date_text or "").strip()
     if not raw:

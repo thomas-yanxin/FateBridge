@@ -249,7 +249,7 @@ class SolarTermProvenance(TypedDict, total=False):
     resolved_civil_point: CivilPoint
 
 
-_STATIC_SOLAR_MODEL_KEYS = frozenset(
+STATIC_SOLAR_MODEL_KEYS = frozenset(
     {
         "coefficient_product_producer",
         "source_url",
@@ -267,7 +267,7 @@ _STATIC_SOLAR_MODEL_KEYS = frozenset(
 
 def _compact_solar_model_details(details: dict[str, Any]) -> dict[str, Any]:
     return {
-        k: deepcopy(v) for k, v in details.items() if k not in _STATIC_SOLAR_MODEL_KEYS
+        k: deepcopy(v) for k, v in details.items() if k not in STATIC_SOLAR_MODEL_KEYS
     }
 
 
@@ -405,15 +405,6 @@ def is_calculated_solar_term(term: SolarTerm) -> bool:
         return (
             term.ephemeris_model == selected
             and details.get("model_id") == selected
-            and all(
-                isinstance(details.get(key), str) and len(details[key]) == 64
-                for key in (
-                    "binary_sha256",
-                    "source_profile_sha256",
-                    "calculation_source_sha256",
-                    "build_manifest_sha256",
-                )
-            )
             and not term.ephemeris_retflags
         )
     elif term.resolution_provider == "jpl_de440":
@@ -423,8 +414,6 @@ def is_calculated_solar_term(term: SolarTerm) -> bool:
             in {de440_solar.MODEL_ID, de440_solar.EXTENDED_MODEL_ID}
             and term.solar_model_details is not None
             and term.solar_model_details.get("model_id") == term.ephemeris_model
-            and bool(term.solar_model_details.get("coefficient_sha256"))
-            and bool(term.solar_model_details.get("source_kernel_sha256"))
             and not term.ephemeris_retflags
         )
     elif term.resolution_provider == "jpl_spk":
@@ -433,7 +422,6 @@ def is_calculated_solar_term(term: SolarTerm) -> bool:
             term.ephemeris_model == spk_solar.MODEL_ID
             and term.solar_model_details is not None
             and term.solar_model_details.get("model_id") == spk_solar.MODEL_ID
-            and bool(term.solar_model_details.get("kernel_sha256"))
         )
     else:
         return (
@@ -505,13 +493,13 @@ def elapsed_days_between(
 def current_local_datetime(timezone_name: str | None = None) -> datetime:
     """当前时刻的"本地墙钟"，以朴素(无 tzinfo) datetime 返回。
 
-    裸 ``datetime.now()`` 读的是*服务器*时区，因此一台部署在 UTC 的主机会
+    裸 datetime.now() 读的是*服务器*时区，因此一台部署在 UTC 的主机会
     为"未显式给定年/月/日"的调用方解析出错误的日历日期——最明显的是临近
-    元旦 / 立春边界时 :func:`calculate_liunian` 默认的流年年份会差一年。
-    这里把默认时刻锚定到一个固定的民用时区（缺省 ``Asia/Shanghai``），
+    元旦 / 立春边界时 calculate_liunian 默认的流年年份会差一年。
+    这里把默认时刻锚定到一个固定的民用时区（缺省 Asia/Shanghai），
     使"当前"无论进程跑在哪个时区都确定一致。
 
-    返回朴素 datetime 是刻意为之：下游一律把它拆成 ``.year/.month/.day``
+    返回朴素 datetime 是刻意为之：下游一律把它拆成 .year/.month/.day
     或据此构造新的朴素 datetime，保持与既有"朴素本地时间"契约一致，绝不与
     别处的 aware datetime 混用而触发 TypeError。
     """
@@ -545,7 +533,7 @@ def _solar_term_utc_via_swe(
     provenance: SolarTermProvenance | None = None,
 ) -> UTCCalendar | None:
     """Resolve a TT solar-longitude crossing, then label its civil instant.
-    ``target_longitude`` near ``anchor_utc``.
+    target_longitude near anchor_utc.
 
     The anchor is used to disambiguate which yearly crossing to return
     (so 冬至 for civil year 2024 is Dec 2024 rather than Dec 2023). Search

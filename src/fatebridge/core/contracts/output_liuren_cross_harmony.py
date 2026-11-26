@@ -50,12 +50,10 @@ class LiurenCrossHarmony(PartialOutput):
     name: Literal["交车合"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     source_revision: StrictInt | None = None
     source_kind: str | None = None
     witness_source_title: str | None = None
     witness_source_url: str | None = None
-    witness_source_sha256: str | None = None
     witness_pdf_pages: list[StrictInt] | None = None
     definition: str | None = None
     excluded_days: list[str] | None = None

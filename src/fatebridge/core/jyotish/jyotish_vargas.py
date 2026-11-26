@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import math
 from fractions import Fraction
-from typing import Optional
 
 SUPPORTED_DIVISIONS = (2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60)
 SHODASHAVARGA_DIVISIONS = (1, *SUPPORTED_DIVISIONS)
@@ -43,7 +42,7 @@ def longitude_ratio(longitude: float | Fraction) -> tuple[int, int]:
 
 def _varga_components(
     longitude: float | Fraction, division: int
-) -> tuple[int, Optional[Fraction]]:
+) -> tuple[int, Fraction | None]:
     """One exact sign assignment and within-sign coordinate for every consumer."""
     n, d = longitude_ratio(longitude)
     sign, degree_numerator = divmod(n, 30 * d)
@@ -93,7 +92,7 @@ def _varga_components(
 
 def varga_coordinates(
     longitude: float | Fraction, division: int
-) -> tuple[int, Optional[float]]:
+) -> tuple[int, float | None]:
     """Return zodiac sign index and transformed degree, or None for D30."""
     sign, degree = _varga_components(longitude, division)
     return sign, (

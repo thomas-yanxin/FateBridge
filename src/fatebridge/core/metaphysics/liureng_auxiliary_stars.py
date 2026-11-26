@@ -12,7 +12,6 @@ from typing import Any
 from fatebridge.core.metaphysics.common import GUI_REN_SEQUENCE, sexagenary_index_for
 from fatebridge.core.metaphysics.liureng_life_stages import build_life_stages
 from fatebridge.core.metaphysics.ren_evidence import xun_dun_stems
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 MONTH_ORDER = "寅卯辰巳午未申酉戌亥子丑"
@@ -106,8 +105,6 @@ def build_auxiliary_stars(
     return {
         "ruleset_id": "tanyuan_auxiliary_stars_v1",
         "source_title": "大六壬探原·论德、论年命、论墓、论冲及论占事（德禄马定位）",
-        "source_url": TANYUAN_SOURCE,
-        "source_sha256": TANYUAN_SCAN_SHA256,
         "original_pdf_pages": [87, 90, 91, 94, 97, 104],
         "day_ganzhi": day_ganzhi,
         "month_building_branch": month_branch,

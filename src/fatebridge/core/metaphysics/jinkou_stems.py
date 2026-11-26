@@ -12,7 +12,6 @@ from fatebridge.core.metaphysics.common import (
     stem_element_text,
     xun_head_for_ganzhi,
 )
-from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
 from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 WUZI_DUN_START = dict(zip("甲乙丙丁戊己庚辛壬癸", "甲丙戊庚壬甲丙戊庚壬"))
@@ -130,8 +129,6 @@ def build_stem_relations(
     return {
         "ruleset_id": "jinkou_jingben_dun_stem_relations_v1",
         "source_title": "校正京本金口诀·五子元遁、五合、干元类及五行气化（所选遁干事实）",
-        "source_url": SCAN_URL,
-        "source_sha256": SCAN_SHA256,
         "original_pdf_pages": [41, 44, 54, 55, 63, 64, 65, 74],
         "day_stem": day_stem,
         "dun_cycle_policy": "single_cycle_zi_to_hai",

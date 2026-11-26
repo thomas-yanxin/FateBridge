@@ -354,7 +354,7 @@ def calculate_relative_chart_analysis(
     """
     Build synastry/composite payloads for two parties.
 
-    ``hsys`` defaults to Placidus (3), matching both published request forms.
+    hsys defaults to Placidus (3), matching both published request forms.
     """
     inner_birth = _build_birth_info(inner_payload)
     outer_birth = _build_birth_info(outer_payload)

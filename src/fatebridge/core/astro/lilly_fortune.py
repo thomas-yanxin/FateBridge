@@ -16,7 +16,7 @@ from fatebridge.core.astro.geometry import (
     angular_separation_fraction,
     longitude_float,
 )
-from fatebridge.core.astro.lilly import SIGNS, SOURCE_URL, dignity_at
+from fatebridge.core.astro.lilly import SIGNS, dignity_at
 from fatebridge.core.astro.lilly_house_assignment import assign_from_cusps
 from fatebridge.core.astro.lilly_star_orbs import STELLAR_ORB_DEGREES
 from fatebridge.core.classical_western import combustion_state
@@ -284,7 +284,6 @@ def evaluate_fortune(
     )
     return {
         "method_id": "lilly_1647_fortune_p143_145_declared_rows_v2",
-        "source_url": SOURCE_URL,
         "source_pages": [33, 104, 113, 143, 144, 145, 177, 179, 180],
         "longitude": None if lon is None else longitude_float(lon),
         "exact_longitude": None if lon is None else str(lon),

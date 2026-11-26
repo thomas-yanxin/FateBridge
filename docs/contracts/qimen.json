@@ -203,7 +203,7 @@
         "qimen_options"
       ],
       "source_refs": [
-        "docs/qimen-depth-audit.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "categorical",
       "validation_scope": {

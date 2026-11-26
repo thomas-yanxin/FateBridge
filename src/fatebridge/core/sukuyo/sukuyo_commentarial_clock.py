@@ -24,14 +24,7 @@ MANUSCRIPT_SOURCE = (
 def _manuscript_reference(
     reference: dict[str, Any], order: Sequence[str]
 ) -> dict[str, Any]:
-    loaded = load_source(MANUSCRIPT_SOURCE)
-    manuscript = loaded.data
-    cited = next(row for row in reference["sources"] if row["id"] == "T2216")
-    if (
-        manuscript["T2216_comparison_context"]["publisher_capture_sha256"]
-        != cited["capture_sha256"]
-    ):
-        raise ValueError("护摩抄本对照与所用T2216来源不一致，须重新核验")
+    manuscript = load_source(MANUSCRIPT_SOURCE)
     rows = manuscript["monthly_day_observations"]
     if (
         len(rows) != 12
@@ -66,7 +59,6 @@ def _manuscript_reference(
         )
     return {
         **manuscript,
-        "source_bundle_sha256": loaded.sha256,
         "selected_date_comparisons": comparisons,
         "date_controls_matching_T2216": sum(
             row["date_matches_quoted_source"] for row in comparisons
@@ -78,8 +70,7 @@ def _manuscript_reference(
 def commentarial_boundary_reference() -> dict[str, Any]:
     # Import at call time: this reference also serves direct calendar-text calls.
 
-    loaded = load_source(SOURCE)
-    reference = loaded.data
+    reference = load_source(SOURCE)
     literal = reference["monthly_pushya_reference"]["literal_days"]
     monthly_literal = reference["monthly_pushya_reference"]["quoted_mansion_literal"]
     if (
@@ -132,7 +123,7 @@ def commentarial_boundary_reference() -> dict[str, Any]:
             "other nested source originals are not identified."
         ),
     )
-    return {**reference, "source_bundle_sha256": loaded.sha256}
+    return reference
 
 
 def commentarial_boundary_lines(reference: dict[str, Any]) -> list[str]:

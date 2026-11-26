@@ -6,7 +6,6 @@ The table is not a reconstruction of ancient astronomical constants.
 
 from __future__ import annotations
 
-import hashlib
 import json
 from bisect import bisect_right
 from copy import deepcopy
@@ -34,7 +33,7 @@ BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 @lru_cache(maxsize=2)
 def historical_month_table(
     profile: str = HISTORICAL_YEAR_PROFILE,
-) -> tuple[dict[str, Any], tuple[date, ...], str]:
+) -> tuple[dict[str, Any], tuple[date, ...]]:
     if profile not in HISTORICAL_YEAR_PROFILES:
         raise ValueError("year_profile须明确选择已发布历史年计配置")
     filename = (
@@ -80,13 +79,13 @@ def historical_month_table(
         or rows[-1]["year"] != upper + 1
     ):
         raise ValueError("历史范围缺少次年正月终界")
-    return data, dates, hashlib.sha256(raw).hexdigest()
+    return data, dates
 
 
 def historical_year_context(
     civil_date: date, *, profile: str = HISTORICAL_YEAR_PROFILE
 ) -> dict[str, Any]:
-    data, dates, digest = historical_month_table(profile)
+    data, dates = historical_month_table(profile)
     if not dates[0] <= civil_date < dates[-1]:
         raise ValueError(
             f"所选太乙历史历表仅覆盖推算公历{dates[0].isoformat()}至{dates[-1].isoformat()}之前；不向未覆盖年代套用现代农历或回退算法"
@@ -110,8 +109,6 @@ def historical_year_context(
         "calendar_title": source["title"],
         "calendar_authors": source["authors"],
         "calendar_edition": source["edition"],
-        "source_url": source["url"],
-        "source_data_sha256": digest,
         "calendar_tradition": data["calendar_tradition"],
         "supported_start": dates[0].isoformat(),
         "supported_end_exclusive": dates[-1].isoformat(),
@@ -161,7 +158,7 @@ def historical_year_text(context: dict[str, Any]) -> str:
         f"历史历表日期：{context['display']}；日期干支{context['day_ganzhi']}。"
         f"本年月首原儒略历{context['source_month_start_julian']}，推算公历{context['month_start_gregorian']}；"
         f"岁首{context['year_start_gregorian']}，次年岁首{context['next_year_start_gregorian']}（不含）。"
-        f"来源：{context['calendar_authors']}《{context['calendar_title']}》{context['calendar_edition']}第{context['source_printed_page']}页；{context['source_url']}。"
+        f"来源：{context['calendar_authors']}《{context['calendar_title']}》{context['calendar_edition']}第{context['source_printed_page']}页。"
         + str(context["calendar_tradition"])
         + "。"
         + str(context["date_basis"])

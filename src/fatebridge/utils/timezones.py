@@ -1,6 +1,5 @@
 """Shared timezone parsing for input normalization and calendar calculations."""
 
-import hashlib
 import re
 import struct
 from dataclasses import dataclass
@@ -22,18 +21,17 @@ from fatebridge.utils.errors import (
 )
 from fatebridge.utils.tzif_transitions import TZifTransitions, read_tzif_transitions
 
-_OFFSET = re.compile(r"^(?:UTC|GMT)?([+-]?)(\d{1,2})(?::?(\d{2}))?$", re.IGNORECASE)
-_SECOND_OFFSET = re.compile(
+OFFSET = re.compile(r"^(?:UTC|GMT)?([+-]?)(\d{1,2})(?::?(\d{2}))?$", re.IGNORECASE)
+SECOND_OFFSET = re.compile(
     r"^(?:UTC|GMT)?([+-]?)(\d{1,2}):(\d{2}):(\d{2})$", re.IGNORECASE
 )
-_HOURS = re.compile(r"^[+-]?\d{1,2}(?:\.\d+)?$")
-_UNSPECIFIED_LOCAL_DESIGNATIONS = ("-00", "zzz")
+HOURS = re.compile(r"^[+-]?\d{1,2}(?:\.\d+)?$")
+UNSPECIFIED_LOCAL_DESIGNATIONS = ("-00", "zzz")
 
 
 @dataclass(frozen=True)
 class _ParsedTimezone:
     zone: tzinfo
-    tzif_sha256: str | None = None
     package_version: str | None = None
     iana_version: str | None = None
     decimal_hour_rounded: bool = False
@@ -124,8 +122,8 @@ def timezone_transition_calendar_candidates(
 
 
 def is_unspecified_local_time(moment: datetime) -> bool:
-    """Recognize RFC 9636's placeholder and the legacy `zzz` spelling."""
-    return moment.tzname() in _UNSPECIFIED_LOCAL_DESIGNATIONS
+    """Recognize RFC 9636's placeholder and the legacy zzz spelling."""
+    return moment.tzname() in UNSPECIFIED_LOCAL_DESIGNATIONS
 
 
 def format_local_time_or_utc(
@@ -212,14 +210,13 @@ def validate_local_clock(
 def timezone_rules_metadata(timezone_name: str) -> dict[str, str]:
     """Identify the rules actually used, independently of the host OS database."""
     parsed = _parse_timezone_name_cached(timezone_name.strip())
-    if parsed.tzif_sha256 is not None:
-        assert parsed.package_version is not None and parsed.iana_version is not None
+    if parsed.package_version is not None:
+        assert parsed.iana_version is not None
         return {
             "provider": "zoneinfo.from_file",
             "database": "pytz",
             "package_version": parsed.package_version,
             "iana_version": parsed.iana_version,
-            "tzif_sha256": parsed.tzif_sha256,
             "future_policy": "extrapolate_pinned_rules_subject_to_legal_changes",
         }
     fixed = {"provider": "datetime.timezone", "database": "explicit_fixed_offset"}
@@ -240,7 +237,7 @@ def _parse_timezone_name_cached(value: str) -> _ParsedTimezone:
         return _ParsedTimezone(timezone(timedelta(0), "GMT"))
     if value.upper() in {"UTC", "Z"}:
         return _ParsedTimezone(timezone.utc)
-    match = _SECOND_OFFSET.fullmatch(value) or _OFFSET.fullmatch(value)
+    match = SECOND_OFFSET.fullmatch(value) or OFFSET.fullmatch(value)
     if match:
         parts = match.groups()
         sign, hour_text, minute_text = parts[:3]
@@ -262,7 +259,7 @@ def _parse_timezone_name_cached(value: str) -> _ParsedTimezone:
             else timezone(timedelta(seconds=seconds))
         )
         return _ParsedTimezone(fixed_zone)
-    if _HOURS.fullmatch(value):
+    if HOURS.fullmatch(value):
         # Preserve Unicode-digit and arbitrary decimal input scope. Compute
         # exactly before the final, explicitly reported microsecond step.
         decimal_text = "".join(str(int(c)) if c.isdecimal() else c for c in value)
@@ -308,13 +305,12 @@ def _parse_timezone_name_cached(value: str) -> _ParsedTimezone:
         raise EphemerisSourceError("timezone_rules_invalid") from error
     # A fixed designation can be checked before any wall label is supplied.
     # For zones that change over time, qualify the selected local type later.
-    if zone.tzname(None) in _UNSPECIFIED_LOCAL_DESIGNATIONS:
+    if zone.tzname(None) in UNSPECIFIED_LOCAL_DESIGNATIONS:
         raise PydanticCustomError(
             "unresolved_timezone_offset", UNRESOLVED_OFFSET_MESSAGE
         )
     return _ParsedTimezone(
         zone,
-        hashlib.sha256(data).hexdigest(),
         pytz.__version__,
         pytz.OLSON_VERSION,
         transitions=read_tzif_transitions(data),

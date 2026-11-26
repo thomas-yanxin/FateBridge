@@ -8,8 +8,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-_ROLE = {"travel": "body", "traveler": "use"}
-_NAMES = {"乾", "兑", "离", "震", "巽", "坎", "艮", "坤"}
+ROLE = {"travel": "body", "traveler": "use"}
+NAMES = {"乾", "兑", "离", "震", "巽", "坎", "艮", "坤"}
 
 
 @lru_cache(maxsize=1)
@@ -26,8 +26,7 @@ def _profile() -> dict[str, Any]:
         or len(result["rows"]) != 4
         or len({r["id"] for r in result["rows"]}) != 4
         or any(
-            r["role"] != _ROLE.get(r["topic"])
-            or r["role_key"] != r["role"] + "_trigram"
+            r["role"] != ROLE.get(r["topic"]) or r["role_key"] != r["role"] + "_trigram"
             for r in result["rows"]
         )
         or any("多" not in r["qualified_predicate"] for r in result["rows"])
@@ -40,12 +39,12 @@ def build_qualified_motion(
     cast: dict[str, Any], topic: str, *, fact_prefix: str
 ) -> dict[str, Any]:
     """Select a singular original role; full source/outcome predicates stay open."""
-    if topic not in _ROLE:
+    if topic not in ROLE:
         raise ValueError("Select travel or traveler for the qualified chapter reading")
     profile = _profile()
-    role = _ROLE[topic]
+    role = ROLE[topic]
     name = cast[role + "_trigram"]["name"]
-    if name not in _NAMES:
+    if name not in NAMES:
         raise ValueError("Qualified chapter reading requires a known original trigram")
     path = fact_prefix + "." + role + "_trigram.name"
     clauses = [

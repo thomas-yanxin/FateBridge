@@ -96,7 +96,6 @@ def solar_altitude_nodes(
     Its high-order tail controls subdivision; the tolerance includes rounding
     the absolute UT1 date to binary64. This is a numerical resolution check,
     not an interval-arithmetic proof for arbitrarily small tangent arcs.
-    See https://www.chebfun.org/docs/guide/guide03.html for spectral rootfinding.
     """
     degree = 12
     pending = [(lower, upper, 0)]

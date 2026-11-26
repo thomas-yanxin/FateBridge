@@ -1,12 +1,12 @@
 # 离线城市与行政区坐标 / Offline place catalog
 
-[文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
+[文档中心](README.md) · [API 参考](api-reference.md)
 
-FateBridge 的 REST、MCP、CLI 共用 `utils/places.py`，不需要在线地理编码服务或 API Key。 `birth_place` 可补全经度、纬度和 IANA 民用时区；显式提供的 `birth_longitude`、`birth_latitude`、`birth_timezone` 各自优先。
+FateBridge 的 REST、MCP、CLI 共用 `utils/places.py`，不需要在线地理编码服务或 API Key。`birth_place` 可补全经度、纬度和 IANA 民用时区；显式提供的 `birth_longitude`、`birth_latitude`、`birth_timezone` 各自优先。
 
 ## 覆盖范围
 
-数据取得日期为 **2026-10-22**；行政区覆盖按下述来源版本核验，不能理解为未来区划变更会自动同步。
+行政区与城市覆盖按内置静态数据（数据截止 2026-10-22）提供，不自动同步后续行政区划调整：
 
 | 范围 | 已收录数量 |
 | --- | ---: |
@@ -18,22 +18,17 @@ FateBridge 的 REST、MCP、CLI 共用 `utils/places.py`，不需要在线地理
 | 中国相关代表点合计 | 3,602 |
 | 海外城市 | 6,333 |
 
-海外部分独立于中国行政区计数：亚洲 2,500、欧洲 1,090、非洲 1,140、美洲 1,497（北美 816、南美 681）、大洋洲 106。 从 GeoNames `cities15000` 的现存居民点选择人口至少 10 万的城市、国家首都和一级行政中心，并补充每个国家/地区人口最多的 3 个居民点及大洋洲前 50 个。排除城区分片 `PPLX`、历史/废弃居民点和南极洲。 人口仅用于选择覆盖范围，不用于在同名城市之间猜测用户地点。
+海外部分包含亚洲 2,500、欧洲 1,090、非洲 1,140、美洲 1,497（北美 816、南美 681）、大洋洲 106，从 GeoNames `cities15000` 选取主要城市与行政中心；同名城市不会按人口猜测地点。中国行政区数据已去除多级联动造成的重复父子条目。
 
-中国行政区数据去除了上游为多级联动生成的重复层级，例如地级市下同名的虚拟县级条目、省直辖县级市的重复父子条目。397 个县级市按原始六位行政区代码逐一核对，清单保存在 `manifest.json`。 上游已明确缺少新设的**和康县、和安县**；这两项是县，不影响本版本的县级市覆盖验收，坐标没有用母县中心或猜测值填充。本库并非截至今天的全部县区无缺漏清单。
+## 坐标与时区口径
 
-## 坐标代表什么
+- 城市和行政区坐标为来源指定的中心或行政代表点，并非具体医院或街道坐标。GeoNames 使用 WGS84；AreaCity 的 GCJ-02 中心坐标在导入时转换为近似 WGS84（标记 `coordinate_system=WGS84_approx`，保留 `source_coordinates` 原值）。需要高精度出生位置时，请直接传入实测 WGS84 经纬度。
+- 大陆民用时区统一使用 `Asia/Shanghai`；香港、澳门、台湾分别使用 `Asia/Hong_Kong`、`Asia/Macau`、`Asia/Taipei`。
+- 命名时区统一由标准库 `zoneinfo` 读取随 `pytz` 锁定的 TZif 数据，不依赖宿主机时区表差异，并保留重复或不存在钟时的校验。
 
-- 城市和行政区覆盖的是**来源指定的中心/行政代表点**，不代表任意地址、医院、街道或整个辖区的实测位置。不同来源或版本选取的城市代表点可能变化。
-- GeoNames 使用 [WGS84](https://www.geonames.org/about.html)，部分行政点本身存在小数位较少、中心选取较粗的情况。台湾城市优先使用同一行政区内同名居民点的坐标；其他单位保留行政代表点。
-- AreaCity 发布的是高德 **GCJ-02** 中心坐标。本项目在导入时使用迭代逆变换产生近似 WGS84，标记 `coordinate_system=WGS84_approx`，保留 `source_coordinates` 原值。存储六位小数表示数值格式，**不承诺米级测绘精度**；逆变换的数值收敛也不是地理误差保证。
-- 大陆民用时区统一使用 `Asia/Shanghai`；新疆也遵循此输入约定。若原始记录使用当地其他计时方式，应显式说明时区。香港、澳门、台湾分别使用 `Asia/Hong_Kong`、`Asia/Macau`、`Asia/Taipei`。
-- 命名时区统一由标准库ZoneInfo读取依赖 `pytz>=2026.6` 的TZif数据，锁定版本包含IANA2026f；不按操作系统或dateutil库的可用性切换规则。例如 `America/Coyhaique` 也能在旧系统上解析，仍保留重复／不存在钟时校验。版本更新及有限对照见[历法边界核对](calendar-boundary-audit.md)。
-- 真太阳时经度每相差 1°，经度校正约相差 4 分钟。临近时辰/日期边界、需要更准确星盘地点时，应传实际出生位置的 WGS84 经度和纬度，不能把城市代表点当作具体出生地点。
+## 地名消歧与调用示例
 
-## 地名与同名处理
-
-支持目录收录的中文、简繁体、拼音、英文和部分当地名称，以及既有兼容别名（如 `peking`、`amoy`、`开县`）。匹配忽略大小写和组合重音。带大小写的字母与十进制数字相邻时，共同形成词内连续段。例如 `хBerlin` 无法定位到 Berlin，`德国Berlin` 仍可使用汉字国名限定 Berlin。 [固定词界对照](precision-acceptance.md#place-unicode-boundaries-round202)
+支持目录收录的中文、简繁体、拼音、英文及常见兼容别名（如 `peking`、`amoy`），匹配忽略大小写和组合重音。存在同名区县（如 `通州区`、`朝阳区`）或海外同名城市时，请附带省、市或国家/州名消歧：
 
 ```text
 江苏省南通市海安市                 → 海安，县级
@@ -45,19 +40,7 @@ London, Canada                   → London，America/Toronto
 Sydney, Nova Scotia, Canada       → Sydney，America/Glace_Bay
 ```
 
-上级行政区参与消歧；`通州区`、`朝阳区`、`和平区` 等缺少必要上级信息时不返回坐标，调用方应补充省、市或国家/州。`London`、`Sydney` 等少数原有常用别名保留既有默认含义，明确的国家/州信息优先。`上海安亭` 不会因跨越“上海”边界抽出“海安”。省级降级仍会通过现有 `resolution_advisory` 告知调用方。
-
-国家、州和省份的限定词按地址中的位置解释。用 `IN`、`CA` 等短码时请大写。同一个 `CA` 可能指加拿大或加利福尼亚州，可再补完整国名消歧。目录保留名称本身带有的逗号，另写的地址成分分别参与判定。例如「内蒙古自治区，呼和浩特市」中，行政名称内部的「蒙古」随实际父级归属。纯数字行政代码只为辖区相符的候选提供线索，例如 `08` 可协助区分安大略省的 London。门牌号或邮政数字不会排除其他辖区的候选。 [GeoNames 行政代码格式](https://download.geonames.org/export/dump/readme.txt)
-
-当逗号或换行分隔的每一项都能识别为完整地名或辖区，解析器要求同一候选能解释各个地点字段。重复的同一地点或其真实祖级可以保留，两个无隶属关系的城市会返回未定位，例如 `Paris, Lyon, France`。已识别的邮政地址沿用邮政字段的含义。 [独立对照](precision-acceptance.md#place-field-ownership-round209)
-
-对部分以逗号或换行分隔的英国格式地址，解析器在道路字段之后查找目录地名。支持的道路结尾包括 UPU 印例中的 `Square` 和 `Walk`。完整邮编字段可按 UPU 固定邮区表提供英国、马恩岛、泽西或根西的辖区线索，显式辖区与邮区冲突时返回未定位。邮区未识别时保留已有的显式限定词。可解析的结果仍取目录代表点，例如含 `Manchester` 邮镇的地址可返回 Manchester 代表点。 [UPU 英国地址指南](https://www.upu.int/UPU/media/upu/PostalEntitiesFiles/addressingUnit/gbrEn.pdf) · [固定对照](precision-acceptance.md#method-and-address-scope-round205)
-
-对没有道路字段的英国信箱地址，单独的 `PO Box`、紧邻邮编的已收录邮镇和一个可识别的完整邮编可以共同区分同名地点。例如 `PO Box 16875, Birmingham, B16 6TN` 可定位到英国 Birmingham 的目录代表点。州或国家与邮区冲突时返回未定位。 [Royal Mail PAF 指南](https://www.poweredbypaf.com/wp-content/uploads/2017/07/Latest-Programmers_guide_Edition-7-Version-6.pdf) · [无道路信箱固定对照](precision-acceptance.md#place-roadless-postal-round210)
-
-少量海外记录在同一国家、同一一级行政区内仍同名（如巴基斯坦 Punjab 的两个 Sahiwal）。无法由这些限定词区分时继续保留歧义，应提供实际经纬度；不会按人口或数组顺序替用户选点。
-
-三端接口参数保持不变。示例：
+使用逗号或换行分隔多个地址成分时，所有识别成分需指向同一候选辖区；无法消除歧义的地区（如同一省内重名城市）将保留未定位状态并提示传入经纬度。调用示例：
 
 ```bash
 uv run --locked --extra dev fatebridge astrology_chart \
@@ -65,41 +48,18 @@ uv run --locked --extra dev fatebridge astrology_chart \
   --birth-hour 12 --birth-minute 10 --birth-place 'Paris, France'
 ```
 
-## 数据来源、许可与复现
+## 数据来源与本地校验
 
-- 中国行政区和 GCJ-02 点位：[AreaCity-JsSpider-StatsGov](https://github.com/xiangyuecn/AreaCity-JsSpider-StatsGov)，版本 `2025.251231.260403`，2026-04-03 发布。上游综合国家地名信息库 2025-12-31、腾讯地图区划 2025-11-19、高德地图行政区划和中心坐标；仓库采用 MIT 许可。
-- 海外居民点、台湾行政点和 IANA 时区：[GeoNames 下载](https://download.geonames.org/export/dump/)，使用 `cities15000.zip`、`TW.zip`、`countryInfo.txt`、`admin1CodesASCII.txt`；[格式与许可](https://download.geonames.org/export/dump/readme.txt)为 CC BY 4.0，来源不保证准确性、时效性和完整性。
-- 第三方署名、转换和筛选说明随发行包保留在 [NOTICE](../NOTICE)。`src/fatebridge/data/places/manifest.json` 记录来源地址、版本、原始归档/提取文件 SHA-256、产物 SHA-256、数量和县级市代码清单。运行时只读打包后的 JSON，不联网、不依赖 OpenCC。
+- 中国行政区点位：[AreaCity-JsSpider-StatsGov](https://github.com/xiangyuecn/AreaCity-JsSpider-StatsGov)（MIT 许可）。
+- 海外居民点与台湾行政点：[GeoNames](https://download.geonames.org/export/dump/)（CC BY 4.0）。
+- 运行时只读取随包发布的 `src/fatebridge/data/places/` JSON，不联网且不依赖外部库；第三方许可详见 [NOTICE](../NOTICE)。
 
-离线检查（也由测试执行）：
-
-```bash
-uv run --locked --extra dev python -m scripts.catalogs.build_place_catalog --check
-uv run --locked --extra dev pytest -q \
-  tests/integration/test_place_catalog.py tests/integration/test_contract_regressions_2.py \
-  tests/integration/test_birth_place_resolution.py tests/integration/test_birth_time_precision.py
-```
-
-更新数据时，将以下文件准备到独立缓存目录：
-
-1. 从 [AreaCity 固定版本 Release](https://github.com/xiangyuecn/AreaCity-JsSpider-StatsGov/releases/tag/2025.251231.260403) 下载 `ok_data_level3-4.csv.7z`、`ok_geo.csv.7z`，保留归档并解出 `ok_data_level3.csv`、`ok_geo.csv`。
-2. 从 GeoNames 下载上述四个文件。GeoNames 是滚动数据；重现本版本需要使用与 manifest SHA-256 一致的快照，重新下载的内容可能不同。
-3. 使用锁定开发环境中的 OpenCC 生成简繁别名。兼容别名输入在 `scripts/data/place_alias_overrides.json`，仅维护名称，不保留旧坐标。
+离线回归测试命令（核对静态目录解析、坐标与边界）：
 
 ```bash
-uv run --locked --extra dev python -m scripts.catalogs.build_place_catalog \
-  --source-dir /absolute/path/to/place-source-cache
-uv run --locked --extra dev python -m scripts.catalogs.build_place_catalog --check
+uv run --locked --extra dev pytest -q tests/integration/test_place_catalog.py tests/integration/test_birth_place_resolution.py
 ```
 
-`Ulaanbaatar` 和蒙古语西里尔原名 `Улаанбаатар` 均定位到 GeoNames 首都居民点 `2028462`。联合国地名专家组核对名称，GeoNames 居民点提供坐标和时区。 [UNGEGN 城市档案](https://ungegn.un.org/dashboard/cities/details?id=178) · [GeoNames 居民点](https://www.geonames.org/2028462)
+## English note
 
-导入不会联网。`--check` 检查已发布 JSON 的摘要、坐标范围、原始坐标逆变换、时区、父子层级/循环、数量和覆盖清单；它不会重新下载上游。来源版本、取得日期和验收数量随区划变更一起审核更新。所有中国代表点还经过完整行政路径逐条解析测试；跨三端测试同时覆盖中国区县、欧洲和大洋洲，只证明软件调用一致性，不证明测绘精度或命理预测有效性。
-
-`St Helier` 和 `St Peter Port` 分别作为泽西、根西居民点的目录别名，沿用对应记录的代表点和时区。 [GeoNames 3042091](https://www.geonames.org/3042091) · [GeoNames 3042287](https://www.geonames.org/3042287) · [地址与别名对照](precision-acceptance.md#conditional-method-address-round209)
-
-## English precision note
-
-The offline catalog includes 397 mainland county-level cities, all 333 prefecture-level units in the pinned source, and 6,333 overseas populated places across five inhabited continents. It also includes counties/districts and Taiwan administrative units. The two new counties He'an and Hekang are absent from the upstream release and remain documented gaps.
-
-Coordinates are source-defined city or administrative representative points. GeoNames coordinates use WGS84; AreaCity GCJ-02 points are converted to **approximate WGS84**, with the original values retained. Decimal places do not establish survey accuracy. Supply actual WGS84 birth coordinates when precise location matters. Qualify ambiguous names with their parent city/province or country/state. REST, MCP and CLI share the same offline resolver and IANA timezone data.
+The offline catalog covers 397 mainland county-level cities, 333 prefecture-level units, Taiwan administrative units, and 6,333 overseas populated places. Coordinates are city or administrative representative points (WGS84 from GeoNames, approximate WGS84 converted from GCJ-02 for AreaCity). Supply explicit WGS84 coordinates and IANA time zones whenever exact birth location precision is required.

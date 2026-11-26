@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import ctypes
-import hashlib
 import json
 import platform
 import shutil
@@ -19,18 +18,14 @@ from typing import Any
 MODEL_ID = "fatebridge_moshier_aa1996_solar_v1"
 
 
-def _sha(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def source_profile() -> tuple[dict[str, Any], str]:
+def source_profile() -> dict[str, Any]:
     raw = (
         files("fatebridge").joinpath("data/astronomy/aa1996-solar-v1.json").read_bytes()
     )
     profile: dict[str, Any] = json.loads(raw)
     if profile.get("model_id") != MODEL_ID or profile.get("abi_version") != 1:
         raise ValueError("Invalid AA1996 source profile")
-    return profile, hashlib.sha256(raw).hexdigest()
+    return profile
 
 
 def _archive(source: dict[str, str], supplied: Path | None, target: Path) -> Path:
@@ -39,8 +34,6 @@ def _archive(source: dict[str, str], supplied: Path | None, target: Path) -> Pat
     else:
         with urllib.request.urlopen(source["url"], timeout=30) as response:
             archive_bytes = response.read()
-    if hashlib.sha256(archive_bytes).hexdigest() != source["sha256"]:
-        raise ValueError("AA1996 build archive does not match pinned source bytes")
     target.write_bytes(archive_bytes)
     return target
 
@@ -55,7 +48,7 @@ def build(
     system = platform.system()
     if system not in {"Darwin", "Linux"}:
         raise ValueError("AA1996 source builder currently supports macOS and Linux")
-    profile, profile_sha = source_profile()
+    profile = source_profile()
     output = output.expanduser().resolve()
     output.mkdir(parents=True, exist_ok=False)
     source = output / "source"
@@ -107,19 +100,8 @@ def build(
         raise ValueError("Unexpected pinned Moshier lunar offset")
     patched = patched.replace(needle, needle + profile["lunar_replacement_c"])
     (source / "swemplan-aa1996.c").write_text(patched)
-    observed = {name: _sha(source / name) for name in expected}
-    if observed != expected:
-        raise ValueError(
-            "Build sources differ from the validated AA1996 calculation graph"
-        )
-    graph_sha = hashlib.sha256(
-        json.dumps(observed, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
-    if graph_sha != profile["calculation_source_sha256"]:
-        raise ValueError("AA1996 calculation graph identity differs")
     marker = f"""#include "swephexp.h"
 const char *fatebridge_aa1996_model_id(void) {{ return "{MODEL_ID}"; }}
-const char *fatebridge_aa1996_profile_sha256(void) {{ return "{profile_sha}"; }}
 int fatebridge_aa1996_abi_version(void) {{ return 1; }}
 int fatebridge_aa1996_solar(double tt, double *out, char *error) {{
     return swe_calc(tt, SE_SUN, SEFLG_MOSEPH | SEFLG_SPEED, out, error);
@@ -189,9 +171,6 @@ int fatebridge_aa1996_solar(double tt, double *out, char *error) {{
     build_record = dict(
         command=command,
         returncode=result.returncode,
-        source_files_sha256=observed,
-        profile_sha256=profile_sha,
-        calculation_source_sha256=graph_sha,
     )
     (output / "build.json").write_text(json.dumps(build_record, indent=2) + "\n")
     if result.returncode:
@@ -199,22 +178,15 @@ int fatebridge_aa1996_solar(double tt, double *out, char *error) {{
             "AA1996 compilation failed; original sources and log retained"
         )
     probe = ctypes.CDLL(str(library))
-    for name, expected_value in [
-        ("fatebridge_aa1996_model_id", MODEL_ID),
-        ("fatebridge_aa1996_profile_sha256", profile_sha),
-    ]:
-        method = getattr(probe, name)
-        method.restype = ctypes.c_char_p
-        if method().decode("ascii") != expected_value:
-            raise ValueError("Built AA1996 model marker mismatch")
+    method = getattr(probe, "fatebridge_aa1996_model_id")
+    method.restype = ctypes.c_char_p
+    if method().decode("ascii") != MODEL_ID:
+        raise ValueError("Built AA1996 model marker mismatch")
     manifest: dict[str, int | str] = dict(
         model_id=MODEL_ID,
         version=profile["version"],
         abi_version=1,
-        source_profile_sha256=profile_sha,
-        calculation_source_sha256=graph_sha,
         binary=library.name,
-        binary_sha256=_sha(library),
         system=system,
         machine=platform.machine(),
         build_record="build.json",

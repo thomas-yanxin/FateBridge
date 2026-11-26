@@ -2,27 +2,16 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
 from pathlib import Path
 from typing import Any
 
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_shoku766_witnesses.json"
-FACTS_SHA256 = "f288efce5fcd845bfbd6ce3fcbad27ba9ad04656269cd45412866cea1c664f55"
 DAY_CYCLE = tuple(
     "甲乙丙丁戊己庚辛壬癸"[n % 10] + "子丑寅卯辰巳午未申酉戌亥"[n % 12]
     for n in range(60)
 )
-
-
-def validate_bundle(data: dict[str, Any]) -> None:
-    raw = json.dumps(
-        data, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode()
-    if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
-        raise ValueError("天平神护二年所选底本、校改和回指证据的固定绑定已改变")
 
 
 def month_witness_comparison(
@@ -40,9 +29,7 @@ def month_witness_comparison(
         raise ValueError("底本月首比较须有明确月键及0至59月首干支序号")
     if (year, month, leap) != (766, 2, False):
         return None
-    source = load_source(SOURCE)
-    data = source.data
-    validate_bundle(data)
+    data = load_source(SOURCE)
     inferences = []
     for witness in data["witnesses"]:
         index = DAY_CYCLE.index(witness["event_day_ganzhi_literal"])
@@ -59,7 +46,6 @@ def month_witness_comparison(
         )
     return {
         **data,
-        "source_bundle_sha256": source.sha256,
         "conditional_inferences": inferences,
         "host_month_start_index": host_month_start_index,
         "host_month_start_ganzhi": DAY_CYCLE[host_month_start_index],

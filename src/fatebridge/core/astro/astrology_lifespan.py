@@ -7,28 +7,29 @@ date. Source conformity and numerical accuracy require separate comparisons.
 
 The techniques:
 
-* :func:`build_harmonic_payload` — 调波盘 (harmonic chart): natal longitudes
-  multiplied by an integer ``harmonic`` number, then re-read for conjunctions.
-* :func:`build_planetary_ages_payload` — 行星年龄 (Ptolemy's seven ages):
+* build_harmonic_payload — 调波盘 (harmonic chart): natal longitudes
+  multiplied by an integer harmonic number, then re-read for conjunctions.
+* build_planetary_ages_payload — 行星年龄 (Ptolemy's seven ages):
   a fixed age table mapping each life band to its ruling planet.
-* :func:`build_triplicity_rulers_payload` — 三分主星推运: the sect light's
+* build_triplicity_rulers_payload — 三分主星推运: the sect light's
   triplicity rulers, ordered by sect, divide life into stages.
-* :func:`build_lunation_phase_payload` — 月相推运: actual postbirth Sun–Moon
+* build_lunation_phase_payload — 月相推运: actual postbirth Sun–Moon
   crossings mapped to symbolic years through the shared progression clock.
-* :func:`build_distributions_payload` — 界推运 / 分配法: the Ascendant directed
+* build_distributions_payload — 界推运 / 分配法: the Ascendant directed
   through the Egyptian bounds, each bound's lord governing one period.
-* :func:`build_balbillus_payload` — Balbillus 129年系统: small-year periods
+* build_balbillus_payload — Balbillus 129年系统: small-year periods
   shortened by each planet's distance from its exaltation, in zodiacal order.
-* :func:`build_keypoints_payload` — 数字相位推运 (120-year keypoints): planets
+* build_keypoints_payload — 数字相位推运 (120-year keypoints): planets
   activated by year when it is a multiple of their position- or period-number.
 
-Builders receive method-specific inputs and return plain ``dict`` payloads.
+Builders receive method-specific inputs and return plain dict payloads.
 Envelope assembly and snapshot rendering live in the service layer, mirroring
-``western_timing_tools`` — this module stays computation-only.
+western_timing_tools — this module stays computation-only.
 """
 
 from __future__ import annotations
 
+from datetime import timedelta
 from fractions import Fraction
 from typing import Any
 
@@ -136,12 +137,12 @@ DISTRIBUTION_TIME_KEY_RATES: dict[str, float] = {
 
 
 def _wrap360(degree: float) -> float:
-    """Normalize an angle into the ``[0, 360)`` range."""
+    """Normalize an angle into the [0, 360) range."""
     return degree % 360.0
 
 
 def _natal_longitudes(natal_reference: dict[str, dict[str, Any]]) -> dict[str, float]:
-    """Map ``TIMING_POINT_NAMES`` to their absolute natal longitudes."""
+    """Map TIMING_POINT_NAMES to their absolute natal longitudes."""
     longitudes: dict[str, float] = {}
     for point_name in TIMING_POINT_NAMES:
         point = natal_reference.get(point_name.lower())
@@ -168,7 +169,7 @@ def _angularity(house: int | None) -> str | None:
 def _planet_condition(
     point_name: str, natal_reference: dict[str, dict[str, Any]]
 ) -> dict[str, Any]:
-    """Compact natal placement of ``point_name`` for ruler/age readouts."""
+    """Compact natal placement of point_name for ruler/age readouts."""
     point = natal_reference.get(point_name.lower(), {})
     house = point.get("house")
     angularity = _angularity(house)
@@ -196,8 +197,8 @@ def build_harmonic_payload(
     orb: float,
 ) -> dict[str, Any]:
     """
-    Build the harmonic chart: each natal longitude is multiplied by ``harmonic``
-    and reduced mod 360. Bodies that fall within ``orb`` of each other in this
+    Build the harmonic chart: each natal longitude is multiplied by harmonic
+    and reduced mod 360. Bodies that fall within orb of each other in this
     harmonic field form 同频合相 (harmonic conjunctions).
     """
     longitudes = _natal_longitudes(natal_reference)
@@ -267,7 +268,7 @@ def build_planetary_ages_payload(
 ) -> dict[str, Any]:
     """
     Build Ptolemy's seven-ages table. Each life band is governed by one of the
-    seven traditional planets; when ``current_age_years`` is given, the active
+    seven traditional planets; when current_age_years is given, the active
     band is flagged.
     """
     bands: list[dict[str, Any]] = []
@@ -331,13 +332,13 @@ def build_triplicity_rulers_payload(
     light's sign. Ruler order follows sect: a day birth runs day → night →
     participating; a night birth runs night → day → participating.
 
-    ``division`` controls how the (nominal) ``lifespan`` is split:
+    division controls how the (nominal) lifespan is split:
 
-    * ``"thirds"`` — three equal stages (0–L/3, L/3–2L/3, 2L/3–L).
-    * ``"halves"`` — main ruler the first half, secondary the second, with the
+    * "thirds" — three equal stages (0–L/3, L/3–2L/3, 2L/3–L).
+    * "halves" — main ruler the first half, secondary the second, with the
       participating ruler running across the whole life.
 
-    The age bands use ``lifespan`` purely as a dividing convention (default 75,
+    The age bands use lifespan purely as a dividing convention (default 75,
     matching the Horosa reference), not as a prediction.
     """
     light_name = "Sun" if sect == "day" else "Moon"
@@ -405,7 +406,7 @@ def build_triplicity_rulers_payload(
 
 
 def _phase_for_elongation(elongation: Angle) -> tuple[str, str]:
-    """Return the ``(key, label)`` of the lunar phase containing ``elongation``."""
+    """Return the (key, label) of the lunar phase containing elongation."""
     band = int((angle_fraction(elongation) % 360) // 45)
     key, label, _ = LUNAR_PHASES[band]
     return key, label
@@ -535,7 +536,7 @@ def _bound_segments_from(
     asc_longitude: float, span_degrees: float
 ) -> list[dict[str, Any]]:
     """
-    Walk ``span_degrees`` of zodiacal arc forward from ``asc_longitude``, yielding
+    Walk span_degrees of zodiacal arc forward from asc_longitude, yielding
     one entry per Egyptian bound crossed, with the absolute arc at which the
     directed Ascendant enters that bound.
     """
@@ -568,7 +569,7 @@ def build_distributions_payload(
     max_age_years: float,
 ) -> dict[str, Any]:
     """
-    Direct the Ascendant through the Egyptian bounds at the chosen ``time_key``
+    Direct the Ascendant through the Egyptian bounds at the chosen time_key
     rate. Each bound the directed Ascendant occupies defines a period whose
     distributor is that bound's lord; natal bodies the directed Ascendant
     conjoins inside a period are recorded as participants (partners).
@@ -702,7 +703,7 @@ def _balbillus_period_years(planet: str, longitude: float | None, mode: str) -> 
 def _balbillus_order(
     longitudes: dict[str, float | None], start_planet: str
 ) -> list[str]:
-    """Seven planets sorted by natal longitude, rotated to ``start_planet``."""
+    """Seven planets sorted by natal longitude, rotated to start_planet."""
     present = [p for p in BALBILLUS_PLANET_ORDER if longitudes.get(p) is not None]
     ordered = sorted(present, key=lambda p: _wrap360(float(longitudes[p])))  # type: ignore[arg-type]
     if not ordered:
@@ -796,7 +797,6 @@ def build_balbillus_payload(
                 "attribution": "Balbillus, transmitted by Palchus; catalogue P. Boudreaux, edition and appendix F. Cumont",
                 "edition_year": 1921,
                 "publisher": "Mauritius Lamertin, Brussels",
-                "url": "https://archive.org/download/ccagtome-08-part-3/CCAGTome08Part4.pdf",
                 "printed_pages": [237, 238],
                 "critical_apparatus": "p237 note24 corrects manuscript 119 to 129 total shares and 119 to 19 Sun shares; compare the small-year list at lines18-19",
             },
@@ -846,8 +846,8 @@ def build_keypoints_payload(
 ) -> dict[str, Any]:
     """
     Build the 120-year keypoints timeline. Each planet carries a position-number
-    ``k`` (signs from the release point) and a period-number; a year activates a
-    planet when it is a multiple of that planet's ``k`` (position transfer) or of
+    k (signs from the release point) and a period-number; a year activates a
+    planet when it is a multiple of that planet's k (position transfer) or of
     its period-number (table activation).
     """
     if release_mode not in KEYPOINTS_RELEASE_MODES:
@@ -958,7 +958,7 @@ def build_yearsystem129_payload(
 ) -> dict[str, Any]:
     """
     Build the 129-year system: seven planets each rule their full small-year, in
-    zodiacal order from ``start_planet``, cycling until ``max_age_years``.
+    zodiacal order from start_planet, cycling until max_age_years.
     """
     if start_planet not in BALBILLUS_SMALL_YEARS:
         start_planet = "Sun"
@@ -1016,12 +1016,12 @@ def build_planetary_arc_payload(
 ) -> dict[str, Any]:
     """
     Direct the whole natal chart by a single arc: the secondary-progressed motion
-    of ``arc_source`` (default Moon). Every natal point advances by that arc, then
+    of arc_source (default Moon). Every natal point advances by that arc, then
     we read the aspects the directed points make back to the natal chart.
 
     This generalises the solar arc (which always uses the Sun's progressed motion)
     to any progressing body, and is verifiable against FateBridge's own secondary
-    progression: ``arc = progressed[arc_source] − natal[arc_source]``.
+    progression: arc = progressed[arc_source] − natal[arc_source].
     """
     if arc_source not in natal_longitudes or arc_source not in progressed_longitudes:
         arc_source = "Moon"
@@ -1073,20 +1073,16 @@ def build_persian_directed_payload(
     """
     波斯向运 / Persian Directed (symbolic 1°/year).
 
-    Faithful port of 星阙 ``AstroPersianDirected``: every classical promittor advances
+    Faithful port of 星阙 AstroPersianDirected: every classical promittor advances
     +1°/year while the natal chart (every body plus the 12 house cusps) stays fixed; we
     list each age at which a directed promittor reaches a Ptolemaic aspect to a natal
-    target, capped at ``max_age_years`` and the first ``limit`` hits by age.
+    target, capped at max_age_years and the first limit hits by age.
 
-    Rational arcs determine selection before display rounding. The fixed chart in
-    :mod:`tests.western.test_persian_directed` retains the historical hit values and checks
-    actual chronological order with an independent Decimal calculation. The hit set
+    Rational arcs determine selection before display rounding. The hit set
     is bounded by the natal objects FateBridge exposes (planets + nodes + 12 cusps); it
     does NOT include 星阙's enriched bodies (asteroids / midpoints / Arabic lots / 四余),
     so the table is a clean subset of 星阙's, not a row-for-row match on a live chart.
     """
-    import datetime as _dt
-
     by_id = {name: Fraction(lon) % 360 for name, lon in natal_longitudes.items()}
     targets = list(by_id.items())
     for index, cusp in enumerate(house_cusps):
@@ -1113,9 +1109,7 @@ def build_persian_directed_payload(
                     if birth_datetime is not None:
                         date = (
                             birth_datetime
-                            + _dt.timedelta(
-                                days=float(age) * PERSIAN_TROPICAL_YEAR_DAYS
-                            )
+                            + timedelta(days=float(age) * PERSIAN_TROPICAL_YEAR_DAYS)
                         ).strftime("%Y-%m-%d")
                     hits.append(
                         (
@@ -1153,9 +1147,9 @@ AGE_POINT_CYCLE_YEARS = 72.0
 def _house_containing(
     longitude: float, koch_cusps: list[float]
 ) -> tuple[int, Fraction]:
-    """Return (0-indexed house, fractional position within it) for ``longitude``.
+    """Return (0-indexed house, fractional position within it) for longitude.
 
-    Houses partition the circle, so exactly one Koch segment ``[cusp_h, cusp_{h+1})``
+    Houses partition the circle, so exactly one Koch segment [cusp_h, cusp_{h+1})
     contains the point; the fraction is how far along that segment the point sits.
     """
     point = Fraction(longitude) % 360
@@ -1186,8 +1180,8 @@ def build_age_point_payload(
 
     The age point leaves the Ascendant and sweeps the 12 Koch houses in zodiacal
     order, spending exactly 6 years in each (linear in time within a house, so the
-    angular speed varies with each Koch house's width). ``contacts`` gives the exact
-    age at which the point conjoins each natal body; ``points`` is the per-year
+    angular speed varies with each Koch house's width). contacts gives the exact
+    age at which the point conjoins each natal body; points is the per-year
     timeline (position + house), tagged with any conjunction landing that year.
     """
     cusps = koch_cusps

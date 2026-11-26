@@ -3,15 +3,11 @@
 from copy import deepcopy
 from typing import Any, Collection, Mapping, Sequence
 
-from fatebridge.core.source_identity import ZIPING_ZHENQUAN_NLC_SCAN_URL
-
 SOURCE = {
     "id": "ziping_stem_order_month_hour_v1",
     "title": "秘本子平真诠·论生克先后分吉凶",
     "author": "沈孝瞻",
     "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
-    "url": ZIPING_ZHENQUAN_NLC_SCAN_URL,
-    "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
     "pdf_pages": [47, 48],
     "printed_pages": [38, 39],
     "support_scope": "原页年甲月癸日丙时戊亦论戊癸无隔而合。同章许类推；其余五合字对只列候选类推，未逐类独立校验。不认证其他格局、合绊量、成化或全章算法。",

@@ -11,7 +11,6 @@ from fatebridge.core.metaphysics.common import (
     stem_element_text,
 )
 from fatebridge.core.metaphysics.liureng_relation_tables import GOD_ELEMENTS
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 MONTH_PARTITION = {
@@ -49,8 +48,6 @@ def seasonal_metadata() -> dict[str, Any]:
     return dict(
         ruleset_id="tanyuan_seasonal_month_conditions_v1",
         source_title="袁树珊《大六壬探原》论空亡、论十二天将、论旺相死囚休",
-        source_url=TANYUAN_SOURCE,
-        source_sha256=TANYUAN_SCAN_SHA256,
         original_pdf_pages=[84, 86, 89, 90],
         month_partition_profile="declared_seasonal_month_branches_v1",
         month_partition_basis="月建寅卯取春、巳午取夏、申酉取秋、亥子取冬，辰未戌丑整月取季月；这是当前配置，不认证季末十八日异法",
@@ -170,7 +167,6 @@ def seasonal_evidence(
 def seasonal_trace(evidence: dict[str, Any]) -> dict[str, Any]:
     return dict(
         rule_id="liuren.seasonal_conditions",
-        source_url=evidence["source_url"],
         source_section=evidence["source_title"],
         result={
             k: evidence[k]

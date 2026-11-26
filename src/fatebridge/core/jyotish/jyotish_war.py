@@ -41,9 +41,7 @@ THROUGH_HORA = (
 SOURCE = {
     "id": "raman_war_76_77_727c8063",
     "title": "B.V.Raman, Graha and Bhava Balas, sections76-77, printed60-61",
-    "url": "https://astrojyotish.info/pdf/graha-bhava-balas.pdf",
-    "sha256": "727c8063f64816a0c1c7f6bc577c249629854e980bf860bf4cfd8de16ec9bab2",
-    "sections": ["76-77 printed60-61/PDF65-66, page images verified"],
+    "sections": ["76-77 printed60-61"],
     "edition": "Foreword to thirteenth edition1992; exact reprint unverified",
     "scope": "War criterion, lower-longitude victor, fixed Bimba constants and through-Hora arithmetic only; other sections and mixed upstream strengths not thereby certified",
 }

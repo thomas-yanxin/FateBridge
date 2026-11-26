@@ -101,10 +101,10 @@ def _load_entries() -> tuple[PlaceEntry, ...]:
 
 KNOWN_BIRTH_PLACE_ENTRIES = _load_entries()
 PLACE_BY_ID = {r["id"]: r for r in KNOWN_BIRTH_PLACE_ENTRIES}
-_COUNTRIES: dict[str, CountryAliases] = json.loads(
+COUNTRIES: dict[str, CountryAliases] = json.loads(
     (CATALOG_DIRECTORY / "countries.json").read_text(encoding="utf-8")
 )
-_MANIFEST: PlaceCatalogAliases = json.loads(
+MANIFEST: PlaceCatalogAliases = json.loads(
     (CATALOG_DIRECTORY / "manifest.json").read_text(encoding="utf-8")
 )
 PLACE_ALIAS_INDEX: dict[str, list[str]] = defaultdict(list)
@@ -125,12 +125,12 @@ for _entry in KNOWN_BIRTH_PLACE_ENTRIES:
         PLACE_ALIAS_INDEX[_alias].append(_entry["id"])
     for _alias in _entry.get("admin1_aliases", ()):
         _index_qualifier(_alias, ("admin1", _entry["id"]))
-for _country, _info in _COUNTRIES.items():
+for _country, _info in COUNTRIES.items():
     for _alias in _info["aliases"]:
         _index_qualifier(_alias, ("country", _country))
 MAX_PLACE_ALIAS_LENGTH = max(map(len, (*PLACE_ALIAS_INDEX, *PLACE_CONTEXT_INDEX)))
 PREFERRED_PLACE_ALIASES: dict[str, str] = {}
-for _preferred_id in _MANIFEST["preferred_aliases"].values():
+for _preferred_id in MANIFEST["preferred_aliases"].values():
     if _preferred_id in PLACE_BY_ID:
         for _alias in PLACE_BY_ID[_preferred_id]["normalized_aliases"]:
             PREFERRED_PLACE_ALIASES[_alias] = _preferred_id

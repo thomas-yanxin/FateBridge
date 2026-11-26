@@ -34,7 +34,6 @@ class LiurenLifeStages(PartialOutput):
     ruleset_id: Literal["tanyuan_ten_stem_life_stages_v1"] | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[int] | None = None
     day_stem: str | None = None
     direction: Literal["顺", "逆"] | None = None

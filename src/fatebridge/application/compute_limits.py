@@ -15,14 +15,14 @@ class HeavyCalculationBudget:
     semaphore: BoundedSemaphore
 
 
-_BUDGET_LOCK = Lock()
+BUDGET_LOCK = Lock()
 _budget: HeavyCalculationBudget | None = None
 
 
 def heavy_calculation_budget() -> HeavyCalculationBudget:
     """Initialize the shared budget once from the configured environment."""
     global _budget
-    with _BUDGET_LOCK:
+    with BUDGET_LOCK:
         if _budget is None:
             configured_limit = os.getenv(
                 "FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY", str(DEFAULT_MAX_CONCURRENCY)

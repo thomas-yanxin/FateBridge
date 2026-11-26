@@ -48,7 +48,6 @@ def complete_inner_rate(
         "positions_unchanged": True,
         "position_reproduction_line_arcsec": POSITION_LINE_ARCSEC,
         "frame_component_reproduction_line_arcsec": FRAME_LINE_ARCSEC,
-        "source_url": "https://www.astro.com/swisseph/swephprg.htm",
         "source_function": "pyswisseph2.10.3.2/libswe/sweph.c:app_pos_etc_plan,swi_deflect_light,swi_aberr_light",
         "physical_TT_TDB_equivalence_certified": False,
         "native_binary_function_derivative_certified": False,

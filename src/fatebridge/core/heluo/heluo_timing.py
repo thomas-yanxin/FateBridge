@@ -9,7 +9,7 @@ intercalary days and the old extra-ke convention remain separate problems.
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Optional
+from typing import Any
 
 from fatebridge.core.heluo.heluo import _flip_line, _ying, da_yun
 from fatebridge.core.heluo.heluo_clock import source_clock_evidence
@@ -22,8 +22,6 @@ from fatebridge.core.heluo.heluo_texts import (
 from fatebridge.core.zhouyi import classical_hexagram
 
 RULESET_ID = "heluo_xiaoxiang_nlc_sequence_v1"
-SOURCE_URL = "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf"
-SOURCE_SHA256 = "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c"
 CYCLE = tuple(GAN[i % 10] + ZHI[i % 12] for i in range(60))
 
 
@@ -60,7 +58,7 @@ def _advance(pos: int, count: int = 1) -> int:
     return (pos - 1 + count) % 6 + 1
 
 
-def _row(before: list[int], changed_pos: Optional[int], pos: int) -> dict[str, Any]:
+def _row(before: list[int], changed_pos: int | None, pos: int) -> dict[str, Any]:
     after = _flip_line(before, changed_pos) if changed_pos is not None else before[:]
     return {
         "gua": lines_to_gua(after)["name"],
@@ -226,8 +224,6 @@ def _selected_text(row: dict[str, Any], scope: str) -> dict[str, Any]:
         "corpus_key": f"{row['gua']}.yao.{row['pos']}",
         "heluo_commentary": deepcopy(yao_text(row["gua"], row["pos"]) or {}),
         "zhouyi_verse": deepcopy(reference["yaoci"][row["pos"] - 1]),
-        "zhouyi_source_url": reference["source_url"],
-        "zhouyi_source_sha256": reference["source_wikitext_sha256"],
         "branch_selection": "no_automatic_xie_or_buxie_selection",
     }
 
@@ -236,9 +232,9 @@ def build_heluo_timing(
     chart: dict,
     birth_ganzhi: str,
     *,
-    analysis_year: Optional[int] = None,
-    month_index: Optional[int] = None,
-    day_index: Optional[int] = None,
+    analysis_year: int | None = None,
+    month_index: int | None = None,
+    day_index: int | None = None,
 ) -> dict[str, Any]:
     if month_index is not None and (
         type(month_index) is not int
@@ -257,8 +253,6 @@ def build_heluo_timing(
         "ruleset_id": RULESET_ID,
         "ruleset_version": "1.1.0",
         "source_title": "河洛理數（上海文明書局印行本）卷一",
-        "source_url": SOURCE_URL,
-        "source_pdf_sha256": SOURCE_SHA256,
         "source_pdf_pages": [37, 38, 39, 40],
         "scope": "collated_sequences_and_source_clock_arithmetic; full_calendar_mapping_pending",
         "year_context": year_context(chart, birth_ganzhi),

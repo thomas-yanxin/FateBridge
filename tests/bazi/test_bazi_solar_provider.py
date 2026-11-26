@@ -69,7 +69,6 @@ def test_missing_native_crossings_are_rejected_on_all_three_surfaces(
         assert envelope["issues"][0]["code"] == "solar_native_unavailable"
         assert envelope["retryable"] is False
         assert not any(k in envelope for k in ("bazi_birth", "four_pillars", "liuyue"))
-    assert "solar_native_unavailable" in str(protocol.content)
 
 
 @pytest.mark.parametrize("provider", ["linear_1900_fallback", "unknown", ""])
@@ -79,7 +78,7 @@ def test_unknown_provenance_is_not_promoted_to_a_calculated_term(provider: str) 
         ZonedCalendar.from_datetime(datetime(2026, 2, 4, tzinfo=timezone.utc)),
         provider,
     )
-    with pytest.raises(RuntimeError, match="swisseph"):
+    with pytest.raises(almanac.EphemerisSourceError):
         almanac.require_calculated_solar_term(term)
 
 
@@ -130,7 +129,7 @@ def test_actual_consumed_boundary_is_checked_even_when_other_terms_are_available
         lambda year, zone: tainted if year == 2026 else original(year, zone),
     )
     probe = next(t for t in terms if t.name == name).moment
-    with pytest.raises(RuntimeError, match="swisseph"):
+    with pytest.raises(almanac.EphemerisSourceError):
         if name == "立春":
             almanac.get_bazi_year(probe)
         elif name == "惊蛰":

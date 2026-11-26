@@ -9,13 +9,6 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.taiyi_geometry import PALACES, RING
-from fatebridge.core.metaphysics.taiyi_hour import KEY_SOURCE
-
-HEAVEN_TIME_RULE_SOURCES = {
-    "key_annual_example": "https://upload.wikimedia.org/wikipedia/commons/1/19/NLC892-411999021066-66022_%E5%A4%AA%E4%B9%99%E9%87%91%E9%91%B0%E5%8C%99.pdf#page=33",
-    "jinjing_vol7": "https://zh.wikisource.org/w/index.php?title=太乙金鏡式經_(四庫全書本)/卷07&oldid=773942",
-    "tongzong_vol20": "https://www.shidianguji.com/zh/book/CADAL02094393/chapter/1lcppxguguiai",
-}
 
 
 def _held_ring(start: str, held: str) -> tuple[str, ...]:
@@ -87,14 +80,12 @@ def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
                 if palace is None
                 else None
             ),
-            "source": KEY_SOURCE,
         }
     records["heaven_time"].update(
         source_comparisons=[],
         rule_evidence={
             "status": "adopted_rule_with_worked_example_disagreement",
             "basis": "金镜卷七、统宗卷二十均明列十二辰；金钥匙年度例第10数在亥，与寅起十二支一致。本项采纳通则，不据单例倒造十六方周期。",
-            "sources": HEAVEN_TIME_RULE_SOURCES,
             "unresolved": "丁未日第8数算路插巽而落坤，与十二支通则不符；原读数保留，未认定为传抄错误或改写原图。",
         },
         candidates=[
@@ -112,7 +103,6 @@ def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
                 "source_value": "坤",
                 "rule_derived_value": records["heaven_time"]["palace"],
                 "scope": "图41-42正文与图43丁未课式均作大武坤；仅同一十二支阳局相位的数值对照，历史日期匹配另列。",
-                "source": KEY_SOURCE,
             }
         ]
     records["taiyi_ordinal"] = {
@@ -123,7 +113,6 @@ def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
         "period": 72,
         "cycle_position": (accumulation - 1) % 72 + 1,
         "reason": "五元七十二局定义与年度例22、日课式44支持局序；日正文又写四宫，宫位语义仍未裁定。阴局对冲不作用于局序。",
-        "source": KEY_SOURCE,
     }
     # These reference the same Yang phase, not the same historical date or
     # a separately validated forecast. Keep BOTH source readings.
@@ -134,7 +123,6 @@ def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
                 "source_value": value,
                 "rule_derived_value": records["eight_winds"]["palace"],
                 "scope": scope,
-                "source": KEY_SOURCE,
             }
             for value, scope in (("乾", "图42正文：阴德"), ("艮", "图43课式：三宫"))
         ]
@@ -143,7 +131,6 @@ def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
         "accumulation": accumulation,
         "yin": yin,
         "records": records,
-        "source": KEY_SOURCE,
         "ruleset_id": "key_ten_jing_v1",
         "version": "1.1.0",
         "author": "FateBridge contributors",
@@ -168,7 +155,7 @@ def attach_ten_jing(board: dict[str, Any]) -> None:
 
 
 def ten_jing_text(data: dict[str, Any]) -> str:
-    lines = [f"金钥匙十精：{data['ruleset_id']}；来源：{data['source']}。"]
+    lines = [f"金钥匙十精：{data['ruleset_id']}（{data['classical_author']}）。"]
     for record in data["records"].values():
         location = record.get("palace") or (
             f"第{record['ordinal']}局（非宫位）" if "ordinal" in record else "未裁定"
@@ -179,8 +166,7 @@ def ten_jing_text(data: dict[str, Any]) -> str:
         evidence = record.get("rule_evidence")
         if evidence:
             lines.append(
-                f"{record['label']}取法依据：{evidence['basis']}；未决：{evidence['unresolved']}；补证来源："
-                + "；".join(f"{k}={v}" for k, v in evidence["sources"].items())
+                f"{record['label']}取法依据：{evidence['basis']}；未决：{evidence['unresolved']}。"
             )
         for comparison in record.get("source_comparisons", []):
             lines.append(

@@ -4,9 +4,29 @@ import copy
 
 import pytest
 
+from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.jyotish.jyotish import build_india
 from fatebridge.core.jyotish.jyotish_evidence import cheshta_ruler_provenance
-from fatebridge.core.jyotish.jyotish_mean import STAR_PLANETS
-from tests.jyotish.test_jyotish_ruler_provenance import computed  # noqa: F401
+from fatebridge.core.jyotish.jyotish_mean import MODEL, STAR_PLANETS
+
+
+@pytest.fixture(scope="module")
+def computed():
+    return build_india(
+        build_astro_birth_info(
+            birth_year=2000,
+            birth_month=1,
+            birth_day=1,
+            birth_hour=0,
+            birth_timezone="UTC",
+            birth_longitude=0.0,
+            birth_latitude=0.0,
+            preserve_instant=True,
+        ),
+        divisions=[],
+        cheshta_model=MODEL,
+    )
+
 
 FAULTS = [
     "mean_operand",

@@ -64,7 +64,7 @@ IR5 与旧工位尖角观察另保留 WOFS／Joey Yap 的作者分歧：后者�
 
 ## 器形参考与代表物资格
 
-器形的五行对应属于署名教学参考；它不自动证明该物件能作某元素的调节物。材料／颜色资格使用 `sourced_material_representation_v1@1.0.1` 并保留条件和异议。例如 [Larry Sang／AFSI《The Principles of Feng Shui》](https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf)第六版（2004年7月）第三章印刷第 19–28 页／PDF 第 36–45 页的既有规则以健康活植物作木代表物，处理木家具不作为该版本的木调节物；不能因木椅呈柱形或涂绿色就消除这一材料限制。原始 PDF 已保存并核对散列，材料重点定位为印刷23、25／PDF40、42页。附加施用条件、目标绑定和 AFSI／Diamond 的柜内金属异议见[工位作者规则](workstation-authored.md)；资格不认证剂量或摆放位置。
+器形的五行对应属于署名教学参考；它不自动证明该物件能作某元素的调节物。材料／颜色资格使用 `sourced_material_representation_v1@1.0.1` 并保留条件和异议。例如 [Larry Sang／AFSI《The Principles of Feng Shui》](https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf)第六版（2004 年 7 月）第三章印刷第 19–28 页／PDF 第 36–45 页的既有规则以健康活植物作木代表物，处理木家具不作为该版本的木调节物；不能因木椅呈柱形或涂绿色就消除这一材料限制（材料重点定位为印刷 23、25／PDF 40、42 页）。附加施用条件、目标绑定和 AFSI／Diamond 的柜内金属异议见[工位作者规则](workstation-authored.md)；资格不认证剂量或摆放位置。
 
 印刷23页的土类颜色分别是 `tan`、`beige`、`yellow`，本版按原词核对。`tan` 与宽泛的 `brown` 分别记录；只确认 `brown` 不足以确认 `tan`，因此不自动给出 AFSI 颜色匹配。FSI 网页另有棕色分类，但本规则只取其器形参考，不能借该网页补写 AFSI 的颜色。未登记颜色继续保留实际观察，不强配元素。
 

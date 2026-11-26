@@ -151,7 +151,6 @@ def build_clash_conditions(
         "ruleset_id": PROFILE["ruleset_id"],
         "ruleset_version": PROFILE["ruleset_version"],
         "source_url": PROFILE["source"]["url"] + "#page=85",
-        "source_sha256": PROFILE["source"]["sha256"],
         "clauses": deepcopy(PROFILE["clauses"]),
         "textual_issues": deepcopy(PROFILE["textual_issues"]),
         "lines": rows,

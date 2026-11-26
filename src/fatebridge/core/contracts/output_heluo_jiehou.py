@@ -238,10 +238,8 @@ class HeluoJiehouEvidence(PartialOutput):
     version: str | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     review_status: str | None = None
-    loaded_sha256: str | None = None
     selection_basis: (
         Literal["already_computed_term_label; modern_calendar_convention"] | None
     ) = None

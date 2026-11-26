@@ -415,7 +415,7 @@
       "role": "calculation",
       "selector_fields": [],
       "source_refs": [
-        "docs/bazi-assessment.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "per_field",
       "validation_scope": {
@@ -456,7 +456,7 @@
       "role": "calculation",
       "selector_fields": [],
       "source_refs": [
-        "docs/bazi-timing.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "per_field",
       "validation_scope": {

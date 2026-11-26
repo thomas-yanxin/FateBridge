@@ -26,7 +26,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 method_name=f"western_{tool_name}",
                 consuming_tools=f"{tool_name} western_timing_analysis",
                 implementation_path="core/predictive/western_timing.py",
-                source_path="docs/western-astrology.md",
+                source_path="docs/algorithm-coverage.md",
                 quantity_kind="astronomy_and_rule_result",
                 measurement_unit="per_field",
                 error_sources=(
@@ -46,7 +46,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 method_name=f"western_{tool_name}",
                 consuming_tools=f"astro_{tool_name}",
                 implementation_path="core/astro/astrology_lifespan.py",
-                source_path="docs/western-astrology.md",
+                source_path="docs/algorithm-coverage.md",
                 quantity_kind="astronomy_and_rule_result",
                 measurement_unit="per_field",
                 error_sources=(
@@ -64,7 +64,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 method_name=f"western_{tool_name}",
                 consuming_tools=f"astro_{tool_name}",
                 implementation_path="services/western_events.py",
-                source_path="docs/western-astrology.md",
+                source_path="docs/algorithm-coverage.md",
                 quantity_kind="astronomy_and_rule_result",
                 measurement_unit="per_field",
                 error_sources=(
@@ -90,13 +90,6 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
             implementation_refs += (
                 "src/fatebridge/core/lunar_phase_events.py",
                 "src/fatebridge/core/predictive/progressions.py",
-            )
-            source_refs += (
-                "https://www.khaldea.com/rudhyar/astroarticles/progressedlunationcharts.php",
-                "https://khaldea.com/rudhyar/pofa/pofa_11.shtml",
-                "https://khaldea.com/rudhyar/astroarticles/lunationbirthday_2.php",
-                "https://www.khaldea.com/rudhyar/astroarticles/lunationbirthday_4.php",
-                "https://www.astro.com/swisseph/swephprg.htm",
             )
             error_sources += ("numerical_solver",)
         records.append(
@@ -195,10 +188,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                     "src/fatebridge/core/local_techniques/chart.py",
                     "src/fatebridge/core/local_techniques/otherbu.py",
                 ),
-                source_refs=(
-                    "docs/astrodice.md",
-                    "https://www.astro.com/swisseph/swephprg.htm",
-                ),
+                source_refs=("docs/astrodice.md",),
                 selector_fields=("tradition", "hsys", "zodiacal", "fortune_method"),
                 error_sources=(
                     "civil_clock",
@@ -282,7 +272,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                     "太阳盘内坐标为具名数学约定；有限队列不认证完整物理范围或现实预测",
                 ),
                 implementation_refs=("src/fatebridge/core/astro/opaque_solar.py",),
-                source_refs=("docs/western-astrology.md",),
+                source_refs=("docs/algorithm-coverage.md",),
                 selector_fields=("apparent_model",),
                 error_sources=(
                     "ephemeris_model",

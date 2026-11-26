@@ -17,9 +17,6 @@ from fatebridge.core.human_design.human_design_interval_geometry import (
 NOMINAL_SOLAR_RADIUS_M = 695700000
 ASTRONOMICAL_UNIT_M = 149597870700
 ARITHMETIC_RESOLUTION_RADIANS = 1e-12
-RADIUS_SOURCE = "https://www.iau.org/common/Uploaded%20files/IAUGA2015-Resolution-B3-recommended-nominal-conversion.pdf"
-AU_SOURCE = "https://ssd.jpl.nasa.gov/planets/eph_export.html"
-DEFLECTION_SOURCE = "https://www.astro.com/swisseph/swisseph.htm"
 
 
 def _coordinates(values: Sequence[float]) -> tuple[float, float, float]:

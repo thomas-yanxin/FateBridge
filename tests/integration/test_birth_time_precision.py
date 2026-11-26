@@ -20,7 +20,6 @@ from fatebridge.utils.places import (
 )
 from fatebridge.utils.solar_time import normalize_birth_time
 from fatebridge.utils.timezones import parse_timezone_name
-from tests.fixtures.solar_reference import expected_solar_clock
 
 
 def test_normalize_birth_time_preserves_legacy_hour_only_behavior() -> None:
@@ -198,9 +197,9 @@ def test_calculate_destiny_analysis_uses_corrected_solar_time_for_hour_pillar() 
     result = calculate_destiny_analysis(person)
 
     assert result["person_info"]["birth_datetime"] == "2020年01月01日 00时30分"
-    assert result["person_info"]["normalized_birth_datetime"] == expected_solar_clock(
-        datetime(2020, 1, 1, 0, 30), "Asia/Shanghai", 87.6168
-    ).strftime("%Y年%m月%d日 %H时%M分")
+    assert (
+        result["person_info"]["normalized_birth_datetime"] == "2019年12月31日 22时17分"
+    )
     assert result["person_info"]["time_adjustment"]["applied"] is True
     assert result["person_info"]["time_adjustment"]["timezone"] == "Asia/Shanghai"
     assert result["person_info"]["time_adjustment"]["longitude_source"] == "birth_place"
@@ -227,9 +226,7 @@ def test_calculate_comprehensive_timing_uses_corrected_birth_time() -> None:
     )
 
     assert result["personal_info"]["birth_datetime"] == "2020-01-01 00:30"
-    assert result["personal_info"]["normalized_birth_datetime"] == expected_solar_clock(
-        datetime(2020, 1, 1, 0, 30), "Asia/Shanghai", 87.6168
-    ).strftime("%Y-%m-%d %H:%M")
+    assert result["personal_info"]["normalized_birth_datetime"] == "2019-12-31 22:17"
     assert result["personal_info"]["time_adjustment"]["applied"] is True
     assert result["personal_info"]["time_adjustment"]["resolved_place"] == "乌鲁木齐"
     assert result["personal_info"]["time_adjustment"]["resolution_level"] == "city"

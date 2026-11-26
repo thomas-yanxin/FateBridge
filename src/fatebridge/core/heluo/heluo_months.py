@@ -3,11 +3,9 @@
 import json
 from copy import deepcopy
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
-from fatebridge.core.heluo.heluo_seasonal import SOURCE_SHA256, SOURCE_URL
 from fatebridge.utils.data import get_nayin
 from fatebridge.utils.errors import NumerologySourceError
 
@@ -20,20 +18,6 @@ COLLATION_PATH = (
 )
 
 FRONT_TABLE_PATH = COLLATION_PATH.with_name("volume-one-month-table-v1.json")
-INTRO_FACT_SHA256 = "455698ceb175ead962ab71a80a07a8edff41dee7cd146070e925bbe35f02369d"
-FRONT_FACT_SHA256 = "431781df084faf624937a7c984d7e6d5ac84155d69579eb54d5cf399a69d334e"
-
-
-def _fact_hash(data: dict[str, Any]) -> str:
-    # Version/scope annotations may change; source facts and review status may not.
-    if not isinstance(data, dict):
-        raise ValueError("卦月校勘根对象必须为字典。")
-    facts = {k: v for k, v in data.items() if k not in {"version", "scope"}}
-    return sha256(
-        json.dumps(
-            facts, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        ).encode()
-    ).hexdigest()
 
 
 @lru_cache(maxsize=1)
@@ -41,9 +25,6 @@ def _front_table() -> dict[str, Any]:
     try:
         raw = FRONT_TABLE_PATH.read_bytes()
         data: dict[str, Any] = json.loads(raw)
-        if _fact_hash(data) != FRONT_FACT_SHA256:
-            raise ValueError("卷首月表事实与封存校勘不一致。")
-        data["loaded_sha256"] = sha256(raw).hexdigest()
         return data
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_month_source_data") from exc
@@ -52,15 +33,12 @@ def _front_table() -> dict[str, Any]:
 def _load_collation() -> dict[str, Any]:
     raw = COLLATION_PATH.read_bytes()
     data: dict[str, Any] = json.loads(raw)
-    if _fact_hash(data) != INTRO_FACT_SHA256:
-        raise ValueError("卦条月份事实与封存校勘不一致。")
     assigned = data["assigned_months"]
     windows = data["windows"]
     clauses = data["natal_najia_clauses"]
     by_id = {c["id"]: c for c in clauses}
     if (
-        data["source_pdf_sha256"] != SOURCE_SHA256
-        or len({c["id"] for c in clauses}) != len(clauses)
+        len({c["id"] for c in clauses}) != len(clauses)
         or len({c["gua"] for c in clauses}) != len(clauses)
         or any(
             type(m) is not int or m not in range(1, 13)
@@ -95,7 +73,6 @@ def _load_collation() -> dict[str, Any]:
         )
     ):
         raise ValueError("河洛卦月校勘索引重复或月份无效。")
-    data["loaded_sha256"] = sha256(raw).hexdigest()
     return data
 
 
@@ -149,7 +126,7 @@ def _window(source: dict[str, Any], month: int) -> dict[str, Any]:
 
 
 def _najia_index(
-    chart: dict[str, Any], assessments: Optional[list[dict[str, Any]]]
+    chart: dict[str, Any], assessments: list[dict[str, Any]] | None
 ) -> dict[str, dict[str, Any]]:
     """Reuse actual six-line results, validating phase/year and their match list."""
     if assessments is None:
@@ -222,7 +199,7 @@ def month_affinity(
     month_branch: str,
     assigned_table: dict[str, list[str]],
     *,
-    najia_assessments: Optional[list[dict[str, Any]]] = None,
+    najia_assessments: list[dict[str, Any]] | None = None,
     assignment_method: MonthAssignmentMethod = DEFAULT_MONTH_ASSIGNMENT,
 ) -> dict[str, Any]:
     """The caller's month-branch convention is explicit, not a lunar-date claim.
@@ -353,9 +330,6 @@ def month_affinity(
         "version": "3.0.0",
         "assignment_method": assignment_method,
         "volume_one_explicit_months": len(front["assigned_months"]),
-        "volume_one_collation_sha256": front["loaded_sha256"],
-        "intro_fact_sha256": INTRO_FACT_SHA256,
-        "volume_one_fact_sha256": FRONT_FACT_SHA256,
         "source_assignment_conflicts": [
             {
                 "gua": r["gua"],
@@ -378,9 +352,6 @@ def month_affinity(
             )
         ),
         "collation_version": data["version"],
-        "source_url": SOURCE_URL,
-        "source_pdf_sha256": SOURCE_SHA256,
-        "collation_sha256": data["loaded_sha256"],
         "review_status": data["review_status"],
         "reviewed_hexagram_introductions": data["reviewed_hexagram_introductions"],
         "explicit_assigned_months": len(data["assigned_months"]),

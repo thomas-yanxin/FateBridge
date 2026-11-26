@@ -4,11 +4,10 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from fatebridge.core.astro.lilly_orbs import SOURCE_URL
 from fatebridge.core.planetary_event_order import ordered_contact
 
-_HOUSE_ORDER = (1, 10, 7, 4, 11, 5, 9, 3, 2, 8, 6, 12)
-_HOUSE_POINTS = {
+HOUSE_ORDER = (1, 10, 7, 4, 11, 5, 9, 3, 2, 8, 6, 12)
+HOUSE_POINTS = {
     1: 5,
     10: 5,
     7: 4,
@@ -27,7 +26,7 @@ _HOUSE_POINTS = {
 def house_condition(
     occupied_house: int | None, house_system: str | None, zodiac_type: str | None
 ) -> dict[str, Any]:
-    if occupied_house is not None and occupied_house not in _HOUSE_ORDER:
+    if occupied_house is not None and occupied_house not in HOUSE_ORDER:
         raise ValueError("Occupied house must be 1..12 or unknown")
     return {
         "occupied_house": occupied_house,
@@ -41,11 +40,11 @@ def house_condition(
             )
         ),
         "p48_strength_rank": (
-            None if occupied_house is None else _HOUSE_ORDER.index(occupied_house) + 1
+            None if occupied_house is None else HOUSE_ORDER.index(occupied_house) + 1
         ),
         "p48_rank_condition": "Ordinal comparison only when two planets are otherwise equally dignified; not sorted by p115 points or a probability",
         "p115_house_points": (
-            None if occupied_house is None else _HOUSE_POINTS[occupied_house]
+            None if occupied_house is None else HOUSE_POINTS[occupied_house]
         ),
         "points_scope": "House row only; not the complete accidental dignity/debility table or a summed judgement",
         "assignment_policy": "Literal selected-chart occupied house only; the separate house_assignment receipt evaluates p33 cusp virtue. Geometric occupancy is not overwritten by that policy; full historical assignment variants remain unverified",
@@ -56,7 +55,6 @@ def house_condition(
             if house_system == "R" and zodiac_type in {"Tropic", "Tropical"}
             else "other_or_unknown_chart_method_not_original_edition_acceptance"
         ),
-        "source_url": SOURCE_URL,
         "source_pages": [48, 50, 115],
         "full_original_text_acceptance": False,
     }
@@ -147,7 +145,6 @@ def dwelling_clause(
         reading = "所问主星实际落第一宫，月亮传递子条件仍未知；不能把缺失历史、边界歧义或角色重合当作传光成立，也不能仅凭居宫断成。"
     return {
         "rule_id": "lilly_1647_p126_127_dwelling_necessary_conditions_v1",
-        "source_url": SOURCE_URL,
         "source_pages": [126, 127],
         "quesited_occupied_house": occupied,
         "quesited_in_first_house": in_first,

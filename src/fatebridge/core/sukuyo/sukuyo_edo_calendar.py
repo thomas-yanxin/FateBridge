@@ -21,8 +21,7 @@ def calendar_method_reference(
         raise ValueError("月份须为1至12")
     if not 1685 <= year <= 1872:
         return None
-    source = load_source(SOURCE)
-    data = source.data
+    data = load_source(SOURCE)
     periods = [
         p
         for p in data["calendar_periods"]
@@ -54,7 +53,6 @@ def calendar_method_reference(
             "nominal_size_does_not_extend_covered_calendar": True,
         }
     return {
-        "source_bundle_sha256": source.sha256,
         "calendar_period": period,
         "period_source": deepcopy(data["sources"]["naoj_reforms"]),
         "period_assignment_basis": "printed_lunar_year_not_civil_year_or_era_name",

@@ -141,7 +141,6 @@ def build_back_generation_conditions(
         qualification_ruleset_id=PENALTY_PROFILE["ruleset_id"],
         qualification_ruleset_version=PENALTY_PROFILE["ruleset_version"],
         qualification_source_url=PENALTY_PROFILE["source"]["url"] + "#page=98",
-        source_sha256=PROFILE["source"]["sha256"],
         source_url=PROFILE["source"]["url"] + "#page=53",
         clauses=deepcopy(PROFILE["clauses"]),
         textual_issues=deepcopy(PROFILE["textual_issues"]),

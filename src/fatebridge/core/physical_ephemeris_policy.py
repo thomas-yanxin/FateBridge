@@ -11,6 +11,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from typing import Iterator
 
+from fatebridge.core.ephemeris_runtime import lock_ephemeris_configuration, swe
 from fatebridge.core.physical_source_observation import (
     _POLICY,
     DataFilePolicy,
@@ -26,8 +27,6 @@ def data_file_policy(mode: str) -> Iterator[DataFilePolicy | None]:
     if active is not None or mode == "auto":
         yield active
         return
-    from fatebridge.core.ephemeris_runtime import lock_ephemeris_configuration, swe
-
     state = DataFilePolicy()
     token = _POLICY.set(state)
     try:

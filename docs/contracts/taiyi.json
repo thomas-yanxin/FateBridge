@@ -92,7 +92,6 @@
         "taiyi.ten_jing.version",
         "taiyi.ten_jing.author",
         "taiyi.ten_jing.classical_author",
-        "taiyi.ten_jing.source",
         "taiyi.ten_jing.classical_acceptance_passed",
         "taiyi.ten_jing.scope",
         "taiyi.ten_jing.records.emperor.label",
@@ -345,7 +344,7 @@
   },
   "input": {
     "additionalProperties": false,
-    "description": "Request model for Taiyi analysis.\n\n太乙 does NOT take 奇门's ``qimen_options`` (layout/palaceShift) — it used to\ninherit ``QimenAnalysisRequest`` purely to reuse the date/time fields, which\nleaked ``qimen_options`` onto the 太乙 schema where it is meaningless. The\nfields below are exactly what ``calculate_taiyi_analysis`` consumes.",
+    "description": "Request model for Taiyi analysis.\n\n太乙 does NOT take 奇门's qimen_options (layout/palaceShift) — it used to\ninherit QimenAnalysisRequest purely to reuse the date/time fields, which\nleaked qimen_options onto the 太乙 schema where it is meaningless. The\nfields below are exactly what calculate_taiyi_analysis consumes.",
     "properties": {
       "analysis_day": {
         "description": "Analysis day (1-31)",
@@ -587,7 +586,7 @@
         "shiji_profile"
       ],
       "source_refs": [
-        "docs/taiyi-sanshi-audit.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "per_field",
       "validation_scope": {

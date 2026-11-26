@@ -472,7 +472,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -1719,7 +1719,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -1728,7 +1728,7 @@
           "definition_basis": "tip[0]为所选五行—五藏原文的限域编释；“五行藏象”为本卡整理总称，非已核同名原文，六府及完整藏象体系不在此四页的接受范围。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
-            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
             "2": "editorial_delivery_boundary; no clinical validation or medical inference"
           },
           "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
@@ -1778,7 +1778,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -1787,7 +1787,7 @@
           "definition_basis": "tip[0]显式连接《素问》木—肝与《灵枢》肝—胆；这是跨段术语整理，未获得一句“木主肝胆”的直接原叶引文。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
-            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
             "2": "editorial_delivery_boundary; no clinical validation or medical inference"
           },
           "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
@@ -1824,7 +1824,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -1833,7 +1833,7 @@
           "definition_basis": "tip[0]按所选原文的同段传统配属解释“主”，不把它改写为生理控制关系。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
-            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
             "2": "editorial_delivery_boundary; no clinical validation or medical inference"
           },
           "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
@@ -1883,7 +1883,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -1892,7 +1892,7 @@
           "definition_basis": "tip[0]显式连接《素问》土—脾与《灵枢》脾—胃；这是跨段术语整理，非一句“土主脾胃”的逐字引文。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
-            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
             "2": "editorial_delivery_boundary; no clinical validation or medical inference"
           },
           "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
@@ -1929,7 +1929,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -1938,7 +1938,7 @@
           "definition_basis": "tip[0]只解释所选原文金—肺的文化配属，不接受由命盘权重到现代人体系统的扩展。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
-            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
             "2": "editorial_delivery_boundary; no clinical validation or medical inference"
           },
           "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
@@ -1975,7 +1975,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -1984,7 +1984,7 @@
           "definition_basis": "tip[0]只解释所选原文水—肾的文化配属，不由盘内有无或偏多少推断实际生理状态。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
-            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
             "2": "editorial_delivery_boundary; no clinical validation or medical inference"
           },
           "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
@@ -2021,7 +2021,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -2059,7 +2059,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -2100,7 +2100,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2152,7 +2152,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2202,7 +2202,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2252,7 +2252,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2306,7 +2306,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2357,7 +2357,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2413,7 +2413,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2464,7 +2464,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2518,7 +2518,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2571,7 +2571,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2647,7 +2647,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2700,7 +2700,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2749,7 +2749,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -3247,7 +3247,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
               "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
             },
             {

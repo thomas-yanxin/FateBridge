@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -13,11 +12,9 @@ from fatebridge.core.human_design.human_design_references import (
     coherent_human_design_references,
 )
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.utils.json_digest import canonical_bytes
 
 CATEGORY = "lines_v4"
 CATALOGUE_PATH = base.CATALOGUE_PATH.with_name("context-clauses-2001-v1.json")
-CATALOGUE_SHA256 = "cc82bc7418315c90edc182c3e510842b1e79cdd583aaf587f99a664b286b5d4b"
 KEYS = ["2.3", "6.3", "7.2", "12.6", "42.1"]
 SCOPE = (
     "另有5条局部结构条款注释（含既有2.3），不增加完整爻义覆盖。"
@@ -32,8 +29,6 @@ def _catalogue(
     data, snapshot, provenance = parent._catalogue() if previous is None else previous
     try:
         raw = CATALOGUE_PATH.read_bytes()
-        if hashlib.sha256(raw).hexdigest() != CATALOGUE_SHA256:
-            raise ValueError("Context annotation catalogue changed")
         catalogue = json.loads(
             raw, object_pairs_hook=base._object, parse_constant=base._nonfinite
         )
@@ -42,8 +37,6 @@ def _catalogue(
             or catalogue["version"] != 4
             or catalogue["catalogue_id"] != "human_design_line_context_annotations_v4"
             or catalogue["parent_version"] != data["version"]
-            or catalogue["parent_manifest_sha256"] != parent.MANIFEST_SHA256
-            or catalogue["source_pdf_sha256"] != data["source"]["pdf_sha256"]
             or catalogue["local_paraphrase_count"] != 18
             or catalogue["independently_accepted_line_count"] != 0
             or catalogue["publisher_master_authenticated"] is not False
@@ -61,8 +54,6 @@ def _catalogue(
             if (
                 annotation["source_pdf_page_one_based"]
                 != row["source_pdf_page_one_based"]
-                or annotation["source_layout_block_sha256"]
-                != row["source_layout_block_sha256"]
                 or annotation["personal_condition_satisfied"] is not None
                 or annotation["automatic_application"] is not False
                 or annotation["complete_line_meaning_accepted"] is not False
@@ -76,9 +67,6 @@ def _catalogue(
         snapshot[CATALOGUE_PATH] = raw
         provenance.update(
             source_catalogue_version=4,
-            source_catalogue_content_sha256=hashlib.sha256(
-                canonical_bytes(data)
-            ).hexdigest(),
             scope=base._scope(data) + SCOPE,
             local_structural_clause_annotations=5,
             newly_annotated_source_lines=4,
@@ -88,8 +76,6 @@ def _catalogue(
                 "domain": base.DOMAIN,
                 "key": CATALOGUE_PATH.stem,
                 "source_path": "human_design/" + CATALOGUE_PATH.name,
-                "loaded_file_sha256": CATALOGUE_SHA256,
-                "source_pdf_sha256": catalogue["source_pdf_sha256"],
                 "source_kind": "bounded_local_source_context_annotations",
                 "source_revision": 4,
                 "review_status": "five_local_clause_annotations_not_full_line_acceptance",

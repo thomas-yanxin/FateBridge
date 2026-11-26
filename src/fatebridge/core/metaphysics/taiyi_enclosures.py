@@ -6,16 +6,7 @@ from typing import Any
 
 from fatebridge.core.metaphysics.taiyi_geometry import PALACE_ORDER, PALACES, RING
 
-SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷03#推提挟法"
-FACSIMILE = "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf#page=51"
 PAIR_PROFILE = "taojin_same_side_general_pair_v1"
-PAIR_SOURCE = (
-    "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第687卷#提挾"
-)
-PAIR_ANNOTATIONS = (
-    "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第694卷"
-)
-PAIR_FACSIMILE = "https://zh.wikisource.org/wiki/Page:Gujin_Tushu_Jicheng,_Volume_477_(1700-1725).djvu/70"
 GENERAL_FIELDS = {
     "main_general": "主大将",
     "main_vice_general": "主参将",
@@ -73,7 +64,6 @@ def principal_enclosures(core: dict[str, Any]) -> list[dict[str, Any]]:
                     "variant": f"太乙与{label}夹{subject}于正宫",
                     "basis": [fact("taiyi_palace"), fact(field), fact(target)],
                     "traditional_meaning": f"太乙{taiyi}与{label}{end}从相邻两侧夹{subject}{middle}；命中李法正宫提挟的空间条件",
-                    "source": SOURCE,
                     "scope": "只核正宫提挟几何；挟闭及四郭固杜未裁定，未核内外生死等后续断语，不能推出实际胜负",
                 }
             )
@@ -133,7 +123,6 @@ def general_pair_enclosures(core: dict[str, Any]) -> list[dict[str, Any]]:
                     "variant": f"{prefix}方二将夹{label}于{kind}",
                     "basis": facts,
                     "traditional_meaning": f"{prefix}大将{a}与{prefix}参将{b}短弧夹{label}{palace}；{kind}夹持几何命中",
-                    "source": PAIR_SOURCE if kind == "正宫" else PAIR_ANNOTATIONS,
                     "relation_profile": PAIR_PROFILE,
                     "scope": "同方二将夹持几何；间神命中不认证完整挟闭，亦不据此断现实胜负。",
                 }
@@ -158,7 +147,6 @@ def enclosure_assessment(
             "version": "1.0.0",
             "author": "FateBridge contributors",
             "classical_author": "李淳风条文，王希明编录",
-            "sources": [SOURCE, FACSIMILE],
         },
         "principal_enclosure": {
             "status": "assessed_geometry",
@@ -175,7 +163,6 @@ def enclosure_assessment(
             "version": "1.0.0",
             "author": "FateBridge contributors",
             "classical_author": "太乙淘金歌及太乙局局注；金镜卷三张良条并参",
-            "sources": [PAIR_SOURCE, PAIR_ANNOTATIONS, PAIR_FACSIMILE, SOURCE],
         },
         "two_general_enclosure": {
             "status": "assessed_geometry" if core is not None else "not_assessed",

@@ -116,8 +116,8 @@ def render_day_reading(day: dict[str, Any]) -> str:
     if calendar.get("calendar_system") == "modern_chinese_lunisolar":
         lines.append(
             "本次声明的现代中国历日采用HKO（香港天文台）年度历表参考，"
-            f"计算后端为{calendar['calendar_backend']}，历日来源为{calendar['calendar_source']}。"
-            "本次返回未附现代中国历日的全域独立验收范围，不能仅据年度来源链接认证古代日界、"
+            f"计算后端为{calendar['calendar_backend']}。"
+            "本次返回未附现代中国历日的全域独立验收范围，不能仅据年度参考认证古代日界、"
             "桧尾半日、闰小月次序或现实预测效力。"
         )
     profile = calendar.get("profile_calculation") or {}

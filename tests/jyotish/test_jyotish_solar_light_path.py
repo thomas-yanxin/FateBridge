@@ -1,14 +1,34 @@
 """Solar exact light-time nodes, original requests and auxiliary fallback."""
 
 import shutil
+from datetime import date
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
 
 from fatebridge.core import compressed_ephemeris as context
 from fatebridge.core import ephemeris_runtime as e
-from tests.jyotish.test_jyotish_planet_light_path import requested_epoch, tt
 from tests.unit_test.fixtures.jyotish_sources import restore_runtime  # noqa: F401
+
+
+def tt(year: int) -> float:
+    return float(
+        Fraction(date(year, 1, 1).toordinal())
+        + Fraction(3442849, 2)
+        + Fraction(333, 86400000)
+    )
+
+
+def requested_epoch(epoch: float, operation: str) -> float:
+    if operation == "calc":
+        return epoch
+    else:
+        pass
+    result = epoch
+    for _ in range(8):
+        result = epoch - e.swe.deltat_ex(result, e.swe.FLG_SWIEPH)
+    return result
 
 
 @pytest.mark.parametrize("year", range(600, 9601, 600))

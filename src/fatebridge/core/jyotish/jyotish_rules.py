@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 from fatebridge.core.jyotish.jyotish_aiyar_ashtakavarga import RULE as AIYAR_BAV_RULE
 from fatebridge.core.jyotish.jyotish_aiyar_ashtakavarga import (
@@ -47,13 +47,11 @@ SOURCES = [
     {
         "id": "iers_leap_seconds",
         "title": "IERS Bulletin C leap-second table (version frozen in the package)",
-        "url": "https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat",
         "scope": "TAI minus UTC from 1972; last offset held fixed beyond table expiry as an explicit assumption",
     },
     {
         "id": "pvr_2000",
         "title": "P.V.R. Narasimha Rao, Vedic Astrology: An Integrated Approach (2000)",
-        "url": "https://www.vedicastrologer.org/articles/vedic_astro_textbook.pdf",
         "sections": [
             "2 Rasis",
             "3 Planets",
@@ -66,12 +64,11 @@ SOURCES = [
     {
         "id": "swiss_ephemeris",
         "title": "Swiss Ephemeris Programmer's Manual: sidereal positions, UTC and solar clocks",
-        "url": "https://www.astro.com/swisseph/swephprg.htm",
     },
 ]
 
 
-def rule_trace() -> List[Dict[str, Any]]:
+def rule_trace() -> list[dict[str, Any]]:
     return [
         {"rule_id": rule, "source_id": source, "section": section}
         for rule, source, section in [

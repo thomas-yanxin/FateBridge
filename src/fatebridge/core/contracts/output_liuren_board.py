@@ -156,7 +156,6 @@ class LiurenSourceNote(PartialOutput):
     annotation: str | None = None
     original_pdf_page: int | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     kind: str | None = None
     explanation: str | None = None
     scope: str | None = None
@@ -194,7 +193,6 @@ class RenTermDependency(PartialOutput):
     civil_time_method: str | None = None
     future_leap_seconds_assumed_unchanged: bool | None = None
     leap_table_expires_at: str | None = None
-    leap_table_source: str | None = None
 
     @model_validator(mode="after")
     def published_date_matches_dependency(self) -> "RenTermDependency":

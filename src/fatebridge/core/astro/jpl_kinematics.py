@@ -8,7 +8,6 @@ this is neither an observational error bound nor an atomic read-set proof.
 
 from __future__ import annotations
 
-import hashlib
 import math
 import os
 import struct
@@ -167,8 +166,6 @@ def source_kinematics(
         "method_id": METHOD_ID,
         "filename": path.name,
         "epoch_native_argument_day": float(epoch),
-        "header_sha256": hashlib.sha256(raw_header).hexdigest(),
-        "record_sha256": hashlib.sha256(raw).hexdigest(),
         "record_index": index,
         "record_start": values[0],
         "record_end": values[1],

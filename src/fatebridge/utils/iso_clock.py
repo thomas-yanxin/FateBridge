@@ -5,19 +5,17 @@ import sys
 from datetime import datetime, timedelta, timezone
 from decimal import Context, Decimal
 
-_SUBSECOND_ZERO_OFFSET = re.compile(r"([+-])00(?::?00){0,2}[.,]([0-9]+)$")
-_ISO_FRACTION = re.compile(
+SUBSECOND_ZERO_OFFSET = re.compile(r"([+-])00(?::?00){0,2}[.,]([0-9]+)$")
+ISO_FRACTION = re.compile(
     r"(?:[0-9]{2}(?::?[0-9]{2}){0,2}[.,]"
     r"|[0-9]{6}(?=[0-9]{2})"
     r"|[0-9]{2}(?::[0-9]{2}){2}:)([0-9]+)"
 )
-_ASCII_DIGITS = re.compile(r"[0-9]*")
-_OFFSET_SIGN = re.compile(r"[+-]")
-_NINES_COMPLEMENT = str.maketrans("0123456789", "9876543210")
-_REDUCED_WALL_FRACTION = re.compile(
-    r"([0-9]{2})(?::?([0-9]{2}))?[.,]([0-9]+)(?=[+-]|$)"
-)
-_PORTABLE_ISO = re.compile(
+ASCII_DIGITS = re.compile(r"[0-9]*")
+OFFSET_SIGN = re.compile(r"[+-]")
+NINES_COMPLEMENT = str.maketrans("0123456789", "9876543210")
+REDUCED_WALL_FRACTION = re.compile(r"([0-9]{2})(?::?([0-9]{2}))?[.,]([0-9]+)(?=[+-]|$)")
+PORTABLE_ISO = re.compile(
     r"([0-9]{4}-[0-9]{2}-[0-9]{2}[\s\S][0-9]{2}:[0-9]{2}:[0-9]{2})"
     r"(?:\.([0-9]+))?"
     r"(?:([+-][0-9]{2}:[0-9]{2})(?:(:[0-9]{2})(?:\.([0-9]+))?)?)?"
@@ -31,7 +29,7 @@ def parse_iso_datetime(value: str, *, portable: bool = True) -> datetime:
     Python 3.10. Native parsing retains the stdlib grammar and rejects excess
     offset digits when restoring an offset that the parser collapsed to UTC.
     """
-    match = _SUBSECOND_ZERO_OFFSET.search(value)
+    match = SUBSECOND_ZERO_OFFSET.search(value)
     parser_value = value
     if portable and match is not None and match.start() > 10:
         parser_value = (
@@ -61,7 +59,7 @@ def _iso_date_end(value: str) -> int:
     if value[4] != "W":
         return 8
     # CPython resolves a digit separator in a basic week date by parity.
-    digits = _ASCII_DIGITS.match(value, 7)
+    digits = ASCII_DIGITS.match(value, 7)
     assert digits is not None
     end = digits.end()
     if end < 9:
@@ -71,7 +69,7 @@ def _iso_date_end(value: str) -> int:
 
 def _fraction_digits(clock: str) -> str:
     # CPython also accepts some compact fractions without a decimal point.
-    match = _ISO_FRACTION.match(clock)
+    match = ISO_FRACTION.match(clock)
     return match[1] if match is not None else ""
 
 
@@ -94,7 +92,7 @@ def parse_microsecond_iso_datetime(value: str) -> tuple[datetime, int]:
         and value[4:6] == "-W"
     )
     if not week_without_day and (
-        reduced := _REDUCED_WALL_FRACTION.match(value, clock_start)
+        reduced := REDUCED_WALL_FRACTION.match(value, clock_start)
     ):
         hour, minute, digits = reduced.groups()
         unit_seconds = 3600 if minute is None else 60
@@ -107,7 +105,7 @@ def parse_microsecond_iso_datetime(value: str) -> tuple[datetime, int]:
         wall = f"{hour}:{minute or f'{whole_minutes:02d}'}:{whole_seconds:02d}.{tail}"
         value = value[:clock_start] + wall + value[reduced.end() :]
     parser_value = value
-    portable = _PORTABLE_ISO.fullmatch(value) if sys.version_info < (3, 11) else None
+    portable = PORTABLE_ISO.fullmatch(value) if sys.version_info < (3, 11) else None
     if portable is not None:
         # Python 3.10 requires fixed-width fractions. Normalize only after
         # matching complete date, time and offset fields, and retain the tails.
@@ -127,7 +125,7 @@ def parse_microsecond_iso_datetime(value: str) -> tuple[datetime, int]:
             raise ValueError("Local ISO clock must be representable to the microsecond")
         return moment, 0
 
-    sign = _OFFSET_SIGN.search(clock)
+    sign = OFFSET_SIGN.search(clock)
     assert sign is not None
     wall_tail = _fraction_digits(clock[: sign.start()])[6:].rstrip("0")
     offset_digits = _fraction_digits(clock[sign.end() :])
@@ -144,7 +142,7 @@ def parse_microsecond_iso_datetime(value: str) -> tuple[datetime, int]:
     # offset's tail must add to the wall tail to reach the next microsecond.
     carry = 0
     if negative and offset_tail:
-        offset_tail = offset_tail[:-1].translate(_NINES_COMPLEMENT) + str(
+        offset_tail = offset_tail[:-1].translate(NINES_COMPLEMENT) + str(
             10 - int(offset_tail[-1])
         )
         carry = 1

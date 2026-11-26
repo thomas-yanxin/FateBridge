@@ -1,7 +1,7 @@
 """Residential inputs: location, facing and observed form stay distinct."""
 
 from datetime import date, datetime
-from typing import Any, Dict, Literal, cast
+from typing import Any, Literal, cast
 
 from dateutil.tz import datetime_exists
 from pydantic import (
@@ -217,7 +217,7 @@ class House(_DeferredModel):
                 raise ValueError("宅向推导的坐山与 sitting_trigram 不一致")
 
 
-_PLACEMENT_FACING_ROLES = {
+PLACEMENT_FACING_ROLES = {
     "door": "door_facing",
     "bed": "headboard",
     "desk": "desk_facing",
@@ -225,7 +225,7 @@ _PLACEMENT_FACING_ROLES = {
 }
 
 
-_PLACEMENT_SCHEMA_CONSTRAINTS: dict[str, Any] = {
+PLACEMENT_SCHEMA_CONSTRAINTS: dict[str, Any] = {
     "allOf": [
         {
             "anyOf": [
@@ -258,7 +258,7 @@ _PLACEMENT_SCHEMA_CONSTRAINTS: dict[str, Any] = {
                 "if": {"properties": {"purpose": {"const": purpose}}},
                 "then": {"properties": {"facing_role": {"enum": [None, role]}}},
             }
-            for purpose, role in _PLACEMENT_FACING_ROLES.items()
+            for purpose, role in PLACEMENT_FACING_ROLES.items()
         ],
         {
             "anyOf": [
@@ -277,7 +277,7 @@ class Placement(_DeferredModel):
 
     # Publish the same cross-field constraints that facing_semantics enforces.
     # Optional fields may be omitted or explicitly null; neither is a bearing.
-    model_config = ConfigDict(json_schema_extra=_PLACEMENT_SCHEMA_CONSTRAINTS)
+    model_config = ConfigDict(json_schema_extra=PLACEMENT_SCHEMA_CONSTRAINTS)
 
     object_id: str = Field(min_length=1, max_length=100)
     purpose: Literal["door", "bed", "desk", "stove"]
@@ -328,7 +328,7 @@ class Placement(_DeferredModel):
             raise ValueError("facing_direction 和 facing_role 必须一起提供")
         if (
             self.facing_role is not None
-            and self.facing_role != _PLACEMENT_FACING_ROLES[self.purpose]
+            and self.facing_role != PLACEMENT_FACING_ROLES[self.purpose]
         ):
             raise ValueError("facing_role 与 purpose 不匹配")
         return self
@@ -590,7 +590,7 @@ class XuankongInterpretationRequest(_DeferredModel):
 
     model_config = ConfigDict(
         json_schema_extra=cast(
-            Dict[str, Any],
+            dict[str, Any],
             {
                 "allOf": [
                     {

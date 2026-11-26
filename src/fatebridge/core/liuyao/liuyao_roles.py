@@ -67,7 +67,6 @@ def build_role_effects(
         "ruleset_id": PROFILE["ruleset_id"],
         "ruleset_version": PROFILE["ruleset_version"],
         "source_url": source["url"] + "#page=51",
-        "source_sha256": source["sha256"],
         "lines": [],
         "chains": [],
         "focus_robustness": "not_adjudicated",

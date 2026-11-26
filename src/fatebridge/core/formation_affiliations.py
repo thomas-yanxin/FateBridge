@@ -7,10 +7,6 @@ An affiliate contributes no separate binding, transformation or physical root.
 from itertools import combinations
 from typing import Any, Mapping, Sequence, TypeVar
 
-from fatebridge.core.source_identity import (
-    DITIAN_SUI_CHANWEI_SCAN_URL,
-    ZIPING_ZHENQUAN_NLC_SCAN_URL,
-)
 from fatebridge.utils.data import BRANCH_CONFLICTS, Element
 
 POLICY = "complete_same_target_affiliation_v1"
@@ -18,16 +14,8 @@ SOURCE = {
     "id": "complete_same_target_affiliation_primary_v1",
     "title": "子平真詮·論正官宣參國例；任注滴天髓闡微·方局、母象",
     "references": [
-        {
-            "url": ZIPING_ZHENQUAN_NLC_SCAN_URL,
-            "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
-            "pdf_pages": [24, 25, 66],
-        },
-        {
-            "url": DITIAN_SUI_CHANWEI_SCAN_URL,
-            "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
-            "pdf_pages": [140, 141, 144, 145, 146, 424],
-        },
+        {"pdf_pages": [24, 25, 66]},
+        {"pdf_pages": [140, 141, 144, 145, 146, 424]},
     ],
     "scope": "完整局与同气外支相容的工程形式化；有直接六冲或仅两六合争用不适用。不是转化系数、从格、有效通关或现实预测的认证。",
 }

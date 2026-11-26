@@ -163,9 +163,9 @@ def method_policy(
 ) -> dict[str, Any]:
     """Describe the policy without treating unrequested layers as failures.
 
-    ``explicit_methods`` may be supplied by the service before Pydantic
+    explicit_methods may be supplied by the service before Pydantic
     normalizes methods. A normalized model alone cannot recover that fact.
-    ``layer_results`` supplies the already calculated current layers. Missing
+    layer_results supplies the already calculated current layers. Missing
     layers are never calculated here to answer an availability question.
     Candidate layer statuses remain independent of those current results.
     """

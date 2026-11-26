@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 from fatebridge.core.fengshui.bazhai import placement_polarity
 from fatebridge.core.fengshui.models import AssessRequest
@@ -18,7 +18,7 @@ def _bundle() -> dict[str, Any]:
     path = (
         Path(__file__).parents[2] / "data" / "fengshui" / "layout-supplements-v1.json"
     )
-    return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
 def supplement_provenance(key: str) -> dict[str, Any]:

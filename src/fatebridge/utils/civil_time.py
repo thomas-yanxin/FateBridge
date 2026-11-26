@@ -20,7 +20,7 @@ from fatebridge.utils.iso_clock import (
     parse_microsecond_iso_datetime,
 )
 
-_DAY_MICROSECONDS = 86400 * 1000000
+DAY_MICROSECONDS = 86400 * 1000000
 
 
 def gregorian_ordinal(year: int, month: int, day: int) -> int:
@@ -70,9 +70,7 @@ class NominalClockLabel:
 
     def shifted(self, delta: timedelta) -> NominalClockLabel:
         delta_us = (delta.days * 86400 + delta.seconds) * 1000000 + delta.microseconds
-        carry, remainder = divmod(
-            self.microseconds_of_day + delta_us, _DAY_MICROSECONDS
-        )
+        carry, remainder = divmod(self.microseconds_of_day + delta_us, DAY_MICROSECONDS)
         return NominalClockLabel(self.ordinal + carry, remainder)
 
     @property
@@ -165,7 +163,7 @@ class UTCCalendar:
     def julian_day_exact(self) -> Fraction:
         """Nominal Gregorian day before scalar-JD rounding; not UTC quasi-JD."""
         return Fraction(2 * self.ordinal + 3442849, 2) + Fraction(
-            self.microseconds_of_day, _DAY_MICROSECONDS
+            self.microseconds_of_day, DAY_MICROSECONDS
         )
 
     def julian_day(self) -> float:
@@ -191,9 +189,9 @@ def nominal_calendar_bracket(day: Fraction) -> tuple[UTCCalendar, UTCCalendar]:
     physical error interval or an actual rounded-wall event threshold.
     """
     epoch = Fraction(4881175, 2)
-    micros = (day - epoch) * _DAY_MICROSECONDS
-    lower_days, lower_us = divmod(math.floor(micros), _DAY_MICROSECONDS)
-    upper_days, upper_us = divmod(math.ceil(micros), _DAY_MICROSECONDS)
+    micros = (day - epoch) * DAY_MICROSECONDS
+    lower_days, lower_us = divmod(math.floor(micros), DAY_MICROSECONDS)
+    upper_days, upper_us = divmod(math.ceil(micros), DAY_MICROSECONDS)
     return (
         UTCCalendar(719163 + lower_days, lower_us),
         UTCCalendar(719163 + upper_days, upper_us),
@@ -215,13 +213,13 @@ class CivilPoint:
     def as_calendar(self) -> UTCCalendar:
         """Round within the ordinary interval already selected by the clock."""
         epoch = Fraction(4881175, 2)
-        micros = round((self.day - epoch) * _DAY_MICROSECONDS)
+        micros = round((self.day - epoch) * DAY_MICROSECONDS)
         if self.excluded_before is not None:
             micros = min(
                 micros,
-                math.ceil((self.excluded_before - epoch) * _DAY_MICROSECONDS) - 1,
+                math.ceil((self.excluded_before - epoch) * DAY_MICROSECONDS) - 1,
             )
-        days, remainder = divmod(micros, _DAY_MICROSECONDS)
+        days, remainder = divmod(micros, DAY_MICROSECONDS)
         return UTCCalendar(719163 + days, remainder)
 
     def nominal_calendar_bracket(self) -> tuple[UTCCalendar, UTCCalendar]:
@@ -370,7 +368,7 @@ def utc_calendar(moment: datetime) -> UTCCalendar:
     if offset is None:
         raise ValueError("UTC calendar normalization requires an aware datetime")
     offset_us = (offset.days * 86400 + offset.seconds) * 1000000 + offset.microseconds
-    carry, utc_us = divmod(_wall_microseconds(moment) - offset_us, _DAY_MICROSECONDS)
+    carry, utc_us = divmod(_wall_microseconds(moment) - offset_us, DAY_MICROSECONDS)
     return UTCCalendar(moment.toordinal() + carry, utc_us)
 
 

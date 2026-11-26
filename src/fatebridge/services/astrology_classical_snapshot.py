@@ -11,7 +11,7 @@ from fatebridge.services.astrology_snapshot_sections import (
     _format_zodiac_degree,
 )
 
-_CLASSICAL_PLANET_ORDER = [
+CLASSICAL_PLANET_ORDER = [
     "Sun",
     "Moon",
     "Mercury",
@@ -20,12 +20,12 @@ _CLASSICAL_PLANET_ORDER = [
     "Jupiter",
     "Saturn",
 ]
-_ANGULARITY_ZH = {"angular": "角宫", "succedent": "续宫", "cadent": "果宫"}
-_COMBUSTION_ZH = {"cazimi": "日心", "combust": "焦伤", "under_beams": "日下"}
+ANGULARITY_ZH = {"angular": "角宫", "succedent": "续宫", "cadent": "果宫"}
+COMBUSTION_ZH = {"cazimi": "日心", "combust": "焦伤", "under_beams": "日下"}
 
 
 def _build_classical_lines(payload: dict[str, Any]) -> str:
-    """One readable line per traditional planet for the ``[古典]`` section."""
+    """One readable line per traditional planet for the [古典] section."""
     classical = payload.get("classical", {})
     planets = classical.get("planets", {})
     if not planets:
@@ -35,7 +35,7 @@ def _build_classical_lines(payload: dict[str, Any]) -> str:
         lines.append(
             "太阳条件采用Lilly 1647第113页明文：日心≤17′、焦伤<8.5°且同星座、日下<17°；原页10°示例与8.5°定义的冲突尚未解决。"
         )
-    for planet in _CLASSICAL_PLANET_ORDER:
+    for planet in CLASSICAL_PLANET_ORDER:
         entry = planets.get(planet)
         if not entry:
             continue
@@ -46,12 +46,12 @@ def _build_classical_lines(payload: dict[str, Any]) -> str:
         parts = [
             PLANET_LABELS_ZH.get(planet, planet),
             f"{'·'.join(labels)}({score_text})",
-            _ANGULARITY_ZH.get(entry.get("angularity"), ""),
+            ANGULARITY_ZH.get(entry.get("angularity"), ""),
         ]
         if entry.get("sect_placement") == "of_sect":
             parts.append("得宗派")
         if entry.get("combustion"):
-            parts.append(_COMBUSTION_ZH.get(entry["combustion"], entry["combustion"]))
+            parts.append(COMBUSTION_ZH.get(entry["combustion"], entry["combustion"]))
         if entry.get("retrograde"):
             parts.append("逆行")
         if entry.get("out_of_bounds"):
@@ -62,7 +62,7 @@ def _build_classical_lines(payload: dict[str, Any]) -> str:
     return "\n".join(lines).strip() or "无"
 
 
-_TERMINAL_ZH = {
+TERMINAL_ZH = {
     "domicile": "入庙自主",
     "mutual_reception": "互含",
     "loop": "循环",
@@ -71,7 +71,7 @@ _TERMINAL_ZH = {
 
 
 def _build_dispositor_lines(payload: dict[str, Any]) -> str:
-    """``[主宰]`` section: final dispositor(s) + each traditional planet's chain."""
+    """[主宰] section: final dispositor(s) + each traditional planet's chain."""
     classical = payload.get("classical", {})
     dispositors = classical.get("dispositors", {})
     chains = dispositors.get("chains", {})
@@ -82,17 +82,17 @@ def _build_dispositor_lines(payload: dict[str, Any]) -> str:
         "、".join(PLANET_LABELS_ZH.get(p, p) for p in finals) or "无（多为互含/循环）"
     )
     lines = [f"终极主宰：{finals_zh}"]
-    for planet in _CLASSICAL_PLANET_ORDER:
+    for planet in CLASSICAL_PLANET_ORDER:
         info = chains.get(planet)
         if not info:
             continue
         arrow = "→".join(PLANET_LABELS_ZH.get(p, p) for p in info.get("chain", []))
-        lines.append(f"{arrow}（{_TERMINAL_ZH.get(info.get('terminal_type'), '')}）")
+        lines.append(f"{arrow}（{TERMINAL_ZH.get(info.get('terminal_type'), '')}）")
     return "\n".join(lines).strip()
 
 
 def _build_lots_lines(payload: dict[str, Any]) -> str:
-    """``[阿拉伯点]`` section: each lot's sign/degree + domicile lord and almuten."""
+    """[阿拉伯点] section: each lot's sign/degree + domicile lord and almuten."""
     lots = payload.get("classical", {}).get("lots", {})
     if not lots:
         return "无"
@@ -108,11 +108,11 @@ def _build_lots_lines(payload: dict[str, Any]) -> str:
     return "\n".join(lines).strip()
 
 
-_BESIEGE_ZH = {"besieged_by_malefics": "凶星围攻", "enclosed_by_benefics": "吉星拱卫"}
+BESIEGE_ZH = {"besieged_by_malefics": "凶星围攻", "enclosed_by_benefics": "吉星拱卫"}
 
 
 def _build_classical_patterns_lines(payload: dict[str, Any]) -> str:
-    """``[古典格局]`` section: sect benefics + overcoming + besiegement + 吉凶化."""
+    """[古典格局] section: sect benefics + overcoming + besiegement + 吉凶化."""
     patterns = payload.get("classical_patterns", {})
     if not patterns:
         return "无"
@@ -136,7 +136,7 @@ def _build_classical_patterns_lines(payload: dict[str, Any]) -> str:
         lines.append(
             "围攻："
             + "；".join(
-                f"{zh(p)}{_BESIEGE_ZH.get(s, s)}" for p, s in besiegement.items()
+                f"{zh(p)}{BESIEGE_ZH.get(s, s)}" for p, s in besiegement.items()
             )
         )
     bonification = patterns.get("bonification", {})
@@ -206,7 +206,7 @@ def _build_classical_patterns_lines(payload: dict[str, Any]) -> str:
 
 
 def _build_temperament_lines(payload: dict[str, Any]) -> str:
-    """``[体质]`` section: humor (温/湿 tally) + each traditional planet's 12分度."""
+    """[体质] section: humor (温/湿 tally) + each traditional planet's 12分度."""
     classical = payload.get("classical", {})
     temperament = classical.get("temperament")
     if not temperament:
@@ -222,7 +222,7 @@ def _build_temperament_lines(payload: dict[str, Any]) -> str:
         ]
     dodeka = []
     ninth = []
-    for planet in _CLASSICAL_PLANET_ORDER:
+    for planet in CLASSICAL_PLANET_ORDER:
         entry = (classical.get("planets") or {}).get(planet)
         if not entry:
             continue
@@ -251,18 +251,18 @@ def _build_topic_almuten_line(payload: dict[str, Any]) -> str:
     return " ".join(parts)
 
 
-_FIGURIS_POINT_ZH = {
+FIGURIS_POINT_ZH = {
     "Sun": "日",
     "Moon": "月",
     "Ascendant": "命",
     "fortune": "福",
     "syzygy": "朔望",
 }
-_SYZYGY_TYPE_ZH = {"new": "新月", "full": "满月"}
+SYZYGY_TYPE_ZH = {"new": "新月", "full": "满月"}
 
 
 def _build_almuten_figuris_line(payload: dict[str, Any]) -> str:
-    """``[命主]`` section: selected tally, actual point coverage and 朔望."""
+    """[命主] section: selected tally, actual point coverage and 朔望."""
     classical = payload.get("classical", {})
     figuris = classical.get("almuten_figuris") or {}
     winner = figuris.get("winner")
@@ -299,7 +299,7 @@ def _build_almuten_figuris_line(payload: dict[str, Any]) -> str:
         if missing:
             lines.append(
                 "未纳入点："
-                + "、".join(_FIGURIS_POINT_ZH.get(point, point) for point in missing)
+                + "、".join(FIGURIS_POINT_ZH.get(point, point) for point in missing)
                 + "。"
             )
     points = figuris.get("points", {})
@@ -310,7 +310,7 @@ def _build_almuten_figuris_line(payload: dict[str, Any]) -> str:
             continue
         ruler = info.get("winner")
         point_parts.append(
-            f"{_FIGURIS_POINT_ZH.get(point_id, point_id)}→"
+            f"{FIGURIS_POINT_ZH.get(point_id, point_id)}→"
             f"{PLANET_LABELS_ZH.get(ruler, ruler or '—')}"
         )
     if point_parts:
@@ -319,7 +319,7 @@ def _build_almuten_figuris_line(payload: dict[str, Any]) -> str:
     if isinstance(syzygy, dict):
         sign = str(syzygy.get("sign") or "?")
         syzygy_type = str(syzygy.get("type") or "?")
-        type_zh = _SYZYGY_TYPE_ZH.get(syzygy_type, syzygy_type)
+        type_zh = SYZYGY_TYPE_ZH.get(syzygy_type, syzygy_type)
         sign_zh = SIGN_LABELS_ZH.get(sign, sign)
         lines.append(
             f"朔望：{type_zh} {sign_zh}{_format_zodiac_degree(syzygy.get('degree_in_sign'))}"
@@ -336,7 +336,7 @@ def _build_almuten_figuris_line(payload: dict[str, Any]) -> str:
 
 
 def _build_fixed_stars_lines(payload: dict[str, Any]) -> str:
-    """``[恒星]`` section: each catalogue star conjunct a chart point (orb ≤ 1°)."""
+    """[恒星] section: each catalogue star conjunct a chart point (orb ≤ 1°)."""
     profile = payload.get("chart_profile", {}).get("fixed_stars") or {}
     if profile.get("status") == "unavailable":
         return profile.get("note_zh") or "恒星层未计算"
@@ -369,7 +369,7 @@ def _build_fixed_stars_lines(payload: dict[str, Any]) -> str:
 
 
 def _build_planetary_hours_line(payload: dict[str, Any]) -> str:
-    """``[行星时]`` section: the birth's planetary hour + the planetary day ruler."""
+    """[行星时] section: the birth's planetary hour + the planetary day ruler."""
     hours = payload.get("planetary_hours")
     if not isinstance(hours, dict) or not hours.get("hour_ruler"):
         return "无"

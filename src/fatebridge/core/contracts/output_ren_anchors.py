@@ -266,8 +266,6 @@ def require_complete_ren_anchors(
                     "age_boundary_classically_verified",
                     "birth_year_calendar_boundary_verified",
                     "comprehensive_year_fate_adjudicated",
-                    "source_url",
-                    "source_sha256",
                     "source_section",
                     "original_pdf_pages",
                     "relation_adjudication",

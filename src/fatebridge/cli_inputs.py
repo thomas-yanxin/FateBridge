@@ -9,6 +9,11 @@ from pathlib import Path
 from pydantic import ValidationError
 from pydantic.fields import FieldInfo
 
+try:
+    import yaml  # note (optional dependency): Only YAML input needs PyYAML.
+except ImportError:
+    yaml = None
+
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.services.tool_catalog import CATALOG
 
@@ -37,13 +42,11 @@ def _parse_json_subject(text: str, path: str) -> object:
 
 
 def _parse_yaml_subject(text: str, path: str) -> object:
-    try:
-        import yaml  # note (optional dependency): Only YAML input needs PyYAML.
-    except ImportError as error:
+    if yaml is None:
         raise ValueError(
             f"解析 YAML subject 档案 {path} 需要 pyyaml；请用 uv 为当前环境安装 pyyaml "
             "或改用 JSON 档案。"
-        ) from error
+        )
     try:
         return yaml.safe_load(text)
     except yaml.YAMLError as error:

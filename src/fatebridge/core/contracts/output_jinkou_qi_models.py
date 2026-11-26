@@ -35,7 +35,6 @@ class JinkouQiEvidence(PartialOutput):
     month_building_checks: list[JinkouMonthBuildingCheck] | None = None
     month_building_basis: str | None = None
     month_building_scan_url: str | None = None
-    month_building_scan_sha256: str | None = None
     month_building_pdf_page: int | None = None
     month_building_scope: str | None = None
     jiangshen_branch: Branch | None = None

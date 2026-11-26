@@ -44,8 +44,6 @@ QUANTIZATION_SOURCE = {
 SOURCE = {
     "id": "pvr_2000_recursive_dasha_1cafa828",
     "title": "P.V.R. Narasimha Rao, Vedic Astrology: An Integrated Approach (2000; 2010 update)",
-    "url": "https://www.vedicastrologer.org/articles/vedic_astro_textbook.pdf",
-    "sha256": "1cafa828f34764ed5e85816882df2e8f0bc014c5c57ccdb27169416e117fd4db",
     "sections": [
         "16.1 names printed209/PDF221",
         "16.2 Table38 printed210/PDF222; Example50 printed211/PDF223",

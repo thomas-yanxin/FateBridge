@@ -322,8 +322,7 @@
         "fortune_method"
       ],
       "source_refs": [
-        "docs/astrodice.md",
-        "https://www.astro.com/swisseph/swephprg.htm"
+        "docs/astrodice.md"
       ],
       "unit": "per_field",
       "validation_scope": {

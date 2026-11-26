@@ -1,13 +1,9 @@
 """Narrow, attributed diagram observations, retaining unresolved source faults."""
 
-import hashlib
 from copy import deepcopy
 from typing import Any
 
-from fatebridge.core.human_design.human_design_references import (
-    reference_bytes,
-    reference_data,
-)
+from fatebridge.core.human_design.human_design_references import reference_data
 
 METHOD = "human_design_primary_transcript_diagrams_v1"
 SCOPE = "只匹配已核看的两幅公开转录图之有序四门与左角度；不由单门、相似名字或角色推断匹配。原页5/1段落不充当其他角色线义；未经校对的公开副本不认证出版方母本，也不是16/6课程列项的勘误。不改写2001版名称、门线、固定极性或原有失败。"
@@ -15,10 +11,6 @@ SCOPE = "只匹配已核看的两幅公开转录图之有序四门与左角度�
 
 def diagram_reference() -> dict[str, Any]:
     return reference_data("primary-diagrams-2008-reference.json")
-
-
-def _raw() -> bytes:
-    return reference_bytes("primary-diagrams-2008-reference.json")
 
 
 def primary_diagram_evidence(chart: dict[str, Any]) -> dict[str, Any]:
@@ -39,7 +31,6 @@ def primary_diagram_evidence(chart: dict[str, Any]) -> dict[str, Any]:
         "primary_2001_name": cross["name"],
         "primary_2001_name_retained": True,
         "observations": deepcopy(matching),
-        "catalog_sha256": hashlib.sha256(_raw()).hexdigest(),
         "attributed_author": reference["attributed_author"],
         "attributed_publisher": reference["attributed_publisher"],
         "title": reference["title"],

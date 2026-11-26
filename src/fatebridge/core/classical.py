@@ -69,7 +69,7 @@ def life_stages_for_pillars(pillars: PillarMap) -> dict[str, Any]:
 # (本气/中气/余气), see which is 透出 on the other stems, and the ten-god of the
 # chosen stem names the 正格. 禄(比肩)/刃(劫财) are handled as the 建禄/月刃 specials.
 
-_TEN_GOD_TO_STRUCTURE: dict[str, str] = {
+TEN_GOD_TO_STRUCTURE: dict[str, str] = {
     "正官": "正官格",
     "七杀": "七杀格",
     "正财": "正财格",
@@ -82,7 +82,7 @@ _TEN_GOD_TO_STRUCTURE: dict[str, str] = {
     "劫财": "月刃格",
 }
 
-_HIDDEN_ROLES: tuple[str, ...] = ("本气", "中气", "余气")
+HIDDEN_ROLES: tuple[str, ...] = ("本气", "中气", "余气")
 
 
 def _select_structure_god(
@@ -189,13 +189,13 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> dict[str, 
             {
                 "stem": hidden_stem,
                 "ten_god": get_shishen(day_stem, hidden_stem),
-                "role": _HIDDEN_ROLES[rank] if rank < len(_HIDDEN_ROLES) else "余气",
+                "role": HIDDEN_ROLES[rank] if rank < len(HIDDEN_ROLES) else "余气",
                 "transparent": hidden_stem in transparent_stems,
             }
         )
 
     god = _select_structure_god(candidates, day_stem, pillars)
-    label = _TEN_GOD_TO_STRUCTURE.get(god["ten_god"], f"{god['ten_god']}格")
+    label = TEN_GOD_TO_STRUCTURE.get(god["ten_god"], f"{god['ten_god']}格")
     if not god["is_special"] and god["ten_god"] in ("比肩", "劫财"):
         label = "比劫待取格"
 
@@ -266,7 +266,7 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> dict[str, 
 # circulated 调候用神简表. It is school-variant at the margins — treat as the
 # mainstream baseline and validate against a preferred lineage source if needed.
 
-_DIAOHOU_TABLE: dict[str, dict[str, tuple[str, tuple[str, ...]]]] = {
+DIAOHOU_TABLE: dict[str, dict[str, tuple[str, tuple[str, ...]]]] = {
     "甲": {
         "寅": ("丙", ("癸",)),
         "卯": ("庚", ("丙", "丁", "戊", "己")),
@@ -414,7 +414,7 @@ def seasonal_climate_god(
     day_stem: str, month_branch: str, pillars: PillarMap | None = None
 ) -> dict[str, Any]:
     """Return table candidates, source layers and optional factual positions."""
-    entry: tuple[str, tuple[str, ...]] | None = _DIAOHOU_TABLE.get(day_stem, {}).get(
+    entry: tuple[str, tuple[str, ...]] | None = DIAOHOU_TABLE.get(day_stem, {}).get(
         month_branch
     )
     if entry is None:

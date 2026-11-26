@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Mapping
 
 import pytest
 from xdist import get_xdist_worker_id  # type: ignore[import-untyped]
@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class CIShard:
+    """Pytest plugin that partitions collected nodes across balanced CI shards."""
+
     def __init__(
         self,
         index: int,
@@ -25,12 +27,13 @@ class CIShard:
         self.count = count
         self.report = report
         self.environment = environment
-        self.weights = weights or {}
+        self.weights: Mapping[str, float] = weights if weights is not None else {}
 
     @pytest.hookimpl(trylast=True)
     def pytest_collection_modifyitems(
         self, session: pytest.Session, config: pytest.Config, items: list[pytest.Item]
     ) -> None:
+        """Select items assigned to the active shard and emit a selection report."""
         collected = [item.nodeid for item in items]
         loads = [0.0] * self.count
         assignments = [0] * len(items)
@@ -70,9 +73,12 @@ class CIShard:
                 + "\n",
                 encoding="utf-8",
             )
+        else:
+            pass
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
+    """Register CI sharding CLI options on the pytest parser."""
     group = parser.getgroup("ci sharding")
     group.addoption("--shard-index", type=int, default=0)
     group.addoption("--shard-count", type=int, default=1)
@@ -81,10 +87,13 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 def pytest_configure(config: pytest.Config) -> None:
+    """Validate shard bounds and register the CIShard plugin."""
     index: int = config.getoption("shard_index")
     count: int = config.getoption("shard_count")
     if not 0 <= index < count:
         raise pytest.UsageError("shard-index must be in [0, shard-count)")
+    else:
+        pass
     weights: dict[str, float] = json.loads(
         (ROOT / ".github/ci-test-costs.json").read_text(encoding="utf-8")
     )

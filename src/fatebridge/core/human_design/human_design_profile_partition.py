@@ -14,7 +14,6 @@ from fatebridge.core.human_design.human_design_mechanics import (
 )
 
 METHOD = "human_design_profile_solar_arc_partition_v1"
-SOURCE = "https://jovianarchive.com/pages/human-design-dictionary"
 FOUNDATION = frozenset({"1/3", "2/4", "3/5", "4/6", "5/1", "6/2"})
 TRANSITION = frozenset({"1/4", "2/5", "3/6", "4/1", "5/2", "6/3"})
 SCOPE = "只解释本次名义盘人格／设计日地角色与精确88度的理想分区；实际设计太阳保留原生求根结果。术语限于所引公开条目，未裁定Resonances的跨条目用法，也未裁定29.1/29.2印刷界。角宽不代表人群比例、人格强弱或现实因果；未认证完整原典或天文精度。"
@@ -43,11 +42,8 @@ def ruleset() -> dict[str, Any]:
         "version": "1.0.0",
         "author": "FateBridge exact geometry and source-qualified paraphrases",
         "source_kind": "current_official_public_glossary_not_complete_2001_text",
-        "sources": {"profile_partition": SOURCE},
         "source_records": [
             {
-                "url": SOURCE,
-                "html_sha256": "06ca304cf81e32d635b8e9f9f7b24dfa36bb7ad7906e6c0e32d1b6aa524e1f3a",
                 "captured_date": "2026-10-25",
                 "sections": ["Profile Foundation", "Profile Transitions", "Resonance"],
                 "attribution": "Jovian Archive public glossary; undated editorial source, not a publisher-authenticated full manuscript",
@@ -168,7 +164,6 @@ def context_reading(context: dict[str, Any]) -> dict[str, Any]:
                 "source_facts",
             )
         ],
-        "source_urls": [SOURCE],
     }
 
 
@@ -190,7 +185,6 @@ def add_profile_partition_evidence(
                     "actual_profile_matches_ideal_partition"
                 ],
             },
-            "source_url": SOURCE,
         }
     )
     evidence["interpretation"]["profile_partition_context"] = context_reading(context)

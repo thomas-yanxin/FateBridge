@@ -6,6 +6,7 @@ from fatebridge.core.astro import native_execution
 from fatebridge.core.astro.source_session import source_session
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.human_design.human_design_birth_clock import resolve_birth_clock
+from fatebridge.core.human_design.human_design_cycles import reference_epoch
 from fatebridge.core.human_design.human_design_reference_order import reference_ordering
 
 ENTRY = "fatebridge.core.human_design.human_design_cycle_input.validate_cycle_reference"
@@ -46,8 +47,6 @@ def validate_cycle_reference(
                 {**arguments, "cycle_reference_datetime": cycle_reference_datetime},
             )
             return
-        from fatebridge.core.human_design.human_design_cycles import reference_epoch
-
         clock = resolve_birth_clock(**arguments)
         label, reference_tt = reference_epoch(cycle_reference_datetime)
         birth_tt = (

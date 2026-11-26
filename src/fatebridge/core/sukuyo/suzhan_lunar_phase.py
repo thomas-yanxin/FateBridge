@@ -18,12 +18,10 @@ METHOD = "modern_geocentric_apparent_elongation_tithi12_v1"
 DEFINITIONS = [
     {
         "id": "imd_positional_astronomy_panchang_explanation",
-        "url": "https://packolkata.imd.gov.in/panchang/en/explanation",
         "role": "Modern tithi spans successive 12 degree Moon-Sun longitude differences; instantaneous segmentation only here.",
     },
     {
         "id": "usno_primary_phase_definition_archived_by_ntsb",
-        "url": "https://data.ntsb.gov/Docket/Document/docBLOB?FileExtension=.PDF&FileName=Data+from+U.S.+Naval+Observatory-Master.PDF&ID=40170653",
         "locator": "PDF page 4, USNO primary-phase definition",
         "role": "Apparent ecliptic Moon minus Sun longitude 0, 90, 180, 270 degrees defines the four primary phases.",
     },

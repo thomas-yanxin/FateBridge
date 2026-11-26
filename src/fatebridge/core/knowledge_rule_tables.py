@@ -10,14 +10,12 @@ from fatebridge.core.astro.astrology_tables import (
     SIGN_LABELS_ZH,
 )
 from fatebridge.core.astro.lilly_houses import house_condition
-from fatebridge.core.astro.ptolemy import FORTUNE_SOURCE_URL, SOURCE_URL
 from fatebridge.core.classical_western import LOTS
 from fatebridge.core.metaphysics.qimen import QIMEN_DOOR_TO_TRIGRAM
 from fatebridge.core.metaphysics.qimen_calendar_tables import QIMEN_FUHEAD_HEAVEN_STEM
 from fatebridge.core.qimen.qimen_evidence import STAR_ELEMENTS
 from fatebridge.core.qimen.qimen_gate_relations import DOOR_ELEMENTS, PRINTED_EXAMPLES
 from fatebridge.core.qimen.qimen_profiles import GOD_PROFILES, god_evidence
-from fatebridge.core.qimen.qimen_sources import YANYI_VOLUMES
 
 
 class KnowledgeCard(TypedDict, total=False):
@@ -36,7 +34,7 @@ def astro_rule_cards(labels: dict[str, str]) -> dict[str, dict[str, KnowledgeCar
                 "入庙：" + "、".join(SIGN_LABELS_ZH[sign] for sign in signs),
                 f"擢升：{SIGN_LABELS_ZH[EXALTATION_SIGNS[planet]]}",
             ],
-            "citation": f"Ptolemy, Tetrabiblos I.17、I.19（Robbins） · {SOURCE_URL}",
+            "citation": "Ptolemy, Tetrabiblos I.17、I.19（Robbins）",
         }
     signs_table: dict[str, KnowledgeCard] = {}
     for sign, ruler in RULER_BY_SIGN.items():
@@ -50,7 +48,7 @@ def astro_rule_cards(labels: dict[str, str]) -> dict[str, dict[str, KnowledgeCar
                     if exaltation == sign
                 ],
             ],
-            "citation": f"Ptolemy, Tetrabiblos I.17、I.19（Robbins） · {SOURCE_URL}",
+            "citation": "Ptolemy, Tetrabiblos I.17、I.19（Robbins）",
         }
     houses: dict[str, KnowledgeCard] = {}
     house_names = {"angular": "角宫", "succedent": "续宫", "cadent": "果宫"}
@@ -63,7 +61,7 @@ def astro_rule_cards(labels: dict[str, str]) -> dict[str, dict[str, KnowledgeCar
                 f"其余尊贵相同时的强度顺序：第 {house['p48_strength_rank']} 位",
                 f"第 115 页宫位单项：{house['p115_house_points']:+d}",
             ],
-            "citation": f"William Lilly, Christian Astrology, pp. 48, 50, 115 · {house['source_url']}",
+            "citation": "William Lilly, Christian Astrology, pp. 48, 50, 115",
         }
     aspects: dict[str, KnowledgeCard] = {}
     classical_angles = {60, 90, 120, 180}
@@ -82,7 +80,7 @@ def astro_rule_cards(labels: dict[str, str]) -> dict[str, dict[str, KnowledgeCar
             "title": f"{title}（{angle}°）",
             "tips": [f"相位角：{angle}°"],
             "citation": (
-                f"Ptolemy, Tetrabiblos I.13（Robbins） · {SOURCE_URL}"
+                "Ptolemy, Tetrabiblos I.13（Robbins）"
                 if angle in classical_angles
                 else "相位名称与标称角度"
             ),
@@ -110,8 +108,8 @@ def astro_rule_cards(labels: dict[str, str]) -> dict[str, dict[str, KnowledgeCar
             "title": definition["cn"],
             "tips": descriptions,
             "citation": (
-                f"FateBridge 昼夜反转点表（core/classical_western.py::LOTS）；"
-                f"Ptolemy, Tetrabiblos III.10（Robbins） · {FORTUNE_SOURCE_URL}"
+                "FateBridge 昼夜反转点表（core/classical_western.py::LOTS）；"
+                "Ptolemy, Tetrabiblos III.10（Robbins）"
                 if lot_id == "fortune"
                 else "FateBridge 昼夜反转点表（core/classical_western.py::LOTS）"
             ),
@@ -138,13 +136,13 @@ def qimen_rule_cards() -> dict[str, dict[str, KnowledgeCard]]:
                     if name == door
                 ],
             ],
-            "citation": f"《遁甲演义》卷二·门迫宫迫 · {YANYI_VOLUMES[2]}",
+            "citation": "《遁甲演义》卷二·门迫宫迫",
         }
     stars: dict[str, KnowledgeCard] = {
         star: {
             "title": star,
             "tips": [f"{star}属{element}。"],
-            "citation": f"《遁甲演义》卷三·九星所属及旺衰 · {YANYI_VOLUMES[3]}",
+            "citation": "《遁甲演义》卷三·九星所属及旺衰",
         }
         for star, element in STAR_ELEMENTS.items()
     }
@@ -154,10 +152,10 @@ def qimen_rule_cards() -> dict[str, dict[str, KnowledgeCard]]:
         gods[god] = {
             "title": god,
             "tips": [evidence["traditional_role"]],
-            "citation": f"《遁甲演义》{evidence['section']} · {evidence['source']}",
+            "citation": f"《遁甲演义》{evidence['section']}",
         }
     instruments = list(QIMEN_FUHEAD_HEAVEN_STEM.items())
-    stem_citation = f"《遁甲演义》卷三·奇遁布局法 · {YANYI_VOLUMES[3]}"
+    stem_citation = "《遁甲演义》卷三·奇遁布局法"
     stems: dict[str, KnowledgeCard] = {
         "甲": {
             "title": "甲",

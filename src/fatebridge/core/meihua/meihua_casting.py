@@ -21,13 +21,13 @@ from fatebridge.core.meihua.meihua_observed import (
 from fatebridge.core.meihua.meihua_tones import build_text_tone_basis
 from fatebridge.core.requests.meihua import MeihuaCasting
 
-_ADAPTER = TypeAdapter(MeihuaCasting)
-_NUMBERS = {name: number for number, name in BAGUA_BY_NUMBER.items()}
-_CODE_NUMBERS = {
+ADAPTER = TypeAdapter(MeihuaCasting)
+NUMBERS = {name: number for number, name in BAGUA_BY_NUMBER.items()}
+CODENUMBERS = {
     "".join(map(str, BAGUA_BY_NAME[name]["lines"])): number
-    for name, number in _NUMBERS.items()
+    for name, number in NUMBERS.items()
 }
-_BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
+BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 
 
 def explicit_ruleset(*, casting_method: str | None = None) -> dict[str, Any]:
@@ -79,10 +79,10 @@ def cast_explicit_meihua(
     casting: dict[str, Any],
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Never infer a method from a question or fill absent casting facts."""
-    parameters = _ADAPTER.validate_python(casting).model_dump(mode="json")
+    parameters = ADAPTER.validate_python(casting).model_dump(mode="json")
     method = parameters["method"]
     hour = (
-        _BRANCHES.index(parameters["hour_branch"]) + 1
+        BRANCHES.index(parameters["hour_branch"]) + 1
         if "hour_branch" in parameters
         else 0
     )
@@ -90,7 +90,7 @@ def cast_explicit_meihua(
     alternate = None
     observation_basis = None
     if method == "lunar_time_added_count":
-        year = _BRANCHES.index(parameters["year_branch"]) + 1
+        year = BRANCHES.index(parameters["year_branch"]) + 1
         upper = (
             year
             + parameters["lunar_month"]
@@ -123,8 +123,8 @@ def cast_explicit_meihua(
         total = upper + lower + hour
     elif method == "observed_trigrams":
         upper, lower = (
-            _NUMBERS[parameters["upper_trigram"]],
-            _NUMBERS[parameters["lower_trigram"]],
+            NUMBERS[parameters["upper_trigram"]],
+            NUMBERS[parameters["lower_trigram"]],
         )
         total = upper + lower + hour
     elif method == "length_zhang_chi":
@@ -156,7 +156,7 @@ def cast_explicit_meihua(
         ) % 6 or 6
     else:  # existing; the discriminated union rejects every other method.
         code = parameters["hexagram_code"]
-        upper, lower = _CODE_NUMBERS[code[3:]], _CODE_NUMBERS[code[:3]]
+        upper, lower = CODENUMBERS[code[3:]], CODENUMBERS[code[:3]]
         total = parameters["moving_line"]
 
     moving_line = total % 6 or 6

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from fractions import Fraction
-from typing import Any, Callable, Dict, Iterable, List, Optional, Set
+from typing import Any, Callable, Iterable
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.profiles import native_factor_model
@@ -186,7 +186,7 @@ VALID_PROFILES = {
 }
 
 
-def longitude_activation(longitude: float) -> Dict[str, Any]:
+def longitude_activation(longitude: float) -> dict[str, Any]:
     """Half-open sectors; never round a longitude before assigning a sector.
 
     Exact arithmetic on the supplied binary float avoids losing a neighboring
@@ -197,7 +197,7 @@ def longitude_activation(longitude: float) -> Dict[str, Any]:
     return _rational_activation(Fraction(longitude) % 360)
 
 
-def opposite_activation(source_longitude: float) -> Dict[str, Any]:
+def opposite_activation(source_longitude: float) -> dict[str, Any]:
     """Classify exact 180-degree opposition before rounding its display float."""
     if not math.isfinite(source_longitude):
         raise ValueError("人类图对点来源黄经必须为有限数值")
@@ -207,7 +207,7 @@ def opposite_activation(source_longitude: float) -> Dict[str, Any]:
     }
 
 
-def _rational_activation(normalized: Fraction) -> Dict[str, Any]:
+def _rational_activation(normalized: Fraction) -> dict[str, Any]:
     units = ((normalized - 302) % 360) * 192  # base = 18.75 arcseconds
     index = int(units // 1080)
     within = units - index * 1080
@@ -241,9 +241,9 @@ def positions_at_tt(
     *,
     require_swiss_files: bool = False,
     backend: str = "swieph",
-    source_observer: Optional[Callable[[str, float, Dict[str, Any]], None]] = None,
+    source_observer: Callable[[str, float, dict[str, Any]], None] | None = None,
     source_role: str = "activation",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     if runtime.swe is None:
         raise RuntimeError("人类图需要 Swiss Ephemeris")
     if node_mode not in {"true", "mean"}:
@@ -260,7 +260,7 @@ def positions_at_tt(
             runtime.swe.TRUE_NODE if node_mode == "true" else runtime.swe.MEAN_NODE
         ),
     }
-    positions: Dict[str, Any] = {}
+    positions: dict[str, Any] = {}
     physical_coordinates = []
     try:
         for body, body_id in ids.items():
@@ -330,8 +330,8 @@ def positions_at_tt(
     return positions
 
 
-def _components(active: Set[int]) -> List[List[str]]:
-    graph: Dict[str, Set[str]] = {}
+def _components(active: set[int]) -> list[list[str]]:
+    graph: dict[str, set[str]] = {}
     for a, b, _ in CHANNELS:
         if {a, b} <= active:
             x, y = GATE_CENTER[a], GATE_CENTER[b]
@@ -352,7 +352,7 @@ def _components(active: Set[int]) -> List[List[str]]:
     return sorted(groups)
 
 
-def bodygraph(personality: Iterable[int], design: Iterable[int]) -> Dict[str, Any]:
+def bodygraph(personality: Iterable[int], design: Iterable[int]) -> dict[str, Any]:
     """Definition requires two channel ends, across either calculation side."""
     p, d = set(personality), set(design)
     active = p | d
@@ -387,7 +387,7 @@ def bodygraph(personality: Iterable[int], design: Iterable[int]) -> Dict[str, An
         authority = "lunar_no_inner_authority"
     else:
         authority = "environment_no_inner_authority"
-    channels: List[Dict[str, Any]] = []
+    channels: list[dict[str, Any]] = []
     for a, b, circuit in CHANNELS:
         if {a, b} <= active:
             channels.append(

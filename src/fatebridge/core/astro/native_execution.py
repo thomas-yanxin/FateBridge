@@ -8,7 +8,6 @@ state isolation, not independent astronomical validation or an atomic file read.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import queue
@@ -21,6 +20,7 @@ from typing import Any, Protocol
 
 from pydantic import JsonValue
 
+from fatebridge.core.astro.iers_ut1 import active_ut1
 from fatebridge.core.astro.native_wire import (
     RESULT_ENCODING,
     NativeExecutionError,
@@ -29,11 +29,22 @@ from fatebridge.core.astro.native_wire import (
     encode,
     encode_result,
 )
+from fatebridge.core.astro.source_session import current_source_session
 from fatebridge.core.compressed_ephemeris import endpoint_context_evidence
 from fatebridge.core.ephemeris_paths import ephemeris_search_directories
+from fatebridge.core.ephemeris_runtime import effective_ephemeris_search_path
 from fatebridge.core.execution_context import (
     clock_snapshot,
     merge_clock_reads,
+)
+from fatebridge.core.human_design.human_design_context import (
+    CONTEXT_LIFETIME,
+    CONTEXT_SCOPE,
+)
+from fatebridge.core.physical_source_observation import (
+    current_policy,
+    merge_worker_policy,
+    policy_mode,
 )
 from fatebridge.utils.errors import EphemerisSourceError, JyotishCalculationError
 
@@ -52,8 +63,8 @@ __all__ = [
     "message_bytes",
 ]
 
-_WORKER_ACTIVE = False
-_ENTRIES = {
+WORKER_ACTIVE = False
+ENTRIES = {
     "fatebridge.core.human_design.human_design_cycle_input.validate_cycle_reference",
     "fatebridge.services.human_design.calculate_human_design",
     "fatebridge.core.jyotish.jyotish.positions",
@@ -61,8 +72,8 @@ _ENTRIES = {
     "fatebridge.services.jyotish.calculate_vimshottari",
     "fatebridge.services.astrology.calculate_core_chart_analysis",
 }
-_MAX_MESSAGE = 64 * 1024 * 1024
-_TIMEOUT = 1800.0
+MAX_MESSAGE = 64 * 1024 * 1024
+TIMEOUT = 1800.0
 _AUXILIARY_EVIDENCE: dict[str, Any] | None = None
 
 
@@ -73,7 +84,7 @@ class NativeSampleObserver(Protocol):
 
 
 class AuxiliaryInputs:
-    """Endpoint fingerprints, including absent files that could shadow a source.
+    """Endpoint file states, including absent files that could shadow a source.
 
     The ordered candidates follow the same path parser as source diagnostics.
     Each identity describes a possible native input at the endpoint.
@@ -95,19 +106,14 @@ class AuxiliaryInputs:
         self.initial = self.snapshot()
 
     def snapshot(self) -> list[Any]:
-        rows: list[list[int | str | None]] = []
+        rows: list[list[int | None]] = []
         for index, path in enumerate(self.paths):
             if path is None:
                 rows.append([index, None, None])
                 continue
             try:
-                digest = hashlib.sha256()
-                with path.open("rb") as source:
-                    size = 0
-                    for chunk in iter(lambda: source.read(65536), b""):
-                        size += len(chunk)
-                        digest.update(chunk)
-                rows.append([index, size, digest.hexdigest()])
+                stat = path.stat()
+                rows.append([index, stat.st_size, stat.st_mtime_ns])
             except (FileNotFoundError, NotADirectoryError):
                 rows.append([index, None, None])
             except OSError as error:
@@ -128,12 +134,11 @@ class AuxiliaryInputs:
                     "search_index": index // 3,
                     "filename": path.name,
                     "bytes": size,
-                    "sha256": digest,
                 }
-                for path, (index, size, digest) in zip(self.paths, self.initial)
-                if path is not None and digest is not None
+                for path, (index, size, mtime) in zip(self.paths, self.initial)
+                if path is not None and mtime is not None
             ],
-            "scope": "Clock inversion, physical coordinates, houses, solar events and all grid samples share this private native context. Auxiliary search candidates are fingerprinted at calculation endpoints; identities do not prove atomic reads, table validity or astronomical accuracy.",
+            "scope": "Clock inversion, physical coordinates, houses, solar events and all grid samples share this private native context. Auxiliary search candidates are checked at calculation endpoints; identities do not prove atomic reads, table validity or astronomical accuracy.",
         }
 
 
@@ -147,11 +152,6 @@ def context_for_entry(entry: str) -> dict[str, str]:
             "scope": "Request-only birth/reference TT ordering in a fresh native process. The calculation revalidates in its separate whole-operation context. Auxiliary candidate identities do not prove atomic reads, table validity or physical accuracy.",
         }
     if entry == "fatebridge.services.human_design.calculate_human_design":
-        from fatebridge.core.human_design.human_design_context import (
-            CONTEXT_LIFETIME,
-            CONTEXT_SCOPE,
-        )
-
         return {"lifetime": CONTEXT_LIFETIME, "scope": CONTEXT_SCOPE}
     return {}
 
@@ -164,7 +164,7 @@ def context_evidence() -> dict[str, Any]:
 
 
 def in_native_worker() -> bool:
-    return _WORKER_ACTIVE
+    return WORKER_ACTIVE
 
 
 def message_bytes(message: dict[str, Any]) -> bytes:
@@ -176,7 +176,7 @@ def message_bytes(message: dict[str, Any]) -> bytes:
         ).encode()
         + b"\n"
     )
-    if len(payload) > _MAX_MESSAGE:
+    if len(payload) > MAX_MESSAGE:
         raise NativeExecutionError("Native calculation message exceeds limit")
     return payload
 
@@ -189,7 +189,7 @@ def _receive(process: subprocess.Popen[bytes], deadline: float) -> dict[str, Any
 
     def read() -> None:
         try:
-            received.put(stdout.readline(_MAX_MESSAGE + 1))
+            received.put(stdout.readline(MAX_MESSAGE + 1))
         except Exception as error:
             received.put(error)
 
@@ -208,7 +208,7 @@ def _receive(process: subprocess.Popen[bytes], deadline: float) -> dict[str, Any
         ) from payload
     elif not payload:
         raise NativeExecutionError("Private native calculation exited without a result")
-    if len(payload) > _MAX_MESSAGE:
+    if len(payload) > MAX_MESSAGE:
         raise NativeExecutionError("Native calculation message exceeds limit")
     try:
         message = json.loads(payload)
@@ -225,16 +225,7 @@ def calculate(
     kwargs: dict[str, Any],
 ) -> Any:
     """Parent dispatch. Caller holds the managed source-session lock."""
-    from fatebridge.core.astro.iers_ut1 import active_ut1
-    from fatebridge.core.astro.source_session import current_source_session
-    from fatebridge.core.ephemeris_runtime import effective_ephemeris_search_path
-    from fatebridge.core.physical_source_observation import (
-        current_policy,
-        merge_worker_policy,
-        policy_mode,
-    )
-
-    if entry not in _ENTRIES:
+    if entry not in ENTRIES:
         raise NativeExecutionError("Unsupported private calculation entry")
     session = current_source_session()
     if session is None:
@@ -253,13 +244,13 @@ def calculate(
         "ut1_source": "iers_c04" if active_ut1.get() is not None else "swiss_delta_t",
         "observer": observer is not None,
         "auxiliary_path": auxiliary_path,
-        "auxiliary_fingerprints": auxiliary.initial,
+        "auxiliary_states": auxiliary.initial,
     }
     if current_policy() is not None:
         request["physical_ephemeris_policy"] = policy_mode()
     payload = message_bytes(request)
     worker = Path(__file__).with_name("_native_worker.py")
-    deadline = time.monotonic() + _TIMEOUT
+    deadline = time.monotonic() + TIMEOUT
     with subprocess.Popen(
         [sys.executable, "-I", "-u", str(worker)],
         stdin=subprocess.PIPE,

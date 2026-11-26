@@ -36,7 +36,6 @@ from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.utils.errors import EphemerisSourceError
 
 NATIVE_PROJECTION_METHOD = "swisseph_house_pos_zero_ecliptic_latitude"
-HOUSE_POSITION_SOURCE = "https://www.astro.com/swisseph/swephprg.htm"
 
 
 @dataclass(frozen=True)
@@ -240,7 +239,6 @@ class EclipticHouseProjection:
             "backend_longitude_origin": self.longitude_origin,
             "backend_frame": "intersection_of_physical_equator_and_source_ecliptic",
             "input_ecliptic_latitude": 0.0,
-            "source_url": HOUSE_POSITION_SOURCE,
             "source_section": "16",
             "scope": "Longitude-only native projection; not actual-body spatial placement",
         }

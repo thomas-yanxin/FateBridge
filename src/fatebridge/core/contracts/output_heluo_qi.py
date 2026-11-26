@@ -52,7 +52,6 @@ class HeluoBodyEvidence(PartialOutput):
     ruleset_id: str | None = None
     version: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     assessment_status: str | None = None
     year_ganzhi: str | None = None
@@ -156,14 +155,11 @@ class HeluoYuanqiOpposition(PartialOutput):
     version: str | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     review_status: str | None = None
     year_context_literal: str | None = None
     absence_literal: str | None = None
     rescue_literal: str | None = None
-    collation_sha256: str | None = None
-    content_sha256: str | None = None
     year_ganzhi: str | None = None
     body_scope_policy: str | None = None
     direct_only_policy: str | None = None
@@ -177,7 +173,6 @@ class HeluoPhaseQi(PartialOutput):
     ruleset_id: str | None = None
     version: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     candidate_basis: str | None = None
     birth_instant_utc: str | None = None
@@ -228,7 +223,6 @@ class HeluoYuantangDerivation(PartialOutput):
     ruleset_id: str | None = None
     version: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     review_status: str | None = None
     gender: Literal["男", "女"] | None = None

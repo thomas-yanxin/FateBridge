@@ -11,7 +11,7 @@ from fractions import Fraction
 from typing import Any
 
 from fatebridge.core.astro.geometry import angle_fraction, angular_separation_fraction
-from fatebridge.core.astro.lilly import PLANETS, SOURCE_URL, dignity_at, pair_reception
+from fatebridge.core.astro.lilly import PLANETS, dignity_at, pair_reception
 from fatebridge.core.astro.lilly_star_orbs import (
     STELLAR_ORB_DEGREES,
     STELLAR_ORB_SOURCE_PAGES,
@@ -525,7 +525,6 @@ def evaluate_fortitudes(
         summaries[planet] = summary
     return {
         "method_id": RULESET,
-        "source_url": SOURCE_URL,
         "source_edition": "William Lilly Christian Astrology London1647",
         "source_pages": [
             57,

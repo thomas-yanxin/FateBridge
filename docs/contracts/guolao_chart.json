@@ -361,7 +361,7 @@
         "guolao_seasonal_anchor_policy"
       ],
       "source_refs": [
-        "docs/western-astrology.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "per_field",
       "validation_scope": {

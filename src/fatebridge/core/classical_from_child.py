@@ -7,7 +7,6 @@ hidden stems stay present even where the source calls a hidden force ineffective
 from copy import deepcopy
 from typing import Any, Mapping
 
-from fatebridge.core.source_identity import DITIAN_SUI_CHANWEI_SCAN_URL
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
     DESTRUCTION_CYCLE,
@@ -21,9 +20,7 @@ SOURCE = {
     "title": "任注滴天髓闡微·六親論·順局",
     "author": "任鐵樵增注，李雨田校訂兼發行",
     "edition": "上海大東書局經售，1947年4月初版",
-    "url": DITIAN_SUI_CHANWEI_SCAN_URL,
     "pdf_pages": [389, 390, 391, 392, 393, 394, 395],
-    "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
 }
 ORDER = ("year", "month", "day", "hour")
 

@@ -62,7 +62,6 @@ SOURCES: list[dict[str, Any]] = [
         "id": "rudolph_1979_17laws",
         "author": "Ludwig Rudolph",
         "title": "17 Gesetze fuer Planetenbilder, Hamburger Hefte 1979/2, no.74, p.1, article 823",
-        "url": "https://www.witte-verlag.com/hamburger-hefte-menu/datenbank/823.html",
         "sections": ["3", "7", "13", "14", "15", "16"],
         "scope": "Geometric propositions only; not adoption of interpretive or empirical claims",
     },
@@ -70,14 +69,12 @@ SOURCES: list[dict[str, Any]] = [
         "id": "witte_instruments",
         "author": "Witte-Verlag Hamburg",
         "title": "Arbeitsgeraete: 360, 90 and 45 degree dials and midpoint ruler",
-        "url": "https://witte-verlag.com/produkte/arbeitsmittel.html",
         "scope": "Published dial instruments; not the full interpretation rulebook",
     },
     {
         "id": "swiss_programmer",
         "author": "Astrodienst AG",
         "title": "Swiss Ephemeris Programmer's Manual",
-        "url": "https://www.astro.com/swisseph/swephprg.htm",
         "sections": [
             "3.2.3 fictitious planets",
             "9.2 UTC and Julian day",
@@ -88,7 +85,6 @@ SOURCES: list[dict[str, Any]] = [
         "id": "swiss_hypothetical",
         "author": "Astrodienst AG",
         "title": "Swiss Ephemeris 2.10: 2.7.1 Uranian planets",
-        "url": "https://www.astro.com/swisseph/swisseph.pdf",
         "scope": "James Neely revised mathematical elements; no observed physical bodies",
     },
 ]
@@ -279,7 +275,6 @@ def _native_factors(
             else {
                 "status": "not_used",
                 "filename": None,
-                "sha256": None,
                 "scope": "Physical/reference factor probe; no fictitious orbit elements read",
             }
         )

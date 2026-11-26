@@ -15,7 +15,7 @@ from tests.fixtures.ephemeris_manifest import manifest_for_payloads
 def profile(tmp_path, monkeypatch):
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
     monkeypatch.delenv("SE_EPHE_PATH", raising=False)
-    monkeypatch.setattr(ephemeris_runtime, "_PROJECT_ROOT", tmp_path / "checkout")
+    monkeypatch.setattr(ephemeris_runtime, "PROJECT_ROOT", tmp_path / "checkout")
     monkeypatch.setattr(
         ephemeris_runtime, "_configured_path", ephemeris_runtime._configured_path
     )
@@ -111,7 +111,7 @@ def test_unusable_checkout_path_does_not_hide_verified_cache(
     project = checkout / "ephe"
     project.mkdir(parents=True)
     (project / "sepl_18.se1").write_bytes(payloads["sepl_18.se1"])
-    monkeypatch.setattr(ephemeris_runtime, "_PROJECT_ROOT", checkout)
+    monkeypatch.setattr(ephemeris_runtime, "PROJECT_ROOT", checkout)
     monkeypatch.setattr(fetch_ephe, "default_dest", lambda: project)
     cached = install.user_ephemeris_dir()
     cached.mkdir(parents=True)

@@ -28,11 +28,11 @@ GuolaoSeasonalAnchorPolicy = Literal[
 ]
 
 
-_SUBMICROSECOND_TARGET = re.compile(
+SUBMICROSECOND_TARGET = re.compile(
     r"[0-9]{4}-[0-9]{2}-[0-9]{2}.[0-9]{2}:[0-9]{2}:[0-9]{2}[.,][0-9]{6}0*[1-9]"
 )
 
-_NUMERIC_TARGET = re.compile(
+NUMERIC_TARGET = re.compile(
     r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?"
 )
 
@@ -45,11 +45,11 @@ def _exact_target_datetime(
     moment: datetime = validate(value)
     if isinstance(value, bytes):
         value = value.decode()
-    if isinstance(value, str) and _SUBMICROSECOND_TARGET.match(value):
+    if isinstance(value, str) and SUBMICROSECOND_TARGET.match(value):
         raise ValueError("Target datetime must be representable to the microsecond")
     if isinstance(value, float):
         timestamp = Decimal.from_float(value)
-    elif isinstance(value, str) and _NUMERIC_TARGET.fullmatch(value):
+    elif isinstance(value, str) and NUMERIC_TARGET.fullmatch(value):
         try:
             timestamp = Decimal(value)
         except InvalidOperation as error:

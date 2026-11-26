@@ -14,10 +14,19 @@ from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core import timing
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.timing import TimingAnalysis
-from tests.bazi.test_bazi_solar_provider import clear_solar_caches
 from tests.support.transports import SPECS, business, call_cli, inputs, native
 from tests.support.transports import rest as _shared_rest
 from tests.unit_test.fixtures.bazi_year_cases import TOPICS
+
+
+def clear_solar_caches() -> None:
+    for function in (
+        almanac.get_solar_terms_for_year,
+        BaZiCalendar._get_four_pillars_cached,
+        timing._calculate_liuyue_cached,
+        timing._calculate_liuri_cached,
+    ):
+        function.cache_clear()
 
 
 @pytest.fixture

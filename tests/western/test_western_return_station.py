@@ -1,12 +1,4 @@
-"""Observed station-loop roots survive a daily return-search cell.
-
-The exposed 2001 Jupiter case has an independently generated Skyfield1.54 /
-DE421 reference, using no FateBridge or Swiss imports. The comparison used
-a 1001-point scan.
-Kernel SHA256: a20a7139da04cbc462454634918e9a9ca69127044e2cc9d4f9c16e238d2deedc.
-The 30-second comparison line was fixed before the independent comparison;
-this is a development case, not a blind sample or all-event completeness proof.
-"""
+"""Observed station-loop roots survive a daily return-search cell."""
 
 import math
 from datetime import datetime, timedelta, timezone

@@ -451,7 +451,7 @@ GENDER_FEMALE_TOKENS = frozenset({"female", "f", "女", "woman"})
 
 
 def normalize_gender(gender: str | None) -> Literal["male", "female"] | None:
-    """将自由格式的性别输入归一化为 ``"male"`` / ``"female"`` / ``None``。
+    """将自由格式的性别输入归一化为 "male" / "female" / None。
 
     None、空串、无法识别的取值统一返回 None（中性，由各模块自行决定如何处理）。
     """
@@ -499,7 +499,7 @@ def iter_pillar_gods(
     """遍历四柱，逐个产出天干与地支藏干的十神条目。
 
     Args:
-        pillars: 四柱 ``{label: (stem, branch)}``，须含 ``"day"`` 柱。
+        pillars: 四柱 {label: (stem, branch)}，须含 "day" 柱。
         day_stem: 日主天干（取十神的基准）。
         skip_day_pillar: True 则跳过整个日柱的明干和藏干；
             False（默认）跳过日干本身但仍计入日支藏干。

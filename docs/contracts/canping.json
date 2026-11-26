@@ -286,7 +286,7 @@
         "dayun_method"
       ],
       "source_refs": [
-        "docs/numerology-audit.md"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "per_field",
       "validation_scope": {

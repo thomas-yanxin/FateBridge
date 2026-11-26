@@ -1,15 +1,15 @@
 """Shared Swiss Ephemeris runtime helpers.
 
-This module is the single import point for the optional ``swisseph`` dependency.
+This module is the single import point for the optional swisseph dependency.
 Centralising it lets FateBridge do two things consistently across every module
 that touches the ephemeris (charts, almanac, predictive directions):
 
 * Apply an operator-supplied data-file path in each calling thread via the
-  ``SE_EPHE_PATH`` environment variable. Swiss Ephemeris silently falls back to
-  its built-in Moshier analytical model when no ``.se1`` data files are
-  reachable; official files enable data-backed ``SWIEPH`` calculations. The
+  SE_EPHE_PATH environment variable. Swiss Ephemeris silently falls back to
+  its built-in Moshier analytical model when no .se1 data files are
+  reachable; official files enable data-backed SWIEPH calculations. The
   underlying DE edition must be read from the active file headers.
-* Translate a ``calc_ut`` return flag into the reported top-level model, and
+* Translate a calc_ut return flag into the reported top-level model, and
   qualify required physical file contexts separately. A Swiss top-level flag
   can coexist with an analytical lunar dependency in the native library.
 """
@@ -21,7 +21,7 @@ from contextlib import contextmanager
 from functools import partial
 from pathlib import Path
 from threading import RLock, local
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator
 
 from fatebridge.core.astro_models import native_rotation_call
 from fatebridge.core.compressed_ephemeris import compressed_endpoint_call
@@ -50,16 +50,16 @@ except ImportError:  # pragma: no cover - exercised only in minimal installs
 # files, never redistributed, so they live outside the package). Module lives at
 # ``<root>/src/fatebridge/core/ephemeris_runtime.py``, so the root is three
 # parents up.
-_PROJECT_ROOT = Path(__file__).resolve().parents[3]
-_EPHEMERIS_LOCK = RLock()
-_configured_path: Optional[str] = None
-_THREAD_STATE = local()
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+EPHEMERIS_LOCK = RLock()
+_configured_path: str | None = None
+THREAD_STATE = local()
 # Some native builds share this path across threads. Keep both caches under
 # the same lock; other builds still require each thread's own initialization.
 _LAST_APPLIED_PATH: tuple[int, str | None] | None = None
 
 
-def _validated_ephemeris_path(path: Optional[str]) -> Optional[str]:
+def _validated_ephemeris_path(path: str | None) -> str | None:
     if path and not ephemeris_search_path_fits(path):
         raise ValueError(
             "Swiss Ephemeris search path must contain no NUL and fit within "
@@ -68,45 +68,45 @@ def _validated_ephemeris_path(path: Optional[str]) -> Optional[str]:
     return path or None
 
 
-def default_ephe_dir() -> Optional[str]:
+def default_ephe_dir() -> str | None:
     """Prefer project-local files, then a complete verified user-cache profile.
 
-    Lets a checkout that ran ``python -m fatebridge.fetch_ephe`` pick up full
+    Lets a checkout that ran python -m fatebridge.fetch_ephe pick up full
     precision with zero configuration — no environment variable required. The
-    directory is only reported when it actually contains ``.se1`` files, so an
+    directory is only reported when it actually contains .se1 files, so an
     empty folder does not mask cache discovery or the Moshier fallback. Explicit
     environment or function paths are handled by configure_ephemeris_path first.
     """
-    candidate = _PROJECT_ROOT / "ephe"
+    candidate = PROJECT_ROOT / "ephe"
     if has_project_ephemeris_files(candidate):
         return str(candidate)
     return verified_user_ephemeris_dir()
 
 
-def configured_ephemeris_path() -> Optional[str]:
+def configured_ephemeris_path() -> str | None:
     """Return the selected path, including Swiss's nonempty environment override."""
-    with _EPHEMERIS_LOCK:
+    with EPHEMERIS_LOCK:
         return _validated_ephemeris_path(
             os.environ.get("SE_EPHE_PATH") or _configured_path
         )
 
 
-def effective_ephemeris_search_path() -> Optional[str]:
+def effective_ephemeris_search_path() -> str | None:
     """Include the loaded library's compiled defaults when no path was selected.
 
     These defaults can include the current directory and optional auxiliary
     files even when physical bodies fall back to Moshier.
     """
-    with _EPHEMERIS_LOCK:
+    with EPHEMERIS_LOCK:
         return configured_ephemeris_path() or getattr(swe, "EPHE_PATH", None)
 
 
-def configure_ephemeris_path(path: Optional[str] = None) -> Optional[str]:
-    """Point Swiss Ephemeris at ``.se1`` data files, if any can be located.
+def configure_ephemeris_path(path: str | None = None) -> str | None:
+    """Point Swiss Ephemeris at .se1 data files, if any can be located.
 
-    Resolution order: nonempty ``SE_EPHE_PATH`` (the C library's override), then
-    the explicit ``path`` argument, then a project-local ``ephe/`` directory (see
-    :func:`default_ephe_dir`). Returns the path that was applied, or ``None``
+    Resolution order: nonempty SE_EPHE_PATH (the C library's override), then
+    the explicit path argument, then a project-local ephe/ directory (see
+    default_ephe_dir). Returns the path that was applied, or None
     when none was found (or swisseph is unavailable), in which case swisseph
     keeps using its built-in Moshier model.
 
@@ -115,7 +115,7 @@ def configure_ephemeris_path(path: Optional[str] = None) -> Optional[str]:
     the importing thread alone is insufficient for a fresh REST worker.
     """
     global _configured_path, _LAST_APPLIED_PATH
-    with _EPHEMERIS_LOCK:
+    with EPHEMERIS_LOCK:
         if swe is None:
             return None
         resolved = _validated_ephemeris_path(
@@ -125,7 +125,7 @@ def configure_ephemeris_path(path: Optional[str] = None) -> Optional[str]:
         # Initialisation and reset also matter with no custom data directory.
         swe.set_ephe_path(resolved or "")
         signature = (id(swe), resolved)
-        _THREAD_STATE.signature = signature
+        THREAD_STATE.signature = signature
         _LAST_APPLIED_PATH = signature
         _configured_path = resolved
         return resolved
@@ -134,7 +134,7 @@ def configure_ephemeris_path(path: Optional[str] = None) -> Optional[str]:
 @contextmanager
 def lock_ephemeris_configuration() -> Iterator[None]:
     """Pin managed configuration without touching the caller's native state."""
-    with _EPHEMERIS_LOCK:
+    with EPHEMERIS_LOCK:
         yield
 
 
@@ -147,7 +147,7 @@ def preserve_ephemeris_path() -> Iterator[None]:
     both success and failure.
     """
     global _LAST_APPLIED_PATH
-    with _EPHEMERIS_LOCK:
+    with EPHEMERIS_LOCK:
         try:
             yield
         finally:
@@ -155,7 +155,7 @@ def preserve_ephemeris_path() -> Iterator[None]:
                 selected = configured_ephemeris_path()
                 swe.set_ephe_path(selected or "")
                 signature = (id(swe), selected)
-                _THREAD_STATE.signature = signature
+                THREAD_STATE.signature = signature
                 _LAST_APPLIED_PATH = signature
 
 
@@ -163,7 +163,7 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
     """Run a direct Swiss Ephemeris call outside third-party path changes."""
     global _LAST_APPLIED_PATH
     with (
-        _EPHEMERIS_LOCK,
+        EPHEMERIS_LOCK,
         native_call_policy(
             swe,
             operation,
@@ -178,13 +178,13 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
         selected = configured_ephemeris_path()
         signature = (id(swe), selected)
         if (
-            getattr(_THREAD_STATE, "signature", None) != signature
+            getattr(THREAD_STATE, "signature", None) != signature
             or _LAST_APPLIED_PATH != signature
         ):
             # deltat_ex requires initialisation even with no .se1 files.
             # Apply once per thread/path, avoiding a cache reset on every call.
             swe.set_ephe_path(selected or "")
-            _THREAD_STATE.signature = signature
+            THREAD_STATE.signature = signature
             _LAST_APPLIED_PATH = signature
         jpl = configured_jpl_file()
         invoke = partial(
@@ -217,21 +217,21 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
 
 
 def ephemeris_model_from_retflag(retflag: int) -> str:
-    """Map a ``swisseph.calc_ut`` return flag to the model that produced it.
+    """Map a swisseph.calc_ut return flag to the model that produced it.
 
     swisseph echoes its top-level ephemeris in the returned flag, which
-    may differ from the one requested (e.g. ``FLG_SWIEPH`` requested but the data
+    may differ from the one requested (e.g. FLG_SWIEPH requested but the data
     files are missing, so it quietly downgraded to Moshier). This alone does
     not identify every internal dependency: inspected sweplan() can use a
     Moshier Moon with a SWIEPH planet/Earth context. Managed physical calls
     separately qualify the required observed file windows. Possible values:
 
-    * ``"swieph"``  – Swiss Ephemeris compressed data files
-    * ``"moshier"`` – built-in Moshier analytical model (no data files needed)
-    * ``"jpl"``     – JPL ephemeris data files
-    * ``"error"``   – swisseph reported a soft failure (``retflag < 0``)
-    * ``"unknown"`` – flag set none of the recognised ephemeris bits
-    * ``"unavailable"`` – swisseph itself is not installed
+    * "swieph"  – Swiss Ephemeris compressed data files
+    * "moshier" – built-in Moshier analytical model (no data files needed)
+    * "jpl"     – JPL ephemeris data files
+    * "error"   – swisseph reported a soft failure (retflag < 0)
+    * "unknown" – flag set none of the recognised ephemeris bits
+    * "unavailable" – swisseph itself is not installed
     """
     if swe is None:
         return "unavailable"

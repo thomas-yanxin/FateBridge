@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 from fatebridge.core.fengshui.directions import rule_data, wrap9
 from fatebridge.core.fengshui.models import MonthlyRequest
@@ -15,7 +15,7 @@ from fatebridge.core.fengshui.monthly_time import solar_month_context
 @lru_cache(maxsize=1)
 def _bundle() -> dict[str, Any]:
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         json.loads(
             (Path(__file__).parents[2] / "data/fengshui/monthly-v1.json").read_text()
         ),

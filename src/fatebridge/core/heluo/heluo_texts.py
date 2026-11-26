@@ -7,7 +7,6 @@ Header, commentary, poem and verdict provenance remain separate.
 import json
 from copy import deepcopy
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +20,6 @@ COLLATION_PATH = (
 COMMENTARY_PATH = (
     Path(__file__).resolve().parents[2] / "data/heluo/commentary-collation-v1.json"
 )
-SOURCE_PDF_SHA256 = "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c"
 COMMENTARY_HEXAGRAMS = (
     "乾為天",
     "坤為地",
@@ -51,33 +49,9 @@ COMMENTARY_HEXAGRAMS = (
     "山天大畜",
 )
 HEADER_HEXAGRAMS = COMMENTARY_HEXAGRAMS
-HEADER_CONTENT_SHA256 = (
-    "61e5f891792122d73c84faef09b46bbc40864ac122a79100f9bdf0decfe0c5e3"
-)
-COMMENTARY_CONTENT_SHA256 = (
-    "0b0bca66080f6e3c8822bc8269d2241b433197b92e1348764057ae1744b765ed"
-)
-CONTENT_IDENTITY_POLICY = (
-    "version_pinned_canonical_JSON_text_labels_and_metadata; formatting_independent"
-)
 SECTION_LAYOUT_EXCEPTIONS = {
     ("風天小畜", 3): ["opening", "xie", "annual"],
 }
-
-
-def _pin_content(data: dict[str, Any], expected: str) -> str:
-    digest = sha256(
-        json.dumps(
-            data,
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-            allow_nan=False,
-        ).encode()
-    ).hexdigest()
-    if digest != expected:
-        raise ValueError("该版本的河洛原文、标签或来源元数据被改写。")
-    return digest
 
 
 def _source_identity(
@@ -87,12 +61,11 @@ def _source_identity(
         not isinstance(data, dict)
         or data["corpus_id"] != corpus
         or data["version"] != version
-        or data["source_pdf_sha256"] != SOURCE_PDF_SHA256
         or type(data[total_key]) is not int
         or data[total_key] != 384
     ):
         raise ValueError("所选河洛文本来源身份不一致。")
-    for key in ("source_url", "review_status", "scope", "transcription_policy"):
+    for key in ("review_status", "scope", "transcription_policy"):
         if not isinstance(data[key], str) or not data[key].strip():
             raise ValueError("河洛文本来源元数据缺失。")
 
@@ -127,11 +100,8 @@ def _collation() -> dict[str, Any]:
                 or not entry["yaoci"].strip()
             ):
                 raise ValueError("河洛爻辞缺原页或正文。")
-        content_sha = _pin_content(data, HEADER_CONTENT_SHA256)
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_heluo_header_collation") from exc
-    data["_loaded_sha256"] = sha256(raw).hexdigest()
-    data["_content_sha256"] = content_sha
     return data
 
 
@@ -141,11 +111,6 @@ def collation_summary() -> dict[str, Any]:
     return {
         "corpus_id": data["corpus_id"],
         "version": data["version"],
-        "sha256": data["_loaded_sha256"],
-        "content_sha256": data["_content_sha256"],
-        "content_identity_policy": CONTENT_IDENTITY_POLICY,
-        "source_pdf_sha256": data["source_pdf_sha256"],
-        "source_url": data["source_url"],
         "review_status": data["review_status"],
         "scope": data["scope"],
         "transcription_policy": data["transcription_policy"],
@@ -224,11 +189,8 @@ def _commentary_collation() -> dict[str, Any]:
                 )
             ):
                 raise ValueError("河洛注文缺原页、段落或条件标签不一致。")
-        content_sha = _pin_content(data, COMMENTARY_CONTENT_SHA256)
     except (OSError, KeyError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_heluo_commentary_collation") from exc
-    data["_loaded_sha256"] = sha256(raw).hexdigest()
-    data["_content_sha256"] = content_sha
     return data
 
 
@@ -238,11 +200,6 @@ def commentary_collation_summary() -> dict[str, Any]:
     return {
         "corpus_id": data["corpus_id"],
         "version": data["version"],
-        "sha256": data["_loaded_sha256"],
-        "content_sha256": data["_content_sha256"],
-        "content_identity_policy": CONTENT_IDENTITY_POLICY,
-        "source_pdf_sha256": data["source_pdf_sha256"],
-        "source_url": data["source_url"],
         "review_status": data["review_status"],
         "scope": data["scope"],
         "transcription_policy": data["transcription_policy"],
@@ -665,12 +622,8 @@ def _apply_commentary(
     provenance.update(
         commentary_status="source_commentary_visually_collated",
         commentary_corpus_id=data["corpus_id"],
-        commentary_sha256=commentary_collation_summary()["sha256"],
-        commentary_content_sha256=data["_content_sha256"],
         inherited_detail=result["detail"],
         commentary_pdf_pages=entry["pdf_pages"][:],
-        commentary_source_url=data["source_url"],
-        commentary_source_pdf_sha256=data["source_pdf_sha256"],
         commentary_review_status=entry.get("review_status", data["review_status"]),
         commentary_transcription_policy=data["transcription_policy"],
         commentary_reading_notes=entry["reading_notes"][:],
@@ -827,9 +780,6 @@ def collated_line(gua: str, pos: int, inherited: dict[str, Any]) -> dict[str, An
             corpus_id=data["corpus_id"],
             inherited_yaoci=inherited["yaoci"],
             pdf_page=entry["pdf_page"],
-            source_url=f"{data['source_url']}#page={entry['pdf_page']}",
-            source_pdf_sha256=data["source_pdf_sha256"],
-            header_content_sha256=data["_content_sha256"],
             review_status=entry.get("review_status", data["review_status"]),
             transcription_policy=data["transcription_policy"],
         )

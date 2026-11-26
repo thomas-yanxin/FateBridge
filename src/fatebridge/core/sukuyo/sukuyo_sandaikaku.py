@@ -2,23 +2,12 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
 from pathlib import Path
 from typing import Any
 
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_sandaikaku766.json"
-FACTS_SHA256 = "d4cdeb8fee076da9222f823e6ea95b2389aa2dce9bc722130db286c674aef67d"
-
-
-def validate_bundle(data: dict[str, Any]) -> None:
-    raw = json.dumps(
-        data, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode()
-    if hashlib.sha256(raw).hexdigest() != FACTS_SHA256:
-        raise ValueError("京大三代格所选文书、被引日期及未载干支的绑定已改变")
 
 
 def month_reference(year: int, month: int, leap: bool) -> dict[str, Any] | None:
@@ -32,9 +21,7 @@ def month_reference(year: int, month: int, leap: bool) -> dict[str, Any] | None:
         raise ValueError("三代格文书须使用明确年月与闰月布尔键")
     if (year, month, leap) not in ((766, 2, False), (822, 3, False)):
         return None
-    source = load_source(SOURCE)
-    data = source.data
-    validate_bundle(data)
+    data = load_source(SOURCE)
     role = next(
         row["role"]
         for row in data["binding_months"]
@@ -42,7 +29,6 @@ def month_reference(year: int, month: int, leap: bool) -> dict[str, Any] | None:
     )
     return {
         **data,
-        "source_bundle_sha256": source.sha256,
         "selected_month_key": [year, month, leap],
         "selected_month_binding_role": role,
         "inferred_original_event_ganzhi": None,

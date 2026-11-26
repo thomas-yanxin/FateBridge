@@ -19,7 +19,7 @@ HOUR_BRANCH_TOMBS = {
 }
 
 
-def build_hour_branch_tomb(hour_ganzhi: str, *, source: str) -> dict[str, Any]:
+def build_hour_branch_tomb(hour_ganzhi: str) -> dict[str, Any]:
     if hour_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("时干支入墓检查需要有效的六十甲子时柱")
     definition = HOUR_BRANCH_TOMBS.get(hour_ganzhi)
@@ -36,7 +36,6 @@ def build_hour_branch_tomb(hour_ganzhi: str, *, source: str) -> dict[str, Any]:
         "verse_omission_is_not_prose_disagreement": True,
         "jia_hidden_instrument_substituted": False,
         "heaven_stem_palace_tomb_evaluated": False,
-        "source": source,
         "source_section": "卷二·三奇入墓·时干支入墓六时",
         "source_scan_pages": [33],
         "evidence_paths": ["qimen.time_ganzhi", "four_pillars.hour"],

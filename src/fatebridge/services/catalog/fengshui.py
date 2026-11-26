@@ -303,7 +303,7 @@ def _compact_assessment(result: ServiceResult) -> ServiceResult:
 
 
 SPECS: list[ToolSpec] = []
-_COMPACT_VIEWS = {
+COMPACT_VIEWS = {
     "minggua": _compact_minggua,
     "bazhai": _compact_bazhai,
     "xuankong_natal": _compact_xuankong,
@@ -385,6 +385,6 @@ for _name, _public_name, _service, _model, _summary in (
             output_model=FengshuiOutput,
             cli_request_file=True,
             approximate_record=detect_fengshui_approximate,
-            compact_view=_COMPACT_VIEWS.get(_name),
+            compact_view=COMPACT_VIEWS.get(_name),
         )
     )

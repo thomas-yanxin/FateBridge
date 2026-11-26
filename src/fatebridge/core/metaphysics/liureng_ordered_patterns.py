@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 PATTERNS = (
@@ -40,8 +39,6 @@ def ordered_transmission_patterns(branches: list[str]) -> dict[str, Any]:
     return dict(
         ruleset_id="tanyuan_ordered_transmission_patterns_v1",
         source_title="大六壬探原·卷下集说篇·课体纲要",
-        source_url=TANYUAN_SOURCE,
-        source_sha256=TANYUAN_SCAN_SHA256,
         original_pdf_pages=[114, 115],
         branches=list(branches),
         evaluations=evaluations,
@@ -54,7 +51,6 @@ def ordered_transmission_patterns(branches: list[str]) -> dict[str, Any]:
 def ordered_patterns_trace(evidence: dict[str, Any]) -> dict[str, Any]:
     return dict(
         rule_id="liuren.ordered_transmission_patterns",
-        source_url=evidence["source_url"],
         source_section=evidence["source_title"],
         result=evidence,
     )

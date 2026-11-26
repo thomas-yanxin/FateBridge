@@ -171,11 +171,9 @@ class HeluoSourceClock(PartialOutput):
     version: str | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     review_status: str | None = None
     scope: str | None = None
-    loaded_sha256: str | None = None
     day_ke: Literal[100] | None = None
     base_ke: Literal[96] | None = None
     extra_ke: Literal[4] | None = None
@@ -222,7 +220,6 @@ class HeluoTiming(PartialOutput):
     ruleset_version: str | None = None
     source_title: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     scope: str | None = None
     calendar_policy: dict[str, str] | None = None

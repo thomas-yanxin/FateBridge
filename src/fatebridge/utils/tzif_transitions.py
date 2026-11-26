@@ -9,22 +9,22 @@ from datetime import datetime, timezone
 
 from fatebridge.utils.civil_time import UTCCalendar, gregorian_ordinal, utc_calendar
 
-_EPOCH = utc_calendar(datetime(1970, 1, 1, tzinfo=timezone.utc))
-_DAY_SECONDS = 86_400
-_SECOND_MICROSECONDS = 1_000_000
-_NAME = rb"(?:[A-Za-z]{3,}|<[A-Za-z0-9+-]{3,}>)"
-_MINUTE_SECOND = rb"(?::[0-5][0-9](?::[0-5][0-9])?)?"
-_OFFSET = rb"[+-]?[0-9]{1,2}" + _MINUTE_SECOND
+EPOCH = utc_calendar(datetime(1970, 1, 1, tzinfo=timezone.utc))
+DAY_SECONDS = 86_400
+SECOND_MICROSECONDS = 1_000_000
+NAME = rb"(?:[A-Za-z]{3,}|<[A-Za-z0-9+-]{3,}>)"
+MINUTE_SECOND = rb"(?::[0-5][0-9](?::[0-5][0-9])?)?"
+OFFSET = rb"[+-]?[0-9]{1,2}" + MINUTE_SECOND
 # The locked month rules and their signed clock shifts stay in their rule
 # year. Keep January and December rules on the loaded-clock fallback.
-_MONTH_RULE = (
+MONTH_RULE = (
     rb"M(?:[2-9]|10|11)\.[1-5]\.[0-6]"
-    rb"(?:/[+-]?(?:[0-9]{1,2}|1[0-5][0-9]|16[0-7])" + _MINUTE_SECOND + rb")?"
+    rb"(?:/[+-]?(?:[0-9]{1,2}|1[0-5][0-9]|16[0-7])" + MINUTE_SECOND + rb")?"
 )
-_FOOTER = re.compile(
-    rb"\n" + _NAME + rb"(?P<standard>" + _OFFSET + rb")"
-    rb"(?:" + _NAME + rb"(?P<daylight>" + _OFFSET + rb")?,"
-    rb"(?P<start>" + _MONTH_RULE + rb"),(?P<end>" + _MONTH_RULE + rb"))?\n"
+FOOTER = re.compile(
+    rb"\n" + NAME + rb"(?P<standard>" + OFFSET + rb")"
+    rb"(?:" + NAME + rb"(?P<daylight>" + OFFSET + rb")?,"
+    rb"(?P<start>" + MONTH_RULE + rb"),(?P<end>" + MONTH_RULE + rb"))?\n"
 )
 
 
@@ -56,7 +56,7 @@ class _MonthRule:
         if day > length:
             day -= 7
         ordinal = gregorian_ordinal(year, self.month, day)
-        return (ordinal - _EPOCH.ordinal) * _DAY_SECONDS + self.utc_shift
+        return (ordinal - EPOCH.ordinal) * DAY_SECONDS + self.utc_shift
 
 
 @dataclass(frozen=True)
@@ -69,13 +69,13 @@ class TZifTransitions:
         self, lower: UTCCalendar, upper: UTCCalendar
     ) -> tuple[UTCCalendar, ...] | None:
         """Return UTC candidates in (lower, upper] when the index covers it."""
-        first = (lower.ordinal - _EPOCH.ordinal) * _DAY_SECONDS + (
-            lower.microseconds_of_day // _SECOND_MICROSECONDS
+        first = (lower.ordinal - EPOCH.ordinal) * DAY_SECONDS + (
+            lower.microseconds_of_day // SECOND_MICROSECONDS
         )
-        last = (upper.ordinal - _EPOCH.ordinal) * _DAY_SECONDS + (
-            upper.microseconds_of_day // _SECOND_MICROSECONDS
+        last = (upper.ordinal - EPOCH.ordinal) * DAY_SECONDS + (
+            upper.microseconds_of_day // SECOND_MICROSECONDS
         )
-        last_microsecond = upper.microseconds_of_day % _SECOND_MICROSECONDS
+        last_microsecond = upper.microseconds_of_day % SECOND_MICROSECONDS
         beyond = not self.seconds or (last, last_microsecond) > (self.seconds[-1], 0)
         if beyond and not self.fixed_tail and self.recurring is None:
             return None
@@ -86,7 +86,7 @@ class TZifTransitions:
         if beyond and (rules := self.recurring) is not None:
             floor = max(first, self.seconds[-1]) if self.seconds else first
             origin_year, _, _ = UTCCalendar(
-                _EPOCH.ordinal + floor // _DAY_SECONDS, 0
+                EPOCH.ordinal + floor // DAY_SECONDS, 0
             ).date_parts
             last_year, _, _ = upper.date_parts
             seconds += tuple(
@@ -97,8 +97,8 @@ class TZifTransitions:
             )
         return tuple(
             UTCCalendar(
-                _EPOCH.ordinal + second // _DAY_SECONDS,
-                second % _DAY_SECONDS * _SECOND_MICROSECONDS,
+                EPOCH.ordinal + second // DAY_SECONDS,
+                second % DAY_SECONDS * SECOND_MICROSECONDS,
             )
             for second in seconds
         )
@@ -141,7 +141,7 @@ def read_tzif_transitions(data: bytes) -> TZifTransitions | None:
         values = struct.unpack_from(f">{times}{code}", data, at)
         if any(a >= b for a, b in zip(values, values[1:])):
             return None
-        footer = _FOOTER.fullmatch(data[end:]) if size == 8 else None
+        footer = FOOTER.fullmatch(data[end:]) if size == 8 else None
         if footer is None:
             return TZifTransitions(values, False)
         if (start := footer["start"]) is None:

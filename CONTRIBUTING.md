@@ -1,8 +1,8 @@
 # 贡献指南
 
-欢迎一起改进 FateBridge，让术数与占星计算更易接入、结果依据更易核对、咨询表达更清楚。算法、接口、测试和文档都欢迎贡献。
+欢迎一起改进 FateBridge，让术数、占星与心理测量计算更易接入、结果依据更易核对。算法、接口、测试和文档都欢迎贡献。
 
-贡献可以从一个可复现的问题或具体使用需求开始，再整理为可审查的改动和 Pull Request。环境配置和技术约束见[开发指南](docs/development-guide.md)，首次使用见[快速入门](docs/getting-started.md)。
+贡献可以从一个可复现的问题或具体使用需求开始，整理为可审查的改动和 Pull Request。环境配置和技术约束见[开发指南](docs/development-guide.md)，首次使用见[快速入门](docs/getting-started.md)。
 
 阅读导航：[开始贡献](#开始贡献) · [报告问题](#报告问题) · [修改约束](#修改约束) · [验证](#提交前验证) · [提交 PR](#提交与-pull-request) · [同步 Fork](#保持-fork-同步)
 
@@ -17,7 +17,7 @@ git clone https://github.com/YOUR_USERNAME/FateBridge.git
 cd FateBridge
 git remote add upstream https://github.com/thomas-yanxin/FateBridge.git
 git fetch upstream
-git switch -c codex/your-change upstream/master
+git switch -c feat/your-change upstream/master
 uv sync --locked --extra dev
 uv run --locked --extra dev fatebridge doctor
 ```
@@ -33,9 +33,7 @@ uv run --locked --extra dev fatebridge doctor
 - 涉及时间或精度时，注明时区、坐标、太阳时策略、分析日期及返回的星历模型。
 - 若有独立参考，给出其版本、来源与比较口径。
 
-用虚构资料或脱敏后的请求复现，不附姓名、真实生日、API 密钥或包含个人数据的完整交付文件。功能建议请说明要解决的读者任务与目前的阻碍。
-
-安全问题请按 [SECURITY.md](SECURITY.md) 私下报告，不在公开 Issue 中粘贴敏感复现材料。
+用虚构资料或脱敏后的请求复现，不附姓名、真实生日、API 密钥或包含个人数据的完整交付文件。安全问题请按 [SECURITY.md](SECURITY.md) 私下报告。
 
 ## 修改约束
 
@@ -55,7 +53,7 @@ uv run --locked --extra dev python scripts/run_ci_checks.py
 
 纯文档变更运行 `uv run --locked --extra dev python scripts/check_docs.py` 与[文档合同和示例检查](docs/development-guide.md#文档维护与验证)；修改生成源后重新生成并检查派生文件。报告实际测试结果与跳过项，不将本地通过写成 CI 已通过。
 
-版本与数据打包变更还需检查 `pyproject.toml`、版本常量、CHANGELOG 和 wheel 的数据文件；发布流程见 [开发指南](docs/development-guide.md#ci打包与发布)。
+版本与数据打包变更还需检查 `pyproject.toml`、版本常量、CHANGELOG 和 wheel 的数据文件；发布流程见 [开发指南](docs/development-guide.md#构建与发布)。
 
 ## 提交与 Pull Request
 
@@ -66,16 +64,10 @@ git status --short
 git diff
 git add <本次修改的文件>
 git commit -m "docs: clarify integration contracts"
-git push -u origin codex/your-change
+git push -u origin feat/your-change
 ```
 
-保持一个 PR 聚焦一个问题，让审查者能够从描述直接找到变更和验证。
-
-提交信息使用 `feat`、`fix`、`docs`、`refactor`、`perf`、`test` 或 `chore` 等类型，可加范围。PR 描述说明：
-
-- 具体问题及修改后的行为，必要时给出修改前后的例子；
-- 相关 Issue（如有）；
-- 测试/示例的实际结果、兼容影响与未验证边界。
+保持一个 PR 聚焦一个问题，让审查者能够从描述直接找到变更和验证。提交信息使用 `feat`、`fix`、`docs`、`refactor`、`perf`、`test` 或 `chore` 等类型，可加范围。PR 描述说明具体问题、修改后行为、相关 Issue 以及实际测试结果。
 
 审查反馈处理后，继续推送同一分支。不要在共享工作分支上为同步上游而重置或覆盖他人的改动。
 
@@ -90,4 +82,4 @@ git merge --ff-only upstream/master
 git push origin master
 ```
 
-回到工作分支后，根据团队约定合并或 rebase。协作中尊重不同观点，反馈聚焦问题本身，不发布他人的私人信息。
+回到工作分支后，根据团队约定合并或 rebase。

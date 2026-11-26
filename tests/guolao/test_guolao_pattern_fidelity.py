@@ -12,7 +12,7 @@ from fatebridge.core.guolao import guolao_moira as m
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from tests.fixtures.surface_payloads import astro_payload
 
-ALONE = dict(zip(m._MOIRA_PLANET_ORDER, range(11)))
+ALONE = dict(zip(m.MOIRA_PLANET_ORDER, range(11)))
 CASES = [
     (
         "八杀朝天",

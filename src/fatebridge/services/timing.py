@@ -1,7 +1,7 @@
 """Compute BaZi time pillars, term boundaries, and pillar relationships."""
 
 from copy import deepcopy
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.almanac import (
@@ -65,7 +65,7 @@ def calculate_comprehensive_timing(
     analysis_minute: int | None = None,
     selected_sections: list[str] | None = None,
     birth_time_uncertainty_minutes: int | None = None,
-) -> Dict:
+) -> dict[str, Any]:
     """
     计算时运分析，包括大运、流年、流月、流日、流时的影响分析
     """
@@ -272,7 +272,7 @@ def calculate_dayun_analysis(
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
     birth_time_uncertainty_minutes: int | None = None,
-) -> Dict:
+) -> dict[str, Any]:
     """
     大运分析工具 - 专门分析指定年龄的大运情况
     """
@@ -411,7 +411,7 @@ def calculate_jieqi_timeline_analysis(
     person: PersonInfo,
     target_year: int | None = None,
     selected_sections: list[str] | None = None,
-) -> Dict:
+) -> dict[str, Any]:
     """
     节气节点时间轴分析 - 输出全年 24 节气节点的流月/流日切换信息
     """

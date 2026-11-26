@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from fatebridge.core.metaphysics.common import (
     YUE_JIANG_NAMES,
@@ -64,10 +64,8 @@ from fatebridge.core.metaphysics.ren_diurnal import resolve_diurnal
 from fatebridge.core.metaphysics.ren_evidence import ruleset_metadata, xun_dun_stems
 from fatebridge.core.metaphysics.ren_gods import (
     DEFAULT_GUIREN_PROFILE,
-    TANYUAN_TRANSCRIPTION,
     GuirenProfile,
 )
-from fatebridge.core.metaphysics.ren_sources import JINGWEI_SOURCE, TANYUAN_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 __all__ = [
@@ -85,10 +83,10 @@ __all__ = [
 def build_liureng_board(
     seed: MetaphysicsSeed,
     gender: str = "未知",
-    month_general_override: Optional[str] = None,
-    is_diurnal_override: Optional[bool] = None,
+    month_general_override: str | None = None,
+    is_diurnal_override: bool | None = None,
     guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     lunar = seed.calendar_context.get("lunar_calendar") or {}
     current_term_name = seed.calendar_context["current_solar_term"]["name"]
     month_branch = seed.pillars["month"][1]
@@ -148,7 +146,7 @@ def build_liureng_board(
 
     initial_branch = transmission_branches[0]
     transmission_labels = ["initial", "middle", "final"]
-    transmission_payload: Dict[str, Any] = {"method": transmission_method}
+    transmission_payload: dict[str, Any] = {"method": transmission_method}
     dun_stems = xun_dun_stems(day_ganzhi)
     earth_by_sky = {sky: earth for earth, sky in sky_to_earth.items()}
     for offset, label in enumerate(transmission_labels):
@@ -268,23 +266,16 @@ def build_liureng_board(
             progression_trace(progression),
             {
                 "rule_id": "liuren.tanyuan_life_stages",
-                "source_url": life_stages["source_url"],
                 "source_section": life_stages["source_title"],
                 "result": life_stages,
             },
             {
                 "rule_id": "liuren.named_subtypes",
-                "source_url": classification["source_url"],
                 "source_section": classification["source_section"],
                 "result": classification,
             },
             {
                 "rule_id": "liuren.guiren_start",
-                "source_url": (
-                    TANYUAN_TRANSCRIPTION
-                    if guiren_profile == "tanyuan_xieji_v1"
-                    else JINGWEI_SOURCE
-                ),
                 "source_section": (
                     "日贵人歌 / 夜贵人歌"
                     if guiren_profile == "tanyuan_xieji_v1"
@@ -310,13 +301,11 @@ def build_liureng_board(
             },
             {
                 "rule_id": "liuren.tanyuan_auxiliary_stars",
-                "source_url": auxiliary_stars["source_url"],
                 "source_section": auxiliary_stars["source_title"],
                 "result": auxiliary_stars,
             },
             {
                 "rule_id": "liuren.transmission_relations",
-                "source_url": transmission_relationships["source_url"],
                 "source_section": "探原·论三传 / 论十二天将 / 论合",
                 "result": {
                     "matched_rule_ids": transmission_relationships["matched_rule_ids"],
@@ -331,7 +320,6 @@ def build_liureng_board(
             day_placements_trace(day_placements),
             {
                 "rule_id": "liuren.empty_scope",
-                "source_url": empty_evidence["source_url"],
                 "source_section": empty_evidence["source_title"],
                 "result": {
                     "day_stem_house": empty_evidence["day_stem_house"],
@@ -341,7 +329,6 @@ def build_liureng_board(
             },
             {
                 "rule_id": "liuren.branch_relations",
-                "source_url": branch_evidence["source_url"],
                 "source_section": branch_evidence["source_title"],
                 "result": {
                     "row_count": len(branch_evidence["rows"]),

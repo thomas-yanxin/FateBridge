@@ -22,8 +22,6 @@ SOURCE = {
     "id": "witte1923_meridian_house_geometry",
     "author": "Alfred Witte",
     "title": "Der progressive Meridian waehrend eines Jahres, Astrologische Rundschau XV/2, 1923, pp.34-37",
-    "url": "https://www.astrax.de/pdf/26_Der%20progressive%20Meridian%20waehrend%20eines%20Jahres.pdf",
-    "source_sha256": "28b14ce9a3dbe9f35293bf9d055e5a83ab02efc3095c9655abdd4225fcf530e6",
     "sections": ["p.34: 30-degree equatorial divisions; pp.35-36: natal cusp table"],
     "scope": "Natal RA-divided cusp geometry only; no complete original progression system, interpretive keywords or event claims",
 }
@@ -31,7 +29,6 @@ SWISS_SOURCE = {
     "id": "swiss_meridian_houses",
     "author": "Astrodienst AG",
     "title": "Swiss Ephemeris documentation 6.2.7 and programmer manual 15",
-    "url": "https://www.astro.com/swisseph/swisseph.htm",
     "sections": ["6.2.7 Meridian system; swehouse.c X and sidereal_houses_trad"],
     "scope": "Backend geometry definition; numerical agreement is not empirical prediction evidence",
 }

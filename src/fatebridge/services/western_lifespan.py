@@ -54,7 +54,7 @@ from fatebridge.utils.house_systems import house_system_fields, normalize_house_
 # house cusps (added by the core builder). This is the clean subset 星阙 shares —
 # it deliberately omits 星阙's enriched objects (asteroids / midpoints / Arabic lots
 # / 四余 / lunar nodes), which live in other FateBridge layers, not the natal chart.
-_PERSIAN_TARGET_BODIES = [
+PERSIAN_TARGET_BODIES = [
     "Sun",
     "Moon",
     "Mercury",
@@ -68,9 +68,9 @@ _PERSIAN_TARGET_BODIES = [
 ]
 # Bodies carried by the declination progression (赤纬推运) — the ten visible planets;
 # nodes/angles sit on the ecliptic and aren't used for declination parallels.
-_DECLINATION_BODIES = [name for name in PLANET_SWISSEPH_IDS if name != "North Node"]
+DECLINATION_BODIES = [name for name in PLANET_SWISSEPH_IDS if name != "North Node"]
 # Ordered Koch house cusps (1st-12th) — 年龄推进点 sweeps these; index 0 = Ascendant.
-_HOUSE_CUSP_POINTS = [
+HOUSE_CUSP_POINTS = [
     "First_House",
     "Second_House",
     "Third_House",
@@ -744,10 +744,10 @@ def calculate_persian_directed(
     birth_info, natal_subject, natal_reference, sect = _prepare_chart(
         house_system=house_system, zodiac_type=zodiac_type, **birth_kwargs
     )
-    natal_longitudes = extract_named_longitudes(natal_subject, _PERSIAN_TARGET_BODIES)
+    natal_longitudes = extract_named_longitudes(natal_subject, PERSIAN_TARGET_BODIES)
     house_cusps = [
         point_absolute_position(natal_subject, point_name)
-        for point_name in _HOUSE_CUSP_POINTS
+        for point_name in HOUSE_CUSP_POINTS
     ]
     payload = build_persian_directed_payload(
         natal_longitudes,
@@ -829,10 +829,10 @@ def calculate_age_point(
     birth_info, natal_subject, natal_reference, sect = _prepare_chart(
         house_system=house_system, zodiac_type=zodiac_type, **birth_kwargs
     )
-    natal_longitudes = extract_named_longitudes(natal_subject, _PERSIAN_TARGET_BODIES)
+    natal_longitudes = extract_named_longitudes(natal_subject, PERSIAN_TARGET_BODIES)
     koch_cusps = [
         point_absolute_position(natal_subject, point_name)
-        for point_name in _HOUSE_CUSP_POINTS
+        for point_name in HOUSE_CUSP_POINTS
     ]
     payload = build_age_point_payload(
         natal_longitudes,
@@ -942,7 +942,7 @@ def _body_declinations(utc: datetime | UTCCalendar) -> dict[str, float]:
     """Equatorial declination of each tracked body at a UTC moment (swisseph)."""
     times = ephemeris_time(utc)
     declinations: dict[str, float] = {}
-    for body in _DECLINATION_BODIES:
+    for body in DECLINATION_BODIES:
         state = _swisseph_planet_state(body, julian_day_tt=times.jd_tt)
         if state is not None and state[0].get("declination") is not None:
             declinations[body] = float(state[0]["declination"])

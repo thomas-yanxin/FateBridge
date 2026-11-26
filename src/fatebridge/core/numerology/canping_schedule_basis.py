@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from copy import deepcopy
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any
@@ -15,7 +14,6 @@ from fatebridge.utils.errors import NumerologySourceError
 COLLATION_PATH = (
     Path(__file__).resolve().parents[2] / "data/canping/schedule-basis-v1.json"
 )
-CONTENT_SHA256 = "0dd48c5f54c3ea3f496fd733d94dad3e5daaf70340d650cc9cfd4abc8b3a1072"
 POLICY_ID = "canping_schedule_source_mapping_v1"
 APPENDIX = "bazi_appendix_v1"
 CONTINUOUS = "bazi_continuous_v1"
@@ -88,20 +86,8 @@ def _collation() -> dict[str, Any]:
     try:
         raw = COLLATION_PATH.read_bytes()
         data: dict[str, Any] = json.loads(raw)
-        digest = sha256(
-            json.dumps(
-                data,
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-                allow_nan=False,
-            ).encode()
-        ).hexdigest()
-        if digest != CONTENT_SHA256:
-            raise ValueError("配运原句或来源身份与所核读法不符。")
     except (OSError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_canping_schedule_collation") from exc
-    data["_file_sha256"] = sha256(raw).hexdigest()
     return data
 
 
@@ -209,8 +195,6 @@ def build_schedule_basis(profile: str, timing: dict, clock: dict) -> dict[str, A
         "profile_id": profile,
         "corpus_id": data["corpus_id"],
         "corpus_version": data["version"],
-        "source_content_sha256": CONTENT_SHA256,
-        "source_file_sha256": data["_file_sha256"],
         "review_status": data["review_status"],
         "sources": deepcopy(data["sources"]),
         "clauses": clauses,

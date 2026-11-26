@@ -13,7 +13,7 @@
 | `afsi_application_conditions_v1` | 水体、金属和植物的附加条件；目标绑定独立 | [Janice Sugita／AFSI FS227](https://www.amfengshui.com/wp-content/uploads/2014/09/fs227.pdf)，2006，印刷28–29/PDF32–33页；[Larry Sang／AFSI](https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf)，印刷23、25/PDF40、42页 |
 | `workstation_source_boundaries_v1` | 尖角、物件路线等作者分歧与范围说明 | [Joey Yap 2014尖角说明](https://masteryacademy.com/Academy/media/columncontent.asp?iframe=academic_colum&nid=1967)、2005装饰象征文章；WOFS及Sean Chan署名立场 |
 
-完整来源、定位及已登记的原始内容散列见 src/fatebridge/data/fengshui/workstation-authored-v1.json。作者用途规则不冒充中州派校勘原典；不同作者文章不作多份独立效果验证。起盘仍来自当前明确的历史宅盘版本。
+完整来源与定位见 `src/fatebridge/data/fengshui/workstation-authored-v1.json`。作者用途规则不冒充中州派校勘原典；不同作者文章不作多份独立效果验证。起盘仍来自当前明确的历史宅盘版本。
 
 ## 请求和读取分支
 

@@ -86,7 +86,7 @@ def test_result_requires_the_current_explicit_envelope(invalid) -> None:
 def test_plain_json_result_cannot_bypass_the_same_message_bound(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(execution, "_MAX_MESSAGE", 128)
+    monkeypatch.setattr(execution, "MAX_MESSAGE", 128)
     with pytest.raises(execution.NativeExecutionError, match="exceeds limit"):
         execution.message_bytes(
             {"value": execution.encode_result({"large": "x" * 128})}
@@ -103,7 +103,7 @@ def test_current_json_tree_keeps_values_under_the_same_64mib_message_bound() -> 
         execution.message_bytes({"value": typed})
     del typed
     wire = execution.message_bytes({"value": execution.encode_result(value)})
-    assert len(wire) <= execution._MAX_MESSAGE == 64 * 1024 * 1024
+    assert len(wire) <= execution.MAX_MESSAGE == 64 * 1024 * 1024
     restored = execution.decode_result(json.loads(wire)["value"])
     assert restored == value
     assert math.copysign(1, restored[-1]["latitude"]) == -1

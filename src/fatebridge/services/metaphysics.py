@@ -743,7 +743,6 @@ def calculate_jinkou_analysis(
     jinkou["rule_trace"].append(
         {
             "rule_id": "jinkou.birth_xun_year_fate",
-            "source_url": jinkou["year_fate"]["source_url"],
             "source_section": jinkou["year_fate"]["source_section"],
             "result": {k: v for k, v in jinkou["year_fate"].items() if k != "course"},
         }

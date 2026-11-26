@@ -13,7 +13,6 @@ Count = Annotated[int, Field(ge=0)]
 
 class ObservedPolicyFile(PartialOutput):
     filename: str
-    sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
 class WesternDataPolicy(PartialOutput):

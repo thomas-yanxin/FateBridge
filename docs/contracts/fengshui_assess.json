@@ -6472,7 +6472,7 @@
         "annual_ruleset_id"
       ],
       "source_refs": [
-        "docs/fengshui-xuankong.md"
+        "docs/fengshui.md"
       ],
       "unit": "categorical",
       "validation_scope": {

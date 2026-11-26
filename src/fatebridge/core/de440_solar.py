@@ -7,7 +7,6 @@ Runtime data are original position coefficients, never event-time references.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 import struct
@@ -24,10 +23,8 @@ from fatebridge.core.analytic_solar import (
     aberration,
     apparent_ecliptic,
 )
-from fatebridge.core.analytic_solar import loaded_sha256 as frame_loaded_sha256
 from fatebridge.core.astro.chebyshev import chebyshev_kinematics
 from fatebridge.core.astro.coefficient_storage import RecordBlock, unpack_records
-from fatebridge.core.astro.tdb import COEFFICIENT_SHA256 as TDB_SHA256
 from fatebridge.core.astro.tdb import Parameters as TDBParameters
 from fatebridge.core.astro.tdb import fairhead_seconds
 from fatebridge.utils.errors import EphemerisSourceError
@@ -38,17 +35,7 @@ EXTENDED_MODEL_ID = "fatebridge_de440_solar_extended_v1"
 CANPING_MODEL_ID = "fatebridge_de440_solar_canping_v1"
 CANPING_EXTENDED_MODEL_ID = "fatebridge_de440_solar_canping_extended_v1"
 ATLAS_BASENAME = "de440-solar-record-atlas-v1"
-ATLAS_MANIFEST_SHA256 = (
-    "b05993b79f7dc4cd695f36ee9e3a92d0306052e4d410d4d25c09f05ab8dd9183"
-)
-_MANIFEST_SHA256 = {
-    "fatebridge_de440_solar_canping_extended_v1": "077ac65e3134162e7f76a4275fbe1b3f4a5c72a9b7686e97c5f85eb197ad687d",
-    "fatebridge_de440_solar_canping_v1": "a74949e48aadcdcd7af99c6f128acd12aa5713d4f3df68fd6299e1ce48b40c4b",
-    "fatebridge_de440_solar_extended_v1": "eb5d7bba7902142702f209183d057e15180a994bc792e6ab6ad40a4586bd03f5",
-    "fatebridge_de440_solar_historical_v1": "e073acaf81593b21078706a9efe95073efebc2e42712c384788fa6f14e7d9e95",
-    "fatebridge_de440_solar_v1": "2bdda66ee61ca065401888629dd4434df6ccc535fdfe20f0c68b3c5a56752145",
-}
-_PROFILE_FILES = {
+PROFILE_FILES = {
     MODEL_ID: "de440-solar-v1",
     HISTORICAL_MODEL_ID: "de440-solar-historical-v1",
     EXTENDED_MODEL_ID: "de440-solar-extended-v1",
@@ -68,7 +55,6 @@ class RecordSegment(TypedDict):
     record_count: int
     offset_bytes: int
     bytes: int
-    sha256: str
 
 
 class SolarManifest(TypedDict):
@@ -77,10 +63,7 @@ class SolarManifest(TypedDict):
     source: dict[str, str]
     storage: str
     file: str
-    compressed_sha256: str
-    uncompressed_sha256: str
     uncompressed_bytes: int
-    tdb_coefficient_sha256: str
     segments: list[RecordSegment]
     derived_product_producer: dict[str, str | bool]
     software_solar_term_years: list[int]
@@ -90,8 +73,6 @@ class SolarManifest(TypedDict):
 
 class _AtlasManifest(TypedDict):
     file: str
-    compressed_sha256: str
-    uncompressed_sha256: str
     segments: list[RecordSegment]
 
 
@@ -100,12 +81,8 @@ def _coefficient_data() -> bytes:
     folder = files("fatebridge").joinpath("data/astronomy")
     try:
         metadata = folder.joinpath(ATLAS_BASENAME + ".json").read_bytes()
-        if hashlib.sha256(metadata).hexdigest() != ATLAS_MANIFEST_SHA256:
-            raise ValueError("DE440 source record atlas identity changed")
         manifest: _AtlasManifest = json.loads(metadata)
         packed = folder.joinpath(manifest["file"]).read_bytes()
-        if hashlib.sha256(packed).hexdigest() != manifest["compressed_sha256"]:
-            raise ValueError("DE440 source record archive changed")
         data = unpack_records(
             packed,
             [
@@ -113,8 +90,6 @@ def _coefficient_data() -> bytes:
                 for s in manifest["segments"]
             ],
         )
-        if hashlib.sha256(data).hexdigest() != manifest["uncompressed_sha256"]:
-            raise ValueError("DE440 source coefficient words changed")
     except (OSError, ValueError, EOFError, zlib.error) as error:
         raise EphemerisSourceError("solar_de440_invalid") from error
     return data
@@ -124,33 +99,21 @@ def _coefficient_data() -> bytes:
 class _Profile:
     manifest: SolarManifest
     data: bytes
-    manifest_sha256: str
     tdb: TDBParameters
-    tdb_sha256: str
 
 
 @lru_cache(maxsize=5)
 def _profile(profile_id: str = MODEL_ID) -> _Profile:
     folder = files("fatebridge").joinpath("data/astronomy")
     try:
-        basename = _PROFILE_FILES[profile_id]
+        basename = PROFILE_FILES[profile_id]
         metadata = folder.joinpath(basename + ".json").read_bytes()
-        if hashlib.sha256(metadata).hexdigest() != _MANIFEST_SHA256[profile_id]:
-            raise ValueError("DE440 selected profile identity changed")
         manifest: SolarManifest = json.loads(metadata)
         tdb_raw = folder.joinpath("geocentric-tdb-v1.json").read_bytes()
-        if hashlib.sha256(tdb_raw).hexdigest() != TDB_SHA256:
-            raise ValueError("Geocentric TDB source terms changed")
         tdb: TDBParameters = json.loads(tdb_raw)
     except (OSError, ValueError, KeyError) as error:
         raise EphemerisSourceError("solar_de440_invalid") from error
-    return _Profile(
-        manifest,
-        _coefficient_data(),
-        hashlib.sha256(metadata).hexdigest(),
-        tdb,
-        TDB_SHA256,
-    )
+    return _Profile(manifest, _coefficient_data(), tdb)
 
 
 def _selected_profile(profile_id: str) -> _Profile:
@@ -279,12 +242,7 @@ def solar_longitude_parts(
 
 def cache_key(profile_id: str = MODEL_ID) -> tuple[str, ...]:
     p = _selected_profile(profile_id)
-    return (
-        p.manifest_sha256,
-        p.manifest["uncompressed_sha256"],
-        p.tdb_sha256,
-        frame_loaded_sha256(),
-    )
+    return (profile_id, p.manifest["version"])
 
 
 def source_receipt(profile_id: str = MODEL_ID) -> dict[str, Any]:
@@ -293,16 +251,8 @@ def source_receipt(profile_id: str = MODEL_ID) -> dict[str, Any]:
         {
             "model_id": profile_id,
             "version": p.manifest["version"],
-            "source_kernel_sha256": p.manifest["source"]["kernel_sha256"],
-            "coefficient_manifest_sha256": p.manifest_sha256,
-            "coefficient_sha256": p.manifest["uncompressed_sha256"],
-            "compressed_coefficient_sha256": p.manifest["compressed_sha256"],
-            "frame_coefficient_sha256": frame_loaded_sha256(),
-            "tdb_coefficient_sha256": p.tdb_sha256,
             "coefficient_storage": p.manifest["storage"],
             "coefficient_product_producer": p.manifest["derived_product_producer"],
-            "source_url": p.manifest["source"]["url"],
-            "source_format_url": p.manifest["source"]["format_url"],
             "spk_frame_id": 1,
             "segment_coverage_tdb_jd": {
                 f"{s['center']}->{s['target']}": [

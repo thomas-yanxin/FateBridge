@@ -2,8 +2,6 @@
 
 from typing import Any, Mapping, Sequence
 
-from fatebridge.core.source_identity import ZIPING_ZHENQUAN_NLC_SCAN_URL
-
 POLICY = "completed_combination_zi_mao_month_officer_resolution_v4"
 STRENGTH_METHOD = "season_root_revelation_relations_v12"
 CURRENT_STRENGTH_METHODS = frozenset({STRENGTH_METHOD})
@@ -12,8 +10,6 @@ SOURCE = {
     "author": "沈孝瞻",
     "title": "秘本子平真詮·論刑沖會合解法",
     "edition": "国家图书馆藏本，上海世界图书馆发行",
-    "url": ZIPING_ZHENQUAN_NLC_SCAN_URL,
-    "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
     "pdf_pages": [23, 24, 25],
     "printed_pages": [14, 15, 16],
     "scope": "所选章区分会合能解与不能解；本规则仅排除同次组合已争议或受冲却仍宣称解刑的内部矛盾。全刑组覆盖是既有模型门槛，不认证原典全部解法、刑冲有效力量、减损系数或现实结果。",

@@ -32,33 +32,33 @@
 
 仅使用用户确认的名义时刻与 `birth_time_uncertainty_minutes`；未声明误差为未知，不能写作零误差。未知生时不猜一个名义值。±N 分钟是资料范围，不是统计分布。
 
-用户已记录秒数时，德国盘、13 等分盘及通用工具的对应变体可传 `birth_second=0..59`。省略仅表示用该分钟的起点计算，不表示生时精确到秒；有秒数也不自动把未知误差改成零。按实际 `base_chart.person_info`（13 等分为 `person_info`）核对钟时及 UTC，不截掉已给出的秒数。历史原刊的模糊钟时与后出作者的 GMT 换算要分别署明；Witte 1919 数值表仍有未裁定差异，不能由它自动新增主题解释或宣称原典完整验收。来源与条件见[钟时精度审查](../../other-chart-schools.md#原刊数值命例与钟时精度)。
+用户已记录秒数时，德国盘、13 等分盘及通用工具的对应变体可传 `birth_second=0..59`。省略仅表示用该分钟的起点计算，不表示生时精确到秒；有秒数也不自动把未知误差改成零。按实际 `base_chart.person_info`（13 等分为 `person_info`）核对钟时及 UTC，不截掉已给出的秒数。
 
-已知输入记录是地方平太阳时／真太阳时，才传 `birth_clock_basis=local_mean_solar/local_apparent_solar`，同时省略 `birth_timezone`、保持 `use_true_solar_time=false`；默认 `civil` 表示民用区时。`OZ` 等记号不明确时先核对记录基准，不靠盘面或事件拟合。读取 `person_info.clock_conversion`（德国盘在 `base_chart` 下）的原始钟时与换算后 UTC；计算时区显示 UTC，原始太阳钟时另有标签。太阳钟时的误差区间先转换端点后才生成 UTC 样点，不把输入 ±N 分钟当成精确等长的 UTC 秒数。数值往返误差与微秒表示不认证记录精度或历史地球自转，不能用于消除原文分歧。详见[钟时基准](../../other-chart-schools.md#显式民用平太阳与真太阳钟时)。
+已知输入记录是地方平太阳时／真太阳时，才传 `birth_clock_basis=local_mean_solar/local_apparent_solar`，同时省略 `birth_timezone`、保持 `use_true_solar_time=false`；默认 `civil` 表示民用区时。读取 `person_info.clock_conversion`（德国盘在 `base_chart` 下）的原始钟时与换算后 UTC。太阳钟时的误差区间先转换端点后才生成 UTC 样点，不把输入 ±N 分钟当成精确等长的 UTC 秒数。
 
-`time_sensitivity.source_pattern.sampled_status` 及解释中的 `birth_time_sampled_status` 决定这条含义如何表达：`varies_across_samples` 表示已找到范围内反例，要保留“名义时刻满足，但范围内会变化”。不要抹去名义结果，也不要把它写成整个范围确定成立。全部样点满足仍不证明连续区间稳定；样点频率不是成功概率或置信度。当前只审该原文条件，不能外推成全部中点联系均稳定。
+`time_sensitivity.source_pattern.sampled_status` 及解释中的 `birth_time_sampled_status` 决定这条含义如何表达：`varies_across_samples` 表示已找到范围内反例，要保留“名义时刻满足，但范围内会变化”。全部样点满足仍不证明连续区间稳定。
 
-精确地理极点的MC只有输入经度所定子午线约定时，本命和太阳弧的原文条件都须保留未定：读取`unresolved_reference_sample_count`、`unresolved_reference_sample_indices`、`resolved_condition_sample_count`及`condition_by_sample`。已知成立／缺失计数不含未知；`backend_convention`只保留形式条件，不能据它判定原文主题适用。推运样点的实际条件、角距及MC可为null，形式值另存；可计算太阳弧继续保留。范围外弧的`unavailable_sample_count`与参考未知数分开，不补零、不丢样点。名义解释的`source_application_status=underdetermined_reference_geometry`及`reading_zh`表明适用条件未知，`backend_reading_zh`仅为形式文案；空解释列表也不证明主题不适用。仅ASC交线退化不限制独立MC。
+精确地理极点的MC只有输入经度所定子午线约定时，本命和太阳弧的原文条件都须保留未定：读取 `unresolved_reference_sample_count`、`unresolved_reference_sample_indices`、`resolved_condition_sample_count` 及 `condition_by_sample`。范围外弧的 `unavailable_sample_count` 与参考未知数分开。名义解释的 `source_application_status=underdetermined_reference_geometry` 及 `reading_zh` 表明适用条件未知；仅 ASC 交线退化不限制独立 MC。
 
 ## 指定时刻的真太阳弧
 
-`midpoint_analysis.solar_arc_analysis` 仅在传入目标时刻时计算。它选用每 365.25 个 UTC 日历日对应 1 个 TT 星历日的符号钥匙，以实际太阳位移旋转本命因素；核对 `profile.analysis_utc/key_years/solar_arc_degrees/key_policy/sun_ephemeris_models`。不把它改写成固定每年 1°，也不宣称这项钥匙是 Witte 唯一原典约定。
+`midpoint_analysis.solar_arc_analysis` 仅在传入目标时刻时计算。它选用每 365.25 个 UTC 日历日对应 1 个 TT 星历日的符号钥匙，以实际太阳位移旋转本命因素；核对 `profile.analysis_utc/key_years/solar_arc_degrees/key_policy/sun_ephemeris_models`。
 
-`profile.progressed_julian_day_tt` 是实际推进太阳查询时刻，由保留的出生 TT 和精确日历钥合成。`profile.key_years` 是显示值，日子午和生时样点用各自绑定的太阳观测。 [历元对照](../../precision-acceptance.md#hamburg-progressed-tt-round94)
+`profile.progressed_julian_day_tt` 是实际推进太阳查询时刻，由保留的出生 TT 和精确日历钥合成；`profile.key_years` 是显示值，日子午和生时样点用各自绑定的太阳观测。
 
-`directed_factors` 是象征旋转，不是目标时刻天上观测位置。每条联系的 `natal/solar_arc` 标签和 `zero_arc_identity` 保留；同名因素跨层仍需说明其来源。当前限定原文解释为 `Mars.natal+Jupiter.natal-Zeus.natal=Midheaven.solar_arc`，不能把推运 MC 改成本命 MC，也不能将这一时刻扩展为整年或一串未计算日期。
+`directed_factors` 是象征旋转，不是目标时刻天上观测位置。每条联系的 `natal/solar_arc` 标签和 `zero_arc_identity` 保留；当前限定原文解释为 `Mars.natal+Jupiter.natal-Zeus.natal=Midheaven.solar_arc`，不能把推运 MC 改成本命 MC，也不能将这一时刻扩展为整年。
 
-太阳弧解释的生时条件读取自身 `birth_time_sensitivity.source_pattern`，不拿本命条件替代。该层会在每个生时样点重新计算实际太阳弧及推运 MC。`contact_counts` 与样点命中率均不转换成现实事件概率。
+太阳弧解释的生时条件读取自身 `birth_time_sensitivity.source_pattern`，该层会在每个生时样点重新计算实际太阳弧及推运 MC。
 
-太阳来源读取 `solar_arc_analysis.profile.sun_ephemeris_source`：`observations` 以实际 TT 时刻去重，`sun_observation_indices` 按本命／推移顺序引用它；每个样点保留自身索引和实际模型。日推运 `target_sun_observation_index` 也引用同一批观测。相同 TT 共用一次观测，不增加独立证据数。不同日期可能合法使用不同模型，应逐项披露；同一角色的生时样点模型／已观察文件内容／DE 版本或文件槽不一致时，不能把来源变化解释成生时效应。原生本命与重算本命太阳也核对同一组文件身份。Swiss 2.10.03 的地球／地月质心转换依赖月球，内部月球可能回退而太阳仍返回 Swiss 标志，因此已观察月球文件也须纳入比较与首尾哈希检查；这些检查不证明完整依赖、原子读取或天文精度。
+太阳来源读取 `solar_arc_analysis.profile.sun_ephemeris_source`：`observations` 以实际 TT 时刻去重，`sun_observation_indices` 按本命／推移顺序引用它；相同 TT 共用一次观测。不同日期可能使用不同模型，同一角色的生时样点模型或文件内容不一致时，须按来源错误核对数据配置。
 
-`daily_meridian` 是另一个具名层，采用 Witte 1924 印刷页 15 的黄道算式：本命 IC 加太阳弧、减本命回归太阳、加目标时刻实际回归太阳；相对的上天顶为 MC。核对它自己的 `profile.upper_meridian_longitude/lower_meridian_longitude/target_tropical_sun` 和 `birth_time_sensitivity`。它不等于只加太阳弧的 MC，也不等于目标时刻真实物理天顶；不把该层坐标代入 Udo 例并自动新增主题解释。该历史例1923／1924的3°04′差值已由第八宫宫头构造偏移解释，只适用于该例，不能加到当前盘；另项4′残差与完整时间钥匙仍未裁定。按实际`source_comparison`交付，保留原典整体和现实效果的未验收状态。原页与范围见[审查记录](../../other-chart-schools.md#witte-1924-黄道和差式日推运天顶)。
+`daily_meridian` 采用 Witte 1924 印刷页 15 的黄道算式：本命 IC 加太阳弧、减本命回归太阳、加目标时刻实际回归太阳；相对的上天顶为 MC。核对它自己的 `profile.upper_meridian_longitude/lower_meridian_longitude/target_tropical_sun` 和 `birth_time_sensitivity`。该历史例 1923／1924 的 3°04′ 差值只适用于该历史例，不加到当前盘面。
 
-日推运的MC参考资格另读其自身`profile`，不能从原文条件或父层状态代替判断。`partial`可仅限制MC依赖坐标；太阳与可计算弧继续交付。形式值位于`backend_convention`，实际范围另看参考已解析数及未知数，不跨未知间隙连线。`input_coherence`只是同run角色／网格绑定，不是独立天文验收；`day_meridian_inputs`503属于内部来源不一致。
+日推运的 MC 参考资格另读其自身 `profile`：`partial` 可仅限制 MC 依赖坐标，太阳与可计算弧继续交付，形式值保留在 `backend_convention`。
 
 ## Witte1924比较换基与镜点
 
-使用`comparative_geometry`视图读取`midpoint_analysis.comparative_geometry`摘要。五个锚点及四点坐标是本命资料的象征几何，镜像轴用实际原生白羊点；恒星显示不能直接按数值0°／90°套轴。框架内名为Aries Point的输入因素同样旋转，轴基准仍取`profile.native_aries_point_longitude`。`defined_anchor_identity`只表示锚点坐标按定义抵消，不能把未解析物理ASC／MC说成已经确定；实际坐标为null时保留其后端形式值限定。生时偏移只覆盖已确认有限样点，不是连续界或概率。原表四行残差仍在，不套用未读的地球宫、事件或第五版反映点章节。规则与完整原表见[比较几何审计](../../../scripts/western/audit_witte_comparative.py)。
+使用 `comparative_geometry` 视图读取 `midpoint_analysis.comparative_geometry` 摘要。五个锚点及四点坐标是本命资料的象征几何，镜像轴用实际原生白羊点；框架内名为 Aries Point 的输入因素同样旋转，轴基准仍取 `profile.native_aries_point_longitude`。`defined_anchor_identity` 只表示锚点坐标按定义抵消，实际坐标为 null 时保留其后端形式值限定。生时偏移只覆盖已确认有限样点。
 
 ## 交付时保留来源和含义
 
@@ -74,4 +74,4 @@
 
 `ephemeris_source_inconsistent` 的 `issues` 指向 `runtime.ephemeris_data`，是来源配置／变更问题；保留其具名原因，不误述为出生资料错误或缺少 Python 包。`retryable=false` 时不原样反复调用；先补齐区间数据、重新加载后再重做相同输入，不变更用户已确认的误差区间。
 
-来源与本次采用范围见[其他流派审查](../../other-chart-schools.md)。原文链接：[Ludwig Rudolph 条文](https://www.witte-verlag.com/hamburger-hefte-menu/datenbank/823.html)、[Udo Rudolph 出版社摘页](https://witte-verlag.com/component/djcatalog2/?fid=12&format=raw&task=download)、[Klaus Bonert 2007 太阳弧作者摘文](https://www.astro.com/astrologie/in_sonnenbogen_g.htm)。最后一项只采用太阳位移的技法说明，不采用其效果主张。
+原文链接：[Ludwig Rudolph 条文](https://www.witte-verlag.com/hamburger-hefte-menu/datenbank/823.html)、[Udo Rudolph 出版社摘页](https://witte-verlag.com/component/djcatalog2/?fid=12&format=raw&task=download)、[Klaus Bonert 2007 太阳弧作者摘文](https://www.astro.com/astrologie/in_sonnenbogen_g.htm)。最后一项只采用太阳位移的技法说明。

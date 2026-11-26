@@ -115,7 +115,6 @@ class HDIntegration(PartialOutput):
 class HDCircuitGroupMembership(PartialOutput):
     method_id: str | None = None
     source_url: str | None = None
-    source_catalog_sha256: str | None = None
     integration_group: str | None = None
     integration_is_separately_reported_subset: bool | None = None
     scope: str | None = None
@@ -255,7 +254,6 @@ class HDDepthEvidence(PartialOutput):
     fixing_policy: dict[str, JsonValue] | None = None
     channel_identifiers: list[HDChannelIdentifier] | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     fixing_rule_source: str | None = None
     node_fixing_exclusion_source: str | None = None
     scope: str | None = None
@@ -308,7 +306,6 @@ class HDProfileEvidence(PartialOutput):
     lines: list[HDProfileLine] | None = None
     geometry: HDProfileGeometry | None = None
     sixth_line_process: HDSixthLineProcess | None = None
-    source_catalog_sha256: str | None = None
     source_urls: list[str] | None = None
     scope: str | None = None
     ruleset: HDProfileRuleset | None = None

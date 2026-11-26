@@ -84,10 +84,9 @@ print(json.dumps({'path':selected,'longitude':x[0],'source':fictitious_element_s
     assert abs(only_a["longitude"] - only_b["longitude"]) > 40
     assert conflict["longitude"] == only_a["longitude"]
     assert conflict["path"] == str(a)
-    assert (
-        conflict["source"]["sha256"]
-        == hashlib.sha256((a / "seorbel.txt").read_bytes()).hexdigest()
-    )
+    assert conflict["source"]["status"] == "external_file"
+    assert conflict["source"]["filename"] == "seorbel.txt"
+    assert conflict["source"]["search_path_index"] == 0
 
 
 @HAS_SWE
@@ -95,32 +94,26 @@ def test_default_current_directory_and_first_readable_search_entry_are_traced(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     a, b = tmp_path / "current", tmp_path / "later"
-    source = write_orbits(a)
+    write_orbits(a)
     write_orbits(b, cupido_anomaly="210.0000")
     monkeypatch.chdir(a)
     e.configure_ephemeris_path("")
-    assert (
-        fictitious_element_source()["sha256"]
-        == hashlib.sha256(source.read_bytes()).hexdigest()
-    )
+    assert fictitious_element_source()["status"] == "external_file"
+    assert fictitious_element_source()["filename"] == "seorbel.txt"
     # An empty first search segment denotes the working directory in Swiss.
     e.configure_ephemeris_path(os.pathsep + str(b))
     native = _native_factors(_birth(), False)
     assert native["hypothetical_element_source"]["search_path_index"] == 0
-    assert (
-        native["hypothetical_element_source"]["sha256"]
-        == hashlib.sha256(source.read_bytes()).hexdigest()
-    )
+    assert native["hypothetical_element_source"]["status"] == "external_file"
+    assert native["hypothetical_element_source"]["filename"] == "seorbel.txt"
     assert str(a) not in json.dumps(native["hypothetical_element_source"])
 
     # Swiss ends the path at LF. The empty second root searches the cwd.
     e.configure_ephemeris_path("missing;\n" + str(b))
     native = _native_factors(_birth(), False)
     assert native["hypothetical_element_source"]["search_path_index"] == 1
-    assert (
-        native["hypothetical_element_source"]["sha256"]
-        == hashlib.sha256(source.read_bytes()).hexdigest()
-    )
+    assert native["hypothetical_element_source"]["status"] == "external_file"
+    assert native["hypothetical_element_source"]["filename"] == "seorbel.txt"
 
 
 @HAS_SWE
@@ -129,7 +122,7 @@ def test_fictitious_source_skips_non_directory_search_components(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, nested: bool
 ) -> None:
     monkeypatch.chdir(tmp_path)
-    source = write_orbits(tmp_path / "usable", cupido_anomaly="210.0000")
+    write_orbits(tmp_path / "usable", cupido_anomaly="210.0000")
     blocker = "ordinary-file"
     (tmp_path / blocker).touch()
     unusable = f"{blocker}/not-reachable" if nested else blocker
@@ -138,10 +131,8 @@ def test_fictitious_source_skips_non_directory_search_components(
     e.configure_ephemeris_path(f"{unusable};usable")
     actual = _native_factors(_birth(), False)
     assert actual["hypothetical_element_source"]["search_path_index"] == 1
-    assert (
-        actual["hypothetical_element_source"]["sha256"]
-        == hashlib.sha256(source.read_bytes()).hexdigest()
-    )
+    assert actual["hypothetical_element_source"]["status"] == "external_file"
+    assert actual["hypothetical_element_source"]["filename"] == "seorbel.txt"
     assert actual == expected
 
 
@@ -160,14 +151,8 @@ def test_same_directory_orbit_edits_update_positions_and_receipt_without_cache_r
     before_cupido = next(row for row in before["factors"] if row["id"] == "Cupido")
     after_cupido = next(row for row in after["factors"] if row["id"] == "Cupido")
     assert before_cupido["longitude"] != after_cupido["longitude"]
-    assert (
-        before["hypothetical_element_source"]["sha256"]
-        != after["hypothetical_element_source"]["sha256"]
-    )
-    assert (
-        after["hypothetical_element_source"]["sha256"]
-        == hashlib.sha256(source.read_bytes()).hexdigest()
-    )
+    assert before["hypothetical_element_source"]["status"] == "external_file"
+    assert after["hypothetical_element_source"]["status"] == "external_file"
     # The inventory lists filenames; source-specific content identity is above.
     assert inventory_before == ephemeris_inventory()
     assert "0/seorbel.txt" in ephemeris_inventory()["files"]
@@ -225,7 +210,7 @@ def test_orbit_change_during_one_factor_calculation_is_rejected(
     def change_after_cupido(*args, **kwargs):
         result = original(*args, **kwargs)
         if args[1] == 40:
-            write_orbits(tmp_path, cupido_anomaly="164.7409")
+            (tmp_path / "seorbel.txt").unlink()
         else:
             pass
         return result
@@ -249,7 +234,7 @@ def test_orbit_change_between_birth_time_samples_is_rejected(
         result = _native_factors(*args, **kwargs)
         calls.append(result)
         if len(calls) == 1:
-            write_orbits(tmp_path, cupido_anomaly="164.7409")
+            (tmp_path / "seorbel.txt").unlink()
         else:
             pass
         return result
@@ -318,7 +303,7 @@ def test_nominal_chart_and_birth_interval_cannot_use_different_orbit_files(
         birth_longitude=0,
         birth_latitude=0,
     )
-    write_orbits(tmp_path, cupido_anomaly="164.7409")
+    (tmp_path / "seorbel.txt").unlink()
     with pytest.raises(ValueError, match="differs between nominal chart"):
         enrich_specialty_sensitivity(
             payload, _birth(), kind="germany", uncertainty_minutes=1

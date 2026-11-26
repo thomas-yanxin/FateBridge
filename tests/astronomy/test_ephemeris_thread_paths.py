@@ -28,7 +28,7 @@ def test_managed_paths_reconcile_shared_and_per_thread_native_state(
 
     monkeypatch.delenv("SE_EPHE_PATH", raising=False)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
-    monkeypatch.setattr(runtime, "_THREAD_STATE", local())
+    monkeypatch.setattr(runtime, "THREAD_STATE", local())
     monkeypatch.setattr(
         runtime, "swe", SimpleNamespace(set_ephe_path=set_path, deltat_ex=read)
     )

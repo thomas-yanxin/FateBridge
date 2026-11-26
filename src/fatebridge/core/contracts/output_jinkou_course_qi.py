@@ -25,7 +25,7 @@ def validate_course_qi(board: dict[str, Any]) -> None:
         raise ValueError("月建日辰得气轨迹不可重复")
     for trace in traces:
         metadata = qi_metadata()
-        compare(trace, {k: metadata[k] for k in ("source_url", "source_section")})
+        compare(trace, {"source_section": metadata["source_section"]})
         result = trace.get("result")
         if isinstance(result, dict):
             JinkouQiEvidence.model_validate(result)

@@ -12,11 +12,6 @@ from fatebridge.core.human_design.human_design_personality_color import (
     personality_colors,
 )
 
-VARIABLE_SOURCES = [
-    "https://jovianarchive.com/blogs/deeper-mechanics-system-theory/a-simple-guide-to-variable",
-    "https://jovianarchive.com/pages/the-basics-of-substructure-in-human-design",
-    "https://jovianarchive.com/pages/get-your-human-design-chart",
-]
 COMPONENTS = (
     ("design_sun_earth", "design", ("Sun", "Earth"), "top_left"),
     ("design_nodes", "design", ("NorthNode", "SouthNode"), "bottom_left"),
@@ -93,7 +88,6 @@ def variables_from_activations(activations: dict[str, Any]) -> dict[str, Any]:
         "arrows": arrows,
         "personality_colors": personality_colors(activations),
         "notation_order": list(NOTATION_ORDER),
-        "source_urls": list(VARIABLE_SOURCES),
         "subdivision_accuracy_certified": False,
         "scope": "所选名义盘的四组Tone数值汇总：1至3向左，4至6向右；P、D均先日地后交点。不同生时或后端的箭头不可拼接。数值可受生时、交点约定和星历影响；不认证认知、健康、饮食或学习能力。",
     }

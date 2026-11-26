@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from fractions import Fraction
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 from fatebridge.core.astro.julian_day import _datetime_from_julian_day
 from fatebridge.core.astro.tt_epoch import TTInstant
@@ -143,13 +143,13 @@ def _date(value: str) -> datetime:
     return datetime.fromisoformat(value).replace(tzinfo=timezone.utc)
 
 
-def historical_tai_minus_utc(moment: datetime) -> Optional[float]:
+def historical_tai_minus_utc(moment: datetime) -> float | None:
     """Round the published affine offset once, after exact UTC evaluation."""
     offset = historical_tai_minus_utc_exact(moment)
     return None if offset is None else float(offset)
 
 
-def historical_tai_minus_utc_exact(moment: datetime) -> Optional[Fraction]:
+def historical_tai_minus_utc_exact(moment: datetime) -> Fraction | None:
     """One published-decimal offset for scalar and exact-point consumers."""
     if moment.utcoffset() is None:
         raise ValueError("Historical UTC requires an aware datetime")
@@ -175,7 +175,7 @@ def historical_tai_minus_utc_exact(moment: datetime) -> Optional[Fraction]:
     return interval.offset_at_start + (day - interval.start_day) * interval.rate
 
 
-def historical_utc_to_tt_point(moment: datetime) -> Optional[TTInstant]:
+def historical_utc_to_tt_point(moment: datetime) -> TTInstant | None:
     """Encode a covered UTC label with the same exact published offset."""
     offset = historical_tai_minus_utc_exact(moment)
     return (
@@ -187,7 +187,7 @@ def historical_utc_to_tt_point(moment: datetime) -> Optional[TTInstant]:
 
 def historical_utc_from_tt(
     jd_tt: float | TTInstant, *, nominal_boundaries: bool = False
-) -> Optional[datetime]:
+) -> datetime | None:
     """Use one point inverse; nominal encoded midnights are explicit policy."""
     point = historical_utc_point_from_tt(jd_tt, nominal_boundaries=nominal_boundaries)
     return (

@@ -2,15 +2,11 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-CATALOG_SHA256 = "3aaa4ee2f3ff3649ad81836620722bfcfdeb5a74a2d398d50577ab05cf99d8bb"
-VOL2 = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷02"
-VOL6 = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷06"
 YANG_POSITIONS = frozenset("乾午艮卯酉坤子巽")
 YIN_POSITIONS = frozenset("亥丑寅辰巳未申戌")
 SCOPE = (
@@ -31,10 +27,9 @@ def source_profiles() -> list[dict[str, Any]]:
         Path(__file__).resolve().parents[2]
         / "data/classical/taiyi-count-profiles-v1.json"
     )
-    raw = path.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != CATALOG_SHA256:
-        raise ValueError("主客算分源目录指纹不符")
-    profiles: list[dict[str, Any]] = json.loads(raw)["profiles"]
+    profiles: list[dict[str, Any]] = json.loads(path.read_text(encoding="utf-8"))[
+        "profiles"
+    ]
     return profiles
 
 
@@ -197,11 +192,9 @@ def count_assessment(core: dict[str, Any]) -> dict[str, Any]:
             "id": "taiyi_count_source_readings_v1",
             "version": "1.0.0",
             "author": "FateBridge contributors",
-            "primary_sources": [VOL2, VOL6],
-            "catalog_sha256": CATALOG_SHA256,
         },
         "sources": [
-            {k: p[k] for k in ("id", "title", "source", "evidence_level")}
+            {k: p[k] for k in ("id", "title", "evidence_level")}
             for p in source_profiles()
         ],
         "unadjudicated_source_readings": [

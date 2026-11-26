@@ -138,8 +138,7 @@
         "include_item_breakdown"
       ],
       "source_refs": [
-        "https://ipip.ori.org/new_ipip-50-item-scale.htm",
-        "https://ipip.ori.org/newScoringInstructions.htm"
+        "docs/algorithm-coverage.md"
       ],
       "unit": "likert_1_to_5",
       "validation_scope": {

@@ -26,12 +26,6 @@ PALACES = {
 PALACE_ORDER = (1, 8, 3, 4, 9, 2, 7, 6)
 
 
-SOURCES = {
-    str(n): f"https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷{n:02}"
-    for n in (1, 2, 3, 6, 9)
-}
-
-
 class CountStep(TypedDict):
     palace: str
     value: int
@@ -44,7 +38,6 @@ class CountTrace(TypedDict):
     terminal_palace: str
     terminal_excluded: bool
     counting_rule: str
-    source: str
 
 
 def count_to_taiyi(marker: str, taiyi_number: int) -> CountTrace:
@@ -80,7 +73,6 @@ def count_to_taiyi(marker: str, taiyi_number: int) -> CountTrace:
         "terminal_palace": PALACES[taiyi_number],
         "terminal_excluded": not is_same_principal_palace,
         "counting_rule": "同宫取本宫数" if is_same_principal_palace else "数至太乙宫前",
-        "source": SOURCES["2"] + "#推太乙運式法",
     }
 
 

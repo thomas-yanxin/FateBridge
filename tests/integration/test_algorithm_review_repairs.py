@@ -235,20 +235,3 @@ def test_missing_required_timing_layer_fails_on_every_transport(
     assert http.status_code == 503 and protocol.is_error
     for result in [http.json(), protocol.structured_content, local]:
         assert "error" in result and "liushi_info" not in result
-
-
-def test_human_design_audit_direct_entry_resolves_its_actual_script_dependencies(
-    tmp_path: Path,
-) -> None:
-    script = (
-        Path(__file__).resolve().parents[2]
-        / "scripts/human_design/audit_human_design.py"
-    )
-    result = subprocess.run(
-        [sys.executable, str(script), "--help"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0, result.stderr
-    assert "--require-professional-acceptance" in result.stdout

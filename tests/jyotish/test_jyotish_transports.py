@@ -113,9 +113,6 @@ def test_1960_sofa_time_context_across_three_real_surfaces(
     assert profile["julian_day_utc"] is not None
     assert profile["time_scale_context"]["method"].startswith("SOFA_1960")
     assert profile["time_scale_context"]["houses_timescale"] == "UT1_model_estimate"
-    assert profile["time_scale_context"]["historical_utc_source"] == (
-        "https://www.iausofa.org/2023-10-11c"
-    )
 
 
 @pytest.mark.parametrize("node_mode,basis", list(product(["mean", "true"], YEAR_DAYS)))
@@ -326,10 +323,6 @@ def test_future_time_context_and_identified_author_rules_across_surfaces(
     assert condition["source_layer"] == "translator_commentary"
     source = next(
         s for s in body["india"]["rulesets"] if s["id"] == condition["source_id"]
-    )
-    assert (
-        STRENGTH_SOURCE["sha256"]
-        == "13609f1af89541e070c798b8c70c6bfd74a8b9a71a71388913bf898e9f9ddf3f"
     )
     assert same_public_value(source, STRENGTH_SOURCE)
     assert {r["rule_id"] for r in body["india"]["rule_trace"]} >= {

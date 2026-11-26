@@ -7,7 +7,7 @@ from pydantic import JsonValue
 
 from fatebridge.utils.json_values import same_value
 
-_INTEGRITY_FIELD = re.compile(
+INTEGRITY_FIELD = re.compile(
     r"(?:^|_)(?:sha\d*|md5|hash(?:es)?|digest(?:s)?|fingerprint(?:s)?)(?:_|$)",
     re.IGNORECASE,
 )
@@ -17,7 +17,7 @@ _INTEGRITY_FIELD = re.compile(
 def is_integrity_field(name: str) -> bool:
     return (
         name in {"first_record_identities", "pixel_firsts"}
-        or _INTEGRITY_FIELD.search(name) is not None
+        or INTEGRITY_FIELD.search(name) is not None
     )
 
 

@@ -8,7 +8,7 @@ branches while leaving each corner's selected lodging unassessed.
 
 from typing import Any
 
-from fatebridge.core.metaphysics.taiyi_geometry import PALACES, SOURCES
+from fatebridge.core.metaphysics.taiyi_geometry import PALACES
 
 # Taiyi number -> physical trigram, Later Heaven/Qimen number, compass bearing.
 PHYSICAL = {
@@ -57,10 +57,6 @@ def liuren_at_taiyi_palace(number: int, liureng: dict[str, Any]) -> dict[str, An
         "status": "not_assessed",
         "reason": "四维寄支未校勘；同方位两支仅并列，不据神将吉凶择一",
         "candidate_scope": "same_sector_branches_not_adjudicated_lodging",
-        "sector_source_urls": [
-            SOURCES["2"] + "#推九宫所主法",
-            SOURCES["9"] + "#推太乙與太嵗格",
-        ],
         "sector_candidates": [actual_row(branch) for branch in SECTOR_BRANCHES[number]],
     }
 
@@ -107,11 +103,6 @@ def palace_correspondences(
             "id": "sanshi_physical_correspondence_v1",
             "version": "1.1.0",
             "author": "FateBridge contributors",
-            "sources": [
-                SOURCES["2"] + "#推九宫所主法",
-                SOURCES["9"] + "#推太乙與太嵗格",
-                SOURCES["1"] + "#太乙當時法",
-            ],
             "conformance": "modern_geometric_join_not_full_classical_joint_judgment",
         },
         "scope": "按原盘同方位对应星门神；子卯午酉直接查六壬地盘十二神，四维并列同方位两支且不选寄支，中五不寄宫。年/月/日计为跨时间层结构对照，时计仍需校定古法寄宫。",

@@ -90,15 +90,15 @@ def _coerce_house_system_code(hsys: object) -> int | None:
     """Translate a user-facing house-system identifier into the internal 0-8 code.
 
     Accepts:
-    - ``int``/``str`` numeric values in 0..8
+    - int/str numeric values in 0..8
     - Swiss Ephemeris single-letter codes (case-insensitive): P, K, W, R, B,
-      V, T, S, D. These match the ``swisseph_code`` bytes on each spec entry
-      and align astro/chart hsys with the ``house_system`` strings the
+      V, T, S, D. These match the swisseph_code bytes on each spec entry
+      and align astro/chart hsys with the house_system strings the
       astro/timing endpoints already accept.
     - Key strings like "placidus"/"whole_sign"/"koch" (case-insensitive),
-      matching the internal ``key`` attribute.
+      matching the internal key attribute.
 
-    Returns the canonical integer code, or ``None`` if the input cannot be
+    Returns the canonical integer code, or None if the input cannot be
     resolved (caller raises a descriptive error)."""
     if hsys is None:
         return None

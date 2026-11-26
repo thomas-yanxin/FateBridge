@@ -184,12 +184,12 @@ def goryeosa_phase_annotation(
 ) -> dict[str, Any]:
     """Evaluate the two explicit clauses with exact units and unknowns retained.
 
-    ``initial_before_chenchu`` is the independently declared truth of that
+    initial_before_chenchu is the independently declared truth of that
     source condition. It is never derived by equating 晨初 with 昏明 or a clock.
     """
-    loaded = load_source(SOURCE)
-    validate_selected_rule(loaded.data)
-    unit = loaded.data["units"]["day_units"]
+    data = load_source(SOURCE)
+    validate_selected_rule(data)
+    unit = data["units"]["day_units"]
     result = _evaluate(
         phase,
         _remainder(phase_remainder, unit),
@@ -199,13 +199,12 @@ def goryeosa_phase_annotation(
     )
     result = {
         **result,
-        "ruleset_id": loaded.data["id"],
+        "ruleset_id": data["id"],
         "day_units": unit,
-        "source_reference": loaded.data["source_reference"],
-        "named_print_variant": loaded.data["named_print_variant"],
+        "source_reference": data["source_reference"],
+        "named_print_variant": data["named_print_variant"],
         "condition_provenance": "caller_declared_not_independently_verified_by_function",
         "independent_adjudicator_identity": None,
-        "source_bundle_sha256": loaded.sha256,
     }
     result["reading_text"] = phase_annotation_reading(result)
     return result
@@ -268,8 +267,7 @@ def phase_annotation_reading(result: dict[str, Any]) -> str:
 
 
 def phase_annotation_reference() -> dict[str, Any]:
-    loaded = load_source(SOURCE)
-    data = loaded.data
+    data = load_source(SOURCE)
     validate_selected_rule(data)
     case = data["reported_1117_case"]
     point, twilight = (
@@ -281,7 +279,6 @@ def phase_annotation_reference() -> dict[str, Any]:
     evaluation = _evaluate("full", Fraction(point), Fraction(twilight), True, None)
     return {
         **data,
-        "source_bundle_sha256": loaded.sha256,
         "reported_case_full_rule_evaluation": evaluation,
         "reported_case_exact_surplus_units": _ratio(point - twilight),
         "current_input_phase_annotation_status": "not_evaluated",

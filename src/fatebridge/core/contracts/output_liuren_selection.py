@@ -88,7 +88,6 @@ def trace_expectations(selection: dict[str, Any]) -> list[dict[str, Any]]:
     return traces + [
         dict(
             rule_id="liuren.named_subtypes",
-            source_url=classification["source_url"],
             source_section=classification["source_section"],
             result=classification,
         ),

@@ -39,11 +39,9 @@ from fatebridge.utils.errors import EphemerisSourceError
 
 RULESET = "fatebridge.local_solar_birth_clock.v1"
 SOLAR_BASES = {"local_mean_solar", "local_apparent_solar"}
-_PRE_ATOMIC_END = utc_calendar(
+PRE_ATOMIC_END = utc_calendar(
     datetime(1960, 1, 1, tzinfo=timezone.utc)
 ).julian_day_exact()
-SOURCE_URL = "https://www.astro.com/swisseph/swephprg.htm"
-CODE_URL = "https://github.com/aloistr/swisseph/blob/v2.10.03/sweph.c#L7280-L7333"
 
 
 @dataclass(frozen=True, init=False)
@@ -291,7 +289,7 @@ def resolve_solar_epoch(
                 )
             sun = sun_at(target_ut1, "final")
         try:
-            if basis == "local_mean_solar" and nominal_mean < _PRE_ATOMIC_END:
+            if basis == "local_mean_solar" and nominal_mean < PRE_ATOMIC_END:
                 point = CivilPoint(nominal_mean)
                 # Keep the established rounded label and the exact UT1 input.
                 display = wall.replace(tzinfo=timezone.utc) - timedelta(
@@ -372,8 +370,6 @@ def resolve_solar_epoch(
             "measured_eop_applied": active_ut1.get() is not None,
             "clock_accuracy_certified": False,
             "swisseph_version": str(runtime.swe.version),
-            "source_url": SOURCE_URL,
-            "source_code_url": CODE_URL,
             "source_sections": "9.2, 9.4; apparent solar hour-angle expression",
         }
 

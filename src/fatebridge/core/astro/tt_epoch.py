@@ -14,9 +14,9 @@ from fatebridge.utils.civil_time import utc_calendar
 class TTInstant:
     """An explicitly exact numerical TT point; precision is not accuracy.
 
-    ``from_float`` preserves the IEEE value, not the unrounded date that may
-    have produced it. ``from_parts`` preserves both inputs without adding
-    them at a large JD. ``from_utc`` retains the supplied civil microsecond
+    from_float preserves the IEEE value, not the unrounded date that may
+    have produced it. from_parts preserves both inputs without adding
+    them at a large JD. from_utc retains the supplied civil microsecond
     and explicit atomic-offset assumption without a float intermediate.
     """
 

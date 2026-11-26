@@ -13,6 +13,8 @@ import tempfile
 from pathlib import Path
 from typing import Literal
 
+from fastmcp import Client
+from fastmcp.client.transports import StdioTransport
 from packaging.requirements import Requirement
 from typing_extensions import NotRequired, TypedDict
 
@@ -28,6 +30,7 @@ from fatebridge.core.ephemeris_installation import (
     user_ephemeris_dir,
 )
 from fatebridge.core.ephemeris_paths import ephemeris_search_directories
+from fatebridge.core.ephemeris_runtime import effective_ephemeris_search_path
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.runtime import load_runtime_env
@@ -130,10 +133,6 @@ class _StdioProbeError(RuntimeError):
 
 
 async def _probe_stdio(env: dict[str, str]) -> StdioProbeResult:
-    # note (startup): Load the protocol client only for a real stdio probe.
-    from fastmcp import Client
-    from fastmcp.client.transports import StdioTransport
-
     # note (installed entry): Launch outside the checkout to exercise installed imports and data.
     with tempfile.TemporaryDirectory(prefix="fatebridge-doctor-") as directory:
         with tempfile.TemporaryFile(
@@ -297,9 +296,6 @@ def diagnose(
     has_fengshui = any(spec.family == "fengshui" for spec in selected)
     has_human_design = any(spec.key == "human_design" for spec in selected)
     if has_fengshui or has_human_design:
-        # note (runtime): The native engine reads its environment when first imported.
-        from fatebridge.core.ephemeris_runtime import effective_ephemeris_search_path
-
         active = effective_ephemeris_search_path()
     else:
         active = None

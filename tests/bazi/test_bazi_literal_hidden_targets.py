@@ -9,7 +9,77 @@ from fatebridge.core.hidden_carriers import (
     build_natal_hidden_carriers,
     describe_hidden_targets,
 )
-from tests.bazi.test_hidden_carriers import ELEMENT, HIDDEN, MATRIX, NATAL
+
+NATAL = dict(
+    zip(("year", "month", "day", "hour"), map(tuple, ["己未", "丁丑", "丙戌", "戊戌"]))
+)
+HIDDEN = dict(
+    zip(
+        "子丑寅卯辰巳午未申酉戌亥",
+        [
+            "癸",
+            "己癸辛",
+            "甲丙戊",
+            "乙",
+            "戊乙癸",
+            "丙戊庚",
+            "丁己",
+            "己丁乙",
+            "庚壬戊",
+            "辛",
+            "戊辛丁",
+            "壬甲",
+        ],
+    )
+)
+ELEMENT = {
+    c: e
+    for chars, e in [
+        ("甲乙", "木"),
+        ("丙丁", "火"),
+        ("戊己", "土"),
+        ("庚辛", "金"),
+        ("壬癸", "水"),
+    ]
+    for c in chars
+}
+MATRIX = {
+    "木": [
+        "same_element",
+        "stem_generates_hidden",
+        "stem_overcomes_hidden",
+        "hidden_overcomes_stem",
+        "hidden_generates_stem",
+    ],
+    "火": [
+        "hidden_generates_stem",
+        "same_element",
+        "stem_generates_hidden",
+        "stem_overcomes_hidden",
+        "hidden_overcomes_stem",
+    ],
+    "土": [
+        "hidden_overcomes_stem",
+        "hidden_generates_stem",
+        "same_element",
+        "stem_generates_hidden",
+        "stem_overcomes_hidden",
+    ],
+    "金": [
+        "stem_overcomes_hidden",
+        "hidden_overcomes_stem",
+        "hidden_generates_stem",
+        "same_element",
+        "stem_generates_hidden",
+    ],
+    "水": [
+        "stem_generates_hidden",
+        "stem_overcomes_hidden",
+        "hidden_overcomes_stem",
+        "hidden_generates_stem",
+        "same_element",
+    ],
+}
 
 STEMS, BRANCHES = "甲乙丙丁戊己庚辛壬癸", "子丑寅卯辰巳午未申酉戌亥"
 CYCLE = {STEMS[i % 10] + BRANCHES[i % 12] for i in range(60)}

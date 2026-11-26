@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Optional, Sequence
+from typing import Any, Callable, Sequence
 
 from fatebridge.core.sukuyo.sukuyo_hinoo_critical import critical_calendar_reference
 from fatebridge.core.sukuyo.sukuyo_sources import load_source
@@ -20,24 +20,19 @@ DEFAULT_PROFILE = "t1299_fullmoon27"
 HINOO_PROFILE = "hinoo_t1299_host27"
 PROFILES = (DEFAULT_PROFILE, HINOO_PROFILE)
 DAY_PARTS = ("first_half", "second_half")
-_ALIASES = str.maketrans("虛婁畢參張軫", "虚娄毕参张轸")
+ALIASES = str.maketrans("虛婁畢參張軫", "虚娄毕参张轸")
 
 
 def source_bundle() -> dict[str, Any]:
-    return load_source(SOURCE).data
-
-
-def source_digest() -> str:
-    return load_source(SOURCE).sha256
+    return load_source(SOURCE)
 
 
 def fullmoon_calculation(month: int, day: int, order: Sequence[str]) -> dict[str, Any]:
-    source = load_source(SOURCE)
-    return _fullmoon_from_loaded(month, day, order, source.data, source.sha256)
+    return _fullmoon_from_loaded(month, day, order, load_source(SOURCE))
 
 
 def _fullmoon_from_loaded(
-    month: int, day: int, order: Sequence[str], bundle: dict[str, Any], digest: str
+    month: int, day: int, order: Sequence[str], bundle: dict[str, Any]
 ) -> dict[str, Any]:
     if type(month) is not int or not 1 <= month <= 12:
         raise ValueError("农历月必须为1..12的整数")
@@ -53,9 +48,7 @@ def _fullmoon_from_loaded(
         for row in rows
     ):
         raise ValueError("十二月望宿表必须完整、月份唯一且宿名有效")
-    anchors = {
-        row["month"]: row["fullmoon_mansion"].translate(_ALIASES) for row in rows
-    }
+    anchors = {row["month"]: row["fullmoon_mansion"].translate(ALIASES) for row in rows}
     if set(anchors) != set(range(1, 13)) or any(
         name not in order for name in anchors.values()
     ):
@@ -83,8 +76,6 @@ def _fullmoon_from_loaded(
         "shortcut_mansion": shortcut,
         "methods_agree": direct == shortcut,
         "source_url": bundle["source_url"],
-        "source_sha256": bundle["source_sha256"],
-        "source_bundle_sha256": digest,
         "direct_locator": bundle["direct_count_locator"],
         "shortcut_locator": bundle["shortcut_locator"],
         "scope": "原典月日配当算法；十五日是表定望日，不以实际天文满月瞬间替换。",
@@ -99,8 +90,8 @@ def select_profile(
     *,
     profile: str,
     leap_policy: str,
-    day_part: Optional[str],
-    previous_lunar: Optional[dict[str, Any]],
+    day_part: str | None,
+    previous_lunar: dict[str, Any] | None,
 ) -> dict[str, Any]:
     if profile not in PROFILES:
         raise ValueError("calendar_profile仅支持t1299_fullmoon27或hinoo_t1299_host27")
@@ -111,13 +102,12 @@ def select_profile(
     if leap_policy not in {"unresolved", "repeat_month"}:
         raise ValueError("闰月政策无效")
     previous_lunar = deepcopy(previous_lunar)
-    source = load_source(SOURCE)
-    bundle = source.data
+    bundle = load_source(SOURCE)
 
-    # Every branch uses one captured table and digest, including the omitted
+    # Every branch uses one captured table, including the omitted
     # day and repeat-month alternatives; never mix separately reloaded tables.
     def calculate(m: int, d: int) -> dict[str, Any]:
-        return _fullmoon_from_loaded(m, d, order, bundle, source.sha256)
+        return _fullmoon_from_loaded(m, d, order, bundle)
 
     host = calculate(month, day)
     base = host["direct_mansion"]
@@ -254,7 +244,6 @@ def select_profile(
         )
     )
     return {
-        "source_bundle_sha256": source.sha256,
         "calendar_profile": profile,
         "mansion_method_id": (
             bundle["hinoo_addendum"]["id"] if profile == HINOO_PROFILE else bundle["id"]

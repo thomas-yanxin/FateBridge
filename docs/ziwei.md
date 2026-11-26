@@ -1,61 +1,28 @@
-# 紫微斗数：当前盘式、时间层与来源
+# 紫微斗数参考
 
-[文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
+[文档中心](README.md) · [API 参考](api-reference.md) · [结果解读参考](interpretation/shared/ziwei-topic-evidence.md)
 
-公开入口为 `ziwei_birth_chart`、`ziwei_timing` 与 `ziwei_rules`。本命与运限保持来源和规则选择，规则查询提供具名条文、前提与未覆盖项。参数和输出字段见[按需合同](contracts/README.md)。
+紫微斗数公开入口为 `ziwei_birth_chart`、`ziwei_timing` 与 `ziwei_rules`。三者共用 `rule_profile` 与来源标注，完整输入与字段视图见[按需调用合同](contracts/README.md)。
 
-## 盘式与四化
+## 盘式、庙旺与四化
 
-`rule_profile` 保留 `iztro_2_5_8` 与 `quanshu_v2_excerpt`，分别表达软件对照配置与限定原典摘录配置。`sihua_source=rule_profile` 沿用所选配置；`naj_ming_v1` 显式采用明刊原页四化表。选择其中一表不代表整部原典已获验收。
+`rule_profile` 支持 `iztro_2_5_8`（软件对照基线）与 `quanshu_v2_excerpt`（限定原典摘录配置）。`sihua_source` 默认沿用所选配置，也可显式指定 `naj_ming_v1`（明刊四化表）；`brightness_source` 默认沿用基础配置，也可显式选择 `iztro_2_5_8`、`quanshu_v2_selected_table`、`ziwei_doushu_qs`、`ziwei_doushu_xd1`、`ziwei_doushu_zz` 或 `ziwei_doushu_xd2`。显式选表仅替换对应表层，不改变安星或运限规则。
 
-`brightness_source=rule_profile` 沿用基础配置的本命庙旺表；也可独立选择 `iztro_2_5_8`、`quanshu_v2_selected_table` 或 `ziwei_doushu_qs`、`ziwei_doushu_xd1`、`ziwei_doushu_zz`、`ziwei_doushu_xd2` 四张固定版本软件对照表。各表保留自身地支顺序、等级、星名对应和未记载单元格，不跨表补值，也不改变安星、四化或运限规则。显式选表时 `ruleset.brightness_table` 返回来源、版本与表式。
-
-本命保留命身宫、五行局、十四主星、辅星、四化、庙旺表、三方四正、长生与博士循环、旬空及相关宫位证据。完整三合视图不自动成为吉凶评级。年干四化使用所选农历年；不能把八字立春年柱挪作紫微农历年。
-
-闰月、日界、早晚子时、火铃顺逆、限宫首位和附星采用所选规则集。原书缺文、同图疑字及版本异读随规则来源和盘内比较返回，不用当前程序通则填补原字。`independent_review` 等状态只约束实际已复读内容，不认证未审阅章节。
+本命盘返回命身宫、五行局、十四主星、辅星、四化、庙旺表、三方四正、长生与博士循环及旬空证据；年干四化使用所选农历年，不以八字立春年柱替代。
 
 ## 时钟与岁序
 
-出生民用时钟、真太阳排盘时钟、目标时钟各自记录；已知重复钟时需明确UTC偏移。真太阳日期可改变安星日期，但岁序统一采用 `birth_civil_timezone`：将出生和目标的实际瞬间转换到出生民用时区，再按当地日期查所采用的东亚农历日期表，以正月初一00:00换岁。
-
-目标瞬间如果落入出生时区的 `-00` 区间，当地日期未定义，运限返回 `unresolved_timezone_offset`。目标 UTC 即使已知，也只能用来确定投影位置。 [TZif 规范](https://www.rfc-editor.org/rfc/rfc9636.html#section-3.2)
-
-分钟诊断沿秒 0 选定的实际时线核对 `59.999999` 秒。历史区内跳时或回拨使该端点缺失时，`endpoint_seconds` 只含 `0`，跨时支和跨排盘日期均为 `null`。 [固定钟面与端点对照](precision-acceptance.md#ziwei-civil-clock-membership-round112)
-
-这一软件约定不重建历史地方朔时，也未认证古典岁首。目标实际时刻早于出生时刻明确拒绝，不能把小于1的错误钳为1。内部规则审计使用的合成农历输入只是条件盘；无实际出生时钟不能自行推定岁序。
+出生民用时钟、真太阳排盘时钟与目标时钟分开记录，重复民用钟时需传 `birth_utc_offset`。真太阳日期可影响安星日界，但虚岁岁序统一按 `birth_civil_timezone` 的东亚农历正月初一 00:00 换岁；目标时刻不得早于出生时刻。
 
 ## 大限、小限与流曜
 
-运限分列大限、小限、流年、流月、流日和流时，实际落宫与目标历法地支分别表达。给定岁序小于所选局数起岁时，大限返回 `status=not_started`、起岁与原因；落宫、宫干与四化为空，映射及连接为空列表。独立 `childhood_limit` 保留具名童限，不拿童限替代正式大限。
-
-起大限当岁按所选配置计算实际宫位；大限上、下五年的限定分段保留实际前提与未决解释。流月斗君、流日及流时的共享索引按所选规则使用，相关出生月、时支和目标月日均随同次本命前置链返回。未知性别只限制需要顺逆的层，不抹去已经确定的本命事实。
-
-运限结果中，`analysis_context` 记录目标时刻，`birth_context` 保留出生校正；`target_minute`、`target_timezone` 默认分别为 0 和 `Asia/Shanghai`。宫位字段分工如下：
+`ziwei_timing` 分层返回大限、小限、流年、流月、流日与流时；未达五行局起运岁数时，大限返回 `status=not_started`，独立童限由 `childhood_limit` 返回。`target_minute` 与 `target_timezone` 默认分别为 `0` 和 `Asia/Shanghai`。
 
 | 字段 | 含义 |
 | --- | --- |
-| `scopes[].palace_name/natal_palace_name` | 本层命宫活动索引所临的本命宫；角色见 `scope_palace_role` |
+| `scopes[].palace_name` / `natal_palace_name` | 本层活动命宫所临的本命宫（角色见 `scope_palace_role`） |
 | `palace_map` | 本层十二宫功能与本命星位的映射 |
-| `mutagen_natal_links` | 本层四化与本命星曜、宫位的连接；`scope_palace_name` 标出本层宫位 |
-| `natal_prerequisites` | 同次运限内部使用的农历、年干、时支、命身宫、五行局及推导轨迹 |
+| `mutagen_natal_links` | 本层四化与本命星曜、宫位的连接 |
+| `natal_prerequisites` | 同次运限内部计算的农历、年干、时支、命身宫、五行局及推导轨迹 |
 
-解释起大限岁数或局数来源时，可读 `evidence_views.natal_prerequisites` 的字段清单，无需另起本命计算。本命官禄不等于流年官禄，出生年干、岁序与目标层天干也不能互换。这些连接不表示全部流曜或飞宫体系已经实现。
-
-## 当前检验与限制
-
-`tests/data/ziwei_independent` 保留一手书影、HKO历表与独立字面规则参考。软件交叉对照只证明对指定配置的有限一致；条件宫位审计不认证历法转换，春节边界与同一瞬间跨区岁序另用独立日期资料检验。
-
-2026-11-09 在原1,080例之外，新增固定 [iztro 2.5.8](https://github.com/SylarLong/iztro/tree/2.5.8) 默认配置的普通月日时、六十年时序和四个闰月网格。13,936条比较记录对应13,910组不同输入；66颗本命星的919,776条记录及334,464个长生／博士格无差异，同时核对命身宫、五行局、命身主、宫名宫干及大限序列。104条不存在的闰月三十日保留为来源无效日期控制，未计通过。参考及采集计划位于本地 `tests/data/ziwei_independent/natal_factor_grid_v1`；网格有重叠，未覆盖所有年份的完整组合，也不裁定其他规则配置、原典异文或全部流曜。
-
-<a id="horoscope-boundaries-round46"></a>
-
-2026-11-19 的运限对照固定 20 例，覆盖十个流年干、闰二月及闰十一月交接、除夕晚子与午夜、同一瞬间转换到不同民用时区的岁序。香港天文台历表给出三组日期。用出生民用时区的目标农历年减出生农历年再加一，独立核对岁序。命身宫、五行局及大限、小限、流年、流月、流日、流时的实际落宫、宫干、四化、十二宫映射、四化星位连接和流年禄羊陀与原版软件对照。 [香港天文台历表](https://www.hko.gov.hk/sc/gts/time/conversion.htm) · [iztro 2.5.8 运限实现](https://raw.githubusercontent.com/SylarLong/iztro/2.5.8/src/astro/FunctionalAstrolabe.ts)
-
-服务、REST、独立 MCP 会话及 CLI 各有 2,440 项对照相符。60 次公开调用均成功。每个案例的完整业务内容与服务一致，比较仅排除顶层 `run_metadata`。MCP 的公开输入 Schema 与当前按需合同相同，输出 Schema 与当前输出模型相同。原 105 条运限比较和三项正式起限前的童限替代差异继续保留。新结果限于这 20 例的所选盘式和字段，其他流曜、其他盘式及原典岁首仍待验。
-
-同一批保存的服务结果与 iztro 2.6.5 发布包另比较，2,422／2,440 项相符。三个晚子时样本各有六项差异，涉及流日、流时的干、四化及本命星位连接。两版对这三例的运限落宫、农历日期和岁序一致。FateBridge 的具名 `iztro_2_5_8` 配置从共享日柱、时柱取干，晚子时按次日取日干；2.6.5 的 `dayDivide=current` 使用当日取干。两个口径按版本保留，原典对流日和流时换日的要求仍待裁定。 [iztro 2.6.5 发布记录](https://github.com/SylarLong/iztro/releases/tag/v2.6.5)
-
-```bash
-uv run --locked --extra dev python -m pytest -n0 tests/ziwei/test_ziwei_depth_transports.py tests/ziwei/test_ziwei_horoscope_crosscheck.py tests/ziwei/test_ziwei_twenty_first_iteration.py
-uv run --locked --extra dev python -m scripts.ziwei.audit_ziwei_natal --fixtures tests/data/ziwei_independent/natal_factor_grid_v1 --output /tmp/ziwei-natal-factor-grid-audit.json
-```
+解读起大限岁数与局数依据时，可直接按 `evidence_views.natal_prerequisites` 投影读取，无需重复调用 `ziwei_birth_chart`。

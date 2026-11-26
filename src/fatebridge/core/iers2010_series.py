@@ -2,8 +2,6 @@
 
 Published coefficients in microarcseconds. Argument order:
 l, l-prime, F, D, Omega, Venus, Earth, general precession.
-Source: https://iers-conventions.obspm.fr/content/chapter5/additional_info/tab5.2e.txt
-Raw source SHA256: a5c690b277108e35d88df9cc20fea4120dfbc10a81444bb41b15cf9c6edcd6cb
 """
 
 EECT_TERMS = (

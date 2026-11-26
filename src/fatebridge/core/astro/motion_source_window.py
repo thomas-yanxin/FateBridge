@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import math
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Sequence
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
@@ -25,7 +25,7 @@ from fatebridge.utils.errors import EphemerisSourceError
 METHOD_ID = "compressed_center_file_window_replay_v1"
 
 
-def observed_windows() -> Optional[Tuple[tuple, ...]]:
+def observed_windows() -> tuple[tuple, ...] | None:
     getter = getattr(runtime.swe, "get_current_file_data", None)
     if not callable(getter):
         return None
@@ -46,8 +46,8 @@ class CenterWindowProbe:
         planet: str,
         epoch: float,
         coordinates: Sequence[float],
-        windows: Tuple[tuple, ...],
-        source: Dict[str, Any],
+        windows: tuple[tuple, ...],
+        source: dict[str, Any],
         trace: PhysicalEphemerisTrace,
         *,
         sidereal: bool,
@@ -67,9 +67,9 @@ class CenterWindowProbe:
         )
         self.lower = max(v[1] for v in windows)
         self.upper = min(v[2] for v in windows)
-        self.cache: Dict[float, Dict[str, Any]] = {}
+        self.cache: dict[float, dict[str, Any]] = {}
         self.anchors: set[float] = set()
-        self.contexts: Dict[str, Any] = {}
+        self.contexts: dict[str, Any] = {}
         self.center_verified = False
 
     def _raw(self, at: float) -> Sequence[float]:
@@ -123,12 +123,12 @@ class CenterWindowProbe:
             anchor = min(candidates, key=lambda x: (abs(x - self.epoch), x))
         raise EphemerisSourceError("position_motion_not_converged")
 
-    def _probe(self, delta: float) -> Dict[str, Any]:
+    def _probe(self, delta: float) -> dict[str, Any]:
         if delta in self.cache:
             return self.cache[delta]
         at = self.epoch + delta
         pad = 64 * math.ulp(at)
-        result: Dict[str, Any] = {"cell": None}
+        result: dict[str, Any] = {"cell": None}
         if not self.lower + pad < at < self.upper - pad:
             result["reason"] = "outside_interior_center_file_window"
             self.cache[delta] = result
@@ -147,7 +147,7 @@ class CenterWindowProbe:
                 raise EphemerisSourceError("position_motion_not_converged")
             self.center_verified = True
         value = float(raw[0])
-        local_contexts: Dict[str, Any] = {}
+        local_contexts: dict[str, Any] = {}
         if self.planet != "Sun":
             value, _ = stabilized_longitude_sample(
                 self.planet,
@@ -183,7 +183,7 @@ class CenterWindowProbe:
         self.cache[delta] = result
         return result
 
-    def branch(self, delta: float) -> Dict[str, Any]:
+    def branch(self, delta: float) -> dict[str, Any]:
         return {
             key: value for key, value in self._probe(delta).items() if key != "value"
         }
@@ -194,7 +194,7 @@ class CenterWindowProbe:
             raise EphemerisSourceError("position_motion_not_converged")
         return float(value["value"])
 
-    def receipt(self) -> Dict[str, Any]:
+    def receipt(self) -> dict[str, Any]:
         return {
             "method_id": METHOD_ID,
             "center_native_state_reproduced_exactly": self.center_verified,

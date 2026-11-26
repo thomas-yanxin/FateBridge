@@ -1,70 +1,40 @@
 # FateBridge API 参考
 
-正确调用一项计算，需要先确认输入要求、公开入口和结果结构。REST、MCP 与 CLI 的公共约定、请求族、路由映射及响应字段集中列在下方，供应用开发者与 Agent 维护者查询，并据此处理精度说明与错误信息。
+本文列出 FateBridge 的 REST 路由、FastMCP 工具、CLI 约定、共享请求族与响应字段。首次安装请看[快速入门](getting-started.md)，客户端集成代码与分页交付示例见[接入指南](agent-guide.md)，各能力范围见[算法覆盖矩阵](algorithm-coverage.md)。
 
-首次运行请先看[快速入门](getting-started.md)，可复制的客户端代码见[接入指南](agent-guide.md)，按日常问题选择方法见[工具覆盖](algorithm-coverage.md)。
-
-OpenAPI 发布 93 个业务 REST 路由，另有 `/health`、`/ready`、`/metrics` 三个运维端点。MCP 通过四个入口提供 93 项业务能力。两个业务计数来自中央目录，并由 `tests/quality/test_doc_tool_counts.py` 核对。字段约束以当前服务的 `/openapi.json`、MCP `describe_capability` 或 CLI `describe` 为准。
-
-## 接口名称与升级
-
-REST 路径按领域和用途组织，路径中的词用连字符分隔。MCP 和 CLI 共用工具名，词之间用下划线分隔。
-
-| 用途 | REST | MCP / CLI | 旧 MCP / CLI |
-| --- | --- | --- | --- |
-| 八字命盘 | `/api/bazi/birth-chart` | `bazi_birth_chart` | `bazi_birth` |
-| 六壬起课 | `/api/liuren/chart` | `liuren_chart` | `liureng_gods` |
-| 解读占星骰面 | `/api/divination/astrology-dice/interpret` | `interpret_astrology_dice` | `otherbu` |
-| 太阳返照 | `/api/astrology/timing/solar-return` | `solar_return` | `solarreturn` |
-| 主限 | `/api/astrology/timing/primary-directions` | `primary_directions` | `pd` |
-| 黄道释放 | `/api/astrology/timing/zodiacal-releasing` | `zodiacal_releasing` | `zr` |
-
-REST、MCP 和 CLI 只接受现行名称。升级客户端时，从 `/openapi.json`、MCP `discover_capabilities` 或 `fatebridge list` 查找业务入口。MCP 将现行名称传给 `run_calculation` 的 `tool` 参数。`fatebridge describe <现行工具名>` 列出对应的请求合同和 REST 路径。用 OpenAPI 生成客户端时，请重新生成以取得新的 `operationId`。已有运行回执中的工具标识沿用原合同。
+OpenAPI 发布 93 个业务 REST 路由，另有 `/health`、`/ready`、`/metrics` 三个运维端点。中央目录共有 93 条记录，CLI 可执行 93 条目录命令，MCP 通过四个入口提供 93 项业务能力。字段约束以当前服务的 `/openapi.json`、MCP `describe_capability` 或 CLI `describe` 为准。
 
 ## 阅读导航
 
 | 要查什么 | 章节 |
 | --- | --- |
-| 错误、快照、三端映射、投影、复现 | [公共约定](#2-公共约定) |
-| 主题限制与调用前检查 | [咨询范围与禁区校验](#咨询范围与禁区校验) |
-| 输入字段与默认值 | [共享请求族](#3-共享请求族)；具体约束以实际 Schema 为准 |
-| REST 路由与风水入口 | [端点家族](#4-rest-端点家族) · [家居风水](#411-家居风水family-fengshui) |
-| 可复制的 HTTP 调用 | [REST 示例](#5-rest-调用示例) |
-| MCP 公开名称 | [FastMCP 工具面](#6-fastmcp-工具面) |
-| 结果字段、精度排错 | [响应字段](#7-常见响应字段) · [调试建议](#8-调试建议) |
-
-首次安装见[快速入门](getting-started.md)，客户端与完整导出见[接入指南](agent-guide.md)，当前字段以本页及运行环境的 Schema 为准。
-
-方法发现的完整记录包含 `method_contracts/method_registration`，摘要包含 `method_ids`。当前 93 条目录记录均已登记领域方法，包含 `bazi_personality` 的出生前置与符号词典合同。使用 `detail=audit` 可在 `run_metadata.calculation_evidence` 读取本次启用的方法和声明误差预算。实际规则版本汇总在 `run_metadata.provenance`，操作数及规则轨迹见各工具的业务字段。见[计算证据合同](computation-evidence.md)。
+| 接口命名、错误、快照、投影与复现 | [公共约定](#2-公共约定) |
+| 咨询禁区与范围校验 | [咨询范围与禁区校验](#咨询范围与禁区校验) |
+| 输入字段与默认值 | [共享请求族](#3-共享请求族) |
+| REST 路由与风水入口 | [REST 端点家族](#4-rest-端点家族) |
+| 可复制 HTTP 调用 | [REST 调用示例](#5-rest-调用示例) |
+| MCP 公开工具列表与差异 | [FastMCP 工具面](#6-fastmcp-工具面) |
+| 常见字段与排错 | [常见响应字段](#7-常见响应字段) · [调试建议](#8-调试建议) |
 
 ## 1. 基础信息
 
 ### REST
 
-- 基础地址：`http://localhost:8010`
-- Swagger UI：`/docs`
-- ReDoc：`/redoc`
-- Content-Type：`application/json`
-- 业务输入：JSON 请求体；通用控制项：URL 查询参数
-- 完整 Schema：`/openapi.json`；能力发现：`/api/tools`
-
-例如 `POST /api/bazi/birth-chart?fields=bazi_birth.day_master&strict_fields=true` 的请求体只放出生信息。多个 `fields` 重复写查询参数；不要放进请求体，未知请求字段会被拒绝。
+- 基础地址：`http://localhost:8010`（Swagger UI `/docs`，ReDoc `/redoc`，OpenAPI Schema `/openapi.json`，能力发现 `/api/tools`）。
+- 请求格式：`Content-Type: application/json`。业务输入放在 JSON 请求体；通用控制项（`fields`、`strict_fields`、`detail`、`include_snapshot_text`、`response_char_limit`、`as_of`、`trace_id`、`parent_run_id`）放在 URL 查询参数，多个 `fields` 重复传参。
 
 ### FastMCP
 
-- 启动命令：`python -m fatebridge.mcp_server`
-- 返回格式：原生 `structuredContent` JSON 对象。工具失败时，`content` 提供简短错误消息
-- 设计目标：让 Agent 宿主可以直接把 FateBridge 视作工具箱使用
+- 启动命令：`python -m fatebridge.mcp_server`（默认 stdio，HTTP 部署见 [MCP 部署指南](mcp-deployment.md)）。
+- 返回格式：原生 `structuredContent` JSON 对象；工具失败时返回 `isError=true`，`content` 附带简短错误消息。
 
 ## 2. 公共约定
 
 ### 2.1 鉴权与错误格式
 
-`FATEBRIDGE_API_KEYS` 为空时 REST 不鉴权；非空时发送 `X-API-Key: <secret>`（请求头名可用 `API_KEY_HEADER_NAME` 修改）。支持逗号分隔的 `name:secret` 或单独的 `secret`。空条目、缺少名称/密钥、重复名称会阻止启动。
+`FATEBRIDGE_API_KEYS` 为空时 REST 不鉴权；非空时发送 `X-API-Key: <secret>`（请求头名可用 `API_KEY_HEADER_NAME` 修改）。`/health`、`/ready`、`/metrics`、`/docs`、`/redoc`、`/openapi.json` 及 `OPTIONS` 免检，其余业务和发现接口均受保护。MCP 与 CLI 不使用 REST API Key。
 
-免鉴权路径为 `/health`、`/ready`、`/metrics`、`/docs`、`/redoc`、`/openapi.json`，`OPTIONS` 也免检。`/api/tools` 需要鉴权。密钥只用于 REST；默认 stdio MCP 与 CLI 不使用此配置。
-
-已知工具的模型校验和业务计算错误采用**扁平的顶层错误包络**，CLI 可额外包含 `status_code`。MCP 返回原生 `isError=true`；FastMCP 客户端默认抛出 `ToolError`，需要读取错误包络时设置 `raise_on_error=False` 并读取 `structured_content`。未知工具、非法 RPC 等协议错误仍由 MCP 框架处理。业务错误按 `error_code` 分支处理：
+已知工具的模型校验与业务错误共享扁平错误包络（`error`、`error_code`、`retryable`、`issues`）：
 
 ```json
 {
@@ -78,59 +48,20 @@ REST、MCP 和 CLI 只接受现行名称。升级客户端时，从 `/openapi.js
 }
 ```
 
-常见 `error_code`：`validation_error`（400 / 422）、`authentication_required`（401）、 `dependency_missing`（503）、`timeout`（504）、`internal_error`（500）。请基于 `error_code` 而非 `error` 文案做分支判断。
+请按 `error_code` 分支处理：
 
-德国盘和日子午盘的原生因子计算若收到已加载 Swiss Ephemeris 绑定的计算异常，返回 `ephemeris_calculation_failed`（503、`retryable=false`）。维护者可用日志中的操作名、异常类型和代码位置定位故障。缺少依赖和已确认的来源故障各用对应错误码。
+- `validation_error`（400 / 422）：字段缺失、格式或取值非法、未知字段、无效日期，或领域输入拒绝；出生年月日无效时 `issues[].path` 指向 `birth_date`（关系盘为 `inner.birth_date` / `outer.birth_date`），正午起算无效钟面返回 `invalid_clock_origin_datetime`。
+- `authentication_required`（401）：缺少或无效 API Key。
+- `consultation_restricted`（400 / 422）：命中咨询禁区（生死、灾祸、临床诊断或医疗择时），`retryable=false`。
+- `dependency_missing` / `ephemeris_calculation_failed`（503）：运行依赖或 Swiss Ephemeris 计算失败。
+- `fengshui_calculation_inconsistent` / `numerology_source_inconsistent`（503）：玄空或数算内部状态不一致，`retryable=false`。
+- `timeout`（504）与 `internal_error`（500）。
 
-玄空内部盘数、身份或飞行记录矛盾返回 `fengshui_calculation_inconsistent`（503、`retryable=false`），`issues.path=runtime.fengshui.natal_chart`。此时无有效盘可交付；不能修改用户资料、丢弃失败候选或以字段投影绕过，维护者须修复计算一致性。处理步骤见[玄空宅盘](fengshui-xuankong.md)。
-
-常见状态码：
-
-- `400`：模型校验通过后的领域输入错误
-- `422`：缺少字段、字段类型或取值错误、无效日期、非法 JSON，以及梅花时卦等工具的领域输入校验失败
-- `401`：缺少或无效的 API key（仅在配置了密钥时），响应带 `WWW-Authenticate: APIKey`
-- `500`：服务内部异常
-- `503`：能力依赖缺失，或领域计算／来源一致性检查拒绝交付；按实际 `error_code` 和 `retryable` 处理
-- `504`：计算超时
-
-`retryable` 是响应的实际重试提示，不能只由状态码推断。框架的未知路由 / 方法错误（404 / 405）不属于业务错误合同。CLI 工具调用成功退出 0，计算失败退出 1，用法错误/不支持退出 2；`list` 和 `--help` 输出文本。
-
-模型校验错误带有 `issues`，每项提供字段 `path`、稳定错误 `code`、校验器的 `message` 和适用的 `constraints`。领域错误也可提供字段路径，具体原因见顶层 `error`。面向调用方的提示可指明与错因有关的提交值。服务端运行日志使用操作名、异常类型、代码位置或已登记的故障码。
-
-未知字段和非法枚举值会被拒绝。`bazi_compatibility` 的 `relationship_type` 接受 `general/marriage/friendship/business/family`，省略时为 `general`。其他可选字段也使用各自声明的默认值。CLI 的未知 flag 或 argparse 类型错误属于用法错误（退出 2），进入请求模型后的校验失败属于计算失败（退出 1）。
-
-出生年月日组合无效时，路径末尾的 `birth_date` 指向这组输入。REST 关系盘用 `inner.birth_date` 和 `outer.birth_date` 标出内外盘。MCP 和 CLI 的关系盘输入采用扁平字段，对应 `inner_birth_date` 和 `outer_birth_date`。
-
-正午起算的提问或候选钟面无效时，`question_datetime` 或 `candidate_datetime` 指向该组日期与小时标签，错误码为 `invalid_clock_origin_datetime`。
-
-REST OpenAPI、`/api/tools` 和 CLI `describe` 发布中央目录的输入与输出 Schema。MCP 用 `describe_capability(detail="full")` 或 `fatebridge://tools/{tool}` 读取单个工具的完整合同。成功结果在字段投影前核对必需的根字段及工具注册的必需事实。启用 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 后，还会校验完整嵌套模型与领域约束。检测到输出合同违规时返回 `internal_error`。合同覆盖根字段，以及主限命中与坐标、时主递归子限、寿限时间线、古典与关系盘、紫微星曜、六壬四课三传、奇门宫位、太乙核心盘和地方术数条目，以及九类八字专题、宿曜双向关系、知识覆盖/查询与导出模板/分段/动态设置等稳定嵌套事实。动态星体、卦码和规则键保持开放。严格模式核对已声明的字典值与列表条目，允许解释文本和未声明扩展。公开 Schema 允许投影省略字段，并保留各字段声明的可空范围。校验读取原响应，不重新序列化，因此保留原数值和扩展字段。OpenAPI 的 `operationId` 使用现行操作名，并在启用 REST 密钥时声明实际鉴权要求。合同回归见 [专业嵌套合同测试](../tests/evaluation/test_agentic_nested_outputs.py) 和 [八字专题、宿曜及知识/导出合同测试](../tests/evaluation/test_agentic_domain_outputs.py)。
+CLI 成功退出 `0`，计算或校验失败退出 `1`，参数语法或未知 flag 错误退出 `2`。
 
 ### 2.2 快照协议
 
-完整计算另有中央目录声明的 `required_output_fields`，通过发现记录的 `full_result_required_fields` 公开，完整验证后再生成公开结果。这些必需业务根缺失、为null或仅为空对象时，共享执行返回 `internal_error`；不可用应保留明确状态。Schema中的 `x-fatebridge-full-result` 另声明嵌套必要事实，可配合集合基数、唯一身份与必要成员。字段投影在完整验证之后执行，仍可合法省略对象字段；该规则不要求所有可选事实存在。领域错误包络也须符合 `ErrorEnvelope`，缺错误事实或错误码／retryable 的异常结果归为内部错误，保留有效trace／parent。
-
-`sanshi_combined_chart` 的完整结果须同时保留 `subresults` 与 `synthesis`。后者的宫位对应、来源资料、有限事实和未知状态由已有嵌套模型校验；单工具的类型声明直接进入公开根 Schema。该合同不增加联合预测规则，也不认证三套方法彼此独立或现实有效。
-
-聚合 `astrology_chart` 根据原请求的 `chart_variant` 核对完整结果。所有分支须有 `planets` 和 `chart_profile`；各分支还须有下表中的业务根。发现记录的 `full_result_required_fields_by_variant` 从对应专用入口的要求派生，须与通用 `full_result_required_fields` 合并读取。
-
-| `chart_variant` | 额外必需业务根 | 结果 `chart_profile.chart_type` |
-| --- | --- | --- |
-| `chart` | 无 | `chart` |
-| `chart13` | `thirteen_sectors` | `chart13` |
-| `hellen_chart` | `hellenistic` | `hellen_chart` |
-| `guolao_chart` | `guolao` | `guolao_chart` |
-| `india_chart` | `india` | `india_chart` |
-| `germany` | `base_chart`、`midpoints` | `germany` |
-
-聚合 Schema 复用专用入口的领域类型，并在有关根字段以 `x-fatebridge-full-result-required-for-chart-variants` 列出适用盘型。该扩展是完整执行的发现元数据，不是标准 JSON Schema 的 `required`，也不要求合法投影包含所有业务根。完整结果的盘型须与原请求一致，专用入口须与其固定盘型一致；缺根、类型错误或错盘型均属于服务输出错误，不能通过投影绕过。此约束不证明同盘型内的出生输入绑定、数值精度或传统解释已全部验收；逐项记录见[聚合星盘合同核对](chart-variant-contract-audit.md)。
-
-领域结果中的规则索引、候选结构和缺失状态按各自专题解释：[八字](bazi-assessment.md)、[紫微](ziwei.md)、[风水](fengshui.md#分层结果与覆盖状态)。快照只呈现同次计算，不改变这些字段的适用范围。
-
-精算时钟通过 `policy_id` 引用 [UTC 定义规范](../src/fatebridge/data/knowledge/western-utc-definition-cgpm2026-v1.json)，通过 `leap_table_expires_at` 给出所用闰秒表的有效期。风水的 `source_catalog` 按 `source_ids` 定位书目，`rulesets[].source_citations` 保留规则各自的引用位置和范围。
-
-参评的 `canping_timing.schedule_basis.sources` 按 `source_id` 存放书目，阅读引文保留页码与角色。配运规则轨迹的 `fact_path` 指向同次 `schedule_basis`。
-
-很多工具返回下面两层快照字段：
+支持双层快照的工具可返回人读文本 `snapshot_text` 及结构化导出 `snapshot_export`（含 `selected_sections`、`section_titles_detected` 与 `export_text`），并附带 `run_metadata`：
 
 ```json
 {
@@ -144,9 +75,7 @@ REST OpenAPI、`/api/tools` 和 CLI `describe` 发布中央目录的输入与输
   },
   "snapshot_text": "[起盘信息]\n...",
   "snapshot_export": {
-    "technique": {
-      "key": "qimen"
-    },
+    "technique": {"key": "qimen"},
     "selected_sections": ["起盘信息", "九宫方盘"],
     "section_titles_detected": ["起盘信息", "九宫方盘", "离九宫"],
     "export_text": "[起盘信息]\n..."
@@ -154,246 +83,81 @@ REST OpenAPI、`/api/tools` 和 CLI `describe` 发布中央目录的输入与输
 }
 ```
 
-要点：
-
-- `run_metadata` 默认附加于成功工具结果，错误和发现接口不保证附带；CLI 可用 `--no-metadata` 关闭
-- `run_id` / `trace_id` 是本次响应生成的轻量标识
-- `tool_name` 是目录中发布的能力名称，REST、MCP 和 CLI 使用同一个值
-- `generated_at` 是 UTC ISO 8601 时间戳
-- `engine` 是从当前 payload 推导出的运行引擎标识
-- `engine_is_approximate` 标识轨道近似或被识别的 Moshier / mixed 星历降级；不是所有算法准确性的评级
-- `snapshot_text` 是完整的人类可读文本
-- `snapshot_export.export_text` 是根据 `selected_sections` 过滤后的导出文本
-- `selected_sections` 只裁剪导出层，不会裁掉完整结构化 payload
-- 部分工具只有 `snapshot_text`，或仅返回结构化业务数据；完整覆盖见 [算法覆盖的快照协议](algorithm-coverage.md#4-快照协议覆盖)
+`ToolSpec.required_output_fields` 声明完整结果必需业务根；启用 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 后校验完整嵌套输出模型。`astrology_chart` 按请求 `chart_variant` 附加对应业务根（`chart` 无额外根、`chart13` 需 `thirteen_sectors`、`hellen_chart` 需 `hellenistic`、`guolao_chart` 需 `guolao`、`india_chart` 需 `india`、`germany` 需 `base_chart` 与 `midpoints`）。
 
 ### 2.3 `selected_sections`
 
-当前请求模型支持 `selected_sections` 的主要入口：
-
-- `bazi_birth_chart`，全部时运与历法 helper；
-- `gua_lookup` / `gua_meanings`、`sanshi_combined_chart`；
-- 中国术数独立盘（紫微、六壬、奇门、太乙、金口诀）；
-- knowledge 工具与 `export_parse`；
-- 独立西占推运工具（`solar_return` 至 `decennials`）。
-
-八字九大专项、核心/关系盘、事件与生命周期、梅花和其他本地占法的请求模型没有此字段。是否有快照、是否有导出、是否接受裁剪参数是三个不同的合同。CLI 用空格分隔多个标题，带空格的单个标题需加引号；紫微命盘的导出 section 是 `起盘信息` / `宫位总览`，单个宫名并非 section。
-
-排查 section 名不生效时，优先看：
-
-- `snapshot_export.section_titles_detected`
-- `snapshot_export.missing_selected_sections`
-
-显式非空选择无任何命中时 `export_text` 为空；未命名前言也不会混入显式选择。未传或传空列表时使用工具默认导出规则。快照存在不代表请求支持该字段，请查询对应模型。
+支持 `selected_sections` 的主要入口包括：`bazi_birth_chart`、全部时运与历法 helper、`gua_lookup` / `gua_meanings`、`sanshi_combined_chart`、中国术数独立盘（紫微、六壬、奇门、太乙、金口诀）、`knowledge_*`、`export_parse` 及 11 个独立西占推运工具。八字九专题、核心/关系星盘、事件与生命周期、梅花等本地占法不支持此字段。显式非空选择未命中任何标题时 `export_text` 为空；紫微命盘的导出章节为 `起盘信息` 与 `宫位总览`。
 
 ### 2.4 三端能力边界
 
-中央目录含 93 条记录。REST 和 MCP 默认公开全量，CLI 可执行 93 条目录命令（另有 `list`、`discover`、`describe`、`profile`）。三端共用公开工具名和业务输入合同。
+中央目录含 93 条记录。REST 和 MCP 默认公开全量，CLI 可执行 93 条目录命令（另有 `list`、`discover`、`describe`、`profile`、`doctor` 与 `result-read`）。三端共用公开工具名和业务输入合同，部分主要命名映射如下：
 
-| 能力 | REST | MCP / CLI | 差异 |
+| 能力 | REST | MCP / CLI | 差异说明 |
 | --- | --- | --- | --- |
-| 独立八字命盘 | `/api/bazi/birth-chart` | `bazi_birth_chart` | 独立排盘，业务数据在 `bazi_birth` |
-| 综合命理分析 | `/api/bazi/overview` | `bazi_overview` | 提供出生盘、喜用和格局事实 |
-| 关系盘 | `/api/astrology/relationship-chart` | `relationship_chart` | 三端使用 `inner_birth_*` / `outer_birth_*` |
-| 家居风水 | `/api/fengshui/*` | `fengshui_*` | 八个工具同名三端；CLI 用 JSON `--request-file` 或 JSON 对象／数组参数 |
-
-以 `surfaces` 选择入口名称。`/api/tools` 的 `parameters` 是参数摘要，完整记录另有 `input_schema` / `output_schema`。MCP 以 `describe_capability` 读取业务参数，`run_calculation` 的外层 Schema 由 `tools/list` 发布。
+| 独立八字命盘 | `/api/bazi/birth-chart` | `bazi_birth_chart` | 业务数据位于 `bazi_birth` |
+| 综合命理分析 | `/api/bazi/overview` | `bazi_overview` | 提供出生盘、喜用与格局事实 |
+| 关系盘 | `/api/astrology/relationship-chart` | `relationship_chart` | 三端统一使用 `inner_birth_*` / `outer_birth_*` |
+| 家居风水 | `/api/fengshui/*` | `fengshui_*` | 八个工具同名；CLI 支持 `--request-file` 传入 JSON |
 
 ### 2.5 字段投影与输出体积
 
-| 选项 | REST（POST 查询参数） | MCP | CLI（工具名后） |
+| 选项 | REST（查询参数） | MCP | CLI（工具名后） |
 | --- | --- | --- | --- |
 | 字段投影 | `?fields=bazi_birth.day_master&fields=person_info` | `fields=["bazi_birth.day_master", "person_info"]` | `--fields bazi_birth.day_master person_info` |
-| 严格投影 | `?strict_fields=true` | `strict_fields=true` | `--strict-fields` 或 `--strict-fields true` |
+| 严格投影 | `?strict_fields=true` | `strict_fields=true` | `--strict-fields` |
 | 结果级别 | `?detail=compact`（默认 `standard`） | `detail="compact"`（默认） | `--detail compact`（默认 `standard`） |
 | 省略顶层快照文本 | `?include_snapshot_text=false` | `include_snapshot_text=false` | `--no-include-snapshot-text` |
-| 紧凑 JSON | HTTP 默认紧凑输出 | 结构化 JSON 对象 | `--compact` |
-| 响应字符预算 | `?response_char_limit=8192`（默认0） | `response_char_limit=8192`（默认8192） | `--response-char-limit 8192`（默认0） |
+| 响应字符预算 | `?response_char_limit=8192`（默认 `0`） | `response_char_limit=8192`（默认 `8192`） | `--response-char-limit 8192`（默认 `0`） |
 
-省略 `fields` 时，`compact` 使用各领域的首轮视图，保留运行标识、有效时间和重放信息。显式传入 `fields` 时，从计算结果选择指定事实，可按 `evidence_views` 取用。节气年表有 `jieqis` 筛选时，首轮返回 `selected_jieqi`，其余请求返回 `jieqi_year`。`standard` 返回常规业务体及来源摘要。`audit` 返回完整业务体，并在回执中提供本次启用的方法与声明误差预算。路径从响应根开始，按本次实际响应对象校验。数组、标量及 null 应选择整个字段。精简模式可显式选择 `run_metadata` 或其子路径以获取常规运行回执。
+`compact` 在省略 `fields` 时返回领域首轮视图，`standard` 返回常规业务体，`audit` 返回完整业务体及方法与误差预算信息。11 个单项西占时运工具与 `horary_chart`、`evaluate_election_time` 在 `standard` 下默认省略快照，需要时可显式启用 `include_snapshot_text=true` 或 `detail=audit`。
 
-11 个单项西占时运工具，以及 `horary_chart` 和 `evaluate_election_time`，在 `standard` 下默认省略快照。使用 `include_snapshot_text=true` 取快照文本。对于提供导出的工具，使用 `fields=["snapshot_export"]` 或请求参数 `selected_sections` 取导出内容。`audit` 默认包含快照。
-
-例如 `fengshui_directions` 选择 `fields=["layers.directions.ruleset.version"]` 后，该规则对象仅含 `version`；公开输出 Schema 允许其余字段缺省，原生 MCP 客户端仍可校验成功结果。数组中的规则来源 `sources` 应整块选择，不能使用 `sources.0.title`。各字段保留既有类型校验，缺省不会被补成 null。投影用法见 [Agent 接入指南](agent-guide.md)。
-
-默认 `strict_fields=false` 保留历史投影的数据形状及成功状态，但无效路径明确附加 `projection_warnings`，不会继续静默忽略。例如拼错 `bazi_birth.day_mastr` 会出现 `{"path":"bazi_birth.day_mastr","code":"unknown_projection_path"}`。另外两种代码为 `invalid_projection_path`（空段/空白段）和 `non_object_projection_path`（继续遍历数组/标量）。诊断不受 `fields` 裁剪，也不回显字段值；重复路径只提示一次。
-
-`strict_fields=true` 遇到任何无效路径会整体失败：REST 422、MCP `isError=true`、CLI 退出 1，共享 `validation_error` / `retryable=false` / `issues`，其中 `path` 表示请求的输出路径。计算领域错误优先返回，不会被投影错误覆盖。校验发生在计算后，投影控制返回体积，不减少计算工作。
-
-超出字符预算时，响应保留运行标识与预算内业务字段，并通过 `result_delivery` 明示结果大小、待读取字段、引用及过期时间。MCP 默认预算为 8192，REST 和 CLI 默认为 0。可设为 0 或 4096–65536，0 表示按选定级别完整交付。
-
-星历回执 `run_metadata.runtime.ephemeris.files` 列出已枚举的相对文件名。目录缺少列举权限时，`unlisted_directory_indices` 记录该目录的搜索位置（从 0 开始）。其余目录按原索引列出。实际模型及可用的来源证据见对应方法的回执。
-
-完整结果超过输出预算且运行环境较长时，`run_metadata.runtime` 在行内保留已列举的文件数 `ephemeris_files_count` 及 `delivery_path`。`result_delivery.deferred_fields` 明列 `run_metadata.runtime`；按该点路径读取可恢复完整运行环境及配置文件名清单，清单没有被当作空集合或静默截断。预算为0时仍返回原完整回执。首轮业务分析优先保持可读。
-
-业务字段仍接近预算上限时，可再把补充回执`run_metadata.provenance`、`run_metadata.determinism`留在同次交付物中，并在`deferred_fields`逐项明列。只有在此举能保留全部业务字段时才采用；运行标识仍行内可见。读取对应点路径可精确恢复原回执，不重新计算、不缩减业务事实或提高预算。
-
-完整结果是同一 run 的不可变交付物，不是按出生输入命中的计算缓存。MCP 读取 `manifest_uri` 后按 `fatebridge://results/{result_id}/fields/{path}/{offset}` 取得所需点路径；字段读取另支持数组数字索引。完整文档为 `first_page_uri`，每页 `text` 至多2048字符，按 `next_offset` 拼接。每页包装本身是完整 JSON，但文档片段不能单独当全文解析。读取不重新计算、不改变原 run／trace 和原回执。
-
-保留的是结果级别、字段投影与快照选项处理后的结果。需要全部业务 JSON 或完整时间线时，首次调用用 `detail=audit` 和 `fields=null`（REST / CLI 不传字段筛选），保留默认响应预算。需要快照文本时还可显式设置 `include_snapshot_text=true`。先投影摘要后，交付文件无法恢复未选字段。分页读取和本地校验示例见 [完整结果交付](agent-guide.md#完整结果交付与同次导出)。
-
-REST 通过 `GET /api/results/{result_id}` 查清单，按 `rest_export_path` 一次下载全部保留 JSON，或用 `GET /api/results/{result_id}/pages?path=analysis_context.analysis_datetime&offset=0` 读取所需字段。接口沿用 API 鉴权。CLI 可据 `file_path` 读取本机交付物，按 `file_payload_path`（`payload`）取出原结果。每页读取一份 JSON，适合少量取证。交付目录仅当前系统用户可读，引用约一小时过期，新交付时清理过期文件并按 64 MiB 容量回收旧结果。从旧索引存储升级后，旧引用失效。MCP 结果读取遵循当前公开工具范围。
-
-精简引用可省略重复的首分页URI及本地文件定位，以保留行内业务和来源事实；此时从`manifest_uri`对应的同次清单恢复定位。清单本身与原交付物保持完整，响应预算不变。
-
-核验读取使用 `GET /api/results/{result_id}/verified?expected_run_id=原run`，另可传 `path` 和 `offset`。CLI 对应 `fatebridge result-read RESULT_ID --run-id ORIGINAL_RUN_ID [--path FIELD_PATH] [--offset 0]`；MCP 资源为 `fatebridge://results/{result_id}/verified/{run_id}/{offset}` 及 `.../verified/{run_id}/fields/{path}/{offset}`。服务使用同一文件中的私有摘要核验整个保留载荷和原 run，再从内存中的原结果选页。错 run、内容损坏或失效引用明确失败。`verification.run_id`、`scope` 和 `calculation_repeated=false` 说明核验对象与范围。此检查只覆盖服务内存储完整性。
-
-校验读取支持只读沙箱：只检查已发布的私有目录和文件，不创建临时探测文件、锁文件或索引，不删除过期结果；写入和回收仍由原锁保护。并发回收可能返回不可用，不一致的载荷与清单不能获核验。CLI可用`--directory 原交付文件所在私有目录`指定已有目录；默认按结果ID查找既有临时存储，若同ID匹配多个目录则报`result_directory_ambiguous`，不会靠散列挑选副本。指定目录不创建目录、不改变原保留期限。
+`strict_fields=false` 时无效路径附带 `projection_warnings`，`strict_fields=true` 则报 `validation_error`。超出字符预算时响应包含 `result_delivery`，可通过 `GET /api/results/{result_id}/payload`、`/pages`、`/verified?expected_run_id=...`、CLI `fatebridge result-read RESULT_ID --run-id ORIGINAL_RUN_ID` 或 MCP `read_result` / 资源 URI 读取同一次运行保留的结果，详见[完整结果交付](agent-guide.md#完整结果交付与同次导出)。
 
 ### 2.6 精度与依赖
 
-- 核心占星盘优先使用本地 `swisseph`，缺失时会回退到 FateBridge 内置近似模型
-- 西占推运不走近似回退；缺少 Swiss Ephemeris 时会直接报错
-- `swisseph` 可导入不代表已加载 `.se1` 数据；实际模型检查 `chart_profile.ephemeris_model` 和 `run_metadata.engine_is_approximate`
-- 完整说明见 [algorithm-coverage.md](algorithm-coverage.md)，数据配置见 [星历数据安装](ephemeris.md)
+核心占星盘优先使用本地 `swisseph`，缺失时回退内置近似轨道；西占推运、事件与生命周期工具依赖 `swisseph` 后端，缺失时返回 `dependency_missing`。`swisseph` 可导入不等于已加载 `.se1` 数据文件，请核对 `chart_profile.ephemeris_model` 与 `run_metadata.engine_is_approximate`，配置方式见[星历数据安装](ephemeris.md)。
 
 ### 2.7 渐进发现与执行提示
 
-目录发现按工具名称、family、关键词与传输接口筛选。REST 使用 `/api/tools`，CLI 使用 `discover`，MCP 使用 `fatebridge://catalog/summary` 及 family／工具资源；关键词只匹配实际工具的名称、说明和分类，不扩展旧主题路由。
-
-单工具输入与完整契约可附 `evidence_views`，按用户任务或盘型提供字段路径。MCP 工具描述指向单工具输入契约。需要指定视图时，复制卡片里的 `fields`。精简级别省略 `fields` 时使用首轮视图，完整结果使用 `detail=audit` 并省略字段投影。
-
-`GET /api/tools` 无参数时保留全量完整记录。可选参数：`detail=summary|full`（REST 默认 full）、`family`（逗号分隔分类）、`q`（名称/分类/描述搜索）、`tool`（精确工具名）和 `surface=rest|mcp|cli`。先请求 `?detail=summary&family=bazi`，选中工具后再请求 `?tool=bazi_birth_chart&detail=full`。摘要不生成或返回参数及输入/输出 Schema。
-
-`counts` 始终表示全局目录数量，`matched_count` 表示筛选后实际返回数量，`detail` 表示记录深度。无匹配关键词返回空列表；非法分类或精确工具名返回带安全 `issues` 的 422。
-
-CLI `discover --family bazi` 默认返回同源 JSON 摘要；`discover --tool bazi_birth_chart --detail full` 获取完整契约。CLI 的 `--query` 对应 REST `q`；`list` 输出文本，支持 `--family`、`--query`、`--tool` 和 `--surface` 筛选。`describe` 提供单工具契约及调用示例。
-
-MCP 公开 `discover_capabilities`、`describe_capability`、`run_calculation` 和 `read_result`。发现入口和目录资源返回能力名称、分类及短标签。通过 `FATEBRIDGE_MCP_FAMILIES=bazi,knowledge` 可限定能力范围。资源 `fatebridge://catalog/summary` 列出当前集合，`fatebridge://families/{family}` 按分类筛选，`fatebridge://tools/{tool}` 提供单项完整契约。
-
-工具 `annotations` 从 `ToolSpec.execution_hints` 派生，同时出现在三端发现记录中。当前本地计算/查询声明 `readOnlyHint=true`、`destructiveHint=false`、`openWorldHint=false`、`idempotentHint=true`。这些提示描述环境影响，不保证相同结果字节：随机起卦、缺省当前日期和每次运行元数据仍按原规则处理。annotations 是提示，不代替执行权限判断，见 [MCP 工具规范](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)。
+REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surface=...`，CLI 使用 `discover` / `list` / `describe`，MCP 使用 `discover_capabilities`、`describe_capability` 与资源 `fatebridge://catalog/summary`、`fatebridge://families/{family}`、`fatebridge://tools/{tool}`。单工具输入契约可附 `evidence_views` 提供可直接复制的 `fields` 路径列表。
 
 ### 2.8 确定性与复现元数据
 
-REST 查询参数与 MCP 参数支持 `as_of`、`trace_id`、`parent_run_id`；CLI 对应 `--as-of`、`--trace-id`、`--parent-run-id`。as_of 为含时区 ISO 8601 时刻，归一化到 UTC，例如 `2024-02-29T16:30:00Z`。省略时捕获本次执行开始时刻；显式日期优先，各工具的部分日期补齐规则仍分别适用。八字综合、流月、流日、流时及独立大运在分析日期全部省略时使用完整当地瞬间，`analysis_reference`保留偏移、fold和秒微秒；只有显式部分日期的流月才沿用缺日取15。不存在／重复的显式分析钟时不猜瞬间，详见[分析时钟](bazi-timing.md#出生时间分量与分析时钟)。上下文按调用隔离，不修改进程时区或全局时间。
-
-给定 `as_of` 时，钟面减偏移所得的 UTC 时刻须在公历 1 至 9999 年内，并能精确表示为整微秒。超出该范围或精度的值在 `as_of` 返回校验错误。 [钟面精度及三端对照](precision-acceptance.md#exact-shared-iso-clock-round49)
-
-标识仅接受 1–128 字符的字母、数字、`_ . : -`。控制项非法为三端校验失败，不回显值；有效 trace / parent 标识传播到成功元数据和模型、领域、投影失败包络。失败可含顶层 `trace_id` / `parent_run_id`；CLI 参数语法错误仍退出 2，框架非法 RPC 与未知工具不属于该包络。
-
-`run_metadata` 使用格式版本 `2.0`，保留运行、关联、生成时间与实际引擎，以及以下信息：
-
-- `tool_name` 使用当前公开工具名，例如 `bazi_birth_chart`。MCP 结果读取按当前公开名核对工具范围，旧名回执可通过原导出的 JSON 查看。
-- `metadata_schema_version`、`package_version`、`duration_ms`：回执格式、包版本和计算耗时。
-- `effective_time`、`determinism`、`replay`：本次固定瞬间、读取时区、缺省时间字段、随机性及实际重放参数。
-- `runtime`：Python、平台、计算依赖版本及配置的星历相对文件名；库存不证明实际使用某文件，实际模型保留在 `provenance` 与业务结果。
-- `provenance`、`warnings`：规则、历法、星历口径及标准警告，包括 `current_time_frozen`、`random_seed_generated`、`approximate_engine`。
-
-业务输出、公开 Schema、快照和结果交付均不提供哈希或指纹字段；规则、来源文件与存储内容的内部完整性校验先于公开交付。来源标题、作者、版本、URL、页码、原始分歧与未知项继续保留。
-
-六爻 method=coin 且缺有效手动输入与 seed 时，共享执行层生成本次 seed，仍为随机起卦，返回 `replay.overrides.seed`。手动优先级沿用引擎判定；已有 seed、手动或时间起卦不生成 seed。将原输入与 overrides 合并，再使用 replay.as_of 调用任一入口，可在相同环境重放业务结果；运行 ID、生成时间、耗时及“本次生成 seed”标志仍变化。
-
-实现、内置数据与部分配置按进程缓存；升级或原地修改后须重启。完整复现要求另存原始请求和 receipt，保持实现、合同、规则数据、依赖、平台、时区数据库与星历配置一致。receipt 不是环境锁文件，不能证明版本相同的第三方安装内容未被修改；跨平台浮点仍可能微差。没有数据库、按 ID 查询或服务器保存出生档案。
-
-CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id 指向 profile 根 run_id；`--no-metadata` 关闭根与子元数据。它仍不是 REST/MCP 的复合业务工具。
+三端支持 `as_of`（ISO 8601 带时区时刻，公历 1–9999 年）、`trace_id` 与 `parent_run_id`（1–128 字符字母数字及 `_ . : -`）。`run_metadata`（2.0）包含 `effective_time`、`determinism`、`replay`、`runtime` 与 `provenance`；随机起卦保留 `replay.overrides.seed`。CLI `profile` 支持统一传入 `--as-of` 与 `--trace-id` 并自动关联子运行的 `parent_run_id`。
 
 ## 3. 共享请求族
 
-### 3.1 `FateBridgeRequest` 家族
-
-用于：
-
-- `/api/bazi/*`
-- `/api/timing/*`
+### 3.1 `FateBridgeRequest` 家族（`/api/bazi/*`、`/api/timing/*`）
 
 | 字段 | 类型 | 必需 | 说明 |
 | --- | --- | --- | --- |
-| `name` | string | 否 | 默认 `未提供` |
-| `gender` | string | 否 | 默认 `未知` |
-| `birth_year` | int | 是 | 出生年 |
-| `birth_month` | int | 是 | `1..12` |
-| `birth_day` | int | 是 | `1..31`，还需满足真实日期 |
-| `birth_hour` | int | 是 | `0..23` |
+| `name` / `gender` | string | 否 | 默认 `未提供` / `未知`；`bazi_luck_cycles` 等须传有效性别 |
+| `birth_year` / `birth_month` / `birth_day` / `birth_hour` | int | 是 | 出生年月日时（公历） |
 | `birth_minute` | int | 否 | 默认 `0` |
-| `birth_second` | int / null | 否 | 八字与七个时运入口支持；已知整秒 `0..59`，提供时必须显式提供分钟；未知省略或 null |
-| `birth_utc_offset` | string / null | 否 | 八字与七个时运入口支持；已确认民用偏移 `±HH:MM[:SS]`，须匹配已解析时区，用于重复钟时消歧；未知省略或 null |
-| `birth_place` | string | 否 | 支持中文、英文、拼音地点文本 |
-| `birth_timezone` | string | 否 | IANA 时区或 UTC offset |
+| `birth_second` | int / null | 否 | 八字与时运入口支持已确认整秒 `0..59`（需同时显式给出分钟） |
+| `birth_utc_offset` | string / null | 否 | 已确认民用偏移 `±HH:MM[:SS]`，用于消歧重复钟时 |
+| `birth_place` / `birth_timezone` | string | 否 | 内置地点解析或 IANA 时区 |
 | `birth_longitude` | float | 否 | `-180..180` |
-| `use_true_solar_time` | bool | 否 | 此家族默认 true；显式 false 使用钟表时间 |
+| `use_true_solar_time` | bool | 否 | 中式出生家族默认 `true`（无经度回退钟表时间；显式 `true` 无经度报错） |
 
-中式模型缺省开启真太阳时但没有可解析经度时，会使用钟表时间并附 `resolution_advisory`；显式 true 且无经度则返回错误。时区应显式传入，IANA 名称可表达历史夏令时，固定偏移不能。年/月柱、节气与起运使用实际民用时刻；太阳钟修正用于日/时柱等既有规则。当前小时必填，不提供省略小时的无时盘模式。
-
-八字与时运的 `BaziClockRequest` 扩展基类以支持已知秒数；其他继承模型不因此获得此参数。`calendar_context.birth_time_input` 区分显式00分／秒与当前接口默认值，回显计算参考与校正钟面。省略分量不代表真实记录精确，也不自动推定舍入方式或误差区间；完整路径和接口范围见[出生时间分量](bazi-timing.md#出生时间分量与分析时钟)。
-
-`BaziClockRequest` 的 `birth_utc_offset` 在重复小时中选择已确认的实际出生瞬间，回执包含实际UTC、fold、歧义状态和时区规则身份。偏移不推断地区时区、不认证记录精度，也不能令不存在的钟时有效；原IANA时区保留用于后续交运。紫微与六壬原有同名参数继续有效。见[重复钟时](bazi-timing.md#出生时间分量与分析时钟)。
-
-九大专项追加 `analysis_year/month/day`、`dayun_pillar`、`liunian_pillar`，`timing_context` 位于 `<dimension>_analysis` 内。时运子模型的必填字段各不相同；大运需要 `gender`，可选的 `analysis_age` 与显式分析日期互斥，日期全部省略时按 `as_of`／执行开始时刻选运。完整规则以 OpenAPI 为准。
+九大专项追加 `analysis_year/month/day`、`dayun_pillar` 与 `liunian_pillar`。
 
 ### 3.2 `AstroChartRequest` 家族
 
-用于：
+用于 `/api/astrology/chart`、`/api/astrology/thirteen-sector-chart`、`/api/astrology/hellenistic-chart`、`/api/astrology/guolao-chart`、`/api/astrology/vedic-chart` 与 `/api/astrology/hamburg-midpoint-chart`：`birth_year/month/day/hour` 必填，`birth_minute` 默认 `0`，`birth_longitude` / `birth_latitude` 条件必需，`use_true_solar_time` 默认 `false`，另可选 `hsys`（`0..8`）与 `zodiacal`（`0` 回归 / `1` 恒星）。
 
-- `/api/astrology/chart`
-- `/api/astrology/thirteen-sector-chart`
-- `/api/astrology/hellenistic-chart`
-- `/api/astrology/guolao-chart`
-- `/api/astrology/vedic-chart`
-- `/api/astrology/hamburg-midpoint-chart`
+### 3.3 `WesternTimingRequest` 家族（`/api/astrology/timing*`）
 
-| 字段 | 类型 | 必需 | 说明 |
-| --- | --- | --- | --- |
-| `name` | string | 否 | 默认 `未提供` |
-| `birth_year` / `birth_month` / `birth_day` / `birth_hour` | int | 是 | 出生日期与时刻 |
-| `birth_minute` | int | 否 | 默认 `0` |
-| `birth_timezone` | string | 否 | 模型默认 null；服务尝试地点/经度推断，不是固定 UTC，建议显式传入 |
-| `birth_longitude` | float | 条件必需 | 某些情况下可由 `birth_place` 推断 |
-| `birth_latitude` | float | 条件必需 | 某些情况下可由 `birth_place` 推断 |
-| `birth_place` | string | 否 | 支持有限内置地点推断 |
-| `hsys` | int | 否 | 离线宫制覆盖；当前支持 `0..8` |
-| `zodiacal` | int | 否 | `0=tropical`，`1=sidereal(Lahiri-like)` |
-| `use_true_solar_time` | bool | 否 | 默认 false，西占默认使用出生地民用时刻 |
-
-### 3.3 `WesternTimingRequest` 家族
-
-用于：
-
-- `/api/astrology/timing`
-- `/api/astrology/timing/*`
-
-`birth_longitude` 和 `birth_latitude` 在此家族均必填，不能仅靠城市文本替代。除出生信息外，还支持：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| `analysis_year` / `analysis_month` / `analysis_day` | int | 目标分析日期 |
-| `analysis_hour` / `analysis_minute` | int | 目标钟时，分别为 `0..23` / `0..59`；省略时分别沿用出生小时 / 分钟 |
-| `return_longitude` / `return_latitude` / `return_timezone` | mixed | 返照或行运地点 |
-| `house_system` | string / int | 已注册的十二宫制字母／名称或 `0..8` 代码；未知、空白、布尔值及浮点选择报错，不改用默认宫制；`E` 等价归为 `A`，Gauquelin (`G`) 不在此接口内 |
-| `zodiac_type` | string | 例如 `Tropic` |
-| `pd_method` | string | 主限方法 |
-| `pd_time_key` | string | `Ptolemy` / `Naibod` / `Cardan`；其他值拒绝 |
-| `pd_type` | int | `0=direct`，`1=converse` |
-| `pd_aspects` | int[] | 主限相位列表 |
-| `show_pd_bounds` | bool | 主限图盘是否带界限层 |
-| `firdaria_night_order` | string | `nodes_at_end`（默认）或 `nodes_after_mars`；只影响法达夜盘顺序 |
-| `firdaria_year_basis` | string | `fixed_365_2425`（默认）或 `calendar_anniversary`；只影响法达日期计算 |
-| `selected_sections` | string[] | 仅独立 timing tools 支持 |
-
-两项法达参数可独立组合，同时适用于综合时运和独立 `firdaria`，REST / MCP 同名，CLI 使用 `--firdaria-night-order` / `--firdaria-year-basis`。固定年使用UTC名义经过时长，公历模式使用原生日周年边界；详情见[法达计算约定](firdaria-compatibility.md#参数与调用)。所有新结果均返回 `calculation_options`，声明实际夜盘顺序、年长、子限时间基准与显示时区。旧地方钟固定年结果不作为当前日期基线。
-
-完整非法分析日期返回 `validation_error`；只给部分年月日时逐字段补齐默认值，部分日期补齐时可约束到月底。目标日期与钟时按 `birth_timezone` 解释，`return_timezone` 用于转换同一时刻。指定某日某时应同时传齐五项 `analysis_*`，核对聚合结果的 `analysis_context.analysis_datetime`；`as_of` 不替代目标钟时。复现计算还应保留出生时区与返照/行运地点。
+`birth_longitude` 与 `birth_latitude` 必填，并支持 `analysis_year/month/day/hour/minute`（省略 `analysis_hour` / `analysis_minute` 时沿用出生时分）、`return_longitude/latitude/timezone`、`house_system`、`zodiac_type`、`pd_method/pd_time_key/pd_type/pd_aspects/show_pd_bounds`、`firdaria_night_order`（`nodes_at_end` / `nodes_after_mars`）、`firdaria_year_basis`（`fixed_365_2425` / `calendar_anniversary`）及独立工具的 `selected_sections`。
 
 ### 3.4 本地技法请求约定
 
-`liuyao`、`suzhan`、`interpret_astrology_dice`、`sanshi_combined_chart` 等大量本地技法接口共享如下约定：
-
-`liuyao` 的 `calendar_context`、`liuyao_evidence` 和 `classical_text_evidence` 分别提供历法、指定版本的日月／动变关系和实际动爻原文；`current_hexagram.classical` 保留《周易》原文、版本与来源。重复提供的铜钱、卦码和六条爻线必须一致；畸形卦码与不完整爻线会明确报错。规则覆盖及现实验证状态见[六爻深度审计](liuyao-depth-audit.md)。
-
-| 字段 | 说明 |
-| --- | --- |
-| `date` / `time` | 输入时刻，例如 `2028-04-06` / `09:33:00` |
-| `zone` | 时区，常见默认 `+08:00` |
-| `lat` / `lon` | 文本化地理提示 |
-| `gps_lat` / `gps_lon` | REST / MCP 使用同一字段名，CLI 使用 `--gps-lat` / `--gps-lon` |
-| `selected_sections` | 快照导出裁剪 |
-
-`suzhan` 的 `time` 可省略或为null，此时仅计算日期与历法候选，不需要坐标；已知钟时则须明确完整经纬度，`lat`／`lon` 或对应GPS分量均可，GPS优先且0°有效。缺少任一分量返回输入错误，不填默认地点。
+`liuyao`、`suzhan`、`interpret_astrology_dice` 与 `sanshi_combined_chart` 等使用 `date` / `time`、`zone`（常见默认 `+08:00`）、`lat` / `lon`、`gps_lat` / `gps_lon` 与可选 `selected_sections`。`suzhan` 在省略 `time` 时仅做日期历法候选计算；已知钟时则需完整经纬度。
 
 ### 3.5 双人关系请求
 
-`/api/bazi/compatibility` 使用两套 `person1_*` / `person2_*` 出生字段（姓名和年月日时必填）；宿曜相性使用两套 `person1_date/time` / `person2_date/time` 等起盘字段。
-
-`relationship_chart` 的 REST、MCP 和 CLI 均使用 `inner_birth_*` / `outer_birth_*` 字段。每方须提供 `year/month/day/hour/longitude/latitude`，并给出可解析的时区或出生地。使用 REST 时，旧的 `inner` / `outer` 对象会返回参数错误。各模式及 Marks 双方个人盘的字段身份见[关系盘说明](western-astrology.md#关系盘的时间空间与方法)。
+`/api/bazi/compatibility` 使用 `person1_*` / `person2_*` 与 `relationship_type`（`general`/`marriage`/`friendship`/`business`/`family`）；`/api/compatibility/sukuyo` 使用 `person1_date/time` 与 `person2_date/time`；`/api/astrology/relationship-chart` 三端统一使用 `inner_birth_*` / `outer_birth_*`。
 
 ## 4. REST 端点家族
 
@@ -401,74 +165,46 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| `POST` | `/api/bazi/birth-chart` | 独立八字命盘 |
+| `POST` | `/api/bazi/birth-chart` | 独立八字命盘（数据根为 `bazi_birth`） |
 | `POST` | `/api/bazi/overview` | 综合命理分析 |
-| `POST` | `/api/bazi/compare-sources` | 已明确的原样四柱与登记编释核对 |
-| `POST` | `/api/bazi/compatibility` | 双人配合分析 |
-| `POST` | `/api/compatibility/sukuyo` | 宿曜双人相性分析（三九の秘法，二十七宿） |
-
-`compare_bazi_sources` 只接收明确给出的 `year_pillar`、`month_pillar`、`day_pillar`、`hour_pillar`，各为天干地支两字。先按当前模型计算，再核对所有同柱登记编释；`current_calculation` 与 `source_comparison.records` 分开返回。 经过图版修订的条目另附 `input_reading_revision`，保留原录文、校读依据与来源定位；`registered_document_scope` 说明引用的登记文档仍是原始转录。未知标签不会因输入修订而自动补定。 `editorial_annotation_provenance`另标记原登记编辑说明的文件与字段位置；补回的说明保存在`annotation_basis`与`retained_context`，不冒称原典逐字引文或新的强弱裁定。相符、差异、未裁定和未收录各自保留，不重建历史生日，也不改写强弱。首轮字段视图为 `source_strength`，详见[原典资料与未决范围](bazi-assessment.md#原典资料与未决范围)。
+| `POST` | `/api/bazi/compare-sources` | 明确四柱与已登记原典编释对照 |
+| `POST` | `/api/bazi/compatibility` | 双人八字配合分析 |
+| `POST` | `/api/compatibility/sukuyo` | 宿曜双人相性分析（三九之秘法） |
 
 #### 4.1.1 八字九大专项维度
 
-> 九个维度均同时提供 REST / MCP / CLI。大运、流年缺省由命盘 + 分析日期内部推算，也可传 `dayun_pillar` / `liunian_pillar` 覆盖以输出时机信号（详见[八字时运](bazi-timing.md)）。
+大运、流年缺省由命盘与分析日期自动推算，也可用 `dayun_pillar` / `liunian_pillar` 覆盖，输出位于 `<dimension>_analysis` 与 `evidence_chain`：
 
-| 方法 | 路径 | 说明 |
+| 方法 | 路径 | 专题事实 |
 | --- | --- | --- |
-| `POST` | `/api/bazi/marriage` | 八字婚姻分析 |
-| `POST` | `/api/bazi/career` | 八字事业分析 |
-| `POST` | `/api/bazi/wealth` | 八字财运分析 |
-| `POST` | `/api/bazi/health` | 八字健康分析 |
-| `POST` | `/api/bazi/children` | 八字子女分析 |
-| `POST` | `/api/bazi/education` | 八字学业分析 |
-| `POST` | `/api/bazi/personality` | 八字性格分析 |
-| `POST` | `/api/bazi/relatives` | 八字六亲分析 |
-| `POST` | `/api/bazi/romance` | 八字正缘桃花分析 |
-
-#### 4.1.2 九大专项维度返回字段
-
-每个维度返回结构化分析对象，同时在 `<dimension>_analysis.timing_context` 中回显内部推算的大运/流年与起运年龄。各维度核心字段：
-
-九专题另提供 `<dimension>_analysis.evidence_chain`，含逐星透藏与根气、位置关系、五类格局有限前提审查、上游旺衰状态与主题运年触点；发现入口为 `evidence_views.depth`。未知性别仅限制自动大运顺逆，仍返回本命及独立流年，`timing_context.dayun_status=unavailable_gender_direction`；显式覆盖的大运标为 `explicit_override`。综合结果的位置为 `structure_profile.evidence_chain`，标准命盘为 `bazi_birth.structure_profile.evidence_chain`。条件审查不认证成格，详见[八字判定](bazi-assessment.md)。
-
-`evidence_chain.topic.first_view` 是紧凑的首轮见证，`depth` 可读取完整星位、格局前提及各层关系。
-
-| 维度 | 端点 | 专题事实 |
-| --- | --- | --- |
-| 婚姻 | `/api/bazi/marriage` | 配偶星、日支关系、神煞及四墓触点 |
-| 事业 | `/api/bazi/career` | 官杀、印、食伤、财的实际透藏与结构条件 |
-| 财运 | `/api/bazi/wealth` | 财、食伤、比劫的实际透藏、墓库及冲动位置 |
-| 健康 | `/api/bazi/health` | 盘内五行、四柱位置及关系 |
-| 子女 | `/api/bazi/children` | 子女星对应、时柱及其时运关系 |
-| 学业 | `/api/bazi/education` | 印、食伤、官杀的位置及文昌查表 |
-| 性格 | `/api/bazi/personality` | 十神透藏、根气和位置关系 |
-| 六亲 | `/api/bazi/relatives` | 偏财、正印、比劫、年柱和月柱关系 |
-| 桃花 | `/api/bazi/romance` | 咸池、红鸾、天喜及日支关系 |
-
-> **大运/流年自动推算**：缺省由命盘 + 分析日期（默认今天，或传 `analysis_year`/`analysis_month`/`analysis_day`）内部推算；如需指定，传 `dayun_pillar` / `liunian_pillar`（如 `"甲子"`）覆盖。
+| `POST` | `/api/bazi/marriage` | 配偶星、日支关系与四墓触点 |
+| `POST` | `/api/bazi/career` | 官杀、印、食伤、财透藏与结构条件 |
+| `POST` | `/api/bazi/wealth` | 财、食伤、比劫透藏与墓库冲动 |
+| `POST` | `/api/bazi/health` | 盘内五行权重、寒暖分类与传统文化对应 |
+| `POST` | `/api/bazi/children` | 子女星、时柱及传统关系对应 |
+| `POST` | `/api/bazi/education` | 印、食伤、官杀及文昌位置 |
+| `POST` | `/api/bazi/personality` | 十神透藏、根气与位置关系 |
+| `POST` | `/api/bazi/relatives` | 偏财、正印、比劫与年月柱关系 |
+| `POST` | `/api/bazi/romance` | 咸池、红鸾、天喜及日支关系 |
 
 ### 4.2 时运分析
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| `POST` | `/api/bazi/timing` | 综合时运 |
-| `POST` | `/api/bazi/timing/luck-cycles` | 大运 |
-| `POST` | `/api/bazi/timing/yearly` | 流年 |
-| `POST` | `/api/bazi/timing/monthly` | 流月 |
-| `POST` | `/api/bazi/timing/daily` | 流日 |
-| `POST` | `/api/bazi/timing/hourly` | 流时 |
+| `POST` | `/api/bazi/timing` | 综合时运（含岁运关系、根位与有限投影） |
+| `POST` | `/api/bazi/timing/luck-cycles` | 大运分析 |
+| `POST` | `/api/bazi/timing/yearly` | 流年分析 |
+| `POST` | `/api/bazi/timing/monthly` | 流月分析 |
+| `POST` | `/api/bazi/timing/daily` | 流日分析 |
+| `POST` | `/api/bazi/timing/hourly` | 流时分析 |
 | `POST` | `/api/calendar/solar-term-timeline` | 全年节气节点时间轴 |
-
-综合时运的 `interaction_analysis.root_context` 分列日主在时运支的根类与运干在原局四支的根类，复用原局根类规则并引用同次地支关系。`roots`、`stem_roots` 是字段视图名；`effective_force_status=not_adjudicated` 表示尚未裁定作用后的旺衰，流月不替换原局月令。字段和来源见[岁运根类与根位触点](bazi-timing.md#关系与作用范围)。
-
-`interaction_analysis.strength_projection` 另提供单层时间支冲刑及唯一大运干五合对原局既有预算的限定投影，字段视图为 `root_effects`。运干数值作用仅限大运、非日干、唯一配对且无争合；其它时间粒度出现干合或合会未解时返回 `blocked`。来源与既有工程系数分别保留，`residual_natal_numerical_label` 仅属残存原局预算，完整行运后旺衰仍为 `not_adjudicated`，不能据此推导吉凶。详见[限定投影](bazi-timing.md#关系与作用范围)。
 
 ### 4.3 Calendar / knowledge / export helper
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| `POST` | `/api/calendar/solar-terms` | 全年节气 helper |
-| `POST` | `/api/calendar/lunar-time` | 农历换算 helper |
+| `POST` | `/api/calendar/solar-terms` | 全年节气时刻表（响应位于 `jieqi_year`） |
+| `POST` | `/api/calendar/lunar-time` | 农历与干支换算（`time_alg=0` 真太阳时 / `1` 直接时间） |
 | `POST` | `/api/divination/gua` | 卦义检索 |
 | `POST` | `/api/divination/gua/meanings` | 批量查询卦象结构与《周易》经文 |
 | `POST` | `/api/export/formats` | 导出合同注册表 |
@@ -478,61 +214,44 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 
 ### 4.4 Divination 与本地技法
 
-`solar_terms_for_year` 的全年列表位于响应字段 `jieqi_year`。农历查询的年柱、时柱分别使用 `yearGanZi`、`timeGanZi`。梅易批量查询从 `results[query]` 读取条目。 各工具只返回其当前输出合同声明的字段。
-
-当地时区历史规则未定义节气钟面时，节气记录仍提供用于比较的 `civil_point`， 并以 `datetime_utc` 显示带零偏移的 UTC 时间。该记录省略当地日期、偏移、 重复时段标记和日干支。需要当地日期或日干支的调用应检查对应字段是否存在。
-
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| `POST` | `/api/divination/meihua/time-cast` | 梅花时间取数；[规则、历法约定与验收](meihua.md) |
-| `POST` | `/api/divination/meihua/cast` | 梅花显式资料起卦与已有单动爻卦解读；判别字段 `casting.method` |
-| `POST` | `/api/divination/combine-four-gua` | 统摄法 |
-| `POST` | `/api/divination/liuyao` | 六爻 |
+| `POST` | `/api/divination/meihua/time-cast` | 梅花时间取数、体用互变与经文参照 |
+| `POST` | `/api/divination/meihua/cast` | 梅花显式物数/声音/字占与单动爻起卦 |
+| `POST` | `/api/divination/combine-four-gua` | 统摄四卦组合 |
+| `POST` | `/api/divination/liuyao` | 六爻纳甲与《增删卜易》结构证据 |
 | `POST` | `/api/divination/canping` | 邵子参评数 / 金锁银匙 |
 | `POST` | `/api/divination/heluo` | 河洛理数 |
-| `POST` | `/api/divination/suzhan` | 宿占 |
-| `POST` | `/api/divination/astrology-dice/interpret` | [占星骰](astrodice.md)：planet/sign/house必填，house=0..11；时间地点可省略 |
+| `POST` | `/api/divination/suzhan` | 二十七宿占 |
+| `POST` | `/api/divination/astrology-dice/interpret` | [占星骰](astrodice.md)：planet/sign/house 必填（house=`0..11`） |
 | `POST` | `/api/divination/sanshi` | 三式合一 |
-
-梅花的输入方法、体用条件、题篇、现场外应和天气分支见[梅花专题](meihua.md)。`evidence_views` 提供各任务的字段清单，调用时传所选 `fields`，不传视图名。天气研究的固定向量、负结果与可达评分上限在[研究部分](meihua.md#天时占与固定天气研究)分别报告。
-
-六爻 `void_conditions` 字段视图返回所选用爻的原旬空、空亡条件与三支资格。日建生扶的 `matched` 是原始关系；若有 `qualified_matched`，它才决定本条能否计入，`null` 仍待审。未选用爻时焦点为 `null`。
 
 ### 4.5 中国术数独立盘
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
 | `POST` | `/api/ziwei/birth-chart` | 紫微斗数命盘 |
-| `POST` | `/api/ziwei/timing` | 紫微斗数运限（大限/小限/流年/流月/流日/流时 + 动态四化） |
-| `POST` | `/api/ziwei/rules` | 紫微规则库 |
+| `POST` | `/api/ziwei/timing` | 紫微斗数运限（大限/小限/流年/流月/流日/流时与四化） |
+| `POST` | `/api/ziwei/rules` | 紫微规则库（详见[紫微参考](ziwei.md)） |
 | `POST` | `/api/liuren/chart` | 六壬起课 |
-| `POST` | `/api/liuren/timing/yearly` | 六壬行年 |
-| `POST` | `/api/qimen` | 奇门遁甲 |
-| `POST` | `/api/taiyi` | 太乙神数 |
-| `POST` | `/api/jinkou` | 金口诀 |
-
-| 输入或结果 | 说明与专题 |
-| --- | --- |
-| 紫微盘式、四化与宫位身份 | 三个工具共用 `rule_profile`；本命和运限字段按[紫微专题](ziwei.md)区分 |
-| 奇门 `qimen_options` | 所选置闰／拆补、贵人和规则前提见[奇门专题](qimen-depth-audit.md)。`stem_candidates` 字段视图区分各所列候选都命中、都未命中及分歧，并返回共同及可能宫位。 |
-| 太乙 `year_profile` | 历史年计可选 `jinjing_year_historical_table_v1`（381–385）或 `jinjing_year_qiliang_table_v1`（501–505），只用于年计；三式放入 `taiyi_options`。历制分歧见[太乙专题](taiyi-sanshi-audit.md) |
-| 六壬／金口诀输入与层次 | `analysis_second`、昼夜贵人、地分、本命和行年条件见[输入与来源](liuren-jinkou-audit.md#输入与来源)及[字段索引](liuren-jinkou-audit.md#输入与字段索引) |
-| 历法提供者与交节 | 实际模型、时标、刊载日期对照及既有超差见[历法验证](liuren-jinkou-audit.md#交气时间尺度与边界序列化) |
-
-金口诀的 `overview.month_general` 是中气月将本位，`overview.yuejiang` 是月将加时后落地分的将神；两者可以不同。原典条件未裁定时保持未知，不能按字段存在或已选视图判为完整断课。
+| `POST` | `/api/liuren/timing/yearly` | 六壬虚岁行年与分析课 |
+| `POST` | `/api/qimen` | 奇门遁甲（支持置闰/拆补 `qimen_options`） |
+| `POST` | `/api/taiyi` | 太乙神数（年/月/日/时计及历史年计 `year_profile`） |
+| `POST` | `/api/jinkou` | 金口诀（四位、课钤与用位证据；`overview.month_general` 为中气月将，`overview.yuejiang` 为加时将神） |
 
 ### 4.6 核心占星盘
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| `POST` | `/api/astrology/chart` | 标准盘 |
-| `POST` | `/api/astrology/thirteen-sector-chart` | 13扇区；ASC未解析时实际落区为null，见[盘式范围](other-chart-schools.md) |
+| `POST` | `/api/astrology/chart` | 标准占星本命盘（支持 `chart_variant` 与 `apparent_model=native\|opaque_solar`） |
+| `POST` | `/api/astrology/thirteen-sector-chart` | 上升起点 13 等分扇区盘 |
 | `POST` | `/api/astrology/hellenistic-chart` | 希腊风格盘 |
-| `POST` | `/api/astrology/guolao-chart` | 果老 / 七政四余风格盘 |
-| `POST` | `/api/astrology/vedic-chart` | 印占 Lahiri 本命、分盘与具名八分法分析；表级`source_profile_comparison.aiyar1905`另列Aiyar自己的原始表及削减，旧`reduction_analysis.source_profile_comparison`仅比较削减读法，Rao默认保留，范围与缺项见[印占说明](jyotish.md) |
-| `POST` | `/api/astrology/vimshottari-dasha` | 印占 Moon-nakshatra 主运／次运；可选`dasha_depth=3..6`当前递归分期，`time_quantization`回显各样本自己的出生历元与精确比例，见范围与验收 |
-| `POST` | `/api/astrology/hamburg-midpoint-chart` | 中点 / germany 派生盘；基础宫制／参考角／子午宫的角色分别读取；太阳弧名义目标有效时保留越界生时样点，分层 `partial` 见范围说明 |
-| `POST` | `/api/astrology/relationship-chart` | 关系盘 |
+| `POST` | `/api/astrology/guolao-chart` | 果老 / 七政四余盘 |
+| `POST` | `/api/astrology/vedic-chart` | 印占 Lahiri 本命、分盘与八分法 |
+| `POST` | `/api/astrology/vimshottari-dasha` | 印占 Moon-nakshatra 达沙（可选 `dasha_depth=2..6`） |
+| `POST` | `/api/astrology/hamburg-midpoint-chart` | 德国汉堡中点 / 太阳弧派生盘 |
+| `POST` | `/api/astrology/relationship-chart` | 关系盘（`compare`/`composite`/`influence`/`timespace`/`marks`） |
+| `POST` | `/api/human-design/chart` | [人类图](human-design.md)双时刻、门线与身体图 |
 
 ### 4.7 西占推运
 
@@ -540,223 +259,122 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | --- | --- | --- |
 | `POST` | `/api/astrology/timing` | 推运总览 bundle |
 | `POST` | `/api/astrology/timing/solar-return` | 太阳返照 |
-| `POST` | `/api/astrology/timing/lunar-return` | 月返 |
-| `POST` | `/api/astrology/timing/transit-chart` | 行运 |
+| `POST` | `/api/astrology/timing/lunar-return` | 月亮返照 |
+| `POST` | `/api/astrology/timing/transit-chart` | 行运盘 |
 | `POST` | `/api/astrology/timing/solar-arc` | 太阳弧 |
 | `POST` | `/api/astrology/timing/chart-for-year` | 指定年盘 |
 | `POST` | `/api/astrology/timing/profection` | 年小限 |
 | `POST` | `/api/astrology/timing/primary-directions` | 主限 |
 | `POST` | `/api/astrology/timing/primary-directions-chart` | 主限图盘 |
 | `POST` | `/api/astrology/timing/zodiacal-releasing` | 黄道释放 |
-| `POST` | `/api/astrology/timing/firdaria` | 法达 |
+| `POST` | `/api/astrology/timing/firdaria` | 法达星限 |
 | `POST` | `/api/astrology/timing/decennials` | 十年星限 |
-
-聚合推运与上述 11 个单项工具共用目标时间合同：`analysis_year`、 `analysis_month`、`analysis_day` 指定日期，`analysis_hour`（0–23）与 `analysis_minute`（0–59）指定小时和分钟，按 `birth_timezone` 解释。 显式传入 `0` 会生效。为保持日期级调用兼容，省略小时或分钟时分别沿用 `birth_hour` 或 `birth_minute`；省略的日期分量仍由当前时间（可用 `as_of` 冻结） 补齐。`as_of` 不替代显式分析时刻，`return_timezone` 只将同一时刻转换到返照／ 行运地点，不重解释输入钟时。出生参数始终用于本命盘。
-
-REST 在 JSON 请求体传入这五项，MCP 使用同名参数，CLI 使用 `--analysis-year/month/day/hour/minute` 对应的独立开关。实际采用时刻见 `analysis_context.analysis_datetime`，行运地点的时刻见聚合结果的 `transits.current_transit.analysis_datetime` 或独立工具的 `transit.analysis_datetime`。
-
-行运与指定年盘的单字段时点保留目的时区的已定义偏移。若该瞬间落在 IANA TZif 的 `-00` 区间，字段按 [RFC 9557 §2.2](https://www.rfc-editor.org/rfc/rfc9557.html#name-update-to-rfc-3339) 返回带 `Z` 的 UTC 时点，表示当地偏移未知。指定年盘的分析时点、年界和每个月段端点分别判断。
-
-固定年与公历周年法达、十年星限和黄道释放的历时端点使用相同的时点格式。公历法达的分钟展示随各端点选择时区标签，周年生成仍要求当地钟面有效。活动期归属使用精确起止时点。
-
-返照结果的`solver.julian_day_tt`也是最终盘`calculation_basis.julian_day_tt`的位置时刻；UTC／本地标签只作表示。等于分析TT时沿用已知分析输入见证，插入UTC秒可返回`:60`标签；无法表示的本地标签保留空值。行运另返回`exact_orb_limit`：`exact_hits`采用该紧密阈值和原始角度，普通命中与紧密命中分别最多展示24／12项。`house_emphasis`统计行运盘自身宫位。详见[返照根与行运分档](western-astrology.md#返照根与行运分档)。
-
-`profection`、`chart_for_year` 和综合推运的月小限采用周年区间的 UTC 时长十二等分；2 月 29 日出生者在平年采用 2 月 28 日，闰年恢复原生日。年区间、月段端点和活动月序共用该口径，见[年小限与月段边界](western-astrology.md#年小限与月段边界)。
-
-`profection`另返回`age_years`、`year_start/year_end`和`calculation_options`；生成周年采用compatible规则，名义周年年序与跳日后的显示年份分开。综合推运的`secondary_progression.calculation_options`及太阳弧的`calculation_options.progression`声明365.24219日固定年键分子／分母、UTC换算与舍入；其他年键和轴宫方法不混称同法，见[具名时间模型](western-astrology.md#周年与次限的具名时间模型)。
-
-`sidereal_progressions`、`planetary_arc_directions`与`declination_progressions`的结果分支均返回实际`progressed_datetime`；恒星／赤纬次限在`calculation_options`声明同一固定年键，行星弧在`progression_options`声明取弧所用的次限模型。赤纬次限不声明未执行的宫位计算。
-
-`decennials`及综合推运的十年星限保留`start_offset_exact_minutes`／`end_offset_exact_minutes`有理数偏移，整数分钟偏移仅供显示。真实`start/end`从出生UTC锚一次舍入到微秒后转出生区；实际模型见`calculation_options`，方法范围见[十年星限精确时轴](western-astrology.md#十年星限比例重建与精确时轴)。
 
 ### 4.8 事件占星（事件盘）
 
-求解天文时刻后起盘的一组事件类工具。
-
-世俗入宫盘的 `ingress_term` 只接收 `春分`、`夏至`、`秋分`、`冬至`；其他节气或拼写错误返回输入错误，不改算春分。
-
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| `POST` | `/api/astrology/events/mundane-ingress-chart` | 世俗入宫盘 |
+| `POST` | `/api/astrology/events/mundane-ingress-chart` | 世俗入宫盘（`ingress_term` 仅限春分/夏至/秋分/冬至） |
 | `POST` | `/api/astrology/events/planetary-returns` | 多重回归 |
-| `POST` | `/api/astrology/events/horary-chart` | 卜卦证据 |
-| `POST` | `/api/astrology/events/evaluate-election-time` | 择日 |
+| `POST` | `/api/astrology/events/horary-chart` | 卜卦盘（支持 `orb_profile` 与 `radicality_context`） |
+| `POST` | `/api/astrology/events/evaluate-election-time` | 择日盘 |
 
-事件工具的日期、钟时和取法约定：
+事件工具支持 `question_calendar` / `candidate_calendar`（`proleptic_gregorian` / `julian`）、`question_clock_basis` / `candidate_clock_basis`（`civil` / `local_mean_solar` / `local_apparent_solar`）、`question_hour_origin` / `candidate_hour_origin`（`midnight` / `noon`）、整秒 `question_second` / `candidate_second` 及 `ut1_source`（`swiss_delta_t` / `iers_c04`）。
 
-| 参数／字段 | 约定与详细说明 |
-| --- | --- |
-| `question_calendar`／`candidate_calendar` | 默认 `proleptic_gregorian`，可显式选 `julian`；[历法与钟时](western-astrology.md#输入与天文精度) |
-| `question_clock_basis`／`candidate_clock_basis` | `civil`、`local_mean_solar` 或 `local_apparent_solar`；太阳时模式省略／null 时区，避免重复修正 |
-| `question_hour_origin`／`candidate_hour_origin` | `midnight` 默认；`noon` 为正午起算的原始小时标签；与钟时基准分别声明 |
-| `question_second`／`candidate_second` | 已确认的整秒 `0..59`，省略沿用 `0`；经历法与正午进位保留，拒绝小数秒和直接输入的秒 `60`。输入分辨率不证明原记录准确度 |
-| `ut1_source` | 默认 `swiss_delta_t`；`iers_c04` 仅覆盖固定来源区间，不外推或静默回退 |
-| 卜卦 `orb_profile` | `lilly_1647_p107_first` 默认，或 `lilly_1647_p107_second`；[两列容许度与宫位](western-astrology.md#lilly两列容许度实际落宫与居宫条款) |
-| 卜卦 `radicality_context` | 严格嵌套对象，只提交已确认条件；[判断前审查](western-astrology.md#lilly判断前审查与资料未知) |
-| 结果字段视图 | `solar_position_model`、`lilly_fortitudes`、`lilly_fortune`、`lilly_radicality` 等是字段选择卡，不是请求参数 |
-
-太阳圆面模型、事件求根及原书差异按[西占专题](western-astrology.md)读取。实际太阳时反解可能得到 UTC 闰秒标签；按 `clock_conversion.utc_representation` 保留其身份，不能截断为普通秒或据 Python datetime 的显示限制判为不可计算。
-
-### 4.9 全生命周期 / 寿命技法
-
-这些技法根据本命盘计算象征阶段与周期。
+### 4.9 全生命周期技法
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
 | `POST` | `/api/astrology/harmonic-chart` | 调波盘 |
 | `POST` | `/api/astrology/timing/planetary-ages` | 行星年龄 |
-| `POST` | `/api/astrology/timing/triplicity-ruler-periods` | 三分主星推运 |
+| `POST` | `/api/astrology/timing/triplicity-ruler-periods` | 三分主星推运（`division=thirds/halves`） |
 | `POST` | `/api/astrology/timing/lunar-phase-progressions` | 月相推运 |
-| `POST` | `/api/astrology/timing/bounds-directions` | 界推运 |
-| `POST` | `/api/astrology/timing/balbillus-periods` | Balbillus 129 年系统 |
-| `POST` | `/api/astrology/timing/numeric-aspect-periods` | 数字相位推运 |
+| `POST` | `/api/astrology/timing/bounds-directions` | 界推运（`time_key=Ptolemy/Naibod`） |
+| `POST` | `/api/astrology/timing/balbillus-periods` | Balbillus 129 年系统（`mode=nearest/forward`） |
+| `POST` | `/api/astrology/timing/numeric-aspect-periods` | 数字相位推运（`release_mode=soul/body`） |
 | `POST` | `/api/astrology/timing/planetary-periods-129-years` | 129 年系统 |
 | `POST` | `/api/astrology/timing/planetary-arc-directions` | 行星弧方向 |
 | `POST` | `/api/astrology/timing/persian-directions` | 波斯向运 |
-| `POST` | `/api/astrology/timing/age-point` | 年龄推进点 (age point) |
+| `POST` | `/api/astrology/timing/age-point` | 年龄推进点 |
 | `POST` | `/api/astrology/timing/sidereal-progressions` | 恒星推运 |
 | `POST` | `/api/astrology/timing/declination-progressions` | 赤纬推运 |
-
-方法选择按实际支持值校验：三分主星 `division=thirds/halves`；界推运 `time_key=Ptolemy/Naibod`；Balbillus `mode=nearest/forward`；数字相位 `release_mode=soul/body`。Balbillus 与129年系统的 `start_planet` 接收 `Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn`；行星弧的 `arc_source` 另支持 `Ascendant/Medium_Coeli`。未支持值返回输入错误，不以默认方法替代。
-
-调波的分座与合相、年龄推进点的宫位和年度标记、波斯向运的前120项选择均在显示舍入之前计算。历史软件的同显示年龄排序可能不同，原夹具和差异仍保留；数值策略与三端检查见[西占说明](western-astrology.md#推运返照与主限坐标)。
 
 ### 4.10 健康检查与能力发现
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| `GET` | `/health` | 存活检查，返回 `{"status":"healthy"}`，不验证全部算法依赖 |
-| `GET` | `/ready` | 必需检查决定 `ready` / `not_ready`；可选西占运行时失败不一定改变状态，需检查 `checks` |
-| `GET` | `/metrics` | Prometheus 文本指标，含请求计数、耗时、就绪与鉴权配置状态 |
-| `GET` | `/api/results/{result_id}` | 同次结果的交付 manifest，沿用业务鉴权 |
-| `GET` | `/api/results/{result_id}/payload` | 一次下载同次结果保留的 JSON，沿用业务鉴权 |
-| `GET` | `/api/results/{result_id}/pages` | 字符分页；`offset` 指定偏移，`path` 可选字段路径 |
-| `GET` | `/api/results/{result_id}/verified` | 先以 `expected_run_id` 核验完整保留结果，再按 `path`／`offset` 取页 |
-| `GET` | `/api/tools` | 能力清单：返回每个工具的自描述记录（参数、类型、所在端、family），与 `fatebridge describe` 同源 |
-
-`/api/tools` 是给 Agent 的机读能力清单——无需抓取本文档即可枚举全部工具及调用约定。 返回结构包含 `counts`（rest / mcp / total）、`matched_count`、`detail` 与 `tools`，其中每个完整 descriptor 形如：
-
-```json
-{
-  "tool": "bazi_wealth",
-  "summary": "八字财运分析：已按出生资料与分析日期自动推算大运、流年和时机依据；首轮无需先调用 bazi_timing 或手动传大运柱。仅有明确外部口径时用 dayun_pillar / liunian_pillar 覆盖。",
-  "operation_label_zh": "八字财运分析",
-  "family": "bazi",
-  "surfaces": {"cli": true, "cli_name": "bazi_wealth", "rest_path": "/api/bazi/wealth", "mcp_name": "bazi_wealth"},
-  "parameters": [{"name": "birth_year", "type": "int", "required": true, "description": "..."}]
-}
-```
-
-> 面向 Agent / 开发者的端到端接入说明（自助发现、错误处理、字段投影、MCP host 配置、Python/JS 示例）见 [agent-guide.md](agent-guide.md)。
-
-`surfaces.rest_path` / `surfaces.mcp_name` 为 `null` 表示该工具不在对应端暴露。
+| `GET` | `/health` | 存活检查，返回 `{"status":"healthy"}` |
+| `GET` | `/ready` | 服务就绪与可选西占运行时检查（`checks`） |
+| `GET` | `/metrics` | Prometheus 文本指标 |
+| `GET` | `/api/results/{result_id}` | 同次结果交付 manifest |
+| `GET` | `/api/results/{result_id}/payload` | 下载同次结果保留的完整 JSON |
+| `GET` | `/api/results/{result_id}/pages` | 字符分页读取（支持 `offset` 与 `path`） |
+| `GET` | `/api/results/{result_id}/verified` | 使用 `expected_run_id` 校验后按页读取 |
+| `GET` | `/api/tools` | 机读能力发现清单（支持 `detail`/`family`/`q`/`tool`/`surface`） |
 
 ### 4.11 家居风水（family `fengshui`）
 
 | REST POST | MCP / CLI | 说明 |
 | --- | --- | --- |
-| `/api/fengshui/directions` | `fengshui_directions` | 后天八卦固定宫数与八方／24山角区索引 |
-| `/api/fengshui/minggua` | `fengshui_minggua` | 出生日期／有效生年／出生时刻三选一、男女约定的命卦与个人八方关系 |
-| `/api/fengshui/bazhai` | `fengshui_bazhai` | 坐山宅盘、逐人命盘、门床桌灶位置／朝向分开判定 |
-| `/api/fengshui/jinsuo` | `fengshui_jinsuo` | 已确认观察的八宫砂水偏好；未知与混合不推断 |
-| `/api/fengshui/annual-stars` | `fengshui_annual_stars` | 立春换年的九宫年星、有效区间、独立列示当前元运 |
-| `/api/fengshui/monthly-stars` | `fengshui_monthly_stars` | 十二节换月的中性月紫白；含时区query_at或确认的effective_solar_year/solar_month_number，独立有效期与固定位置释义 |
-| `/api/fengshui/xuankong-house-chart` | `fengshui_xuankong_house_chart` | 中州派运山向宅盘、历史定运、兼向替星及边界候选；独立于年星 |
-| `/api/fengshui/assess` | `fengshui_assess` | 原始盘与布局关联、室内形态观察、按目标的元素候选、限定年度作者规则、来源与分歧 |
+| `/api/fengshui/directions` | `fengshui_directions` | 后天八卦与八方／24山角区索引 |
+| `/api/fengshui/minggua` | `fengshui_minggua` | 个人命卦与八方关系 |
+| `/api/fengshui/bazhai` | `fengshui_bazhai` | 坐山宅盘与逐人命盘 |
+| `/api/fengshui/jinsuo` | `fengshui_jinsuo` | 金锁玉关八宫固定砂水偏好 |
+| `/api/fengshui/annual-stars` | `fengshui_annual_stars` | 立春换年九宫年星与元运 |
+| `/api/fengshui/monthly-stars` | `fengshui_monthly_stars` | 十二节换月中性月紫白 |
+| `/api/fengshui/xuankong-house-chart` | `fengshui_xuankong_house_chart` | 中州派玄空运山向宅盘与替星 |
+| `/api/fengshui/assess` | `fengshui_assess` | 分层宅盘、室内布局与条件式方案评估 |
 
-输入不继承完整八字生辰要求；命卦可用 `birth_date`、`effective_birth_year` 或 `birth_at` 三选一，年度使用 `effective_year` 或 `query_at` 二选一。角度须声明参考北。组合结果在 `layers.bazhai`、`layers.jinsuo`、`layers.annual_stars`、`layers.xuankong_natal` 中分别返回，合法缺失资料用 `status=partial`，不是协议错误。月飞星可独立调用，也可显式加入合参；金锁进阶规则尚未实现；没有三法总分。每层带规则版本、来源和范围，快照记录同一组分层计算事实。
-
-三端可复制示例、详细字段语义及来源限制见 [家居风水](fengshui.md)。CLI 示例：`fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json`。MCP 参数为同一文件内容的 JSON 对象；REST 请求体同理。`--request-file` 保留未知字段交给模型拒绝，显式字段参数覆盖同名顶层字段。
+三端可复制请求与状态字段语义见[家居风水参考](fengshui.md)。
 
 ### 4.12 心理测量量表（family `psychometrics`）
 
 | REST POST | MCP / CLI | 说明 |
 | --- | --- | --- |
-| `/api/psychometrics/ipip-big-five` | `ipip_big_five` | Goldberg (1992) IPIP 50 题大五人格因子标记量表：支持 `action=list_items` 与 `action=score`（`responses` 映射或 `ratings` 列表） |
+| `/api/psychometrics/ipip-big-five` | `ipip_big_five` | Goldberg (1992) IPIP 50 题大五人格因子标记量表：支持 `action=list_items` 与 `action=score` |
 
 ## 5. REST 调用示例
 
-以下人物资料均为虚构示例，默认未开启 API Key 鉴权；开启后加 `-H "X-API-Key: <secret>"`。
-
-### 5.1 旧入口迁移
-
-独立八字命盘使用 `/api/bazi/birth-chart` 或 `bazi_birth_chart`，命盘字段位于 `bazi_birth` 对象。综合命理使用 MCP / CLI 的 `bazi_overview`。当前接口与模块职责见[架构](architecture.md)。
-
-### 5.2 核心占星盘
+### 5.1 核心占星盘
 
 ```bash
 curl -X POST http://localhost:8010/api/astrology/chart \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Chart Demo",
-    "birth_year": 1990,
-    "birth_month": 4,
-    "birth_day": 6,
-    "birth_hour": 9,
-    "birth_minute": 33,
+    "birth_year": 1990, "birth_month": 4, "birth_day": 6,
+    "birth_hour": 9, "birth_minute": 33,
     "birth_timezone": "Asia/Shanghai",
-    "birth_longitude": 121.4667,
-    "birth_latitude": 31.2167,
-    "birth_place": "上海"
+    "birth_longitude": 121.4667, "birth_latitude": 31.2167, "birth_place": "上海"
   }'
 ```
 
-返回重点：
-
-- `chart_profile.engine_precision`
-- `angles`
-- `houses`
-- `planets`
-- `aspects`
-- `snapshot_text`
-- `snapshot_export`
-
-### 5.3 独立西占技法
+### 5.2 独立西占技法
 
 ```bash
 curl -X POST http://localhost:8010/api/astrology/timing/solar-return \
   -H "Content-Type: application/json" \
   -d '{
     "name": "SR Demo",
-    "birth_year": 1990,
-    "birth_month": 4,
-    "birth_day": 6,
-    "birth_hour": 9,
-    "birth_minute": 33,
+    "birth_year": 1990, "birth_month": 4, "birth_day": 6,
+    "birth_hour": 9, "birth_minute": 33,
     "birth_timezone": "Asia/Shanghai",
-    "birth_longitude": 121.4667,
-    "birth_latitude": 31.2167,
-    "birth_place": "上海",
-    "analysis_year": 2028,
-    "analysis_month": 4,
-    "analysis_day": 6,
-    "analysis_hour": 12,
-    "analysis_minute": 0,
+    "birth_longitude": 121.4667, "birth_latitude": 31.2167, "birth_place": "上海",
+    "analysis_year": 2028, "analysis_month": 4, "analysis_day": 6,
+    "analysis_hour": 12, "analysis_minute": 0,
     "selected_sections": ["起盘信息", "星盘信息"]
   }'
 ```
 
-返回重点：
-
-- `snapshot_text`
-- `snapshot_export.selected_sections`
-- `snapshot_export.export_text`
-
-### 5.4 导出解析 helper
+### 5.3 导出解析 helper
 
 ```bash
 curl -X POST http://localhost:8010/api/export/parse \
   -H "Content-Type: application/json" \
-  -d '{
-    "technique": "qimen",
-    "content": "[起盘信息]\n示例\n\n[九宫方盘]\n示例",
-    "selected_sections": ["起盘信息"]
-  }'
+  -d '{"technique":"qimen","content":"[起盘信息]\n示例\n\n[九宫方盘]\n示例","selected_sections":["起盘信息"]}'
 ```
 
 ## 6. FastMCP 工具面
-
-下表按 family 列出公开名称。MCP host 的配置与结构化结果处理见[接入指南](agent-guide.md#fastmcpagent-host)，Codex 配置见[专用指南](codex-guide.md)。
 
 ### 6.1 启动
 
@@ -766,105 +384,134 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 
 ### 6.2 MCP 工具分组
 
-> 全部 93 项 MCP 计算能力按 `family` 分组如下，各端绑定差异见 §2.4。机读清单见 `GET /api/tools` 或 `fatebridge list`。
+全部 93 项业务能力由 `discover_capabilities`、`describe_capability`、`run_calculation` 与 `read_result` 四个协议工具暴露，按 `family` 分组如下：
 
 #### 基础命理（family `bazi`）
 
 - `bazi_overview`
 - `bazi_birth_chart`
 - `compare_bazi_sources`
-- `bazi_marriage` / `bazi_career` / `bazi_wealth` / `bazi_health` / `bazi_children`
-- `bazi_education` / `bazi_personality` / `bazi_relatives` / `bazi_romance`
+- `bazi_marriage`
+- `bazi_career`
+- `bazi_wealth`
+- `bazi_health`
+- `bazi_children`
+- `bazi_education`
+- `bazi_personality`
+- `bazi_relatives`
+- `bazi_romance`
 
 #### 双人配合（family `compatibility`）
 
 - `bazi_compatibility`
 - `sukuyo_compatibility`
 
-`bazi_compatibility` 交付双方盘式、跨盘干支接触和双向十神。`relationship_type` 记录语境。详见[双人八字取证](compatibility-scoring.md)。
-
 #### 时运与历法（family `timing`）
 
 - `bazi_timing`
-- `bazi_luck_cycles` / `bazi_yearly_timing` / `bazi_monthly_timing` / `bazi_daily_timing` / `bazi_hourly_timing`
-
+- `bazi_luck_cycles`
+- `bazi_yearly_timing`
+- `bazi_monthly_timing`
+- `bazi_daily_timing`
+- `bazi_hourly_timing`
 - `solar_term_timeline`
-- `solar_terms_for_year` / `lunar_calendar_time`
-
-`lunar_calendar_time` 的 `time_alg` 接受 `0`（真太阳时，默认）或 `1`（直接时间），其余整数返回 `validation_error`。选择 `0` 但缺少经度时，以给定钟面继续并返回提示。
+- `solar_terms_for_year`
+- `lunar_calendar_time`
 
 #### Divination 与本地技法（family `divination`）
 
-- `gua_lookup` / `gua_meanings`
-- `meihua_time_cast` / `meihua_cast` / `combine_four_gua` / `liuyao`
-- `canping` / `heluo`
-- `suzhan` / `interpret_astrology_dice` / `sanshi_combined_chart`
+- `gua_lookup`
+- `gua_meanings`
+- `meihua_time_cast`
+- `meihua_cast`
+- `combine_four_gua`
+- `liuyao`
+- `canping`
+- `heluo`
+- `suzhan`
+- `interpret_astrology_dice`
+- `sanshi_combined_chart`
 
-`heluo`、`canping` 的完整参数、字段投影和逐项语义分别由[河洛调用合同](contracts/heluo.json)与[参评调用合同](contracts/canping.json)生成；计算依据和未决范围集中在[河洛与参评数](numerology-audit.md)。
-
-共同输入要求：
-
-`date` 为推算格里历 `YYYY-MM-DD`，不自动转换儒略历、年号或历史阴历；`time` 须明确提供当地钟时，可含小数秒，不能夹带时区后缀或用未知值补零点。 `gender` 必填。`zone` 省略／null为固定 `+08:00`；地区历史规则须明确提供 IANA 名称。已确认的 `birth_utc_offset` 可在保留地区规则时选择重复钟时；不存在钟时或地区／偏移冲突报输入错误。 真太阳时默认开启，须明确 `lon` 或数值 `gps_lon`，GPS 优先且0°有效；明确选择钟表时才传 `use_true_solar_time=false`。`birth_clock` 证据区分实际民用时刻、UTC瞬间和计算钟面。
-
-| 结果或选法 | 当前合同与边界 |
-| --- | --- |
-| 河洛属月 | `month_assignment_method` 默认 `intro_preferred_v1`，另选 `volume_one_table_v1`；`judge.month_affinity` 保留两表冲突、缺号与条件未决。`judge.deTime` 仅为月表匹配 |
-| 河洛元堂与结构 | `yuantang`、`body_structure`、`line_conditions`、`body_relations` 分别读取实际阶段、爻位及有向关系；完整得体、阴月当位与综合葉否仍未裁定 |
-| 河洛元气与时令 | `qi_phases`、`yuanqi_opposition`、`number_conditions`、`najia` 保留实际命中位置、来源角色与未决条件；候选命中不代替综合结论 |
-| 河洛岁运与源钟 | 年、月、日序是原典序号。`clock_basis`、`source_clock`、`jiehou` 保留年柱、百刻、节卦及候卦对照；未完成的分制、日内映射和实际日卦不补值 |
-| 参评取数 | `method=gu` 默认按日支起数；显式 `ming` 为另一选法，未知值拒绝。`text_selection` 保留五行、编号、男女／岁运栏、顺逆配对及选文状态 |
-| 参评配运 | `dayun_method=bazi_appendix_v1` 默认，另有 `bazi_continuous_v1`、`legacy_minggong_v1`。带时区的 `analysis_datetime` 查询实际当段；旧命宫法不支持日期查询，不由年龄标签补UTC区间 |
-| 参评首运与来源 | `timing_policy` 中的 `first_row`、`first_period`、`schedule_basis` 与同次实际首行、日期政策和来源角色绑定；旧法 `first_period=null` 不等于没有首行，也不代替 `selected` 查询 |
-| 太阳与年界 | `pillar_links`、`calendar_boundaries` 及来源轨迹保留实际柱、模型和边界。参评完整120年不因所选模型超范围而截短；严格 Swiss 模式的范围／缺文件错误见[太阳后端](solar-backends.md#严格-swiss-文件模式) |
-| 条文与版本 | `selected_texts` 分列爻辞、注文、诗歌、继承旧文与见证状态；条件适用为null时不择优解释，不用有条件引卦替换正式盘 |
-
-上述视图仅提供可复制的 `fields` 清单，调用时传 `fields` 与 `strict_fields=true`，不传视图名。数组按合同整块选择，完整时间线从同次 `result_delivery` 读取。
-
-来源、实际选文或同次回执不一致，在投影前返回 HTTP503、`error_code=numerology_source_inconsistent`、`retryable=false`；无关字段投影也不能隐藏故障。缺失投影上下文继续保留未知，来源故障应由维护者核对，不能更换出生参数绕过。历史历法和 `core.song_clock` 的具名来源算术属于 Python 研究入口，不是这里新增的请求字段。
+`heluo` 与 `canping` 的完整按需输入契约与视图字段见[河洛调用合同](contracts/heluo.json)及[参评调用合同](contracts/canping.json)。
 
 #### 中国术数独立盘（family `metaphysics`）
 
-- `ziwei_birth_chart` / `ziwei_timing` / `ziwei_rules`
-- `liuren_chart` / `liuren_yearly_timing`
-- `qimen` / `taiyi` / `jinkou`
+- `ziwei_birth_chart`
+- `ziwei_timing`
+- `ziwei_rules`
+- `liuren_chart`
+- `liuren_yearly_timing`
+- `qimen`
+- `taiyi`
+- `jinkou`
 
 #### export / knowledge helper
 
-- `export_formats` / `export_parse`
-- `knowledge_catalog` / `knowledge_read`
+- `export_formats`
+- `export_parse`
+- `knowledge_catalog`
+- `knowledge_read`
 
 #### 核心占星盘（family `astro`）
 
-- `astrology_chart` / `thirteen_sector_chart` / `hellenistic_chart`
-- `guolao_chart` / `vedic_chart` / `hamburg_midpoint_chart`
-- `vimshottari_dasha`：独立月宿达沙，参数、任务字段、分盘与版本来源见[印占说明](jyotish.md)
+- `astrology_chart`
+- `thirteen_sector_chart`
+- `hellenistic_chart`
+- `guolao_chart`
+- `vedic_chart`
+- `vimshottari_dasha`
+- `hamburg_midpoint_chart`
+- `human_design`
 - `relationship_chart`
-- `human_design`：人类图双时刻、门线、身体图与来源审计；`POST /api/human-design/chart`，详见[人类图](human-design.md)
-
-`astrology_chart` 的 `chart` 盘式下， `apparent_model=native|opaque_solar` 默认原生盘；显式不透明太阳模型额外返回独立 `apparent_model_positions`。该层不重算原盘日速、宫位、相位或解释，具体框架、依赖与0.02角秒对照见[西占说明](western-astrology.md#参考点模型与日速来源)。
 
 #### 西占推运（family `western_timing` / `western_timing_tool`）
 
 - `western_timing`
-- `solar_return` / `lunar_return` / `transit_chart` / `solar_arc` / `chart_for_year`
-- `profection` / `primary_directions` / `primary_directions_chart` / `zodiacal_releasing` / `firdaria` / `decennials`
+- `solar_return`
+- `lunar_return`
+- `transit_chart`
+- `solar_arc`
+- `chart_for_year`
+- `profection`
+- `primary_directions`
+- `primary_directions_chart`
+- `zodiacal_releasing`
+- `firdaria`
+- `decennials`
 
 #### 事件占星（family `western_event`）
 
-- `mundane_ingress_chart` / `planetary_returns` / `horary_chart` / `evaluate_election_time`
+- `mundane_ingress_chart`
+- `planetary_returns`
+- `horary_chart`
+- `evaluate_election_time`
 
-#### 全生命周期 / 寿命技法（family `western_lifespan`）
+#### 全生命周期技法（family `western_lifespan`）
 
-- `harmonic_chart` / `planetary_ages` / `triplicity_ruler_periods` / `lunar_phase_progressions`
-- `bounds_directions` / `balbillus_periods` / `numeric_aspect_periods` / `planetary_periods_129_years`
-- `planetary_arc_directions` / `persian_directions` / `age_point` / `sidereal_progressions` / `declination_progressions`
+- `harmonic_chart`
+- `planetary_ages`
+- `triplicity_ruler_periods`
+- `lunar_phase_progressions`
+- `bounds_directions`
+- `balbillus_periods`
+- `numeric_aspect_periods`
+- `planetary_periods_129_years`
+- `planetary_arc_directions`
+- `persian_directions`
+- `age_point`
+- `sidereal_progressions`
+- `declination_progressions`
 
 #### 家居风水（family `fengshui`）
 
-- `fengshui_directions` / `fengshui_minggua` / `fengshui_bazhai` / `fengshui_jinsuo`
-- `fengshui_annual_stars` / `fengshui_monthly_stars` / `fengshui_xuankong_house_chart` / `fengshui_assess`
-
-住宅输入、分层响应与复杂 CLI 用法见 [家居风水接口](#411-家居风水family-fengshui)。
+- `fengshui_directions`
+- `fengshui_minggua`
+- `fengshui_bazhai`
+- `fengshui_jinsuo`
+- `fengshui_annual_stars`
+- `fengshui_monthly_stars`
+- `fengshui_xuankong_house_chart`
+- `fengshui_assess`
 
 #### 心理测量量表（family `psychometrics`）
 
@@ -876,78 +523,21 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 | --- | --- | --- |
 | 传输协议 | HTTP JSON | MCP tool call |
 | 返回格式 | JSON object | `structuredContent` JSON object |
-| 错误表现 | HTTP status + 顶层错误 JSON（不嵌套 `detail`） | 模型/业务错误为 `isError=true` + 统一错误包络；协议错误由框架处理 |
-| 使用场景 | Web / script / service integration | Agent host / tool invocation |
+| 错误表现 | HTTP status + 顶层错误 JSON | 模型/业务错误为 `isError=true` + 统一错误包络 |
+| 使用场景 | Web / script / 后端集成 | Agent host / 工具调用 |
 
 ## 7. 常见响应字段
 
-### 7.1 命理类
-
-- `person_info`
-- `four_pillars`
-- `day_master`
-- `element_distribution`
-- `favorable_elements`
-- `structure_profile`
-- `ten_gods`
-- `patterns`
-- `calendar_context`
-
-### 7.2 占星类
-
-- `chart_profile`
-- `angles`
-- `houses`
-- `planets`
-- `aspects`
-- `aspect_evidence`
-- `classical`
-- `snapshot_text`
-- `snapshot_export`
-
-### 7.3 推运类
-
-- `summary`
-- `analysis_context`
-- 各技法的结果字段，例如 `solarreturn`、`pd`、`firdaria`
-- `snapshot_text`
-- `snapshot_export`
+- **命理类**：`person_info`、`four_pillars`、`day_master`、`element_distribution`、`favorable_elements`、`structure_profile`、`ten_gods`、`patterns`、`calendar_context`。
+- **占星类**：`chart_profile`、`angles`、`houses`、`planets`、`aspects`、`aspect_evidence`、`classical`、`snapshot_text`、`snapshot_export`。
+- **推运类**：`summary`、`analysis_context`、各技法字段（如 `solarreturn`、`pd`、`firdaria`）、`snapshot_text`、`snapshot_export`。
 
 ## 8. 调试建议
 
-### 8.1 section 名称不匹配
-
-优先检查：
-
-- `snapshot_export.section_titles_detected`
-- `snapshot_export.missing_selected_sections`
-
-### 8.2 占星盘精度不如预期
-
-优先检查：
-
-- `chart_profile.engine_precision`
-- `chart_profile.engine_backend`
-- `chart_profile.ephemeris_model`
-- `run_metadata.engine_is_approximate`
-
-### 8.3 西占推运直接报错
-
-优先检查本地是否具备：
-
-- Swiss Ephemeris 运行时
-
-## 9. 进一步阅读
-
-- [getting-started.md](getting-started.md)
-- [architecture.md](architecture.md)
-- [algorithm-coverage.md](algorithm-coverage.md)
-- [troubleshooting.md](troubleshooting.md)
+- **`selected_sections` 不生效**：核对 `snapshot_export.section_titles_detected` 与 `missing_selected_sections`。
+- **占星精度下降**：同时核对 `chart_profile.engine_precision`、`engine_backend`、`ephemeris_model` 与 `run_metadata.engine_is_approximate`。
+- **西占推运报错**：检查当前进程解释器是否具备 `swisseph` 运行时依赖；更多排错见[故障排除](troubleshooting.md)。
 
 ## 咨询范围与禁区校验
 
-生死寿命、灾祸断言、临床诊断治疗与医疗择时不提供。卜卦 category 不再接受 death、health、pregnancy，择时 topic_id 不再接受 surgery；直接服务／核心调用亦不能将这些类别静默回退为 general 或 marriage。对已知明确的禁区问法，REST／MCP／CLI 在计算前返回非重试错误 consultation_restricted，issues 保留安全路径而不回显问题。其他无效枚举仍按 validation_error 处理。调用方须在选工具前完成语义判断；有限文本检测不是完整语义安全保证。
-
-健康返回仅含盘内文化分类与对应，旧疾病风险根保留但禁用。没有中医辨证／体质问卷能力，不能据五行制定饮食、药物或治疗。
-
-子女专项保留命主视角的星／宫与传统关系，不提供数量预测字段；时间信号不提供备孕、添丁或生育建议。孩子本人分析需使用孩子资料。普通星盘已移除死亡点计算及输出，剩余阿拉伯点不用于生死解释。
+生死寿命、灾祸断言、临床诊断治疗与医疗择时不提供。卜卦 `category` 不接受 `death`、`health`、`pregnancy`，择时 `topic_id` 不接受 `surgery`；明确命中禁区的请求在计算前返回非重试错误 `consultation_restricted`。健康专项仅提供盘内传统文化分类，子女专项仅提供命主视角的星宫关系而不做数量或生育时间预测，普通星盘亦已排除死亡点。详见[硬边界](interpretation/shared/safety-boundaries.md)。

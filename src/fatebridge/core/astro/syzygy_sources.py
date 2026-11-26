@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.physical_sources import (
@@ -24,8 +24,8 @@ class SyzygySourceTrace:
     def __init__(self) -> None:
         self.selected = configured_ephemeris_path()
         self.physical = PhysicalEphemerisTrace()
-        self.contexts: Dict[tuple, Dict[str, Any]] = {}
-        self.models: Dict[str, set[str]] = {}
+        self.contexts: dict[tuple, dict[str, Any]] = {}
+        self.models: dict[str, set[str]] = {}
 
     def observe(self, body_id: int, flags: int, epoch_tt: float, stage: str) -> None:
         assert_physical_configuration(self.selected)
@@ -50,7 +50,7 @@ class SyzygySourceTrace:
         row["minimum_jd_tt"] = min(row["minimum_jd_tt"], epoch_tt)
         row["maximum_jd_tt"] = max(row["maximum_jd_tt"], epoch_tt)
 
-    def finish(self) -> Dict[str, Any]:
+    def finish(self) -> dict[str, Any]:
         assert_physical_configuration(self.selected)
         physical = self.physical.finish()
         return {

@@ -14,9 +14,6 @@ SOURCE_ID = "bphs_santhanam_vol1_13609f1a"
 SOURCE = {
     "id": SOURCE_ID,
     "title": "Brihat Parasara Hora Sastra, Vol. I, translation and commentary by R. Santhanam, Ranjan Publications (preface dated 1984)",
-    "url": "https://elibraryofyoga.com/items/13b2600f-95fd-4bb5-86b4-a18396c68993/full",
-    "scan_url": "https://elibraryofyoga.com/bitstreams/0a9652fc-4c10-4904-82bd-7e0c331f1961/download",
-    "sha256": "13609f1af89541e070c798b8c70c6bfd74a8b9a71a71388913bf898e9f9ddf3f",
     "sections": [
         "3.49-54: printed pp.38-39",
         "6.5-8, 6.10-15, 6.27-28: printed pp.68-80",
@@ -26,8 +23,7 @@ SOURCE = {
         "45.3-4: printed p.449",
         "7.28-29 commentary: printed p.100",
     ],
-    "textual_status": "translator and scanned witness identified; exact reprint edition unconfirmed; sloka translation and translator commentary distinguished; not critical-edition or whole-text acceptance",
-    "previous_witness_sha256": "24f5bac882aaa6549a86723c05081703a8d7ec766b97e8fb46a99822efdff758",
+    "textual_status": "translator and edition identified; sloka translation and translator commentary distinguished; not critical-edition or whole-text acceptance",
 }
 
 # Zodiac indexes are zero based. Peaks and zones are distinct concepts:

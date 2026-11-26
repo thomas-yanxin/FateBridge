@@ -8,9 +8,11 @@ import re
 from collections.abc import Sequence
 from pathlib import Path
 from types import UnionType
-from typing import Annotated, Literal, NoReturn, Union, get_args, get_origin
+from typing import Annotated, Literal, NoReturn, get_args, get_origin
 
 from pydantic.fields import FieldInfo
+
+UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
 
 from fatebridge.application.description import is_model_field, spec_is_cli_safe
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
@@ -19,8 +21,8 @@ from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.transports.flags import RESPONSE_LIMIT_DESC
 
-_BOOL_TRUE_TOKENS = {"true", "1", "yes", "y", "on"}
-_BOOL_FALSE_TOKENS = {"false", "0", "no", "n", "off"}
+BOOL_TRUE_TOKENS = {"true", "1", "yes", "y", "on"}
+BOOL_FALSE_TOKENS = {"false", "0", "no", "n", "off"}
 
 
 def emit_error(payload: ServiceResult, code: int) -> int:
@@ -99,9 +101,9 @@ class _BooleanFlagAction(argparse.Action):
             result = True
         else:
             token = str(values).strip().lower()
-            if token in _BOOL_TRUE_TOKENS:
+            if token in BOOL_TRUE_TOKENS:
                 result = True
-            elif token in _BOOL_FALSE_TOKENS:
+            elif token in BOOL_FALSE_TOKENS:
                 result = False
             else:
                 parser.error(
@@ -116,14 +118,12 @@ def _argument_type(annotation: object) -> object:
     if get_origin(annotation) is Annotated:
         return _argument_type(get_args(annotation)[0])
     # note (unions): Keep textual branches lexical so named house systems reach validation.
-    if get_origin(annotation) in (Union, UnionType):
+    if get_origin(annotation) in UNION_ORIGINS:
         members = [a for a in get_args(annotation) if a is not type(None)]
         resolved = [_argument_type(a) for a in members]
         if str in resolved:
             return str
-        if len(resolved) == 1:
-            return resolved[0]
-        if get_origin(annotation) is Union and resolved:
+        if resolved:
             return resolved[0]
     return annotation
 

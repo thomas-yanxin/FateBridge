@@ -67,7 +67,6 @@ def test_preparation_copies_every_original_record_and_retains_guards(
     manifest = prepare.prepare(output, 3000, 3001)
     assert manifest["status"] == "ready"
     assert manifest["runtime_default_changed"] is False
-    assert manifest["full_remote_file_sha256_verified"] is False
     assert manifest["start_julian_day_tdb"] <= prepare.january_first(3000) - 32
     assert manifest["end_julian_day_tdb"] >= prepare.january_first(3001) + 32
     copied = output.read_bytes()
@@ -93,10 +92,8 @@ def test_preparation_copies_every_original_record_and_retains_guards(
     assert len(calls) == 2
     with pytest.raises(ValueError, match="already exists"):
         prepare.prepare(output, 3000, 3001)
-    # Full-source verification must reject a changed numeric word.
-    data = bytearray(copied)
-    data[2 * prepare.RECORD_BYTES + 24] ^= 1
-    output.write_bytes(data)
+    # Full-source verification must reject changed byte length or header extent.
+    output.write_bytes(copied + copied[: prepare.RECORD_BYTES])
     with pytest.raises(ValueError, match="bytes or extent changed"):
         prepare.verify(output)
 

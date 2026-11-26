@@ -12,7 +12,6 @@ from fatebridge.core.metaphysics.common import (
 )
 from fatebridge.core.metaphysics.liureng_seasonal import MONTH_PARTITION, POWERS
 from fatebridge.core.metaphysics.ren_gods import GuirenProfile, noble_start
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 RULE_ID = "liuren.tanyuan_god_yin"
@@ -114,8 +113,6 @@ def god_yin_spirits(
     return dict(
         ruleset_id="tanyuan_category_spirit_yin_v1",
         source_title="大六壬探原·论阴神〔类神之阴〕",
-        source_url=TANYUAN_SOURCE,
-        source_sha256=TANYUAN_SCAN_SHA256,
         original_pdf_pages=[87, 88],
         day_ganzhi=day_ganzhi,
         month_branch=month_branch,
@@ -136,7 +133,6 @@ def god_yin_spirits(
 def god_yin_trace(value: dict[str, Any]) -> dict[str, Any]:
     return dict(
         rule_id=RULE_ID,
-        source_url=value["source_url"],
         source_section=value["source_title"],
         result=value,
     )

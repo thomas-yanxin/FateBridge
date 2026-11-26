@@ -34,7 +34,6 @@ def build_combinations(
     board: dict[str, Any],
     *,
     leader: QimenLeaders,
-    source: str,
     existing_patterns: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     """Read the actual layers, including hosted stems, with no time-table shortcut."""
@@ -67,7 +66,6 @@ def build_combinations(
                     "palace": palace["name"],
                     "evidence_paths": [path, "qimen.zhifu", "qimen.zhishi"],
                     "facts": facts,
-                    "source": source,
                     "section": section,
                     "source_scan_pages": scan_pages,
                     "layer": "traditional_rule_match",

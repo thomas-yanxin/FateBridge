@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from functools import lru_cache
 from pathlib import Path
@@ -10,7 +9,6 @@ from typing import Any
 
 from fatebridge.core.metaphysics.common import ELEMENT_CONTROLS, ELEMENT_GENERATES
 
-CATALOG_SHA256 = "dff1e69e6dcbc69ce9ebe4dc53c6e2f2ca785f2dc20eceb5214fb38494ed043b"
 LABELS = {
     "same_element": "同一五行",
     "main_generates_guest": "主生客",
@@ -26,10 +24,7 @@ def source_catalog() -> dict[str, Any]:
         Path(__file__).resolve().parents[2]
         / "data/classical/taiyi-elemental-relations-v1.json"
     )
-    raw = p.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != CATALOG_SHA256:
-        raise ValueError("二目五行资料指纹不符")
-    data: dict[str, Any] = json.loads(raw)
+    data: dict[str, Any] = json.loads(p.read_text(encoding="utf-8"))
     if len(data["spirit_elements"]) != 16:
         raise ValueError("二目五行表须保留十六神")
     return data
@@ -69,10 +64,8 @@ def elemental_guan_assessment(
             "author",
             "source_title",
             "classical_author",
-            "source_manifest_sha256",
         ]
     }
-    ruleset.update(source_urls=list(data["source_urls"]), catalog_sha256=CATALOG_SHA256)
     usage = (
         "day_mode_selected_fragment_only"
         if calculation_mode == "day"
@@ -168,7 +161,6 @@ def elemental_guan_assessment(
         source_interpretation={
             "kind": kind,
             "reading": reading,
-            "source": data["source_urls"][1],
             "applicability": usage,
             "scope": bound,
             "overall_outcome_assessed": False,

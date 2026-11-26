@@ -9,9 +9,9 @@ from fatebridge.core.astro.time_scales import utc_calendar_from_tt
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
 
-_SCALAR = "explicit_ieee_float_tt_point"
-_PARTS = "explicit_two_part_tt"
-_REQUIRED = {
+SCALAR = "explicit_ieee_float_tt_point"
+PARTS = "explicit_two_part_tt"
+REQUIRED = {
     "selected_crossing_jd_tt",
     "root_bracket_tt",
     "root_bracket_seconds",
@@ -60,12 +60,12 @@ def validate_term_point(
     """
     if details is None and not complete:
         return
-    if not isinstance(details, dict) or (complete and not _REQUIRED <= details.keys()):
+    if not isinstance(details, dict) or (complete and not REQUIRED <= details.keys()):
         raise _bad()
     representation = details.get("numerical_epoch_representation")
     if "numerical_epoch_representation" in details and representation not in (
-        _SCALAR,
-        _PARTS,
+        SCALAR,
+        PARTS,
     ):
         raise _bad()
     if "root_time_scale" in details and details["root_time_scale"] != "TT":
@@ -77,8 +77,8 @@ def validate_term_point(
         raise _bad()
     scope = (
         {
-            _SCALAR: "exact_value_of_selected_ieee_float",
-            _PARTS: "rounded_display_of_selected_tt_parts",
+            SCALAR: "exact_value_of_selected_ieee_float",
+            PARTS: "rounded_display_of_selected_tt_parts",
         }.get(representation)
         if isinstance(representation, str)
         else None
@@ -98,7 +98,7 @@ def validate_term_point(
             raise _bad()
     point = None
     bracket = None
-    if representation == _SCALAR:
+    if representation == SCALAR:
         if (
             "selected_crossing_tt_parts" in details
             or "root_bracket_tt_parts" in details
@@ -108,7 +108,7 @@ def validate_term_point(
             point = TTInstant.from_float(scalar)
         if display_bracket is not None:
             bracket = tuple(TTInstant.from_float(x) for x in display_bracket)
-    elif representation == _PARTS:
+    elif representation == PARTS:
         if (
             complete
             and not {"selected_crossing_tt_parts", "root_bracket_tt_parts"}

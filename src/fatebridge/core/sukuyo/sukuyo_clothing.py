@@ -17,13 +17,12 @@ SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_t1299_clothing.json"
 
 
 def source_bundle() -> dict[str, Any]:
-    return load_source(SOURCE).data
+    return load_source(SOURCE)
 
 
 def clothing_reference(calendar: dict[str, Any]) -> dict[str, Any]:
 
-    record = load_source(SOURCE)
-    source = record.data
+    source = load_source(SOURCE)
     mansion = calendar.get("natal_su27")
     if mansion is not None and (not isinstance(mansion, str) or len(mansion) != 1):
         raise ValueError("衣事章须使用已核定的二十七宿，不含牛或并字")
@@ -117,8 +116,6 @@ def clothing_reference(calendar: dict[str, Any]) -> dict[str, Any]:
         "historical_clock_mapping_evaluated": False,
         "real_world_event_prediction_evaluated": False,
         "source_url": source["source_url"],
-        "source_sha256": source["source_sha256"],
-        "source_bundle_sha256": record.sha256,
         "locator": source["locator"],
         "unmapped_clothing_predicates": source["unmapped_clothing_predicates"],
         "scope": source["scope"],

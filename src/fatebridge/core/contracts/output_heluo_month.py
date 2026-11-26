@@ -87,7 +87,6 @@ class HeluoSeasonalNumbers(PartialOutput):
     ruleset_id: str | None = None
     version: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
     source_pdf_pages: list[int] | None = None
     assessment_status: str | None = None
     numbers: dict[str, HeluoNumberFact] | None = None
@@ -185,9 +184,6 @@ class HeluoMonthAffinity(PartialOutput):
         None
     )
     volume_one_explicit_months: int | None = Field(default=None, ge=0, le=64)
-    volume_one_collation_sha256: str | None = None
-    intro_fact_sha256: str | None = None
-    volume_one_fact_sha256: str | None = None
     source_assignment_conflicts: list[HeluoMonthAssignmentConflict] | None = None
     source_consensus_match: bool | None = Field(
         default=None,
@@ -197,8 +193,6 @@ class HeluoMonthAffinity(PartialOutput):
     version: str | None = None
     collation_version: str | None = None
     source_url: str | None = None
-    source_pdf_sha256: str | None = None
-    collation_sha256: str | None = None
     review_status: str | None = None
     reviewed_hexagram_introductions: int | None = Field(default=None, ge=0, le=64)
     explicit_assigned_months: int | None = Field(default=None, ge=0, le=64)

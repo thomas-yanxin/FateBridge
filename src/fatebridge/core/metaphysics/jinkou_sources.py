@@ -4,12 +4,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.metaphysics.ren_sources import (
-    JINKOU_RELATIONS_SCAN_SHA256 as SCAN_SHA256,
-)
-from fatebridge.core.metaphysics.ren_sources import JINKOU_RELATIONS_SOURCE as SCAN_URL
-from fatebridge.core.metaphysics.ren_sources import JINKOU_SOURCE
-
 STRENGTH_NOTE = (
     "课内旺衰采用网上转录十二例归纳的唯一不受克规则；"
     "京本PDF130天乙例图式末位为木，转录为水，书影判语仍为土旺。"
@@ -19,16 +13,12 @@ STRENGTH_NOTE = (
 
 
 def strength_sources() -> dict[str, Any]:
-
     asset = Path(__file__).resolve().parents[2] / "data/jinkou_waseda_strength.json"
     corroboration: dict[str, Any] = json.loads(asset.read_text(encoding="utf-8"))
     return {
         "selected_witness": "online_transcription",
         "derivation": "sufficient_condition_inferred_from_examples",
-        "source_url": JINKOU_SOURCE,
         "source_section": "贵神休旺所主",
-        "scan_source_url": SCAN_URL,
-        "scan_source_sha256": SCAN_SHA256,
         "scan_pdf_pages": [129, 130],
         "scan_collation_status": "unresolved_diagram_prose_difference",
         "daily_five_states_adjudicated": False,
@@ -40,8 +30,6 @@ def strength_sources() -> dict[str, Any]:
 
 def use_sources() -> dict[str, Any]:
     return {
-        "scan_source_url": SCAN_URL,
-        "scan_source_sha256": SCAN_SHA256,
         "no_control_pdf_page": 18,
         "no_control_footer_page": 17,
         "polarity_pdf_pages": [45, 46],

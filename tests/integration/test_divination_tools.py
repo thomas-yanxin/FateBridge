@@ -198,10 +198,7 @@ def test_calculate_gua_meiyi_returns_snapshot_export() -> None:
     assert result["results"]["111"]["name"] == "乾"
     assert "[查询概览]" in result["snapshot_text"]
     assert "[批量结果]" in result["snapshot_text"]
-    assert (
-        result["results"]["111111"]["classical"]["source_url"]
-        in result["snapshot_text"]
-    )
+    assert result["results"]["111111"]["classical"]["guaci"] in result["snapshot_text"]
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 

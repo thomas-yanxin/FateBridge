@@ -5,8 +5,6 @@ declared day scale; these kernels do not supply a physical TT/TDB conversion.
 The position map is the Lorentz part of ERFA2.0.1 eraAb, based on Urban &
 Seidelmann (2013), Expr7.40. Its solar-potential addition is not in this native
 Swiss-model kernel. Position and observer-beta JVPs differentiate the same map.
-Source: https://github.com/liberfa/erfa/blob/v2.0.1/src/ab.c
-Native convention: https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swephlib.c
 """
 
 from __future__ import annotations

@@ -16,6 +16,13 @@ from fatebridge.core.hexagram_relations import (
     ELEMENT_GENERATES,
     relationship_by_role,
 )
+from fatebridge.core.meihua.meihua import meihua_traditional_readings
+from fatebridge.core.meihua.meihua_countercontrol import build_internal_countercontrol
+from fatebridge.core.meihua.meihua_seasonal_reading import build_seasonal_qualification
+from fatebridge.core.meihua.meihua_text_reference import render_yaoci_text
+from fatebridge.core.meihua.meihua_topics import build_topic_interpretation
+from fatebridge.core.meihua.meihua_weather import build_weather_interpretation
+from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
 from fatebridge.core.zhouyi import classical_hexagram
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
@@ -174,8 +181,6 @@ def build_moving_line_oracle(
     line_body_use = resolve_body_use(hexagram, moving_line)
     classical = hexagram.get("classical") or classical_hexagram(hexagram["binary_code"])
     verse = classical["yaoci"][moving_line - 1]
-    from fatebridge.core.meihua.meihua_text_reference import render_yaoci_text
-
     rendering = render_yaoci_text(verse["text"])
     display = rendering["display_text"]
     verse_text = display if display is not None else "〔转录标记未解析，原文另存〕"
@@ -193,7 +198,6 @@ def build_moving_line_oracle(
         },
         "classical_yaoci": verse,
         "classical_yaoci_rendering": rendering,
-        "classical_source_url": classical["source_url"],
     }
 
 
@@ -330,8 +334,6 @@ def build_meihua_interpretation(
     interpretation_topic: str = "general",
     weather_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
-
     options = MeihuaInterpretationOptions.model_validate(
         {
             "interpretation_topic": interpretation_topic,
@@ -339,8 +341,6 @@ def build_meihua_interpretation(
         }
     )
     if options.interpretation_topic == "weather":
-        from fatebridge.core.meihua.meihua_weather import build_weather_interpretation
-
         interpretation = build_weather_interpretation(meihua, weather_context)
         interpretation["topic_reading"] = None
         interpretation["topic_ruleset"] = None
@@ -350,22 +350,12 @@ def build_meihua_interpretation(
         interpretation["classical_text_reference"] = None
         return interpretation
     if options.interpretation_topic != "general":
-        from fatebridge.core.meihua.meihua_topics import build_topic_interpretation
-
         return build_topic_interpretation(meihua, options.interpretation_topic)
     base = meihua["base_hexagram"]
     changed = meihua["changed_hexagram"]
     moving_line = meihua["seed"]["moving_line"]
     line_oracles = build_line_oracles(base, moving_line)
     moving_line_oracle = line_oracles[moving_line - 1]
-
-    from fatebridge.core.meihua.meihua import meihua_traditional_readings
-    from fatebridge.core.meihua.meihua_countercontrol import (
-        build_internal_countercontrol,
-    )
-    from fatebridge.core.meihua.meihua_seasonal_reading import (
-        build_seasonal_qualification,
-    )
 
     control_stages = meihua.get("stage_relations", [])
     internal_control = (
@@ -408,7 +398,6 @@ def build_meihua_interpretation(
         "classical_text_reference": {
             "moving_yaoci": moving_line_oracle.get("classical_yaoci"),
             "moving_yaoci_rendering": moving_line_oracle["classical_yaoci_rendering"],
-            "source_url": moving_line_oracle.get("classical_source_url"),
             "selection_policy": "actual_moving_line_reference_only",
             "scope": "按实际卦码和动爻引用《周易》经文；所选原法的经文参照不自动推导现实成败。",
         },

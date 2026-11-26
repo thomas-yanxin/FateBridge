@@ -113,7 +113,6 @@ class TransmissionTrine(PartialOutput):
 class LiurenTransmissionRelations(PartialOutput):
     ruleset_id: Literal["liuren_tanyuan_transmission_relations_v1"] | None = None
     source_url: str | None = None
-    source_sha256: str | None = None
     original_pdf_pages: list[int] | None = None
     day_ganzhi: str | None = None
     day_element: Phase | None = None

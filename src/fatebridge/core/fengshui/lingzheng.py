@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 from fatebridge.core.fengshui.directions import rule_data
 from fatebridge.core.fengshui.lingzheng_inputs import (
@@ -16,7 +16,7 @@ from fatebridge.core.fengshui.lingzheng_inputs import (
 @lru_cache(maxsize=1)
 def _data() -> dict[str, Any]:
     p = Path(__file__).parents[2] / "data/fengshui/fixed-lingzheng-v1.json"
-    return cast(Dict[str, Any], json.loads(p.read_text(encoding="utf-8")))
+    return cast(dict[str, Any], json.loads(p.read_text(encoding="utf-8")))
 
 
 def lingzheng_provenance() -> dict[str, Any]:

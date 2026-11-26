@@ -165,8 +165,6 @@ class SourceAlias:
 class CompiledProfile:
     profile_id: str
     source_commit: str
-    source_property_sha256: str
-    source_url: str
     source_declarations: int
     rules: tuple[CompiledRule, ...]
     aliases: tuple[SourceAlias, ...]
@@ -218,8 +216,6 @@ def load_source_profile(path: Path) -> CompiledProfile:
     for key in (
         "profile_id",
         "source_commit",
-        "source_property_sha256",
-        "source_url",
         "separator",
     ):
         value = source.get(key)
@@ -333,8 +329,6 @@ def load_source_profile(path: Path) -> CompiledProfile:
     return CompiledProfile(
         identity["profile_id"],
         identity["source_commit"],
-        identity["source_property_sha256"],
-        identity["source_url"],
         len(declarations),
         tuple(rules.values()),
         tuple(aliases),

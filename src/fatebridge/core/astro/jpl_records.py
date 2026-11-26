@@ -6,7 +6,6 @@ The float-state reader remains separate. This context has no global file cache.
 
 from __future__ import annotations
 
-import hashlib
 import math
 import os
 import struct
@@ -84,7 +83,6 @@ class SourceRecords:
             self.cache[index] = values
             self.receipts[index] = {
                 "index": index,
-                "sha256": hashlib.sha256(raw).hexdigest(),
                 "start": values[0],
                 "end": values[1],
             }
@@ -108,7 +106,6 @@ class SourceRecords:
     def evidence(self) -> dict[str, Any]:
         return {
             "filename": self.path.name,
-            "header_sha256": hashlib.sha256(self.header).hexdigest(),
             "records": [self.receipts[k] for k in sorted(self.receipts)],
             "polynomial_cells": [list(cell) for cell in sorted(self.cells)],
             "source_time_scale": "TDB",

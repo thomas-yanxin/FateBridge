@@ -8,7 +8,6 @@ from fatebridge.core.metaphysics.common import LIURENG_GUIREN_DAY, LIURENG_GUIRE
 
 GuirenProfile = Literal["liuren_common_v1", "tanyuan_xieji_v1"]
 DEFAULT_GUIREN_PROFILE: GuirenProfile = "liuren_common_v1"
-TANYUAN_TRANSCRIPTION = "https://www.yiology.mobi/books/卜/大六壬/大六壬探原/"
 
 # 探原·卷上·日贵人歌 / 夜贵人歌 (author explicitly follows 协纪辨方).
 TANYUAN_DAY = dict(zip("甲乙丙丁戊己庚辛壬癸", "未申酉亥丑子丑寅卯巳"))

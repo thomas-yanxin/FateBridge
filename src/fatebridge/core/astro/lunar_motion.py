@@ -36,7 +36,6 @@ from fatebridge.utils.errors import EphemerisSourceError
 
 METHOD_ID = "fatebridge_lunar_fixed_frame_source_derivative_v3"
 NATIVE_ABERRATION_STEP_DAYS = 0.0001  # PLAN_SPEED_INTV in the locked source.
-SOURCE_URL = "https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html"
 SOURCE_VERSION = ("2.10.03", "2.10.3.2")
 
 
@@ -104,7 +103,6 @@ def lunar_light_time_correction(
         "binding_version": binding_version,
         "ephemeris_model": model,
         "epoch_jd_tt": julian_day_tt,
-        "source_url": SOURCE_URL,
         "source_function": "pyswisseph2.10.3.2/libswe/sweph.c:app_pos_etc_moon",
         "scope": "Light-time and spatial terms are retained separately. An eligible observer/source remainder differentiates the declared continuous source model in the fixed reception frame; positions are unchanged. Complete moving-frame derivatives, native binary identity, physical TT-clock mapping, station time and observational accuracy remain unqualified.",
     }

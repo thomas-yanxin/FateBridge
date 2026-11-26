@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
-from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 MONTHS = "寅卯辰巳午未申酉戌亥子丑"
@@ -116,8 +115,6 @@ def branch_stars(
         )
     return dict(
         ruleset_id="jinkou_jingben_branch_stars_v1",
-        source_url=SCAN_URL,
-        source_sha256=SCAN_SHA256,
         original_pdf_pages=[118, 119, 120],
         year_branch=year_branch,
         month_building_branch=month_branch,
@@ -137,7 +134,6 @@ def branch_stars(
 def branch_stars_trace(value: dict[str, Any]) -> dict[str, Any]:
     return dict(
         rule_id="jinkou.jingben_branch_stars",
-        source_url=SCAN_URL,
         source_section="京本卷上·合用神煞·天赦、天喜、天马、驿马、丧门、吊客、丧车",
         result=value,
     )

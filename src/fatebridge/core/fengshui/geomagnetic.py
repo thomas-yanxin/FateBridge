@@ -28,17 +28,12 @@ class _GeomagneticRuleset(TypedDict):
     conventions: list[str]
 
 
-class _GeomagneticOrigin(TypedDict):
-    coefficient_sha256: str
-
-
 class _GeomagneticData(TypedDict):
     ruleset: _GeomagneticRuleset
     sources: dict[str, dict[str, JsonValue]]
     model_header: tuple[float, str, str]
     degree: Literal[12]
     coefficients: tuple[WmmCoefficient, ...]
-    origin: _GeomagneticOrigin
 
 
 class GeomagneticResult(TypedDict):
@@ -177,7 +172,6 @@ def geomagnetic_reference(
                 "degree": 12,
                 "arithmetic_decimal_digits": 50,
             },
-            "coefficient_sha256": data["origin"]["coefficient_sha256"],
             "supported_decimal_year": {
                 "from_inclusive": 2025.0,
                 "until_exclusive": 2030.0,

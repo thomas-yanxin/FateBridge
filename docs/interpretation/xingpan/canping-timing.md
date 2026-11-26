@@ -1,6 +1,6 @@
 # 参评配运与原典依据
 
-[取证入口](numerology.md) · [计算口径与复核](../../numerology-audit.md)
+[取证入口](numerology.md)
 
 配运问题先按公开`timing_policy`视图保留本命和同次首行，再解释所查阶段。不要因`first_period=null`或没有查询时刻就漏掉有实际编号、年龄标签和可读条文的`first_row`。
 

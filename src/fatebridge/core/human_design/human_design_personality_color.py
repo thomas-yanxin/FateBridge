@@ -5,19 +5,12 @@ from typing import Any, cast
 from fatebridge.core.human_design.human_design_references import (
     reference_data,
 )
-from fatebridge.core.human_design.human_design_references import (
-    reference_sha256 as catalogue_sha256,
-)
 
 SCOPE = "按人格日地／交点的实际Color及对点一致性读取官方类别名；对点来自同一依赖，不是两份独立证据。类别不评定现实动机、性格或能力；本命资料未评估转移、分心或是否对齐，也不提供决策、临床或预测依据。路径相对于本盘或当前联合快照。"
 
 
 def _reference() -> dict[str, Any]:
     return reference_data("personality-color-reference.json")
-
-
-def reference_sha256() -> str:
-    return catalogue_sha256("personality-color-reference.json")
 
 
 def personality_colors(activations: dict[str, Any]) -> dict[str, Any]:
@@ -70,7 +63,6 @@ def personality_colors(activations: dict[str, Any]) -> dict[str, Any]:
                 if valid
                 else []
             ),
-            "source_url": reference["sources"][kind]["url"],
         }
     return {
         "status": (
@@ -80,7 +72,6 @@ def personality_colors(activations: dict[str, Any]) -> dict[str, Any]:
         ),
         **components,
         "source_catalog_id": reference["source_catalog_id"],
-        "source_catalog_sha256": reference_sha256(),
         "observed_transference": None,
         "observed_distraction": None,
         "observed_alignment": None,

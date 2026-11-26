@@ -12,7 +12,7 @@ from fatebridge.utils.errors import EphemerisSourceError
 def test_point_mass_dependency_absence_is_explicit_without_native_fallback(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(model, "find_spec", lambda _: None)
+    monkeypatch.setattr(model, "erfa", None)
     result = model.point_mass_positions(2451545.0)
     assert result == {
         "method_id": model.METHOD_ID,
@@ -74,7 +74,7 @@ def test_candidate_root_uses_its_own_sun_across_zero_degrees(
 def test_candidate_root_keeps_optional_dependency_unavailable(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(model, "find_spec", lambda _: None)
+    monkeypatch.setattr(model, "erfa", None)
     result = model.solve_point_mass_design_root(2451545.0)
     assert result["status"] == "unavailable"
     assert "design_jd_tt" not in result

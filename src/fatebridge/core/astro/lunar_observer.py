@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import math
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Sequence, Tuple
+from typing import Any, Callable, Sequence
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
@@ -39,13 +39,13 @@ STENCILS = {
 ACCELERATION_LINE = 1e-10
 OBSERVER_RATE_LINE = 1e-6
 POSITION_LINE_ARCSEC = 1e-7
-NativeState = Tuple[Tuple[float, ...], int]
+NativeState = tuple[tuple[float, ...], int]
 Sampler = Callable[..., NativeState]
 
 
 def acceleration_from_velocities(
     velocities: Sequence[Sequence[float]], step: float, direction: str
-) -> Tuple[float, ...]:
+) -> tuple[float, ...]:
     """Sixth-order derivative; coefficients independently derived rationally."""
     if direction not in STENCILS or not math.isfinite(step) or step <= 0:
         raise EphemerisSourceError("coordinate_motion_unavailable")
@@ -63,7 +63,7 @@ def acceleration_from_velocities(
     return result
 
 
-def select_source_stencil(epoch: float, lower: float, upper: float) -> Optional[str]:
+def select_source_stencil(epoch: float, lower: float, upper: float) -> str | None:
     """Source-only priority; rates/residuals cannot affect this choice."""
     if (
         not all(math.isfinite(x) for x in (epoch, lower, upper))
@@ -95,7 +95,7 @@ def fixed_frame_source_remainder(
     light_time_derivative: float,
     prior_light: float,
     prior_spatial: float,
-) -> Tuple[float, Dict[str, Any]]:
+) -> tuple[float, dict[str, Any]]:
     """Differentiate the full source formula; subtract already exposed terms.
 
     Geometry and velocity use the same native argument-day unit. A physical
@@ -176,12 +176,12 @@ def lunar_observer_remainder(
     light_time_derivative: float,
     prior_light: float,
     prior_spatial: float,
-) -> Tuple[Optional[float], Dict[str, Any]]:
+) -> tuple[float | None, dict[str, Any]]:
     """Checked transaction; caller owns the lock and fixes SIDBIT_ECL_T0.
 
     The frame epoch must remain the reception epoch throughout all samples.
     """
-    metadata: Dict[str, Any] = {
+    metadata: dict[str, Any] = {
         "method_id": METHOD_ID,
         "epoch_jd_tt": epoch,
         "ephemeris_model": model,
@@ -250,7 +250,7 @@ def lunar_observer_remainder(
             stencil_integer_weights=list(STENCILS[direction][1]),
             stencil_divisor=60,
         )
-    initial: Dict[str, NativeState] = {"earth": earth_center}
+    initial: dict[str, NativeState] = {"earth": earth_center}
     cache = {epoch: earth_center[0][3:]}
 
     def check_context() -> None:

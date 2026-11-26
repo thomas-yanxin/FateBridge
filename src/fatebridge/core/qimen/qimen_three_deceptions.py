@@ -2,9 +2,6 @@
 
 from typing import Any
 
-from fatebridge.core.qimen.qimen_sources import YANYI_VOLUMES
-
-SOURCE = YANYI_VOLUMES[2]
 PROFILE_ID = "yanyi_vol2_three_deceptions_full_triples_v1"
 DEFINITIONS = {
     "太阴": ("true_deception", "真诈"),
@@ -19,7 +16,6 @@ def describe_three_deceptions() -> dict[str, Any]:
     return {
         "id": PROFILE_ID,
         "title": "卷二三诈完整奇门神组合；缺项判断优先未决",
-        "source": SOURCE,
         "section": "卷二·三诈五假·三诈",
         "scan_pages": [25, 26],
         "definitions": [
@@ -105,7 +101,6 @@ def three_deception_context(
         "rhetorical_fractions_converted_to_probability": False,
         "earth_wonder_used_as_heaven_wonder": False,
         "outcome_inference_allowed": False,
-        "source": SOURCE,
         "source_scan_pages": [25, 26],
     }
 
@@ -157,7 +152,6 @@ def build_three_deceptions(
                     f"{path}.evidence.three_deceptions",
                     "qimen.rule_profiles.three_deceptions",
                 ],
-                "source": SOURCE,
                 "section": "卷二·三诈五假·三诈",
                 "source_scan_pages": [25, 26],
                 "layer": "traditional_rule_match",

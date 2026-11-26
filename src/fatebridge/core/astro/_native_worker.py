@@ -13,43 +13,44 @@ from queue import Queue
 from threading import Thread
 from typing import Any
 
+from pydantic import JsonValue
+
+from fatebridge.core.astro import native_execution as execution
+from fatebridge.core.astro.iers_ut1 import use_ut1_source
+from fatebridge.core.compressed_ephemeris import audit_compressed_endpoints
+from fatebridge.core.ephemeris_runtime import configure_ephemeris_path
+from fatebridge.core.execution_context import call_clock
+from fatebridge.core.physical_ephemeris_policy import data_file_policy
+from fatebridge.utils.errors import EphemerisSourceError, JyotishCalculationError
+
 logger = logging.getLogger(__name__)
 
 
 def main() -> None:
     """Serve one request after resolving the isolated executable's package path."""
-    from pydantic import JsonValue
-
-    from fatebridge.core.astro import native_execution as execution
-    from fatebridge.core.astro.iers_ut1 import use_ut1_source
-    from fatebridge.core.compressed_ephemeris import audit_compressed_endpoints
-    from fatebridge.core.execution_context import call_clock
-    from fatebridge.core.physical_ephemeris_policy import data_file_policy
-    from fatebridge.utils.errors import EphemerisSourceError, JyotishCalculationError
-
     output = sys.stdout.buffer
 
     def send(message: dict[str, Any]) -> None:
         output.write(execution.message_bytes(message))
         output.flush()
 
-    line = sys.stdin.buffer.readline(execution._MAX_MESSAGE + 1)
-    if len(line) > execution._MAX_MESSAGE or not line.endswith(b"\n"):
+    line = sys.stdin.buffer.readline(execution.MAX_MESSAGE + 1)
+    if len(line) > execution.MAX_MESSAGE or not line.endswith(b"\n"):
         raise execution.NativeExecutionError("Invalid private calculation request")
     request = json.loads(line)
-    if request["entry"] not in execution._ENTRIES:
+    if request["entry"] not in execution.ENTRIES:
         raise execution.NativeExecutionError("Unsupported private calculation entry")
     acknowledgements: Queue[bytes] = Queue(maxsize=1)
 
     def watch_parent() -> None:
         while True:
-            acknowledgement = sys.stdin.buffer.readline(execution._MAX_MESSAGE + 1)
+            acknowledgement = sys.stdin.buffer.readline(execution.MAX_MESSAGE + 1)
             if not acknowledgement:
                 # The owning process exited (including SIGKILL), or closed its
                 # request pipe after receiving the final result. Never carry
                 # on a long grid after the sole result recipient disappears.
                 os._exit(0)
-            if len(acknowledgement) > execution._MAX_MESSAGE:
+            if len(acknowledgement) > execution.MAX_MESSAGE:
                 os._exit(1)
             acknowledgements.put(acknowledgement)
 
@@ -57,7 +58,7 @@ def main() -> None:
     owner.start()
     # Process lifetime is exactly one operation. No parent native module, cache,
     # fixed Delta-T override, or fault-injection monkeypatch is inherited.
-    execution._WORKER_ACTIVE = True
+    execution.WORKER_ACTIVE = True
     selected = request["path"]
     if selected:
         os.environ["SE_EPHE_PATH"] = selected
@@ -70,14 +71,12 @@ def main() -> None:
     with contextlib.redirect_stdout(sys.stderr), call_clock(request["clock"]) as clock:
         try:
             auxiliary = execution.AuxiliaryInputs(request["auxiliary_path"])
-            if auxiliary.initial != request["auxiliary_fingerprints"]:
+            if auxiliary.initial != request["auxiliary_states"]:
                 raise EphemerisSourceError("auxiliary_changed_during")
             execution._AUXILIARY_EVIDENCE = {
                 **auxiliary.evidence(),
                 **execution.context_for_entry(request["entry"]),
             }
-            from fatebridge.core.ephemeris_runtime import configure_ephemeris_path
-
             configure_ephemeris_path(selected or "")
             arguments = execution.decode(request["args"])
             options = execution.decode(request["kwargs"])

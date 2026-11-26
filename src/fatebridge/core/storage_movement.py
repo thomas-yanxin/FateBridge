@@ -20,7 +20,7 @@ SOURCE: RootSource = {
     "pdf_pages": [44, 45],
     "printed_pages": [35, 36],
 }
-_CLASHES = {frozenset("辰戌"), frozenset("丑未")}
+CLASHES = {frozenset("辰戌"), frozenset("丑未")}
 
 
 class StorageRootRetention(TypedDict):
@@ -56,7 +56,7 @@ def storage_movement_effect(
 ) -> StorageMovementReceipt | None:
     """Separate the text's retention direction from the numeric policy for participating roots."""
     present = frozenset(branches[p] for p in positions)
-    applicable = (kind == "六冲" and len(positions) == 2 and present in _CLASHES) or (
+    applicable = (kind == "六冲" and len(positions) == 2 and present in CLASHES) or (
         kind == "刑" and present == frozenset("丑未戌")
     )
     if not applicable:

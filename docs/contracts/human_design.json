@@ -92,9 +92,7 @@
         "interpretation.circuit_topology_meaning",
         "source_consistency.archival_channel_pages.status",
         "source_consistency.archival_channel_pages.source_label_disagreements",
-        "source_consistency.archival_channel_pages.source_url",
-        "source_consistency.archival_channel_pages.source_revision",
-        "source_consistency.archival_channel_pages.publisher_master_authenticity_certified"
+        "source_consistency.archival_channel_pages.source_revision"
       ],
       "purpose": "本次完整通道、回路群与整合小计；保留原有来源层级和扫描标签分歧，逐项全回路集合另读topology卡或完整结果"
     },
@@ -379,7 +377,6 @@
         "source_consistency.archival_channel_pages.channels_checked",
         "source_consistency.archival_channel_pages.channels_matched",
         "source_consistency.archival_channel_pages.source_label_disagreements",
-        "source_consistency.archival_channel_pages.publisher_master_authenticity_certified",
         "rulesets",
         "validation"
       ],

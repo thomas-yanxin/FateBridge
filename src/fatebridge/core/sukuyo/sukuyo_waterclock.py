@@ -177,8 +177,7 @@ def _counter_row(completed: int, per_part: int) -> dict[str, Any]:
 
 
 def nalanda_group_count(completed_sinkings: int) -> dict[str, Any]:
-    loaded = load_source(SOURCE)
-    data = loaded.data
+    data = load_source(SOURCE)
     validate_source_controls(data)
     n = data["T2125"]["nalanda"]
     limit = n["sinkings_per_named_part"] * n["named_parts_per_day_and_night"]
@@ -190,7 +189,6 @@ def nalanda_group_count(completed_sinkings: int) -> dict[str, Any]:
     fraction = row["elapsed_named_parts"]
     return {
         **row,
-        "source_bundle_sha256": loaded.sha256,
         "physical_clock_conversion": False,
         "reading_text": (
             f"按所选那烂陀每{n['sinkings_per_named_part']}碗一时的累计计碗模型，"
@@ -204,8 +202,7 @@ def nalanda_group_count(completed_sinkings: int) -> dict[str, Any]:
 
 def source_specific_time_reference() -> dict[str, Any]:
 
-    loaded = load_source(SOURCE)
-    data = loaded.data
+    data = load_source(SOURCE)
     validate_source_controls(data)
     n = data["T2125"]["nalanda"]
     k = data["T2125"]["kulun"]
@@ -214,7 +211,6 @@ def source_specific_time_reference() -> dict[str, Any]:
     total = n["sinkings_per_named_part"] * n["named_parts_per_day_and_night"]
     return {
         **data,
-        "source_bundle_sha256": loaded.sha256,
         "daybreak_source_comparison": daybreak_reference(),
         "count_arithmetic": {
             "nalanda_source_count_consistency": {

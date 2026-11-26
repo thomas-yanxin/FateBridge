@@ -46,7 +46,6 @@ class TaiyiOppositionRuleset(PartialOutput):
     version: str | None = None
     author: str | None = None
     classical_sources: list[str] | None = None
-    annotation_data_sha256: str | None = None
 
 
 class TaiyiOppositionAssessment(PartialOutput):

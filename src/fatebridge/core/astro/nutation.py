@@ -6,7 +6,6 @@ parameter file. This is the native 2.10.03 model, not a new physical error bound
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 from pathlib import Path
@@ -16,22 +15,17 @@ from fatebridge.core.astro.tt_epoch import TTInstant
 
 
 class NutationParameters(TypedDict):
-    source_url: str
     terms: list[list[str]]
     fundamental_arcseconds: list[list[str]]
 
 
-COEFFICIENT_SHA256 = "8479887ba03b0c3d3c6e8371a6dac61b28cdf1abe52b148f17e71dde1c714120"
-_RAW = (
+RAW = (
     Path(__file__).resolve().parents[2] / "data/astronomy/swiss-nutation77-v1.json"
 ).read_bytes()
-if hashlib.sha256(_RAW).hexdigest() != COEFFICIENT_SHA256:
-    raise RuntimeError("Nutation coefficients differ from the pinned native source")
-_DATA: NutationParameters = json.loads(_RAW)
-SOURCE_URL = _DATA["source_url"]
-_TERMS = tuple(tuple(map(float, row)) for row in _DATA["terms"])
-_FUNDAMENTAL = tuple(tuple(map(float, row)) for row in _DATA["fundamental_arcseconds"])
-_AS2R = math.pi / 648000.0
+DATA: NutationParameters = json.loads(RAW)
+TERMS = tuple(tuple(map(float, row)) for row in DATA["terms"])
+FUNDAMENTAL = tuple(tuple(map(float, row)) for row in DATA["fundamental_arcseconds"])
+AS2R = math.pi / 648000.0
 
 
 def nutation(epoch: float | TTInstant) -> tuple[float, float, float, float]:
@@ -39,16 +33,16 @@ def nutation(epoch: float | TTInstant) -> tuple[float, float, float, float]:
     t = float((TTInstant.from_value(epoch).days - 2451545) / 36525)
     phases = []
     rates = []
-    for polynomial in _FUNDAMENTAL:
+    for polynomial in FUNDAMENTAL:
         angle = polynomial[-1]
         derivative = 0.0
         for coefficient in reversed(polynomial[:-1]):
             derivative = derivative * t + angle
             angle = angle * t + coefficient
-        phases.append(math.remainder(angle, 1296000.0) * _AS2R)
-        rates.append(derivative * _AS2R / 36525.0)
+        phases.append(math.remainder(angle, 1296000.0) * AS2R)
+        rates.append(derivative * AS2R / 36525.0)
     values: list[list[float]] = [[], [], [], []]
-    for row in reversed(_TERMS):
+    for row in reversed(TERMS):
         phase = math.remainder(
             math.fsum(n * a for n, a in zip(row[:5], phases)), math.tau
         )

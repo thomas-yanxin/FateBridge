@@ -12,7 +12,7 @@ from importlib.metadata import version
 from typing import Any
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.astro.lunar_motion import SOURCE_URL, SOURCE_VERSION
+from fatebridge.core.astro.lunar_motion import SOURCE_VERSION
 from fatebridge.core.astro.native_identity import binding_distribution_version
 from fatebridge.core.ephemeris_runtime import (
     configured_ephemeris_path,
@@ -54,7 +54,6 @@ def traditional_lahiri_origin_wrap(
         "epoch_jd_tt": julian_day_tt,
         "native_version": native_version,
         "binding_version": binding_version,
-        "source_url": SOURCE_URL,
         "source_function": "pyswisseph2.10.3.2/libswe/sweph.c:swi_get_ayanamsa_with_speed",
         "sidereal_mode": "managed_traditional_lahiri",
         "native_divisor_days": NATIVE_INTERVAL_DAYS,

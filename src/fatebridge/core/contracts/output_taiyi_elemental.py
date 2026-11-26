@@ -11,8 +11,6 @@ class TaiyiElementalRuleset(PartialOutput):
     author: str | None = None
     source_title: str | None = None
     classical_author: str | None = None
-    source_manifest_sha256: str | None = None
-    catalog_sha256: str | None = None
     source_urls: list[str] | None = None
 
 

@@ -81,6 +81,7 @@ async def call_contracts() -> list[dict[str, object]]:
 
 
 def render_files(records: list[dict[str, object]]) -> dict[str, str]:
+    """Format generated contract JSON files and the index README."""
     files = {
         f"{record['tool']}.json": json.dumps(
             record, ensure_ascii=False, indent=2, sort_keys=True
@@ -113,6 +114,7 @@ def render_files(records: list[dict[str, object]]) -> dict[str, str]:
 
 
 async def main(argv: list[str] | None = None) -> None:
+    """Write or verify on-demand MCP call contract files."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)

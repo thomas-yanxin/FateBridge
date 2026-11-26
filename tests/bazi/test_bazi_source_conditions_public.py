@@ -1,6 +1,5 @@
 """All original source conditions remain distinct from actual model decisions."""
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -25,7 +24,6 @@ def test_every_original_case_supplies_its_own_complete_source_conditions(row) ->
             **row["review"],
             "provenance": {
                 "method_id": PLAN["method_id"],
-                "condition_layer_sha256": hashlib.sha256(DATA.read_bytes()).hexdigest(),
             },
         }
     assert result["current_calculation"]["calculation_overridden"] is False
@@ -151,22 +149,3 @@ def test_public_data_contains_source_conditions_without_private_answers() -> Non
     data = DATA.read_text()
     for key in ("expected_answer", "rubric", "actual_model_semantic_acceptance"):
         assert '"' + key + '"' not in data
-
-
-def test_entire_layer_tampering_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
-    from fatebridge.core import source_conditions
-
-    source_conditions._published_plan.cache_clear()
-    original = Path.read_bytes
-
-    def altered(path):
-        raw = original(path)
-        return raw + b" " if path.name == source_conditions.DATA_NAME else raw
-
-    try:
-        with monkeypatch.context() as patch:
-            patch.setattr(Path, "read_bytes", altered)
-            with pytest.raises(ValueError, match="散列"):
-                source_conditions._published_plan()
-    finally:
-        source_conditions._published_plan.cache_clear()

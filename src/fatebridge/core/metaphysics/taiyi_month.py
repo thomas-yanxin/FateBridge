@@ -8,8 +8,6 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal, cast
 
-from fatebridge.core.metaphysics.taiyi_hour import KEY_SOURCE
-
 TaiyiMonthProfile = Literal["jinjing_month_jie_360_v1", "key_month_tianzheng_jie_v1"]
 DEFAULT_MONTH_PROFILE = "jinjing_month_jie_360_v1"
 KEY_MONTH_PROFILE = "key_month_tianzheng_jie_v1"
@@ -81,7 +79,6 @@ def key_month_origin(cycle_year: int, month_offset: int) -> dict[str, Any]:
     shortcut_completed = nominal_year - 1504
     shortcut = shortcut_completed * 12 + 2 + nominal_month
     return {
-        "source": KEY_SOURCE,
         "cycle_year": cycle_year,
         "nominal_year": nominal_year,
         "nominal_month": nominal_month,

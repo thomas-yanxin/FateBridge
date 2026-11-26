@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-PLAN_SHA256 = "c397ced17ec8f83ee899e3de7a2c06cf2485ce1fdc5b11d474abe5a39793ad00"
 METHOD_ID = "registered_source_conditions_v1"
 DATA_NAME = "bazi-source-conditions.json"
 
@@ -19,8 +17,6 @@ def _published_plan() -> dict[str, Any]:
     raw = (
         Path(__file__).resolve().parents[1] / "data/reference" / DATA_NAME
     ).read_bytes()
-    if hashlib.sha256(raw).hexdigest() != PLAN_SHA256:
-        raise ValueError("原典条件校读层散列不符")
     result: dict[str, Any] = json.loads(raw)
     return result
 
@@ -59,10 +55,7 @@ def validate_known_review(value: dict[str, Any]) -> None:
     ):
         raise ValueError("完整四柱顺序与同一登记校读不符")
     provenance = value.get("provenance", {})
-    expected_provenance = {
-        "method_id": METHOD_ID,
-        "condition_layer_sha256": PLAN_SHA256,
-    }
+    expected_provenance = {"method_id": METHOD_ID}
     if any(expected_provenance.get(k) != v for k, v in provenance.items()):
         raise ValueError("原典条件校读来源回执不符")
 
@@ -95,14 +88,10 @@ def condition_reviews(
                 raise ValueError("原典条件不可拼接其他命式或重复来源")
             result[identifier] = {
                 **deepcopy(review),
-                "provenance": {
-                    "method_id": METHOD_ID,
-                    "condition_layer_sha256": PLAN_SHA256,
-                },
+                "provenance": {"method_id": METHOD_ID},
             }
     return result, {
         "source_condition_review_method_id": METHOD_ID,
-        "source_condition_review_sha256": PLAN_SHA256,
         "total_registered_source_condition_reviews": len(plan["reviews"]),
         "total_records_with_source_condition_review": len(result),
     }

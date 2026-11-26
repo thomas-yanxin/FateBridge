@@ -255,7 +255,7 @@ def build_decennials_payload(
     """Build the seven-period preview and the current path, not a discarded tree.
 
     Only the default settings are exposed by the public request schemas. The
-    former, unattributed ``hephaistio`` candidate did not conserve parent time;
+    former, unattributed hephaistio candidate did not conserve parent time;
     it is rejected rather than normalized or presented as an accepted method.
     """
     if start_mode not in [
