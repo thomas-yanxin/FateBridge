@@ -1,25 +1,70 @@
-"""Sitting-trigram house chart and separately scoped personal charts."""
+"""BaZhai sitting-trigram charts, 1864 MingGua, YouNian element relations, and YangZhai SanYao."""
+
+from __future__ import annotations
 
 from typing import Any
 
 from fatebridge.core.divination import BAGUA_BY_NAME
-from fatebridge.core.fengshui.bazhai_interpretation import (
-    palace_star_relationship,
-    you_nian_trace,
-)
-from fatebridge.core.fengshui.bearing_support import sitting_support
 from fatebridge.core.fengshui.calendar import (
     boundary_dates,
     boundary_model_policy,
     lichun_resolution,
     year_context,
 )
-from fatebridge.core.fengshui.directions import rule_data, sitting_from_facing, wrap9
+from fatebridge.core.fengshui.directions import (
+    raw_rule_data,
+    sitting_from_facing,
+    sitting_support,
+    wrap9,
+)
 from fatebridge.core.fengshui.models import BazhaiRequest, House, MingguaRequest
+from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
+
+_FLIPS = (3, 2, 1, 2, 3, 2, 1)
+_MASKS = (0, 4, 6, 7, 5, 1, 3, 2)
+_EAST_TRIGRAMS = frozenset({"坎", "离", "震", "巽"})
+_TRIGRAM_BITS = {
+    name: sum(bit << i for i, bit in enumerate(info["lines"]))
+    for name, info in BAGUA_BY_NAME.items()
+}
+
+
+def you_nian_trace(base_bits: int, target_bits: int) -> dict[str, Any]:
+    mask = base_bits ^ target_bits
+    step = _MASKS.index(mask)
+    changed = [line for line in (1, 2, 3) if mask & (1 << (line - 1))]
+    return {
+        "operation_count": step,
+        "cumulative_flip_sequence": list(_FLIPS[:step]),
+        "net_changed_lines": changed,
+        "net_changed_line_count": len(changed),
+        "changed_line_mask": mask,
+    }
+
+
+def palace_star_relationship(
+    palace_element: str, star_name: str, star_element: str
+) -> dict[str, Any]:
+    if palace_element == star_element:
+        code, label = "same_element", "宫星比和"
+    elif ELEMENT_GENERATES[palace_element] == star_element:
+        code, label = "palace_generates_star", "宫生星"
+    elif ELEMENT_GENERATES[star_element] == palace_element:
+        code, label = "star_generates_palace", "星生宫"
+    elif ELEMENT_CONTROLS[palace_element] == star_element:
+        code, label = "palace_controls_star", "宫克星"
+    else:
+        code, label = "star_controls_palace", "星克宫"
+    return {
+        "palace_element": palace_element,
+        "star_element": star_element,
+        "star_name": star_name,
+        "relationship": code,
+        "traditional_label": label,
+    }
 
 
 def placement_polarity(purpose: str, aspect: str) -> str:
-    """One rule for current findings and inverse direction calculations."""
     return (
         "inauspicious" if purpose == "stove" and aspect == "location" else "auspicious"
     )
@@ -28,50 +73,127 @@ def placement_polarity(purpose: str, aspect: str) -> str:
 def placement_application(
     palace: dict[str, Any], purpose: str, aspect: str
 ) -> dict[str, Any]:
-    """The same scoped evidence for a current or proposed direction."""
     expected = placement_polarity(purpose, aspect)
     return {
         "star": palace["star"],
         "expected_polarity": expected,
         "matches_convention": palace["star"]["polarity"] == expected,
-        "matches_convention_scope": "basic_star_polarity_only_not_element_or_whole_house_verdict",
-        "you_nian_trace": palace["you_nian_trace"],
-        "palace_star_relationship": palace["palace_star_relationship"],
-        "rule_id": (
-            "bazhai_sitting_v1.stove_seat_fire_mouth"
-            if purpose == "stove"
-            else "bazhai_sitting_v1.placement_application"
-        ),
-        "source_ids": ["S3"],
-        "application_scope": "selected_ruleset_convention",
+        "palace_star_relation": palace["palace_star_relation"],
     }
 
 
 def sectors(base: str, subject_id: str, basis: str) -> dict[str, Any]:
-    bits = {
-        name: sum(bit << i for i, bit in enumerate(info["lines"]))
-        for name, info in BAGUA_BY_NAME.items()
-    }
-    stars = rule_data("bazhai_stars")
-    return {
-        direction: {
-            **info,
-            "star": stars[str(bits[base] ^ bits[info["trigram"]])],
-            "changed_line_mask": bits[base] ^ bits[info["trigram"]],
-            "you_nian_trace": you_nian_trace(bits[base], bits[info["trigram"]]),
-            "palace_star_relationship": palace_star_relationship(
-                info["element"],
-                stars[str(bits[base] ^ bits[info["trigram"]])]["name"],
-                stars[str(bits[base] ^ bits[info["trigram"]])]["element"],
-            ),
-            "base_trigram": base,
-            "subject_id": subject_id,
-            "basis": basis,
-            "method": "bazhai",
-            "rule_id": "bazhai_sitting_v1.dayounian_xor",
-            "source_ids": ["S3"],
+    stars = raw_rule_data("bazhai_stars")
+    directions = raw_rule_data("directions")
+    base_bits = _TRIGRAM_BITS[base]
+    result: dict[str, Any] = {}
+    for direction, info in directions.items():
+        mask = base_bits ^ _TRIGRAM_BITS[info["trigram"]]
+        star = stars[str(mask)]
+        step = _MASKS.index(mask)
+        rel = palace_star_relationship(info["element"], star["name"], star["element"])
+        result[direction] = {
+            "star": star,
+            "changed_line_mask": mask,
+            "operation_count": step,
+            "palace_star_relation": rel["traditional_label"],
         }
-        for direction, info in rule_data("directions").items()
+    return result
+
+
+def _trigram_pair_relation(
+    from_role: str, from_trigram: str, to_role: str, to_trigram: str
+) -> dict[str, Any]:
+    """Compute YouNian star and five-element relation between two SanYao trigrams."""
+    stars = raw_rule_data("bazhai_stars")
+    star = stars[str(_TRIGRAM_BITS[from_trigram] ^ _TRIGRAM_BITS[to_trigram])]
+    from_elem = BAGUA_BY_NAME[from_trigram]["element"]
+    to_elem = BAGUA_BY_NAME[to_trigram]["element"]
+    if from_elem == to_elem:
+        elem_rel, elem_label = "same_element", f"{from_role}{to_role}比和"
+    elif ELEMENT_GENERATES[from_elem] == to_elem:
+        elem_rel, elem_label = "first_generates_second", f"{from_role}生{to_role}"
+    elif ELEMENT_GENERATES[to_elem] == from_elem:
+        elem_rel, elem_label = "second_generates_first", f"{to_role}生{from_role}"
+    elif ELEMENT_CONTROLS[from_elem] == to_elem:
+        elem_rel, elem_label = "first_controls_second", f"{from_role}克{to_role}"
+    else:
+        elem_rel, elem_label = "second_controls_first", f"{to_role}克{from_role}"
+    return {
+        "from_trigram": from_trigram,
+        "to_trigram": to_trigram,
+        "from_element": from_elem,
+        "to_element": to_elem,
+        "younian_star": star,
+        "element_relation": elem_rel,
+        "element_label": elem_label,
+        "same_group": (from_trigram in _EAST_TRIGRAMS)
+        == (to_trigram in _EAST_TRIGRAMS),
+    }
+
+
+def yangzhai_sanyao(
+    house_sitting_trigram: str | None, placements: list[Any]
+) -> dict[str, Any] | None:
+    """Evaluate 《阳宅三要》 (门/主/灶) trigram relations & East/West 4-house coherence."""
+    directions = raw_rule_data("directions")
+    role_dirs: dict[str, str] = {}
+    for p in placements:
+        if p.location_direction is None:
+            continue
+        if p.purpose == "door" and "door" not in role_dirs:
+            role_dirs["door"] = p.location_direction
+        elif p.purpose == "bed" and "master_room" not in role_dirs:
+            role_dirs["master_room"] = p.location_direction
+        elif p.purpose == "stove" and "stove" not in role_dirs:
+            role_dirs["stove"] = p.location_direction
+
+    if not role_dirs:
+        return None
+
+    nodes: dict[str, dict[str, Any]] = {}
+    if house_sitting_trigram is not None:
+        nodes["house_sitting"] = {
+            "trigram": house_sitting_trigram,
+            "element": BAGUA_BY_NAME[house_sitting_trigram]["element"],
+            "group": "east" if house_sitting_trigram in _EAST_TRIGRAMS else "west",
+        }
+    for role, direction in role_dirs.items():
+        info = directions[direction]
+        tri = info["trigram"]
+        nodes[role] = {
+            "direction": direction,
+            "trigram": tri,
+            "element": info["element"],
+            "group": "east" if tri in _EAST_TRIGRAMS else "west",
+        }
+
+    groups = {n["group"] for n in nodes.values()}
+    coherence = (
+        "east_four_coherent"
+        if groups == {"east"}
+        else "west_four_coherent" if groups == {"west"} else "east_west_mixed"
+    )
+    relations: dict[str, Any] = {}
+    if "door" in nodes and "master_room" in nodes:
+        relations["door_to_master"] = _trigram_pair_relation(
+            "门", nodes["door"]["trigram"], "主", nodes["master_room"]["trigram"]
+        )
+    if "master_room" in nodes and "stove" in nodes:
+        relations["master_to_stove"] = _trigram_pair_relation(
+            "主", nodes["master_room"]["trigram"], "灶", nodes["stove"]["trigram"]
+        )
+    if "door" in nodes and "stove" in nodes:
+        relations["door_to_stove"] = _trigram_pair_relation(
+            "门", nodes["door"]["trigram"], "灶", nodes["stove"]["trigram"]
+        )
+    return {
+        "nodes": nodes,
+        "east_west_coherence": coherence,
+        "relations": relations,
+        "complete_sanyao": all(
+            k in role_dirs for k in ("door", "master_room", "stove")
+        ),
     }
 
 
@@ -107,8 +229,6 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
         )
         unresolved_boundary_date = resolution is not None and projected_boundary is None
         boundary_day, possible_dates = projected_boundary or (None, set())
-        # Preserve any date crossed by the selected model guard; it is not
-        # an independently certified physical error bound.
         uncertain_boundary = bool(
             resolution
             and boundary_day is not None
@@ -152,8 +272,10 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
         missing.append(f"occupants.{subject_id}.{required_year_input}")
     if req.gender_convention is None:
         missing.append(f"occupants.{subject_id}.gender_convention")
+
     candidates: list[dict[str, Any]] = []
     if year is not None:
+        directions = raw_rule_data("directions")
         for convention in (
             [req.gender_convention] if req.gender_convention else ["male", "female"]
         ):
@@ -163,7 +285,7 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
             number = (2 if convention == "male" else 8) if raw == 5 else raw
             trigram = next(
                 i["trigram"]
-                for i in rule_data("directions").values()
+                for i in directions.values()
                 if i["palace_number"] == number
             )
             candidates.append(
@@ -175,13 +297,6 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
                     "trigram": trigram,
                     "group": "east" if number in {1, 3, 4, 9} else "west",
                     "sectors": sectors(trigram, subject_id, "personal_minggua"),
-                    "rule_id": "bazhai_sitting_v1.minggua_1864",
-                    "source_ids": ["S2", "S4"],
-                    "trace": {
-                        "epoch_year": 1864,
-                        "elapsed_years": year - 1864,
-                        "raw_five_mapped_after_cycle": True,
-                    },
                 }
             )
     return {
@@ -193,20 +308,16 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
     }
 
 
-def _house_inputs(req: BazhaiRequest) -> tuple[House | None, float, str, str]:
-    # Assess is a BazhaiRequest subclass. Its optional natal branch describes
-    # the same physical house, as enforced by the assessment input contract.
+def _house_inputs(req: BazhaiRequest) -> tuple[House | None, float, str]:
     natal = getattr(req, "xuankong", None)
     house = req.house or (natal.house if natal is not None else None)
     origin = "house" if req.house is not None else "xuankong.house"
-    if house is not None and house.bearing_uncertainty_degrees is not None:
-        return (
-            house,
-            house.bearing_uncertainty_degrees,
-            origin,
-            origin + ".bearing_uncertainty_degrees",
-        )
-    return house, 0, origin, "not_provided_point_input_convention"
+    radius = (
+        house.bearing_uncertainty_degrees
+        if (house and house.bearing_uncertainty_degrees is not None)
+        else 0.0
+    )
+    return house, radius, origin
 
 
 def bazhai(req: BazhaiRequest) -> dict[str, Any]:
@@ -214,7 +325,9 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
     house_candidates: list[dict[str, Any]] = []
     orientation = None
     missing: list[str] = []
-    declared_house, radius, origin, radius_source = _house_inputs(req)
+    declared_house, radius, origin = _house_inputs(req)
+    directions = raw_rule_data("directions")
+
     if declared_house is not None:
         data = declared_house.model_dump(exclude={"bearing_uncertainty_degrees"})
         sitting = data["sitting_trigram"]
@@ -240,19 +353,9 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
                         {
                             **data,
                             "sitting_trigram": trigram,
-                            "candidate_id": "house-sitting:" + trigram,
+                            "candidate_id": f"house-sitting:{trigram}",
                             "candidate_only": ambiguous,
-                            "bearing_support": {
-                                **support,
-                                "policy_id": "house_bearing_closed_interval_v1",
-                                "policy_version": "1.0.0",
-                                "author": "FateBridge",
-                                "source_ids": ["S4"],
-                                "source_scope": "direction_mapping_only; interval_policy_is_engineering",
-                                "arithmetic": "exact_rational_values_of_supplied_binary_floats",
-                                "coordinate_system": "unwrapped_about_normalized_reported_facing",
-                                "scope": "input_interval_support_not_probability_or_site_measurement_certification",
-                            },
+                            "bearing_support": support,
                             "sectors": sectors(
                                 trigram, data["object_id"], "house_sitting_trigram"
                             ),
@@ -266,15 +369,6 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
                     "nominal_facing_degrees": data["facing_degrees"],
                     "nominal_sitting_bearing": bearing,
                     "bearing_uncertainty_degrees": radius,
-                    "uncertainty_input_path": radius_source,
-                    "north_reference": data["north_reference"],
-                    "confirmed_sitting_trigram": sitting,
-                    "policy_id": "house_bearing_closed_interval_v1",
-                    "policy_version": "1.0.0",
-                    "author": "FateBridge",
-                    "zero_radius_policy": "existing_left_closed_right_open_point_convention",
-                    "positive_radius_policy": "closed_interval_all_intersecting_sectors",
-                    "scope": "bounded_input_not_certified_site_error_or_WMM_sigma_interval",
                 }
                 if ambiguous:
                     missing.append("house.unambiguous_sitting_trigram")
@@ -291,29 +385,28 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
             }
     if house is None and not house_candidates:
         missing.append("house.sitting_trigram_or_confirmed_facing")
+
     occupants = [minggua(o, o.subject_id) for o in req.occupants]
     for o in occupants:
         missing.extend(o["missing_inputs"])
     if not occupants:
         missing.append("occupants")
+
     findings = []
     for placement in req.placements:
         if placement.location_direction is None:
             missing.append(f"placements.{placement.object_id}.location_direction")
         bases = []
         if house_candidates:
-            for candidate in house_candidates:
+            for cand in house_candidates:
                 bases.append(
                     (
-                        candidate["object_id"],
+                        cand["object_id"],
                         "house",
-                        candidate["sectors"],
+                        cand["sectors"],
                         None,
-                        {
-                            "house_candidate_id": candidate["candidate_id"],
-                            "house_sitting_trigram": candidate["sitting_trigram"],
-                        },
-                        candidate["candidate_only"],
+                        {"house_candidate_id": cand["candidate_id"]},
+                        cand["candidate_only"],
                     )
                 )
         elif house is not None:
@@ -333,40 +426,38 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
                             o["status"] == "partial",
                         )
                     )
-        for (
-            subject_id,
-            basis,
-            chart,
-            convention,
-            candidate_context,
-            candidate_only,
-        ) in bases:
-            for aspect, direction in [
+        for subject_id, basis, chart, convention, cand_ctx, cand_only in bases:
+            for aspect, direction in (
                 ("location", placement.location_direction),
                 ("facing", placement.facing_direction),
-            ]:
+            ):
                 if direction is None:
                     continue
-                entry = chart[direction]
-                findings.append(
-                    {
-                        "method": "bazhai",
-                        "subject_id": subject_id,
-                        "subject_kind": basis,
-                        "gender_convention": convention,
-                        **candidate_context,
-                        "object_id": placement.object_id,
-                        "purpose": placement.purpose,
-                        "aspect": aspect,
-                        "facing_role": (
-                            placement.facing_role if aspect == "facing" else None
-                        ),
-                        "direction": direction,
-                        **placement_application(entry, placement.purpose, aspect),
-                        "observation_basis": placement.observation_basis,
-                        "candidate_only": candidate_only,
-                    }
-                )
+                finding: dict[str, Any] = {
+                    "subject_id": subject_id,
+                    "subject_kind": basis,
+                    **(
+                        {"gender_convention": convention}
+                        if convention is not None
+                        else {}
+                    ),
+                    **cand_ctx,
+                    "object_id": placement.object_id,
+                    "purpose": placement.purpose,
+                    "aspect": aspect,
+                    **(
+                        {"facing_role": placement.facing_role}
+                        if aspect == "facing" and placement.facing_role
+                        else {}
+                    ),
+                    "direction": direction,
+                    **placement_application(
+                        chart[direction], placement.purpose, aspect
+                    ),
+                }
+                if cand_only:
+                    finding["candidate_only"] = True
+                findings.append(finding)
     if (
         req.placements
         and house is None
@@ -374,6 +465,10 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
         and not any(o["candidates"] for o in occupants)
     ):
         missing.append("placements.usable_house_or_personal_chart")
+
+    sanyao = yangzhai_sanyao(
+        house["sitting_trigram"] if house else None, req.placements
+    )
     return {
         "status": "partial" if missing else "complete",
         "house": house,
@@ -387,5 +482,6 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
         ),
         "occupants": occupants,
         "placement_findings": findings,
+        **({"yangzhai_sanyao": sanyao} if sanyao is not None else {}),
         "missing_inputs": missing,
     }

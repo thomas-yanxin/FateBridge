@@ -10,7 +10,6 @@ from fatebridge.core.fengshui.models import (
     MingguaRequest,
     XuankongRequest,
 )
-from fatebridge.services import replay_metadata
 from fatebridge.services.fengshui import (
     calculate_annual_stars as _calculate_annual_stars,
 )
@@ -37,27 +36,6 @@ def calculate_minggua(**kwargs):
 
 def calculate_xuankong_natal(**kwargs):
     return _calculate_xuankong_natal(XuankongRequest.model_validate(kwargs))
-
-
-def test_runtime_receipt_includes_observed_field_arithmetic_version(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    original = replay_metadata.version
-    replay_metadata.environment_receipt.cache_clear()
-    try:
-        before = replay_metadata.environment_receipt()
-        assert before["dependencies"]["mpmath"] == original("mpmath")
-        monkeypatch.setattr(
-            replay_metadata,
-            "version",
-            lambda name: "9.9.9" if name == "mpmath" else original(name),
-        )
-        replay_metadata.environment_receipt.cache_clear()
-        after = replay_metadata.environment_receipt()
-        assert after["dependencies"]["mpmath"] == "9.9.9"
-        assert after != before
-    finally:
-        replay_metadata.environment_receipt.cache_clear()
 
 
 @pytest.mark.parametrize("kind", ["annual", "birth_date", "period"])

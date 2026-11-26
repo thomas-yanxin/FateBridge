@@ -1,72 +1,96 @@
-"""Frozen WMM2025 reference; original directional facts remain unchanged."""
+"""WMM2025 (2025-2030) and IGRF-14 (1900-2030) geomagnetic reference evaluation."""
+
+from __future__ import annotations
 
 import math
-from copy import deepcopy
+from datetime import date, datetime
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 from pydantic import JsonValue, TypeAdapter
 from typing_extensions import TypedDict
 
 from fatebridge.core.fengshui.directions import bearing_context
-from fatebridge.core.fengshui.geomagnetic_inputs import GeomagneticReference
+from fatebridge.core.fengshui.models import GeomagneticReference
 from fatebridge.core.geomagnetic_field import (
+    IGRF14_IMPLEMENTATION_ID,
     IMPLEMENTATION_ID,
+    IgrfCoefficient,
     WmmCoefficient,
+    igrf14_field,
     wmm2025_field,
 )
 
 
-class _GeomagneticRuleset(TypedDict):
-    ruleset_id: str
-    version: str
-    method: str
-    source_ids: list[str]
-    scope: str
-    conventions: list[str]
-
-
 class _GeomagneticData(TypedDict):
-    ruleset: _GeomagneticRuleset
-    sources: dict[str, dict[str, JsonValue]]
-    model_header: tuple[float, str, str]
-    degree: Literal[12]
-    coefficients: tuple[WmmCoefficient, ...]
-
-
-class GeomagneticResult(TypedDict):
-    calculation_status: Literal["complete"]
     ruleset: dict[str, JsonValue]
-    input: dict[str, JsonValue]
-    model: dict[str, JsonValue]
-    field: dict[str, float]
-    heading_context: dict[str, JsonValue]
-    uncertainty: dict[str, JsonValue]
-    conversion: dict[str, JsonValue]
-    limitations: list[str]
+    sources: dict[str, dict[str, JsonValue]]
+    model_header: list[JsonValue]
+    degree: int
+    coefficients: list[JsonValue]
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> _GeomagneticData:
+def _wmm_bundle() -> tuple[
+    dict[str, JsonValue],
+    dict[str, dict[str, JsonValue]],
+    list[JsonValue],
+    tuple[WmmCoefficient, ...],
+]:
     path = Path(__file__).parents[2] / "data/fengshui/geomagnetic-wmm2025-v1.json"
-    return TypeAdapter(_GeomagneticData).validate_json(path.read_bytes())
+    data = TypeAdapter(_GeomagneticData).validate_json(path.read_bytes())
+    coeffs = tuple(cast(WmmCoefficient, tuple(row)) for row in data["coefficients"])
+    return data["ruleset"], data["sources"], data["model_header"], coeffs
 
 
-def geomagnetic_provenance() -> dict[str, JsonValue]:
-    data = _bundle()
+@lru_cache(maxsize=1)
+def _igrf_bundle() -> tuple[
+    dict[str, JsonValue],
+    dict[str, dict[str, JsonValue]],
+    list[JsonValue],
+    tuple[IgrfCoefficient, ...],
+]:
+    path = Path(__file__).parents[2] / "data/fengshui/geomagnetic-igrf14-v1.json"
+    data = TypeAdapter(_GeomagneticData).validate_json(path.read_bytes())
+    coeffs = tuple(
+        (
+            int(cast(int, row[0])),
+            int(cast(int, row[1])),
+            tuple(float(v) for v in cast(list[float], row[2])),
+            tuple(float(v) for v in cast(list[float], row[3])),
+            float(cast(float, row[4])),
+            float(cast(float, row[5])),
+        )
+        for row in data["coefficients"]
+    )
+    return data["ruleset"], data["sources"], data["model_header"], coeffs
+
+
+def _select_model(model_id: str, year: float) -> Literal["wmm2025_v1", "igrf14_v1"]:
+    if model_id == "wmm2025_v1":
+        return "wmm2025_v1"
+    if model_id == "igrf14_v1":
+        return "igrf14_v1"
+    return "wmm2025_v1" if 2025.0 <= year < 2030.0 else "igrf14_v1"
+
+
+def geomagnetic_provenance(
+    model_id: Literal["wmm2025_v1", "igrf14_v1"] = "wmm2025_v1",
+) -> dict[str, JsonValue]:
+    ruleset, sources, _, _ = (
+        _wmm_bundle() if model_id == "wmm2025_v1" else _igrf_bundle()
+    )
+    src_ids = cast(list[str], ruleset["source_ids"])
     return {
-        "ruleset_id": data["ruleset"]["ruleset_id"],
-        "version": data["ruleset"]["version"],
-        "method": data["ruleset"]["method"],
-        "source_ids": list(data["ruleset"]["source_ids"]),
-        "scope": data["ruleset"]["scope"],
-        "conventions": list(data["ruleset"]["conventions"]),
-        "sources": [
-            dict(source_id=k, **deepcopy(data["sources"][k]))
-            for k in data["ruleset"]["source_ids"]
-        ],
+        "ruleset_id": ruleset["ruleset_id"],
+        "version": ruleset["version"],
+        "method": ruleset["method"],
+        "source_ids": list(src_ids),
+        "scope": ruleset["scope"],
+        "conventions": list(cast(list[str], ruleset["conventions"])),
+        "sources": [{"source_id": k, **sources[k]} for k in src_ids],
     }
 
 
@@ -82,15 +106,44 @@ def geomagnetic_reference(
     req: GeomagneticReference,
     bearing_degrees: float | None = None,
     north_reference: Literal["magnetic", "true"] | None = None,
-) -> GeomagneticResult:
-    data = _bundle()
-    value = wmm2025_field(
-        req.latitude,
-        req.longitude,
-        req.height_km_wgs84,
-        req.year_value(),
-        data["coefficients"],
-    )
+) -> dict[str, JsonValue]:
+    year = req.year_value()
+    chosen = _select_model(req.model_id, year)
+    if chosen == "wmm2025_v1":
+        ruleset, _, header, coeffs = _wmm_bundle()
+        value = wmm2025_field(
+            req.latitude, req.longitude, req.height_km_wgs84, year, coeffs
+        )
+        model_info: dict[str, JsonValue] = {
+            "model_id": "wmm2025_v1",
+            "name": header[1],
+            "epoch": header[0],
+            "degree": 12,
+            "implementation": IMPLEMENTATION_ID,
+            "arithmetic": "IEEE-754 binary64",
+            "supported_decimal_year": {
+                "from_inclusive": 2025.0,
+                "until_exclusive": 2030.0,
+            },
+        }
+    else:
+        ruleset, _, header, coeffs_igrf = _igrf_bundle()
+        value = igrf14_field(
+            req.latitude, req.longitude, req.height_km_wgs84, year, coeffs_igrf
+        )
+        model_info = {
+            "model_id": "igrf14_v1",
+            "name": header[2],
+            "release": header[3],
+            "degree": 13,
+            "implementation": IGRF14_IMPLEMENTATION_ID,
+            "arithmetic": "IEEE-754 binary64",
+            "supported_decimal_year": {
+                "from_inclusive": 1900.0,
+                "until_inclusive": 2030.0,
+            },
+        }
+
     field = {
         "declination_degrees_east": value.d,
         "inclination_degrees_down": value.i,
@@ -114,14 +167,11 @@ def geomagnetic_reference(
         "formula": "true=magnetic+east_positive_D (mod360)",
         "original_input_retained": True,
         "automatically_applied_to_house": False,
-        "scope": "model_candidate_not_confirmed_site_heading",
     }
     if bearing_degrees is not None and unavailable is None:
         if north_reference not in ("magnetic", "true"):
             raise ValueError("换算方位必须明确原始north_reference")
         target = "magnetic" if north_reference == "true" else "true"
-        # Partition the exact sum of the supplied heading and delivered D.
-        # Rounding that sum first can move it onto a different sector edge.
         angle = (
             Fraction(bearing_degrees)
             + (-Fraction(value.d) if target == "magnetic" else Fraction(value.d))
@@ -130,83 +180,37 @@ def geomagnetic_reference(
             status="model_candidate",
             input=bearing_context(bearing_degrees, north_reference),
             candidate=bearing_context(angle, target),
-            arithmetic_method="exact_binary64_heading_conversion_v1",
             angle_exact={
                 "numerator": str(angle.numerator),
                 "denominator": str(angle.denominator),
             },
-            classification_basis="supplied_heading_and_delivered_declination_before_display_rounding",
         )
     return {
         "calculation_status": "complete",
-        # Full source records live once in the public envelope's rulesets.
-        # Keep this branch's identity without duplicating large source blocks,
-        # so a strict evidence projection fits the default response budget.
+        "selected_model_id": chosen,
         "ruleset": {
-            "ruleset_id": data["ruleset"]["ruleset_id"],
-            "version": data["ruleset"]["version"],
-            "method": data["ruleset"]["method"],
-            "source_ids": list(data["ruleset"]["source_ids"]),
+            "ruleset_id": ruleset["ruleset_id"],
+            "version": ruleset["version"],
+            "method": ruleset["method"],
+            "source_ids": list(cast(list[str], ruleset["source_ids"])),
         },
         "input": {
             **req.model_dump(mode="json"),
-            "effective_decimal_year": req.year_value(),
-            "date_convention": (
-                "explicit_decimal_year"
-                if req.model_date is None
-                else "UTC_start_of_reference_date"
-            ),
-            "coordinate_reference": "WGS84_geodetic_latitude_longitude_ellipsoid_height",
+            "effective_decimal_year": year,
         },
-        "model": {
-            "name": data["model_header"][1],
-            "epoch": data["model_header"][0],
-            "coefficient_header_release": data["model_header"][2],
-            "degree": data["degree"],
-            "implementation": IMPLEMENTATION_ID,
-            "implementation_identity": {
-                "ellipsoid": "WGS84",
-                "geodetic_conversion": "WGS84 exact inverse flattening",
-                "semimajor_axis_metres": 6378137.0,
-                "inverse_flattening": "298.257223563",
-                "degree": 12,
-                "arithmetic_decimal_digits": 50,
-            },
-            "supported_decimal_year": {
-                "from_inclusive": 2025.0,
-                "until_exclusive": 2030.0,
-            },
-            "numerical_reference_precision": "WGS84 source arithmetic at 1e-7nT/1e-9deg on fixed reference cohorts; not physical accuracy",
-        },
+        "model": model_info,
         "field": field,
         "heading_context": {
             "zone": zone,
             "geographic_pole": pole,
             "declination_usable_as_heading_reference": unavailable is None,
-            "site_measurement_confirmed": False,
-            "space_weather_checked": False,
         },
         "uncertainty": {
             "interpretation": "one_sigma_at_earth_surface_not_hard_bound",
             "declination_degrees": (
                 math.hypot(0.26, 5417 / value.h) if value.h > 0 else None
             ),
-            "x_nt": 137,
-            "y_nt": 89,
-            "z_nt": 141,
-            "h_nt": 133,
-            "f_nt": 138,
-            "inclination_degrees": 0.20,
-            "total_site_measurement_error_known": False,
-            "converted_to_bearing_uncertainty_interval": False,
-            "source_ids": ["GM2"],
+            "source_ids": ["GM2"] if chosen == "wmm2025_v1" else ["IGRF1"],
         },
         "conversion": conversion,
-        "limitations": [
-            "模型估计地球主磁场；室内钢筋、电器和局部磁扰未实测，不能据此确认磁北朝向。",
-            "一倍标准差是地表统计模型误差，不是保证误差范围、现场总误差或候选概率；不生成玄空角度区间。",
-            "黑障区H<2000nT及地理极点不提供方位换算；2000≤H<6000nT为慎用区。",
-            "未查询实时磁暴；模型不能替代现场方向复测，严重磁暴期间不应据此确认方向。",
-            "原始方位和宅盘不变；换算值仅为待复测候选。本模型验证不构成风水现实预测验证。",
-        ],
     }
