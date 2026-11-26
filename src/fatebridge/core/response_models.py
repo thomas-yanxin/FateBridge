@@ -252,7 +252,7 @@ def output_model_for(tool_name: str) -> type[BaseModel]:
         return getattr(import_module(mod_name), attr_name)
     if tool_name.startswith("fengshui_"):
         return getattr(
-            import_module("fatebridge.core.fengshui.output"), "FengshuiOutput"
+            import_module("fatebridge.core.fengshui.models"), "FengshuiOutput"
         )
 
     if tool_name not in TOOL_FIELDS:
@@ -282,7 +282,6 @@ def output_model_for(tool_name: str) -> type[BaseModel]:
                 "input_context": symbols["LiteralSourceInputContext"],
                 "current_calculation": symbols["SourceCurrentCalculation"],
                 "source_comparison": symbols["SourceAnnotationComparison"],
-                "summary": str,
             }
             if tool_name == "compare_bazi_sources"
             else {}
@@ -379,16 +378,12 @@ EXTRA_TOOL_OUTPUT_FIELDS: dict[str, tuple[str, ...]] = {
 
 STANDALONE_TOOL_OUTPUT_FIELDS: dict[str, tuple[str, ...]] = {
     "human_design": (
-        "apparent_model_comparison",
-        "apparent_position_context",
-        "native_execution_context",
         "run_metadata",
         "engine",
         "method_id",
         "name",
         "birth_utc",
         "birth_clock_evidence",
-        "clock_evidence",
         "design_utc",
         "design_solver",
         "time_scales",
@@ -398,28 +393,15 @@ STANDALONE_TOOL_OUTPUT_FIELDS: dict[str, tuple[str, ...]] = {
         "bodygraph",
         "definition_bridging",
         "profile",
-        "profile_evidence",
+        "incarnation_cross",
+        "depth_evidence",
+        "line_fixings",
         "cycle_context",
         "cycle_summary",
-        "cycle_origin_comparison",
-        "incarnation_cross",
-        "node_convention_comparison",
-        "node_backend_comparison",
-        "ephemeris_backend_comparison",
-        "ephemeris_source_evidence",
-        "ephemeris_source_summary",
         "time_sensitivity",
-        "rulesets",
-        "source_consistency",
-        "source_summary",
-        "gate_evidence",
-        "historical_polarity_context",
-        "gate_activation_context",
-        "profile_partition_context",
-        "depth_evidence",
-        "rule_trace",
-        "interpretation",
-        "validation",
+        "transit_overlay",
+        "composite",
+        "summary",
     ),
     "meihua_cast": (
         "run_metadata",
@@ -440,17 +422,12 @@ STANDALONE_TOOL_OUTPUT_FIELDS: dict[str, tuple[str, ...]] = {
         "answered_count",
         "missing_count",
         "total_items",
-        "scale_raw_sum",
-        "scale_mean",
         "domains",
         "item_breakdown",
         "provenance",
         "summary",
     ),
     "fengshui": (
-        "calculation_reading",
-        "method_policy",
-        "method_details",
         "analysis_type",
         "engine",
         "status",
@@ -462,13 +439,14 @@ STANDALONE_TOOL_OUTPUT_FIELDS: dict[str, tuple[str, ...]] = {
         "rule_trace",
         "summary",
         "run_metadata",
+        "palace_overlay",
         "layout_analysis",
     ),
 }
 
 
 TOOL_FIELDS = {
-    "compare_bazi_sources": "analysis_type four_pillars input_context current_calculation source_comparison summary",
+    "compare_bazi_sources": "analysis_type four_pillars input_context current_calculation source_comparison",
     "bazi_overview": "calendar_context day_master element_distribution element_distribution_basis element_seasonal_phase favorable_elements four_pillars patterns person_info structure_profile ten_gods",
     "bazi_birth_chart": "analysis_type bazi_birth",
     "bazi_marriage": "analysis_type marriage_analysis",
@@ -480,8 +458,8 @@ TOOL_FIELDS = {
     "bazi_personality": "analysis_type personality_analysis",
     "bazi_relatives": "analysis_type relatives_analysis",
     "bazi_romance": "analysis_type romance_analysis",
-    "bazi_compatibility": "relationship_type person_info natal_contexts element_relationship cross_chart_relations directional_ten_gods",
-    "bazi_timing": "analysis_reference analysis_calendar analysis_type birth_pillars birth_time_sensitivity calendar_context combined_effects comprehensive_summary dayun_analysis interaction_analysis liunian_analysis liuri_analysis liushi_analysis liuyue_analysis personal_info",
+    "bazi_compatibility": "relationship_type person_info natal_contexts element_relationship nayin_comparison day_pillar_synergy element_complementarity cross_shensha cross_chart_relations directional_ten_gods",
+    "bazi_timing": "analysis_reference analysis_calendar analysis_type birth_pillars birth_time_sensitivity calendar_context combined_effects dayun_analysis interaction_analysis liunian_analysis liuri_analysis liushi_analysis liuyue_analysis personal_info",
     "bazi_luck_cycles": "analysis_reference analysis_type birth_time_sensitivity calendar_context dayun_info element_effects personal_info summary timing_context",
     "bazi_yearly_timing": "analysis_type calendar_context element_effects liunian_info personal_info summary target_year_jieqi",
     "bazi_monthly_timing": "analysis_reference analysis_calendar analysis_type calendar_context combination_effects detailed_analysis element_effects liunian_info liuyue_info personal_info summary target_year_jieqi",
@@ -507,15 +485,15 @@ TOOL_FIELDS = {
     "liuren_yearly_timing": "analysis_context analysis_type calendar_context four_pillars liureng runyear",
     "qimen": "analysis_context analysis_type calendar_context four_pillars qimen",
     "taiyi": "analysis_context analysis_type calendar_context four_pillars taiyi",
-    "jinkou": "analysis_context analysis_type calendar_context four_pillars jinkou liureng",
+    "jinkou": "analysis_context analysis_type calendar_context four_pillars jinkou",
     "knowledge_catalog": "bundle_version domains provenance source",
     "knowledge_read": "bundle_version category citation domain key lines provenance query_normalized reference_only reference_details rendered_text source tips title",
     "astrology_chart": "angles apparent_model_positions aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses modality_balance person_info planetary_hours planets summary",
     "thirteen_sector_chart": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses modality_balance person_info planetary_hours planets summary thirteen_sectors sector_profile time_sensitivity",
     "hellenistic_chart": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars hellenistic houses modality_balance person_info planetary_hours planets summary",
-    "guolao_chart": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars guolao houses modality_balance person_info planetary_hours planets summary",
-    "vedic_chart": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses india modality_balance person_info planetary_hours planets summary",
-    "vimshottari_dasha": "analysis_context person_info india vimshottari summary",
+    "guolao_chart": "angles chart_profile guolao houses person_info planets summary",
+    "vedic_chart": "india person_info summary",
+    "vimshottari_dasha": "analysis_context ashtottari chara person_info summary vimshottari yogini",
     "hamburg_midpoint_chart": "base_chart chart_profile planets midpoint_aspects midpoints midpoint_analysis summary",
     "relationship_chart": "chart in_to_out_antiscia in_to_out_aspects in_to_out_contra_antiscia in_to_out_midpoint inner inner_chart marks_charts out_to_in_antiscia out_to_in_aspects out_to_in_contra_antiscia out_to_in_midpoint outer outer_chart relationship_profile summary synastry_aspects",
     "western_timing": "analysis_context analysis_type directions natal_reference returns summary time_lords transits",
@@ -551,7 +529,7 @@ TOOL_FIELDS = {
 
 
 REQUIRED_OUTPUT_FIELDS = {
-    "compare_bazi_sources": "four_pillars input_context current_calculation source_comparison summary",
+    "compare_bazi_sources": "four_pillars input_context current_calculation source_comparison",
     "bazi_overview": "four_pillars day_master",
     "bazi_birth_chart": "bazi_birth",
     "bazi_marriage": "marriage_analysis",
@@ -564,7 +542,7 @@ REQUIRED_OUTPUT_FIELDS = {
     "bazi_relatives": "relatives_analysis",
     "bazi_romance": "romance_analysis",
     "bazi_compatibility": "natal_contexts cross_chart_relations directional_ten_gods",
-    "bazi_timing": "birth_pillars comprehensive_summary",
+    "bazi_timing": "birth_pillars dayun_analysis liunian_analysis interaction_analysis",
     "bazi_luck_cycles": "dayun_info",
     "bazi_yearly_timing": "liunian_info",
     "bazi_monthly_timing": "liuyue_info",
@@ -596,9 +574,9 @@ REQUIRED_OUTPUT_FIELDS = {
     "astrology_chart": "planets chart_profile",
     "thirteen_sector_chart": "planets chart_profile thirteen_sectors",
     "hellenistic_chart": "planets chart_profile hellenistic",
-    "guolao_chart": "planets chart_profile guolao",
-    "vedic_chart": "planets chart_profile india",
-    "vimshottari_dasha": "analysis_context person_info india vimshottari summary",
+    "guolao_chart": "guolao",
+    "vedic_chart": "india",
+    "vimshottari_dasha": "analysis_context person_info vimshottari summary",
     "hamburg_midpoint_chart": "base_chart midpoints chart_profile",
     "relationship_chart": "relationship_profile",
     "western_timing": "directions returns time_lords transits",

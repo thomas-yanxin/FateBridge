@@ -19,7 +19,6 @@ from fatebridge.core.astro.native_identity import binding_distribution_version
 from fatebridge.core.astro.orbits import ORBITAL_MODEL
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.core.jpl_ephemeris import configured_jpl_file, jpl_header
-from fatebridge.core.physical_source_observation import require_physical_model
 from fatebridge.utils.errors import EphemerisSourceError
 
 RULESET = "fatebridge.physical_ephemeris_sources.v1"
@@ -55,7 +54,6 @@ class PhysicalEphemerisTrace:
         their context in the method's own provenance. They are not additional
         physical chart factors and must not change a body's source cohort.
         """
-        require_physical_model(model)
         if configured_jpl_file() != self._jpl_name:
             raise EphemerisSourceError("physical_configuration_changed")
         ids = []

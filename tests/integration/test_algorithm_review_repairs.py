@@ -62,7 +62,6 @@ def test_empty_preferences_do_not_become_penalty_support_or_definite_match(
             assessment_status="partial",
         )
         profile.update(preferences)
-        profile["engineering_reference"].update(preferences)
         payload["favorable_elements"] = []
         return payload
 
@@ -197,7 +196,7 @@ def test_missing_required_timing_layer_fails_on_every_transport(
 ) -> None:
     import fatebridge.api as api
     from fatebridge.cli import run
-    from fatebridge.core.timing import TimingAnalysis
+    from fatebridge.core.bazi.timing import TimingAnalysis
     from fatebridge.mcp_server import app
     from fatebridge.utils.errors import EphemerisSourceError
 

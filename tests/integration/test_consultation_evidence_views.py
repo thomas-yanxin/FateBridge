@@ -212,12 +212,12 @@ async def test_western_timing_views_preserve_time_bounds_and_relevant_positions(
 @pytest.mark.parametrize(
     "dimension,ten_god,visible_in,hidden_in,dayun_palace_hits",
     [
-        ("marriage", "正财", [], ["day"], 0),
-        ("romance", "正财", [], ["day"], 0),
-        ("education", "正印", [], ["year"], 1),
-        ("personality", "比肩", ["year"], ["month", "hour"], 0),
-        ("relatives", "正印", [], ["year"], 1),
-        ("children", "正官", [], ["year"], 1),
+        ("marriage", "正财", [], ["day(辰)"], 0),
+        ("romance", "正财", [], ["day(辰)"], 0),
+        ("education", "正印", [], ["year(午)"], 3),
+        ("personality", "比肩", ["year"], ["month(巳)", "hour(巳)"], 0),
+        ("relatives", "正印", [], ["year(午)"], 3),
+        ("children", "正官", [], ["year(午)"], 3),
     ],
 )
 async def test_bazi_topic_starter_preserves_structure_and_its_own_timing(
@@ -229,17 +229,17 @@ async def test_bazi_topic_starter_preserves_structure_and_its_own_timing(
         )
     analysis = payload[dimension + "_analysis"]
     assert analysis["timing_context"]["analysis_date"] == "2026-10-20"
-    first_view = analysis["evidence_chain"]["topic"]["first_view"]
-    assert first_view["natal_stars"][0] == {
+    facts = analysis["topic_facts"]
+    assert facts["natal_stars"][0] == {
         "ten_god": ten_god,
         "visible_in": visible_in,
         "hidden_in": hidden_in,
     }
-    assert [(layer["layer"], layer["pillar"]) for layer in first_view["timing"]] == [
+    assert [(layer["layer"], layer["pillar"]) for layer in facts["timing_layers"]] == [
         ("dayun", "甲申"),
         ("liunian", "丙午"),
     ]
-    assert first_view["timing"][0]["palace_relation_count"] == dayun_palace_hits
+    assert len(facts["timing_layers"][0]["palace_hits"]) == dayun_palace_hits
 
 
 @pytest.mark.asyncio

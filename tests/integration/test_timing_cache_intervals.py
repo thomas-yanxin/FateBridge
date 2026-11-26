@@ -5,14 +5,15 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from fatebridge.core import almanac, timing
+from fatebridge.core import almanac
 from fatebridge.core.almanac import (
     SolarTerm,
     elapsed_days_between,
     localize_datetime,
 )
-from fatebridge.core.calendar import BaZiCalendar
-from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core.bazi import timing
+from fatebridge.core.bazi.calendar import BaZiCalendar
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.utils.civil_time import ZonedCalendar
 
 

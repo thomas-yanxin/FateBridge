@@ -4,8 +4,8 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from fatebridge.core.calendar import BaZiCalendar
-from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core.bazi.calendar import BaZiCalendar
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.civil_clock import format_utc_offset
 from fatebridge.utils.solar_time import normalize_birth_time

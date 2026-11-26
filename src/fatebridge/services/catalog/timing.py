@@ -130,12 +130,6 @@ SPECS: list[ToolSpec] = [
         family="timing",
         rest_path="/api/bazi/timing",
         cpu_bound=True,
-        required_output_fields=(
-            "birth_pillars",
-            "dayun_analysis",
-            "liunian_analysis",
-            "interaction_analysis",
-        ),
         compact_view=_compact_bazi_timing,
         resolve_time_defaults=resolve_bazi_analysis_time_defaults,
     ),

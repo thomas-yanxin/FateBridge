@@ -505,10 +505,10 @@ def test_calculate_jinkou_analysis_returns_four_positions() -> None:
     )
 
     assert result["analysis_type"] == "金口诀"
-    assert result["liureng"]["engine"] == "fatebridge-offline"
+    assert "liureng" not in result
     assert result["jinkou"]["engine"] == "fatebridge-offline"
-    assert result["liureng"]["month_general"]["branch"] == "戌"
     assert result["jinkou"]["overview"]["di_fen"] == "酉"
+    assert result["jinkou"]["overview"]["month_general"]["branch"] == "戌"
     assert result["jinkou"]["overview"]["yuejiang"]["branch"] == "申"
     # 金口诀戊日夜贵未：未贵、午蛇……酉太阴，不能借用大六壬天盘。
     assert result["jinkou"]["overview"]["guishen"]["name"] == "太阴"
@@ -539,7 +539,7 @@ def test_calculate_jinkou_analysis_does_not_borrow_liureng_transmission_rule() -
         di_fen="巳",
     )
 
-    assert result["liureng"]["board_style_detail"] == "弹射"
+    assert "liureng" not in result
     assert result["jinkou"]["overview"]["board_style_detail"] == "三阴一阳"
     # 丙子日巳时巳位：癸 / 天空戌 / 大吉丑 / 巳，唯一阳位是贵神。
     assert result["jinkou"]["overview"]["use_position"] == "贵神"

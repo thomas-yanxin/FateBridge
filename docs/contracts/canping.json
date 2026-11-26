@@ -24,7 +24,6 @@
         "canping_timing.solar_year_context",
         "canping_timing.selected",
         "liunian_series.solar_context",
-        "liunian_series.year_boundaries",
         "numerology_evidence.rule_trace"
       ],
       "purpose": "核对完整年序的实际立春、所选查询两端及未来钟面条件；派生事件许可不扩大公开模型年份，不解释为寿命或预测认证。"
@@ -67,9 +66,7 @@
         "benming",
         "canping_timing.selected",
         "numerology_evidence.selected_texts",
-        "numerology_evidence.canping_text_collation",
-        "numerology_evidence.rule_trace",
-        "numerology_evidence.interpretation_constraints"
+        "numerology_evidence.rule_trace"
       ],
       "purpose": "核对本命及已查询岁运的实际编号、栏目、缺行／圈空、同号及局部校勘来源。 同时保留本次归一输入与实际计算钟面，供核验所用资料。"
     },
@@ -82,8 +79,6 @@
         "numerology_evidence.birth_clock",
         "canping_timing.profile_id",
         "canping_timing.schedule_basis",
-        "canping_timing.first_row",
-        "canping_timing.first_period",
         "canping_timing.selected"
       ],
       "purpose": "首轮配运取证：同次出生钟面、实际方法、具名原句／现代日期映射、首运及所查询段；全运或121个立春按需另取。first_row保留同次dayun[0]的编号／栏目与条文；旧命宫法first_period仍为null，首行只有年龄标签，不补日期。"

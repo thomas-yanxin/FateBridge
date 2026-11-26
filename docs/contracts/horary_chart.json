@@ -41,8 +41,7 @@
         "horary.significators",
         "horary.perfection.event_history",
         "horary.perfection.lilly_conditions.event_paths",
-        "horary.perfection.status",
-        "horary.perfection.missing_conditions"
+        "horary.perfection.status"
       ],
       "purpose": "Read actual seven-planet TT roots in the explicit ±30-day scan, distinct principal/principal and carrier/source prior contacts, all intervening carrier contacts, event-epoch receptions with numerical boundary uncertainty, and selected Lilly p111 prohibition/refranation patterns. Product radius and radical sect policies, unknown conditions, finite horizon, frame-specific station timing and incomplete whole-method acceptance remain explicit. A satisfied sequence subset is not a full judgement or outcome proof.",
       "when": "核对主星、传光星与聚光星的实际历史／未来事件顺序、停滞折返及不同事件历元的接纳。"
@@ -91,8 +90,7 @@
         "horary.fortune.applied_conditions",
         "horary.fortune.interpretation_policies",
         "horary.fortune.source_method_scope",
-        "horary.fortune.full_original_text_acceptance",
-        "horary.rule_profile.cusp_virtue_policy"
+        "horary.fortune.full_original_text_acceptance"
       ],
       "purpose": "Lilly pp143-144 uses physical ASC+Moon-Sun day and night. Keep geometric occupancy, nearest-cusp virtue and significator roles separate. The28 p145 rows include neutral Aries and Fortune-specific sixth/eighth-house weights. Exact planetary rays and p179 stellar range transfer are disclosed conventions. P180 beyond-five-degree assignment and row discrepancies remain failed controls; unknowns never equal zero; no wealth amount, success probability or complete judgement follows.",
       "when": "核对Lilly1647福点昼夜同式、宫头五度效力归属和第145页独立强弱表。"
@@ -121,10 +119,7 @@
         "horary.radicality.ascendant_degree_gate",
         "horary.radicality.clauses",
         "horary.radicality.unknown_clauses",
-        "horary.radicality.safe_to_judge",
-        "horary.radicality.safe_to_judge_scope",
-        "horary.radicality.full_original_text_acceptance",
-        "horary.radicality.full_judgement_accepted"
+        "horary.radicality.safe_to_judge"
       ],
       "purpose": "Read all12 clauses in the pp121-123 manual inventory, actual unequal-hour geometry, selected p104 triplicity and own-nature affinity, prerequisites, exceptions and attributed variants. The Moon late-degree cutoff is unspecified; no27degree threshold or p115 weighted balance0 is invented. Optional context is caller-reported only: a known question timestamp is not a certain timed event, and no age/appearance/strength is inferred. safe_to_judge remains null for the uncertified full method, not false/true reality prediction. Compute the supplied instant without changing it to clear a caution.",
       "when": "核对Lilly1647起盘审慎条件、时主对应、原文例外与未知定义，避免仅凭上升度数认定整盘可判断。"
@@ -185,11 +180,8 @@
         "horary.perfection.event_history.failed_sample",
         "horary.perfection.event_history.completeness_scope",
         "horary.perfection.event_history.ephemeris_reference_points",
-        "horary.perfection.event_history.longitude_motion",
         "horary.perfection.event_history.question_states",
         "horary.moon.motion_basis.status",
-        "horary.moon.motion_basis.ephemeris_reference_points",
-        "horary.moon.motion_basis.longitude_motion",
         "horary.perfection.status",
         "horary.perfection.lilly_conditions.event_paths.status",
         "horary.rule_profile"
@@ -199,7 +191,6 @@
     },
     "solar_position_model": {
       "fields": [
-        "horary.calculation_basis.apparent_position_policy",
         "horary.calculation_basis.ephemeris_model",
         "horary.calculation_basis.julian_day_tt"
       ],
@@ -210,7 +201,6 @@
       "fields": [
         "analysis_context",
         "clock_conversion",
-        "horary.calculation_basis.earth_rotation",
         "horary.calculation_basis.julian_day_tt",
         "horary.calculation_basis.julian_day_ut1"
       ],
@@ -536,6 +526,36 @@
         "default": null,
         "description": "Civil timezone (IANA or UTC offset). Omitted/null with civil preserves legacy +08:00; supply the known zone explicitly. Solar clock bases must omit/null this field to prevent double correction.",
         "title": "Timezone Name"
+      },
+      "turned_from_house": {
+        "anyOf": [
+          {
+            "maximum": 12,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional base house (1-12) for derived/turned horary questions (e.g. 7 for partner).",
+        "title": "Turned From House"
+      },
+      "turned_house": {
+        "anyOf": [
+          {
+            "maximum": 12,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional derived house offset (1-12) counted from turned_from_house (or quesited_house), e.g. 5th from 7th = 11th radical house.",
+        "title": "Turned House"
       },
       "ut1_source": {
         "default": "swiss_delta_t",

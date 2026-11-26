@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from calendar import isleap
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from fractions import Fraction
@@ -455,10 +456,7 @@ def _calculate_liuri_cached(
 
 
 def _copy_timing_info(info: dict[str, Any]) -> dict[str, Any]:
-    result = info.copy()
-    if "solar_term_window" in info:
-        result["solar_term_window"] = info["solar_term_window"].copy()
-    return result
+    return deepcopy(info)
 
 
 class TimingAnalysis:

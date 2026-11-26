@@ -22,14 +22,6 @@ from fatebridge.core.contracts.output_ziwei_palaces import (
 )
 
 
-class ZiweiConditionSourceRevision(PartialOutput):
-    """Retained placeholder symbol for output_chinese.py until Wave 3 cleanup."""
-
-
-class ZiweiStructuralConditionRecord(PartialOutput):
-    """Retained placeholder symbol for output_chinese.py until Wave 3 cleanup."""
-
-
 class ZiweiXunVoid(PartialOutput):
     source_branches: list[str] | None = None
     displayed_star_branches: list[str] | None = None

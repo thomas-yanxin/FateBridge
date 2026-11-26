@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 
-from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.bazi.calendar import BaZiCalendar
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 STAMP = "2025-02-04T04:37:49.123456Z"

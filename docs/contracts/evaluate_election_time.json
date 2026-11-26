@@ -20,10 +20,8 @@
         "election.marriage_significators",
         "election.moon",
         "election.ascendant",
-        "election.solar_condition_policy",
         "election.factors",
-        "election.unresolved_factors",
-        "election.condition_policy"
+        "election.unresolved_factors"
       ],
       "purpose": "依据明确选定的传统口径解读，并保留未决条件。",
       "when": "逐项比较候选时刻的行星、月亮条件、实际角点与未决因素。"
@@ -77,7 +75,6 @@
       "fields": [
         "analysis_context",
         "clock_conversion",
-        "election.calculation_basis.earth_rotation",
         "election.calculation_basis.julian_day_tt",
         "election.calculation_basis.julian_day_ut1"
       ],
@@ -94,10 +91,8 @@
       "election.axes",
       "election.moon",
       "election.ascendant",
-      "election.solar_condition_policy",
       "election.factors",
-      "election.unresolved_factors",
-      "election.condition_policy"
+      "election.unresolved_factors"
     ]
   },
   "input": {
@@ -216,6 +211,14 @@
         "default": null,
         "description": "Optional chart name",
         "title": "Name"
+      },
+      "search_window_hours": {
+        "default": 0,
+        "description": "Optional candidate window scanner duration (hours, 0..168). When > 0, scans 1-hour steps forward from candidate datetime for top non-VOC, benefic-supported windows.",
+        "maximum": 168,
+        "minimum": 0,
+        "title": "Search Window Hours",
+        "type": "integer"
       },
       "timezone_name": {
         "anyOf": [

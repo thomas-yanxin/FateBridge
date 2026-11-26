@@ -39,7 +39,7 @@ flowchart TD
 | 协议传输 | `transports/rest.py`、`transports/flags.py`、`api.py`、`mcp_server.py`、`cli.py` | REST 路由注册、FastMCP 两工具协议与 CLI 参数生成 |
 | 请求与响应模型 | `core/requests/`、`core/response_models.py`、`core/contracts/` | Pydantic 输入校验、输出根契约与 `PartialOutput` 嵌套模型 |
 | 服务与分析 | `services/*.py`、`analysis/*.py` | 领域编排、时运复合分析与 `run_metadata` |
-| 核心计算与数据 | `core/*.py`、`core/metaphysics/`、`core/predictive/`、`core/fengshui/`、`data/*` | 各体系算法实现、知识条目、规则表与内置数据 |
+| 核心计算与数据 | `core/*.py`、`core/{bazi,ziwei,fengshui,guolao,jyotish,human_design,qimen,liuyao,meihua,heluo,numerology,sukuyo}/`、`core/{astro,predictive,metaphysics}/`、`data/*` | 各体系独立领域计算、知识条目、规则表与内置数据 |
 | 公共基础 | `utils/*`、`core/ephemeris_runtime.py`、`core/execution_context.py` | 出生时间/地点/时区、星历共享锁、调用时钟与统一错误 |
 | 测试与工具 | `tests/`、`scripts/` | 领域回归、三端契约检查与文档/合同生成校验 |
 
@@ -91,9 +91,9 @@ sequenceDiagram
 | 关注点 | 模块与维护规则 |
 | --- | --- |
 | 出生公共计算 | `services/birth_context.py` 与 `birth_payload.py` 复用出生归一化与公共命盘构造 |
-| 时运与日历 | `services/timing.py` 编排时运，`timing_clock.py` 读取 `core.execution_context` 执行时钟；日历查询在 `calendar_tools.py` |
-| 星盘与子技法 | `core/astro/`、`core/predictive/`、`core/local_techniques/` 按领域目录组织，共享星座与尊贵表位于 `core/astro/astrology_tables.py` |
-| 领域共享定义 | 各术数、河洛、人类图与风水共享定义留在本领域定义模块，计算与消费端共同引用，不引入反向依赖 |
+| 八字与时运 | `core/bazi/{calendar,timing,elements,rules,pillars,relations,shensha}.py` 实现历法、时运与命盘计算；`services/{bazi,timing,timing_clock,calendar_tools}.py` 编排服务与 `core.execution_context` 执行时钟 |
+| 星盘与子技法 | `core/astro/`、`core/predictive/`、`core/{jyotish,guolao,human_design}/` 按领域目录组织；`services/{astrology,jyotish,guolao,human_design}.py` 分别提供对应独立入口，共享星座与尊贵表位于 `core/astro/astrology_tables.py` |
+| 术数与占卜 | `core/{ziwei,qimen,liuyao,meihua,heluo,numerology,sukuyo,metaphysics}/` 保持各自独立计算与规则表；`services/{ziwei,sanshi,divination}.py` 编排交付 |
 | 家居风水 | `core/fengshui/` 按八宅、砂水、年/月星、玄空与布局分层实现，`services/fengshui.py` 编排多层合并与 `cli_request_file` 支持，详见[家居风水参考](fengshui.md) |
 
 ## 运行配置与边界

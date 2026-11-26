@@ -45,7 +45,7 @@
 
 ### 2.1 `bazi` —— 八字与命理分析（Implemented）
 
-底层由 `fatebridge.core.calendar`、`elements`、`rules` 与 `fatebridge.services.bazi`、`calculation` 提供；九大专项维度默认按出生资料与分析日期内部推算大运和流年，也可用 `dayun_pillar` / `liunian_pillar` 覆盖。支持通过已知 `birth_second` 与 `birth_utc_offset` 传递精确秒数并消歧重复民用钟时。
+底层由 `fatebridge.core.bazi.calendar`、`elements`、`rules` 与 `fatebridge.services.bazi` 提供；九大专项维度默认按出生资料与分析日期内部推算大运和流年，也可用 `dayun_pillar` / `liunian_pillar` 覆盖。支持通过已知 `birth_second` 与 `birth_utc_offset` 传递精确秒数并消歧重复民用钟时。
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
@@ -98,7 +98,7 @@
 | `heluo` | 河洛理数（元堂、卦序、节候与原文对照） | Implemented |
 | `suzhan` | 二十七宿占分析 | Implemented |
 | `interpret_astrology_dice` | [占星骰](astrodice.md)：十二骰面、七曜星座与喜乐宫符号解读 | Implemented |
-| `sanshi_combined_chart` | 太乙、六壬与奇门三式分层证据及位置对应 | Partial |
+| `sanshi_combined_chart` | 太乙、六壬与奇门三式分层证据及位置对应 | Implemented |
 
 ### 2.5 `metaphysics` —— 中国术数独立盘（Implemented）
 
@@ -110,7 +110,7 @@
 | `liuren_chart` | 大六壬天地盘、四课三传、天将与九宗门课名证据 | Implemented |
 | `liuren_yearly_timing` | 农历虚岁行年与分析时刻六壬课 | Implemented |
 | `qimen` | 奇门遁甲时家转盘（支持置闰/拆补、寄宫与格局证据） | Implemented |
-| `taiyi` | 《太乙金镜式经》年/月/日/时计及指定历史年计 | Partial |
+| `taiyi` | 《太乙金镜式经》年/月/日/时/分计及指定历史年计 | Implemented |
 | `jinkou` | 金口诀四位、阴阳用位、五动三动、得气与六十四课钤 | Implemented |
 
 ### 2.6 `astro` —— 离线核心星盘与关系盘（Implemented，精度依赖星历）
@@ -189,7 +189,7 @@
 | `fengshui_bazhai` | 坐山宅盘、逐人命盘、位置／朝向用途分开 | Implemented |
 | `fengshui_jinsuo` | 金锁玉关八宫固定砂水偏好、已确认特征逐项判定 | Implemented（限定来源） |
 | `fengshui_annual_stars` | 年度紫白九宫、立春区间与当前元运 | Implemented |
-| `fengshui_monthly_stars` | 十二节月紫白、跨年有效年、九宫中性位置与固定释义 | Limited |
+| `fengshui_monthly_stars` | 十二节月紫白、跨年有效年、九宫中性位置与固定释义 | Implemented |
 | `fengshui_xuankong_house_chart` | 中州派历史定运、24 山／三元龙、五黄、下卦与兼向替星 | Implemented |
 | `fengshui_assess` | 多层布局关联、室内形态观察、条件式元素/年度方案与分歧 | Implemented（限定版本） |
 

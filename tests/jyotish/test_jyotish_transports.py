@@ -183,13 +183,20 @@ def test_strict_data_file_policy_rejects_fallback_on_all_surfaces(
 
 
 def test_discovery_has_nested_output_contracts_and_new_standalone_requests() -> None:
-    for key in ["vedic_chart", "vimshottari_dasha"]:
+    expected_defs = {
+        "vedic_chart": {"JyotishProfile", "VargaCharts", "VargaChart", "Nakshatra"},
+        "vimshottari_dasha": {
+            "Vimshottari",
+            "DashaPeriod",
+            "DashaSeed",
+            "DashaBirthBalance",
+        },
+    }
+    for key, defs in expected_defs.items():
         description = describe_spec(SPECS[key])
         assert description["evidence_views"]
         schema = SPECS[key].output_model.model_json_schema()
-        assert {"JyotishProfile", "VargaCharts", "VargaChart", "Nakshatra"} <= set(
-            schema["$defs"]
-        )
+        assert defs <= set(schema["$defs"])
     req1 = VedicChartRequest.model_validate(
         {**astro_payload(), "ayanamsa": "kp", "ashtakavarga_profile": "aiyar"}
     )

@@ -9,9 +9,7 @@ from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core.almanac import get_solar_terms_for_year
 from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
 from fatebridge.core.de441_solar import PROVIDER as DE441_PROVIDER
-from fatebridge.core.metaphysics.qimen import (
-    _qimen_build_yinyangdun_map_from_seeds as cached,
-)
+from fatebridge.core.qimen.calendar import build_zhirun_schedule as cached
 from tests.support.ephemeris_context import empty_ephemeris_path
 
 

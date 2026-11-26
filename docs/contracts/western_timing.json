@@ -279,6 +279,17 @@
         "title": "Firdaria Year Basis",
         "type": "string"
       },
+      "high_latitude_fallback": {
+        "default": "error",
+        "description": "Fallback when quadrant houses fail at high latitudes: error (default), porphyry, or whole_sign.",
+        "enum": [
+          "error",
+          "porphyry",
+          "whole_sign"
+        ],
+        "title": "High Latitude Fallback",
+        "type": "string"
+      },
       "house_system": {
         "anyOf": [
           {
@@ -313,12 +324,26 @@
         "title": "Pd Aspects",
         "type": "array"
       },
-      "pd_method": {
-        "default": "astroapp_alchabitius",
-        "description": "Primary direction method identifier, e.g. astroapp_alchabitius, equatorial, or fatebridge_mundane_semiarc",
+      "pd_direction_mode": {
+        "default": "zodiacal",
+        "description": "Primary direction mode: 'zodiacal' (ecliptic aspect points) or 'mundane' (in mundo).",
         "enum": [
-          "astroapp_alchabitius",
+          "zodiacal",
+          "mundane"
+        ],
+        "title": "Pd Direction Mode",
+        "type": "string"
+      },
+      "pd_method": {
+        "default": "placidus",
+        "description": "Primary direction method: placidus (default), regiomontanus, campanus, alcabitius, or equatorial (oblique ascension for Asc, RAMC for MC).",
+        "enum": [
+          "placidus",
+          "regiomontanus",
+          "campanus",
+          "alcabitius",
           "equatorial",
+          "astroapp_alchabitius",
           "fatebridge_mundane_semiarc"
         ],
         "title": "Pd Method",
@@ -326,11 +351,13 @@
       },
       "pd_time_key": {
         "default": "Ptolemy",
-        "description": "Primary direction time key: Ptolemy, Naibod or Cardan",
+        "description": "Primary direction time key: Ptolemy, Naibod, Cardan, Solar_Arc, or Van_Dam.",
         "enum": [
           "Ptolemy",
           "Naibod",
-          "Cardan"
+          "Cardan",
+          "Solar_Arc",
+          "Van_Dam"
         ],
         "title": "Pd Time Key",
         "type": "string"

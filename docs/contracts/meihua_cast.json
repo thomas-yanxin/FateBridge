@@ -52,11 +52,7 @@
         "interpretation.topic_reading",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
-        "interpretation.internal_countercontrol",
-        "interpretation.seasonal_qualification",
-        "interpretation.wealth_components",
-        "interpretation.external_omens",
-        "interpretation.trigram_relation_symbols"
+        "interpretation.external_omens"
       ],
       "purpose": "核对所用原法、软件约定、原始数及取爻计数分歧"
     },
@@ -143,7 +139,6 @@
         "meihua.mutual_hexagram",
         "meihua.stage_relations",
         "meihua.seasonal_strength",
-        "interpretation.internal_countercontrol",
         "summary"
       ]
     },
@@ -171,7 +166,6 @@
         "meihua.body_trigram",
         "meihua.use_trigram",
         "meihua.stage_relations",
-        "interpretation.status",
         "interpretation.evidence_scope",
         "summary"
       ]
@@ -183,10 +177,8 @@
         "meihua.body_trigram",
         "meihua.stage_relations",
         "meihua.counting_variants",
-        "interpretation.stage_emphasis",
         "interpretation.casting_readings",
         "meihua.seasonal_strength",
-        "interpretation.internal_countercontrol",
         "interpretation.day_qi",
         "meihua.use_trigram",
         "meihua.mutual_hexagram.upper",
@@ -220,7 +212,6 @@
         "meihua.seed",
         "meihua.counting_variants",
         "meihua.ruleset.id",
-        "meihua.ruleset.sources",
         "meihua.ruleset.version",
         "meihua.calendar_policy",
         "meihua.base_hexagram",
@@ -234,18 +225,13 @@
         "summary",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
-        "interpretation.internal_countercontrol",
-        "interpretation.external_omens",
-        "interpretation.trigram_relation_symbols",
-        "interpretation.seasonal_qualification"
+        "interpretation.external_omens"
       ],
       "purpose": "按实际原始资料起卦或解释已有卦，不补钟时、字音和笔画"
     },
     "situational": {
       "fields": [
-        "input_normalized.response_context",
         "meihua",
-        "interpretation.situational_responses",
         "interpretation.casting_readings",
         "summary"
       ],
@@ -258,7 +244,6 @@
         "input_normalized",
         "meihua.seed",
         "meihua.body_trigram",
-        "interpretation.stage_emphasis",
         "interpretation.casting_readings",
         "summary"
       ]
@@ -268,9 +253,6 @@
       "fields": [
         "input_normalized",
         "meihua",
-        "interpretation.stage_emphasis",
-        "interpretation.internal_countercontrol",
-        "interpretation.seasonal_qualification",
         "interpretation.casting_readings",
         "summary"
       ]
@@ -279,15 +261,12 @@
       "fields": [
         "meihua.stage_relations",
         "meihua.seasonal_strength",
-        "interpretation.seasonal_qualification",
         "summary"
       ]
     },
     "strength_audit": {
       "fields": [
         "meihua",
-        "interpretation.seasonal_qualification",
-        "interpretation.internal_countercontrol",
         "interpretation.topic_reading",
         "summary",
         "interpretation.casting_readings",
@@ -303,7 +282,6 @@
         "meihua.evidence_scope",
         "meihua.counting_variants",
         "interpretation.evidence_scope",
-        "interpretation.status",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
         "summary"
@@ -319,7 +297,6 @@
         "meihua.rule_trace",
         "meihua.evidence_scope",
         "interpretation.evidence_scope",
-        "interpretation.status",
         "interpretation.traditional_judgement",
         "summary"
       ],
@@ -340,8 +317,6 @@
         "interpretation.casting_comparison",
         "interpretation.evidence_scope",
         "summary",
-        "interpretation.internal_countercontrol",
-        "interpretation.wealth_components",
         "interpretation.external_omens",
         "interpretation.day_qi"
       ],
@@ -352,15 +327,11 @@
       "fields": [
         "input_normalized",
         "meihua",
-        "interpretation.topic_ruleset",
         "interpretation.topic_reading",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
         "interpretation.evidence_scope",
         "summary",
-        "interpretation.internal_countercontrol",
-        "interpretation.seasonal_qualification",
-        "interpretation.wealth_components",
         "interpretation.external_omens",
         "interpretation.day_qi"
       ],
@@ -369,11 +340,8 @@
     },
     "trigram_symbols": {
       "fields": [
-        "interpretation.trigram_relation_symbols",
         "meihua.stage_relations",
         "meihua.seasonal_strength",
-        "interpretation.internal_countercontrol",
-        "interpretation.seasonal_qualification",
         "interpretation.casting_readings"
       ],
       "purpose": "按本次原体与初用、体互、用互、变用的实际生体或克体关系，读取文明书局本16组八卦专属象义。各计数候选分列，保留受制和旺衰；或字为史料备选，不能推定现实人物、姓氏、方位、灾祸、诊疗、应期或已验证结果。所选巽克体南方等异文不以常识改字。",
@@ -385,7 +353,6 @@
         "meihua.stage_relations",
         "meihua.seasonal_strength",
         "interpretation.topic_reading",
-        "interpretation.wealth_components",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
         "summary",
@@ -400,23 +367,6 @@
         "meihua.counting_variants",
         "meihua.seed",
         "meihua.evidence_scope",
-        "interpretation.weather.ruleset_id",
-        "interpretation.weather.version",
-        "interpretation.weather.ruleset.sources",
-        "interpretation.weather.control_profile.id",
-        "interpretation.weather.control_profile.version",
-        "interpretation.weather.control_profile.sources",
-        "interpretation.weather.context",
-        "interpretation.weather.trigram_counts",
-        "interpretation.weather.frequency_views",
-        "interpretation.weather.selected_readings",
-        "interpretation.weather.symbolic_attributions",
-        "interpretation.weather.time_scope_comparison",
-        "interpretation.weather.casting_comparison",
-        "interpretation.weather.casting_variants",
-        "interpretation.weather.controls",
-        "interpretation.weather.pending_rule_ids",
-        "interpretation.weather.research_validation",
         "interpretation.evidence_scope",
         "summary"
       ],

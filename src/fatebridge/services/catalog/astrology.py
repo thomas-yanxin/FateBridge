@@ -183,29 +183,9 @@ def _chart_spec(
         ),
         request_model_loader=request_model_ref(
             _ASTRO_REQ,
-            (
-                "AstroIndiaRequest"
-                if variant == "india_chart"
-                else (
-                    "AstroGuolaoRequest"
-                    if variant == "guolao_chart"
-                    else (
-                        "AstroSpecialtyRequest"
-                        if variant == "chart13"
-                        else "AstroChartRequest"
-                    )
-                )
-            ),
+            "AstroSpecialtyRequest" if variant == "chart13" else "AstroChartRequest",
         ),
-        summary=(
-            "印占 Lahiri 整宫与分盘，含 PAV/BAV/SAV 计数及生时抽样。"
-            if variant == "india_chart"
-            else (
-                "果老研究盘：七政四余坐标、赤经宿界、宫度主与可选目标小限。"
-                if variant == "guolao_chart"
-                else f"离线{label}（高精度星历或近似回退）。"
-            )
-        ),
+        summary=f"离线{label}（高精度星历或近似回退）。",
         operation_label_zh=label,
         family="astro",
         cpu_bound=True,
@@ -228,28 +208,16 @@ SPECS: list[ToolSpec] = [
             "variables",
             "bodygraph",
             "profile",
-            "design_solver",
-            "rulesets",
-            "rule_trace",
-            "source_consistency",
-            "gate_evidence",
-            "historical_polarity_context",
-            "gate_activation_context",
-            "profile_partition_context",
-            "apparent_position_context",
-            "depth_evidence",
-            "definition_bridging",
             "incarnation_cross",
-            "cycle_context",
-            "cycle_summary",
-            "interpretation",
-            "validation",
         ),
         summary="人类图：88°双时刻、26激活、通道与类型权威；区分已定义/未定义中心。",
         operation_label_zh="人类图",
         family="astro",
         cpu_bound=True,
         rest_path="/api/human-design/chart",
+        compact_view=service_ref(
+            "fatebridge.services.human_design", "compact_human_design"
+        ),
     ),
     ToolSpec(
         name="astrology_chart",
@@ -275,29 +243,59 @@ SPECS: list[ToolSpec] = [
         "hellen_chart",
         "希腊盘",
     ),
-    _chart_spec(
-        "guolao_chart",
-        "/api/astrology/guolao-chart",
-        "guolao_chart",
-        "果老星宗盘",
+    ToolSpec(
+        name="guolao_chart",
+        bind=bind_kwargs(
+            service_ref("fatebridge.services.guolao", "calculate_guolao_chart")
+        ),
+        request_model_loader=request_model_ref(
+            "fatebridge.core.requests.guolao", "GuolaoChartRequest"
+        ),
+        required_output_fields=("guolao",),
+        summary="果老研究盘：七政四余坐标、赤经宿界、宫度主、命度身宫、十干化曜、神煞与洞微大限。",
+        operation_label_zh="果老星宗盘",
+        family="astro",
+        cpu_bound=True,
+        rest_path="/api/astrology/guolao-chart",
+        output_validators=(validate_astro_chart_variant,),
+        compact_view=service_ref("fatebridge.services.guolao", "compact_guolao_chart"),
     ),
-    _chart_spec(
-        "vedic_chart",
-        "/api/astrology/vedic-chart",
-        "india_chart",
-        "印度盘",
+    ToolSpec(
+        name="vedic_chart",
+        bind=bind_kwargs(
+            service_ref("fatebridge.services.jyotish", "calculate_vedic_chart")
+        ),
+        request_model_loader=request_model_ref(
+            "fatebridge.core.requests.jyotish", "VedicChartRequest"
+        ),
+        required_output_fields=("india",),
+        summary="印占整宫与十六分盘，含 Shadbala、Bhava Bala、Yoga、Arudha 与 Ashtakavarga。",
+        operation_label_zh="印度盘",
+        family="astro",
+        cpu_bound=True,
+        rest_path="/api/astrology/vedic-chart",
+        compact_view=service_ref("fatebridge.services.jyotish", "compact_vedic_chart"),
     ),
     ToolSpec(
         name="vimshottari_dasha",
         bind=bind_kwargs(
             service_ref("fatebridge.services.jyotish", "calculate_vimshottari")
         ),
-        request_model_loader=request_model_ref(_ASTRO_REQ, "AstroVimshottariRequest"),
-        summary="印占 Vimshottari 分期：2–6层大运子期、出生剩余运及分盘八分法。",
+        request_model_loader=request_model_ref(
+            "fatebridge.core.requests.jyotish", "VimshottariDashaRequest"
+        ),
+        required_output_fields=(
+            "analysis_context",
+            "person_info",
+            "vimshottari",
+            "summary",
+        ),
+        summary="印占 Vimshottari 分期（及可选 Yogini / Ashtottari / Chara）：2–6层大运子期与出生剩余运。",
         operation_label_zh="印占 Vimshottari 分期",
         family="astro",
         cpu_bound=True,
         rest_path="/api/astrology/vimshottari-dasha",
+        compact_view=service_ref("fatebridge.services.jyotish", "compact_vimshottari"),
     ),
     ToolSpec(
         name="hamburg_midpoint_chart",

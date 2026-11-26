@@ -4,7 +4,7 @@ from calendar import isleap
 from datetime import datetime
 
 from fatebridge.core.almanac import localize_datetime
-from fatebridge.core.timing import DEFAULT_DAYUN_PERIODS, TimingAnalysis
+from fatebridge.core.bazi.timing import DEFAULT_DAYUN_PERIODS, TimingAnalysis
 from fatebridge.services.birth_time_events import BirthEventRecord, UnresolvedBirthEvent
 from fatebridge.services.dayun_wall_cells import (
     MICROSECOND,

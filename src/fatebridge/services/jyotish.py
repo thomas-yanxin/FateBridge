@@ -7,7 +7,7 @@ from typing import Any, Literal, TypedDict
 
 from typing_extensions import Required, Unpack
 
-from fatebridge.core.astro.birth import AstroBirthInfo, build_astro_birth_info
+from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.execution_context import current_datetime
 from fatebridge.core.jyotish.dasha import (
     DashaGrid,
@@ -30,47 +30,6 @@ from fatebridge.utils.timezones import (
     parse_timezone_name,
     validate_local_clock,
 )
-
-
-def enrich_india_chart(
-    result: dict[str, Any],
-    birth: AstroBirthInfo,
-    *,
-    node_mode: str,
-    ephemeris_policy: str,
-    saptavargaja_profile: str,
-    drekkana_profile: str,
-    cheshta_model: str,
-    divisions: list[int] | None,
-    birth_time_uncertainty_minutes: float | None,
-) -> None:
-    """Attach Indian Vedic chart payload onto core chart envelope (until Wave 3 switchover)."""
-    if (
-        result["chart_profile"]["zodiac"] != "sidereal"
-        or result["chart_profile"]["house_system"] != "whole_sign"
-    ):
-        result["india"].update(
-            {
-                "status": "configuration_not_supported",
-                "interpretation_scope": "Parashari D1/D9/D10 require sidereal and whole-sign.",
-            }
-        )
-        return
-    india = build_india(
-        birth,
-        node_mode=node_mode,
-        ephemeris_policy=ephemeris_policy,
-        saptavargaja_profile=saptavargaja_profile,
-        drekkana_profile=drekkana_profile,
-        cheshta_model=cheshta_model,
-        divisions=divisions,
-        birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
-    )
-    result["india"] = india
-    asc = india["charts"]["D1"]["ascendant"]
-    result["summary"] = (
-        f"印占本命（名义生时）：上升{asc['sign_zh']}，月宿{india['moon_nakshatra']}；已计算{', '.join(india['charts'])}。"
-    )
 
 
 def compact_vedic_chart(result: dict[str, Any]) -> dict[str, Any]:
@@ -218,8 +177,8 @@ def calculate_vedic_chart(
     name: str | None = None,
     birth_place: str | None = None,
     birth_timezone: str | None = None,
-    birth_longitude: float = 77.2090,
-    birth_latitude: float = 28.6139,
+    birth_longitude: float | None = 77.2090,
+    birth_latitude: float | None = 28.6139,
     ayanamsa: str = "lahiri",
     node_mode: str = "mean",
     divisions: list[int] | None = None,
@@ -409,13 +368,6 @@ def calculate_vimshottari(
             "birth_longitude": birth.longitude,
             "birth_latitude": birth.latitude,
             "birth_place": birth.birth_place,
-        },
-        # Minimal summary stub satisfies catalog/astrology.py required_output_fields until Wave 3 switchover
-        "india": {
-            "status": "complete",
-            "ayanamsa": ayanamsa,
-            "ayanamsha": ayanamsha_val,
-            "moon_nakshatra": result["seed"]["name"],
         },
         "vimshottari": result,
         "summary": f"按名义生时，目标时刻为{LABELS[result['current_major']['lord']]}主运／{LABELS[result['current_sub']['lord']]}次运（{year_basis}）。",

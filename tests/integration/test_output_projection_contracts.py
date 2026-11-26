@@ -20,7 +20,7 @@ import fatebridge.mcp_server as mcp
 from fatebridge.application.projection import project_fields
 from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.cli import run
-from fatebridge.core.fengshui.output import Ruleset
+from fatebridge.core.fengshui.models import Ruleset
 from fatebridge.core.response_models import (
     CHART_TOOL_FIELDS,
     CHINESE_TOOL_FIELDS,

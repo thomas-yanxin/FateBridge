@@ -11,11 +11,15 @@ from fatebridge.core.astro.astrology_tables import (
 )
 from fatebridge.core.astro.lilly_houses import house_condition
 from fatebridge.core.classical_western import LOTS
-from fatebridge.core.metaphysics.qimen import QIMEN_DOOR_TO_TRIGRAM
-from fatebridge.core.metaphysics.qimen_calendar_tables import QIMEN_FUHEAD_HEAVEN_STEM
-from fatebridge.core.qimen.qimen_evidence import STAR_ELEMENTS
-from fatebridge.core.qimen.qimen_gate_relations import DOOR_ELEMENTS, PRINTED_EXAMPLES
-from fatebridge.core.qimen.qimen_profiles import GOD_PROFILES, god_evidence
+from fatebridge.core.qimen import (
+    DOOR_ELEMENTS,
+    GOD_PROFILES,
+    PRINTED_EXAMPLES,
+    QIMEN_DOOR_TO_TRIGRAM,
+    QIMEN_FUHEAD_HEAVEN_STEM,
+    STAR_ELEMENTS,
+    god_evidence,
+)
 
 
 class KnowledgeCard(TypedDict, total=False):

@@ -6,7 +6,7 @@ import random
 from typing import Any
 
 from fatebridge.core.almanac import build_calendar_context
-from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.divination import lookup_hexagram_by_code
 from fatebridge.core.liuyao.casting import (
     CoinToss,

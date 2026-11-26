@@ -17,7 +17,7 @@ from fatebridge.core.almanac import (
     get_bazi_year,
     localize_datetime,
 )
-from fatebridge.core.calendar import LATE_ZI_HOUR, BaZiCalendar
+from fatebridge.core.bazi.calendar import LATE_ZI_HOUR, BaZiCalendar
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.ziwei.tables import (
     DEFAULT_ZIWEI_AGE_DIVIDE,

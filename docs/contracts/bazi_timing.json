@@ -13,30 +13,19 @@
       "fields": [
         "personal_info.analysis_datetime",
         "calendar_context.birth_time_input",
-        "dayun_analysis",
-        "birth_time_sensitivity"
+        "dayun_analysis"
       ],
       "when": "用户确认名义出生参考的正负UTC经过分钟范围时，传birth_time_uncertainty_minutes并读取完整候选与事件未决层；无分钟样本的事件候选不能忽略，计数不是概率，None不是精确生时"
     },
     "carriers": {
       "fields": [
-        "personal_info.analysis_datetime",
-        "interaction_analysis.method_id",
-        "interaction_analysis.pillar_carrier_summary",
-        "interaction_analysis.pillar_carrier_scope",
-        "interaction_analysis.pillar_carrier_source"
+        "personal_info.analysis_datetime"
       ],
       "when": "核对大运至流时的同柱干支生克、本柱真实藏根及原局外援；喜支才核盖头、喜干才核截脚压力，不据候选裁定喜忌、合化、救应或吉凶。"
     },
     "carriers_detail": {
       "fields": [
-        "personal_info.analysis_datetime",
-        "interaction_analysis.method_id",
-        "interaction_analysis.pillar_carriers",
-        "interaction_analysis.pillar_carrier_scope",
-        "interaction_analysis.pillar_carrier_source",
-        "interaction_analysis.hidden_target_reference",
-        "interaction_analysis.hidden_target_carriers"
+        "personal_info.analysis_datetime"
       ],
       "when": "逐项核对本柱藏根和原局外援及原典来源；完整明细若分页，读取同一run，不另算补齐。"
     },
@@ -46,14 +35,6 @@
         "dayun_analysis"
       ],
       "when": "查看交运边界与十二步大运时间轴；analysis_age仅作显式年龄参考，默认按目标时刻选运"
-    },
-    "hidden_carriers": {
-      "fields": [
-        "interaction_analysis.pillar_carriers",
-        "interaction_analysis.hidden_target_carriers",
-        "interaction_analysis.hidden_target_reference"
-      ],
-      "when": "在已算大运、流年、流月、流日、流时中逐藏干核对同柱生克；干克某藏干只列该目标为所喜时的盖头候选，不能推成全支受克。"
     },
     "interactions": {
       "fields": [
@@ -69,8 +50,7 @@
       "fields": [
         "personal_info.analysis_datetime",
         "interaction_analysis.nodes",
-        "interaction_analysis.relations",
-        "interaction_analysis.strength_projection"
+        "interaction_analysis.relations"
       ],
       "when": "核对时间支冲刑及唯一大运干五合对原局既有预算的限定投影、来源、同次参数与阻塞关系；其它时间粒度的干合未定量，残存原局数值档不能解释为完整行运后旺衰。"
     },
@@ -78,13 +58,7 @@
       "fields": [
         "personal_info.analysis_datetime",
         "interaction_analysis.nodes",
-        "interaction_analysis.relations",
-        "interaction_analysis.root_context.method_id",
-        "interaction_analysis.root_context.month_command_node_id",
-        "interaction_analysis.root_context.day_master_roots",
-        "interaction_analysis.root_context.effective_force_status",
-        "interaction_analysis.root_context.source",
-        "interaction_analysis.root_context.scope"
+        "interaction_analysis.relations"
       ],
       "when": "核对日主在时运支的原典根类、真实藏干及同次冲合刑触点；月令仍属原局，阴长生参考不补根，未见根不直接判弱，关系触点不等于有效损益。"
     },
@@ -92,12 +66,7 @@
       "fields": [
         "personal_info.analysis_datetime",
         "interaction_analysis.nodes",
-        "interaction_analysis.relations",
-        "interaction_analysis.root_context.method_id",
-        "interaction_analysis.root_context.timing_stem_natal_roots",
-        "interaction_analysis.root_context.effective_force_status",
-        "interaction_analysis.root_context.source",
-        "interaction_analysis.root_context.scope"
+        "interaction_analysis.relations"
       ],
       "when": "核对运干在四个原局支的根类及关系触点；共享根位不能重复相加为预算，不据原局根存在宣称已算行运后旺衰。"
     }
@@ -333,6 +302,29 @@
         "title": "Birth Year",
         "type": "integer"
       },
+      "changsheng_school": {
+        "default": "fire_earth_same_palace",
+        "description": "十二长生流派：fire_earth_same_palace（火土同宫，戊随丙、己随丁） | water_earth_same_palace（水土同宫，戊随壬、己随癸） | five_element_same_stage（五行同生同死）。",
+        "enum": [
+          "fire_earth_same_palace",
+          "water_earth_same_palace",
+          "five_element_same_stage"
+        ],
+        "title": "Changsheng School",
+        "type": "string"
+      },
+      "duty_profile": {
+        "default": "sanming",
+        "description": "人元司令分野分日表：sanming（三命通会）| yuanhai（渊海子平）| 6tail | ditian（滴天髓）。",
+        "enum": [
+          "sanming",
+          "yuanhai",
+          "6tail",
+          "ditian"
+        ],
+        "title": "Duty Profile",
+        "type": "string"
+      },
       "gender": {
         "anyOf": [
           {
@@ -364,6 +356,17 @@
         "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default on in the current software policy; this option does not certify a classical text's clock rule. Set false for the raw civil clock.",
         "title": "Use True Solar Time",
         "type": "boolean"
+      },
+      "zi_hour_policy": {
+        "default": "day_rollover_at_23",
+        "description": "早晚子时（23:00–23:59）流派：day_rollover_at_23（sect=1，23时换日柱，五鼠遁按次日干） | night_zi_same_day_next_hour_stem（sect=2，夜子时日柱不换，时干按次日五鼠遁） | night_zi_same_day_same_hour_stem（夜子时日柱不换，时干按当日五鼠遁）。",
+        "enum": [
+          "day_rollover_at_23",
+          "night_zi_same_day_next_hour_stem",
+          "night_zi_same_day_same_hour_stem"
+        ],
+        "title": "Zi Hour Policy",
+        "type": "string"
       }
     },
     "required": [

@@ -6,6 +6,7 @@ from typing import Literal
 
 from pydantic import JsonValue
 
+from fatebridge.core.bazi.calendar import ZiHourPolicy
 from fatebridge.core.bazi.compatibility import (
     analyze_cross_shensha,
     analyze_day_pillar_synergy,
@@ -28,11 +29,22 @@ def calculate_compatibility_analysis(
     relationship_type: Literal[
         "general", "marriage", "friendship", "business", "family"
     ] = "general",
+    *,
+    person1_zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+    person2_zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
 ) -> dict[str, JsonValue]:
     """Build both natal charts once and compute full compatibility facts."""
     contexts = {
-        "person1": build_birth_computation_context(person1, field_prefix="person1_"),
-        "person2": build_birth_computation_context(person2, field_prefix="person2_"),
+        "person1": build_birth_computation_context(
+            person1,
+            field_prefix="person1_",
+            zi_hour_policy=person1_zi_hour_policy,
+        ),
+        "person2": build_birth_computation_context(
+            person2,
+            field_prefix="person2_",
+            zi_hour_policy=person2_zi_hour_policy,
+        ),
     }
     natal_charts = {
         role: build_destiny_payload(context) for role, context in contexts.items()

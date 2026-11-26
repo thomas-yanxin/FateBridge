@@ -2,13 +2,13 @@
 
 import pytest
 
-from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.services.guolao import calculate_guolao_chart
 from tests.fixtures.surface_payloads import astro_payload
 
 
 def chart(**changes):
-    return calculate_core_chart_analysis(
-        **{**astro_payload(), "chart_variant": "guolao_chart", **changes}
+    return calculate_guolao_chart(
+        **{**astro_payload(), "use_true_solar_time": False, **changes}
     )
 
 

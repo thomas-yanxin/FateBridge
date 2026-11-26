@@ -10,32 +10,15 @@
   "evidence_views": {
     "additional_poles": {
       "fields": [
-        "birth_utc",
-        "depth_evidence.additional_polarity_sources",
-        "depth_evidence.additional_polarity_summary",
-        "rulesets"
+        "birth_utc"
       ],
       "purpose": "2001原典正文另列的11.4金星与25.4木星、原符号保留、页码/来源定位及本盘实际使用这些附加依据的位置和全部星体路径；不将两项补充当384线全文验收。完整逐项reading读取同一run的depth_evidence.line_fixings。"
     },
     "apparent_positions": {
       "fields": [
-        "apparent_position_context.coordinate_context",
-        "interpretation.coordinate_frame_meaning",
         "birth_utc",
         "design_utc",
-        "calculation_policy.position_frame",
-        "calculation_policy.ephemeris_version",
-        "apparent_position_context.nominal_side_batch_ids",
-        "apparent_position_context.unique_batch_count",
-        "apparent_position_context.observed_batch_count",
-        "apparent_position_context.observed_physical_position_count",
-        "apparent_position_context.solar_deflection_policy",
-        "apparent_position_context.arithmetic_method",
-        "apparent_position_context.arithmetic_policy",
-        "apparent_position_context.radius_is_nominal_conversion_constant",
-        "apparent_position_context.excluded_factors",
-        "rulesets",
-        "interpretation.apparent_position_context"
+        "calculation_policy.ephemeris_version"
       ],
       "purpose": "核对同次原生全体物理天体批次、太阳附近光偏折约定及名义圆盘投影。名义半径不是真实太阳边缘，投影不认证遮掩或可见性；完整批次读同一run，不从摘要重算。"
     },
@@ -45,29 +28,20 @@
         "bodygraph.subtype",
         "bodygraph.authority",
         "bodygraph.centers",
-        "bodygraph.channels",
-        "bodygraph.classification_evidence",
-        "rulesets",
-        "validation"
+        "bodygraph.channels"
       ],
       "purpose": "核对权威优先序、已定义中心及真实完整通道路径；保留直接和间接意志连接，无内在权威不强加喉中心定义"
     },
     "birth_clock": {
       "fields": [
         "birth_utc",
-        "birth_clock_evidence",
-        "time_scales.personality",
-        "interpretation.birth_clock_meaning"
+        "time_scales.personality"
       ],
       "purpose": "仅用于已确认正闰秒出生：当地60秒、UTC标签、冻结IERS来源与实际TT及说明；不认证出生记录、实测UT1、星历精度或完整历法范围"
     },
     "birth_interval": {
       "fields": [
-        "birth_utc",
-        "calculation_policy.birth_time_uncertainty_minutes",
-        "time_sensitivity.summary",
-        "interpretation.birth_interval_meaning",
-        "validation.prediction"
+        "birth_utc"
       ],
       "purpose": "出生名义时刻正负范围内实际求值数、激活与联合结构变化及未分开区间；完整采样原始黄经、速度、旗标和见证从同次result_delivery读取。0表示未评估；有限采样不是连续稳定性或出生钟认证，次数不是概率。"
     },
@@ -76,52 +50,22 @@
         "bodygraph.circuitry.defined_channel_count",
         "bodygraph.circuitry.circuits",
         "bodygraph.circuitry.group_channel_counts",
-        "bodygraph.circuitry.group_membership",
-        "bodygraph.circuitry.integration",
-        "bodygraph.circuitry.source_url",
-        "bodygraph.circuitry.integration_source_url",
-        "bodygraph.circuitry.scope",
-        "interpretation.circuitry_meaning",
-        "source_consistency.channel_classifications.direct_classifications_checked",
-        "source_consistency.channel_classifications.endpoint_inferences_checked",
-        "source_consistency.channel_classifications.scope",
-        "source_consistency.circuit_group_memberships.status",
-        "source_consistency.activation_impacts",
-        "validation.classical_acceptance_passed",
-        "validation.prediction",
-        "interpretation.circuit_topology_meaning",
-        "source_consistency.archival_channel_pages.status",
-        "source_consistency.archival_channel_pages.source_label_disagreements",
-        "source_consistency.archival_channel_pages.source_revision"
+        "bodygraph.circuitry.integration"
       ],
       "purpose": "本次完整通道、回路群与整合小计；保留原有来源层级和扫描标签分歧，逐项全回路集合另读topology卡或完整结果"
     },
     "cross_sources": {
       "fields": [
-        "incarnation_cross.gates",
-        "source_consistency.expanded_cross_name_comparison",
-        "interpretation.expanded_cross_name_meaning"
+        "incarnation_cross.gates"
       ],
       "purpose": "本盘四门、完整新增官方标签比较与解释；保留原典名称、别名拒绝、原PDF名称及目录定位和课程冲突。原19盘与29门印刷分界的完整明细仍见原证据卡或同次完整run，不把有限192门角覆盖当作完整原典或精度认证"
-    },
-    "cycle_origins": {
-      "fields": [
-        "cycle_origin_comparison.status",
-        "cycle_origin_comparison.selected_origin",
-        "cycle_origin_comparison.hypothesis_origin",
-        "cycle_origin_comparison.summary",
-        "cycle_origin_comparison.interpretation"
-      ],
-      "purpose": "须显式compare_cycle_origins=true并提供cycle_reference_datetime；比较人格主周期与实际设计TT原点的数学假设。保留两边全部交会的首末摘要、不同候选数量和未完成状态，不按序号配对、不认证设计原点为原典规则或指定第六线阶段。完整设计侧见证与文件来源读取同一run的cycle_origin_comparison.alternative，人格主见证仍读cycle_context。"
     },
     "cycles": {
       "fields": [
         "birth_utc",
         "profile",
         "cycle_summary",
-        "calculation_policy.position_frame",
-        "calculation_policy.ephemeris_model",
-        "validation.prediction"
+        "calculation_policy.ephemeris_model"
       ],
       "purpose": "明确cycle_reference_datetime才计算首轮周期交会；保留逆行多次接触、有限搜索和缺失凯龙星数据，不按生日分期。参考输入最多6位小数秒，超限拒绝；reference_ordering以源定义连续TT核对不早于出生，微秒输入顺序不认证微秒天文精度。摘要保留文件来源和DE版本，完整逐点来源索引与TT求根见证读同一run的cycle_context。交会与已观测驻点细化到函数零值或相邻TT，保留精确残差和驻点速度区间；量化可能掩盖极近峰值，完整解析交会数量仍未认证。文件身份及数值收敛不认证物理时刻精度。"
     },
@@ -131,16 +75,7 @@
         "definition_bridging.status",
         "definition_bridging.original_component_count",
         "definition_bridging.minimum_added_gate_count",
-        "definition_bridging.minimum_solution_count",
-        "definition_bridging.minimum_solutions_preview",
-        "definition_bridging.preview_is_truncated",
-        "definition_bridging.all_minimum_solutions_enumerated",
-        "definition_bridging.source_scope",
-        "definition_bridging.scope",
-        "definition_bridging.ruleset",
-        "interpretation.definition_meaning",
-        "interpretation.definition_structure",
-        "validation.prediction"
+        "definition_bridging.minimum_solution_count"
       ],
       "purpose": "区分单门局部合并与连接全部原定义分组的最少不同新增门；仅预览前三组方案，完整方案读取同次完整结果，不推断他人、行运或心理需要"
     },
@@ -149,11 +84,7 @@
         "incarnation_cross",
         "depth_evidence",
         "bodygraph.channels",
-        "profile",
-        "rulesets",
-        "source_consistency",
-        "validation",
-        "interpretation.line_fixing_meaning"
+        "profile"
       ],
       "purpose": "原典交叉、通道及384线极性星体；本盘26位置逐项固定机制说明，交点可接受但不充当固定星体；完整线义未验收"
     },
@@ -161,110 +92,47 @@
       "fields": [
         "birth_utc",
         "calculation_policy.ephemeris_model",
-        "calculation_policy.require_swiss_files",
-        "ephemeris_backend_comparison.status",
-        "ephemeris_backend_comparison.selected_models",
-        "ephemeris_backend_comparison.selected_physical_models",
-        "ephemeris_backend_comparison.mean_node_flag_scope",
-        "ephemeris_backend_comparison.design_time_difference_seconds",
-        "ephemeris_backend_comparison.changed_levels",
-        "ephemeris_backend_comparison.joint_evidence_summary",
-        "ephemeris_backend_comparison.target_scope",
-        "ephemeris_backend_comparison.scope",
-        "node_backend_comparison.status",
-        "interpretation.ephemeris_scope",
-        "calculation_policy.ephemeris_model_scope",
-        "calculation_policy.physical_backend_policy",
-        "calculation_policy.nonphysical_factor_models",
-        "ephemeris_backend_comparison.reference_computation_performed",
-        "ephemeris_backend_comparison.unavailable_reason",
-        "calculation_policy.position_frame",
-        "calculation_policy.position_frame_scope",
-        "calculation_policy.lunar_node_frame",
-        "ephemeris_backend_comparison.selected_model_scope",
-        "interpretation.design_time_precision_meaning"
+        "calculation_policy.require_swiss_files"
       ],
       "purpose": "比较同一出生TT下全部激活及各自太阳弧设计根，分别读取物理天体视位置与数学交点口径；保留实际模型和原始旗标的区别。后端相同不是认证，差值非误差界，完整参考、旗标和快照读取同一run"
     },
     "fixing": {
       "fields": [
-        "depth_evidence.fixing_summary",
-        "depth_evidence.fixing_policy",
-        "interpretation.line_fixing_meaning",
-        "historical_polarity_context.status",
-        "historical_polarity_context.nominal_recipient_count",
-        "historical_polarity_context.nominal_changed_state_count",
-        "interpretation.historical_polarity_context",
-        "depth_evidence.fixing_rule_source",
-        "depth_evidence.node_fixing_exclusion_source",
-        "rulesets",
-        "validation"
+        "depth_evidence.fixing_summary"
       ],
       "purpose": "本盘26位置固定状态计数及交点接受角色；完整逐项机制与触发位置读取depth。单极性类别不等于实际触发，尚未认证完整线义。"
     },
     "gate_context": {
       "fields": [
-        "birth_utc",
-        "gate_activation_context.method_id",
-        "gate_activation_context.nominal.activated_gates",
-        "gate_activation_context.nominal.active_in_defined_centers",
-        "gate_activation_context.nominal.dormant_in_undefined_centers",
-        "gate_activation_context.nominal.broad_unpaired_activated_gates",
-        "gate_activation_context.nominal.defined_center_hanging_gates",
-        "gate_activation_context.context_count",
-        "gate_activation_context.ruleset",
-        "interpretation.gate_activation_context"
+        "birth_utc"
       ],
       "purpose": "区分名义盘已激活、定义中心内active与未定义中心内dormant；保留悬挂门的公开宽窄用词。逐门通道与人格/设计来源读同run的gate_activation_context.nominal.gates；各后端和生时联合见证读witnesses，不把名义状态拼到另一TT。"
     },
     "grounding": {
       "fields": [
-        "interpretation",
         "bodygraph",
         "profile",
         "incarnation_cross",
-        "depth_evidence",
-        "validation",
-        "source_consistency"
+        "depth_evidence"
       ],
       "purpose": "逐句固定模板、实际计算依据与来源分歧；完整核验仍读取同次完整原始结果。"
     },
     "historical_polarity": {
       "fields": [
-        "historical_polarity_context",
-        "interpretation.historical_polarity_context",
         "depth_evidence.line_fixings"
       ],
       "purpose": "58.5历史通知与2001字面表、两张既有官方盘标记的未决冲突；仅比较名义盘真实触发路径，不改默认、不认证完整线义。"
     },
     "native_context": {
       "fields": [
-        "birth_utc",
-        "native_execution_context",
-        "validation.prediction"
+        "birth_utc"
       ],
       "purpose": "同一外层人类图操作的独立原生进程边界、辅助文件候选身份与压缩文件端点诊断。父进程DeltaT、潮汐加速度和旧表缓存不参与当前计算；当前配置文件仍有效。仅为声明与端点检查，不认证原生执行、原子读取、物理精度或预测。完整诊断过长时读取同次result_delivery。"
-    },
-    "nodes": {
-      "fields": [
-        "node_convention_comparison.selected",
-        "node_convention_comparison.alternative",
-        "node_convention_comparison.reference_node_positions",
-        "node_convention_comparison.changed_activations",
-        "node_backend_comparison.status",
-        "node_backend_comparison.reference_node_positions",
-        "node_backend_comparison.rows",
-        "node_backend_comparison.changed_levels",
-        "interpretation.node_comparison_meaning"
-      ],
-      "purpose": "同TT真平交点的完整细分变化、节点原生见证、四项后端差值及固定说明；8192字符内保留业务依据，过长环境元数据按同次run分页读取，完整联合结构仍读该run，不认证调用真实性或天文误差界"
     },
     "personality_colors": {
       "fields": [
         "birth_utc",
-        "variables.personality_colors",
-        "interpretation.personality_color_meaning",
-        "node_convention_comparison.personality_colors_changed"
+        "variables.personality_colors"
       ],
       "purpose": "按人格日地/交点的实际Color及一致对点读取官方Motivation/View类别名、来源定位和本盘局部依据；同箭头编码不保证Color类别相同。出生盘不测量现实心理、转移或分心状态，不将类别当完整PHS、384线原典或现实预测验收。完整比较和时间样本读取同一run。"
     },
@@ -275,32 +143,21 @@
         "design_solver",
         "activations",
         "variables",
-        "node_convention_comparison",
-        "node_backend_comparison",
-        "time_sensitivity",
-        "validation",
-        "source_consistency.activation_impacts",
-        "interpretation.design_time_precision_meaning"
+        "time_sensitivity"
       ],
       "purpose": "连续TT、最终相邻浮点太阳根见证、端点日地细分与实际星历口径；数值收敛不表示物理精度认证。实际设计根端点另读root_endpoints，分别保留13项激活、整盘结构与四箭头差异；不把端点一致当连续稳定，也不拼接候选盘。"
     },
     "primary_diagrams": {
       "fields": [
         "incarnation_cross",
-        "profile",
-        "source_consistency.primary_transcript_diagrams"
+        "profile"
       ],
       "purpose": "按有序四门和角度读取两幅2008公开转录图的窄范围旁证、页码与文件名称；保留未经校对、未认证母本和非勘误的限定，不代替2001名称或完整线义验收"
     },
     "profile": {
       "fields": [
         "profile",
-        "profile_evidence",
-        "incarnation_cross.angle",
-        "interpretation.profile_meaning",
-        "interpretation.time_scope",
-        "source_consistency.activation_impacts",
-        "interpretation.source_discrepancy_meaning"
+        "incarnation_cross.angle"
       ],
       "purpose": "人格/设计日地线号、上下卦与角色角度分别核对；4/6仍为右角、4/1单列并列。角色含6线才提供三阶段教学来源，未求行星回归和评估时刻不分配现阶段，也不改写出生角色数字"
     },
@@ -308,14 +165,7 @@
       "fields": [
         "birth_utc",
         "design_utc",
-        "profile",
-        "profile_partition_context.actual_profile_category",
-        "profile_partition_context.ideal_partition",
-        "profile_partition_context.actual_profile_matches_ideal_partition",
-        "profile_partition_context.actual_solar_arc_residual_degrees_ratio",
-        "profile_partition_context.source_facts",
-        "profile_partition_context.ruleset",
-        "interpretation.profile_partition_context"
+        "profile"
       ],
       "purpose": "根据本次实际日地线号说明基础或过渡角色；单列人格太阳精确回退88度的理想分区，保留与原生设计太阳的差别，不改写角色或把角宽当人群比例。公开Resonances用词保留上下文，未认证完整原典或天文精度。"
     },
@@ -323,22 +173,14 @@
       "fields": [
         "birth_utc",
         "design_utc",
-        "design_solver.bracket_width_seconds",
-        "design_solver.numerical_precision.design_body_endpoint_summary",
-        "design_solver.numerical_precision.sun_coordinate_policy",
-        "design_solver.numerical_precision.local_solar_lattice_summary",
-        "design_solver.numerical_precision.local_root_family_summary",
-        "interpretation.design_time_precision_meaning",
-        "validation.prediction"
+        "design_solver.bracket_width_seconds"
       ],
       "purpose": "实际设计数值根的1或2个TT端点、13激活与完整解释依赖摘要；求根和实际太阳统一坐标旗标并逐位绑定。主盘在已观测正到负括区及精确零点中按绝对精确残差、较早TT选根；local_root_family_summary另列全部多接触候选的实际整盘。初始括区、完整邻点、最终端点与候选见同一run的design_solver.numerical_precision；不拼接候选，不将有限最优性、候选异同当作全域最优、物理误差界或连续稳定认证。"
     },
     "source_files": {
       "fields": [
         "birth_utc",
-        "calculation_policy.ephemeris_model",
-        "ephemeris_source_summary",
-        "validation.prediction"
+        "calculation_policy.ephemeris_model"
       ],
       "purpose": "本命／设计根／范围及后端对照的实际原生位置文件上下文与前后身份检查；保留文件来源、DE号、返回旗标模型、作用、TT包络与实际求值次数，解析平交点和内置Moshier单列。文件身份不是位置精度或原子读取认证，周期搜索另有来源证据；完整卡过长读取同次result_delivery。"
     },
@@ -355,65 +197,24 @@
         "bodygraph.definition",
         "bodygraph.channels",
         "profile",
-        "profile_evidence",
         "variables.status",
-        "variables.code",
-        "source_consistency.status",
-        "source_consistency.discrepancies",
-        "validation",
-        "rulesets",
-        "source_consistency.activation_impacts",
-        "source_consistency.cross_name_comparison.status",
-        "source_consistency.cross_name_comparison.observed_labels",
-        "design_solver.numerical_precision"
+        "variables.code"
       ],
       "purpose": "类型、权威、定义与人生角色；忠于通道及来源"
-    },
-    "topology": {
-      "fields": [
-        "bodygraph.circuitry.topology_completion",
-        "interpretation.circuit_topology_meaning",
-        "source_consistency.archival_channel_pages.status",
-        "source_consistency.archival_channel_pages.channels_checked",
-        "source_consistency.archival_channel_pages.channels_matched",
-        "source_consistency.archival_channel_pages.source_label_disagreements",
-        "rulesets",
-        "validation"
-      ],
-      "purpose": "六个回路及整合四通道的逐项集合核对；中心群连通与全回路齐全分开，保留扫描来源与防御页标签分歧"
     },
     "uncertainty": {
       "fields": [
         "birth_utc",
         "calculation_policy.node_mode",
         "calculation_policy.ephemeris_model",
-        "time_sensitivity.status",
-        "time_sensitivity.joint_evidence_summary",
-        "time_sensitivity.sampling",
-        "time_sensitivity.joint_evidence_cache",
-        "node_convention_comparison.joint_evidence_summary",
-        "node_backend_comparison.status",
-        "node_backend_comparison.joint_evidence_summary",
-        "node_backend_comparison.subdivision_accuracy_certified",
-        "ephemeris_backend_comparison.status",
-        "ephemeris_backend_comparison.joint_evidence_summary",
-        "interpretation.time_scope",
-        "interpretation.ephemeris_scope",
-        "definition_bridging.ruleset",
-        "validation.prediction",
-        "time_sensitivity.joint_transition_refinement_summary"
+        "time_sensitivity.status"
       ],
       "purpose": "联合比较桥接门集、线固定与四箭头；需明确birth_time_uncertainty_minutes才做区间采样，0返回未评估。完整快照及局部字段路径读取同次结果，不以方案数量或有限网格认证稳定性；另列已观测多依赖过渡细查及未分开区间，不把有限细查认证为连续穷尽"
     },
     "variables": {
       "fields": [
         "variables",
-        "interpretation.variables_meaning",
-        "node_backend_comparison",
-        "node_convention_comparison",
-        "time_sensitivity",
-        "rulesets",
-        "validation"
+        "time_sensitivity"
       ],
       "purpose": "人格与设计日地/交点四组Tone的左右箭头、同次引用和实际变体；不作健康、饮食或学习能力评估"
     }
@@ -433,13 +234,11 @@
       "profile",
       "variables.status",
       "variables.code",
-      "profile_evidence.status",
-      "profile_evidence.lines",
-      "profile_evidence.geometry",
-      "source_consistency.status",
-      "source_consistency.discrepancies",
-      "validation",
-      "source_summary"
+      "variables.phs_determination",
+      "variables.environment",
+      "variables.cognition",
+      "variables.sense",
+      "summary"
     ]
   },
   "input": {
@@ -475,7 +274,7 @@
       },
       "birth_second": {
         "default": 0,
-        "description": "省略按所记分钟的第0秒计算；60仅接受冻结IERS已公布且经当地时区换算确认的UTC正闰秒，不认证出生记录精度",
+        "description": "省略按第0秒计算；60仅接受冻结IERS已公布的UTC正闰秒",
         "maximum": 60,
         "minimum": 0,
         "title": "Birth Second",
@@ -483,14 +282,14 @@
       },
       "birth_time_uncertainty_minutes": {
         "default": 0,
-        "description": "可选的出生时间正负范围；10秒TT网格、速度变号及已观测多依赖过渡细查，不认证连续区间穷尽；0表示未评估",
+        "description": "可选出生时间正负误差分钟（1–60）；0表示未评估",
         "maximum": 60,
         "minimum": 0,
         "title": "Birth Time Uncertainty Minutes",
         "type": "integer"
       },
       "birth_timezone": {
-        "description": "必须提供 IANA 时区、UTC 偏移或十进制小时数；显式偏移限±15小时，十进制按最近微秒取偶转换并回显量化；DST 重复时刻需用明确偏移消歧；时区规则未指定当地偏移的历史日期须补充已核实偏移，不能当作零偏移",
+        "description": "必须提供 IANA 时区、UTC 偏移或十进制小时数",
         "title": "Birth Timezone",
         "type": "string"
       },
@@ -500,18 +299,6 @@
         "minimum": 1800,
         "title": "Birth Year",
         "type": "integer"
-      },
-      "compare_apparent_models": {
-        "default": false,
-        "description": "可选在原人格/设计TT比较Swiss重心状态、有限源太阳点质量偏折、ERFA光行差和IAU2006真黄道模型，并用该模型自己的太阳重求88度设计根及该根位置；需jpl额外依赖与重心文件。不替换原生激活或原生设计根，不证明原典优先；太阳盘内仅数学延拓，物理误差界未知。",
-        "title": "Compare Apparent Models",
-        "type": "boolean"
-      },
-      "compare_cycle_origins": {
-        "default": false,
-        "description": "可选比较人格与实际88度太阳弧设计TT两个周期原点；cycle_reference_datetime可省略；省略时不评估相对某日的位置。人格主结果不改，设计原点仅为数学敏感性假设，未获原典优先性认证；完整保留两边交会及失败，不指定首末触优先或人生阶段。",
-        "title": "Compare Cycle Origins",
-        "type": "boolean"
       },
       "cycle_reference_datetime": {
         "anyOf": [
@@ -523,7 +310,7 @@
           }
         ],
         "default": null,
-        "description": "可选带时区ISO时刻；当地时间的小数按最低已给单位（小时、分钟或秒）精确展开，最多6位，超限拒绝而非截断。提供时计算出生起65儒略年内土星首轮回归、天王星对冲及凯龙星首轮回归的多次交会与该时刻的相对位置。须在源定义的连续TT上不早于出生；输入顺序校验不认证微秒级天文精度。比较双原点时可省略参考日，只搜索交会。不按生日划阶段，不默认当前时间。有限采样不认证穷尽。",
+        "description": "可选带时区ISO时刻，计算出生起65儒略年内土星回归、天王星对冲及凯龙星回归",
         "title": "Cycle Reference Datetime"
       },
       "name": {
@@ -541,7 +328,7 @@
       },
       "node_mode": {
         "default": "true",
-        "description": "真交点或平交点；这是一项显式计算约定，未认证与原版软件完全一致",
+        "description": "真交点或平交点",
         "enum": [
           "true",
           "mean"
@@ -549,11 +336,38 @@
         "title": "Node Mode",
         "type": "string"
       },
+      "partner": {
+        "anyOf": [
+          {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "可选合盘对象出生参数（含 birth_year..birth_timezone），计算关系合盘通道",
+        "title": "Partner"
+      },
       "require_swiss_files": {
         "default": false,
-        "description": "为真时要求实际使用 Swiss 数据文件；否则允许并回显 Moshier 后端",
+        "description": "为真时要求实际使用 Swiss 数据文件；否则允许 Moshier 后端",
         "title": "Require Swiss Files",
         "type": "boolean"
+      },
+      "transit_datetime": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "可选带时区ISO行运时刻，叠加当前行运闸门与通道",
+        "title": "Transit Datetime"
       }
     },
     "required": [

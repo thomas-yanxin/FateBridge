@@ -21,143 +21,48 @@
     "temporal_balas": "Kala与Cheshta均为出生时刻的本命分量，不是analysis_year/as_of的时运。Natha按视太阳过中天，Hora按日出后等长平均小时，不套西占不等时小时；日主日出换日，岁/月主为360/30日传统口径。月亮第八日窗口与盈亏读法、水星性质保留scenarios；星战金额按Raman76-77固定系数及本次前置力量条件计算，读取yuddha_bala.evidence/upstream_profile。"
   },
   "evidence_views": {
-    "ashtakavarga": {
-      "fields": [
-        "india.ashtakavarga",
-        "india.birth_time_sensitivity",
-        "india.rulesets",
-        "india.rule_trace"
-      ],
-      "when": "未削减八分法：按具名Rao2000规则读取PAV/BAV/SAV、贡献者及本次分盘方法；计数不是概率，生时抽样变体另读敏感性。"
-    },
-    "ashtakavarga_reductions": {
-      "fields": [
-        "india.ashtakavarga.charts",
-        "india.birth_time_sensitivity",
-        "india.rulesets",
-        "india.rule_trace"
-      ],
-      "when": "按具名Rao2000七曜占据口径读取reduction_analysis：原始BAV不改，未决相等分支为空值，保留每步来源与七曜加权。Pinda未接入事件择时或概率。"
-    },
-    "ashtakavarga_source_profiles": {
-      "fields": [
-        "india.ashtakavarga.charts.D1.source_profile_comparison",
-        "india.ashtakavarga.charts.D1.bhinna",
-        "india.ashtakavarga.charts.D1.samudaya",
-        "india.birth_time_sensitivity.ashtakavarga_variants",
-        "india.rulesets",
-        "india.rule_trace"
-      ],
-      "when": "印度盘按来源比较原始BAV与削减：Rao默认保留，Aiyar1905使用自己的七曜672单元及自身削减；旧的仅换削减读法与完整原始表口径分开，不拼其他作者的Pinda或事件概率。"
-    },
-    "dasha_levels": {
-      "fields": [
-        "summary",
-        "analysis_context",
-        "vimshottari.subdivisions",
-        "vimshottari.time_quantization",
-        "vimshottari.birth_time_sensitivity",
-        "vimshottari.natal_ruler_context",
-        "india.rulesets",
-        "india.rule_trace"
-      ],
-      "when": "要求PD/SD/PAD/DAD时先显式设置dasha_depth=3..6；读取当前完整运主链、逐层九个子期及同生时网格候选，timeline仍只有MD/AD。细分不代表事件精度或概率。"
-    },
-    "santhanam_drishti_witnesses": {
-      "fields": [
-        "india.strengths.drik_bala.method",
-        "india.strengths.drik_bala.source_witness",
-        "india.strengths.drik_bala.source_reading_conflicts",
-        "india.strengths.drik_bala.alternative_source_witnesses",
-        "india.strengths.drik_bala.source_disagreements",
-        "india.strengths.drik_bala.matrix",
-        "india.strengths.drik_bala.summary",
-        "india.strengths.drik_bala.nature_context",
-        "india.rule_trace"
-      ],
-      "when": "核对 Santhanam 26/27.19 的译文、注解和 540 行普通相位表来源（含两处坐标标注冲突）；该来源未应用于当前 Raman Drik 计算。"
-    },
     "stage": {
       "fields": [
-        "summary",
         "analysis_context",
+        "person_info",
+        "vimshottari.method_id",
+        "vimshottari.year_basis",
+        "vimshottari.seed",
+        "vimshottari.birth_balance",
         "vimshottari.current_major",
         "vimshottari.current_sub",
-        "vimshottari.birth_balance",
-        "vimshottari.year_basis",
-        "vimshottari.year_days",
-        "vimshottari.elapsed_time_convention",
-        "vimshottari.natal_ruler_context",
-        "vimshottari.time_quantization",
-        "vimshottari.birth_time_sensitivity",
-        "vimshottari.timeline_scope",
-        "vimshottari.interpretation_scope",
-        "india.profile",
-        "india.reading_basis",
-        "india.rulesets",
-        "india.rule_trace",
-        "india.strengths.sthana_bala.summary",
-        "india.strengths.sthana_bala.profile",
-        "india.strengths.dig_bala",
-        "india.strengths.naisargika_bala",
-        "india.strengths.drik_bala",
-        "india.strengths.shadbala_assessment",
-        "india.strengths.kala_bala",
-        "india.strengths.cheshta_bala"
+        "vimshottari.timeline",
+        "summary"
       ],
-      "when": "指定目标时刻主运与次运；不代表全年逐月扫描。"
+      "purpose": "当前大运/子运阶段与出生剩余运"
     },
     "timeline": {
       "fields": [
         "analysis_context",
-        "vimshottari",
-        "india.profile",
-        "india.reading_basis",
-        "india.rulesets",
-        "india.rule_trace",
-        "india.strengths.sthana_bala.summary",
-        "india.strengths.sthana_bala.profile",
-        "india.strengths.dig_bala",
-        "india.strengths.naisargika_bala",
-        "india.strengths.drik_bala",
-        "india.strengths.shadbala_assessment",
-        "india.strengths.kala_bala",
-        "india.strengths.cheshta_bala"
+        "vimshottari.seed",
+        "vimshottari.birth_balance",
+        "vimshottari.timeline",
+        "summary"
       ],
-      "when": "目标所在完整120年规则周期、出生剩余运和全部次运。"
+      "purpose": "完整120年大运/子运时间轴"
     }
   },
   "first_view": {
     "fields": [
-      "summary",
       "analysis_context",
+      "person_info",
+      "vimshottari.method_id",
+      "vimshottari.year_basis",
+      "vimshottari.seed",
+      "vimshottari.birth_balance",
       "vimshottari.current_major",
       "vimshottari.current_sub",
-      "vimshottari.birth_balance",
-      "vimshottari.year_basis",
-      "vimshottari.year_days",
-      "vimshottari.elapsed_time_convention",
-      "vimshottari.natal_ruler_context",
-      "vimshottari.birth_time_sensitivity",
-      "vimshottari.timeline_scope",
-      "vimshottari.interpretation_scope",
-      "india.profile",
-      "india.reading_basis",
-      "india.rulesets",
-      "india.rule_trace",
-      "india.strengths.sthana_bala.summary",
-      "india.strengths.sthana_bala.profile",
-      "india.strengths.dig_bala",
-      "india.strengths.naisargika_bala",
-      "india.strengths.drik_bala",
-      "india.strengths.shadbala_assessment",
-      "india.strengths.kala_bala",
-      "india.strengths.cheshta_bala"
+      "vimshottari.timeline",
+      "summary"
     ]
   },
   "input": {
     "additionalProperties": false,
-    "description": "Moon-nakshatra Vimshottari with reproducible UTC interval arithmetic.",
     "properties": {
       "analysis_day": {
         "anyOf": [
@@ -171,7 +76,7 @@
           }
         ],
         "default": null,
-        "description": "Analysis day (1-31)",
+        "description": "分析公历日",
         "title": "Analysis Day"
       },
       "analysis_hour": {
@@ -186,7 +91,7 @@
           }
         ],
         "default": null,
-        "description": "Analysis hour (0-23)",
+        "description": "分析小时",
         "title": "Analysis Hour"
       },
       "analysis_minute": {
@@ -201,7 +106,7 @@
           }
         ],
         "default": null,
-        "description": "Analysis minute (0-59)",
+        "description": "分析分钟",
         "title": "Analysis Minute"
       },
       "analysis_month": {
@@ -216,13 +121,12 @@
           }
         ],
         "default": null,
-        "description": "Analysis month (1-12)",
+        "description": "分析公历月",
         "title": "Analysis Month"
       },
       "analysis_timezone": {
         "anyOf": [
           {
-            "minLength": 1,
             "type": "string"
           },
           {
@@ -230,14 +134,12 @@
           }
         ],
         "default": null,
-        "description": "Civil target clock timezone, independent of the birth clock basis. Defaults to resolved birth civil timezone for civil input, or UTC for LMT/LAT input. It never changes the birth conversion or defines a solar target clock.",
+        "description": "分析时刻时区",
         "title": "Analysis Timezone"
       },
       "analysis_year": {
         "anyOf": [
           {
-            "maximum": 9800,
-            "minimum": 2,
             "type": "integer"
           },
           {
@@ -245,29 +147,31 @@
           }
         ],
         "default": null,
-        "description": "Gregorian target year in analysis_timezone, else resolved birth civil zone or UTC for solar birth input. Omit to use that zone's date frozen by as_of/current clock; an explicit year defaults omitted month/day to January1.",
+        "description": "分析公历年",
         "title": "Analysis Year"
       },
-      "birth_clock_basis": {
-        "default": "civil",
-        "description": "Confirmed basis of the supplied birth clock label: civil uses birth_timezone; local_mean_solar (LMT) or local_apparent_solar (LAT) uses longitude and modeled UT1/TT with birth_timezone omitted.",
+      "ayanamsa": {
+        "default": "lahiri",
+        "description": "恒星岁差体系",
         "enum": [
-          "civil",
-          "local_mean_solar",
-          "local_apparent_solar"
+          "lahiri",
+          "true_citra",
+          "raman",
+          "kp",
+          "true_pushya"
         ],
-        "title": "Birth Clock Basis",
+        "title": "Ayanamsa",
         "type": "string"
       },
       "birth_day": {
-        "description": "Birth day (1-31)",
+        "description": "公历出生日",
         "maximum": 31,
         "minimum": 1,
         "title": "Birth Day",
         "type": "integer"
       },
       "birth_hour": {
-        "description": "Birth hour (0-23)",
+        "description": "出生小时（0-23）",
         "maximum": 23,
         "minimum": 0,
         "title": "Birth Hour",
@@ -284,8 +188,8 @@
             "type": "null"
           }
         ],
-        "default": null,
-        "description": "Birth latitude (optional)",
+        "default": 28.6139,
+        "description": "出生地纬度",
         "title": "Birth Latitude"
       },
       "birth_longitude": {
@@ -299,28 +203,20 @@
             "type": "null"
           }
         ],
-        "default": null,
-        "description": "Birth longitude (optional)",
+        "default": 77.209,
+        "description": "出生地经度",
         "title": "Birth Longitude"
-      },
-      "birth_microsecond": {
-        "default": 0,
-        "description": "Numerical fraction of the supplied second, including explicitly converted clocks; does not certify source clock precision.",
-        "maximum": 999999,
-        "minimum": 0,
-        "title": "Birth Microsecond",
-        "type": "integer"
       },
       "birth_minute": {
         "default": 0,
-        "description": "Birth minute (0-59)",
+        "description": "出生分钟（0-59）",
         "maximum": 59,
         "minimum": 0,
         "title": "Birth Minute",
         "type": "integer"
       },
       "birth_month": {
-        "description": "Birth month (1-12)",
+        "description": "公历出生月",
         "maximum": 12,
         "minimum": 1,
         "title": "Birth Month",
@@ -335,32 +231,17 @@
             "type": "null"
           }
         ],
-        "default": "未提供",
-        "description": "Birth place",
+        "default": null,
+        "description": "出生地名称",
         "title": "Birth Place"
       },
       "birth_second": {
         "default": 0,
-        "description": "Recorded birth second (0..59), if known. Omitted seconds use the start of the supplied minute; this does not certify exact recording precision. Leap-second labels are not represented.",
-        "maximum": 59,
+        "description": "出生秒（0-60）",
+        "maximum": 60,
         "minimum": 0,
         "title": "Birth Second",
         "type": "integer"
-      },
-      "birth_time_uncertainty_minutes": {
-        "anyOf": [
-          {
-            "maximum": 120,
-            "minimum": 0,
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "User-confirmed +/- minutes. Civil input uses elapsed minutes around its resolved instant; LMT/LAT uses a recorded solar-wall interval whose endpoints are converted first. None means unknown, not exact. The TT grid includes the endpoints and nominal instant, with adjacent samples at most 30 SI seconds apart.",
-        "title": "Birth Time Uncertainty Minutes"
       },
       "birth_timezone": {
         "anyOf": [
@@ -372,77 +253,27 @@
           }
         ],
         "default": null,
-        "description": "Birth timezone (IANA name or UTC offset). Optional: when omitted, FateBridge may resolve it from a supported birth_place. Western charts and timing reject an unresolved civil timezone; coordinates alone do not establish a zone. Supply UTC explicitly when that is the confirmed recorded basis. Place inference does not certify historical clock accuracy.",
+        "description": "IANA 时区或 UTC 偏移",
         "title": "Birth Timezone"
       },
       "birth_year": {
-        "description": "Birth year, e.g., 1990",
-        "maximum": 9999,
-        "minimum": 1,
+        "description": "公历出生年",
+        "maximum": 2399,
+        "minimum": 1800,
         "title": "Birth Year",
         "type": "integer"
       },
-      "cheshta_model": {
-        "default": "unadjudicated",
-        "description": "Five-star motional mean model. Select simon1994_j2000 for Simon (1994) secular means and geometric J2000 positions within 1900–2050 TT.",
-        "enum": [
-          "unadjudicated",
-          "simon1994_j2000"
-        ],
-        "title": "Cheshta Model",
-        "type": "string"
-      },
       "dasha_depth": {
         "default": 2,
-        "description": "Vimshottari levels:2=MD/AD(default),3=PD,4=SD,5=PAD,6=DAD. Above2 adds the active ancestry and nine siblings per lower level, using complete-period fractions. The existing120-year timeline remains MD/AD only. Birth-grid variants follow all selected rulers; finer labels are not event precision or probabilities.",
+        "description": "达沙递归层数（2-6）",
         "maximum": 6,
         "minimum": 2,
         "title": "Dasha Depth",
         "type": "integer"
       },
-      "divisions": {
-        "default": [
-          9,
-          10
-        ],
-        "description": "Parashari Shodashavarga charts to include: D2, D3, D4, D7, D9, D10, D12, D16, D20, D24, D27, D30 (unequal sign assignments only), D40, D45, D60. Default [9,10]; D1 always included, [] requests D1 only.",
-        "items": {
-          "enum": [
-            2,
-            3,
-            4,
-            7,
-            9,
-            10,
-            12,
-            16,
-            20,
-            24,
-            27,
-            30,
-            40,
-            45,
-            60
-          ],
-          "type": "integer"
-        },
-        "maxItems": 15,
-        "title": "Divisions",
-        "type": "array"
-      },
-      "drekkana_profile": {
-        "default": "santhanam_27_6",
-        "description": "D1 decanate positional strength, independently of Saptavargaja: Santhanam27.6 gives Moon/Venus the middle decanate, Mercury/Saturn the last; Raman36 reverses them. Both use15 Virupa. Raman's detailed section36 and Example12 are selected explicitly; its conflicting summary60 remains unresolved. Not D3 chart longitude or whole-book acceptance.",
-        "enum": [
-          "santhanam_27_6",
-          "raman_36"
-        ],
-        "title": "Drekkana Profile",
-        "type": "string"
-      },
       "ephemeris_policy": {
         "default": "auto",
-        "description": "auto reports actual Swiss/Moshier provenance; require_data_files rejects analytical fallback for physical coordinates, sensitivity/rise-set samples and every Sun call resolving LAT clocks and their interval endpoints. Does not certify empirical prediction accuracy.",
+        "description": "星历数据策略：auto 或 require_data_files",
         "enum": [
           "auto",
           "require_data_files"
@@ -450,34 +281,23 @@
         "title": "Ephemeris Policy",
         "type": "string"
       },
-      "gender": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": "未知",
-        "description": "性别（可选，仅用于结果标识；西方星盘计算不使用性别）。接受此字段是为了让同一套出生信息可以原样喂给八字/紫微/星盘等工具，避免批量调用时'有的工具收、有的不收'造成的反复试错。",
-        "title": "Gender"
+      "include_ashtottari": {
+        "default": false,
+        "description": "是否附带108年Ashtottari Dasha",
+        "title": "Include Ashtottari",
+        "type": "boolean"
       },
-      "house_system": {
-        "anyOf": [
-          {
-            "type": "integer"
-          },
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Accepts SE letters, keys, or integer codes 0..8 (0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected.",
-        "title": "House System"
+      "include_chara": {
+        "default": false,
+        "description": "是否附带Jaimini Chara Dasha",
+        "title": "Include Chara",
+        "type": "boolean"
+      },
+      "include_yogini": {
+        "default": false,
+        "description": "是否附带36年Yogini Dasha",
+        "title": "Include Yogini",
+        "type": "boolean"
       },
       "name": {
         "anyOf": [
@@ -488,13 +308,13 @@
             "type": "null"
           }
         ],
-        "default": "未提供",
-        "description": "Name (optional)",
+        "default": null,
+        "description": "姓名或备注，不参与计算",
         "title": "Name"
       },
       "node_mode": {
         "default": "mean",
-        "description": "Rahu: mean or true lunar node; Ketu is opposite.",
+        "description": "罗睺/计都交点模式（include_chara 时使用）",
         "enum": [
           "mean",
           "true"
@@ -502,49 +322,17 @@
         "title": "Node Mode",
         "type": "string"
       },
-      "saptavargaja_profile": {
-        "default": "santhanam_27",
-        "description": "Saptavargaja coefficients and moolatrikona scope: Santhanam27 literal seven-sign reading or Raman30 D1-only exception. Changes this component only; Drekkana is independently selected by drekkana_profile. Neither certifies full Shadbala or predictive validity.",
-        "enum": [
-          "santhanam_27",
-          "raman_30"
-        ],
-        "title": "Saptavargaja Profile",
-        "type": "string"
-      },
-      "use_true_solar_time": {
-        "default": false,
-        "description": "Report an apparent-solar wall-clock label separately. Recorded civil birth time and its physical ephemeris instant are preserved with either setting; this option cannot select a different birth date, dasha start or mean-model window. A known historical LAT/LMT record is not a civil input and must not be guessed with this switch.",
-        "title": "Use True Solar Time",
-        "type": "boolean"
-      },
       "year_basis": {
-        "default": "sidereal_365_25636",
-        "description": "Fixed elapsed-day year convention, applied to all major/subperiod boundaries. No universal convention is implied.",
+        "default": "julian_365_25",
+        "description": "达沙年长口径",
         "enum": [
+          "julian_365_25",
           "sidereal_365_25636",
           "tropical_365_2425",
           "savana_360"
         ],
         "title": "Year Basis",
         "type": "string"
-      },
-      "zodiac_type": {
-        "anyOf": [
-          {
-            "enum": [
-              "Tropic",
-              "Sidereal"
-            ],
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Optional offline zodiac override ('Tropic' or 'Sidereal'); if omitted, FateBridge keeps each chart variant's historical default.",
-        "title": "Zodiac Type"
       }
     },
     "required": [
@@ -553,7 +341,7 @@
       "birth_day",
       "birth_hour"
     ],
-    "title": "AstroVimshottariRequest",
+    "title": "VimshottariDashaRequest",
     "type": "object"
   },
   "tool": "vimshottari_dasha"

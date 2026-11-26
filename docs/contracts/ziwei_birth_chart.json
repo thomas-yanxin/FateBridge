@@ -19,8 +19,7 @@
       "fields": [
         "analysis_context",
         "ziwei_birth.ruleset.id",
-        "ziwei_birth.ruleset.version",
-        "ziwei_birth.auxiliary_placement_sources"
+        "ziwei_birth.ruleset.version"
       ],
       "purpose": "核查部分辅星逐颗来源与实际星位；火铃缺生时指令、闰月月系规则未明时比较值为空，不认证全部辅星或整书。"
     },
@@ -43,12 +42,7 @@
         "ziwei_birth.calendar_basis.civil_date_lunar_date",
         "ziwei_birth.calendar_basis.reference_datetime_utc_plus_08",
         "ziwei_birth.calendar_basis.reference_lunar_date",
-        "ziwei_birth.calendar_basis.date_lookup_convention",
         "ziwei_birth.calendar_basis.day_boundary",
-        "ziwei_birth.calendar_basis.solar_terms_basis",
-        "ziwei_birth.calendar_basis.classical_clock_rule_verified",
-        "ziwei_birth.calendar_basis.source_scope",
-        "ziwei_birth.calendar_basis.reference_source",
         "ziwei_birth.calendar_basis.time_input",
         "ziwei_birth.calendar_basis.civil_clock",
         "ziwei_birth.calendar_rules",
@@ -65,30 +59,21 @@
         "ziwei_birth.calendar_basis.placement_clock",
         "ziwei_birth.calendar_basis.placement_lunar_date",
         "ziwei_birth.calendar_basis.civil_date_lunar_date",
-        "ziwei_birth.calendar_basis.reference_lunar_date",
-        "ziwei_birth.calendar_basis.date_conversion_provenance"
+        "ziwei_birth.calendar_basis.reference_lunar_date"
       ],
       "purpose": "逐个排盘、钟表和UTC+08参考日期核实际库表／补表来源及分别发布的印刷见证；1900年参照TAM，紫台仅是所用一月补表，不把实现输入冒充独立验证或古典校时认证。"
     },
     "classical_condition_details": {
       "fields": [
         "analysis_context",
-        "ziwei_birth.ruleset",
-        "ziwei_birth.ming_structural_conditions"
+        "ziwei_birth.ruleset"
       ],
       "purpose": "首次需要完整五条原注与实际星对象连接时选择；长结果按该run分页读齐"
     },
     "classical_conditions": {
       "fields": [
         "analysis_context",
-        "ziwei_birth.ruleset",
-        "ziwei_birth.ming_structural_conditions.method_id",
-        "ziwei_birth.ming_structural_conditions.source",
-        "ziwei_birth.ming_structural_conditions.source_status",
-        "ziwei_birth.ming_structural_conditions.source_revision",
-        "ziwei_birth.ming_structural_conditions.index",
-        "ziwei_birth.ming_structural_conditions.actual_assignments_modified",
-        "ziwei_birth.ming_structural_conditions.whole_book_acceptance_passed"
+        "ziwei_birth.ruleset"
       ],
       "purpose": "所选明刊五条的必要几何前提与未判定原注，不是完整格局吉凶"
     },
@@ -96,16 +81,7 @@
       "fields": [
         "analysis_context",
         "ziwei_birth.ruleset.id",
-        "ziwei_birth.ruleset.version",
-        "ziwei_birth.ming_textual_properties.method_id",
-        "ziwei_birth.ming_textual_properties.version",
-        "ziwei_birth.ming_textual_properties.source",
-        "ziwei_birth.ming_textual_properties.source_title",
-        "ziwei_birth.ming_textual_properties.printed_volume",
-        "ziwei_birth.ming_textual_properties.source_section",
-        "ziwei_birth.ming_textual_properties.manual_reader_count",
-        "ziwei_birth.ming_textual_properties.conditional_readings",
-        "ziwei_birth.ming_textual_properties.unresolved_relational_definitions"
+        "ziwei_birth.ruleset.version"
       ],
       "purpose": "廉贞在官禄／身命的条件及七杀遇帝的未定几何；依实际落宫核查，未新增四化或现实断言。"
     },
@@ -114,8 +90,7 @@
         "analysis_context",
         "ziwei_birth.ruleset.id",
         "ziwei_birth.ruleset.version",
-        "ziwei_birth.calendar_cycles.status",
-        "ziwei_birth.cycle_source_comparison"
+        "ziwei_birth.calendar_cycles.status"
       ],
       "purpose": "逐宫核查长生／博士与明刊的起点、顺逆、规范名及实际标记；未知性别仅保留两方向都相同的标记，余项候选不冒充已确定。"
     },
@@ -123,8 +98,7 @@
       "fields": [
         "analysis_context",
         "ziwei_birth.ruleset",
-        "ziwei_birth.sihua",
-        "ziwei_birth.sihua_source_comparison"
+        "ziwei_birth.sihua"
       ],
       "purpose": "核对当前四化与指定明刊本的异文及本命星位影响；compared_position不是实际新增四化，比较不等于套用另一本完整规则。"
     },
@@ -132,8 +106,7 @@
       "fields": [
         "analysis_context",
         "ziwei_birth.ruleset.id",
-        "ziwei_birth.ruleset.version",
-        "ziwei_birth.ming_textual_properties"
+        "ziwei_birth.ruleset.version"
       ],
       "purpose": "明刊卷三星义定义与实际本命星曜、四化、博士循环的分层连接；完整来源视图可按同run分页读取。"
     },
@@ -163,7 +136,7 @@
     },
     "palace_sihua": {
       "fields": [
-        "ziwei_birth.palace_sihua_relations"
+        "ziwei_birth.flying_sihua"
       ],
       "purpose": "按化名和目标星反查十二宫宫干四化，复用所选生年四化表。逐组列出全部发出宫和本命候选星位；星位为空表示未定位，发出宫内有同星落点则记自化。生年与运限标记独立。"
     },
@@ -181,8 +154,7 @@
         "analysis_context",
         "ziwei_birth.ruleset",
         "ziwei_birth.year_stem",
-        "ziwei_birth.sihua",
-        "ziwei_birth.sihua_source_comparison"
+        "ziwei_birth.sihua"
       ],
       "purpose": "核对实际四化表身份、原页比较与是否显式应用；运限的各层实际四化另读同run scopes，运限复用未获原典认证。"
     },
@@ -200,8 +172,7 @@
     "symbolism": {
       "fields": [
         "analysis_context",
-        "ziwei_birth.ruleset",
-        "ziwei_birth.symbolic_properties"
+        "ziwei_birth.ruleset"
       ],
       "purpose": "原文星曜属性与实际本命落宫、亮度、四化的连接；保留多五行与古名，原文化财/化印等不是四化赋值。"
     },
@@ -252,6 +223,17 @@
     "additionalProperties": false,
     "description": "Request model for Zi Wei birth chart analysis.",
     "properties": {
+      "astro_type": {
+        "default": "heaven",
+        "description": "天地人三盘：heaven（天盘，默认命宫起盘）、earth（地盘，身宫为命宫重排）、human（人盘，福德宫为命宫重排）。",
+        "enum": [
+          "heaven",
+          "earth",
+          "human"
+        ],
+        "title": "Astro Type",
+        "type": "string"
+      },
       "birth_day": {
         "description": "Birth day (1-31)",
         "maximum": 31,
@@ -332,7 +314,7 @@
           }
         ],
         "default": null,
-        "description": "出生钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与解析后的birth_timezone核对，用于选择重复钟时，不替换命名时区。省略仍拒绝歧义或不存在的钟时。",
+        "description": "出生钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与解析后的birth_timezone核对，用于选择重复钟时。",
         "title": "Birth Utc Offset"
       },
       "birth_year": {
@@ -344,7 +326,7 @@
       },
       "brightness_source": {
         "default": "rule_profile",
-        "description": "本命庙旺表。rule_profile（默认）沿用基础盘式。iztro_2_5_8 取软件原表，quanshu_v2_selected_table 取《紫微斗数全书》卷二转录的十二宫表。ziwei_doushu_qs、ziwei_doushu_xd1、ziwei_doushu_zz、ziwei_doushu_xd2 取 Renhuai123/ziwei-doushu 固定版本软件对照表。空格为 null，不跨表补值。安星、历法、四化及运限起法仍按各自规则。",
+        "description": "本命庙旺表。rule_profile（默认）沿用基础盘式。iztro_2_5_8 取软件原表，quanshu_v2_selected_table 取《紫微斗数全书》卷二转录的十二宫表。ziwei_doushu_qs、ziwei_doushu_xd1、ziwei_doushu_zz、ziwei_doushu_xd2 取 Renhuai123/ziwei-doushu 固定版本软件对照表。空格为 null，不跨表补值。",
         "enum": [
           "rule_profile",
           "iztro_2_5_8",
@@ -359,7 +341,7 @@
       },
       "day_divide": {
         "default": "current",
-        "description": "晚子（23:00-23:59）分日口径：current（默认，当日农历与当日日/时干）或 forward（算次日早子农历与次日早子日/时干）。",
+        "description": "晚子（23:00-23:59）分日口径：current（当日）或 forward（次日早子翻日，虚岁与流年同步）。",
         "enum": [
           "current",
           "forward"
@@ -408,12 +390,12 @@
           }
         ],
         "default": null,
-        "description": "本命闰月安星月序：split_at_day_15（初一至十五沿用同名月序，十六日起后移一月）、all_current_month（全月原位）、all_next_month（全月后移）。保留出生农历年、日、闰月标记；闰十二月后移为本年安星月序13。省略按rule_profile：iztro分半，摘录全月后移。",
+        "description": "闰月月序口径：split_at_day_15（十五日前作当月、十六日起作下月）、all_current_month（全月作当月）、all_next_month（全月作下月）。",
         "title": "Natal Leap Month Policy"
       },
       "rule_profile": {
         "default": "iztro_2_5_8",
-        "description": "紫微规则：iztro_2_5_8 保留软件口径；quanshu_v2_excerpt 1.3.2 选择闰月、四化、亮度、长生、旬空双支、部分流年星，以及邻宫起大限、火铃年支定点读法；另用sihua_source显式选四化表，非全书认证。",
+        "description": "紫微规则配置：iztro_2_5_8（软件基线）或 quanshu_v2_excerpt（全书摘录）。",
         "enum": [
           "iztro_2_5_8",
           "quanshu_v2_excerpt"
@@ -421,12 +403,28 @@
         "title": "Rule Profile",
         "type": "string"
       },
+      "school": {
+        "default": "default",
+        "description": "紫微流派：default（通行三合/iztro基线）、zhongzhou（中州派：年支定命主、阴男阳女天伤天使互换、截空、大耗/龙德/劫杀、岁破）、quanshu（全书摘录）、feixing（飞星/钦天四化矩阵与来因宫）。",
+        "enum": [
+          "default",
+          "zhongzhou",
+          "quanshu",
+          "feixing"
+        ],
+        "title": "School",
+        "type": "string"
+      },
       "sihua_source": {
         "default": "rule_profile",
-        "description": "四化表：rule_profile沿用基础配置；naj_ming_v1显式取明刊卷三原页（庚日武同相、壬梁紫府武）。只选四化表，不代表整部原典获认证。",
+        "description": "四化表：rule_profile（随流派/配置）、iztro_2_5_8、quanshu_v2、naj_ming_v1（明刊庚日武同相）、feixing_liang（梁若瑜飞星）、qintian（钦天四化）。",
         "enum": [
           "rule_profile",
-          "naj_ming_v1"
+          "iztro_2_5_8",
+          "quanshu_v2",
+          "naj_ming_v1",
+          "feixing_liang",
+          "qintian"
         ],
         "title": "Sihua Source",
         "type": "string"
@@ -436,6 +434,16 @@
         "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default on in the current software policy; this option does not certify a classical text's clock rule. Set false for the raw civil clock.",
         "title": "Use True Solar Time",
         "type": "boolean"
+      },
+      "year_divide": {
+        "default": "normal",
+        "description": "年界口径：normal（正月初一换年，默认）或 exact（立春换年）。",
+        "enum": [
+          "normal",
+          "exact"
+        ],
+        "title": "Year Divide",
+        "type": "string"
       }
     },
     "required": [

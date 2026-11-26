@@ -7,8 +7,9 @@ import pytest
 
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.guolao import guolao, guolao_timing
-from fatebridge.core.sukuyo.suzhan_astronomy import build_equatorial_mansions
+from fatebridge.core.sukuyo.astronomy import build_equatorial_mansions
 from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.services.guolao import calculate_guolao_chart
 from fatebridge.utils.places import resolve_birth_place_context
 
 CASE = dict(
@@ -45,11 +46,11 @@ def test_resolved_place_can_supply_timezone_without_moving_the_clock(
     birth = build_astro_birth_info(**CASE, birth_place=place)
     assert birth.timezone_source == "birth_place"
     assert birth.timezone == zone
-    inferred = calculate_core_chart_analysis(
-        **CASE, birth_place=place, chart_variant="guolao_chart"
+    inferred = calculate_guolao_chart(
+        **CASE, birth_place=place, use_true_solar_time=False
     )
-    explicit = calculate_core_chart_analysis(
-        **CASE, birth_place=place, birth_timezone=zone, chart_variant="guolao_chart"
+    explicit = calculate_guolao_chart(
+        **CASE, birth_place=place, birth_timezone=zone, use_true_solar_time=False
     )
     assert "guolao" in inferred, inferred
     assert inferred == explicit
@@ -74,11 +75,10 @@ def test_unresolved_timezone_rejects_before_native_ephemeris_calls(
     monkeypatch.setattr(guolao.runtime, "ephemeris_call", forbidden)
     with pytest.raises(ValueError, match="birth_timezone"):
         guolao.build_chart(birth)
-    result = calculate_core_chart_analysis(
+    result = calculate_guolao_chart(
         **CASE,
         birth_place=place,
         use_true_solar_time=solar,
-        chart_variant="guolao_chart",
     )
     assert result["error_code"] == "validation_error"
     assert result["status_code"] == 400 and not result["retryable"]
@@ -131,11 +131,11 @@ def test_shared_default_stays_tagged_but_western_chart_requires_a_known_zone() -
 
 
 def test_explicit_different_offsets_cannot_be_replaced_by_a_longitude_guess() -> None:
-    utc = calculate_core_chart_analysis(
-        **CASE, birth_timezone="UTC", chart_variant="guolao_chart"
+    utc = calculate_guolao_chart(
+        **CASE, birth_timezone="UTC", use_true_solar_time=False
     )
-    utc8 = calculate_core_chart_analysis(
-        **CASE, birth_timezone="+08:00", chart_variant="guolao_chart"
+    utc8 = calculate_guolao_chart(
+        **CASE, birth_timezone="+08:00", use_true_solar_time=False
     )
     assert utc["person_info"]["utc_datetime"] == "2000-01-01T09:30:00+00:00"
     assert utc8["person_info"]["utc_datetime"] == "2000-01-01T01:30:00+00:00"

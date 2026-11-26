@@ -126,13 +126,13 @@ def calculate_guolao_chart(
     birth_month: int,
     birth_day: int,
     birth_hour: int,
-    birth_minute: int,
+    birth_minute: int = 0,
     birth_second: int = 0,
     name: str | None = None,
     birth_place: str | None = None,
     birth_timezone: str | None = None,
-    birth_longitude: float = 116.4074,
-    birth_latitude: float = 39.9042,
+    birth_longitude: float | None = 116.4074,
+    birth_latitude: float | None = 39.9042,
     use_true_solar_time: bool = True,
     house_system: int | str | None = None,
     zodiac_type: str | None = None,
@@ -157,8 +157,19 @@ def calculate_guolao_chart(
         birth_longitude=birth_longitude,
         birth_latitude=birth_latitude,
         use_true_solar_time=use_true_solar_time,
+        preserve_instant=True,
+        require_resolved_timezone=True,
     )
-    selected_zodiacal = zodiacal if zodiacal is not None else zodiac_type
+    if zodiacal is not None:
+        selected_zodiacal: int | str | None = zodiacal
+    elif isinstance(zodiac_type, str):
+        selected_zodiacal = {
+            "tropic": 0,
+            "tropical": 0,
+            "sidereal": 1,
+        }.get(zodiac_type.strip().lower(), zodiac_type)
+    else:
+        selected_zodiacal = None
     payload = build_chart(
         birth,
         hsys=house_system,

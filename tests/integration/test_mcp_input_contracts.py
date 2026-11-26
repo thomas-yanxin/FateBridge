@@ -54,9 +54,6 @@ def test_every_mcp_input_preserves_canonical_constraints_and_examples() -> None:
     assert set(placement["required"]) == {"object_id", "purpose"}
     assert "至少提供位置或朝向" in placement["description"]
     assert placement["allOf"]  # Cross-field rules survive nested MCP publication.
-    forms = assess["form_observations"]["items"]
-    assert forms["properties"]["purpose"]["enum"] == ["bed", "desk", "stove"]
-    assert "无需罗盘" in forms["description"]
 
 
 @pytest.mark.parametrize(
@@ -249,29 +246,27 @@ def test_form_only_calls_need_no_compass_placeholder_and_invalid_layout_stays_re
 ):
     async def call():
         async with Client(cached_mcp_app(families="fengshui")) as client:
-            forms = {
-                "methods": [],
-                "form_observations": [
+            valid_payload = {
+                "methods": ["bazhai"],
+                "analyze_layout": True,
+                "placements": [
                     {
                         "object_id": "desk",
                         "purpose": "desk",
-                        "entrance_visible": True,
-                        "entrance_direct_line": False,
-                        "solid_backing": True,
-                        "observation_basis": "user_confirmed",
-                        "evidence": "三项已确认",
+                        "location_direction": "N",
                     }
                 ],
             }
-            valid = await call_calculation(client, "fengshui_assess", forms)
-            assert (
-                valid.structured_content["layout_analysis"]["form_analysis"]["status"]
-                == "complete"
-            )
+            valid = await call_calculation(client, "fengshui_assess", valid_payload)
+            assert valid.structured_content["layout_analysis"]["status"] == "partial"
             invalid = await call_calculation(
                 client,
                 "fengshui_assess",
-                {**forms, "placements": [{"object_id": "desk", "purpose": "desk"}]},
+                {
+                    "methods": [],
+                    "analyze_layout": True,
+                    "placements": [{"object_id": "desk", "purpose": "desk"}],
+                },
                 raise_on_error=False,
             )
             assert invalid.is_error
@@ -294,14 +289,14 @@ def test_city_only_career_call_remains_callable_without_explicit_solar_flag() ->
                     "gender": "男",
                     "birth_place": "上海",
                     "as_of": "2026-10-16T12:00:00+08:00",
-                    "fields": [
-                        "career_analysis.evidence_chain.month_command.month_branch"
-                    ],
+                    "fields": ["career_analysis.topic_facts.four_pillars.month.branch"],
                 },
             )
             assert not result.is_error
-            evidence = result.structured_content["career_analysis"]["evidence_chain"]
-            assert evidence["month_command"]["month_branch"] == "巳"
+            month = result.structured_content["career_analysis"]["topic_facts"][
+                "four_pillars"
+            ]["month"]
+            assert month["branch"] == "巳"
 
     asyncio.run(call())
 

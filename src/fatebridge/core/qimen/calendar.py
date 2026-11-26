@@ -12,7 +12,7 @@ from fatebridge.core.almanac import (
     _solar_term_source_year,
     _solar_terms_for_context_year,
 )
-from fatebridge.core.calendar import BaZiCalendar, resolve_bazi_effective_date
+from fatebridge.core.bazi.calendar import BaZiCalendar, resolve_bazi_effective_date
 from fatebridge.core.metaphysics.common import (
     MetaphysicsSeed,
     ganzhi_text,

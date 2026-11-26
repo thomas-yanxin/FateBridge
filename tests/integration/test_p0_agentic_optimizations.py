@@ -22,6 +22,7 @@ from tests.support.transports import call_calculation
 def test_knowledge_catalog_runs_once_without_redundant_reexecution(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    kn._cached_registry.cache_clear()
     orig = kn.build_knowledge_registry
     calls = 0
 

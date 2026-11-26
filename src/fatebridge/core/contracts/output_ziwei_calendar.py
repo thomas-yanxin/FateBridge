@@ -59,10 +59,6 @@ class ZiweiCivilClock(PartialOutput):
     timezone_rules: dict[str, str] | None = None
 
 
-class ZiweiDateConversionProvenance(PartialOutput):
-    """Retained placeholder symbol for output_chinese.py until Wave 3 cleanup."""
-
-
 class ZiweiCalendarBasis(PartialOutput):
     method_id: str | None = None
     placement_clock: str | None = None

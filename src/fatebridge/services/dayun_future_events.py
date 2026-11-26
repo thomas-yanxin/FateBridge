@@ -6,7 +6,7 @@ from typing import Literal, TypedDict
 from typing_extensions import NotRequired
 
 from fatebridge.core.almanac import localize_datetime
-from fatebridge.core.timing import DEFAULT_DAYUN_PERIODS, TimingAnalysis
+from fatebridge.core.bazi.timing import DEFAULT_DAYUN_PERIODS, TimingAnalysis
 from fatebridge.services.birth_time_events import BirthEventRecord, UnresolvedBirthEvent
 from fatebridge.services.dayun_wall_cells import DayunWallCell
 from fatebridge.utils.civil_time import utc_calendar

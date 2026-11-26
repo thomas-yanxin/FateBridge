@@ -51,49 +51,31 @@
     },
     "liuren_branch_relations": {
       "fields": [
-        "four_pillars",
-        "liureng.month_general",
-        "liureng.four_lessons",
-        "liureng.three_transmissions",
-        "liureng.branch_relations",
-        "liureng.ruleset"
+        "four_pillars"
       ],
       "purpose": "只核对附带大六壬盘的支位并存条件；不将探原大六壬规则替换金口诀本课四位规则。"
     },
     "liuren_cross_harmony": {
       "fields": [
-        "four_pillars",
-        "liureng.cross_harmony",
-        "liureng.ruleset"
+        "four_pillars"
       ],
       "purpose": "核对干上神与日支、支上神与日干寄宫的两边六合，以及五个干支同宫日的排除条件；按所选原文列实际支位和来源。"
     },
     "liuren_day_placement_patterns": {
       "fields": [
-        "four_pillars",
-        "liureng.day_placement_patterns",
-        "liureng.ruleset"
+        "four_pillars"
       ],
       "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合缺加临时排除，加临成立但合式未裁时仍未知。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。"
     },
     "liuren_seasonal_evidence": {
       "fields": [
-        "four_pillars",
-        "liureng.month_general",
-        "liureng.three_transmissions",
-        "liureng.seasonal_evidence",
-        "liureng.emptiness_evidence",
-        "liureng.ruleset"
+        "four_pillars"
       ],
       "purpose": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。"
     },
     "liuren_transmission_progression": {
       "fields": [
-        "four_pillars",
-        "liureng.three_transmissions",
-        "liureng.transmission_progression",
-        "liureng.emptiness_evidence",
-        "liureng.ruleset"
+        "four_pillars"
       ],
       "purpose": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。"
     },
@@ -175,6 +157,21 @@
         "minimum": 0,
         "title": "Analysis Hour",
         "type": "integer"
+      },
+      "analysis_latitude": {
+        "anyOf": [
+          {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "起课纬度（与 analysis_longitude 合用供 sunrise_sunset 昼夜界定）",
+        "title": "Analysis Latitude"
       },
       "analysis_longitude": {
         "anyOf": [
@@ -285,6 +282,16 @@
         "description": "地分十二地支；不填按时支作软件回退。",
         "title": "Di Fen"
       },
+      "diurnal_mode": {
+        "default": "clock",
+        "description": "昼夜贵人分界：clock（默认卯至申昼）或 sunrise_sunset（需经纬度按日出日没定昼夜）。",
+        "enum": [
+          "clock",
+          "sunrise_sunset"
+        ],
+        "title": "Diurnal Mode",
+        "type": "string"
+      },
       "gender": {
         "anyOf": [
           {
@@ -300,7 +307,7 @@
       },
       "guiren_profile": {
         "default": "liuren_common_v1",
-        "description": "大六壬昼夜贵人表：liuren_common_v1 为既有表；tanyuan_xieji_v1 按探原日夜贵人歌。",
+        "description": "贵神本位表：liuren_common_v1 为既有表；tanyuan_xieji_v1 按探原表。",
         "enum": [
           "liuren_common_v1",
           "tanyuan_xieji_v1"
@@ -318,8 +325,18 @@
           }
         ],
         "default": null,
-        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。",
+        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按 diurnal_mode（默认卯至申昼、酉至寅夜）。",
         "title": "Is Diurnal"
+      },
+      "month_general_mode": {
+        "default": "solar_term",
+        "description": "月将换将规则：solar_term（默认中气换将）或 true_solar_longitude（太阳真黄经过宫）。",
+        "enum": [
+          "solar_term",
+          "true_solar_longitude"
+        ],
+        "title": "Month General Mode",
+        "type": "string"
       },
       "natal_branch": {
         "anyOf": [

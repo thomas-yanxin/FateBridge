@@ -17,7 +17,6 @@
         "guolao.profile",
         "guolao.conditions",
         "guolao.bodies",
-        "guolao.purple_model_audit",
         "guolao.mansion_boundaries"
       ],
       "purpose": "检查时间尺度、七政两帧模型与黄经速度分项、非物理点、距星地球观测者及研究宿度；来源和修正状态不作全域精度认证"
@@ -29,7 +28,6 @@
         "guolao.rulesets",
         "guolao.rule_trace",
         "guolao.god_positions",
-        "guolao.purple_model_audit",
         "guolao.validation"
       ],
       "purpose": "核对宫主度主归属与未验收依赖"
@@ -67,7 +65,6 @@
   },
   "input": {
     "additionalProperties": false,
-    "description": "Explicit target instant for the partial Guolao temporal research layer.",
     "properties": {
       "analysis_datetime": {
         "anyOf": [
@@ -80,29 +77,18 @@
           }
         ],
         "default": null,
-        "description": "Optional ISO target instant with timezone offset, at or after recorded birth. Returns source-ordinal small-limit palace with declared LiChun year policy and actual geocentric target seven bodies / four-extra models. Omit for natal only; no implicit today, full classical temporal judgement or event probability.",
+        "description": "可选带时区流年推运时刻（计算小限、洞微大限当前限及行运星象）",
         "title": "Analysis Datetime"
       },
-      "birth_clock_basis": {
-        "default": "civil",
-        "description": "Confirmed basis of the supplied birth clock label: civil uses birth_timezone; local_mean_solar (LMT) or local_apparent_solar (LAT) uses longitude and modeled UT1/TT with birth_timezone omitted.",
-        "enum": [
-          "civil",
-          "local_mean_solar",
-          "local_apparent_solar"
-        ],
-        "title": "Birth Clock Basis",
-        "type": "string"
-      },
       "birth_day": {
-        "description": "Birth day (1-31)",
+        "description": "公历出生日",
         "maximum": 31,
         "minimum": 1,
         "title": "Birth Day",
         "type": "integer"
       },
       "birth_hour": {
-        "description": "Birth hour (0-23)",
+        "description": "出生小时（0-23）",
         "maximum": 23,
         "minimum": 0,
         "title": "Birth Hour",
@@ -119,8 +105,8 @@
             "type": "null"
           }
         ],
-        "default": null,
-        "description": "Birth latitude (optional)",
+        "default": 39.9042,
+        "description": "出生地纬度",
         "title": "Birth Latitude"
       },
       "birth_longitude": {
@@ -134,28 +120,20 @@
             "type": "null"
           }
         ],
-        "default": null,
-        "description": "Birth longitude (optional)",
+        "default": 116.4074,
+        "description": "出生地经度",
         "title": "Birth Longitude"
-      },
-      "birth_microsecond": {
-        "default": 0,
-        "description": "Explicit fraction of the recorded birth second. Preserved in the physical instant and solar-hour calculation; datetime resolution does not certify source-clock or astronomical accuracy.",
-        "maximum": 999999,
-        "minimum": 0,
-        "title": "Birth Microsecond",
-        "type": "integer"
       },
       "birth_minute": {
         "default": 0,
-        "description": "Birth minute (0-59)",
+        "description": "出生分钟（0-59）",
         "maximum": 59,
         "minimum": 0,
         "title": "Birth Minute",
         "type": "integer"
       },
       "birth_month": {
-        "description": "Birth month (1-12)",
+        "description": "公历出生月",
         "maximum": 12,
         "minimum": 1,
         "title": "Birth Month",
@@ -170,14 +148,14 @@
             "type": "null"
           }
         ],
-        "default": "未提供",
-        "description": "Birth place",
+        "default": null,
+        "description": "出生地名称（可辅助解析时区）",
         "title": "Birth Place"
       },
       "birth_second": {
         "default": 0,
-        "description": "Recorded birth second (0..59), if known. Omitted seconds use the start of the supplied minute; this does not certify exact recording precision. Leap-second labels are not represented.",
-        "maximum": 59,
+        "description": "出生秒（0-60）",
+        "maximum": 60,
         "minimum": 0,
         "title": "Birth Second",
         "type": "integer"
@@ -192,63 +170,15 @@
           }
         ],
         "default": null,
-        "description": "Birth timezone (IANA name or UTC offset). Optional: when omitted, FateBridge may resolve it from a supported birth_place. Western charts and timing reject an unresolved civil timezone; coordinates alone do not establish a zone. Supply UTC explicitly when that is the confirmed recorded basis. Place inference does not certify historical clock accuracy.",
+        "description": "IANA 时区或 UTC 偏移",
         "title": "Birth Timezone"
       },
       "birth_year": {
-        "description": "Birth year, e.g., 1990",
-        "maximum": 9999,
-        "minimum": 1,
+        "description": "公历出生年",
+        "maximum": 2399,
+        "minimum": 1800,
         "title": "Birth Year",
         "type": "integer"
-      },
-      "gender": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": "未知",
-        "description": "性别（可选，仅用于结果标识；西方星盘计算不使用性别）。接受此字段是为了让同一套出生信息可以原样喂给八字/紫微/星盘等工具，避免批量调用时'有的工具收、有的不收'造成的反复试错。",
-        "title": "Gender"
-      },
-      "guolao_month_basis": {
-        "anyOf": [
-          {
-            "enum": [
-              "jie_month",
-              "chinese_lunar_utc8"
-            ],
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Optional Guolao monthly-limit research policy; requires analysis_datetime. jie_month uses calculated Jie boundaries with Yin=month 1; chinese_lunar_utc8 uses regular Chinese lunar month numbers on UTC+08 civil dates and leaves intercalary birth/target months unassigned. Neither mapping is certified by the cited edition. The annual small limit keeps its declared LiChun year policy. Omit to leave the monthly layer unrequested.",
-        "title": "Guolao Month Basis"
-      },
-      "guolao_seasonal_anchor_policy": {
-        "anyOf": [
-          {
-            "enum": [
-              "term_instants",
-              "source_solar_days_winter_exclusive",
-              "source_solar_days_winter_inclusive"
-            ],
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Optional Guolao anchor policy. term_instants preserves v7. source_solar_days_winter_exclusive/inclusive require use_true_solar_time=true or an explicit LAT input: use the same Sun/UT1 apparent-solar day, include the whole Major Cold, summer-solstice and Minor Heat days, and exclude/include the winter-solstice day. These explicit v8 hypotheses do not adjudicate historical day boundaries or predictive validity; numerical ambiguity and model changes error without fallback.",
-        "title": "Guolao Seasonal Anchor Policy"
       },
       "house_system": {
         "anyOf": [
@@ -263,8 +193,47 @@
           }
         ],
         "default": null,
-        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Accepts SE letters, keys, or integer codes 0..8 (0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected.",
+        "description": "参考天文宫位制",
         "title": "House System"
+      },
+      "life_degree_method": {
+        "default": "sun_degree_in_palace",
+        "description": "命度算法：sun_degree_in_palace（太阳所在宫度入命宫）或 ascendant",
+        "enum": [
+          "sun_degree_in_palace",
+          "ascendant"
+        ],
+        "title": "Life Degree Method",
+        "type": "string"
+      },
+      "mansion_frame": {
+        "default": "modern_equatorial",
+        "description": "宿度体系：modern_equatorial/ecliptic（今度360°）或 shoushi_ecliptic/equatorial（古度365.2575°）",
+        "enum": [
+          "modern_equatorial",
+          "modern_ecliptic",
+          "shoushi_ecliptic",
+          "shoushi_equatorial"
+        ],
+        "title": "Mansion Frame",
+        "type": "string"
+      },
+      "month_basis": {
+        "anyOf": [
+          {
+            "enum": [
+              "jie_month",
+              "chinese_lunar_utc8"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "可选月限起算标准：jie_month 或 chinese_lunar_utc8",
+        "title": "Month Basis"
       },
       "name": {
         "anyOf": [
@@ -275,13 +244,13 @@
             "type": "null"
           }
         ],
-        "default": "未提供",
-        "description": "Name (optional)",
+        "default": null,
+        "description": "姓名或备注标签，不参与计算",
         "title": "Name"
       },
       "use_true_solar_time": {
-        "default": false,
-        "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default OFF: western astrology conventionally casts on the recorded civil (zone) clock time. Set true to align the western chart with the BaZi engine's apparent-solar instant. Guolao and Indian charts preserve the recorded civil instant and report the solar clock separately.",
+        "default": true,
+        "description": "是否标记使用真太阳时",
         "title": "Use True Solar Time",
         "type": "boolean"
       },
@@ -299,7 +268,7 @@
           }
         ],
         "default": null,
-        "description": "Optional offline zodiac override ('Tropic' or 'Sidereal'); if omitted, FateBridge keeps each chart variant's historical default.",
+        "description": "黄道体制",
         "title": "Zodiac Type"
       }
     },
@@ -309,7 +278,7 @@
       "birth_day",
       "birth_hour"
     ],
-    "title": "AstroGuolaoRequest",
+    "title": "GuolaoChartRequest",
     "type": "object"
   },
   "tool": "guolao_chart"

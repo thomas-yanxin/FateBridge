@@ -7,10 +7,7 @@
   "evidence_views": {
     "branch_candidates": {
       "fields": [
-        "input_context",
-        "current_calculation.method_id",
-        "current_calculation.branch_combination_candidates",
-        "current_calculation.assessment.relations"
+        "input_context"
       ],
       "label": "合会候选与同次筛选回执",
       "purpose": "保留现有v8目录中的完整局、字面六合及含旺支半合候选，包括被冲、占位或邻接条件筛掉的图形。候选、筛选与实际事件分别解释，不据候选认定合化、通关或旺衰；未提供或未知方法保留未知。视图字段复制到fields，视图名不是请求参数。"
@@ -19,8 +16,7 @@
       "fields": [
         "four_pillars",
         "input_context",
-        "current_calculation.strength_level",
-        "current_calculation.energy_provenance"
+        "current_calculation.strength_level"
       ],
       "label": "同次身印等五类能量来源",
       "purpose": "分开真实藏干、支合成贡献和非日干天干，按未舍入回执核对能量闭合；不把合成贡献当物理根，不据工程分量认证原典身印轻重、月令司令或通关成立。缺失回执保留未知，不重算盘。视图字段复制到fields，视图名不是请求参数。"
@@ -40,10 +36,7 @@
         "four_pillars",
         "input_context",
         "current_calculation.strength_level",
-        "current_calculation.engineering_index",
-        "current_calculation.classical_adjudication",
-        "source_comparison",
-        "summary"
+        "source_comparison"
       ],
       "label": "字面四柱与强弱编释核对",
       "purpose": "保留原工程政策档、全部同柱来源记录和旧分歧；原典裁定未知另列，不改原标签、不以未决计通过。"
@@ -54,8 +47,7 @@
       "four_pillars",
       "input_context",
       "current_calculation.strength_level",
-      "source_comparison",
-      "summary"
+      "source_comparison"
     ]
   },
   "input": {

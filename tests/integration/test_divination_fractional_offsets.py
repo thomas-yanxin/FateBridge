@@ -175,7 +175,7 @@ def test_fractional_offset_and_day_pillars_agree_across_transports(
     else:
         payload["use_true_solar_time"] = False
         fields = [
-            "subresults.liureng_gods.calendar_context.solar_datetime",
+            "liureng.calendar_policy.corrected_clock",
             *[
                 f"subresults.{tool}.four_pillars.{pillar}"
                 for tool in ("qimen", "taiyi", "liureng_gods")
@@ -201,8 +201,7 @@ def test_fractional_offset_and_day_pillars_agree_across_transports(
         assert expected["nongli"] == {"birth": wall, "dayGanZi": day, "time": hour}
     else:
         assert (
-            expected["subresults"]["liureng_gods"]["calendar_context"]["solar_datetime"]
-            == wall
+            expected["liureng"]["calendar_policy"]["corrected_clock"] == expected_clock
         )
         for tool in ("qimen", "taiyi", "liureng_gods"):
             pillars = expected["subresults"][tool]["four_pillars"]

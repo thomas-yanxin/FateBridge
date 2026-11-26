@@ -89,9 +89,10 @@ def time_sensitivity(
                 include_meridian_houses=include_hypothetical,
                 epoch=sample.effective,
             )
+            native_source = native.get("hypothetical_element_source")
             if element_source is None:
-                element_source = native["hypothetical_element_source"]
-            elif native["hypothetical_element_source"] != element_source:
+                element_source = native_source
+            elif native_source != element_source:
                 raise EphemerisSourceError("fictitious_changed_across")
             models.update(native["ephemeris_models"])
             physical_source_index = physical_cohort.add(
@@ -138,10 +139,20 @@ def time_sensitivity(
                     "effective_utc": sample.effective.utc_label,
                     "julian_day_tt": native["julian_day_tt"],
                     "julian_day_ut1": native["julian_day_ut1"],
-                    "time_scale_method": native["time_scale_method"],
-                    "future_leap_seconds_assumed_unchanged": native[
-                        "future_leap_seconds_assumed_unchanged"
-                    ],
+                    **(
+                        {"time_scale_method": native["time_scale_method"]}
+                        if "time_scale_method" in native
+                        else {}
+                    ),
+                    **(
+                        {
+                            "future_leap_seconds_assumed_unchanged": native[
+                                "future_leap_seconds_assumed_unchanged"
+                            ]
+                        }
+                        if "future_leap_seconds_assumed_unchanged" in native
+                        else {}
+                    ),
                     **(
                         {"angle_definition": native["angle_definition"]}
                         if "angle_definition" in native
@@ -260,9 +271,8 @@ def enrich_specialty_sensitivity(
             attach_meridian_sensitivity(layer["meridian_houses"], sensitivity)
         if sensitivity["status"] != "sampled":
             return None
-        if (
-            sensitivity["hypothetical_element_source"]
-            != layer["profile"]["hypothetical_element_source"]
+        if sensitivity.get("hypothetical_element_source") != layer["profile"].get(
+            "hypothetical_element_source"
         ):
             raise EphemerisSourceError("fictitious_nominal_mismatch")
         nominal_cohort = PhysicalSourceCohort()

@@ -9,7 +9,6 @@ from datetime import datetime
 import pytest
 
 from fatebridge.core.guolao import moira as m
-from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.guolao import calculate_guolao_chart, compact_guolao_chart
 from tests.fixtures.surface_payloads import astro_payload
 
@@ -167,10 +166,10 @@ def test_missing_and_explicit_unknown_values_do_not_create_patterns_or_cross_rol
 def test_native_pattern_trace_and_classical_features(
     target: str | None,
 ) -> None:
-    r = calculate_core_chart_analysis(
-        chart_variant="guolao_chart",
+    r = calculate_guolao_chart(
         **{
             **astro_payload(),
+            "use_true_solar_time": False,
             "analysis_datetime": datetime.fromisoformat(target) if target else None,
         },
     )

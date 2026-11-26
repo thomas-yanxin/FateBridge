@@ -13,7 +13,6 @@
       "fields": [
         "rule_catalogue.ruleset",
         "rule_catalogue.sihua_by_year_stem",
-        "rule_catalogue.sihua_source_comparison",
         "focused_rules"
       ],
       "purpose": "核对实际四化表身份、原页比较与是否显式应用；运限的各层实际四化另读同run scopes，运限复用未获原典认证。"
@@ -26,9 +25,20 @@
     "additionalProperties": false,
     "description": "Request model for Zi Wei rule catalogue lookup.",
     "properties": {
+      "astro_type": {
+        "default": "heaven",
+        "description": "天地人三盘：heaven / earth / human。",
+        "enum": [
+          "heaven",
+          "earth",
+          "human"
+        ],
+        "title": "Astro Type",
+        "type": "string"
+      },
       "brightness_source": {
         "default": "rule_profile",
-        "description": "本命庙旺表。rule_profile（默认）沿用基础盘式。iztro_2_5_8 取软件原表，quanshu_v2_selected_table 取《紫微斗数全书》卷二转录的十二宫表。ziwei_doushu_qs、ziwei_doushu_xd1、ziwei_doushu_zz、ziwei_doushu_xd2 取 Renhuai123/ziwei-doushu 固定版本软件对照表。空格为 null，不跨表补值。安星、历法、四化及运限起法仍按各自规则。",
+        "description": "本命庙旺表。rule_profile（默认）沿用基础盘式。iztro_2_5_8 取软件原表，quanshu_v2_selected_table 取《紫微斗数全书》卷二转录的十二宫表。ziwei_doushu_qs、ziwei_doushu_xd1、ziwei_doushu_zz、ziwei_doushu_xd2 取 Renhuai123/ziwei-doushu 固定版本软件对照表。空格为 null，不跨表补值。",
         "enum": [
           "rule_profile",
           "iztro_2_5_8",
@@ -53,7 +63,7 @@
       },
       "rule_profile": {
         "default": "iztro_2_5_8",
-        "description": "要查询的紫微规则配置；quanshu_v2_excerpt 1.3.2 包括邻宫起大限、火铃年支定点读法，非全书认证。",
+        "description": "要查询的紫微规则配置。",
         "enum": [
           "iztro_2_5_8",
           "quanshu_v2_excerpt"
@@ -61,14 +71,40 @@
         "title": "Rule Profile",
         "type": "string"
       },
+      "school": {
+        "default": "default",
+        "description": "紫微流派：default / zhongzhou / quanshu / feixing。",
+        "enum": [
+          "default",
+          "zhongzhou",
+          "quanshu",
+          "feixing"
+        ],
+        "title": "School",
+        "type": "string"
+      },
       "sihua_source": {
         "default": "rule_profile",
-        "description": "要查询的实际四化表；naj_ming_v1为明刊卷三原页，不改变基础安星配置。",
+        "description": "要查询的四化表。",
         "enum": [
           "rule_profile",
-          "naj_ming_v1"
+          "iztro_2_5_8",
+          "quanshu_v2",
+          "naj_ming_v1",
+          "feixing_liang",
+          "qintian"
         ],
         "title": "Sihua Source",
+        "type": "string"
+      },
+      "year_divide": {
+        "default": "normal",
+        "description": "年界口径：normal 或 exact。",
+        "enum": [
+          "normal",
+          "exact"
+        ],
+        "title": "Year Divide",
         "type": "string"
       },
       "year_stem": {

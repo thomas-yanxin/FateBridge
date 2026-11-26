@@ -17,7 +17,7 @@ from fatebridge.core import astro_models
 from fatebridge.core.astro import earth_attitude, runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.guolao import guolao
-from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.services.guolao import calculate_guolao_chart
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import astro_payload
 from tests.support.transports import cached_mcp_app, call_calculation
@@ -43,9 +43,7 @@ def polar_payload(**changes):
 
 
 def chart(**changes):
-    return calculate_core_chart_analysis(
-        chart_variant="guolao_chart", **polar_payload(**changes)
-    )
+    return calculate_guolao_chart(**polar_payload(**changes))
 
 
 @pytest.mark.parametrize("latitude", [69.65, -69.65, 80.0, -80.0])

@@ -6,7 +6,9 @@ from typing import Literal
 
 from pydantic import Field, model_validator
 
+from fatebridge.core.bazi.calendar import ZiHourPolicy
 from fatebridge.core.requests.base import FateBridgeBaseRequest
+from fatebridge.core.sukuyo.sanjiu import DistanceRule
 from fatebridge.core.sukuyo.sukuyo_calendar_basis import SukuyoCalendarBasis
 from fatebridge.utils.birth_input import MAX_PERSON_BIRTH_YEAR, MIN_PERSON_BIRTH_YEAR
 
@@ -60,6 +62,10 @@ class TwoPersonCompatibilityRequest(FateBridgeBaseRequest):
         default=True,
         description="Enable true solar time for first person (八字 default on)",
     )
+    person1_zi_hour_policy: ZiHourPolicy = Field(
+        default="day_rollover_at_23",
+        description="第一人早晚子时（23:00–23:59）流派：day_rollover_at_23 | night_zi_same_day_next_hour_stem | night_zi_same_day_same_hour_stem",
+    )
     person2_name: str = Field(description="Second person name")
     person2_birth_year: int = Field(
         ge=MIN_PERSON_BIRTH_YEAR,
@@ -105,6 +111,10 @@ class TwoPersonCompatibilityRequest(FateBridgeBaseRequest):
     person2_use_true_solar_time: bool = Field(
         default=True,
         description="Enable true solar time for second person (八字 default on)",
+    )
+    person2_zi_hour_policy: ZiHourPolicy = Field(
+        default="day_rollover_at_23",
+        description="第二人早晚子时（23:00–23:59）流派：day_rollover_at_23 | night_zi_same_day_next_hour_stem | night_zi_same_day_same_hour_stem",
     )
     relationship_type: Literal[
         "general", "marriage", "friendship", "business", "family"
@@ -156,6 +166,10 @@ class SukuyoCompatibilityRequest(FateBridgeBaseRequest):
     leap_month_policy: Literal["unresolved", "repeat_month"] = Field(
         default="unresolved",
         description="闰月默认仅返回候选；repeat_month显式约定沿用同名月，不宣称原典唯一算法",
+    )
+    distance_rule: DistanceRule = Field(
+        default="symmetric",
+        description="三九法距离口径：symmetric（对称双九）或 directional（单向顺逆）",
     )
     person1_name: str = Field(default="甲方", description="First person name / label")
     person1_date: str = Field(description="First person birth date, e.g. 1990-06-15")

@@ -14,11 +14,11 @@ _EMPTY_EPHEMERIS_DEPTH: ContextVar[int] = ContextVar(
 def _clear_ephemeris_dependent_caches() -> None:
     """Discard solar-term facts and derived caches when switching test models."""
     from fatebridge.core.almanac import get_solar_terms_for_year
-    from fatebridge.core.calendar import BaZiCalendar
-    from fatebridge.core.metaphysics.qimen import (
-        _qimen_build_yinyangdun_map_from_seeds,
+    from fatebridge.core.bazi.calendar import BaZiCalendar
+    from fatebridge.core.bazi.timing import _calculate_liuyue_cached
+    from fatebridge.core.qimen.calendar import (
+        build_zhirun_schedule as _qimen_build_yinyangdun_map_from_seeds,
     )
-    from fatebridge.core.timing import _calculate_liuyue_cached
 
     for cached in (
         get_solar_terms_for_year,

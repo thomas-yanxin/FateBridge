@@ -23,22 +23,6 @@ from fatebridge.core.contracts.output_ziwei_structure import (
 )
 
 
-class ZiweiDecadeHalf(PartialOutput):
-    """Retained placeholder symbol for output_chinese.py until Wave 3 cleanup."""
-
-
-class ZiweiSmallLimitHalf(PartialOutput):
-    """Retained placeholder symbol for output_chinese.py until Wave 3 cleanup."""
-
-
-class ZiweiLimitStarGroup(PartialOutput):
-    """Retained placeholder symbol for output_chinese.py until Wave 3 cleanup."""
-
-
-class ZiweiLimitSubperiods(PartialOutput):
-    """Retained placeholder symbol for output_chinese.py until Wave 3 cleanup."""
-
-
 class ZiweiMutagenNatalLink(PartialOutput):
     transformation: str | None = None
     star: str | None = None

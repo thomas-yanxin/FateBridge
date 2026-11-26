@@ -26,11 +26,11 @@ FateBridge provides local Chinese metaphysics, astrology, and psychometrics calc
 
 | Domain | Implemented scope | Details and limits |
 | --- | --- | --- |
-| BaZi and relationships | Four pillars, nine topics, cross-chart contacts, luck periods through hourly timing | [Coverage](docs/algorithm-coverage.md) · [Method reference](docs/interpretation/README.md) |
-| Chinese systems and divination | Zi Wei, Qi Men, Liu Ren, Jin Kou, Tai Yi, Mei Hua, Liu Yao, He Luo, and Canping | [Zi Wei](docs/ziwei.md) · [Coverage](docs/algorithm-coverage.md) |
-| Astrology | Western natal, relationship, timing, and event charts; Jyotish, Guolao, Sukuyo, and other schools | [Sukuyo](docs/sukuyo.md) · [Astrodice](docs/astrodice.md) · [Coverage](docs/algorithm-coverage.md) |
+| BaZi and relationships | Four pillars, nine topics (`topic_facts`), cross-chart contacts, luck periods through hourly timing | [Coverage](docs/algorithm-coverage.md) · [Method reference](docs/interpretation/README.md) |
+| Chinese systems and divination | Zi Wei, Qi Men, Liu Ren (720 boards), Jin Kou, Tai Yi, Mei Hua, Liu Yao, He Luo, and Canping | [Zi Wei](docs/ziwei.md) · [Coverage](docs/algorithm-coverage.md) |
+| Astrology | Western natal, relationship, timing (PD/ZR/returns), and horary; Jyotish, Guolao, Sukuyo, and other schools | [Sukuyo](docs/sukuyo.md) · [Astrodice](docs/astrodice.md) · [Coverage](docs/algorithm-coverage.md) |
 | Human Design | Dual moments separated by 88° solar longitude, gates and lines, channels, type, and authority | [Human Design reference](docs/human-design.md) |
-| Feng Shui | Eight Mansions, basic sand/water rules, annual/monthly stars, historical Xuan Kong charts, layouts, and measured workstations | [Home assessment](docs/fengshui.md) · [Consultation guide](docs/interpretation/fengshui/consultation.md) |
+| Feng Shui | Eight Mansions, Jinsuo sand/water rules, annual/monthly stars, Xuan Kong charts, IGRF-14 geomagnetic, and layouts | [Home assessment](docs/fengshui.md) · [Consultation guide](docs/interpretation/fengshui/consultation.md) |
 | Psychometrics | IPIP 50-item Big Five factor markers (Goldberg 1992 public domain) | [Coverage](docs/algorithm-coverage.md#212-psychometrics--心理测量量表implemented) |
 
 The current source exposes **90 business REST routes**. Two MCP tools (`discover_tools` and `run_calculation`) provide access to **90 capabilities** across **12 families**. The central catalog contains 90 entries, with 90 available through the CLI. All three interfaces share the same domain calculations; see [interface boundaries](docs/api-reference.md#22-三端能力边界) and the [algorithm coverage matrix](docs/algorithm-coverage.md).

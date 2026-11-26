@@ -36,7 +36,10 @@ def deliver_response(
         payload = project_fields(payload, fields)
     elif detail == "compact" and spec is not None:
         if spec.compact_view is not None:
+            metadata = payload.get("run_metadata")
             payload = spec.compact_view(payload)
+            if metadata is not None and "run_metadata" not in payload:
+                payload = {**payload, "run_metadata": metadata}
         default_fields = compact_fields(spec)
         if default_fields:
             payload = project_present_fields(payload, default_fields)

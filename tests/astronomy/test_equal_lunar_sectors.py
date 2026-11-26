@@ -13,7 +13,7 @@ from fatebridge.core.astro import chart as core_chart
 from fatebridge.core.astro.geometry import _nakshatra, _su28
 from fatebridge.core.astro.reference import NAKSHATRAS, SU28
 from fatebridge.core.jyotish import jyotish
-from fatebridge.core.sukuyo.suzhan_astronomy import apply_equatorial_mansions
+from fatebridge.core.sukuyo.astronomy import apply_equatorial_mansions
 
 
 @pytest.mark.parametrize("count", [27, 28])

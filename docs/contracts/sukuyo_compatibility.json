@@ -129,6 +129,17 @@
         "title": "Calendar Profile",
         "type": "string"
       },
+      "distance_rule": {
+        "default": "symmetric",
+        "description": "三九法距离口径：symmetric（对称双九）或 directional（单向顺逆）",
+        "enum": [
+          "symmetric",
+          "cyclic",
+          "none"
+        ],
+        "title": "Distance Rule",
+        "type": "string"
+      },
       "leap_month_policy": {
         "default": "unresolved",
         "description": "闰月默认仅返回候选；repeat_month显式约定沿用同名月，不宣称原典唯一算法",

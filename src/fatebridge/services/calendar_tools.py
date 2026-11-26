@@ -4,7 +4,7 @@ from datetime import timedelta
 from typing import Any
 
 from fatebridge.core.almanac import build_calendar_context, get_jieqi_year_grid
-from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.services.calendar_input import _parse_calendar_datetime
 from fatebridge.utils.civil_clock import resolve_civil_clock
 from fatebridge.utils.civil_time import NominalClockLabel

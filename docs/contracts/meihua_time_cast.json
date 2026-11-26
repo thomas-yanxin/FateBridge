@@ -51,11 +51,7 @@
         "interpretation.classical_text_reference",
         "interpretation.traditional_stage_readings",
         "interpretation.evidence_scope",
-        "interpretation.internal_countercontrol",
-        "interpretation.seasonal_qualification",
-        "interpretation.wealth_components",
-        "interpretation.external_omens",
-        "interpretation.trigram_relation_symbols"
+        "interpretation.external_omens"
       ],
       "purpose": "核对原文修订、历法约定与实际取数过程；不另起卦"
     },
@@ -156,7 +152,6 @@
         "meihua.mutual_hexagram",
         "meihua.stage_relations",
         "meihua.seasonal_strength",
-        "interpretation.internal_countercontrol",
         "summary"
       ]
     },
@@ -176,9 +171,7 @@
         "analysis_context",
         "meihua.body_trigram",
         "meihua.stage_relations",
-        "interpretation.stage_emphasis",
         "meihua.seasonal_strength",
-        "interpretation.internal_countercontrol",
         "interpretation.day_qi",
         "meihua.use_trigram",
         "meihua.mutual_hexagram.upper",
@@ -214,7 +207,6 @@
         "meihua.use_trigram.name",
         "meihua.body_use_relation",
         "meihua.ruleset.id",
-        "meihua.ruleset.sources",
         "meihua.ruleset.version",
         "meihua.calendar_policy",
         "meihua.stage_relations",
@@ -224,18 +216,13 @@
         "interpretation.classical_text_reference",
         "interpretation.evidence_scope",
         "summary",
-        "interpretation.internal_countercontrol",
-        "interpretation.external_omens",
-        "interpretation.trigram_relation_symbols",
-        "interpretation.seasonal_qualification"
+        "interpretation.external_omens"
       ],
       "purpose": "读同一次时间梅花的卦变、原体下初中终生克与季令，区分原文和现代建议"
     },
     "situational": {
       "fields": [
-        "analysis_context.response_context",
         "meihua",
-        "interpretation.situational_responses",
         "summary"
       ],
       "purpose": "已报同次方应、天时应、地理应、人事应与原体符号关系；多候选及异文分列",
@@ -259,7 +246,6 @@
         "analysis_context",
         "meihua.seed",
         "meihua.body_trigram",
-        "interpretation.stage_emphasis",
         "summary"
       ]
     },
@@ -268,9 +254,6 @@
       "fields": [
         "analysis_context",
         "meihua",
-        "interpretation.stage_emphasis",
-        "interpretation.internal_countercontrol",
-        "interpretation.seasonal_qualification",
         "summary"
       ]
     },
@@ -278,15 +261,12 @@
       "fields": [
         "meihua.stage_relations",
         "meihua.seasonal_strength",
-        "interpretation.seasonal_qualification",
         "summary"
       ]
     },
     "strength_audit": {
       "fields": [
         "meihua",
-        "interpretation.seasonal_qualification",
-        "interpretation.internal_countercontrol",
         "interpretation.topic_reading",
         "summary",
         "interpretation.external_omens"
@@ -306,8 +286,6 @@
         "interpretation.casting_comparison",
         "interpretation.evidence_scope",
         "summary",
-        "interpretation.internal_countercontrol",
-        "interpretation.wealth_components",
         "interpretation.external_omens",
         "interpretation.day_qi"
       ],
@@ -318,15 +296,11 @@
       "fields": [
         "analysis_context",
         "meihua",
-        "interpretation.topic_ruleset",
         "interpretation.topic_reading",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
         "interpretation.evidence_scope",
         "summary",
-        "interpretation.internal_countercontrol",
-        "interpretation.seasonal_qualification",
-        "interpretation.wealth_components",
         "interpretation.external_omens",
         "interpretation.day_qi"
       ],
@@ -335,11 +309,8 @@
     },
     "trigram_symbols": {
       "fields": [
-        "interpretation.trigram_relation_symbols",
         "meihua.stage_relations",
         "meihua.seasonal_strength",
-        "interpretation.internal_countercontrol",
-        "interpretation.seasonal_qualification",
         "interpretation.casting_readings"
       ],
       "purpose": "按本次原体与初用、体互、用互、变用的实际生体或克体关系，读取文明书局本16组八卦专属象义。各计数候选分列，保留受制和旺衰；或字为史料备选，不能推定现实人物、姓氏、方位、灾祸、诊疗、应期或已验证结果。所选巽克体南方等异文不以常识改字。",
@@ -351,7 +322,6 @@
         "meihua.stage_relations",
         "meihua.seasonal_strength",
         "interpretation.topic_reading",
-        "interpretation.wealth_components",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
         "summary",
@@ -367,23 +337,6 @@
         "meihua.calendar_policy.label_precision",
         "meihua.calendar_policy.solar_term_date_reference",
         "meihua.evidence_scope",
-        "interpretation.weather.ruleset_id",
-        "interpretation.weather.version",
-        "interpretation.weather.ruleset.sources",
-        "interpretation.weather.control_profile.id",
-        "interpretation.weather.control_profile.version",
-        "interpretation.weather.control_profile.sources",
-        "interpretation.weather.context",
-        "interpretation.weather.trigram_counts",
-        "interpretation.weather.frequency_views",
-        "interpretation.weather.selected_readings",
-        "interpretation.weather.symbolic_attributions",
-        "interpretation.weather.time_scope_comparison",
-        "interpretation.weather.casting_comparison",
-        "interpretation.weather.casting_variants",
-        "interpretation.weather.controls",
-        "interpretation.weather.pending_rule_ids",
-        "interpretation.weather.research_validation",
         "interpretation.evidence_scope",
         "summary"
       ],
@@ -824,6 +777,19 @@
         "title": "Analysis Hour",
         "type": "integer"
       },
+      "analysis_longitude": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional longitude in decimal degrees; required when use_true_solar_time is True.",
+        "title": "Analysis Longitude"
+      },
       "analysis_minute": {
         "anyOf": [
           {
@@ -1015,6 +981,12 @@
         ],
         "default": null,
         "description": "Optional caller-reported same-cast 方應/天時應/地理應/人事應 for human matters. No scene, direction or weather inferred; retain multiple trigram candidates and source variants. Not a casting method, future weather forecast, combined ten-response verdict, probability or event date"
+      },
+      "use_true_solar_time": {
+        "default": false,
+        "description": "Apply true solar time correction before resolving the lunar cast hour (default False).",
+        "title": "Use True Solar Time",
+        "type": "boolean"
       },
       "weather_context": {
         "anyOf": [

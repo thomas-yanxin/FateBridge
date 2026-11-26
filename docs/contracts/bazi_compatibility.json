@@ -11,7 +11,11 @@
       "natal_contexts.person1.four_pillars",
       "natal_contexts.person2.four_pillars",
       "cross_chart_relations.pairs",
-      "cross_chart_relations.groups"
+      "cross_chart_relations.groups",
+      "nayin_comparison",
+      "day_pillar_synergy",
+      "element_complementarity",
+      "cross_shensha"
     ]
   },
   "input": {
@@ -133,6 +137,17 @@
         "title": "Person1 Use True Solar Time",
         "type": "boolean"
       },
+      "person1_zi_hour_policy": {
+        "default": "day_rollover_at_23",
+        "description": "第一人早晚子时（23:00–23:59）流派：day_rollover_at_23 | night_zi_same_day_next_hour_stem | night_zi_same_day_same_hour_stem",
+        "enum": [
+          "day_rollover_at_23",
+          "night_zi_same_day_next_hour_stem",
+          "night_zi_same_day_same_hour_stem"
+        ],
+        "title": "Person1 Zi Hour Policy",
+        "type": "string"
+      },
       "person2_birth_day": {
         "description": "Second person birth day",
         "maximum": 31,
@@ -247,6 +262,17 @@
         "description": "Enable true solar time for second person (八字 default on)",
         "title": "Person2 Use True Solar Time",
         "type": "boolean"
+      },
+      "person2_zi_hour_policy": {
+        "default": "day_rollover_at_23",
+        "description": "第二人早晚子时（23:00–23:59）流派：day_rollover_at_23 | night_zi_same_day_next_hour_stem | night_zi_same_day_same_hour_stem",
+        "enum": [
+          "day_rollover_at_23",
+          "night_zi_same_day_next_hour_stem",
+          "night_zi_same_day_same_hour_stem"
+        ],
+        "title": "Person2 Zi Hour Policy",
+        "type": "string"
       },
       "relationship_type": {
         "default": "general",

@@ -158,14 +158,22 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
             assert payload["run_metadata"]["tool_name"] == specs[record["tool"]].name
             if record["tool"] == "bazi_career":
                 career = payload["career_analysis"]
-                first_view = career["evidence_chain"]["topic"]["first_view"]
-                assert first_view["natal_stars"] == [
-                    {"ten_god": "正官", "visible_in": [], "hidden_in": ["year"]},
+                topic_facts = career["topic_facts"]
+                assert topic_facts["natal_stars"] == [
+                    {"ten_god": "正官", "visible_in": [], "hidden_in": ["year(午)"]},
                     {
                         "ten_god": "七杀",
                         "visible_in": [],
-                        "hidden_in": ["month", "hour"],
+                        "hidden_in": ["month(巳)", "hour(巳)"],
                     },
+                    {"ten_god": "正印", "visible_in": [], "hidden_in": ["year(午)"]},
+                    {
+                        "ten_god": "偏印",
+                        "visible_in": [],
+                        "hidden_in": ["month(巳)", "day(辰)", "hour(巳)"],
+                    },
+                    {"ten_god": "伤官", "visible_in": [], "hidden_in": ["day(辰)"]},
+                    {"ten_god": "正财", "visible_in": [], "hidden_in": ["day(辰)"]},
                 ]
                 assert career["timing_context"]["analysis_datetime"] == (
                     "2026-10-12T00:00:00+08:00"
@@ -181,9 +189,7 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
                 assert payload["cross_chart_relations"]["pairs"]
             elif record["tool"] == "horary_chart":
                 horary = payload["horary"]
-                assert horary["perfection"] == {
-                    "status": "source_conditions_incomplete"
-                }
+                assert horary["perfection"]["status"] == "same_ruler"
                 assert horary["significators"]["querent"]["planet"]
                 assert horary["significators"]["quesited"]["planet"]
             elif record["tool"] == "bazi_timing":

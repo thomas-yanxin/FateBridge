@@ -20,9 +20,7 @@ def pytest_pyfunc_call(pyfuncitem: pytest.Function) -> bool | None:
         return None
     else:
         pass
-    from fatebridge.core.astro.native_execution import in_native_worker
-
-    if in_native_worker():
+    if os.environ.get("_FATEBRIDGE_TEST_FAULT_WORKER") == "1":
         return None
     else:
         pass

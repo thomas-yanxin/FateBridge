@@ -47,7 +47,6 @@
         "sukuyo.lower_mansion_day",
         "sukuyo.conjunction_doctrine",
         "sukuyo.activity_assessment",
-        "sukuyo.reading_text",
         "rulesets",
         "validation",
         "summary",
@@ -57,9 +56,7 @@
         "sukuyo.six_palace_reference",
         "sukuyo.taibai_direction_reference",
         "sukuyo.day_mansion",
-        "sukuyo.nature",
-        "sukuyo.candidate_days",
-        "sukuyo.candidate_mansion_days"
+        "sukuyo.nature"
       ],
       "when": "按事项核对三九、宿性、七曜宜忌及原典冲突。"
     },
@@ -113,13 +110,9 @@
         "sukuyo.lower_methods",
         "sukuyo.directional_travel",
         "sukuyo.special_day_evidence",
-        "sukuyo.candidate_days",
-        "sukuyo.clothing_reference",
-        "sukuyo.reading_text",
         "input_normalized",
         "validation",
-        "summary",
-        "sukuyo.candidate_mansion_days"
+        "summary"
       ],
       "purpose": "完整衣事上下文。口诀和上卷预测式原句为单独文献见证，不作为新的现实预测或加权评分；源注与缺项完整保留。",
       "when": "按明确衣事动作核对专章、跨卷条文、明本未识别字及半日候选；未宣称现实病灾。"
@@ -139,12 +132,10 @@
         "sukuyo.lower_mansion_day",
         "sukuyo.conjunction_doctrine",
         "sukuyo.activity_assessment",
-        "sukuyo.reading_text",
         "input_normalized",
         "rulesets",
         "sukuyo.lower_methods",
-        "sukuyo.directional_travel",
-        "sukuyo.candidate_mansion_days"
+        "sukuyo.directional_travel"
       ],
       "purpose": "下卷逐宿条文、文本归属问题及条件性事项；宿月配合分类不代替物理观测"
     },
@@ -155,12 +146,10 @@
         "sukuyo.weekday",
         "sukuyo.lower_methods",
         "sukuyo.activity_assessment",
-        "sukuyo.reading_text",
         "input_normalized",
         "rulesets",
         "validation",
-        "sukuyo.special_day_evidence",
-        "sukuyo.candidate_mansion_days"
+        "sukuyo.special_day_evidence"
       ],
       "purpose": "下卷七类宿性、七曜章法、主文与校记、上下卷冲突及行为分类推导"
     },
@@ -169,7 +158,6 @@
         "sukuyo.calendar",
         "sukuyo.day_mansion",
         "sukuyo.palace_reference",
-        "sukuyo.reading_text",
         "input_normalized",
         "rulesets",
         "validation"
@@ -181,9 +169,7 @@
         "sukuyo.calendar",
         "sukuyo.personal_day",
         "sukuyo.activity_assessment",
-        "rulesets.personal_day_witnesses",
-        "input_normalized",
-        "sukuyo.candidate_mansion_days"
+        "input_normalized"
       ],
       "purpose": "本命三九日的卷别、启程与入宅范围；条件未定不代入。"
     },
@@ -191,11 +177,9 @@
       "fields": [
         "sukuyo.calendar",
         "sukuyo.day_mansion",
-        "sukuyo.reading_text",
         "input_normalized",
         "rulesets",
-        "validation",
-        "sukuyo.candidate_mansion_days"
+        "validation"
       ],
       "purpose": "核对望宿两法及可选桧尾补配、半日和规则次序候选"
     },
@@ -204,8 +188,6 @@
         "sukuyo.six_palace_reference",
         "sukuyo.personal_day",
         "sukuyo.calendar",
-        "sukuyo.reading_text",
-        "rulesets.six_palace_positions",
         "input_normalized"
       ],
       "purpose": "核对T1299六个本命相对位置及原文例题；运行犯宿未计算，不生成当日吉凶"
@@ -214,7 +196,6 @@
       "fields": [
         "sukuyo.calendar.profile_calculation",
         "sukuyo.calendar.candidate_su27s",
-        "sukuyo.reading_text",
         "rulesets.calendar",
         "input_normalized"
       ],
@@ -228,10 +209,7 @@
         "sukuyo.special_day_labels",
         "sukuyo.special_day_evidence",
         "sukuyo.activity_assessment",
-        "sukuyo.reading_text",
-        "rulesets.special_days",
-        "input_normalized",
-        "sukuyo.candidate_mansion_days"
+        "input_normalized"
       ],
       "purpose": "核对上下卷大正特殊日、明本校记及未识别宿字；不将合宿原文变成物理观测"
     },
@@ -239,9 +217,6 @@
       "fields": [
         "sukuyo.calendar",
         "sukuyo.calendar_day",
-        "sukuyo.reading_text",
-        "rulesets.textual_resolutions",
-        "rulesets.unresolved",
         "input_normalized"
       ],
       "purpose": "核对原典一夜省文、十一夜释义及有效时段证言；不是已定现代钟时"
@@ -252,10 +227,7 @@
         "sukuyo.day_mansion",
         "sukuyo.directional_travel",
         "sukuyo.activity_assessment",
-        "sukuyo.reading_text",
-        "rulesets.travel_directions",
-        "input_normalized",
-        "sukuyo.candidate_mansion_days"
+        "input_normalized"
       ],
       "purpose": "核对明确方向条件、吉时不能解除的原注、版本相反校记与逐宿章冲突；不计算地理角度或本命宫"
     }
@@ -396,6 +368,17 @@
         "title": "Date",
         "type": "string"
       },
+      "distance_rule": {
+        "default": "symmetric",
+        "description": "三九法近/中/远距离规则：symmetric（对称折半，默认）/cyclic（循环序）/none（不分级）",
+        "enum": [
+          "symmetric",
+          "cyclic",
+          "none"
+        ],
+        "title": "Distance Rule",
+        "type": "string"
+      },
       "doubing_su28": {
         "default": true,
         "description": "是否按当日视赤经和已声明现代距星标注七曜的不等宽天文宿位；历日本命宿单独计算",
@@ -418,7 +401,7 @@
           }
         ],
         "default": "D",
-        "description": "Offline house system selector (0..8, SE letter, or name; default 'D'/8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected.",
+        "description": "Offline house system selector (0..8, SE letter, or name; default 'D'/8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D, E); boolean, floating-point, blank and unsupported values are rejected.",
         "title": "House System"
       },
       "latitude": {

@@ -6,7 +6,7 @@ from itertools import pairwise
 from typing import Protocol
 
 from fatebridge.core.almanac import SolarTerm
-from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.utils.solar_time import NormalizedBirthTime
 
 MICROSECOND = timedelta(microseconds=1)

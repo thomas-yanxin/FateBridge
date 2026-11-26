@@ -10,9 +10,9 @@ from fatebridge.core.almanac import (
     get_adjacent_solar_terms,
     localize_datetime,
 )
-from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
-from fatebridge.core.ziwei.ziwei_time_input import birth_clock_receipt
+from fatebridge.core.ziwei.calendar import birth_clock_receipt
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.civil_clock import resolve_civil_clock
 from fatebridge.utils.civil_time import NominalClockLabel

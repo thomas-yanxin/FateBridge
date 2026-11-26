@@ -17,6 +17,8 @@ from fatebridge.services.astrology import (
     calculate_germany_chart_analysis,
     calculate_relative_chart_analysis,
 )
+from fatebridge.services.guolao import calculate_guolao_chart
+from fatebridge.services.jyotish import calculate_vedic_chart
 from fatebridge.utils.places import KNOWN_BIRTH_PLACE_ENTRIES
 from tests.fixtures.surface_payloads import astro_payload
 
@@ -31,12 +33,11 @@ def test_core_chart_variants_expose_variant_specific_fields() -> None:
         chart_variant="hellen_chart",
         **astro_payload(),
     )
-    guolao = calculate_core_chart_analysis(
-        chart_variant="guolao_chart",
+    guolao = calculate_guolao_chart(
+        use_true_solar_time=False,
         **astro_payload(),
     )
-    india = calculate_core_chart_analysis(
-        chart_variant="india_chart",
+    india = calculate_vedic_chart(
         **astro_payload(),
     )
 
@@ -59,18 +60,12 @@ def test_core_chart_variants_expose_variant_specific_fields() -> None:
     assert "lot_of_fortune" in hellen["hellenistic"]
 
     assert guolao["chart_profile"]["chart_type"] == "guolao_chart"
-    assert (
-        guolao["guolao"]["lunar_mansion_system"]
-        == "modern_equatorial_research_anchors_v1"
-    )
+    assert guolao["guolao"]["lunar_mansion_system"] == "modern_research_anchors_v1"
     assert len(guolao["guolao"]["planetary_mansions"]) >= 7
 
-    assert india["chart_profile"]["chart_type"] == "india_chart"
-    assert india["chart_profile"]["zodiac"] == "sidereal"
+    assert india["india"]["ayanamsa"] == "lahiri"
     assert india["india"]["ayanamsha"] > 0
-    assert "nakshatra" in next(
-        item for item in india["planets"] if item["id"] == "Moon"
-    )
+    assert india["india"]["moon_nakshatra"]
 
     assert "interpretation" not in chart
     assert "个星体与虚点" in chart["summary"][0]
@@ -231,12 +226,6 @@ def test_core_chart_offline_options_preserve_defaults_and_allow_overrides() -> N
         zodiac_type="Sidereal",
         **astro_payload(),
     )
-    india_tropical_placidus = calculate_core_chart_analysis(
-        chart_variant="india_chart",
-        house_system=3,
-        zodiac_type="Tropic",
-        **astro_payload(),
-    )
 
     assert default_chart["chart_profile"]["house_system"] == "placidus"
     assert default_chart["chart_profile"]["house_system_code"] == 3
@@ -265,12 +254,6 @@ def test_core_chart_offline_options_preserve_defaults_and_allow_overrides() -> N
         item for item in equal_mc_sidereal_chart["planets"] if item["id"] == "Sun"
     )
     assert default_sun["longitude"] != sidereal_sun["longitude"]
-
-    assert india_tropical_placidus["chart_profile"]["zodiac"] == "tropical"
-    assert india_tropical_placidus["chart_profile"]["zodiacal"] == 0
-    assert india_tropical_placidus["chart_profile"]["house_system"] == "placidus"
-    assert india_tropical_placidus["chart_profile"]["house_system_code"] == 3
-    assert india_tropical_placidus["india"]["ayanamsha"] == 0.0
 
 
 def test_germany_chart_returns_midpoint_payload() -> None:

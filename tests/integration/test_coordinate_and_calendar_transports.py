@@ -427,10 +427,10 @@ def test_birth_strength_uses_one_assessment_on_every_transport(
     for birth in births:
         assert "element_distribution_adjusted" not in birth
         assert "element_relations" not in birth
-        assessment = birth["day_master"]["assessment"]
-        assert set(assessment["effective_elements"]) == {"木", "火", "土", "金", "水"}
-        assert assessment["method_id"] == "season_root_revelation_relations_v12"
-        assert assessment["seasonal_phases"] == {
+        adjudication = birth["day_master"]["classical_adjudication"]
+        assert adjudication["status"] == "adjudicated"
+        assert adjudication["body_strength"] == "中和"
+        assert birth["element_seasonal_phase"] == {
             "木": "休",
             "火": "旺",
             "土": "相",

@@ -14,13 +14,13 @@ from typing import Any
 from dateutil.relativedelta import relativedelta
 
 from fatebridge.core.almanac import get_bazi_year, localize_datetime
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.core.numerology.canping import _verses, _year_ganzhi, compute_number
 from fatebridge.core.numerology.solar import (
     ResolvedProjectionBoundary,
     boundary_context,
     resolve_projection_boundary,
 )
-from fatebridge.core.timing import TimingAnalysis
 from fatebridge.utils.civil_time import (
     CivilPoint,
     UTCCalendar,
@@ -245,6 +245,15 @@ def luck_timeline(
             birth, gender, month_pillar, zone, periods=12
         )
         timeline["profile_id"] = method
+        timeline.setdefault(
+            "calendar_policy",
+            "360_nominal_days_to_year_30_to_month_then_civil_addition",
+        )
+        timeline.setdefault(
+            "reference_policy",
+            "next_jie_strict_for_forward_previous_jie_inclusive_for_reverse",
+        )
+        timeline.setdefault("dst_policy", "fold_0_gap_forward")
         return timeline
     resolution = TimingAnalysis.resolve_dayun_start(birth, gender, zone)
     term = resolution.target_term

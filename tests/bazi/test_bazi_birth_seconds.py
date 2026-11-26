@@ -9,8 +9,8 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.core.requests.bazi import BaziBirthRequest
-from fatebridge.core.timing import TimingAnalysis
 from fatebridge.utils.birth_input import PersonInfo, create_person_info
 from fatebridge.utils.solar_time import normalize_birth_time
 from tests.support.transports import inputs, rest, surface_calls

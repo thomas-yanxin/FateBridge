@@ -13,7 +13,7 @@ from fatebridge.core.almanac import (
     get_bazi_month_boundaries,
 )
 from fatebridge.core.analytic_solar import MODEL_ID
-from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.liuyao.strength import (
     ADVANCES,
     COMBINES,

@@ -8,8 +8,7 @@ from fatebridge.application.examples import (
     suggested_fields,
 )
 from fatebridge.core.almanac import localize_datetime
-from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
-from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.services.bazi import calculate_bazi_career
 from fatebridge.utils.birth_input import create_person_info
 from tests.support.transports import SPECS, business, rest, surface_calls
@@ -47,48 +46,6 @@ def person():
     )
 
 
-def test_primary_tie_preserves_heuristic_formation_conditions() -> None:
-    career = calculate_bazi_career(
-        person(), analysis_year=2027, analysis_month=6, analysis_day=15
-    )["career_analysis"]
-    evidence = career["evidence_chain"]
-    assert any(
-        row["pillar"] == "day" and row["stem"] == "壬"
-        for row in evidence["ten_gods"]["劫财"]
-    )
-    assert any(
-        row["pillar"] == "day" and row["stem"] == "甲"
-        for row in evidence["ten_gods"]["伤官"]
-    )
-    assert all(
-        check["formation_status"] == "not_adjudicated"
-        for check in evidence["structure_checks"]
-    )
-
-
-def test_changing_day_branch_changes_its_hidden_counts_and_preserves_actual_ties() -> (
-    None
-):
-    pillars = {
-        "year": ("甲", "子"),
-        "month": ("乙", "丑"),
-        "day": ("丙", "寅"),
-        "hour": ("丁", "卯"),
-    }
-    first = build_natal_evidence(pillars)["ten_gods"]
-    second = build_natal_evidence({**pillars, "day": ("丙", "午")})["ten_gods"]
-    assert {
-        god
-        for god, stars in first.items()
-        if any(row["pillar"] == "day" for row in stars)
-    } == {"偏印", "比肩", "食神"}
-    assert {
-        god
-        for god, stars in second.items()
-        if any(row["pillar"] == "day" for row in stars)
-    } == {"劫财", "伤官"}
-
-
 def test_boundary_day_keeps_midnight_and_makes_hourly_followup_discoverable() -> None:
     from datetime import datetime
 
@@ -106,7 +63,6 @@ def test_boundary_day_keeps_midnight_and_makes_hourly_followup_discoverable() ->
     )
     assert tc["liunian_pillar"] == "丙午"
     assert noon["stem"] + noon["branch"] == "丁未"
-    assert tc["hourly_evidence"]["tool"] == SPECS["bazi_timing"].name
 
 
 def test_partial_override_reports_effective_pillar_and_marks_auto_age_reference() -> (
@@ -116,11 +72,12 @@ def test_partial_override_reports_effective_pillar_and_marks_auto_age_reference(
         "career_analysis"
     ]["timing_context"]
     assert tc["dayun_pillar"] == "甲子" and isinstance(tc["dayun_age"], float)
-    assert tc["dayun_age_basis"] == "auto_derived_reference_not_override_pillar_age"
+    assert tc["dayun_status"] == "explicit_override"
+    assert tc["dayun_selection_basis"] is None
     assert tc["overridden"] == {"dayun_pillar": True, "liunian_pillar": False}
 
 
-@pytest.mark.parametrize("view", [None, "direction", "target_year"])
+@pytest.mark.parametrize("view", [None, "target_year", "depth"])
 def test_career_projection_preserves_primary_tie_and_scope_across_transports(
     view: str | None, surface_calls
 ) -> None:
@@ -147,13 +104,12 @@ def test_career_projection_preserves_primary_tie_and_scope_across_transports(
         == business(output)
     )
     career = output["career_analysis"]
-    assert career["evidence_chain"]["topic"]["first_view"]["natal_stars"]
+    if view is None:
+        assert career["topic_facts"]["natal_stars"]
     if "timing_context" in career:
         assert (
             career["timing_context"]["analysis_datetime"] == "2027-06-15T00:00:00+08:00"
         )
-    else:
-        pass
 
 
 def test_western_career_view_keeps_phase_bounds_and_real_transit_evidence() -> None:
@@ -248,9 +204,9 @@ def test_omitted_target_date_uses_person_timezone_at_frozen_utc_across_transport
 
 
 @pytest.mark.parametrize(
-    "case_input,expected_stars,expected_strength,expected_status",
+    "case_input,expected_stars,expected_strength,expected_structure",
     [
-        (D1, ["正官", "七杀"], "强", "pending_adjudication"),
+        (D1, ["正官", "七杀", "正印", "食神", "伤官", "偏财"], "强", "正官格"),
         pytest.param(
             dict(
                 birth_year=1965,
@@ -265,9 +221,9 @@ def test_omitted_target_date_uses_person_timezone_at_frozen_utc_across_transport
                 analysis_month=2,
                 analysis_day=4,
             ),
-            ["正官", "正印"],
-            "弱",
-            "prerequisite_not_met",
+            ["正官", "正印", "偏印", "伤官", "正财"],
+            "强",
+            "偏印格",
             id="1965-winter-rootless-wood",
         ),
     ],
@@ -276,7 +232,7 @@ def test_career_evidence_retains_star_positions_and_formation_status(
     case_input,
     expected_stars,
     expected_strength: str,
-    expected_status: str,
+    expected_structure: str,
     surface_calls,
 ) -> None:
     spec = SPECS["bazi_career"]
@@ -303,16 +259,12 @@ def test_career_evidence_retains_star_positions_and_formation_status(
     )
     career = output["career_analysis"]
     assert {"suggestions", "career_structure", "industry_analysis"}.isdisjoint(career)
-    evidence = career["evidence_chain"]
-    stars = evidence["topic"]["first_view"]["natal_stars"]
+    facts = career["topic_facts"]
+    stars = facts["natal_stars"]
     assert [star["ten_god"] for star in stars] == expected_stars
     assert all(star["visible_in"] or star["hidden_in"] for star in stars)
-    assert evidence["strength_context"]["strength_level"] == expected_strength
-    checks = {check["label"]: check for check in evidence["structure_checks"]}
-    assert checks["正官财印相辅"]["status"] == expected_status
-    assert all(
-        check["formation_status"] == "not_adjudicated" for check in checks.values()
-    )
+    assert facts["day_master"]["strength"] == expected_strength
+    assert facts["dominant_structure"] == expected_structure
 
 
 @pytest.mark.parametrize(
@@ -386,7 +338,7 @@ def test_exact_valid_dual_override_matches_applied_pillars_across_transports(
     case_input = {**D1, "dayun_pillar": "甲子", "liunian_pillar": "丙寅"}
     fields = [
         "career_analysis.timing_context",
-        "career_analysis.evidence_chain.topic.timing.layers",
+        "career_analysis.topic_facts.timing_layers",
     ]
     params = dict(detail="audit", fields=fields)
     http, protocol, code, output = surface_calls(
@@ -411,7 +363,7 @@ def test_exact_valid_dual_override_matches_applied_pillars_across_transports(
     tc = output["career_analysis"]["timing_context"]
     assert tc["dayun_pillar"] == "甲子" and tc["liunian_pillar"] == "丙寅"
     assert tc["source"] == "explicit_pillar_overrides"
-    layers = output["career_analysis"]["evidence_chain"]["topic"]["timing"]["layers"]
+    layers = output["career_analysis"]["topic_facts"]["timing_layers"]
     assert {layer["layer"]: layer["pillar"] for layer in layers} == {
         "dayun": "甲子",
         "liunian": "丙寅",

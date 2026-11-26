@@ -185,7 +185,7 @@ def test_restrictions_match_rest_mcp_cli_and_never_reach_services(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     import fatebridge.api as api
-    import fatebridge.cli as cli
+    import fatebridge.application.execution as execution
     from fatebridge.mcp_server import create_mcp_app
 
     spec = resolve_spec(CATALOG, tool)
@@ -197,11 +197,13 @@ def test_restrictions_match_rest_mcp_cli_and_never_reach_services(
 
     monkeypatch.setattr(api, "execute_with_receipt", forbidden_execute)
     monkeypatch.setattr("fatebridge.mcp_server.execute_with_receipt", forbidden_execute)
-    monkeypatch.setattr(cli, "execute_with_receipt", forbidden_execute)
+    monkeypatch.setattr(execution, "execute_with_receipt", forbidden_execute)
     response = TestClient(api.app).post(spec.rest_path, json=inputs)
     args = [tool]
     for key, value in inputs.items():
         args += ["--" + key.replace("_", "-"), str(value)]
+    from fatebridge import cli
+
     code = cli.run(args)
     local = json.loads(capsys.readouterr().out)
 
@@ -225,9 +227,9 @@ def test_health_is_cultural_and_has_no_disease_or_treatment_recommendations() ->
     assert spec is not None
     request = spec.request_model.model_validate(MCP_CASES["bazi_health"][1]())
     result = invoke_validated_service(spec, request)["health_analysis"]
-    evidence = result["evidence_chain"]
-    assert evidence["element_presence"]
-    assert evidence["seasonal_reference"]
+    facts = result["topic_facts"]
+    assert facts["element_distribution"]
+    assert facts["seasonal_climate"]
     assert "disease_risks" not in result
     assert "regimen" not in result
     text = json.dumps(result, ensure_ascii=False)
@@ -266,9 +268,9 @@ def test_parent_child_rules_do_not_recommend_reproduction_or_predict_count() -> 
         {**MCP_CASES["bazi_children"][1](), "gender": "女"}
     )
     result = invoke_validated_service(spec, request)["children_analysis"]
-    topic = result["evidence_chain"]["topic"]
-    assert set(topic["palaces"]) == {"hour"}
-    assert set(topic["stars"]) == {"食神", "伤官"}
+    facts = result["topic_facts"]
+    assert facts["four_pillars"]["hour"]
+    assert [star["ten_god"] for star in facts["natal_stars"]] == ["伤官"]
     assert "count_hint" not in result
     text = json.dumps(result, ensure_ascii=False)
     for claim in ("早育多育", "利于添丁", "一至二位", "主生育", "备孕育儿"):

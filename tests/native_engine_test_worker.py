@@ -4,15 +4,14 @@ There is no environment switch or test hook in the production dispatcher.
 Boundary behavior is separately tested through the actual production worker.
 """
 
+import os
 import sys
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(root / "src"), str(root)]
 
-from fatebridge.core.astro import native_execution  # noqa: E402
-
-native_execution.WORKER_ACTIVE = True
+os.environ["_FATEBRIDGE_TEST_FAULT_WORKER"] = "1"
 
 import pytest  # noqa: E402
 

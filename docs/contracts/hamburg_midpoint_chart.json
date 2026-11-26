@@ -37,9 +37,7 @@
     "aspect_motion": {
       "fields": [
         "base_chart.person_info",
-        "base_chart.planets",
-        "base_chart.aspects",
-        "base_chart.classical_patterns"
+        "base_chart.planets"
       ],
       "purpose": "Instantaneous longitude motion only; inspect application_policy and aspect_motion before interpreting light configurations. No future perfection or complete source-method acceptance; not an event probability. Bodily latitude status is a separate bounded Western I.24 condition, possibly missing; it does not establish full bodily application.",
       "when": "用户询问入相／出相、精确成相或光的传递／聚集；核对当前黄经与相对速度，精确、同速和速度未知分别保留。"
@@ -59,18 +57,15 @@
         "midpoint_analysis.comparative_geometry.birth_time_sensitivity.status",
         "midpoint_analysis.comparative_geometry.birth_time_sensitivity.sample_count",
         "midpoint_analysis.comparative_geometry.birth_time_sensitivity.summary",
-        "midpoint_analysis.comparative_geometry.sources",
-        "midpoint_analysis.comparative_geometry.limitations"
+        "midpoint_analysis.comparative_geometry.sources"
       ],
       "purpose": "Selected symbolic ecliptic rotations and four-point reflection systems. Use actual native Aries Point for tropical cardinal references in either display zodiac. Assigned anchor identity does not resolve a physical ASC/MC. Append required frame paths or the whole midpoint_analysis.comparative_geometry.birth_time_sensitivity.samples array in the first call; field projection cannot descend through an array when exact coordinates are needed; full JSON requires fields=null initially and same-run result delivery. Preserve unknown references and original source discrepancies; no Earth-house or event interpretation.",
       "when": "用户点名Witte1924比较盘、太阳／子午线／上升等换基或四点镜像几何；仅用已确认的本命资料，不要求新增目标日期。"
     },
     "contact_evidence": {
       "fields": [
-        "midpoint_analysis.profile.hypothetical_element_source",
         "midpoint_analysis.factors",
         "midpoint_analysis.dials",
-        "midpoint_analysis.limitations",
         "midpoint_analysis.unique_two_factor_pair_count",
         "base_chart.person_info"
       ],
@@ -90,10 +85,6 @@
         "midpoint_analysis.factors",
         "midpoint_analysis.midpoint_axes",
         "midpoint_analysis.dials",
-        "midpoint_analysis.reading_guide",
-        "midpoint_analysis.rulesets",
-        "midpoint_analysis.sources",
-        "midpoint_analysis.rule_trace",
         "midpoint_analysis.unique_two_factor_pair_count",
         "base_chart.person_info"
       ],
@@ -101,19 +92,12 @@
     },
     "meridian_houses": {
       "fields": [
-        "midpoint_analysis.meridian_houses",
         "midpoint_analysis.time_sensitivity",
         "base_chart.chart_profile",
         "base_chart.person_info"
       ],
       "purpose": "Selected natal RA-divided Meridian cusps only; distinguish equatorial first cusp from physical Ascendant and base-chart house system. Check actual native angle epoch/frame and all user-confirmed birth-time samples. Missing backend stays unavailable; no full-original or event prediction claim.",
       "when": "用户指定汉堡／Witte 1923 本命子午宫表，或追问赤经等分与实际ASC的区别"
-    },
-    "meridian_placement": {
-      "fields": [
-        "midpoint_analysis.meridian_houses"
-      ],
-      "purpose": "子午宫完整方向投影、天体归属与实际生时样点摘要"
     },
     "mixed_pair_sensitivity": {
       "fields": [
@@ -133,22 +117,16 @@
         "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.status",
         "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.profile",
         "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.contact_counts",
-        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.sources",
-        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.limitations"
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.sources"
       ],
       "purpose": "Mixed-pair method, grouped relation counts and invariant-vs-dependent scope; counts are not timing accuracy. Request the same-run dials separately only when the actual equations are needed.",
       "when": "用户明确指定德国盘太阳弧目标时刻；通用入口须chart_variant=germany。analysis_datetime未给出时不计算。"
     },
     "overview": {
       "fields": [
-        "summary",
         "midpoint_analysis.status",
         "midpoint_analysis.profile",
         "midpoint_analysis.contact_counts",
-        "midpoint_analysis.reading_guide",
-        "midpoint_analysis.limitations",
-        "midpoint_analysis.original_text_conformance",
-        "midpoint_analysis.interpretations",
         "midpoint_analysis.time_sensitivity.status",
         "midpoint_analysis.time_sensitivity.uncertainty_minutes",
         "midpoint_analysis.unique_two_factor_pair_count",
@@ -158,24 +136,17 @@
     },
     "progression_key": {
       "fields": [
-        "midpoint_analysis.solar_arc_analysis.profile",
-        "midpoint_analysis.solar_arc_analysis.sources",
-        "midpoint_analysis.solar_arc_analysis.rule_trace",
-        "midpoint_analysis.solar_arc_analysis.original_text_conformance"
+        "midpoint_analysis.solar_arc_analysis.profile"
       ],
       "purpose": "实际年长钥匙、原刊时角算术及未采纳状态"
     },
     "solar_arc": {
       "fields": [
-        "midpoint_analysis.profile.hypothetical_element_source",
         "midpoint_analysis.solar_arc_analysis.status",
         "midpoint_analysis.solar_arc_analysis.profile",
         "midpoint_analysis.solar_arc_analysis.contact_counts",
         "midpoint_analysis.solar_arc_analysis.interpretations",
         "midpoint_analysis.solar_arc_analysis.birth_time_sensitivity",
-        "midpoint_analysis.solar_arc_analysis.rule_trace",
-        "midpoint_analysis.solar_arc_analysis.sources",
-        "midpoint_analysis.solar_arc_analysis.limitations",
         "base_chart.person_info"
       ],
       "purpose": "True solar arc with 365.25-day Julian symbolic key; natal/directed references stay distinct. Source interpretation requires actual directed-MC occupancy and carries sampled birth-time conditions. Counts are not probabilities or observed future events. Distinguish unresolved physical MC from formal backend conditions and unavailable arcs. Read resolved/unresolved condition counts; unknown applicability is not absence. Only ASC degeneracy does not restrict a resolved MC.",
@@ -185,9 +156,7 @@
       "fields": [
         "base_chart.person_info",
         "base_chart.chart_profile",
-        "base_chart.planets",
-        "base_chart.classical.solar_condition_policy",
-        "base_chart.classical.planets"
+        "base_chart.planets"
       ],
       "purpose": "Named Lilly solar definitions only: 17 arcminutes, same-sign 8.5-degree combustion, 17-degree beams. Keep the contradictory printed ten-degree example and explicit boundary convention unresolved; no whole-page or event-validity certification.",
       "when": "询问日心、焦伤或日下；先核对Lilly 1647第113页的明文定义、同星座条件、实际状态及未解决的原文示例冲突。"
@@ -196,10 +165,6 @@
       "fields": [
         "midpoint_analysis.profile",
         "midpoint_analysis.factors",
-        "midpoint_analysis.interpretations",
-        "midpoint_analysis.rule_trace",
-        "midpoint_analysis.sources",
-        "midpoint_analysis.limitations",
         "midpoint_analysis.time_sensitivity",
         "base_chart.person_info"
       ],
@@ -219,7 +184,6 @@
         "midpoint_analysis.solar_arc_analysis.original_table_1925.source",
         "midpoint_analysis.solar_arc_analysis.original_table_1925.coverage",
         "midpoint_analysis.solar_arc_analysis.original_table_1925.worked_example",
-        "midpoint_analysis.solar_arc_analysis.original_table_1925.limitations",
         "midpoint_analysis.solar_arc_analysis.original_table_1925.full_original_method_accepted",
         "midpoint_analysis.solar_arc_analysis.profile.key_policy"
       ],
@@ -228,14 +192,9 @@
   },
   "first_view": {
     "fields": [
-      "summary",
       "midpoint_analysis.status",
       "midpoint_analysis.profile",
       "midpoint_analysis.contact_counts",
-      "midpoint_analysis.reading_guide",
-      "midpoint_analysis.limitations",
-      "midpoint_analysis.original_text_conformance",
-      "midpoint_analysis.interpretations",
       "midpoint_analysis.time_sensitivity.status",
       "midpoint_analysis.time_sensitivity.uncertainty_minutes",
       "midpoint_analysis.unique_two_factor_pair_count",
@@ -386,6 +345,17 @@
         "title": "Birth Year",
         "type": "integer"
       },
+      "dial_degrees": {
+        "default": "90",
+        "description": "Primary dial modulus to summarize in compact output (90, 45, or 22.5).",
+        "enum": [
+          "90",
+          "45",
+          "22.5"
+        ],
+        "title": "Dial Degrees",
+        "type": "string"
+      },
       "gender": {
         "anyOf": [
           {
@@ -398,6 +368,17 @@
         "default": "未知",
         "description": "性别（可选，仅用于结果标识；西方星盘计算不使用性别）。接受此字段是为了让同一套出生信息可以原样喂给八字/紫微/星盘等工具，避免批量调用时'有的工具收、有的不收'造成的反复试错。",
         "title": "Gender"
+      },
+      "high_latitude_fallback": {
+        "default": "error",
+        "description": "Fallback when quadrant houses fail at |lat| >= 66.5°: error (default), porphyry, or whole_sign.",
+        "enum": [
+          "error",
+          "porphyry",
+          "whole_sign"
+        ],
+        "title": "High Latitude Fallback",
+        "type": "string"
       },
       "house_system": {
         "anyOf": [
@@ -412,7 +393,7 @@
           }
         ],
         "default": null,
-        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Accepts SE letters, keys, or integer codes 0..8 (0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected.",
+        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Accepts SE letters, keys, or integer codes 0..8 (0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D, E); boolean, floating-point, blank and unsupported values are rejected.",
         "title": "House System"
       },
       "name": {
@@ -427,6 +408,19 @@
         "default": "未提供",
         "description": "Name (optional)",
         "title": "Name"
+      },
+      "sensitive_point_query": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional sensitive point formula 'A+B-C' (e.g. 'Mars+Jupiter-Zeus') to evaluate against all chart factors.",
+        "title": "Sensitive Point Query"
       },
       "use_true_solar_time": {
         "default": false,

@@ -44,7 +44,6 @@
         "analysis_context",
         "taiyi.calendar_rules",
         "taiyi.core_board",
-        "taiyi.day_source_comparisons",
         "taiyi.determinate_calculation",
         "taiyi.ruleset"
       ],
@@ -52,72 +51,18 @@
     },
     "daily_essences": {
       "fields": [
-        "taiyi.calendar_summary",
-        "taiyi.ten_jing.ruleset_id",
-        "taiyi.ten_jing.version",
-        "taiyi.ten_jing.author",
-        "taiyi.ten_jing.classical_author",
-        "taiyi.ten_jing.classical_acceptance_passed",
-        "taiyi.ten_jing.scope",
-        "taiyi.ten_jing.records.emperor.label",
-        "taiyi.ten_jing.records.emperor.status",
-        "taiyi.ten_jing.records.emperor.palace",
-        "taiyi.ten_jing.records.emperor.reason",
-        "taiyi.ten_jing.records.earth.label",
-        "taiyi.ten_jing.records.earth.status",
-        "taiyi.ten_jing.records.earth.palace",
-        "taiyi.ten_jing.records.earth.reason",
-        "taiyi.ten_jing.records.flying_bird.label",
-        "taiyi.ten_jing.records.flying_bird.status",
-        "taiyi.ten_jing.records.flying_bird.palace",
-        "taiyi.ten_jing.records.flying_bird.reason",
-        "taiyi.ten_jing.records.heaven_venerable.label",
-        "taiyi.ten_jing.records.heaven_venerable.status",
-        "taiyi.ten_jing.records.heaven_venerable.palace",
-        "taiyi.ten_jing.records.heaven_venerable.reason",
-        "taiyi.ten_jing.records.five_elements.label",
-        "taiyi.ten_jing.records.five_elements.status",
-        "taiyi.ten_jing.records.five_elements.palace",
-        "taiyi.ten_jing.records.five_elements.reason",
-        "taiyi.ten_jing.records.eight_winds.label",
-        "taiyi.ten_jing.records.eight_winds.status",
-        "taiyi.ten_jing.records.eight_winds.palace",
-        "taiyi.ten_jing.records.eight_winds.reason",
-        "taiyi.ten_jing.records.five_winds.label",
-        "taiyi.ten_jing.records.five_winds.status",
-        "taiyi.ten_jing.records.five_winds.palace",
-        "taiyi.ten_jing.records.five_winds.reason",
-        "taiyi.ten_jing.records.three_winds.label",
-        "taiyi.ten_jing.records.three_winds.status",
-        "taiyi.ten_jing.records.three_winds.palace",
-        "taiyi.ten_jing.records.three_winds.reason",
-        "taiyi.ten_jing.records.heaven_time.label",
-        "taiyi.ten_jing.records.heaven_time.status",
-        "taiyi.ten_jing.records.heaven_time.palace",
-        "taiyi.ten_jing.records.heaven_time.reason",
-        "taiyi.ten_jing.records.heaven_time.source_comparisons",
-        "taiyi.ten_jing.records.heaven_time.rule_evidence",
-        "taiyi.ten_jing.records.taiyi_ordinal.label",
-        "taiyi.ten_jing.records.taiyi_ordinal.status",
-        "taiyi.ten_jing.records.taiyi_ordinal.palace",
-        "taiyi.ten_jing.records.taiyi_ordinal.reason",
-        "taiyi.ten_jing.records.eight_winds.source_comparisons",
-        "taiyi.ten_jing.records.heaven_time.candidates",
-        "taiyi.ten_jing.records.taiyi_ordinal.ordinal",
-        "taiyi.day_source_comparisons"
+        "taiyi.calendar_summary"
       ],
       "purpose": "仅calculation_mode=day：首读金钥匙十精的实际位置、未决宫位及原文对照；具体周期与序列按同盘ten_jing.records续读。不替代年度十神或完整天气断语。"
     },
     "historical_year_calendar": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.calendar_rules.historical_calendar",
         "taiyi.core_board.kook_number",
         "taiyi.core_board.taiyi_number",
         "taiyi.core_board.suijun",
         "taiyi.ruleset.classical_acceptance_passed",
-        "synthesis.time_scopes",
-        "synthesis.limitations"
+        "synthesis.time_scopes"
       ],
       "purpose": "先明确year_profile=jinjing_year_historical_table_v1（381—385晋历）或jinjing_year_qiliang_table_v1（501—505齐梁史历，含502闰标分歧）；合参置taiyi_options。仅year可用，保留实际日期、来源及范围，不认证完整古历或其他两术古历。"
     },
@@ -140,12 +85,9 @@
     "monthly_key_calendar": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.calendar_rules.month_origin",
         "taiyi.core_board",
         "taiyi.gates.counter",
         "taiyi.gates.moving_frame.anchor_palace",
-        "taiyi.gates.source_comparisons",
-        "taiyi.gates.source_counter_alternatives",
         "taiyi.gates.ruleset",
         "taiyi.condition_assessment.three_gates",
         "taiyi.ruleset.classical_acceptance_passed"
@@ -171,19 +113,10 @@
         "taiyi.ruleset",
         "qimen.stem_context.day",
         "qimen.stem_context.hour",
-        "qimen.stem_context.day_jia_policy_automatically_selected",
         "qimen.rule_profiles.god.id",
         "qimen.rule_profiles.god.title",
-        "qimen.rule_profiles.god.variant_note",
         "qimen.rule_profiles.season.id",
         "qimen.rule_profiles.season.title",
-        "qimen.rule_profiles.season.variant_note",
-        "qimen.rule_profiles.wonder_tomb.id",
-        "qimen.rule_profiles.wonder_tomb.title",
-        "qimen.rule_profiles.wonder_tomb.variant_note",
-        "qimen.rule_profiles.wonder_tomb.source_priority_resolved",
-        "qimen.rule_profiles.wonder_tomb.whole_book_conformance_established",
-        "synthesis.source_profiles.qimen",
         "liureng.ruleset.id",
         "liureng.ruleset.version",
         "liureng.ruleset.source_title",
@@ -204,19 +137,10 @@
         "qimen.zhishi",
         "qimen.stem_context.day",
         "qimen.stem_context.hour",
-        "qimen.stem_context.day_jia_policy_automatically_selected",
         "qimen.rule_profiles.god.id",
         "qimen.rule_profiles.god.title",
-        "qimen.rule_profiles.god.variant_note",
         "qimen.rule_profiles.season.id",
         "qimen.rule_profiles.season.title",
-        "qimen.rule_profiles.season.variant_note",
-        "qimen.rule_profiles.wonder_tomb.id",
-        "qimen.rule_profiles.wonder_tomb.title",
-        "qimen.rule_profiles.wonder_tomb.variant_note",
-        "qimen.rule_profiles.wonder_tomb.source_priority_resolved",
-        "qimen.rule_profiles.wonder_tomb.whole_book_conformance_established",
-        "synthesis.source_profiles.qimen",
         "liureng.month_general",
         "liureng.three_transmissions",
         "liureng.patterns",
@@ -226,16 +150,13 @@
         "liureng.ruleset.classical_conformance",
         "liureng.ruleset.classical_acceptance_passed",
         "synthesis.noble_source_assessment",
-        "synthesis.time_scopes",
-        "synthesis.limitations"
+        "synthesis.time_scopes"
       ],
       "purpose": "首轮读取三式关键事实与来源、贵人本位逐版对照，保留完整三传；四课、太乙逐项依据或宫位对应按需深读，未读内容不视为不存在。"
     },
     "solar_anchors": {
       "fields": [
         "synthesis.time_scopes",
-        "taiyi.solar_anchors",
-        "taiyi.solar_anchor_scope",
         "taiyi.calendar_summary",
         "taiyi.ruleset.id",
         "taiyi.ruleset.classical_acceptance_passed"
@@ -255,7 +176,6 @@
     "taiyi_count_sources": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.count_source_assessment",
         "taiyi.ruleset.classical_acceptance_passed",
         "synthesis.time_scopes"
       ],
@@ -264,7 +184,6 @@
     "taiyi_counts": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.count_assessment",
         "taiyi.ruleset.classical_acceptance_passed",
         "synthesis.time_scopes"
       ],
@@ -278,8 +197,7 @@
         "taiyi.rule_trace",
         "taiyi.patterns",
         "taiyi.ruleset",
-        "synthesis.time_scopes",
-        "synthesis.limitations"
+        "synthesis.time_scopes"
       ],
       "purpose": "进一步核查所选年/月/时计的计算与原典依据；结合已有奇门六壬证据。"
     },
@@ -297,7 +215,6 @@
     "taiyi_elemental_relations": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.elemental_guan_assessment",
         "taiyi.ruleset.classical_acceptance_passed",
         "synthesis.time_scopes"
       ],
@@ -306,7 +223,6 @@
     "taiyi_enclosures": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.enclosure_assessment",
         "taiyi.pattern_summary",
         "taiyi.taiyi_palace",
         "taiyi.wenchang_palace",
@@ -327,7 +243,6 @@
         "taiyi.gates.selected_profile",
         "taiyi.gates.old_open_summary",
         "taiyi.gates.dingmu_comparison_frame",
-        "taiyi.gates.dingmu_comparison_source",
         "taiyi.gates.ruleset"
       ],
       "purpose": "比较李法太乙/主/客/定计大将常开四盘摘要及金钥匙定计目加临盘；原始门行按source_path续读，不静默择优或覆盖所选王法。"
@@ -350,7 +265,6 @@
     "taiyi_oppositions": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.opposition_assessment",
         "taiyi.ruleset.classical_acceptance_passed",
         "synthesis.time_scopes"
       ],
@@ -363,7 +277,6 @@
         "taiyi.core_board.jishen",
         "taiyi.core_board.shiji",
         "taiyi.shiji_derivation",
-        "taiyi.count_source_assessment.summary",
         "taiyi.ruleset.classical_acceptance_passed",
         "synthesis.time_scopes"
       ],
@@ -371,17 +284,6 @@
     },
     "taiyi_victory_matrix": {
       "fields": [
-        "taiyi.victory_matrix_assessment.source_cell",
-        "taiyi.victory_matrix_assessment.comparison_summary",
-        "taiyi.victory_matrix_assessment.ruleset",
-        "taiyi.victory_matrix_assessment.role_scope",
-        "taiyi.victory_matrix_assessment.method_scope",
-        "taiyi.victory_matrix_assessment.scope",
-        "taiyi.victory_matrix_assessment.source_outcome_applied",
-        "taiyi.victory_matrix_assessment.actual_geometry",
-        "taiyi.victory_matrix_assessment.status",
-        "taiyi.victory_matrix_assessment.table_applicability_verified",
-        "taiyi.victory_matrix_assessment.classical_acceptance_passed",
         "taiyi.calendar_summary",
         "taiyi.ruleset.classical_acceptance_passed"
       ],
@@ -404,15 +306,12 @@
         "taiyi.ruleset.id",
         "taiyi.ruleset.version",
         "taiyi.ruleset.classical_acceptance_passed",
-        "synthesis.time_scopes",
-        "synthesis.limitations"
+        "synthesis.time_scopes"
       ],
       "purpose": "先设year，核对输入钟时、校正钟面、实际年计农历及换算来源；兼容明确所选历史历表，不把时间上下文农历替代年计日期。"
     },
     "winter_origin_selection": {
       "fields": [
-        "taiyi.winter_origin_selection",
-        "taiyi.solar_anchors.winter_origin",
         "taiyi.calendar_summary",
         "taiyi.ruleset.id",
         "taiyi.ruleset.classical_acceptance_passed"
@@ -432,19 +331,10 @@
       "qimen.zhishi",
       "qimen.stem_context.day",
       "qimen.stem_context.hour",
-      "qimen.stem_context.day_jia_policy_automatically_selected",
       "qimen.rule_profiles.god.id",
       "qimen.rule_profiles.god.title",
-      "qimen.rule_profiles.god.variant_note",
       "qimen.rule_profiles.season.id",
       "qimen.rule_profiles.season.title",
-      "qimen.rule_profiles.season.variant_note",
-      "qimen.rule_profiles.wonder_tomb.id",
-      "qimen.rule_profiles.wonder_tomb.title",
-      "qimen.rule_profiles.wonder_tomb.variant_note",
-      "qimen.rule_profiles.wonder_tomb.source_priority_resolved",
-      "qimen.rule_profiles.wonder_tomb.whole_book_conformance_established",
-      "synthesis.source_profiles.qimen",
       "liureng.month_general",
       "liureng.three_transmissions",
       "liureng.patterns",
@@ -453,8 +343,7 @@
       "liureng.ruleset.source_title",
       "liureng.ruleset.classical_conformance",
       "liureng.ruleset.classical_acceptance_passed",
-      "synthesis.time_scopes",
-      "synthesis.limitations"
+      "synthesis.time_scopes"
     ]
   },
   "input": {
@@ -475,22 +364,35 @@
           },
           "ju_method": {
             "default": "zhirun",
-            "description": "定局法：zhirun（默认置闰）或 chaibu（拆补）。",
+            "description": "定局法：zhirun（默认置闰）、chaibu（拆补）或 maoshan（茅山）。",
             "enum": [
               "zhirun",
-              "chaibu"
+              "chaibu",
+              "maoshan"
             ],
             "title": "Ju Method",
             "type": "string"
           },
           "layout": {
             "default": "direct",
-            "description": "转盘排法：direct/rotating。",
+            "description": "排盘法：direct/rotating（转盘）或 fei（飞盘）。",
             "enum": [
               "direct",
-              "rotating"
+              "rotating",
+              "fei"
             ],
             "title": "Layout",
+            "type": "string"
+          },
+          "lodging_policy": {
+            "default": "kun2",
+            "description": "转盘中五寄宫：kun2（默认寄坤二）、gen8（寄艮八）或 yin_gen_yang_kun（阳遁寄坤阴遁寄艮）。",
+            "enum": [
+              "kun2",
+              "gen8",
+              "yin_gen_yang_kun"
+            ],
+            "title": "Lodging Policy",
             "type": "string"
           },
           "season_profile": {
@@ -514,15 +416,34 @@
         "properties": {
           "calculation_mode": {
             "default": "year",
-            "description": "year年计附金镜年度十神；month按十二节月；day采用金钥匙冬至前甲子积日；hour按所选时计。",
+            "description": "year年计；month按十二节月；day按日计（金镜/金钥匙）；hour按所选时计；minute刻家太乙；fate太乙命法十二宫。",
             "enum": [
               "year",
               "month",
               "day",
-              "hour"
+              "hour",
+              "minute",
+              "fate"
             ],
             "title": "Calculation Mode",
             "type": "string"
+          },
+          "day_profile": {
+            "anyOf": [
+              {
+                "enum": [
+                  "jinjing_day_v1",
+                  "key_day_winter_jiazi_v1"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "仅day日计：jinjing_day_v1（默认）或 key_day_winter_jiazi_v1（金钥匙冬至前甲子积日十精异数）。",
+            "title": "Day Profile"
           },
           "hour_profile": {
             "anyOf": [
@@ -576,6 +497,16 @@
             "description": "始击来源。默认 jinjing_vol2_rotation_v1 按《金镜》卷二推演。jinjing_vol3_table_v1 对阴遁37、43、44局采用卷三表列始击并按卷二重算客算。jinjing_vol3_table_literal_v1 对这三局采用卷三表列始击和客算。",
             "title": "Shiji Profile"
           },
+          "table_policy": {
+            "default": "computed",
+            "description": "局表口径：computed（默认依算法推算）或 printed_table（采印本刊本表列异数）。",
+            "enum": [
+              "computed",
+              "printed_table"
+            ],
+            "title": "Table Policy",
+            "type": "string"
+          },
           "year_profile": {
             "anyOf": [
               {
@@ -602,6 +533,18 @@
     "additionalProperties": false,
     "description": "Request model for sanshiunited.",
     "properties": {
+      "corner_lodging": {
+        "default": "both",
+        "description": "四维及中宫对应六壬地支寄支方式：both（默认并列同宫两支）、first_branch、second_branch 或 unassessed。",
+        "enum": [
+          "unassessed",
+          "first_branch",
+          "second_branch",
+          "both"
+        ],
+        "title": "Corner Lodging",
+        "type": "string"
+      },
       "date": {
         "description": "推算公历日期，例如2028-04-06；历史儒略历标签须先明确转换，不自动切换历制。",
         "title": "Date",

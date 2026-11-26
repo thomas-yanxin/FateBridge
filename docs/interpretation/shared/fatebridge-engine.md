@@ -74,12 +74,12 @@ fatebridge <tool> [参数...]
 
 **结构化字段怎么读（需要精确时）：**
 
-- `bazi_overview` → 根字段 `four_pillars`、`day_master`、`ten_gods`、`structure_profile`、`element_distribution`、`element_distribution_basis`、`person_info`。普通画像首轮可取这七项；格局解释读完整 `structure_profile` 的 `candidate_selection`、`layers/conflicts/conditional_elements/limitations`、`dominant_structure.formation_status` 和 `decision_basis`。月令主类、旧共现候选与尚未选定的原典取用路径分开，不能只取最终 `useful_elements`；按[八字专题取证](bazi-topic-evidence.md)区分月令格局、扶抑与调候。五行分布不等于喜用。
+- `bazi_overview` → 根字段 `four_pillars`、`day_master`、`ten_gods`、`structure_profile`、`element_distribution`、`element_distribution_basis`、`person_info`。普通画像首轮可取这七项；格局解释读完整 `structure_profile` 的 `assessment_status`、`dominant_structure`、`recognized_structures`、`useful_elements`、`avoid_elements` 与 `seasonal_climate`，区分月令取格与调候/扶抑参考，不将五行分布直接当作喜用。
 - `bazi_birth_chart` → `bazi_birth.four_pillars`、`bazi_birth.day_master` 等嵌套字段。它与 `bazi_overview` 的输出根结构不同，不能共用 `bazi_birth.` 前缀。
 - `ziwei_birth_chart` → `ziwei_birth.ming_gong/shen_gong/palaces/sihua`；核对出生处理口径时按需加 `person_info`、`analysis_context`。
 - `ziwei_timing` → 普通运限首轮可取 `analysis_context`、`birth_context`、`ziwei_horoscope.interpretation_scope`、`ziwei_horoscope.nominal_age`、`ziwei_horoscope.calendar_rules`、`ziwei_horoscope.scopes`；默认 `detail=compact` 已预设精简核心视图。`scopes` 是数组，当前投影必须整体取，不能编造 `scopes.流年` 或索引路径；按本轮粒度解释其中所需层，其余不展开。核对 `analysis_context.context_role=target` 及 `analysis_datetime`，出生处理另读 `birth_context`。本命／运限宫位身份与四化连接读[紫微专题取证](ziwei-topic-evidence.md)。
 - `astrology_chart` → `angles`、`chart_profile`、`planets`、`aspect_evidence`、`classical`、`person_info`。按问题读取位置、相位或具名版本的原典条件。
-- 八字九专题 → `<topic>_analysis.evidence_chain.topic.first_view` 为首轮取证，完整 `evidence_chain` 含星位、根气、格局前提与运年触点。`timing_context` 列实际所用时柱和时间来源。
+- 八字九专题 → `<topic>_analysis.topic_facts` 为首轮取证，含星位、根气、喜忌、五行旺相与运年触点。`timing_context` 列实际所用时柱和时间来源。
 - `bazi_compatibility` → `natal_contexts`、`cross_chart_relations`、`directional_ten_gods`。结合实际关系与问题解读双方盘式和跨盘接触。
 - `sukuyo_compatibility` → 现代中国农历月日及T1299下卷望宿两法定27宿，**有方向**：`person1_to_person2` 与 `person2_to_person1` 分别读取；`pair`仅为配对类别，`su27_basis`是算法版本，各自本命宿在 `person1/2.natal_su27`。闰月或可选桧尾半日/补配次序未定时保留候选；`candidate_relation_analysis`仅列条件组合，不能挑一行当已定结果；`source_table_variant`是T1299印本28宿月建表异文，不能替代三九所用27宿。
 - `relationship_chart` → `relationship_profile`、`inner_chart`、`outer_chart`、`synastry_aspects`、`chart`、`compatibility`。
@@ -95,9 +95,9 @@ python3 -m fatebridge.cli bazi_birth_chart <出生参数> \
 python3 -m fatebridge.cli bazi_birth_chart <出生参数> \
   --fields bazi_birth.four_pillars bazi_birth.three_origins
 
-# 专项嵌套字段：只取正缘时机信号
+# 专项嵌套字段：只取核心专题事实
 python3 -m fatebridge.cli bazi_romance <出生参数> \
-  --fields romance_analysis.romance_timing
+  --fields romance_analysis.topic_facts
 ```
 
 路径按所调用工具自己的输出根结构填写：`bazi_birth_chart` 带 `bazi_birth.` 前缀，`bazi_overview` 直接取根字段，八字 9 专项带 `<dim>_analysis.` 前缀。输入参数相似不代表输出路径相同。三端对 `fields` 始终严格校验：路径不存在时返回 `validation_error` 并在 `constraints.available` 提示可用键名，应核对合同后修正，不要编造字段。

@@ -8,7 +8,7 @@ from typing import Any, Literal
 
 from fatebridge.core.astro.birth import AstroBirthInfo, require_resolved_birth_timezone
 from fatebridge.core.astro.time_scales import ephemeris_time
-from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.guolao import classical, ephemeris, guolao, moira
 from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar, utc_ordering_key
 from fatebridge.utils.timezones import is_unspecified_local_time

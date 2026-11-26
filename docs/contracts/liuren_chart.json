@@ -154,6 +154,21 @@
         "title": "Analysis Hour",
         "type": "integer"
       },
+      "analysis_latitude": {
+        "anyOf": [
+          {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "起课纬度（与 analysis_longitude 合用供 sunrise_sunset 昼夜界定）",
+        "title": "Analysis Latitude"
+      },
       "analysis_longitude": {
         "anyOf": [
           {
@@ -223,6 +238,16 @@
         "title": "Analysis Year",
         "type": "integer"
       },
+      "diurnal_mode": {
+        "default": "clock",
+        "description": "昼夜贵人分界：clock（默认卯至申昼）或 sunrise_sunset（需经纬度按日出日没定昼夜）。",
+        "enum": [
+          "clock",
+          "sunrise_sunset"
+        ],
+        "title": "Diurnal Mode",
+        "type": "string"
+      },
       "gender": {
         "anyOf": [
           {
@@ -246,6 +271,12 @@
         "title": "Guiren Profile",
         "type": "string"
       },
+      "harm_include_terminal": {
+        "default": false,
+        "description": "涉害计数是否包含地支本位终点（默认 false）。",
+        "title": "Harm Include Terminal",
+        "type": "boolean"
+      },
       "is_diurnal": {
         "anyOf": [
           {
@@ -256,8 +287,28 @@
           }
         ],
         "default": null,
-        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。",
+        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按 diurnal_mode（默认卯至申昼、酉至寅夜）。",
         "title": "Is Diurnal"
+      },
+      "month_general_mode": {
+        "default": "solar_term",
+        "description": "月将换将规则：solar_term（默认中气换将）或 true_solar_longitude（太阳真黄经30度过宫）。",
+        "enum": [
+          "solar_term",
+          "true_solar_longitude"
+        ],
+        "title": "Month General Mode",
+        "type": "string"
+      },
+      "shehai_method": {
+        "default": "depth_first",
+        "description": "涉害取传法：depth_first（默认深浅度法）或 meng_zhong_first（孟仲季法）。",
+        "enum": [
+          "depth_first",
+          "meng_zhong_first"
+        ],
+        "title": "Shehai Method",
+        "type": "string"
       },
       "use_true_solar_time": {
         "default": true,

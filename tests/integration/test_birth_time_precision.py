@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from fatebridge.core.timing import TimingAnalysis
-from fatebridge.services.calculation import calculate_destiny_analysis
+from fatebridge.core.bazi.timing import TimingAnalysis
+from fatebridge.services.bazi import calculate_bazi_overview
 from fatebridge.services.timing import (
     calculate_comprehensive_timing,
     calculate_dayun_analysis,
@@ -194,7 +194,7 @@ def test_calculate_destiny_analysis_uses_corrected_solar_time_for_hour_pillar() 
         name="测试",
     )
 
-    result = calculate_destiny_analysis(person)
+    result = calculate_bazi_overview(person)
 
     assert result["person_info"]["birth_datetime"] == "2020年01月01日 00时30分"
     assert (

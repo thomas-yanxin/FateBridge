@@ -68,22 +68,35 @@
           },
           "ju_method": {
             "default": "zhirun",
-            "description": "定局法：zhirun（默认置闰）或 chaibu（拆补）。",
+            "description": "定局法：zhirun（默认置闰）、chaibu（拆补）或 maoshan（茅山）。",
             "enum": [
               "zhirun",
-              "chaibu"
+              "chaibu",
+              "maoshan"
             ],
             "title": "Ju Method",
             "type": "string"
           },
           "layout": {
             "default": "direct",
-            "description": "转盘排法：direct/rotating。",
+            "description": "排盘法：direct/rotating（转盘）或 fei（飞盘）。",
             "enum": [
               "direct",
-              "rotating"
+              "rotating",
+              "fei"
             ],
             "title": "Layout",
+            "type": "string"
+          },
+          "lodging_policy": {
+            "default": "kun2",
+            "description": "转盘中五寄宫：kun2（默认寄坤二）、gen8（寄艮八）或 yin_gen_yang_kun（阳遁寄坤阴遁寄艮）。",
+            "enum": [
+              "kun2",
+              "gen8",
+              "yin_gen_yang_kun"
+            ],
+            "title": "Lodging Policy",
             "type": "string"
           },
           "season_profile": {

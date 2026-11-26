@@ -30,7 +30,7 @@
 
 本表供助手按问题选用，不是请用户填完的问卷。需要精确方位时说明该数值会影响哪项判断，以及最简取得方法；方位与图纸中心尚无法核对，就先交付独立形态或方法解释。落实动作时另记能否搬转、新增、预算、共用范围与不可用区域，物理观察仍按实际证据记录。
 
-年星和命卦遇到实际星历模型的立春护栏时，保留可能的有效年并请求确认。仅给出生日期时，核对 `time_context.boundary_resolution` 的交节来源及 `boundary_precision_policy` 的实际模型和候选日期。明确的有效生年或分析年可按所给值计算，历史宅运由宅盘自己的时间依据确定，参见[家居风水参考](../../fengshui.md#分层状态与覆盖边界)。
+年星和命卦遇到实际星历模型的立春护栏时，保留可能的有效年并请求确认。仅给出生日期时，核对 `time_context.boundary_resolution` 的交节来源及 `boundary_precision_policy` 的实际模型和候选日期。明确的有效生年或分析年可按所给值计算，历史宅运由宅盘自己的时间依据确定，参见[家居风水参考](../../fengshui.md)。
 
 `entrance_position`、`passage_position`、`window_position` 使用 `front/front_left/front_right/left/right/back/back_left/back_right` 这八种相对位置，未知省略；中文“左侧”不能自行拼成 `left_side_of_bed` 等值。定义仍以当前 schema 为准，校验失败按 issues 的路径和允许值修正一次，不重复失败输入。
 

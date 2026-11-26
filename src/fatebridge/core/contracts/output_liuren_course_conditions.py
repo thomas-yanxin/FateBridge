@@ -151,27 +151,40 @@ class LiurenCourseConditions(PartialOutput):
             for k in (
                 "day_ganzhi",
                 "branches",
+                "transmission_branches",
+                "initial_branch",
                 "initial_god",
                 "initial_earth_branch",
                 "initial_stage",
+                "initial_day_stem_stage",
                 "day_stem_house",
                 "xun_head_branch",
                 "xun_tail_branch",
+                "day_xun_head",
+                "day_xun_tail",
                 "matched_ids",
             ):
                 expected.pop(k, None)
-            for group in ("stage_god_patterns", "god_patterns", "structural_patterns"):
+            for group in (
+                "stage_god_patterns",
+                "god_patterns",
+                "structural_patterns",
+                "stage_god_pairs",
+                "god_pairs",
+                "structural_clauses",
+            ):
                 for row in expected.get(group, ()):
                     for k in ("matched", "stage_matches", "god_matches", "checks"):
                         row.pop(k, None)
         if self.day_ganzhi is None:
-            for row in expected.get("stage_god_patterns", ()):
-                for k in (
-                    "required_stage_branch",
-                    "possible_god_branches",
-                    "compatible_in_any_supported_noble_layout",
-                ):
-                    row.pop(k, None)
+            for group in ("stage_god_patterns", "stage_god_pairs"):
+                for row in expected.get(group, ()):
+                    for k in (
+                        "required_stage_branch",
+                        "possible_god_branches",
+                        "compatible_in_any_supported_noble_layout",
+                    ):
+                        row.pop(k, None)
         compare_present_branches(self.model_dump(exclude_unset=True), expected)
         # Some projections include enough inputs for a smaller independent check.
         if self.day_ganzhi is not None:

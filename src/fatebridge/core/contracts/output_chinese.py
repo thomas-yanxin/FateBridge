@@ -71,25 +71,14 @@ from fatebridge.core.contracts.output_qimen_board import Qimen
 from fatebridge.core.contracts.output_ren_patterns import JinkouPatterns
 from fatebridge.core.contracts.output_sanshi import SanshiSynthesis
 from fatebridge.core.contracts.output_taiyi_board import Taiyi, TaiyiCounterCycles
-from fatebridge.core.contracts.output_ziwei_calendar import (
-    ZiweiDateConversionProvenance,
-)
-from fatebridge.core.contracts.output_ziwei_structure import (
-    ZiweiBirth,
-    ZiweiConditionSourceRevision,
-    ZiweiStructuralConditionRecord,
-)
+from fatebridge.core.contracts.output_ziwei_structure import ZiweiBirth
 from fatebridge.core.contracts.output_ziwei_timing import (
     ZiweiChildhoodLimit,
-    ZiweiDecadeHalf,
     ZiweiFocusedRules,
     ZiweiHoroscope,
     ZiweiHoroscopeNatalPrerequisites,
-    ZiweiLimitStarGroup,
-    ZiweiLimitSubperiods,
     ZiweiNominalAgeCalendar,
     ZiweiRuleCatalogue,
-    ZiweiSmallLimitHalf,
 )
 
 __all__ = [
@@ -121,15 +110,8 @@ __all__ = [
     "Taiyi",
     "TaiyiCounterCycles",
     "ZiweiChildhoodLimit",
-    "ZiweiConditionSourceRevision",
-    "ZiweiDateConversionProvenance",
-    "ZiweiDecadeHalf",
     "ZiweiHoroscopeNatalPrerequisites",
-    "ZiweiLimitStarGroup",
-    "ZiweiLimitSubperiods",
     "ZiweiNominalAgeCalendar",
-    "ZiweiSmallLimitHalf",
-    "ZiweiStructuralConditionRecord",
 ]
 
 

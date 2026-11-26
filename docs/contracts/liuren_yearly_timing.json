@@ -157,6 +157,21 @@
         "title": "Analysis Hour",
         "type": "integer"
       },
+      "analysis_latitude": {
+        "anyOf": [
+          {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "起课纬度（与 analysis_longitude 合用供 sunrise_sunset 昼夜界定）",
+        "title": "Analysis Latitude"
+      },
       "analysis_longitude": {
         "anyOf": [
           {
@@ -316,6 +331,16 @@
         "title": "Birth Year",
         "type": "integer"
       },
+      "diurnal_mode": {
+        "default": "clock",
+        "description": "昼夜贵人分界：clock（默认卯至申昼）或 sunrise_sunset（需经纬度按日出日没定昼夜）。",
+        "enum": [
+          "clock",
+          "sunrise_sunset"
+        ],
+        "title": "Diurnal Mode",
+        "type": "string"
+      },
       "gender": {
         "anyOf": [
           {
@@ -339,6 +364,12 @@
         "title": "Guiren Profile",
         "type": "string"
       },
+      "harm_include_terminal": {
+        "default": false,
+        "description": "涉害计数是否包含地支本位终点（默认 false）。",
+        "title": "Harm Include Terminal",
+        "type": "boolean"
+      },
       "is_diurnal": {
         "anyOf": [
           {
@@ -351,6 +382,16 @@
         "default": null,
         "description": "分析时刻是否按昼贵起课；省略按时支区分昼夜。",
         "title": "Is Diurnal"
+      },
+      "month_general_mode": {
+        "default": "solar_term",
+        "description": "月将换将规则：solar_term（默认中气换将）或 true_solar_longitude（太阳真黄经过宫）。",
+        "enum": [
+          "solar_term",
+          "true_solar_longitude"
+        ],
+        "title": "Month General Mode",
+        "type": "string"
       },
       "name": {
         "anyOf": [
@@ -365,9 +406,19 @@
         "description": "姓名（可选，仅用于结果标识，不参与计算）",
         "title": "Name"
       },
+      "shehai_method": {
+        "default": "depth_first",
+        "description": "涉害取传法：depth_first（默认）或 meng_zhong_first。",
+        "enum": [
+          "depth_first",
+          "meng_zhong_first"
+        ],
+        "title": "Shehai Method",
+        "type": "string"
+      },
       "use_true_solar_time": {
-        "default": true,
-        "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default on in the current software policy; this option does not certify a classical text's clock rule. Set false for the raw civil clock.",
+        "default": false,
+        "description": "行年默认按钟表历时起算（false）；设 true 并给经度则改用真太阳时。",
         "title": "Use True Solar Time",
         "type": "boolean"
       }

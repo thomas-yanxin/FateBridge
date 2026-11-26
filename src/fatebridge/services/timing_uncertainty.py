@@ -7,7 +7,7 @@ from typing_extensions import NotRequired
 
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.almanac import localize_datetime
-from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.services.birth_time_events import (
     NatalEventPayload,
     collect_natal_event_probes,

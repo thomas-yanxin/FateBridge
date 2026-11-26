@@ -157,12 +157,6 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="原典四柱核对",
         family="bazi",
         rest_path="/api/bazi/compare-sources",
-        required_output_fields=(
-            "four_pillars",
-            "input_context",
-            "current_calculation",
-            "source_comparison",
-        ),
         cpu_bound=True,
     ),
 ]

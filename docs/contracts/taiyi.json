@@ -52,7 +52,6 @@
     "count_sources": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.count_source_assessment",
         "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "分辨主客算差异在源位置还是同位置加总；保留原字、所选书影层和当前同盘事实。仅选定卷三四位置/两算，不认证全书或古历。"
@@ -69,7 +68,6 @@
     "counts": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.count_assessment",
         "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "核查主客算的原条缺数、足数推导、杜塞数格、分源和数与太乙/二目各自阴阳配数；保留源差异和未决，不裁成总体胜负。"
@@ -79,7 +77,6 @@
         "analysis_context",
         "taiyi.calendar_rules",
         "taiyi.core_board",
-        "taiyi.day_source_comparisons",
         "taiyi.determinate_calculation",
         "taiyi.ruleset"
       ],
@@ -87,59 +84,7 @@
     },
     "daily_essences": {
       "fields": [
-        "taiyi.calendar_summary",
-        "taiyi.ten_jing.ruleset_id",
-        "taiyi.ten_jing.version",
-        "taiyi.ten_jing.author",
-        "taiyi.ten_jing.classical_author",
-        "taiyi.ten_jing.classical_acceptance_passed",
-        "taiyi.ten_jing.scope",
-        "taiyi.ten_jing.records.emperor.label",
-        "taiyi.ten_jing.records.emperor.status",
-        "taiyi.ten_jing.records.emperor.palace",
-        "taiyi.ten_jing.records.emperor.reason",
-        "taiyi.ten_jing.records.earth.label",
-        "taiyi.ten_jing.records.earth.status",
-        "taiyi.ten_jing.records.earth.palace",
-        "taiyi.ten_jing.records.earth.reason",
-        "taiyi.ten_jing.records.flying_bird.label",
-        "taiyi.ten_jing.records.flying_bird.status",
-        "taiyi.ten_jing.records.flying_bird.palace",
-        "taiyi.ten_jing.records.flying_bird.reason",
-        "taiyi.ten_jing.records.heaven_venerable.label",
-        "taiyi.ten_jing.records.heaven_venerable.status",
-        "taiyi.ten_jing.records.heaven_venerable.palace",
-        "taiyi.ten_jing.records.heaven_venerable.reason",
-        "taiyi.ten_jing.records.five_elements.label",
-        "taiyi.ten_jing.records.five_elements.status",
-        "taiyi.ten_jing.records.five_elements.palace",
-        "taiyi.ten_jing.records.five_elements.reason",
-        "taiyi.ten_jing.records.eight_winds.label",
-        "taiyi.ten_jing.records.eight_winds.status",
-        "taiyi.ten_jing.records.eight_winds.palace",
-        "taiyi.ten_jing.records.eight_winds.reason",
-        "taiyi.ten_jing.records.five_winds.label",
-        "taiyi.ten_jing.records.five_winds.status",
-        "taiyi.ten_jing.records.five_winds.palace",
-        "taiyi.ten_jing.records.five_winds.reason",
-        "taiyi.ten_jing.records.three_winds.label",
-        "taiyi.ten_jing.records.three_winds.status",
-        "taiyi.ten_jing.records.three_winds.palace",
-        "taiyi.ten_jing.records.three_winds.reason",
-        "taiyi.ten_jing.records.heaven_time.label",
-        "taiyi.ten_jing.records.heaven_time.status",
-        "taiyi.ten_jing.records.heaven_time.palace",
-        "taiyi.ten_jing.records.heaven_time.reason",
-        "taiyi.ten_jing.records.heaven_time.source_comparisons",
-        "taiyi.ten_jing.records.heaven_time.rule_evidence",
-        "taiyi.ten_jing.records.taiyi_ordinal.label",
-        "taiyi.ten_jing.records.taiyi_ordinal.status",
-        "taiyi.ten_jing.records.taiyi_ordinal.palace",
-        "taiyi.ten_jing.records.taiyi_ordinal.reason",
-        "taiyi.ten_jing.records.eight_winds.source_comparisons",
-        "taiyi.ten_jing.records.heaven_time.candidates",
-        "taiyi.ten_jing.records.taiyi_ordinal.ordinal",
-        "taiyi.day_source_comparisons"
+        "taiyi.calendar_summary"
       ],
       "purpose": "仅calculation_mode=day：首读金钥匙十精的实际位置、未决宫位及原文对照；具体周期与序列按同盘ten_jing.records续读。不替代年度十神或完整天气断语。"
     },
@@ -157,7 +102,6 @@
     "elemental_relations": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.elemental_guan_assessment",
         "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "按同盘文昌/始击实际十六神核二目五行生克，与旧空间同宫关分开；保留卷四日计适用和角色语境，原断不裁为整体胜负。"
@@ -165,7 +109,6 @@
     "enclosures": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.enclosure_assessment",
         "taiyi.pattern_summary",
         "taiyi.taiyi_palace",
         "taiyi.wenchang_palace",
@@ -186,7 +129,6 @@
         "taiyi.gates.selected_profile",
         "taiyi.gates.old_open_summary",
         "taiyi.gates.dingmu_comparison_frame",
-        "taiyi.gates.dingmu_comparison_source",
         "taiyi.gates.ruleset"
       ],
       "purpose": "比较李法太乙/主/客/定计大将常开四盘摘要及金钥匙定计目加临盘；原始门行按source_path续读，不静默择优或覆盖所选王法。"
@@ -209,7 +151,6 @@
     "historical_year_calendar": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.calendar_rules.historical_calendar",
         "taiyi.core_board.kook_number",
         "taiyi.core_board.taiyi_number",
         "taiyi.core_board.suijun",
@@ -220,12 +161,9 @@
     "monthly_key_calendar": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.calendar_rules.month_origin",
         "taiyi.core_board",
         "taiyi.gates.counter",
         "taiyi.gates.moving_frame.anchor_palace",
-        "taiyi.gates.source_comparisons",
-        "taiyi.gates.source_counter_alternatives",
         "taiyi.gates.ruleset",
         "taiyi.condition_assessment.three_gates",
         "taiyi.ruleset.classical_acceptance_passed"
@@ -235,7 +173,6 @@
     "oppositions": {
       "fields": [
         "taiyi.calendar_summary",
-        "taiyi.opposition_assessment",
         "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "核六主体实际对宫，中五无环向；主方格/对原名并列，保留阳53附带外迫不符。几何事实不代替五将合取或原典名称统一验收。"
@@ -247,15 +184,12 @@
         "taiyi.core_board.jishen",
         "taiyi.core_board.shiji",
         "taiyi.shiji_derivation",
-        "taiyi.count_source_assessment.summary",
         "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "核本盘计神加和德艮后顺行十六神的逐步天地对应，以实际文昌取始击；步数为间隔，不是主客算。原表差异继续保留，不把推步相符当全书符合。"
     },
     "solar_anchors": {
       "fields": [
-        "taiyi.solar_anchors",
-        "taiyi.solar_anchor_scope",
         "taiyi.calendar_summary",
         "taiyi.ruleset.id",
         "taiyi.ruleset.classical_acceptance_passed"
@@ -264,17 +198,6 @@
     },
     "victory_matrix": {
       "fields": [
-        "taiyi.victory_matrix_assessment.source_cell",
-        "taiyi.victory_matrix_assessment.comparison_summary",
-        "taiyi.victory_matrix_assessment.ruleset",
-        "taiyi.victory_matrix_assessment.role_scope",
-        "taiyi.victory_matrix_assessment.method_scope",
-        "taiyi.victory_matrix_assessment.scope",
-        "taiyi.victory_matrix_assessment.source_outcome_applied",
-        "taiyi.victory_matrix_assessment.actual_geometry",
-        "taiyi.victory_matrix_assessment.status",
-        "taiyi.victory_matrix_assessment.table_applicability_verified",
-        "taiyi.victory_matrix_assessment.classical_acceptance_passed",
         "taiyi.calendar_summary",
         "taiyi.ruleset.classical_acceptance_passed"
       ],
@@ -282,8 +205,6 @@
     },
     "winter_origin_selection": {
       "fields": [
-        "taiyi.winter_origin_selection",
-        "taiyi.solar_anchors.winter_origin",
         "taiyi.calendar_summary",
         "taiyi.ruleset.id",
         "taiyi.ruleset.classical_acceptance_passed"
@@ -429,15 +350,34 @@
       },
       "calculation_mode": {
         "default": "year",
-        "description": "year年计附金镜年度十神；month按十二节月；day采用金钥匙冬至前甲子积日；hour按所选时计。",
+        "description": "year年计；month按十二节月；day按日计（金镜/金钥匙）；hour按所选时计；minute刻家太乙；fate太乙命法十二宫。",
         "enum": [
           "year",
           "month",
           "day",
-          "hour"
+          "hour",
+          "minute",
+          "fate"
         ],
         "title": "Calculation Mode",
         "type": "string"
+      },
+      "day_profile": {
+        "anyOf": [
+          {
+            "enum": [
+              "jinjing_day_v1",
+              "key_day_winter_jiazi_v1"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅day日计：jinjing_day_v1（默认）或 key_day_winter_jiazi_v1（金钥匙冬至前甲子积日十精异数）。",
+        "title": "Day Profile"
       },
       "gender": {
         "anyOf": [
@@ -503,6 +443,16 @@
         "default": null,
         "description": "始击来源。默认 jinjing_vol2_rotation_v1 按《金镜》卷二推演。jinjing_vol3_table_v1 对阴遁37、43、44局采用卷三表列始击并按卷二重算客算。jinjing_vol3_table_literal_v1 对这三局采用卷三表列始击和客算。",
         "title": "Shiji Profile"
+      },
+      "table_policy": {
+        "default": "computed",
+        "description": "局表口径：computed（默认依算法推算）或 printed_table（采印本刊本表列异数）。",
+        "enum": [
+          "computed",
+          "printed_table"
+        ],
+        "title": "Table Policy",
+        "type": "string"
       },
       "use_true_solar_time": {
         "default": false,

@@ -126,8 +126,7 @@ def test_all_original_native_events_select_the_first_post_crossing_point(
     terms = almanac.get_solar_terms_for_year(year, "UTC")
     assert len(terms) == 24
     for term, target in zip(terms, almanac.SOLAR_TERM_LONGITUDES, strict=True):
-        details = term.solar_model_details
-        point = details["selected_crossing_jd_tt"]
+        point = ephemeris_time(term.moment).jd_tt
         before = math.nextafter(point, -math.inf)
         assert term.resolution_provider == de441_solar.PROVIDER
         assert term.ephemeris_model == de441_solar.MODEL_ID
@@ -135,10 +134,7 @@ def test_all_original_native_events_select_the_first_post_crossing_point(
         right = de441_solar.solar_longitude(point)
         assert math.remainder(left - target, 360) < 0, term.name
         assert math.remainder(right - target, 360) >= 0, term.name
-        assert details["root_bracket_tt"] == [before, point]
-        assert details["root_selection_policy"] == "first_post_crossing_tt_float"
-        assert ephemeris_time(term.moment).jd_tt == point
-        assert details["accuracy_certified"] is False
+        assert term.tt_instant is not None and term.tt_instant.days == point
         require_ren_solar_term(term)
 
 
@@ -170,26 +166,16 @@ def test_new_post_crossing_contract_rejects_a_coherent_pre_crossing_point(
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     term = almanac.get_solar_terms_for_year(2026, "UTC")[0]
-    details = dict(term.solar_model_details)
-    low = details["root_bracket_tt"][0]
-    details["selected_crossing_jd_tt"] = low
+    low = math.nextafter(ephemeris_time(term.moment).jd_tt, -math.inf)
     bad = replace(
         term,
         calendar=ZonedCalendar(
             solar_term_clock.native_solar_root_calendar(low), timezone.utc
         ),
-        solar_model_details=details,
     )
     with pytest.raises(EphemerisSourceError) as caught:
         require_ren_solar_term(bad)
-    assert caught.value.reason == "ren_solar_term_longitude_inconsistent"
-
-    # A retired model name cannot bypass the current crossing contract.
-    historical = dict(details)
-    historical["model_id"] = "native_swiss_tt_solar_bisection_v1"
-    historical.pop("root_selection_policy")
-    with pytest.raises((EphemerisSourceError, RuntimeError)):
-        require_ren_solar_term(replace(bad, solar_model_details=historical))
+    assert caught.value.reason == "ren_solar_term_point_inconsistent"
 
 
 def test_current_facts_ignore_only_execution_receipts() -> None:

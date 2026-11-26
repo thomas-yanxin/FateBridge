@@ -8,7 +8,7 @@ from typing import Literal, TypedDict
 from dateutil.relativedelta import relativedelta
 from typing_extensions import NotRequired
 
-from fatebridge.core.timing import DEFAULT_DAYUN_PERIODS, TimingAnalysis
+from fatebridge.core.bazi.timing import DEFAULT_DAYUN_PERIODS, TimingAnalysis
 from fatebridge.services.birth_time_events import BirthEventRecord, UnresolvedBirthEvent
 from fatebridge.services.dayun_wall_cells import MICROSECOND, DayunWallCell
 from fatebridge.utils.clock_events import CivilClockGap, clock_offset_changes

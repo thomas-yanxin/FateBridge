@@ -56,7 +56,7 @@ def test_cli_runs_bazi_dimension(capsys: pytest.CaptureFixture[str]) -> None:
     out = capsys.readouterr().out
     payload = json.loads(out)
     assert code == 0
-    assert payload["analysis_type"] == "八字桃花星宫取证"
+    assert payload["analysis_type"] == "八字正缘桃花分析"
     assert "romance_analysis" in payload
     assert isinstance(payload.get("run_metadata"), dict)
 
@@ -87,7 +87,7 @@ def test_cli_fields_projection_trims_payload(
     payload = json.loads(out)
     assert code == 0
     assert set(payload) <= {"analysis_type", "run_metadata"}
-    assert payload["analysis_type"] == "八字桃花星宫取证"
+    assert payload["analysis_type"] == "八字正缘桃花分析"
     assert "romance_analysis" not in payload
 
 

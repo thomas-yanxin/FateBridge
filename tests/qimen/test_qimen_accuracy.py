@@ -5,9 +5,15 @@ from itertools import product
 
 import pytest
 
-from fatebridge.core.metaphysics import qimen as engine
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
-from fatebridge.core.metaphysics.qimen import build_qimen_board, qimen_futou_for_ganzhi
+from fatebridge.core.qimen import (
+    QIMEN_STAR_DISPLAY,
+    build_earth_plate,
+    build_palace_geometry,
+    build_qimen_board,
+    build_qimen_leaders,
+    qimen_futou_for_ganzhi,
+)
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.sanshi import calculate_qimen_analysis
 from fatebridge.utils.civil_time import NominalClockLabel
@@ -130,9 +136,9 @@ def test_all_1080_boards_preserve_stars_stems_doors_gods_and_leaders(dun, ju) ->
     for i in range(60):
         hour = stems[i % 10] + branches[i % 12]
         text = f'{dun}{"一二三四五六七八九"[ju-1]}局上元'
-        earth = engine._qimen_pan_earth(text)
-        leader = engine._qimen_zhifu_zhishi(hour, earth, dun_type=dun)
-        palaces = engine._qimen_build_palaces(earth=earth, leader=leader)
+        earth = build_earth_plate(text)
+        leader = build_qimen_leaders(hour, earth, dun_type=dun)
+        palaces = build_palace_geometry(earth=earth, leader=leader)
         outer = [p for p in palaces if p["trigram"] != "中"]
         assert sorted(
             s for p in outer for s in [p["star"], *p["hosted_stars"]]
@@ -152,7 +158,7 @@ def test_all_1080_boards_preserve_stars_stems_doors_gods_and_leaders(dun, ju) ->
             is None
         )
         at = next(p for p in outer if p["trigram"] == leader["star_gong"])
-        assert engine.QIMEN_STAR_DISPLAY[leader["star"]] in [
+        assert QIMEN_STAR_DISPLAY[leader["star"]] in [
             at["star"],
             *at["hosted_stars"],
         ]

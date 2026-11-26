@@ -17,9 +17,7 @@
     },
     "void_conditions": {
       "fields": [
-        "current_hexagram",
-        "liuyao_evidence.conditional_analysis.void_conditions.focus",
-        "liuyao_evidence.conditional_analysis.penalty_conditions.focus"
+        "current_hexagram"
       ],
       "when": "查所选用爻原旬空、空亡条件及寅日生扶资格；未选用爻则保留空焦点，不代选"
     },
@@ -30,13 +28,7 @@
         "lines",
         "liuyao_evidence.calendar_conventions.month_branch",
         "liuyao_evidence.calendar_conventions.day_ganzhi",
-        "liuyao_evidence.calendar_conventions.xunkong",
-        "liuyao_evidence.conditional_analysis.void_conditions.lines",
-        "liuyao_evidence.conditional_analysis.void_conditions.hidden",
-        "liuyao_evidence.conditional_analysis.void_conditions.textual_issues",
-        "liuyao_evidence.conditional_analysis.void_conditions.horizon_status",
-        "liuyao_evidence.conditional_analysis.void_conditions.scope",
-        "liuyao_evidence.conditional_analysis.penalty_conditions.lines"
+        "liuyao_evidence.calendar_conventions.xunkong"
       ],
       "when": "无明确用爻时，查六条明爻和实际伏神的原旬旬空与空／不空条件，核对原文疑义及使用范围。保留问事近远、总旺衰未决的条件，不代选用爻。超出响应预算时，按 result_delivery 读取同一 run 的证据。"
     }

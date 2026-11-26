@@ -6,256 +6,42 @@
     "target_clock": "日期级专项固定出生时区的本地零点，timing_context回显analysis_datetime、timezone和boundary_status；交节当日涉及钟时时，用 bazi_timing 核对实际目标时刻。"
   },
   "evidence_views": {
-    "bureau_season_reference": {
-      "fields": [
-        "career_analysis.evidence_chain.bureau_season_reference"
-      ],
-      "when": "区分同次月支本气、寅卯辰等季支归组与实际相位旺门槛；保留门槛不一致及未运行状态，不据归组宣称已合化、改旺衰或分钟换柱。"
-    },
     "calendar_basis": {
       "fields": [
         "career_analysis.calendar_context"
       ],
       "when": "复核同次出生历法、节气来源与实际星历模型；提供者状态不等于天文精度或原典认证。"
     },
-    "candidate_selection": {
-      "fields": [
-        "career_analysis.evidence_chain.candidate_selection",
-        "career_analysis.evidence_chain.month_command",
-        "career_analysis.evidence_chain.ten_gods"
-      ],
-      "when": "核对月令本气与所选取神、印用杀/杀用印/伤官用杀印等原典路径及缺少的力量条件；共现或旧优先级不认证成格、兼格或相神。"
-    },
     "carriers": {
       "fields": [
-        "career_analysis.timing_context.analysis_datetime",
-        "career_analysis.evidence_chain.topic.timing.pillar_carriers",
-        "career_analysis.evidence_chain.topic.timing.carrier_source",
-        "career_analysis.evidence_chain.topic.timing.carrier_scope"
+        "career_analysis.timing_context.analysis_datetime"
       ],
       "when": "同一目标日期核对大运与流年的本柱承载和原局外援，喜干与喜支分别读条件；未知性别时不补造大运，不以承载条件判断吉凶或合化。"
     },
-    "clash_reasoning": {
-      "fields": [
-        "career_analysis.evidence_chain.strength_context.strength_level",
-        "career_analysis.evidence_chain.strength_context.method_id",
-        "career_analysis.evidence_chain.strength_context.clash_comparison"
-      ],
-      "when": "核对六冲为什么采用某保留系数、合解冲或四墓土分支；读取同次初始藏干预算与未参与因素。工程冲力代理不等于原典有效根力、拔根或吉凶裁定。"
-    },
-    "classical_routes": {
-      "fields": [
-        "career_analysis.evidence_chain.classical_routes",
-        "career_analysis.evidence_chain.month_command",
-        "career_analysis.evidence_chain.ten_gods"
-      ],
-      "when": "按所选月令核对生克合、财印隔位、同根及透藏条件；只支持有限路径观察，不认证全局成格。"
-    },
     "depth": {
       "fields": [
-        "career_analysis.evidence_chain",
         "career_analysis.timing_context"
       ],
       "when": "核对星位、根气、格局前提与目标日期大运流年触点；保留不满足和未裁定条件。"
     },
-    "direction": {
-      "fields": [
-        "career_analysis.evidence_chain.method_id",
-        "career_analysis.evidence_chain.strength_context.strength_level",
-        "career_analysis.evidence_chain.strength_context.method_id",
-        "career_analysis.evidence_chain.strength_context.status",
-        "career_analysis.evidence_chain.strength_context.requires_special_structure_review",
-        "career_analysis.evidence_chain.strength_context.candidate_strengths",
-        "career_analysis.evidence_chain.strength_context.root_effect_policy",
-        "career_analysis.evidence_chain.strength_context.root_qualifications",
-        "career_analysis.evidence_chain.strength_context.storage_movement_effects",
-        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.method_id",
-        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.arithmetic_policy",
-        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.conversion_policy",
-        "career_analysis.evidence_chain.topic.first_view"
-      ],
-      "when": "按问题读取专题星位、透藏和当前时运触点。结合用户实际经历解释主题。"
-    },
-    "element_presence": {
-      "fields": [
-        "career_analysis.evidence_chain.element_presence"
-      ],
-      "when": "分别核对含日干的天干、地支本气与全部藏干的实际五行；本气是藏干子集，层间不相加。无、不杂须按原文语境另审，不能把某层缺项推成全局缺失或成格。"
-    },
-    "force_arithmetic": {
-      "fields": [
-        "career_analysis.evidence_chain.strength_context.threshold_arithmetic",
-        "career_analysis.evidence_chain.force_components.engineering_composition",
-        "career_analysis.evidence_chain.force_components.classical_adjudication"
-      ],
-      "purpose": "核对同次精确身印工程预算、保留浮点比较及未裁定的原典身印力量；精确预算相等不认证身印等力。"
-    },
-    "force_components": {
-      "fields": [
-        "career_analysis.evidence_chain.force_components",
-        "career_analysis.evidence_chain.strength_context",
-        "career_analysis.evidence_chain.classical_root_profile",
-        "career_analysis.evidence_chain.ten_gods"
-      ],
-      "when": "身、印、食伤、财、官杀分列；原局藏根与同次工程能量分开，不能由身印总量裁定原典身重印重。"
-    },
-    "force_roots": {
-      "fields": [
-        "career_analysis.evidence_chain.force_components.source_root_observations",
-        "career_analysis.evidence_chain.force_components.classical_adjudication",
-        "career_analysis.evidence_chain.classical_root_profile.life_stage_profile"
-      ],
-      "when": "逐干比较身、印等原局根类与冲的位置；不按身印合计或有冲即无根裁定力量。"
-    },
-    "from_child": {
-      "fields": [
-        "career_analysis.evidence_chain.from_child_reference"
-      ],
-      "when": "核对任注顺局从儿的月柱食伤、食伤分布、财星与印官阻碍；从儿不以普通身弱为前提，可观察筛选不证明成格。符合筛选时普通扶抑只列条件参考，继续核对力量、承接及救应。"
-    },
-    "hidden_carriers": {
-      "fields": [
-        "career_analysis.evidence_chain.natal_hidden_carriers"
-      ],
-      "when": "核对同柱天干与每个真实藏干的生克，特别是丁丑对丑藏辛财的盖头候选；目标藏干、本气与其他藏干分开。关系不等于实际喜忌、根损或制化效力。"
-    },
     "hidden_carriers_timing": {
       "fields": [
-        "career_analysis.timing_context.analysis_datetime",
-        "career_analysis.evidence_chain.topic.timing.pillar_carriers",
-        "career_analysis.evidence_chain.topic.timing.hidden_target_carriers",
-        "career_analysis.evidence_chain.topic.timing.hidden_target_reference"
+        "career_analysis.timing_context.analysis_datetime"
       ],
       "when": "在同一目标时点逐项核对运年柱的真实藏干生克；与公共hidden_target_reference合读来源、方法和效力边界，不能从盖头候选推成全支或实际根损。"
     },
-    "passage": {
-      "fields": [
-        "career_analysis.evidence_chain.classical_passage.source",
-        "career_analysis.evidence_chain.classical_passage.summary",
-        "career_analysis.evidence_chain.classical_passage.visible_paths",
-        "career_analysis.evidence_chain.classical_passage.principal_hidden_paths",
-        "career_analysis.evidence_chain.classical_passage.scope"
-      ],
-      "when": "先核对透干与本气的生克中介、位置、剩余根和合绊；数量不证明有效通关，不改旺衰。全部藏干、跨层及同柱步骤分别见passage_hidden和passage_mixed。 同次关系条件另读passage_relations；no_binding_recorded不表示条件全清。"
-    },
-    "passage_hidden": {
-      "fields": [
-        "career_analysis.evidence_chain.classical_passage.source",
-        "career_analysis.evidence_chain.classical_passage.nodes",
-        "career_analysis.evidence_chain.classical_passage.all_hidden_paths",
-        "career_analysis.evidence_chain.classical_passage.scope"
-      ],
-      "when": "核对全部藏干的生克中介，本气子集不能代表全部藏干；同柱步骤单列，路径不自动判为有效。"
-    },
-    "passage_mixed": {
-      "fields": [
-        "career_analysis.evidence_chain.classical_passage.source",
-        "career_analysis.evidence_chain.classical_passage.summary",
-        "career_analysis.evidence_chain.classical_passage.mixed_paths",
-        "career_analysis.evidence_chain.classical_passage.scope"
-      ],
-      "when": "核对干支跨层、日支印接日主等实际路径；数组完整保留，较大结果沿同一run分页读取，位置不自动证明有效通关。"
-    },
-    "passage_relations": {
-      "fields": [
-        "career_analysis.evidence_chain.classical_passage.source",
-        "career_analysis.evidence_chain.classical_passage.summary",
-        "career_analysis.evidence_chain.classical_passage_relations"
-      ],
-      "when": "逐项读取同次争合、半合、条件转化与冲刑原回执；透干合和支中根载体分列，零剩余根所在柱仍保留。未提供与已给空列表分开，no_binding_recorded不表示条件全清；不据关系记录认定有效通关。较大结果沿同一run分页读取。"
-    },
-    "root_predicates": {
-      "fields": [
-        "career_analysis.evidence_chain.strength_context.threshold_arithmetic",
-        "career_analysis.evidence_chain.strength_context.strength_level",
-        "career_analysis.evidence_chain.force_components.classical_adjudication",
-        "career_analysis.evidence_chain.month_command.intra_month_duty.status",
-        "career_analysis.evidence_chain.classical_passage.summary"
-      ],
-      "when": "核对实际藏干根预算达到既定单位门槛的精确比较、旧浮点标记及财官结构条件；预算资格不代表有效根力或通关成立。"
-    },
-    "seasonal_conditions": {
-      "fields": [
-        "career_analysis.evidence_chain.seasonal_reference",
-        "career_analysis.evidence_chain.force_components.classical_adjudication",
-        "career_analysis.evidence_chain.month_command.intra_month_duty.status",
-        "career_analysis.evidence_chain.classical_passage.summary"
-      ],
-      "when": "核对已校格的提要、正文条件与干支位置，以及同次未裁定的身印、司令和通关。已校范围含甲、乙、丙、丁、戊各月及己土各月。"
-    },
-    "seasonal_reference": {
-      "fields": [
-        "career_analysis.evidence_chain.seasonal_reference"
-      ],
-      "when": "区分旧调候简表、具页来源与实际干见支藏。已校范围含甲、乙、丙、丁、戊各月及己土各月，共72格。全盘取用未裁定。"
-    },
-    "stage_profile": {
-      "fields": [
-        "career_analysis.evidence_chain.classical_root_profile.life_stage_profile",
-        "career_analysis.evidence_chain.classical_root_profile.day_stem",
-        "career_analysis.evidence_chain.classical_root_profile.roots",
-        "career_analysis.evidence_chain.classical_root_profile.source",
-        "career_analysis.evidence_chain.classical_root_profile.global_strength_status"
-      ],
-      "when": "核对十二阶段采用的查表口径、土随火选择及出处；阶段不代替根气、旺衰、司令或有效通关。"
-    },
-    "star_occurrences": {
-      "fields": [
-        "career_analysis.evidence_chain.star_occurrences"
-      ],
-      "when": "逐项实数对照一杀四制、五杀五制、印不透与藏印，日干不作额外支持票；实数不是加权旺衰或制化成败。"
-    },
-    "stem_energy": {
-      "fields": [
-        "career_analysis.evidence_chain.strength_context.strength_level",
-        "career_analysis.evidence_chain.strength_context.method_id",
-        "career_analysis.evidence_chain.strength_context.stem_energy_accounting"
-      ],
-      "when": "逐干核对原字、实际根激活、合绊预算和未舍入能量；成化候选未获原典验收，不能把合绊当已成化或把工程量当现实概率。"
-    },
-    "stem_order": {
-      "fields": [
-        "career_analysis.evidence_chain.strength_context.stem_energy_accounting",
-        "career_analysis.evidence_chain.strength_context.strength_level",
-        "career_analysis.evidence_chain.force_components.classical_adjudication",
-        "career_analysis.evidence_chain.month_command.intra_month_duty.status",
-        "career_analysis.evidence_chain.classical_passage.summary"
-      ],
-      "purpose": "核对所选原典月时五合候选、同次非日干合绊预算及未裁定的身印、司令与通关；不把未记录当作原典不合，不启用数值候选。"
-    },
     "target_year": {
       "fields": [
-        "career_analysis.timing_context",
-        "career_analysis.evidence_chain.method_id",
-        "career_analysis.evidence_chain.strength_context.strength_level",
-        "career_analysis.evidence_chain.strength_context.method_id",
-        "career_analysis.evidence_chain.strength_context.status",
-        "career_analysis.evidence_chain.strength_context.requires_special_structure_review",
-        "career_analysis.evidence_chain.strength_context.candidate_strengths",
-        "career_analysis.evidence_chain.strength_context.root_effect_policy",
-        "career_analysis.evidence_chain.strength_context.root_qualifications",
-        "career_analysis.evidence_chain.strength_context.storage_movement_effects",
-        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.method_id",
-        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.arithmetic_policy",
-        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.conversion_policy",
-        "career_analysis.evidence_chain.topic.first_view"
+        "career_analysis.timing_context"
       ],
       "when": "询问指定年份或日期时读取对应大运、流年及命盘触点。"
-    },
-    "thresholds": {
-      "fields": [
-        "career_analysis.evidence_chain.strength_context.threshold_arithmetic",
-        "career_analysis.evidence_chain.strength_context.strength_level",
-        "career_analysis.evidence_chain.strength_context.method_id",
-        "career_analysis.evidence_chain.strength_context.requires_special_structure_review"
-      ],
-      "purpose": "核对既定工程系数的精确阈值比较、保留浮点原判与最终结构判级；不修改原典标签，不把算术修复当预测准确率。"
     }
   },
   "first_view": {
     "fields": [
-      "career_analysis.evidence_chain.topic.first_view",
-      "career_analysis.timing_context"
+      "career_analysis.topic_facts",
+      "career_analysis.timing_context",
+      "career_analysis.calendar_context"
     ]
   },
   "input": {
@@ -410,6 +196,17 @@
         "title": "Birth Year",
         "type": "integer"
       },
+      "changsheng_school": {
+        "default": "fire_earth_same_palace",
+        "description": "十二长生流派：fire_earth_same_palace（火土同宫，戊随丙、己随丁） | water_earth_same_palace（水土同宫，戊随壬、己随癸） | five_element_same_stage（五行同生同死）。",
+        "enum": [
+          "fire_earth_same_palace",
+          "water_earth_same_palace",
+          "five_element_same_stage"
+        ],
+        "title": "Changsheng School",
+        "type": "string"
+      },
       "dayun_pillar": {
         "anyOf": [
           {
@@ -425,6 +222,18 @@
         "default": null,
         "description": "Optional override: exactly one valid sexagenary pillar, e.g. '甲子'",
         "title": "Dayun Pillar"
+      },
+      "duty_profile": {
+        "default": "sanming",
+        "description": "人元司令分野分日表：sanming（三命通会）| yuanhai（渊海子平）| 6tail | ditian（滴天髓）。",
+        "enum": [
+          "sanming",
+          "yuanhai",
+          "6tail",
+          "ditian"
+        ],
+        "title": "Duty Profile",
+        "type": "string"
       },
       "gender": {
         "anyOf": [
@@ -473,6 +282,17 @@
         "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default on in the current software policy; this option does not certify a classical text's clock rule. Set false for the raw civil clock.",
         "title": "Use True Solar Time",
         "type": "boolean"
+      },
+      "zi_hour_policy": {
+        "default": "day_rollover_at_23",
+        "description": "早晚子时（23:00–23:59）流派：day_rollover_at_23（sect=1，23时换日柱，五鼠遁按次日干） | night_zi_same_day_next_hour_stem（sect=2，夜子时日柱不换，时干按次日五鼠遁） | night_zi_same_day_same_hour_stem（夜子时日柱不换，时干按当日五鼠遁）。",
+        "enum": [
+          "day_rollover_at_23",
+          "night_zi_same_day_next_hour_stem",
+          "night_zi_same_day_same_hour_stem"
+        ],
+        "title": "Zi Hour Policy",
+        "type": "string"
       }
     },
     "required": [

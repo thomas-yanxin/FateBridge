@@ -150,7 +150,7 @@ def test_astro_house_system_accepts_string_and_integer(
     assert info["key"] == expected_key
 
 
-@pytest.mark.parametrize("bad", ["", None, "nonsense", 99, "equal"])
+@pytest.mark.parametrize("bad", ["", None, "nonsense", 99])
 def test_astro_house_system_rejects_unknown(bad: int | str | None) -> None:
     with pytest.raises(ValueError):
         _resolve_offline_house_system(bad, context_label="test")

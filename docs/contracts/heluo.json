@@ -31,9 +31,7 @@
       "fields": [
         "four_pillars",
         "judge.deTi",
-        "judge.deTi_policy",
-        "numerology_evidence.rulesets",
-        "numerology_evidence.unresolved_rules"
+        "numerology_evidence.rulesets"
       ],
       "purpose": "核对年纳音、实际上下及互体的有向五行关系、无元气前提；完整得体仍未决。"
     },
@@ -51,8 +49,6 @@
       "description": "岁运年上下文与卷一百刻／寄时原式；计数可核对，物理钟面与日期桥接仍未完成。",
       "fields": [
         "heluo_timing.year_context",
-        "heluo_timing.source_clock",
-        "heluo_timing.calendar_policy",
         "numerology_evidence.rule_trace",
         "numerology_evidence.rulesets"
       ]
@@ -80,10 +76,8 @@
     "month_affinity": {
       "fields": [
         "judge.deTime",
-        "judge.deTime_policy",
         "judge.month_affinity",
-        "numerology_evidence.rulesets",
-        "numerology_evidence.unresolved_rules"
+        "numerology_evidence.rulesets"
       ],
       "purpose": "区分卦属本月与原文另述跨月窗口，核对原页、边界月和完整判断尚未完成的范围。"
     },
@@ -91,9 +85,7 @@
       "fields": [
         "four_pillars.year",
         "judge.deSheng",
-        "judge.deSheng_policy",
-        "judge.najia",
-        "numerology_evidence.najia_collation"
+        "judge.najia"
       ],
       "purpose": "逐阶段核对年命正纳与借用的实际位置、直接原页或纯卦推演来源，以及未决列举次序。"
     },
@@ -113,8 +105,7 @@
         "chart.tian",
         "chart.di",
         "judge.seasonal_numbers",
-        "numerology_evidence.rulesets",
-        "numerology_evidence.unresolved_rules"
+        "numerology_evidence.rulesets"
       ],
       "purpose": "核对原典十一数式、六个时令窗口及重叠；绝对数段与时令条件分开读取，不据此裁定综合葉否。"
     },
@@ -123,7 +114,6 @@
         "chart",
         "dayun",
         "heluo_timing.ruleset_id",
-        "heluo_timing.calendar_policy",
         "heluo_timing.selected_annual",
         "heluo_timing.selected_month",
         "heluo_timing.selected_day",
@@ -159,10 +149,6 @@
         "chart.xian",
         "chart.hou",
         "numerology_evidence.selected_texts",
-        "numerology_evidence.yaoci_collation",
-        "numerology_evidence.commentary_collation",
-        "numerology_evidence.poem_collation",
-        "numerology_evidence.interpretation_constraints",
         "numerology_evidence.rule_trace"
       ],
       "purpose": "读取本次实际先后天元堂的底本注文、条件段落、异文与独立来源状态；不自动裁定葉否。 同时保留本次归一输入与实际计算钟面，供核验所用资料。 卷三诗诀另列底本、爻组与首数；象曰不借诗诀认证，多首诗按原次序全列。"
@@ -178,8 +164,7 @@
         "chart.yuantang_derivation",
         "judge.yuanTang",
         "numerology_evidence.rulesets",
-        "numerology_evidence.rule_trace",
-        "numerology_evidence.unresolved_rules"
+        "numerology_evidence.rule_trace"
       ],
       "purpose": "核对实际元堂配时、阴阳令来源、两半年的敏感性及后天换卦；反事实不是两个出生盘或现实预测。"
     }

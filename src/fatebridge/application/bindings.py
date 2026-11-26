@@ -87,6 +87,7 @@ def _build_person(
     *,
     true_solar_explicit: bool = True,
     supplied_fields: set[str] | None = None,
+    default_true_solar: bool = False,
 ) -> PersonInfo:
     person_arguments = {
         "name": data.get(f"{prefix}name", "未提供"),
@@ -99,7 +100,9 @@ def _build_person(
         "birth_timezone": data.get(f"{prefix}birth_timezone"),
         "birth_utc_offset": data.get(f"{prefix}birth_utc_offset"),
         "birth_longitude": data.get(f"{prefix}birth_longitude"),
-        "use_true_solar_time": data.get(f"{prefix}use_true_solar_time", False),
+        "use_true_solar_time": data.get(
+            f"{prefix}use_true_solar_time", default_true_solar
+        ),
         "true_solar_explicit": true_solar_explicit,
     }
     birth_minute = data.get(f"{prefix}birth_minute")
@@ -156,16 +159,23 @@ def bind_pair(
             prefix="person1_",
             true_solar_explicit="person1_use_true_solar_time" in supplied_fields,
             supplied_fields=supplied_fields,
+            default_true_solar=True,
         )
         person2 = _build_person(
             arguments,
             prefix="person2_",
             true_solar_explicit="person2_use_true_solar_time" in supplied_fields,
             supplied_fields=supplied_fields,
+            default_true_solar=True,
         )
         relationship = arguments.get(relationship_field, "general")
+        extra_kwargs = {
+            k: arguments[k]
+            for k in ("person1_zi_hour_policy", "person2_zi_hour_policy")
+            if k in arguments
+        }
         return BoundServiceCall(
-            resolve_service(service), (person1, person2, relationship), {}
+            resolve_service(service), (person1, person2, relationship), extra_kwargs
         )
 
     return bind

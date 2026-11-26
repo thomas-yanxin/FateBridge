@@ -135,6 +135,16 @@
     "additionalProperties": false,
     "description": "Flat (non-nested) relative/synastry chart request for tool surfaces.",
     "properties": {
+      "composite_house_method": {
+        "default": "cusp_midpoints",
+        "description": "Composite house cusp method: 'cusp_midpoints' (default short-arc cusp midpoints) or 'mc_latitude' (Composite MC + mean latitude derived houses).",
+        "enum": [
+          "cusp_midpoints",
+          "mc_latitude"
+        ],
+        "title": "Composite House Method",
+        "type": "string"
+      },
       "davison_variant": {
         "default": "uncorrected",
         "description": "TimeSpace/Marks variant: uncorrected, MC-axis corrected, or spherical geographic midpoint. UT1 arithmetic time mean; nondefault variants require TimeSpace or Marks.",
@@ -144,6 +154,17 @@
           "spherical"
         ],
         "title": "Davison Variant",
+        "type": "string"
+      },
+      "high_latitude_fallback": {
+        "default": "error",
+        "description": "Fallback when quadrant houses fail at high latitudes: error (default), porphyry, or whole_sign.",
+        "enum": [
+          "error",
+          "porphyry",
+          "whole_sign"
+        ],
+        "title": "High Latitude Fallback",
         "type": "string"
       },
       "house_system": {
@@ -156,7 +177,7 @@
           }
         ],
         "default": "P",
-        "description": "House system identifier (0..8, SE letter, or key). Defaults to Placidus ('P') to match the natal chart. Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected.",
+        "description": "House system identifier (0..8, SE letter, or key). Defaults to Placidus ('P') to match the natal chart. Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D, E); boolean, floating-point, blank and unsupported values are rejected.",
         "title": "House System"
       },
       "inner_birth_day": {

@@ -111,9 +111,9 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 
 九大专项追加 `analysis_year/month/day`、`dayun_pillar` 与 `liunian_pillar`。
 
-### 3.2 `AstroChartRequest` 家族
+### 3.2 核心占星与印度/果老请求家族
 
-用于 `/api/astrology/chart`、`/api/astrology/thirteen-sector-chart`、`/api/astrology/hellenistic-chart`、`/api/astrology/guolao-chart`、`/api/astrology/vedic-chart` 与 `/api/astrology/hamburg-midpoint-chart`：`birth_year/month/day/hour` 必填，`birth_minute` 默认 `0`，`birth_longitude` / `birth_latitude` 条件必需，`use_true_solar_time` 默认 `false`，另可选 `house_system`（`0..8`、SE 字母或名称如 `W`/`P`/`D`）与 `zodiac_type`（`Tropic` / `Sidereal`）。
+`AstroChartRequest` 用于 `/api/astrology/chart`、`/api/astrology/thirteen-sector-chart`、`/api/astrology/hellenistic-chart` 与 `/api/astrology/hamburg-midpoint-chart`；`/api/astrology/guolao-chart` 使用独立的 `GuolaoChartRequest`（默认开启 `use_true_solar_time=true`），`/api/astrology/vedic-chart` 与 `/api/astrology/vimshottari-dasha` 使用 `VedicChartRequest` / `VimshottariDashaRequest`（Lahiri 恒星黄道）。以上入口均要求 `birth_year/month/day/hour` 必填，`birth_minute` 默认 `0`，`birth_longitude` / `birth_latitude` 条件必需，`AstroChartRequest` 默认 `use_true_solar_time=false`。
 
 ### 3.3 `WesternTimingRequest` 家族（`/api/astrology/timing*`）
 
@@ -125,7 +125,7 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 
 ### 3.5 双人关系请求
 
-`/api/bazi/compatibility` 使用 `person1_*` / `person2_*` 与 `relationship_type`（`general`/`marriage`/`friendship`/`business`/`family`）；`/api/compatibility/sukuyo` 使用 `person1_date/time` 与 `person2_date/time`；`/api/astrology/relationship-chart` 三端统一使用 `inner_birth_*` / `outer_birth_*`。
+`/api/bazi/compatibility` 使用 `person1_*` / `person2_*`（支持 `person1_zi_hour_policy` / `person2_zi_hour_policy`）与 `relationship_type`（`general`/`marriage`/`friendship`/`business`/`family`）；`/api/compatibility/sukuyo` 使用 `person1_date/time`、`person2_date/time` 与 `distance_rule`；`/api/astrology/relationship-chart` 三端统一使用 `inner_birth_*` / `outer_birth_*`。
 
 ## 4. REST 端点家族
 
@@ -141,7 +141,7 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 
 #### 4.1.1 八字九大专项维度
 
-大运、流年缺省由命盘与分析日期自动推算，也可用 `dayun_pillar` / `liunian_pillar` 覆盖，输出位于 `<dimension>_analysis` 与 `evidence_chain`：
+大运、流年缺省由命盘与分析日期自动推算，也可用 `dayun_pillar` / `liunian_pillar` 覆盖，输出位于 `<dimension>_analysis`（含 `calendar_context`、`timing_context` 与 `topic_facts`）：
 
 | 方法 | 路径 | 专题事实 |
 | --- | --- | --- |

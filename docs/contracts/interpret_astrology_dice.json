@@ -26,13 +26,6 @@
         "sign",
         "house",
         "input_normalized",
-        "chart.params.zodiacMode",
-        "chart.params.chart_profile.ephemeris_model",
-        "chart.params.chart_profile.physical_ephemeris_source",
-        "chart.params.chart_profile.nonphysical_factor_models",
-        "chart.params.chart_profile.longitude_motion",
-        "chart.params.motionPolicy",
-        "chart.chart.objects",
         "validation"
       ],
       "purpose": "完整提供实际时空输入后核对独立天象的瞬时黄经日速、显示黄道参考系、实际文件来源与缺失状态；原生速度缺失不得解释为顺行，零日速不定位留站，不能改写骰面条件。"
@@ -107,7 +100,7 @@
           }
         ],
         "default": "D",
-        "description": "Offline house system selector (0..8, SE letter, or name; default 'D'/8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected.",
+        "description": "Offline house system selector (0..8, SE letter, or name; default 'D'/8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D, E); boolean, floating-point, blank and unsupported values are rejected.",
         "title": "House System"
       },
       "latitude": {

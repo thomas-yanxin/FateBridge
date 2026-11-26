@@ -7,7 +7,7 @@ from fatebridge.core.ephemeris_runtime import (
     configure_ephemeris_path,
     configured_ephemeris_path,
 )
-from fatebridge.core.numerology.canping_solar import projection_boundary
+from fatebridge.core.numerology.solar import projection_boundary
 from fatebridge.utils.errors import EphemerisSourceError
 
 

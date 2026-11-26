@@ -5,9 +5,9 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.bazi.calendar import BaZiCalendar
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.core.requests.bazi import BaziBirthRequest
-from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_clock import birth_clock_input_receipt
 from fatebridge.utils.birth_input import PersonInfo, create_person_info

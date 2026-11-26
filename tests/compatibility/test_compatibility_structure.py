@@ -12,7 +12,7 @@ from fatebridge.core.bazi.relations import (
     check_harmony_patterns,
 )
 from fatebridge.core.bazi.strength import analyze_elements_and_structure
-from fatebridge.services.calculation import calculate_destiny_analysis
+from fatebridge.services.bazi import calculate_bazi_overview
 from fatebridge.utils.birth_input import create_person_info
 
 
@@ -171,7 +171,7 @@ def test_calculate_destiny_analysis_exposes_structure_profile() -> None:
         birth_timezone="Asia/Shanghai",
     )
 
-    result = calculate_destiny_analysis(person)
+    result = calculate_bazi_overview(person)
 
     assert "structure_profile" in result
     assert (

@@ -5,8 +5,8 @@ from datetime import datetime, timedelta, timezone
 from fractions import Fraction
 from typing import Literal, Mapping, TypedDict
 
-from fatebridge.core.calendar import BaZiCalendar
-from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core.bazi.calendar import BaZiCalendar
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.services.birth_time_events import (
     BirthEventProbeRecord,
     BirthEventRecord,

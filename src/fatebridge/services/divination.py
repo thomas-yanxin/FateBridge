@@ -4,6 +4,7 @@ FateBridge divination services.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from datetime import datetime, timedelta
 from typing import Any, Literal
 
@@ -13,7 +14,7 @@ from fatebridge.core.almanac import (
     build_calendar_context,
     get_day_ganzhi,
 )
-from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.divination import build_meihua_interpretation, lookup_gua
 from fatebridge.core.heluo.judgment import (
     DEFAULT_MONTH_ASSIGNMENT,
@@ -219,7 +220,8 @@ def calculate_meihua_analysis(
         pillars=pillars,
     )
     lunar_calendar = calendar_context.get("lunar_calendar") or {}
-    meihua = lunar_calendar.get("meihua")
+    raw_meihua = lunar_calendar.get("meihua")
+    meihua = deepcopy(raw_meihua) if raw_meihua else None
 
     if not meihua:
         # A missing lunar context is a runtime-dependency problem, not a
@@ -274,6 +276,7 @@ def calculate_meihua_analysis(
     meihua["calendar_policy"]["label_precision"] = label_precision
     solar_reference = solar_term_date_reference(calendar_context)
     meihua["calendar_policy"]["solar_term_date_reference"] = solar_reference
+    calendar_context["lunar_calendar"] = {**lunar_calendar, "meihua": meihua}
     interpretation = build_meihua_interpretation(
         meihua,
         interpretation_topic=interpretation_topic,

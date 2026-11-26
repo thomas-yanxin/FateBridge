@@ -5,25 +5,28 @@ from typing import Literal
 
 from pydantic import Field
 
-from fatebridge.core.requests.base import FateBridgeBaseRequest
+from fatebridge.core.requests.base import (
+    FateBridgeBaseRequest,
+    OfflineHouseValidatorMixin,
+)
 
 
-class GuolaoChartRequest(FateBridgeBaseRequest):
+class GuolaoChartRequest(OfflineHouseValidatorMixin, FateBridgeBaseRequest):
     name: str | None = Field(default=None, description="姓名或备注标签，不参与计算")
     birth_year: int = Field(ge=1800, le=2399, description="公历出生年")
     birth_month: int = Field(ge=1, le=12, description="公历出生月")
     birth_day: int = Field(ge=1, le=31, description="公历出生日")
     birth_hour: int = Field(ge=0, le=23, description="出生小时（0-23）")
-    birth_minute: int = Field(ge=0, le=59, description="出生分钟（0-59）")
+    birth_minute: int = Field(default=0, ge=0, le=59, description="出生分钟（0-59）")
     birth_second: int = Field(default=0, ge=0, le=60, description="出生秒（0-60）")
     birth_timezone: str | None = Field(default=None, description="IANA 时区或 UTC 偏移")
     birth_place: str | None = Field(
         default=None, description="出生地名称（可辅助解析时区）"
     )
-    birth_longitude: float = Field(
+    birth_longitude: float | None = Field(
         default=116.4074, ge=-180, le=180, description="出生地经度"
     )
-    birth_latitude: float = Field(
+    birth_latitude: float | None = Field(
         default=39.9042, ge=-90, le=90, description="出生地纬度"
     )
     use_true_solar_time: bool = Field(default=True, description="是否标记使用真太阳时")

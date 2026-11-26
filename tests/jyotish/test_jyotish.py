@@ -39,7 +39,6 @@ from fatebridge.core.jyotish.yogas import (
     evaluate_yogas,
     upagrahas_and_special_lagnas,
 )
-from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.jyotish import (
     calculate_vedic_chart,
     calculate_vimshottari,
@@ -324,16 +323,6 @@ def test_missing_ephemeris_fails_honestly(monkeypatch: pytest.MonkeyPatch) -> No
     monkeypatch.setattr(runtime, "swe", None)
     result = calculate_vimshottari(**astro_payload(), analysis_year=2026)
     assert "error" in result and "vimshottari" not in result
-
-
-def test_legacy_explicit_tropical_override_does_not_fabricate_vargas() -> None:
-    result = calculate_core_chart_analysis(
-        chart_variant="india_chart",
-        zodiac_type="Tropic",
-        house_system=3,
-        **astro_payload(),
-    )
-    assert result["india"]["status"] == "configuration_not_supported"
 
 
 def test_parallel_native_positions_are_isolated() -> None:

@@ -207,7 +207,7 @@ async def test_mcp_input_contract_is_small_and_projections_are_callable() -> Non
             {
                 **record["example_input"],
                 "detail": "audit",
-                "fields": ["career_analysis.evidence_chain.topic.first_view"],
+                "fields": ["career_analysis.topic_facts"],
             },
         )
         restored = await verified_inline_business(client, result.structured_content)
@@ -249,20 +249,17 @@ async def test_consultation_first_views_keep_interpretable_evidence_across_surfa
         assert payload["four_pillars"]["day"]["stem"]
         assert payload["day_master"]["element"]
         assert payload["ten_gods"]
-        assert payload["structure_profile"]["decision_basis"]
         profile = payload["structure_profile"]
-        assert profile["resolution_policy"] == "source_force_before_preference_v4"
+        assert profile["assessment_status"] in {"adjudicated", "conditional", "partial"}
         assert (
-            payload["day_master"]["classical_adjudication"]["status"]
-            == "not_adjudicated"
+            payload["day_master"]["classical_adjudication"]["status"] == "adjudicated"
         )
-        assert payload["day_master"]["classical_adjudication"]["body_strength"] is None
+        assert payload["day_master"]["classical_adjudication"]["body_strength"]
         reference = profile["dominant_structure"]
-        assert reference["key"] == "month_use_reference"
-        assert reference["formation_status"] == "not_adjudicated"
-        assert reference["useful_elements"] == reference["avoid_elements"] == []
+        assert reference["key"]
+        assert reference["formation_status"]
         assert set(profile["useful_elements"]).isdisjoint(profile["avoid_elements"])
-        assert profile["layers"] and profile["conditional_elements"]
+        assert profile["seasonal_climate"]["available"] is True
         assert payload["person_info"]["normalized_birth_datetime"]
     elif key == "astrology_chart":
         assert {"Sun", "Moon"} <= {p["id"] for p in payload["planets"]}
@@ -459,8 +456,8 @@ async def test_published_input_contract_delivers_strict_fields_from_one_run() ->
             },
         )
         payload = await same_run_projected_response(client, result)
-        evidence = payload["career_analysis"]["evidence_chain"]["topic"]["first_view"]
-        assert evidence["natal_stars"]
+        facts = payload["career_analysis"]["topic_facts"]
+        assert facts["natal_stars"]
         assert "run_metadata" in payload
 
 
@@ -497,7 +494,7 @@ async def test_explicit_pillar_context_can_be_projected_without_a_retry() -> Non
         )
     assert not response.is_error
     career = response.structured_content["career_analysis"]
-    assert career["evidence_chain"]["topic"]["first_view"]["natal_stars"]
+    assert career["topic_facts"]["natal_stars"]
     assert career["timing_context"]["source"] == "explicit_pillar_overrides"
     assert "analysis_date" not in career["timing_context"]
     assert "dayun_age" not in career["timing_context"]

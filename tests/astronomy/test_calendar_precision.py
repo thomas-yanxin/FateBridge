@@ -5,10 +5,10 @@ from datetime import datetime, timedelta
 import pytest
 
 from fatebridge.core.almanac import get_solar_terms_for_year, localize_datetime
-from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.bazi.calendar import BaZiCalendar
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.core.local_techniques.chart import _build_metaphysics_seed
 from fatebridge.core.metaphysics.seed import _build_person_seed, build_analysis_seed
-from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.bazi import _resolve_analysis_date, calculate_bazi_birth
 from fatebridge.services.birth_context import (
     build_birth_computation_context as _build_birth_computation_context,

@@ -17,7 +17,7 @@ from fatebridge.core.astro.astrology_tables import (
 from fatebridge.core.astro.birth import AstroBirthInfo, require_resolved_birth_timezone
 from fatebridge.core.astro.geometry import _degree_in_sign, _sign_name, _week_ruler
 from fatebridge.core.astro.parts import _build_houses, _build_planet_record
-from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.guolao import classical, ephemeris, moira
 from fatebridge.core.guolao.classical import (
     BRANCHES,
@@ -41,7 +41,12 @@ from fatebridge.core.guolao.ephemeris import (
     mansion_at,
     positions,
 )
-from fatebridge.core.guolao.guolao_anchor_days import POLICIES
+
+POLICIES = (
+    "term_instants",
+    "source_solar_days_winter_exclusive",
+    "source_solar_days_winter_inclusive",
+)
 from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.timezones import validate_local_clock
 
@@ -178,32 +183,18 @@ def build_chart(
         mansions.append({"id": name, **mansion})
         bodies.append(body)
         if name in CN:
-            if cusps:
-                record = _build_planet_record(
-                    name,
-                    state["longitude"],
-                    state["latitude"],
-                    asc,
-                    hi["key"],
-                    house_cusps=cusps,
-                    sidereal=zi["sidereal"],
-                    ayanamsha=shift,
-                    zodiac_longitude=body["zodiac_longitude"],
-                )
-            else:
-                lon = body["zodiac_longitude"]
-                sign = _sign_name(lon)
-                record = {
-                    "id": name,
-                    "longitude": lon,
-                    "latitude": state["latitude"],
-                    "sign": sign,
-                    "sign_zh": SIGN_LABELS_ZH[sign],
-                    "degree_in_sign": _degree_in_sign(lon),
-                    "house": None,
-                    "element": ELEMENT_BY_SIGN[sign],
-                    "modality": MODALITY_BY_SIGN[sign],
-                }
+            record = _build_planet_record(
+                name,
+                state["longitude"],
+                state["latitude"],
+                asc,
+                hi["key"],
+                house_cusps=cusps,
+                sidereal=zi["sidereal"],
+                ayanamsha=shift,
+                zodiac_longitude=body["zodiac_longitude"],
+                houses_resolved=bool(cusps),
+            )
             record["dignity"] = None
             record["su28"] = mansion["su28"]
             planets.append(record)
