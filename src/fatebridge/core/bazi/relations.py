@@ -254,13 +254,15 @@ def group_relations(pillars: Pillars) -> list[dict[str, Any]]:
                 }
             )
 
-    for group in BRANCH_THREE_PUNISHMENTS:
-        if len(group) == 3 and set(group) <= branch_set:
+    for punish_group in BRANCH_THREE_PUNISHMENTS:
+        if len(punish_group) == 3 and set(punish_group) <= branch_set:
             groups.append(
                 {
                     "kind": "三刑",
-                    "branches": list(group),
-                    "positions": [n for n, (_, b) in pillars.items() if b in group],
+                    "branches": list(punish_group),
+                    "positions": [
+                        n for n, (_, b) in pillars.items() if b in punish_group
+                    ],
                     "bureau": None,
                     "effect_status": "relation_only",
                 }
@@ -654,37 +656,43 @@ def collect_target_branch_relations(
                 )
 
     combined_branches = natal_branches | {target_branch}
-    for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
-        if target_branch not in group:
+    for triple_group, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
+        if target_branch not in triple_group:
             continue
-        membership = classify_triple_members(group, combined_branches)
+        membership = classify_triple_members(triple_group, combined_branches)
         if membership == "complete":
             relations.append(
                 {
                     "type": "三合",
-                    "group": group,
+                    "group": triple_group,
                     "bureau": bureau,
-                    "with_pillars": [p for p in ORDER if natal_pillars[p][1] in group],
+                    "with_pillars": [
+                        p for p in ORDER if natal_pillars[p][1] in triple_group
+                    ],
                 }
             )
         elif membership == "peak_pair":
             relations.append(
                 {
                     "type": "半合",
-                    "group": group,
+                    "group": triple_group,
                     "bureau": bureau,
-                    "with_pillars": [p for p in ORDER if natal_pillars[p][1] in group],
+                    "with_pillars": [
+                        p for p in ORDER if natal_pillars[p][1] in triple_group
+                    ],
                 }
             )
 
-    for group, bureau in BRANCH_SEASONAL_COMBINATIONS.items():
-        if target_branch in group and set(group) <= combined_branches:
+    for seasonal_group, bureau in BRANCH_SEASONAL_COMBINATIONS.items():
+        if target_branch in seasonal_group and set(seasonal_group) <= combined_branches:
             relations.append(
                 {
                     "type": "三会",
-                    "group": group,
+                    "group": seasonal_group,
                     "bureau": bureau,
-                    "with_pillars": [p for p in ORDER if natal_pillars[p][1] in group],
+                    "with_pillars": [
+                        p for p in ORDER if natal_pillars[p][1] in seasonal_group
+                    ],
                 }
             )
 

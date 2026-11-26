@@ -314,29 +314,34 @@ def solve_planetary_events(
                         candidate_targets.append((turn, ray))
             if not candidate_targets:
                 continue
-            value: Any = None
-            first: Fraction | None = None
-            last: Fraction | None = None
+            exact_val: float | Fraction | None = None
+            exact_first: Fraction | None = None
+            exact_last: Fraction | None = None
             for turn, ray in candidate_targets:
                 target_int = turn * 360 + ray
                 target_f = float(target_int)
                 if not (low_f + 1e-6 < target_f < high_f - 1e-6):
-                    if value is None:
-                        value = longitude(x)
-                        first = Fraction(value)
-                        last = first + _step(value, longitude(y))
+                    if exact_val is None:
+                        exact_val = longitude(x)
+                        exact_first = Fraction(exact_val)
+                        exact_last = exact_first + _step(exact_val, longitude(y))
+                    assert exact_first is not None and exact_last is not None
                     target = Fraction(target_int)
-                    if not (first < target <= last or last <= target < first):
+                    if not (
+                        exact_first < target <= exact_last
+                        or exact_last <= target < exact_first
+                    ):
                         continue
                 else:
                     target = Fraction(target_int)
 
                 def residual(at: float) -> Fraction:
-                    nonlocal value, first
-                    if value is None:
-                        value = longitude(x)
-                        first = Fraction(value)
-                    return first + _step(value, longitude(at)) - target
+                    nonlocal exact_val, exact_first
+                    if exact_val is None:
+                        exact_val = longitude(x)
+                        exact_first = Fraction(exact_val)
+                    assert exact_first is not None
+                    return exact_first + _step(exact_val, longitude(at)) - target
 
                 def residual_f(at: float) -> float:
                     return (
@@ -359,7 +364,11 @@ def solve_planetary_events(
                     direction=(
                         1
                         if step_f > 0.0
-                        or (last is not None and first is not None and last > first)
+                        or (
+                            exact_last is not None
+                            and exact_first is not None
+                            and exact_last > exact_first
+                        )
                         else -1
                     ),
                     topology=topology,
@@ -664,9 +673,9 @@ def native_planetary_events(
         cached = lon_cache.get(key)
         if cached is not None:
             return cached
-        cached = sample_cache.get(key)
-        if cached is not None:
-            lon = cached["longitude"]
+        cached_sample = sample_cache.get(key)
+        if cached_sample is not None:
+            lon = cached_sample["longitude"]
             lon_cache[key] = lon
             return lon
         if use_fast:

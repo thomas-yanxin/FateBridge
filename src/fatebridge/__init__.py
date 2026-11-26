@@ -37,7 +37,8 @@ def discover(
 
 def tools(family: str | None = None) -> list[dict[str, Any]]:
     """Return tool summary records, optionally filtered by family."""
-    return discover(family=family)["tools"]
+    tool_rows: list[dict[str, Any]] = discover(family=family)["tools"]
+    return tool_rows
 
 
 def run(

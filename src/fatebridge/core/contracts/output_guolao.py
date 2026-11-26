@@ -197,6 +197,18 @@ class GuolaoPatternEvidence(PartialOutput):
     classical_acceptance: bool | None = None
 
 
+class MoiraPattern(PartialOutput):
+    basis: str | None = None
+    classical_acceptance: bool | None = None
+    detail: str | None = None
+    dsl: str | None = None
+    level: str | None = None
+    name: str | None = None
+    source: str | None = None
+    rule_id: str | None = None
+    evidence: GuolaoPatternEvidence | None = None
+
+
 class GuolaoMoiraCounts(PartialOutput):
     source_declarations: int | None = None
     predicate_rules: int | None = None
@@ -458,7 +470,7 @@ class GuolaoResearch(PartialOutput):
     moon_mansion: str | None = None
     si_yu_sign_index: dict[str, int] | None = None
     god_sign_index: dict[str, int] | None = None
-    moira_patterns: list[GuolaoMoiraRule] | None = None
+    moira_patterns: list[MoiraPattern] | None = None
     bodies: list[GuolaoBody] | None = None
     life_palace: GuolaoLifePalace | None = None
     body_palace: GuolaoBodyPalace | None = None

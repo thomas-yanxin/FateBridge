@@ -117,11 +117,12 @@ BAGUA_WANWU: dict[str, dict[str, Any]] = {
 @lru_cache(maxsize=None)
 def load_meihua_json(filename: str) -> dict[str, Any]:
     """Load and cache a frozen JSON resource from fatebridge.data/meihua."""
-    return json.loads(
+    data: dict[str, Any] = json.loads(
         files("fatebridge.data")
         .joinpath(f"meihua/{filename}")
         .read_text(encoding="utf-8")
     )
+    return data
 
 
 def lookup_trigram_wanwu(name: str) -> dict[str, Any]:

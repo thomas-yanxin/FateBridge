@@ -57,7 +57,8 @@ def request_model_ref(module: str, name: str) -> Callable[[], type[BaseModel]]:
     """Reference a Pydantic request model without importing it during catalog load."""
 
     def load() -> type[BaseModel]:
-        return getattr(import_module(module), name)
+        model: type[BaseModel] = getattr(import_module(module), name)
+        return model
 
     return load
 
@@ -169,7 +170,7 @@ def bind_pair(
             default_true_solar=True,
         )
         relationship = arguments.get(relationship_field, "general")
-        extra_kwargs = {
+        extra_kwargs: dict[str, ServiceInput] = {
             k: arguments[k]
             for k in ("person1_zi_hour_policy", "person2_zi_hour_policy")
             if k in arguments

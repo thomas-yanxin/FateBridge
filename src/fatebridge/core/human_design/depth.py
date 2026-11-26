@@ -25,7 +25,8 @@ def _load_json(filename: str) -> dict[str, Any]:
         .joinpath(filename)
         .read_bytes()
     )
-    return json.loads(raw)
+    data: dict[str, Any] = json.loads(raw)
+    return data
 
 
 @lru_cache(maxsize=1)

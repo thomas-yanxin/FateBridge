@@ -77,7 +77,7 @@ def upagrahas_and_special_lagnas(
         if isinstance(solar_context, dict)
         else None
     )
-    if isinstance(sunrise_jd, float):
+    if isinstance(solar_context, dict) and isinstance(sunrise_jd, float):
         hrs = (jd_ut1 - sunrise_jd) * 24.0
         ghatis = hrs * 2.5
         bhava_lagna = (sun_longitude + hrs * 15.0) % 360.0

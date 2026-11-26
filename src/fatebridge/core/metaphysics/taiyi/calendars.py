@@ -418,7 +418,8 @@ def _historical_date_records() -> dict[str, Any]:
         Path(__file__).resolve().parents[3]
         / "data/classical/taiyi-key-historical-dates-v1.json"
     )
-    return json.loads(path.read_text(encoding="utf-8"))
+    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    return data
 
 
 def source_date_reference(

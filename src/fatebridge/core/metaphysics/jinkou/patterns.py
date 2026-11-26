@@ -318,17 +318,17 @@ def _evaluate_patterns(
         if op in {"control", "generate", "same"}:
             a, b = by_role[parts[0]]["element"], by_role[parts[1]]["element"]
             if op == "control":
-                return ELEMENT_CONTROLS[a] == b
+                return bool(ELEMENT_CONTROLS[a] == b)
             if op == "generate":
-                return ELEMENT_GENERATES[a] == b
-            return a == b
+                return bool(ELEMENT_GENERATES[a] == b)
+            return bool(a == b)
         if op in {"equal_branch", "clash", "combine"}:
             a, b = by_role[parts[0]]["content"], by_role[parts[1]]["content"]
             if op == "equal_branch":
-                return a == b
+                return bool(a == b)
             if op == "clash":
-                return SIX_CLASH_BRANCHES[a] == b
-            return BRANCH_COMBINES[a] == b
+                return bool(SIX_CLASH_BRANCHES[a] == b)
+            return bool(BRANCH_COMBINES[a] == b)
         if op == "stem_combine":
             a = by_role[parts[0]]["content"]
             b = by_role[parts[1]].get("dun_stem")
@@ -380,9 +380,9 @@ def _evaluate_patterns(
                 parts[2]
             )
         if op == "branch":
-            return by_role[parts[0]]["content"] == parts[1]
+            return bool(by_role[parts[0]]["content"] == parts[1])
         if op == "phase":
-            return by_role[parts[0]]["element"] == parts[1]
+            return bool(by_role[parts[0]]["element"] == parts[1])
         if op in {"xun_kong", "si_da_kong"}:
             return by_role[parts[0]].get(op)
         if op == "twilight_god_exchange":
@@ -407,7 +407,7 @@ def _evaluate_patterns(
                 if is_diurnal
                 else LIURENG_GUIREN_DAY[day_stem]
             )
-            return ground == other
+            return bool(ground == other)
         if op == "straddles_noble_start":
             diurnal = True if is_diurnal is None else is_diurnal
             start = (LIURENG_GUIREN_DAY if diurnal else LIURENG_GUIREN_NIGHT)[day_stem]
@@ -416,12 +416,12 @@ def _evaluate_patterns(
             ahead = (EARTHLY_BRANCHES.index(general) - s_idx) % 12
             return behind in (1, 2, 3) and ahead in (1, 2, 3)
         if op == "ding_controls_in_course":
-            stems = {
+            ding_stems: set[str | None] = {
                 human_stem,
                 by_role["G"].get("dun_stem"),
                 by_role["J"].get("dun_stem"),
             }
-            return "丁" in stems and (
+            return "丁" in ding_stems and (
                 ELEMENT_CONTROLS["火"] == by_role["H"]["element"]
                 or ELEMENT_CONTROLS["火"] == by_role["D"]["element"]
             )

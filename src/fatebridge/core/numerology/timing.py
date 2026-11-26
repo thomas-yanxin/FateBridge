@@ -83,7 +83,8 @@ def clock_policy_for_rules(rules: dict[str, Any]) -> str | None:
 @lru_cache(maxsize=1)
 def _schedule_collation() -> dict[str, Any]:
     try:
-        return json.loads(COLLATION_PATH.read_bytes())
+        data: dict[str, Any] = json.loads(COLLATION_PATH.read_bytes())
+        return data
     except (OSError, TypeError, ValueError) as exc:
         raise NumerologySourceError("invalid_canping_schedule_collation") from exc
 

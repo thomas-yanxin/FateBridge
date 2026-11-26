@@ -29,7 +29,7 @@ class _GeomagneticData(TypedDict):
     sources: dict[str, dict[str, JsonValue]]
     model_header: list[JsonValue]
     degree: int
-    coefficients: list[JsonValue]
+    coefficients: list[list[JsonValue]]
 
 
 @lru_cache(maxsize=1)
@@ -144,7 +144,7 @@ def geomagnetic_reference(
             },
         }
 
-    field = {
+    field: dict[str, JsonValue] = {
         "declination_degrees_east": value.d,
         "inclination_degrees_down": value.i,
         "north_component_nt": value.x,

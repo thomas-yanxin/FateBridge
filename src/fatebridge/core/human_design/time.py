@@ -300,7 +300,7 @@ def _assemble_chart(
     birth_utc: str | None,
     solved: dict[str, Any],
     personality_positions: dict[str, Any],
-    personality_time: dict[str, Any],
+    personality_time: dict[str, Any] | EpochTime,
     node_mode: str,
     require_swiss_files: bool,
     backend: str = "swieph",

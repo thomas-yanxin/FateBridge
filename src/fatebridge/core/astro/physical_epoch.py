@@ -7,6 +7,7 @@ be carried by datetime. Never substitute the following midnight for it.
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone, tzinfo
 from fractions import Fraction
@@ -107,7 +108,7 @@ _LAST_LEAP_SPANS: (
 
 
 def _leap_spans_for(
-    entries: list[dict[str, Any]],
+    entries: Sequence[Mapping[str, Any]],
 ) -> tuple[
     float,
     float,

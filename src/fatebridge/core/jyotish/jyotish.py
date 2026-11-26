@@ -92,7 +92,7 @@ def build_india(
     panchanga = compute_panchanga(
         nominal_longitudes["Sun"],
         nominal_longitudes["Moon"],
-        nominal_nakshatras["Moon"],
+        dict(nominal_nakshatras["Moon"]),
         local_datetime=birth.local_datetime,
         solar_context=solar_ctx,
         sun_speed=raw["speeds"]["Sun"],
@@ -127,6 +127,7 @@ def build_india(
         nak_counts: dict[str, dict[tuple[int, int], dict[str, Any]]] = {
             p: {} for p in GRAHAS
         }
+        assert birth.utc_datetime is not None
         for off in offsets:
             if off == 0.0:
                 s_raw, s_lons = raw, nominal_longitudes

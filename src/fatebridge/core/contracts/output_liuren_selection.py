@@ -6,7 +6,7 @@ independent classical oracle, astronomical accuracy, or predictive efficacy.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
 from fatebridge.core.metaphysics.liureng.board import derive_selection
@@ -79,11 +79,18 @@ def expected_selection(
     if len(offsets) != 1:
         raise ValueError("九宗门天地盘须为同一次顺布旋转盘")
 
-    meta = board.get("meta") if isinstance(board.get("meta"), dict) else {}
+    raw_meta = board.get("meta")
+    meta: dict[str, Any] = raw_meta if isinstance(raw_meta, dict) else {}
+    shehai = meta.get("shehai_method", "depth_first")
+    if shehai not in ("depth_first", "meng_zhong_first"):
+        shehai = "depth_first"
+    shehai_method: Literal["depth_first", "meng_zhong_first"] = (
+        "meng_zhong_first" if shehai == "meng_zhong_first" else "depth_first"
+    )
     return derive_selection(
         days[0],
         sky,
-        shehai_method=meta.get("shehai_method", "depth_first"),
+        shehai_method=shehai_method,
         harm_include_terminal=bool(meta.get("harm_include_terminal", False)),
     )
 

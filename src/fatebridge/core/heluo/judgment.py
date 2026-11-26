@@ -213,39 +213,44 @@ JIEHOU_ALIASES = {
 JIEHOU_MODELS = ("continuous_yao_from_yi_four", "six_days_per_gua_caption_first")
 
 
+def _load_heluo_json(filename: str) -> dict[str, Any]:
+    data: dict[str, Any] = json.loads((_HELUO_DATA_DIR / filename).read_bytes())
+    return data
+
+
 @lru_cache(maxsize=1)
 def _line_source() -> dict[str, Any]:
-    return json.loads((_HELUO_DATA_DIR / "line-rules-v1.json").read_bytes())
+    return _load_heluo_json("line-rules-v1.json")
 
 
 @lru_cache(maxsize=1)
 def _month_front_table() -> dict[str, Any]:
-    return json.loads((_HELUO_DATA_DIR / "volume-one-month-table-v1.json").read_bytes())
+    return _load_heluo_json("volume-one-month-table-v1.json")
 
 
 @lru_cache(maxsize=1)
 def _month_collation() -> dict[str, Any]:
-    return json.loads((_HELUO_DATA_DIR / "month-collation-v1.json").read_bytes())
+    return _load_heluo_json("month-collation-v1.json")
 
 
 @lru_cache(maxsize=1)
 def _najia_source() -> dict[str, Any]:
-    return json.loads((_HELUO_DATA_DIR / "najia-collation-v1.json").read_bytes())
+    return _load_heluo_json("najia-collation-v1.json")
 
 
 @lru_cache(maxsize=1)
 def _opposition_source() -> dict[str, Any]:
-    return json.loads((_HELUO_DATA_DIR / "yuanqi-opposition-v1.json").read_bytes())
+    return _load_heluo_json("yuanqi-opposition-v1.json")
 
 
 @lru_cache(maxsize=1)
 def _structure_source() -> dict[str, Any]:
-    return json.loads((_HELUO_DATA_DIR / "body-structure-v1.json").read_bytes())
+    return _load_heluo_json("body-structure-v1.json")
 
 
 @lru_cache(maxsize=1)
 def _jiehou_source() -> dict[str, Any]:
-    return json.loads((_HELUO_DATA_DIR / "jiehou-v1.json").read_bytes())
+    return _load_heluo_json("jiehou-v1.json")
 
 
 @dataclass(frozen=True)
@@ -1384,7 +1389,7 @@ def judge(
             }
             for phase in ("xian", "hou")
         },
-        {"tian": yuan["tian"]["gua"], "di": yuan["di"]["gua"]},
+        {"tian": t_yuan, "di": d_yuan},
     )
     de_ti_bodies = [
         {
@@ -1404,8 +1409,8 @@ def judge(
     ]
     qi_phases = phase_qi_evidence(
         de_ti_bodies,
-        {k: v["gua"] for k, v in yuan.items()},
-        {k: v["gua"] for k, v in fan_yuan.items()},
+        {"tian": t_yuan, "di": d_yuan},
+        {"tian": t_fan, "di": d_fan},
         hg_list,
         fh_list,
         hg_override,

@@ -9,6 +9,7 @@ facts use the same nested contracts in validation and transport discovery.
 from __future__ import annotations
 
 from functools import lru_cache
+from types import GenericAlias
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -249,11 +250,13 @@ def output_model_for(tool_name: str) -> type[BaseModel]:
     }
     if tool_name in standalone_refs:
         mod_name, attr_name = standalone_refs[tool_name]
-        return getattr(import_module(mod_name), attr_name)
+        model: type[BaseModel] = getattr(import_module(mod_name), attr_name)
+        return model
     if tool_name.startswith("fengshui_"):
-        return getattr(
+        fengshui_model: type[BaseModel] = getattr(
             import_module("fatebridge.core.fengshui.models"), "FengshuiOutput"
         )
+        return fengshui_model
 
     if tool_name not in TOOL_FIELDS:
         raise KeyError(f"Missing output contract for tool {tool_name}")
@@ -298,7 +301,7 @@ def output_model_for(tool_name: str) -> type[BaseModel]:
         "bazi_birth": symbols["BaziBirth"],
         "day_master": symbols["DayMaster"],
         "structure_profile": symbols["EvidenceStructureProfile"],
-        "planets": list[symbols["ChartPlanet"]],
+        "planets": GenericAlias(list, (symbols["ChartPlanet"],)),
         "election": symbols["Election"],
         "vimshottari": symbols["Vimshottari"],
         "interaction_analysis": symbols["TimingInteractions"],

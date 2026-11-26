@@ -35,28 +35,10 @@ class ResolvedProjectionBoundary:
     selection: Literal["ordinary_public_year_grid", "bounded_derived_lichun_event"]
 
     def to_record(self) -> dict[str, object]:
-        cal = self.term.calendar
-        record: dict[str, object] = {
-            "name": self.term.name,
-            "resolution_provider": self.term.resolution_provider,
-            "ephemeris_model": self.term.ephemeris_model,
-            "timezone": cal.timezone_label,
-        }
-        if self.term.has_defined_local_clock:
-            record.update(
-                datetime=cal.isoformat(sep=" ", include_offset=False),
-                date_key=self.term.date_key,
-                day_ganzhi=self.term.day_ganzhi,
-                datetime_with_offset=cal.isoformat(),
-                utc_offset_seconds=cal.offset.total_seconds(),
-                fold=cal.fold,
-            )
-        else:
-            record["datetime_utc"] = cal.utc.isoformat()
         return {
             "year": self.year,
-            "record": record,
-            "instant_utc": cal.utc.isoformat(),
+            "record": self.term.as_dict(),
+            "instant_utc": self.term.calendar.utc.isoformat(),
             "selection": self.selection,
         }
 

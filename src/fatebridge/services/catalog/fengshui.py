@@ -8,14 +8,15 @@ from pydantic import BaseModel
 
 from fatebridge.application.bindings import bind_request, service_ref
 from fatebridge.application.domain_validators import detect_fengshui_approximate
-from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+from fatebridge.application.tool_spec import CompactView, ServiceResult, ToolSpec
 from fatebridge.core.reproducibility import ReproducibilityPolicy
 
 
 def _load_fengshui_model(model_name: str) -> type[BaseModel]:
     from fatebridge.core.fengshui import models
 
-    return getattr(models, model_name)
+    model: type[BaseModel] = getattr(models, model_name)
+    return model
 
 
 def _compact_rulesets(result: ServiceResult) -> list[ServiceResult]:
@@ -382,13 +383,21 @@ def _compact_assessment(result: ServiceResult) -> ServiceResult:
     return out
 
 
-COMPACT_VIEWS = {
+def _compact_annual_stars(result: ServiceResult) -> ServiceResult:
+    return _compact_zibai("annual_stars", result)
+
+
+def _compact_monthly_stars(result: ServiceResult) -> ServiceResult:
+    return _compact_zibai("monthly_stars", result)
+
+
+COMPACT_VIEWS: dict[str, CompactView] = {
     "fengshui_directions": _compact_directions,
     "fengshui_minggua": _compact_minggua,
     "fengshui_bazhai": _compact_bazhai,
     "fengshui_jinsuo": _compact_jinsuo,
-    "fengshui_annual_stars": partial(_compact_zibai, "annual_stars"),
-    "fengshui_monthly_stars": partial(_compact_zibai, "monthly_stars"),
+    "fengshui_annual_stars": _compact_annual_stars,
+    "fengshui_monthly_stars": _compact_monthly_stars,
     "fengshui_xuankong_house_chart": _compact_xuankong,
     "fengshui_assess": _compact_assessment,
 }

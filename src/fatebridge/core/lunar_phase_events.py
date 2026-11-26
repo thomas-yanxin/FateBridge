@@ -9,7 +9,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from fractions import Fraction
-from typing import Literal, Protocol, TypedDict
+from typing import Any, Literal, Protocol, TypedDict
 
 from fatebridge.core.astro.ephemeris import fast_swe_call
 from fatebridge.core.astro.geometry import Angle, angle_fraction

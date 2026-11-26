@@ -141,11 +141,13 @@ def _resolve_swe_body_id(planet: str, *, node_mode: str = "mean") -> int | None:
     if runtime.swe is None:
         return None
     if planet == "North Node":
-        return runtime.swe.TRUE_NODE if node_mode == "true" else runtime.swe.MEAN_NODE
+        return int(
+            runtime.swe.TRUE_NODE if node_mode == "true" else runtime.swe.MEAN_NODE
+        )
     if planet in PLANET_SWISSEPH_IDS:
-        return PLANET_SWISSEPH_IDS[planet]
+        return int(PLANET_SWISSEPH_IDS[planet])
     if planet in EXTRA_BODY_SWISSEPH_IDS:
-        return EXTRA_BODY_SWISSEPH_IDS[planet]
+        return int(EXTRA_BODY_SWISSEPH_IDS[planet])
     return None
 
 

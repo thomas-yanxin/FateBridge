@@ -152,7 +152,11 @@ def _utc_clock_matches(value: JsonValue, expected: datetime, path: str) -> None:
 def _elapsed_matches(
     actual: JsonValue, expected: float, path: str, *, tol: float = 1e-4
 ) -> None:
-    if type(actual) not in {int, float} or abs(actual - expected) > tol:
+    if (
+        not isinstance(actual, (int, float))
+        or isinstance(actual, bool)
+        or abs(actual - expected) > tol
+    ):
         raise ValueError("梅花UTC钟面间隔不符：" + path)
 
 

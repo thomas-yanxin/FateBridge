@@ -50,11 +50,12 @@ def _reject_nonfinite(_value: str) -> None:
 
 
 def _load_json(path: Path) -> dict[str, Any]:
-    return json.loads(
+    data: dict[str, Any] = json.loads(
         path.read_bytes(),
         object_pairs_hook=_strict_object,
         parse_constant=_reject_nonfinite,
     )
+    return data
 
 
 @lru_cache(maxsize=4)
@@ -65,9 +66,10 @@ def _depth_data() -> dict[str, Any]:
         .joinpath("rave-2001-depth.json")
         .read_bytes()
     )
-    return json.loads(
+    data: dict[str, Any] = json.loads(
         raw, object_pairs_hook=_strict_object, parse_constant=_reject_nonfinite
     )
+    return data
 
 
 @lru_cache(maxsize=4)
@@ -78,9 +80,10 @@ def _additional_polarities() -> list[dict[str, Any]]:
         .joinpath("additional-polarities-2001.json")
         .read_bytes()
     )
-    return json.loads(
+    facts: list[dict[str, Any]] = json.loads(
         raw, object_pairs_hook=_strict_object, parse_constant=_reject_nonfinite
     )["facts"]
+    return facts
 
 
 def _coverage(rows: list[dict[str, Any]], full_accepted: bool) -> dict[str, Any]:

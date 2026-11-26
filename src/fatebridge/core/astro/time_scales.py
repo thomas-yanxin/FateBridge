@@ -10,10 +10,12 @@ Earlier inputs retain Swiss Ephemeris' historical UT1/Delta-T convention.
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
 from functools import lru_cache
+from typing import Any
 
 import astronomy
 
@@ -410,7 +412,7 @@ _LAST_UTC_ENTRIES_ID: int | None = None
 _LAST_UTC_COMPILED: Any = None
 
 
-def _utc_entries_for(entries: list[dict[str, Any]]) -> Any:
+def _utc_entries_for(entries: Sequence[Mapping[str, Any]]) -> Any:
     global _LAST_UTC_ENTRIES_ID, _LAST_UTC_COMPILED
     if _LAST_UTC_COMPILED is not None and id(entries) == _LAST_UTC_ENTRIES_ID:
         return _LAST_UTC_COMPILED

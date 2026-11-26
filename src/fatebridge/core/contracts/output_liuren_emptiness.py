@@ -77,7 +77,6 @@ class LiurenEmptinessEvidence(PartialOutput):
     nianming_status: Literal["calculated", "partial", "inputs_not_available"] | None = (
         None
     )
-    seasonal_true_half_empty_status: Literal["not_adjudicated"] | None = None
     filling_clashing_status: Literal["role_exceptions_only"] | None = None
     comprehensive_judgement: None = None
     complete_classical_conformance: StrictBool | None = None

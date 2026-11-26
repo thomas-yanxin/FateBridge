@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gc
 import json
 import time
 from datetime import datetime
@@ -438,6 +439,7 @@ def test_compact_payload_bloat_and_warm_latency_budgets() -> None:
             detail="compact",
         )
 
+    gc.collect()
     for name, payload in bazi_tools:
         # Warm cache
         _invoke(SPECS[name], payload)

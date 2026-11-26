@@ -1221,7 +1221,7 @@ def analyze_natal_interpretation(
                 "timeliness": timeliness_info,
                 "external_form_analysis": ext,
             }
-        findings = []
+        findings: list[dict[str, Any]] = []
         for placement in placements:
             if placement.purpose not in {"bed", "door"}:
                 findings.append(

@@ -7,7 +7,6 @@ from pydantic import Field
 from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_chart_geometry import ChartPoint
 from fatebridge.core.contracts.output_clock_labels import WesternUTCRepresentation
-from fatebridge.core.contracts.output_guolao import GuolaoPatternEvidence
 from fatebridge.core.contracts.output_midpoint_geometry import PhysicalEphemerisSource
 
 
@@ -371,15 +370,3 @@ class Hellenistic(PartialOutput):
     ascendant_ruler: str | None = None
     lot_of_fortune: ChartPoint | None = None
     sect: str | None = None
-
-
-class MoiraPattern(PartialOutput):
-    basis: str | None = None
-    classical_acceptance: bool | None = None
-    detail: str | None = None
-    dsl: str | None = None
-    level: str | None = None
-    name: str | None = None
-    source: str | None = None
-    rule_id: str | None = None
-    evidence: GuolaoPatternEvidence | None = None

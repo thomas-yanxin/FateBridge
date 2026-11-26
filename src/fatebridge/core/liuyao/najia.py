@@ -257,8 +257,8 @@ def build_sixyao_enrichment(
     day_gan: str | None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Build hexagram palace info and 6 bottom-to-top Najia/Liuqin/Liushen rows."""
-    current_info = HEXAGRAM_PALACE_LOOKUP.get(current_code, {})
-    changed_info = HEXAGRAM_PALACE_LOOKUP.get(changed_code, {})
+    current_info: dict[str, Any] = dict(HEXAGRAM_PALACE_LOOKUP.get(current_code, {}))
+    changed_info: dict[str, Any] = dict(HEXAGRAM_PALACE_LOOKUP.get(changed_code, {}))
 
     lower_trigram, upper_trigram = _decode_trigrams(current_code)
     branches = list(TRIGRAM_LOWER_BRANCHES.get(lower_trigram, ("", "", ""))) + list(

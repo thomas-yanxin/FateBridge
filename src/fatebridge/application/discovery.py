@@ -2,8 +2,9 @@
 
 import difflib
 from collections import Counter
+from collections.abc import Callable
 from functools import partial
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 
@@ -154,6 +155,7 @@ def discover_specs(
         **query.model_dump(exclude={"detail", "include_output_schema"}),
         allowed_names=allowed_names,
     )
+    describe: Callable[[ToolSpec], dict[str, Any]]
     if query.detail == "full":
         describe = partial(
             describe_spec, include_output_schema=query.include_output_schema

@@ -453,8 +453,8 @@ def _longitude_crossings(
             )
             if following == cursor:
                 raise ValueError("Longitude-crossing scan step does not advance TT")
-            if fast_direct:
-                res, ret = swe_calc(following, planet_id, flags)
+            if fast_direct and swe_mod is not None:
+                res, ret = swe_mod.calc(following, planet_id, flags)
                 if ret < 0:
                     next_sample = _planet_motion(
                         following, planet_id, sidereal=sidereal, collect_files=False

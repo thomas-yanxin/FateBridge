@@ -10,6 +10,7 @@ from fatebridge.core.astro.birth import AstroBirthInfo, require_resolved_birth_t
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.guolao import classical, ephemeris, guolao, moira
+from fatebridge.core.ziwei.calendar import fast_lunar_dict
 from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar, utc_ordering_key
 from fatebridge.utils.timezones import is_unspecified_local_time
 
@@ -71,6 +72,8 @@ def enrich_guolao_timing(
     )
 
     target_scales = ephemeris_time(instant)
+    if target_scales.tt is None:
+        raise RuntimeError("果老目标时刻缺少可用 TT 星历")
     target_jd_tt = target_scales.tt.as_float()
     birth_year_num = ephemeris.fast_lichun_year(recorded, g["profile"]["julian_day_tt"])
     target_year_num = ephemeris.fast_lichun_year(calendar_clock, target_jd_tt)
@@ -211,12 +214,8 @@ def enrich_guolao_timing(
             "palace_lord": m_palace["lord"],
         }
     elif month_basis == "chinese_lunar_utc8":
-        b_lunar = BaZiCalendar.solar_to_lunar(
-            recorded.year, recorded.month, recorded.day
-        )
-        t_lunar = BaZiCalendar.solar_to_lunar(
-            calendar_clock.year, calendar_clock.month, calendar_clock.day
-        )
+        b_lunar = fast_lunar_dict(recorded.date())
+        t_lunar = fast_lunar_dict(calendar_clock.date())
         bm_num = max(1, min(12, int(b_lunar.get("month", 1))))
         tm_num = max(1, min(12, int(t_lunar.get("month", 1))))
         m_branch = classical.month_limit_branch(branch, bm_num, tm_num)
@@ -229,11 +228,11 @@ def enrich_guolao_timing(
             "annual_branch": branch,
             "birth_month": {
                 "month_number": bm_num,
-                "is_leap_month": bool(b_lunar.get("is_leap")),
+                "is_leap_month": bool(b_lunar.get("is_leap_month")),
             },
             "target_month": {
                 "month_number": tm_num,
-                "is_leap_month": bool(t_lunar.get("is_leap")),
+                "is_leap_month": bool(t_lunar.get("is_leap_month")),
             },
             "branch": m_branch,
             "natal_functional_palace": m_palace["palace"],

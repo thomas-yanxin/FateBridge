@@ -148,15 +148,16 @@ def biwheel_geometry(
 
     def contact(
         equation: str,
-        delta: Fraction,
+        delta: float | Fraction,
         names: tuple[str, ...],
         identity: bool,
         **refs: Any,
     ) -> dict[str, Any]:
+        orb_val = float(abs(delta)) if isinstance(delta, Fraction) else abs(delta)
         return {
             "rule_id": "hamburg.solar_arc.biwheel_geometry.v1",
             "equation": equation,
-            "orb": float(abs(delta)),
+            "orb": orb_val,
             "signed_orb": float(delta),
             "contains_hypothetical": any(name in HYPOTHETICAL_BODIES for name in names),
             "zero_arc_identity": identity,
@@ -176,6 +177,7 @@ def biwheel_geometry(
                 delta_f = (vf - natal_f[b] + half_p_f) % period - half_p_f
                 if abs(delta_f) > 1.0 + 1e-8:
                     continue
+                delta: float | Fraction
                 if abs(delta_f) >= 1.0 - 1e-8:
                     delta = _residual(value, reference, period)
                     if abs(delta) > orb:
@@ -235,23 +237,24 @@ def biwheel_geometry(
                         delta_f = (p_val_f - r_val_f + half_p_f) % period - half_p_f
                         if abs(delta_f) > orb_guard:
                             continue
+                        delta_three: float | Fraction
                         if abs(delta_f) >= 1.0 - 1e-8:
                             if is_solar_point:
-                                delta = _residual(directed[point], axis, period)
+                                delta_three = _residual(directed[point], axis, period)
                             else:
-                                delta = _residual(
+                                delta_three = _residual(
                                     natal[point], (axis + arc) % 180, period
                                 )
-                            if abs(delta) > orb:
+                            if abs(delta_three) > orb:
                                 continue
                         else:
-                            delta = delta_f
+                            delta_three = delta_f
                         point_layer = "solar_arc" if is_solar_point else "natal"
                         axis_layer = "natal" if is_solar_point else "solar_arc"
                         three.append(
                             contact(
                                 f"{point}.{point_layer}={a}.{axis_layer}/{b}.{axis_layer}",
-                                delta,
+                                delta_three,
                                 (point, a, b),
                                 False,
                                 point=point,
@@ -284,16 +287,17 @@ def biwheel_geometry(
                     delta_f = (shifted_raw - ref_f + half_p_f) % period - half_p_f
                     if abs(delta_f) > orb_guard:
                         continue
+                    delta_four: float | Fraction
                     if abs(delta_f) >= 1.0 - 1e-8:
-                        delta = _residual(axis + arc, reference, period)
-                        if abs(delta) > orb:
+                        delta_four = _residual(axis + arc, reference, period)
+                        if abs(delta_four) > orb:
                             continue
                     else:
-                        delta = delta_f
+                        delta_four = delta_f
                     four.append(
                         contact(
                             f"{a}.solar_arc/{b}.solar_arc={c}.natal/{d}.natal",
-                            delta,
+                            delta_four,
                             (a, b, c, d),
                             arc == 0 and a == c and b == d,
                             id_a=a,

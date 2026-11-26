@@ -166,7 +166,7 @@ DIAOHOU_TABLE: dict[str, dict[str, tuple[str, tuple[str, ...]]]] = {
         "午": ("癸", ("庚", "辛")),
         "未": ("辛", ("甲",)),
         "申": ("戊", ("丁",)),
-        "酉": ("甲",),  # fallback handled below
+        "酉": ("甲", ()),  # fallback handled below
         "戌": ("甲", ("丙",)),
         "亥": ("戊", ("丙", "庚")),
         "子": ("戊", ("丙",)),
@@ -375,8 +375,8 @@ def evaluate_strength_policy(
             effective[bureau_elem] += policy.triple_bonus
         elif m == "peak_pair":
             effective[bureau_elem] += policy.half_bonus
-    for group, bureau in BRANCH_SEASONAL_COMBINATIONS.items():
-        if set(group) <= branch_set:
+    for s_group, bureau in BRANCH_SEASONAL_COMBINATIONS.items():
+        if set(s_group) <= branch_set:
             b_elem = next(e for e in Element if e.value == bureau[0])
             effective[b_elem] += policy.triple_bonus * 1.1
 

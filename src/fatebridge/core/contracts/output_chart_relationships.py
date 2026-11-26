@@ -5,7 +5,6 @@ from typing import Literal
 from pydantic import Field
 
 from fatebridge.core.contracts.output_base import OpenJsonValue, PartialOutput
-from fatebridge.core.contracts.output_chart_classical import MoiraPattern
 from fatebridge.core.contracts.output_chart_geometry import (
     ChartAngle,
     ChartAspect,
@@ -22,7 +21,6 @@ from fatebridge.core.contracts.output_jyotish import JyotishIndia
 class Guolao(GuolaoResearch):
     god_sign_index: dict[str, int] | None = None
     lunar_mansion_system: str | None = None
-    moira_patterns: list[MoiraPattern] | None = None
     moon_mansion: str | None = None
     planetary_mansions: list[GuolaoMansion] | None = None
     si_yu_sign_index: dict[str, int] | None = None

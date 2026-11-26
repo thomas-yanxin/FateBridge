@@ -604,7 +604,7 @@ def _extract_all_natal_points(
     birth_info: AstroBirthInfo,
     natal_subject: Any,
     context: PrimaryDirectionEquatorialContext | None,
-) -> tuple[dict[str, float], dict[str, tuple[float, float]], dict[str, float]]:
+) -> tuple[dict[str, float], dict[str, float], dict[str, tuple[float, float]]]:
     """Return (ecliptic_longitudes, ecliptic_latitudes, ra_dec_pairs) for all PD points."""
     longitudes = extract_reference_longitudes(natal_subject)
     latitudes: dict[str, float] = {}
@@ -858,7 +858,7 @@ def build_primary_direction_analysis(
                                     longitude_origin=context.longitude_origin,
                                     ecliptic_latitude=target_prom_lat,
                                 )
-                            direct_arc, skip_reason = _spherical_direct_arc(
+                            spherical_arc, skip_reason = _spherical_direct_arc(
                                 p_ra,
                                 p_dec,
                                 sig_ra,
@@ -868,7 +868,7 @@ def build_primary_direction_analysis(
                                 latitude=birth_info.latitude,
                                 sig_name=sig,
                             )
-                            if direct_arc is None:
+                            if spherical_arc is None:
                                 if len(skipped_circumpolar) < 50:
                                     skipped_circumpolar.append(
                                         {
@@ -879,7 +879,9 @@ def build_primary_direction_analysis(
                                     )
                                 continue
                             arc_deg = (
-                                (-direct_arc) % 360.0 if pd_type == 1 else direct_arc
+                                (-spherical_arc) % 360.0
+                                if pd_type == 1
+                                else spherical_arc
                             )
                     else:
                         target_lon = (longitudes[sig] + variant) % 360.0

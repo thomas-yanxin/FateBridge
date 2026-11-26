@@ -289,7 +289,7 @@ def divisional_chart(
     asc_sign, asc_degree = varga_coordinates(raw["ascendant"], division)
     asc = None if division == 30 else varga_longitude(raw["ascendant"], division)
 
-    planets = []
+    planets: list[dict[str, Any]] = []
     for p in GRAHAS:
         sign, degree = varga_coordinates(longitudes[p], division)
         lon = None if division == 30 else varga_longitude(longitudes[p], division)

@@ -369,7 +369,6 @@ def emptiness_evidence(
             )
             for earth in EARTHLY_BRANCHES
         ],
-        seasonal_true_half_empty_status="not_adjudicated",
         filling_clashing_status="role_exceptions_only",
         comprehensive_judgement=None,
         complete_classical_conformance=False,

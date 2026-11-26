@@ -618,7 +618,7 @@ def _solar_term_utc_via_swe(
     models: set[str] = set()
     retflags: set[int] = set()
     refining = False
-    refinement_context: dict[str, Any] | None = None
+    refinement_context: tuple[tuple[str, float, float, int], ...] | None = None
 
     def sun_longitude(jd: float) -> float:
         # Planetary dynamics use TT. A UTC wall-clock JD is not UT1, and an

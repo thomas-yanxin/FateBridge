@@ -382,7 +382,7 @@ def _build_weather_one(
             dependencies.add(conditions["many"])
         for pair in conditions.get("pairs", []):
             dependencies.update(pair)
-        controlled = set()
+        controlled: set[str] = set()
         for control in controls:
             if control["status"] == "met_under_declared_threshold_and_scope_probes":
                 for trigram, tags in control["affected_targets"].items():

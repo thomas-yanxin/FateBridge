@@ -130,7 +130,9 @@ def active_levels(
     chain: list[str] = []
     for level_idx, (level_name, code) in enumerate(LEVELS[:depth], start=1):
         rows: list[dict[str, Any]] = []
-        active_row = active_start = active_end = None
+        active_row: dict[str, Any] | None = None
+        active_start: Fraction | None = None
+        active_end: Fraction | None = None
         cursor = Fraction(0)
         start_idx = ORDER.index(chain[-1] if chain else major_lord)
         for step in range(9):
@@ -146,7 +148,7 @@ def active_levels(
                 else offset + duration * cursor / 120
             )
             start_cal, end_cal = edge(start), edge(end)
-            row = {
+            row: dict[str, Any] = {
                 "level": level_idx,
                 "name": level_name,
                 "abbreviation": code,
@@ -303,7 +305,7 @@ def vimshottari(
     }
     if dasha_depth > 2:
         subdivisions = active_levels(
-            current_major["lord"],
+            str(current_major["lord"]),
             edge(current_major_offset),
             analysis,
             year_basis=year_basis,

@@ -23,14 +23,13 @@ def expected_patterns(board: dict[str, Any]) -> dict[str, Any] | None:
         return None
     if any(not isinstance(row, dict) or row.get("content") is None for row in rows):
         return None
-    overview = board.get("overview") if isinstance(board.get("overview"), dict) else {}
-    de = (
-        board.get("definition_evidence")
-        if isinstance(board.get("definition_evidence"), dict)
-        else {}
-    )
-    hour_branch = de.get("hour_branch") or (overview.get("diurnal_evidence") or {}).get(
-        "hour_branch"
+    raw_overview = board.get("overview")
+    overview: dict[str, Any] = raw_overview if isinstance(raw_overview, dict) else {}
+    raw_de = board.get("definition_evidence")
+    de: dict[str, Any] = raw_de if isinstance(raw_de, dict) else {}
+    diurnal_ev = overview.get("diurnal_evidence")
+    hour_branch = de.get("hour_branch") or (
+        diurnal_ev.get("hour_branch") if isinstance(diurnal_ev, dict) else None
     )
     is_diurnal = overview.get("is_diurnal")
     return patterns_from_symbols(

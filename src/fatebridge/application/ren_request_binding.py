@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
@@ -120,7 +120,7 @@ def require_request_binding(
         override = request.liureng_yue
         gender = "未知"
         offset = None
-        diurnal_mode = "clock"
+        diurnal_mode: Literal["clock", "sunrise_sunset"] = "clock"
         month_general_mode = "solar_term"
         _same(
             result,
@@ -147,7 +147,12 @@ def require_request_binding(
         )
         longitude = request.analysis_longitude
         latitude = getattr(request, "analysis_latitude", None)
-        diurnal_mode = getattr(request, "diurnal_mode", "clock")
+        raw_diurnal_mode = getattr(request, "diurnal_mode", "clock")
+        if raw_diurnal_mode not in ("clock", "sunrise_sunset"):
+            raise ValueError(f"不支持的昼夜划分方式: {raw_diurnal_mode!r}")
+        diurnal_mode = (
+            "sunrise_sunset" if raw_diurnal_mode == "sunrise_sunset" else "clock"
+        )
         month_general_mode = getattr(request, "month_general_mode", "solar_term")
         if (
             request.use_true_solar_time
