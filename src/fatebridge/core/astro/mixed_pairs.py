@@ -50,9 +50,6 @@ def unavailable_mixed_pairs(
             "continuous_interval_proven": False,
         },
         "sources": [SOURCE],
-        "limitations": [
-            "No native factors or arc; no empty-contact conclusion inferred"
-        ],
     }
 
 
@@ -62,6 +59,7 @@ def mixed_pair_geometry(
     *,
     orb_degrees: float = 1.0,
     hypothetical_ids: Collection[str] = (),
+    max_contacts_per_field: int | None = None,
 ) -> dict[str, Any]:
     """All mixed-pair layer assignments for four distinct factor names.
 
@@ -77,10 +75,24 @@ def mixed_pair_geometry(
     if any(type(name) is not str or not name for name in longitudes):
         raise ValueError("Mixed-pair factor names must be nonempty strings")
     values = {name: _finite(value) % 360 for name, value in longitudes.items()}
+    values_f = {name: float(val) for name, val in values.items()}
+    arc_f = float(arc)
+    orb_exact_f = float(orb)
+    boundary_lo = orb_exact_f - 1e-8
+    boundary_hi = orb_exact_f + 1e-8
     patterns: dict[int, list[tuple[int, ...]]] = {-1: [], 0: [], 1: []}
     for bits in product((0, 1), repeat=4):
         if bits[0] != bits[1] or bits[2] != bits[3]:
             patterns[bits[0] + bits[1] - bits[2] - bits[3]].append(bits)
+    pattern_items = tuple(
+        (
+            numerator,
+            numerator * 0.5,
+            float(numerator * 0.5) * arc_f,
+            layer_patterns,
+        )
+        for numerator, layer_patterns in patterns.items()
+    )
     dials: dict[str, dict[str, Any]] = {
         str(period): {
             "period_degrees": period,
@@ -91,20 +103,43 @@ def mixed_pair_geometry(
     }
     partition_count = 0
     unique = set()
+    zero_arc = arc == 0
     for a, b, c, d in combinations(sorted(values), 4):
-        for names in ((a, b, c, d), (a, c, b, d), (a, d, b, c)):
+        va, vb, vc, vd = values_f[a], values_f[b], values_f[c], values_f[d]
+        for names, diff_f in (
+            ((a, b, c, d), (va + vb - vc - vd) * 0.5),
+            ((a, c, b, d), (va + vc - vb - vd) * 0.5),
+            ((a, d, b, c), (va + vd - vb - vc) * 0.5),
+        ):
             partition_count += 1
             first, second, third, fourth = names
-            difference = (
-                values[first] + values[second] - values[third] - values[fourth]
-            ) / 2
-            for numerator, layer_patterns in patterns.items():
-                coefficient = Fraction(numerator, 2)
-                raw = difference + coefficient * arc
+            contains_hyp: bool | None = None
+            for numerator, coeff_f, coeff_arc_f, layer_patterns in pattern_items:
+                raw_f = diff_f + coeff_arc_f
                 for period in (90, 45):
-                    delta = (raw + Fraction(period, 2)) % period - Fraction(period, 2)
-                    if abs(delta) > orb:
+                    half_p = period * 0.5
+                    delta_f = (raw_f + half_p) % period - half_p
+                    abs_df = abs(delta_f)
+                    if abs_df > boundary_hi:
                         continue
+                    if abs_df >= boundary_lo:
+                        difference = (
+                            values[first]
+                            + values[second]
+                            - values[third]
+                            - values[fourth]
+                        ) / 2
+                        raw = difference + Fraction(numerator, 2) * arc
+                        delta = (raw + Fraction(period, 2)) % period - Fraction(
+                            period, 2
+                        )
+                        if abs(delta) > orb:
+                            continue
+                        delta_out = float(delta)
+                    else:
+                        delta_out = delta_f
+                    if contains_hyp is None:
+                        contains_hyp = any(n in hypothetical_ids for n in names)
                     assignments = [
                         {
                             name: "solar_arc" if bit else "natal"
@@ -119,16 +154,14 @@ def mixed_pair_geometry(
                         "id_c": third,
                         "id_d": fourth,
                         "equation": f"({first}+{second})/2=({third}+{fourth})/2; apply each factor_layers assignment",
-                        "signed_orb": float(delta),
-                        "orb": float(abs(delta)),
-                        "midpoint_arc_coefficient": float(coefficient),
+                        "signed_orb": delta_out,
+                        "orb": abs(delta_out),
+                        "midpoint_arc_coefficient": coeff_f,
                         "arc_invariant": numerator == 0,
                         "factor_layer_assignments": assignments,
                         "represented_layer_assignment_count": len(assignments),
-                        "contains_hypothetical": any(
-                            n in hypothetical_ids for n in names
-                        ),
-                        "zero_arc_groups_coincide": arc == 0,
+                        "contains_hypothetical": contains_hyp,
+                        "zero_arc_groups_coincide": zero_arc,
                     }
                     field = (
                         "arc_invariant_contacts"
@@ -148,6 +181,11 @@ def mixed_pair_geometry(
             "arc_invariant_relation_groups": len(invariant),
             "represented_layer_assignments": 4 * (len(dependent) + len(invariant)),
         }
+        if max_contacts_per_field is not None:
+            dependent.sort(key=lambda r: (r["orb"], r["equation"]))
+            invariant.sort(key=lambda r: (r["orb"], r["equation"]))
+            dial["arc_dependent_contacts"] = dependent[:max_contacts_per_field]
+            dial["arc_invariant_contacts"] = invariant[:max_contacts_per_field]
     return {
         "status": "computed",
         "ruleset_id": RULESET,
@@ -179,11 +217,5 @@ def mixed_pair_geometry(
             "continuous_interval_proven": False,
         },
         "sources": [SOURCE],
-        "limitations": [
-            "Complete only for the stated four-distinct-name, two-layer, uniform-arc mixed-pair domain; no repeated-name, arbitrary progression, declination or transit catalogue",
-            "The original mixed-layer idea motivates this reconstruction; it does not authenticate our year key, orb, factor selection or every enumerated modern combination",
-            "Arc-invariant relations, zero-arc coincident groups and equivalent assignments are not additional timing signals or independent evidence",
-            "Birth-time contact sensitivity is separate and, when computed, covers only the confirmed finite grid; no continuous stability, keyword or real event probability is inferred",
-        ],
         "full_original_method_accepted": False,
     }

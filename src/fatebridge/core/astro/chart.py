@@ -92,6 +92,9 @@ def build_core_chart_payload(
     lot_longitudes: dict[str, Fraction] | None = None,
     guolao_seasonal_anchor_policy: str | None = None,
     include_planetary_hours: bool = True,
+    include_classical: bool = True,
+    include_fixed_stars: bool = True,
+    include_aspects: bool = True,
     node_mode: str = "mean",
     high_latitude_fallback: str = "error",
     include_minor_aspects: bool = False,
@@ -113,6 +116,9 @@ def build_core_chart_payload(
             lot_longitudes=lot_longitudes,
             guolao_seasonal_anchor_policy=guolao_seasonal_anchor_policy,
             include_planetary_hours=include_planetary_hours,
+            include_classical=include_classical,
+            include_fixed_stars=include_fixed_stars,
+            include_aspects=include_aspects,
             node_mode=node_mode,
             high_latitude_fallback=high_latitude_fallback,
             include_minor_aspects=include_minor_aspects,
@@ -134,6 +140,9 @@ def _build_core_chart_payload(
     lot_longitudes: dict[str, Fraction] | None = None,
     guolao_seasonal_anchor_policy: str | None = None,
     include_planetary_hours: bool = True,
+    include_classical: bool = True,
+    include_fixed_stars: bool = True,
+    include_aspects: bool = True,
     node_mode: str = "mean",
     high_latitude_fallback: str = "error",
     include_minor_aspects: bool = False,
@@ -353,10 +362,14 @@ def _build_core_chart_payload(
         for planet in planet_names
         if planet in planet_states
     ]
-    aspect_evidence = _build_aspects(
-        planets,
-        include_evidence=True,
-        include_minor_aspects=include_minor_aspects,
+    aspect_evidence = (
+        _build_aspects(
+            planets,
+            include_evidence=True,
+            include_minor_aspects=include_minor_aspects,
+        )
+        if include_aspects
+        else []
     )
     aspects = [
         {key: item[key] for key in ("planet_a", "planet_b", "aspect", "orb")}
@@ -372,14 +385,17 @@ def _build_core_chart_payload(
         if houses_resolved
         else []
     )
-    fixed_stars, fixed_star_profile = _build_fixed_stars(
-        planets,
-        reference_ascendant,
-        effective_midheaven,
-        times.jd_ut1,
-        julian_day_tt=times.tt,
-        sidereal=sidereal,
-    )
+    if include_fixed_stars:
+        fixed_stars, fixed_star_profile = _build_fixed_stars(
+            planets,
+            reference_ascendant,
+            effective_midheaven,
+            times.jd_ut1,
+            julian_day_tt=times.tt,
+            sidereal=sidereal,
+        )
+    else:
+        fixed_stars, fixed_star_profile = [], {}
     ascendant_angle: dict[str, Any] = (
         {
             "longitude": reference_ascendant,
@@ -466,24 +482,32 @@ def _build_core_chart_payload(
         "planets": planets,
         "aspects": aspects,
         "aspect_evidence": aspect_evidence,
-        "classical": _build_classical_layer(
-            planets,
-            house_list,
-            reference_ascendant,
-            states=interpretation_states,
-            source_ecliptic_coordinates={
-                name: (state["longitude"], state["latitude"])
-                for name, state in planet_states.items()
-            },
-            julian_day=julian_day,
-            julian_day_tt=times.tt,
-            sidereal=sidereal,
-            chart_sect=chart_sect,
-            lot_longitudes=lot_longitudes,
-            houses_resolved=houses_resolved,
+        "classical": (
+            _build_classical_layer(
+                planets,
+                house_list,
+                reference_ascendant,
+                states=interpretation_states,
+                source_ecliptic_coordinates={
+                    name: (state["longitude"], state["latitude"])
+                    for name, state in planet_states.items()
+                },
+                julian_day=julian_day,
+                julian_day_tt=times.tt,
+                sidereal=sidereal,
+                chart_sect=chart_sect,
+                lot_longitudes=lot_longitudes,
+                houses_resolved=houses_resolved,
+            )
+            if include_classical
+            else {}
         ),
-        "classical_patterns": _build_classical_patterns(
-            planets, aspects, interpretation_states, chart_sect=chart_sect
+        "classical_patterns": (
+            _build_classical_patterns(
+                planets, aspects, interpretation_states, chart_sect=chart_sect
+            )
+            if include_classical and include_aspects
+            else []
         ),
         "planetary_hours": (
             _planetary_hours(
@@ -544,7 +568,8 @@ def _build_core_chart_payload(
         )
     elif include_physical_source:
         result["chart_profile"]["planetary_models"] = planetary_models
-    result["classical"]["source_profile"] = "mixed_dorothean_egyptian_lilly"
+    if include_classical:
+        result["classical"]["source_profile"] = "mixed_dorothean_egyptian_lilly"
     if sidereal:
         result["chart_profile"].update(
             {
@@ -580,12 +605,13 @@ def _build_core_chart_payload(
                 ),
             }
         )
-    result["classical"]["ptolemy"] = build_ptolemy_layer(
-        {planet: state["longitude"] for planet, state in planet_states.items()},
-        chart_sect,
-        tropical=not sidereal,
-        ascendant=reference_ascendant,
-    )
+    if include_classical:
+        result["classical"]["ptolemy"] = build_ptolemy_layer(
+            {planet: state["longitude"] for planet, state in planet_states.items()},
+            chart_sect,
+            tropical=not sidereal,
+            ascendant=reference_ascendant,
+        )
 
     if angle_definition is not None:
         result["chart_profile"]["angle_definition"] = angle_definition
@@ -715,6 +741,9 @@ def build_midpoint_payload(
         hsys=hsys,
         zodiacal=zodiacal,
         include_planetary_hours=False,
+        include_classical=False,
+        include_fixed_stars=False,
+        include_aspects=False,
         high_latitude_fallback=high_latitude_fallback,
     )
     slim_base_chart = {

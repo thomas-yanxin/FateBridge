@@ -9,9 +9,11 @@ Earlier inputs retain Swiss Ephemeris' historical UT1/Delta-T convention.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
+from functools import lru_cache
 
 import astronomy
 
@@ -345,6 +347,83 @@ def ephemeris_time(moment: datetime | UTCCalendar) -> EphemerisTime:
     return EphemerisTime(civil, ut1_point, tt, method, assumed)
 
 
+@lru_cache(maxsize=4)
+def _compiled_utc_entries(
+    raw_entries: tuple[tuple[str, int], ...],
+) -> tuple[
+    tuple[float, ...],
+    tuple[
+        tuple[
+            Fraction,
+            float,
+            Fraction,
+            Fraction,
+            Fraction | None,
+            Fraction,
+        ],
+        ...,
+    ],
+    float,
+]:
+    nominal_starts: list[float] = []
+    max_boundary = -math.inf
+    for (prev_date, prev_tai), (curr_date, curr_tai) in zip(
+        raw_entries, raw_entries[1:]
+    ):
+        if curr_tai <= prev_tai:
+            continue
+        effective = datetime.fromisoformat(curr_date).replace(tzinfo=timezone.utc)
+        nom = _julian_day(effective) + (prev_tai + 32.184) / 86400
+        nominal_starts.append(nom)
+        max_boundary = max(max_boundary, nom)
+    parsed: list[
+        tuple[Fraction, float, Fraction, Fraction, Fraction | None, Fraction]
+    ] = []
+    n = len(raw_entries)
+    for index, (eff_date, tai) in enumerate(raw_entries):
+        effective = datetime.fromisoformat(eff_date).replace(tzinfo=timezone.utc)
+        eff_jd = _julian_day(effective)
+        eff_jd_frac = Fraction(eff_jd)
+        offset = Fraction(tai) + Fraction(32184, 1000)
+        nominal_boundary = eff_jd + (tai + 32.184) / 86400
+        start_tt = eff_jd_frac + offset / 86400
+        eff_cal_jd = utc_calendar(effective).julian_day_exact()
+        ordinary_stop: Fraction | None = None
+        if index + 1 < n:
+            next_date, next_tai = raw_entries[index + 1]
+            next_midnight = datetime.fromisoformat(next_date).replace(
+                tzinfo=timezone.utc
+            )
+            next_offset = Fraction(next_tai) + Fraction(32184, 1000)
+            ordinary_stop = (
+                Fraction(_julian_day(next_midnight))
+                + min(Fraction(0), next_offset - offset) / 86400
+            )
+        parsed.append(
+            (offset, nominal_boundary, start_tt, eff_cal_jd, ordinary_stop, start_tt)
+        )
+        max_boundary = max(max_boundary, nominal_boundary)
+    return tuple(nominal_starts), tuple(parsed), max_boundary
+
+
+_LAST_UTC_ENTRIES_ID: int | None = None
+_LAST_UTC_COMPILED: Any = None
+
+
+def _utc_entries_for(entries: list[dict[str, Any]]) -> Any:
+    global _LAST_UTC_ENTRIES_ID, _LAST_UTC_COMPILED
+    if _LAST_UTC_COMPILED is not None and id(entries) == _LAST_UTC_ENTRIES_ID:
+        return _LAST_UTC_COMPILED
+    raw_entries = tuple(
+        (entry["effective_date"], int(entry["tai_minus_utc_seconds"]))
+        for entry in entries
+    )
+    res = _compiled_utc_entries(raw_entries)
+    _LAST_UTC_ENTRIES_ID = id(entries)
+    _LAST_UTC_COMPILED = res
+    return res
+
+
 def utc_point_from_tt(
     julian_day_tt: float | TTInstant,
     *,
@@ -369,58 +448,35 @@ def utc_point_from_tt(
     else:
         exact_tt = Fraction(julian_day_tt)
     entries = utc_policy.leap_table()["entries"]
-    if not exact_epoch:
-        for previous, current in zip(entries, entries[1:]):
-            if current["tai_minus_utc_seconds"] <= previous["tai_minus_utc_seconds"]:
-                continue
-            effective = datetime.fromisoformat(current["effective_date"]).replace(
-                tzinfo=timezone.utc
+    nominal_starts, parsed, max_boundary = _utc_entries_for(entries)
+    if julian_day_tt > max_boundary + 1e-3:
+        offset, _nom, _start_tt, _eff_cal_jd, ordinary_stop, _ = parsed[-1]
+        point = CivilPoint(exact_tt - offset / 86400, ordinary_stop)
+        moment = point.as_calendar()
+        if active_ut1.get() is None and 1 <= moment.date_parts[0] <= 9999:
+            resolved = float(moment.julian_day_exact() + offset / 86400)
+        else:
+            resolved = _utc_tt_without_rotation(moment)
+        if abs(resolved - julian_day_tt) * 86400 > 0.0002:
+            raise ValueError(
+                "Solved event lies in a UTC leap second not representable by datetime"
             )
-            nominal_start = (
-                _julian_day(effective)
-                + (previous["tai_minus_utc_seconds"] + 32.184) / 86400
-            )
-            if julian_day_tt == nominal_start:
+        return point
+    if not exact_epoch and julian_day_tt in nominal_starts:
+        raise ValueError(
+            "Solved event lies in a UTC leap second not representable by datetime"
+        )
+    for offset, nominal_boundary, start_tt, eff_cal_jd, ordinary_stop, _ in reversed(
+        parsed
+    ):
+        encoded_boundary = not exact_epoch and julian_day_tt == nominal_boundary
+        if encoded_boundary or exact_tt >= start_tt:
+            if ordinary_stop is not None and exact_tt >= ordinary_stop + offset / 86400:
                 raise ValueError(
                     "Solved event lies in a UTC leap second not representable by datetime"
                 )
-    for index in range(len(entries) - 1, -1, -1):
-        entry = entries[index]
-        effective = datetime.fromisoformat(entry["effective_date"]).replace(
-            tzinfo=timezone.utc
-        )
-        offset = Fraction(entry["tai_minus_utc_seconds"]) + Fraction(32184, 1000)
-        nominal_boundary = (
-            _julian_day(effective) + (entry["tai_minus_utc_seconds"] + 32.184) / 86400
-        )
-        encoded_boundary = not exact_epoch and julian_day_tt == nominal_boundary
-        if (
-            encoded_boundary
-            or exact_tt >= Fraction(_julian_day(effective)) + offset / 86400
-        ):
-            ordinary_stop = None
-            if index + 1 < len(entries):
-                following = entries[index + 1]
-                next_midnight = datetime.fromisoformat(
-                    following["effective_date"]
-                ).replace(tzinfo=timezone.utc)
-                next_offset = Fraction(following["tai_minus_utc_seconds"]) + Fraction(
-                    32184, 1000
-                )
-                ordinary_stop = (
-                    Fraction(_julian_day(next_midnight))
-                    + min(Fraction(0), next_offset - offset) / 86400
-                )
-                if exact_tt >= ordinary_stop + offset / 86400:
-                    raise ValueError(
-                        "Solved event lies in a UTC leap second not representable by datetime"
-                    )
             point = CivilPoint(
-                (
-                    utc_calendar(effective).julian_day_exact()
-                    if encoded_boundary
-                    else exact_tt - offset / 86400
-                ),
+                eff_cal_jd if encoded_boundary else exact_tt - offset / 86400,
                 ordinary_stop,
             )
             moment = point.as_calendar()

@@ -164,97 +164,137 @@ def calculate_extrareturns(
             ValueError,
             RuntimeError,
         ) + runtime.native_ephemeris_errors()
-        for body_name, spec in RETURN_BODIES.items():
-            planet_id = int(spec["planet_id"])  # type: ignore[call-overload]
-            try:
-                natal_motion = planet_motion_at_utc(
-                    planet_id,
-                    birth_info.utc_calendar,
-                    sidereal=sidereal,
-                )
-                natal_longitude = natal_motion[0]
-                resolved = resolve_planet_returns(
-                    planet_id,
-                    natal_longitude,
-                    period_days=float(spec["period_days"]),  # type: ignore[arg-type]
-                    reference_utc=reference_utc,
-                    past=1,
-                    future=1,
-                    sidereal=sidereal,
-                    natal_motion=natal_motion,
-                    not_before_utc=birth_info.utc_calendar,
-                )
-            except chiron_errors as body_err:
-                if body_name == "Chiron":
-                    returns.append(
-                        {
-                            "body": body_name,
-                            "body_label": "凯龙星",
-                            "status": "unavailable",
-                            "unavailable_reason": str(body_err),
-                            "natal_longitude": None,
-                            "most_recent_return": None,
-                            "next_return": None,
-                        }
-                    )
-                    continue
-                raise
-            most_recent = resolved.past[-1] if resolved.past else None
-            upcoming = resolved.future[0] if resolved.future else None
-            return_moments: dict[str, JsonValue] = {}
-            next_date = "—"
-            for key, event in (
-                ("most_recent_return", most_recent),
-                ("next_return", upcoming),
-            ):
-                if event is None:
-                    return_moments[key] = None
-                    continue
-                moment, utc_label = event.utc_datetime, event.utc_label
-                local_label = None
-                if moment is not None:
-                    utc_label = moment.isoformat()
-                if utc_label is not None:
-                    if event.utc_is_leap_second:
-                        local_label = local_leap_second_label(utc_label, local_tz)
-                    else:
-                        calendar = (
-                            utc_calendar(moment)
-                            if moment is not None
-                            else ZonedCalendar.from_isoformat(utc_label).utc
+        from fatebridge.core.astro.astrology_events import _julian_day as _events_jd_tt
+        from fatebridge.core.astro.astrology_events import (
+            _planet_motion as _events_planet_motion,
+        )
+
+        use_fast_motion = (
+            planet_motion_at_utc.__module__ == "fatebridge.core.astro.astrology_events"
+            and planet_motion_at_utc.__name__ == "planet_motion_at_utc"
+        )
+        use_fast_resolve = (
+            resolve_planet_returns.__module__
+            == "fatebridge.core.astro.astrology_events"
+            and resolve_planet_returns.__name__ == "resolve_planet_returns"
+        )
+        birth_tt = _events_jd_tt(birth_info.utc_calendar) if use_fast_motion else None
+        reference_tt = _events_jd_tt(reference_utc) if use_fast_resolve else None
+        with runtime.preserve_ephemeris_path():
+            for body_name, spec in RETURN_BODIES.items():
+                planet_id = int(spec["planet_id"])  # type: ignore[call-overload]
+                try:
+                    natal_motion = (
+                        _events_planet_motion(
+                            birth_tt, planet_id, sidereal=sidereal, collect_files=True
                         )
-                        local = ZonedCalendar(calendar, local_tz)
-                        if not is_unspecified_local_time(local.rule_sample()):
-                            local_label = local.isoformat()
-                event_record: dict[str, JsonValue] = {
-                    "datetime_utc": utc_label,
-                    "datetime_local": local_label,
-                }
-                if moment is None:
-                    event_record["julian_day_tt"] = event.tt.as_float()
-                    event_record["utc_representation"] = utc_representation(
-                        utc_label, moment, event.utc_is_leap_second
+                        if use_fast_motion and birth_tt is not None
+                        else planet_motion_at_utc(
+                            planet_id,
+                            birth_info.utc_calendar,
+                            sidereal=sidereal,
+                        )
                     )
-                return_moments[key] = event_record
-                if key == "next_return":
-                    if local_label is not None:
-                        next_date = local_label.partition("T")[0]
-                    elif utc_label is not None:
-                        next_date = f"{utc_label.partition('T')[0]}（UTC）"
+                    natal_longitude = natal_motion[0]
+                    if use_fast_resolve:
+                        resolved = resolve_planet_returns(
+                            planet_id,
+                            natal_longitude,
+                            period_days=float(spec["period_days"]),  # type: ignore[arg-type]
+                            reference_utc=reference_utc,
+                            past=1,
+                            future=1,
+                            sidereal=sidereal,
+                            natal_motion=natal_motion,
+                            not_before_utc=birth_info.utc_calendar,
+                            not_before_tt=birth_tt,
+                            reference_tt=reference_tt,
+                        )
                     else:
-                        next_date = "UTC 钟面无唯一表示"
-            body_label = "凯龙星" if body_name == "Chiron" else planet_label(body_name)
-            returns.append(
-                {
-                    "body": body_name,
-                    "body_label": body_label,
-                    "natal_longitude": longitude_to_point_dict(
-                        body_name, natal_longitude
-                    ),
-                    **return_moments,
-                }
-            )
-            return_summaries.append(f"{body_label}下次返照 {next_date}")
+                        resolved = resolve_planet_returns(
+                            planet_id,
+                            natal_longitude,
+                            period_days=float(spec["period_days"]),  # type: ignore[arg-type]
+                            reference_utc=reference_utc,
+                            past=1,
+                            future=1,
+                            sidereal=sidereal,
+                            natal_motion=natal_motion,
+                            not_before_utc=birth_info.utc_calendar,
+                        )
+                except chiron_errors as body_err:
+                    if body_name == "Chiron":
+                        returns.append(
+                            {
+                                "body": body_name,
+                                "body_label": "凯龙星",
+                                "status": "unavailable",
+                                "unavailable_reason": str(body_err),
+                                "natal_longitude": None,
+                                "most_recent_return": None,
+                                "next_return": None,
+                            }
+                        )
+                        continue
+                    raise
+                most_recent = resolved.past[-1] if resolved.past else None
+                upcoming = resolved.future[0] if resolved.future else None
+                return_moments: dict[str, JsonValue] = {}
+                next_date = "—"
+                for key, event in (
+                    ("most_recent_return", most_recent),
+                    ("next_return", upcoming),
+                ):
+                    if event is None:
+                        return_moments[key] = None
+                        continue
+                    moment, utc_label = event.utc_datetime, event.utc_label
+                    local_label = None
+                    if moment is not None:
+                        utc_label = moment.isoformat()
+                    if utc_label is not None:
+                        if event.utc_is_leap_second:
+                            local_label = local_leap_second_label(utc_label, local_tz)
+                        else:
+                            calendar = (
+                                utc_calendar(moment)
+                                if moment is not None
+                                else ZonedCalendar.from_isoformat(utc_label).utc
+                            )
+                            local = ZonedCalendar(calendar, local_tz)
+                            if not is_unspecified_local_time(local.rule_sample()):
+                                local_label = local.isoformat()
+                    event_record: dict[str, JsonValue] = {
+                        "datetime_utc": utc_label,
+                        "datetime_local": local_label,
+                    }
+                    if moment is None:
+                        event_record["julian_day_tt"] = event.tt.as_float()
+                        event_record["utc_representation"] = utc_representation(
+                            utc_label, moment, event.utc_is_leap_second
+                        )
+                    return_moments[key] = event_record
+                    if key == "next_return":
+                        if local_label is not None:
+                            next_date = local_label.partition("T")[0]
+                        elif utc_label is not None:
+                            next_date = f"{utc_label.partition('T')[0]}（UTC）"
+                        else:
+                            next_date = "UTC 钟面无唯一表示"
+                body_label = (
+                    "凯龙星" if body_name == "Chiron" else planet_label(body_name)
+                )
+                returns.append(
+                    {
+                        "body": body_name,
+                        "body_label": body_label,
+                        "natal_longitude": longitude_to_point_dict(
+                            body_name, natal_longitude
+                        ),
+                        **return_moments,
+                    }
+                )
+                return_summaries.append(f"{body_label}下次返照 {next_date}")
 
         house_fields = house_system_fields(house_system)
         context: dict[str, JsonValue] = {

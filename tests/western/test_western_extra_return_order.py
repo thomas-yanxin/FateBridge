@@ -437,6 +437,9 @@ def test_extra_returns_preserve_the_root_when_utc_has_no_datetime(
         "Mercury",
         "North Node",
         "Chiron",
+        "Uranus",
+        "Neptune",
+        "Pluto",
     }
     node = next(row for row in returns if row["body"] == "North Node")
     assert (

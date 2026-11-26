@@ -84,6 +84,7 @@ def phase_crossings_tt(
     *,
     step_degrees: Literal[45, 90],
     include_end: bool = False,
+    phase_float_at: Any | None = None,
 ) -> list[PhaseCrossing]:
     """Find first on-or-post crossing source points in the exact TT window."""
     left = start_tt.as_float()
@@ -97,73 +98,105 @@ def phase_crossings_tt(
 
     rows: list[PhaseCrossing] = []
     max_residual = 1e-6
-    phase = angle_fraction(phase_at(left))
-    start_residual = phase % step_degrees
-    if start_residual < max_residual:
-        # The first eligible grid point can already be just past a crossing.
-        # Only consult its predecessor for a point within the root tolerance.
-        previous = left
-        crosses_at_start = start_residual == 0
-        if not crosses_at_start:
-            previous = math.nextafter(left, -math.inf)
-            advance = (phase - angle_fraction(phase_at(previous))) % 360
-            crosses_at_start = start_residual < advance < 30
-        if crosses_at_start:
-            rows.append(
-                PhaseCrossing(
-                    TTInstant.from_float(previous),
-                    TTInstant.from_float(left),
-                    int(phase - start_residual) % 360,
-                    start_residual,
+    phase_f_fn = phase_float_at or (lambda t: float(phase_at(t)))
+    phase_f = float(phase_f_fn(left)) % 360.0
+    start_res_f = phase_f % step_degrees
+    if start_res_f < max_residual + 1e-7:
+        phase = angle_fraction(phase_at(left))
+        start_residual = phase % step_degrees
+        if start_residual < max_residual:
+            # The first eligible grid point can already be just past a crossing.
+            # Only consult its predecessor for a point within the root tolerance.
+            previous = left
+            crosses_at_start = start_residual == 0
+            if not crosses_at_start:
+                previous = math.nextafter(left, -math.inf)
+                advance = (phase - angle_fraction(phase_at(previous))) % 360
+                crosses_at_start = start_residual < advance < 30
+            if crosses_at_start:
+                rows.append(
+                    PhaseCrossing(
+                        TTInstant.from_float(previous),
+                        TTInstant.from_float(left),
+                        int(phase - start_residual) % 360,
+                        start_residual,
+                    )
                 )
-            )
 
     while left < last:
         right = min(left + 1.0, last)
         if right <= left:
             raise ValueError("窗口小于可表示JD间隔")
-        next_phase = angle_fraction(phase_at(right))
-        advance = (next_phase - phase) % 360
-        if not 0 < advance < 30:
+        next_phase_f = float(phase_f_fn(right)) % 360.0
+        advance_f = (next_phase_f - phase_f) % 360.0
+        if not 0.0 < advance_f < 30.0:
             raise ValueError("日采样黄经差越界，不跨越未知相位或漏项")
-        distance = step_degrees - phase % step_degrees
-        if distance <= advance:
-            lo, hi = left, right
-            angle = int(phase + distance) % 360
-            residual = advance - distance
-            d_lo = float(phase - angle)
-            if d_lo >= 180.0:
-                d_lo -= 360.0
-            d_hi = float(next_phase - angle)
-            if d_hi < -180.0:
-                d_hi += 360.0
-            for step in range(64):
-                mid = (lo + hi) / 2
-                if mid in (lo, hi):
-                    break
-                cand = mid
-                if step % 3 != 2:
-                    denom = d_hi - d_lo
-                    if denom != 0.0 and math.isfinite(denom):
-                        sec = lo - d_lo * (hi - lo) / denom
-                        if lo < sec < hi:
-                            cand = sec
-                difference = (angle_fraction(phase_at(cand)) - angle + 180) % 360 - 180
-                if difference < 0:
-                    lo, d_lo = cand, float(difference)
-                else:
-                    hi, residual, d_hi = cand, difference, float(difference)
-            if residual >= max_residual:
-                raise ValueError("相位求根未收敛，不输出近似猜测")
-            rows.append(
-                PhaseCrossing(
-                    TTInstant.from_float(lo),
-                    TTInstant.from_float(hi),
-                    angle,
-                    residual,
+        dist_f = step_degrees - phase_f % step_degrees
+        if dist_f <= advance_f + 1e-9:
+            phase = angle_fraction(phase_at(left))
+            next_phase = angle_fraction(phase_at(right))
+            advance = (next_phase - phase) % 360
+            distance = step_degrees - phase % step_degrees
+            if distance <= advance:
+                lo, hi = left, right
+                angle = int(phase + distance) % 360
+                residual = advance - distance
+                d_lo = float(phase - angle)
+                if d_lo >= 180.0:
+                    d_lo -= 360.0
+                d_hi = float(next_phase - angle)
+                if d_hi < -180.0:
+                    d_hi += 360.0
+                tol = 8.0 * math.ulp(max(abs(lo), abs(hi), 1.0))
+                if phase_float_at is not None and abs(hi - lo) > tol:
+                    for step in range(40):
+                        if abs(hi - lo) <= tol:
+                            break
+                        mid = (lo + hi) / 2
+                        if mid in (lo, hi):
+                            break
+                        cand = mid
+                        if step % 3 != 2:
+                            denom = d_hi - d_lo
+                            if denom != 0.0 and math.isfinite(denom):
+                                sec = lo - d_lo * (hi - lo) / denom
+                                if lo < sec < hi:
+                                    cand = sec
+                        df = math.remainder(float(phase_f_fn(cand)) - angle, 360.0)
+                        if df < 0.0:
+                            lo, d_lo = cand, df
+                        else:
+                            hi, d_hi = cand, df
+                    residual = (angle_fraction(phase_at(hi)) - angle + 180) % 360 - 180
+                for step in range(64):
+                    mid = (lo + hi) / 2
+                    if mid in (lo, hi):
+                        break
+                    cand = mid
+                    if step % 3 != 2:
+                        denom = d_hi - d_lo
+                        if denom != 0.0 and math.isfinite(denom):
+                            sec = lo - d_lo * (hi - lo) / denom
+                            if lo < sec < hi:
+                                cand = sec
+                    difference = (
+                        angle_fraction(phase_at(cand)) - angle + 180
+                    ) % 360 - 180
+                    if difference < 0:
+                        lo, d_lo = cand, float(difference)
+                    else:
+                        hi, residual, d_hi = cand, difference, float(difference)
+                if residual >= max_residual:
+                    raise ValueError("相位求根未收敛，不输出近似猜测")
+                rows.append(
+                    PhaseCrossing(
+                        TTInstant.from_float(lo),
+                        TTInstant.from_float(hi),
+                        angle,
+                        residual,
+                    )
                 )
-            )
-        left, phase = right, next_phase
+        left, phase_f = right, next_phase_f
     return rows
 
 

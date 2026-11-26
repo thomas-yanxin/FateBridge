@@ -449,7 +449,10 @@ def build_lunation_phase_payload(
     )
     samples: dict[float, Fraction] = {}
     from fatebridge.core.astro import runtime as _astro_rt
-    from fatebridge.core.astro.ephemeris import fast_swe_call as _fast_swe
+    from fatebridge.core.ephemeris_runtime import EPHEMERIS_LOCK as _EPHEM_LOCK
+    from fatebridge.core.ephemeris_runtime import (
+        _ensure_thread_ephemeris_path as _ensure_ephem_path,
+    )
     from fatebridge.core.ephemeris_runtime import ephemeris_call as _orig_ephem_call
     from fatebridge.core.jpl_ephemeris import configured_jpl_file as _jpl_file
 
@@ -458,6 +461,10 @@ def build_lunation_phase_payload(
         and _jpl_file() is None
         and _astro_rt.swe is not None
     )
+    swe_mod = _astro_rt.swe
+    fast_lun_flags = (
+        (swe_mod.FLG_SWIEPH | swe_mod.FLG_SPEED) if swe_mod is not None else 0
+    )
 
     def phase_at(jd_tt: float) -> Fraction:
         if jd_tt in samples:
@@ -465,13 +472,8 @@ def build_lunation_phase_payload(
         longitudes: list[Fraction] = []
         speeds: list[float] = []
         if use_fast_lunation and jd_tt != natal_subject.tt.as_float():
-            for body_id in (_astro_rt.swe.SUN, _astro_rt.swe.MOON):
-                coords, flag = _fast_swe(
-                    "calc",
-                    jd_tt,
-                    body_id,
-                    _astro_rt.swe.FLG_SWIEPH | _astro_rt.swe.FLG_SPEED,
-                )
+            for body_id in (swe_mod.SUN, swe_mod.MOON):
+                coords, flag = swe_mod.calc(jd_tt, body_id, fast_lun_flags)
                 if flag < 0:
                     raise ValueError("Progressed lunation ephemeris source unavailable")
                 longitudes.append(Fraction(float(coords[0]) % 360.0))
@@ -497,16 +499,45 @@ def build_lunation_phase_payload(
         samples[jd_tt] = elongation
         return elongation
 
+    def phase_float_at(jd_tt: float) -> float:
+        if jd_tt in samples:
+            return float(samples[jd_tt])
+        if use_fast_lunation and jd_tt != natal_subject.tt.as_float():
+            c_sun, f_sun = swe_mod.calc(jd_tt, swe_mod.SUN, fast_lun_flags)
+            c_moon, f_moon = swe_mod.calc(jd_tt, swe_mod.MOON, fast_lun_flags)
+            if f_sun < 0 or f_moon < 0:
+                raise ValueError("Progressed lunation ephemeris source unavailable")
+            if float(c_moon[3]) <= float(c_sun[3]):
+                raise ValueError(
+                    "Progressed lunation requires increasing Moon–Sun motion"
+                )
+            return ((float(c_moon[0]) % 360.0) - (float(c_sun[0]) % 360.0)) % 360.0
+        return float(phase_at(jd_tt))
+
     natal_elongation = phase_at(natal_subject.tt.as_float())
     natal_key, natal_label = _phase_for_elongation(natal_elongation)
     timeline: list[dict[str, Any]] = []
-    for crossing in phase_crossings_tt(
-        natal_subject.tt,
-        cap_tt,
-        phase_at,
-        step_degrees=45,
-        include_end=True,
-    ):
+    if use_fast_lunation:
+        with _EPHEM_LOCK:
+            _ensure_ephem_path()
+            crossings = phase_crossings_tt(
+                natal_subject.tt,
+                cap_tt,
+                phase_at,
+                step_degrees=45,
+                include_end=True,
+                phase_float_at=phase_float_at,
+            )
+    else:
+        crossings = phase_crossings_tt(
+            natal_subject.tt,
+            cap_tt,
+            phase_at,
+            step_degrees=45,
+            include_end=True,
+            phase_float_at=phase_float_at,
+        )
+    for crossing in crossings:
         civil = utc_point_from_tt(crossing.tt)
         age = civil.day - birth_day
         if not 0 < age <= max_age:

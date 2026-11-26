@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import time
+from datetime import datetime, timezone
 
 import pytest
 
@@ -231,6 +232,17 @@ def test_horary_election_hamburg_and_relationship_features_and_no_prose_bloat() 
     assert hamburg_bytes < 80 * 1024, f"Hamburg audit too large: {hamburg_bytes} B"
     assert not (_walk_keys(hamburg) & PROSE_KEYS)
 
+    hamburg_directed = calculate_germany_chart_analysis(
+        **NATAL_1990,
+        analysis_datetime=datetime(2024, 6, 15, 12, 0, tzinfo=timezone.utc),
+    )
+    assert "error" not in hamburg_directed
+    assert (
+        hamburg_directed["midpoint_analysis"]["solar_arc_analysis"]["status"]
+        == "computed"
+    )
+    assert not (_walk_keys(hamburg_directed) & PROSE_KEYS)
+
     rel = calculate_relative_chart_analysis(
         inner_payload=NATAL_1990,
         outer_payload={
@@ -252,7 +264,7 @@ def test_warm_latencies_meet_realtime_budgets() -> None:
         (
             "astrology_chart",
             lambda: calculate_core_chart_analysis(**NATAL_1990, chart_variant="chart"),
-            60.0,
+            30.0,
         ),
         (
             "horary_chart",
@@ -267,7 +279,7 @@ def test_warm_latencies_meet_realtime_budgets() -> None:
                 latitude=39.9,
                 category="marriage",
             ),
-            450.0,
+            130.0,
         ),
         (
             "evaluate_election_time",
@@ -282,24 +294,24 @@ def test_warm_latencies_meet_realtime_budgets() -> None:
                 latitude=39.9,
                 topic_id="marriage",
             ),
-            450.0,
+            35.0,
         ),
         (
             "planetary_returns",
             lambda: calculate_extrareturns(
                 **NATAL_1990, analysis_year=2025, analysis_month=1, analysis_day=1
             ),
-            200.0,
+            85.0,
         ),
         (
             "hamburg_midpoint_chart",
             lambda: calculate_germany_chart_analysis(**NATAL_1990),
-            150.0,
+            30.0,
         ),
         (
             "lunar_phase_progressions",
             lambda: calculate_lunation_phase(**NATAL_1990),
-            90.0,
+            35.0,
         ),
     ]
     for label, fn, limit_ms in cases:

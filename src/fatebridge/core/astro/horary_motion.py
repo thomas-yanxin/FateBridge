@@ -26,7 +26,11 @@ from fatebridge.core.astro.physical_sources import (
 )
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.classical_western import _aspect_phase
-from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
+from fatebridge.core.ephemeris_runtime import (
+    EPHEMERIS_LOCK,
+    _ensure_thread_ephemeris_path,
+    configured_ephemeris_path,
+)
 from fatebridge.core.ephemeris_runtime import ephemeris_call as _ORIG_EPHEMERIS_CALL
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.utils.errors import EphemerisSourceError
@@ -59,11 +63,46 @@ def _signed_step(first: float, second: float) -> Fraction:
 
 
 def _bisect_crossing(
-    left: float, right: float, residual: LunarCrossingResidual
+    left: float,
+    right: float,
+    residual: LunarCrossingResidual,
+    float_residual: Any | None = None,
 ) -> TtRootBracket:
     """Return adjacent TT endpoints with negative left and nonnegative right."""
+    orig_left, orig_right = left, right
+    if float_residual is not None:
+        tol = 0.0
+        fl, fr = float_residual(left), float_residual(right)
+        if fl < 0.0 <= fr:
+            fl_s, fr_s = fl, fr
+            last_side = 0
+            for step in range(48):
+                mid = (left + right) / 2
+                if mid == left or mid == right:
+                    break
+                cand = mid
+                if step % 4 != 3:
+                    denom = fr_s - fl_s
+                    if denom != 0.0 and math.isfinite(denom):
+                        sec = left - fl_s * (right - left) / denom
+                        if left < sec < right:
+                            cand = sec
+                fm = float_residual(cand)
+                if fm < 0.0:
+                    left, fl, fl_s = cand, fm, fm
+                    if last_side == -1:
+                        fr_s *= 0.5
+                    last_side = -1
+                else:
+                    right, fr, fr_s = cand, fm, fm
+                    if last_side == 1:
+                        fl_s *= 0.5
+                    last_side = 1
     if not residual(left) < 0 <= residual(right):
-        raise ValueError("Lunar event root is not bracketed")
+        if (left, right) != (orig_left, orig_right):
+            left, right = orig_left, orig_right
+        if not residual(left) < 0 <= residual(right):
+            raise ValueError("Lunar event root is not bracketed")
     for _ in range(80):
         middle = (left + right) / 2
         if middle == left or middle == right:
@@ -169,9 +208,12 @@ def solve_lunar_contacts(
     first = {p: sample(p, start_tt) for p in ("Moon", *bodies)}
     initial_moon = angle_fraction(first["Moon"]["longitude"]) % 360
     boundary = (initial_moon // 30 + 1) * 30
+    boundary_f = float(boundary)
     longitude = initial_moon
-    relative = {
-        p: initial_moon - angle_fraction(first[p]["longitude"]) % 360 for p in bodies
+    longitude_f = float(initial_moon)
+    relative_f = {
+        p: float(initial_moon - angle_fraction(first[p]["longitude"]) % 360)
+        for p in bodies
     }
     left, before = start_tt, first
     contacts = []
@@ -181,73 +223,155 @@ def solve_lunar_contacts(
         after = {p: sample(p, right) for p in ("Moon", *bodies)}
         if before["Moon"]["speed"] <= 0 or after["Moon"]["speed"] <= 0:
             raise ValueError("Lunar forward-motion condition not established")
-        moon_step = _signed_step(
-            before["Moon"]["longitude"], after["Moon"]["longitude"]
-        )
-        if not 0 < moon_step < 5:
-            raise ValueError("Lunar scan interval violates the declared unwrap bound")
-        next_longitude = longitude + moon_step
-        if longitude < boundary <= next_longitude:
-
-            def ingress_residual(at: float) -> Fraction:
-                return (
-                    longitude
-                    + _signed_step(
-                        before["Moon"]["longitude"], sample("Moon", at)["longitude"]
-                    )
-                    - boundary
+        moon_step_f = (
+            after["Moon"]["longitude"] - before["Moon"]["longitude"] + 180.0
+        ) % 360.0 - 180.0
+        if not 0.0 < moon_step_f < 5.0:
+            moon_step = _signed_step(
+                before["Moon"]["longitude"], after["Moon"]["longitude"]
+            )
+            if not 0 < moon_step < 5:
+                raise ValueError(
+                    "Lunar scan interval violates the declared unwrap bound"
                 )
+            moon_step_f = float(moon_step)
+        next_longitude_f = longitude_f + moon_step_f
+        if longitude_f < boundary_f <= next_longitude_f + 1e-9:
+            longitude_exact = angle_fraction(before["Moon"]["longitude"]) % 360
+            # Recover cumulative unwrapped exact longitude only at sign exit.
+            turns_exit = int(round((longitude_f - float(longitude_exact)) / 360.0))
+            longitude = longitude_exact + turns_exit * 360
+            moon_step = _signed_step(
+                before["Moon"]["longitude"], after["Moon"]["longitude"]
+            )
+            next_longitude = longitude + moon_step
+            if longitude < boundary <= next_longitude:
 
-            exit_bracket = _bisect_crossing(left, right, ingress_residual)
+                def ingress_residual(at: float) -> Fraction:
+                    return (
+                        longitude
+                        + _signed_step(
+                            before["Moon"]["longitude"], sample("Moon", at)["longitude"]
+                        )
+                        - boundary
+                    )
+
+                def ingress_residual_f(at: float) -> float:
+                    return (
+                        longitude_f
+                        + (
+                            sample("Moon", at)["longitude"]
+                            - before["Moon"]["longitude"]
+                            + 180.0
+                        )
+                        % 360.0
+                        - 180.0
+                        - boundary_f
+                    )
+
+                exit_bracket = _bisect_crossing(
+                    left, right, ingress_residual, ingress_residual_f
+                )
         for planet in bodies:
             if any(
                 row["Moon"]["speed"] <= row[planet]["speed"] for row in (before, after)
             ):
                 raise ValueError("Lunar relative-motion condition not established")
-            change = moon_step - _signed_step(
-                before[planet]["longitude"], after[planet]["longitude"]
-            )
-            if not 0 < change < 5:
-                raise ValueError(
-                    "Relative lunar scan is not monotone within unwrap bounds"
+            other_step_f = (
+                after[planet]["longitude"] - before[planet]["longitude"] + 180.0
+            ) % 360.0 - 180.0
+            change_f = moon_step_f - other_step_f
+            if not 0.0 < change_f < 5.0:
+                moon_step = _signed_step(
+                    before["Moon"]["longitude"], after["Moon"]["longitude"]
                 )
-            low, high = relative[planet], relative[planet] + change
-            for turn in range(low // 360 - 1, high // 360 + 2):
+                change = moon_step - _signed_step(
+                    before[planet]["longitude"], after[planet]["longitude"]
+                )
+                if not 0 < change < 5:
+                    raise ValueError(
+                        "Relative lunar scan is not monotone within unwrap bounds"
+                    )
+                change_f = float(change)
+            low_f = relative_f[planet]
+            high_f = low_f + change_f
+            t_lo = int(math.floor(low_f / 360.0)) - 1
+            t_hi = int(math.floor(high_f / 360.0)) + 1
+            hit = False
+            for turn in range(t_lo, t_hi + 1):
+                base = turn * 360
                 for ray in RAYS:
-                    target = ray + turn * 360
-                    if not low < target <= high:
-                        continue
+                    tgt_f = ray + base
+                    if low_f - 1e-8 < tgt_f <= high_f + 1e-8:
+                        hit = True
+                        break
+                if hit:
+                    break
+            if hit:
+                base_rel_exact = (
+                    angle_fraction(before["Moon"]["longitude"]) % 360
+                    - angle_fraction(before[planet]["longitude"]) % 360
+                )
+                turns_rel = int(round((low_f - float(base_rel_exact)) / 360.0))
+                low = base_rel_exact + turns_rel * 360
+                change = _signed_step(
+                    before["Moon"]["longitude"], after["Moon"]["longitude"]
+                ) - _signed_step(
+                    before[planet]["longitude"], after[planet]["longitude"]
+                )
+                high = low + change
+                for turn in range(low // 360 - 1, high // 360 + 2):
+                    for ray in RAYS:
+                        target = ray + turn * 360
+                        if not low < target <= high:
+                            continue
+                        target_f = float(target)
 
-                    def residual(at: float) -> Fraction:
-                        current_moon = _signed_step(
-                            before["Moon"]["longitude"], sample("Moon", at)["longitude"]
-                        )
-                        current_other = _signed_step(
-                            before[planet]["longitude"], sample(planet, at)["longitude"]
-                        )
-                        return low + current_moon - current_other - target
+                        def residual(at: float) -> Fraction:
+                            current_moon = _signed_step(
+                                before["Moon"]["longitude"],
+                                sample("Moon", at)["longitude"],
+                            )
+                            current_other = _signed_step(
+                                before[planet]["longitude"],
+                                sample(planet, at)["longitude"],
+                            )
+                            return low + current_moon - current_other - target
 
-                    bracket = _bisect_crossing(left, right, residual)
-                    event_moon, event_other = sample("Moon", bracket[1]), sample(
-                        planet, bracket[1]
-                    )
-                    contacts.append(
-                        {
-                            "other": planet,
-                            "after_days": bracket[1] - start_tt,
-                            "julian_day_tt": bracket[1],
-                            "root_bracket_tt": list(bracket),
-                            "moon_longitude": event_moon["longitude"],
-                            "other_longitude": event_other["longitude"],
-                            "moon_latitude": event_moon.get("latitude"),
-                            "other_latitude": event_other.get("latitude"),
-                            **_event_fields(first["Moon"], first[planet], ray),
-                        }
-                    )
-            relative[planet] = high
+                        def residual_f(at: float) -> float:
+                            cm = (
+                                sample("Moon", at)["longitude"]
+                                - before["Moon"]["longitude"]
+                                + 180.0
+                            ) % 360.0 - 180.0
+                            co = (
+                                sample(planet, at)["longitude"]
+                                - before[planet]["longitude"]
+                                + 180.0
+                            ) % 360.0 - 180.0
+                            return low_f + cm - co - target_f
+
+                        bracket = _bisect_crossing(left, right, residual, residual_f)
+                        event_moon, event_other = sample("Moon", bracket[1]), sample(
+                            planet, bracket[1]
+                        )
+                        contacts.append(
+                            {
+                                "other": planet,
+                                "after_days": bracket[1] - start_tt,
+                                "julian_day_tt": bracket[1],
+                                "root_bracket_tt": list(bracket),
+                                "moon_longitude": event_moon["longitude"],
+                                "other_longitude": event_other["longitude"],
+                                "moon_latitude": event_moon.get("latitude"),
+                                "other_latitude": event_other.get("latitude"),
+                                **_event_fields(first["Moon"], first[planet], ray),
+                            }
+                        )
+            relative_f[planet] = high_f
         if exit_bracket is not None:
             break
-        left, before, longitude = right, after, next_longitude
+        left, before, longitude_f = right, after, next_longitude_f
     if exit_bracket is None:
         raise ValueError("No lunar ingress bracket within the declared seven-day guard")
     accepted = [row for row in contacts if row["root_bracket_tt"][1] <= exit_bracket[0]]
@@ -298,14 +422,14 @@ def native_lunar_contacts(subject: Any) -> dict[str, Any]:
     def offset_speed(at: float) -> float:
         return offset(at + 0.5) - offset(at - 0.5) if sidereal else 0.0
 
+    swe_mod = runtime.swe
+    fast_flags = (swe_mod.FLG_SWIEPH | swe_mod.FLG_SPEED) if swe_mod is not None else 0
+
     @lru_cache(maxsize=None)
     def sample(planet: str, at: float) -> SampledPlanetMotion:
-        assert_physical_configuration(selected)
         if use_fast and at != subject.julian_day_tt:
             body_id = PLANET_SWISSEPH_IDS[planet]
-            coords, flag = fast_swe_call(
-                "calc", at, body_id, runtime.swe.FLG_SWIEPH | runtime.swe.FLG_SPEED
-            )
+            coords, flag = swe_mod.calc(at, body_id, fast_flags)
             if flag < 0:
                 raise ValueError("Physical lunar-event ephemeris unavailable")
             model = runtime.ephemeris_model_from_retflag(flag)
@@ -320,6 +444,7 @@ def native_lunar_contacts(subject: Any) -> dict[str, Any]:
             if not all(math.isfinite(v) for v in values.values()):
                 raise ValueError("Nonfinite physical lunar-event state")
             return values
+        assert_physical_configuration(selected)
         result = _swisseph_planet_state(
             planet,
             julian_day_tt=at,
@@ -344,7 +469,14 @@ def native_lunar_contacts(subject: Any) -> dict[str, Any]:
         return values
 
     try:
-        result = solve_lunar_contacts(subject.julian_day_tt, sample)
+        sample("Moon", subject.julian_day_tt)
+        if use_fast:
+            with EPHEMERIS_LOCK:
+                _ensure_thread_ephemeris_path()
+                assert_physical_configuration(selected)
+                result = solve_lunar_contacts(subject.julian_day_tt, sample)
+        else:
+            result = solve_lunar_contacts(subject.julian_day_tt, sample)
         result["physical_ephemeris_source"] = trace.finish()
         result["longitude_frame"] = (
             "sidereal_lahiri" if sidereal else "tropical_true_ecliptic_of_date"

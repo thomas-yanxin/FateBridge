@@ -10,6 +10,7 @@ import math
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone, tzinfo
 from fractions import Fraction
+from functools import lru_cache
 from typing import Any
 
 from fatebridge.core.astro import runtime
@@ -64,6 +65,67 @@ def _extended_utc_label(point: TTInstant) -> str | None:
     return candidate.isoformat() if candidate.date_parts[0] < 1 else None
 
 
+@lru_cache(maxsize=4)
+def _compiled_leap_spans(
+    raw_entries: tuple[tuple[str, int], ...],
+) -> tuple[
+    float,
+    float,
+    tuple[tuple[float, float, Fraction, Fraction, int, str], ...],
+]:
+    spans: list[tuple[float, float, Fraction, Fraction, int, str]] = []
+    min_start = math.inf
+    max_stop = -math.inf
+    for (prev_date, prev_tai), (curr_date, curr_tai) in zip(
+        raw_entries, raw_entries[1:]
+    ):
+        delta = curr_tai - prev_tai
+        if delta <= 0:
+            continue
+        effective = datetime.fromisoformat(curr_date).replace(tzinfo=timezone.utc)
+        midnight = Fraction(_julian_day(effective))
+        start = midnight + (Fraction(prev_tai) + Fraction(4023, 125)) / 86400
+        stop = midnight + (Fraction(curr_tai) + Fraction(4023, 125)) / 86400
+        start_f = float(start)
+        stop_f = float(stop)
+        min_start = min(min_start, start_f)
+        max_stop = max(max_stop, stop_f)
+        prior_prefix = (effective - timedelta(days=1)).strftime("%Y-%m-%dT23:59:60")
+        spans.append((start_f, stop_f, start, stop, delta, prior_prefix))
+    return min_start, max_stop, tuple(spans)
+
+
+_LAST_LEAP_TABLE_ID: int | None = None
+_LAST_LEAP_SPANS: (
+    tuple[
+        float,
+        float,
+        tuple[tuple[float, float, Fraction, Fraction, int, str], ...],
+    ]
+    | None
+) = None
+
+
+def _leap_spans_for(
+    entries: list[dict[str, Any]],
+) -> tuple[
+    float,
+    float,
+    tuple[tuple[float, float, Fraction, Fraction, int, str], ...],
+]:
+    global _LAST_LEAP_TABLE_ID, _LAST_LEAP_SPANS
+    if _LAST_LEAP_SPANS is not None and id(entries) == _LAST_LEAP_TABLE_ID:
+        return _LAST_LEAP_SPANS
+    raw_entries = tuple(
+        (entry["effective_date"], int(entry["tai_minus_utc_seconds"]))
+        for entry in entries
+    )
+    res = _compiled_leap_spans(raw_entries)
+    _LAST_LEAP_TABLE_ID = id(entries)
+    _LAST_LEAP_SPANS = res
+    return res
+
+
 def utc_from_tt(
     jd_tt: float | TTInstant, *, legacy_pre_utc: bool = False
 ) -> tuple[str | None, datetime | None, bool]:
@@ -80,36 +142,23 @@ def utc_from_tt(
     point = TTInstant.from_value(jd_tt)
     scalar_tt = point.as_float()
     entries = leap_table()["entries"]
-    for previous, current in zip(entries, entries[1:]):
-        delta = current["tai_minus_utc_seconds"] - previous["tai_minus_utc_seconds"]
-        if delta <= 0:
-            continue
-        effective = datetime.fromisoformat(current["effective_date"]).replace(
-            tzinfo=timezone.utc
-        )
-        midnight = Fraction(_julian_day(effective))
-        start = (
-            midnight
-            + (Fraction(previous["tai_minus_utc_seconds"]) + Fraction(4023, 125))
-            / 86400
-        )
-        stop = (
-            midnight
-            + (Fraction(current["tai_minus_utc_seconds"]) + Fraction(4023, 125)) / 86400
-        )
-        if start <= point.days < stop:
-            if delta != 1:
-                raise RuntimeError("未支持连续插入多个 UTC 闰秒的表示")
-            fraction = int((point.days - start) * 86_400_000_000)
-            prior_day = effective - timedelta(days=1)
-            label = prior_day.strftime("%Y-%m-%dT23:59:60") + f".{fraction:06d}+00:00"
-            observe_clock(
-                "tt_to_utc_display",
-                jd_tt=scalar_tt,
-                utc_label=label,
-                utc_is_leap_second=True,
-            )
-            return label, None, True
+    min_start_f, max_stop_f, spans = _leap_spans_for(entries)
+    if min_start_f - 1e-6 <= scalar_tt <= max_stop_f + 1e-6:
+        for start_f, stop_f, start, stop, delta, prior_prefix in spans:
+            if not (start_f - 1e-6 <= scalar_tt <= stop_f + 1e-6):
+                continue
+            if start <= point.days < stop:
+                if delta != 1:
+                    raise RuntimeError("未支持连续插入多个 UTC 闰秒的表示")
+                fraction = int((point.days - start) * 86_400_000_000)
+                label = prior_prefix + f".{fraction:06d}+00:00"
+                observe_clock(
+                    "tt_to_utc_display",
+                    jd_tt=scalar_tt,
+                    utc_label=label,
+                    utc_is_leap_second=True,
+                )
+                return label, None, True
     try:
         calendar = utc_calendar_from_tt(point, legacy_pre_utc=legacy_pre_utc)
     except EphemerisSourceError:

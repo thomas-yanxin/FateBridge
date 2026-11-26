@@ -222,11 +222,5 @@ def source_table_analysis() -> dict[str, Any]:
             "hypothetical_unrounded_policy_adopted_as_original": False,
             "source_rounding_policy_fully_specified": False,
         },
-        "limitations": [
-            "The unreadable/absent degree marker in the20-year column remains unresolved until its next explicit printed degree; no modern ephemeris supplied the missing value",
-            "The final January6 row is a next-year extension. The until-January-zero column's wrap sign is not inferred",
-            "Exact bilinear interpolation is a numerical operation, not a fully accepted original calendar-to-arc method; subday, leap-day and staged rounding policies remain unresolved",
-            "All numbers describe the source table or its historical worked example; none is substituted into the current chart or interpreted as a real-event forecast",
-        ],
         "full_original_method_accepted": False,
     }

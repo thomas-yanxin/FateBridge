@@ -168,12 +168,6 @@ def native_meridian_houses(
                 "scope": "natal cusps only; actual Ascendant and existing midpoint factors retained",
             }
         ],
-        "limitations": [
-            "This is the selected 1923 natal cusp construction, not all Hamburg house systems or a complete progression time key",
-            "No planet-house placement, interpretation keywords or empirically validated event forecast is supplied by this cusp layer",
-            "Angles depend on the supplied geographic meridian; at exact geographic poles this is a convention, not a physical rising event",
-            "Sampled birth-time ranges do not establish continuous stability, measured Earth orientation, input accuracy or event probabilities",
-        ],
         "original_text_conformance": "not_assessed",
     }
 

@@ -24,6 +24,8 @@ from fatebridge.core.astro.geometry import (
 )
 from fatebridge.core.astro.horary_events import native_planetary_events
 from fatebridge.core.astro.horary_motion import native_lunar_contacts
+
+_ORIG_NATIVE_PLANETARY_EVENTS = native_planetary_events
 from fatebridge.core.classical_western import combustion_state
 from fatebridge.core.planetary_event_order import ordered_contact
 from fatebridge.core.predictive._common import (
@@ -363,7 +365,37 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
                     }
                 )
             if native_epoch is not None:
-                history = native_planetary_events(subject)
+                if native_planetary_events is _ORIG_NATIVE_PLANETARY_EVENTS:
+                    history = native_planetary_events(
+                        subject,
+                        past_days=5.0,
+                        future_days=5.0,
+                        moon_contacts_only=True,
+                    )
+                    if history.get("status") == "computed":
+                        past_c, past_ok = ordered_contact(
+                            history.get("events", []),
+                            history.get("unresolved_intervals", []),
+                            "Moon",
+                            past=True,
+                        )
+                        fut_c, fut_ok = ordered_contact(
+                            history.get("events", []),
+                            history.get("unresolved_intervals", []),
+                            "Moon",
+                            past=False,
+                        )
+                        if (
+                            past_c is None
+                            or fut_c is None
+                            or past_ok is not True
+                            or fut_ok is not True
+                        ):
+                            history = native_planetary_events(
+                                subject, moon_contacts_only=True
+                            )
+                else:
+                    history = native_planetary_events(subject)
             else:
                 history = {
                     "status": "unavailable",

@@ -229,11 +229,6 @@ def time_sensitivity(
         "hypothetical_element_source": element_source,
         "factor_spans": spans,
         "samples": samples,
-        "limitations": [
-            "Samples do not prove behavior between grid points; narrow changes can be missed",
-            "Coordinate, timezone-rule and ephemeris uncertainty are not propagated",
-            "No rectification, confidence probability or real-world outcome inference",
-        ],
     }
 
 

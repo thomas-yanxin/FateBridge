@@ -29,6 +29,7 @@ from fatebridge.core.astro.meridian_houses import (
 )
 from fatebridge.core.astro.meridian_placement import attach_factor_placement
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch
+from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.profiles import native_factor_model
 from fatebridge.core.astro.reference import PHYSICAL_BODIES
 from fatebridge.core.astro.reference_angles import (
@@ -189,7 +190,6 @@ def midpoint_geometry(
             }
         )
     orb = Fraction(orb_degrees)
-    orb_f = float(orb_degrees) + 1e-9
     periods: tuple[int | float, ...] = (
         (90, 45, 22.5) if dial_degrees == "22.5" else (90, 45)
     )
@@ -202,61 +202,84 @@ def midpoint_geometry(
             Fraction(str(period)) if isinstance(period, float) else Fraction(period)
         )
         p_float = float(p_frac)
+        half_p_f = p_float * 0.5
+        orb_exact_f = float(orb_degrees)
+        boundary_lo = orb_exact_f - 1e-8
+        boundary_hi = orb_exact_f + 1e-8
+        points_f = {name: float(val) % 360.0 for name, val in point_items}
         doubles, triples, quadruples = [], [], []
         for a, b in combinations(sorted(points), 2):
-            delta = _residual(points[a], points[b], p_frac)
-            if abs(delta) <= orb:
-                offset = int(round(float((points[a] - points[b] - delta) % 360)))
-                doubles.append(
-                    {
-                        "id_a": a,
-                        "id_b": b,
-                        "equation": f"{a}={b}",
-                        "orb": float(abs(delta)),
-                        "signed_orb": float(delta),
-                        "factor_offset_degrees": offset,
-                        "aspect_degrees": min(offset, 360 - offset),
-                        "separation_degrees": float(
-                            abs(_residual(points[a], points[b], 360))
-                        ),
-                    }
-                )
+            delta_f = (points_f[a] - points_f[b] + half_p_f) % p_float - half_p_f
+            abs_df = abs(delta_f)
+            if abs_df > boundary_hi:
+                continue
+            if abs_df >= boundary_lo:
+                delta_val = _residual(points[a], points[b], p_frac)
+                if abs(delta_val) > orb:
+                    continue
+                delta_out = float(delta_val)
+            else:
+                delta_out = delta_f
+            offset = int(round((points_f[a] - points_f[b] - delta_out) % 360.0))
+            sep_f = abs((points_f[a] - points_f[b] + 180.0) % 360.0 - 180.0)
+            doubles.append(
+                {
+                    "id_a": a,
+                    "id_b": b,
+                    "equation": f"{a}={b}",
+                    "orb": abs(delta_out),
+                    "signed_orb": delta_out,
+                    "factor_offset_degrees": offset,
+                    "aspect_degrees": min(offset, 360 - offset),
+                    "separation_degrees": sep_f,
+                }
+            )
+        point_mod = [
+            (point, value, points_f[point] % p_float) for point, value in point_items
+        ]
         for a, b, axis in distinct_axes:
-            ax_f = float(axis % p_frac)
-            for point, value in point_items:
+            ax_f_raw = float(axis)
+            ax_f = ax_f_raw % p_float
+            for point, value, val_f in point_mod:
                 if point in (a, b):
                     continue
-                val_f = float(value % p_frac)
-                diff_f = abs(val_f - ax_f)
-                if diff_f > orb_f and (p_float - diff_f) > orb_f:
+                delta_f = (val_f - ax_f + half_p_f) % p_float - half_p_f
+                abs_df = abs(delta_f)
+                if abs_df > boundary_hi:
                     continue
-                delta = _residual(value, axis, p_frac)
-                if abs(delta) <= orb:
-                    raw_offset = float((value - axis - delta) % 180)
-                    rounded_int = round(raw_offset)
-                    axis_offset: int | float = (
-                        int(rounded_int)
-                        if abs(raw_offset - rounded_int) < 1e-6
-                        else round(raw_offset, 4)
-                    )
-                    triples.append(
-                        {
-                            "point": point,
-                            "id_a": a,
-                            "id_b": b,
-                            "equation": f"{point}={a}/{b}",
-                            "orb": float(abs(delta)),
-                            "signed_orb": float(delta),
-                            "axis_offset_degrees": axis_offset,
-                        }
-                    )
+                if abs_df >= boundary_lo:
+                    delta_val = _residual(value, axis, p_frac)
+                    if abs(delta_val) > orb:
+                        continue
+                    delta_out = float(delta_val)
+                else:
+                    delta_out = delta_f
+                raw_offset = (points_f[point] - ax_f_raw - delta_out) % 180.0
+                rounded_int = round(raw_offset)
+                axis_offset: int | float = (
+                    int(rounded_int)
+                    if abs(raw_offset - rounded_int) < 1e-6
+                    else round(raw_offset, 4)
+                )
+                triples.append(
+                    {
+                        "point": point,
+                        "id_a": a,
+                        "id_b": b,
+                        "equation": f"{point}={a}/{b}",
+                        "orb": abs(delta_out),
+                        "signed_orb": delta_out,
+                        "axis_offset_degrees": axis_offset,
+                    }
+                )
 
-        # Sorted circular sweep for four-factor axis hits: O(A log A + hits)
+        # Single sorted circular sweep for four-factor axis hits: O(A log A + hits)
         sorted_axes = sorted(
-            ((float(axis % p_frac), a, b, axis) for a, b, axis in distinct_axes),
+            ((float(axis) % p_float, a, b, axis) for a, b, axis in distinct_axes),
             key=lambda item: item[0],
         )
         n_ax = len(sorted_axes)
+        quadruples_seen: set[tuple[str, str, str, str]] = set()
         for i in range(n_ax):
             ax_i, a, b, left = sorted_axes[i]
             j = (i + 1) % n_ax
@@ -264,47 +287,28 @@ def midpoint_geometry(
             while steps < n_ax - 1:
                 ax_j, c, d, right = sorted_axes[j]
                 circ_diff = (ax_j - ax_i) % p_float
-                if circ_diff > orb_f:
+                if circ_diff > boundary_hi:
                     break
-                if (a, b) < (c, d) and len({a, b, c, d}) == 4:
-                    delta = _residual(left, right, p_frac)
-                    if abs(delta) <= orb:
-                        quadruples.append(
-                            {
-                                "id_a": a,
-                                "id_b": b,
-                                "id_c": c,
-                                "id_d": d,
-                                "equation": f"{a}/{b}={c}/{d}",
-                                "orb": float(abs(delta)),
-                                "signed_orb": float(delta),
-                            }
-                        )
-                j = (j + 1) % n_ax
-                steps += 1
-        # Also check backward wrap? Forward circ_diff covers every pair once because
-        # if circ_diff(i -> j) <= orb_f holds in one direction, if (a,b)<(c,d) wasn't
-        # in the forward direction it's caught when starting at j! Wait: if (a,b)>(c,d)
-        # we skip when i comes first, so when starting at j where circ_diff(j->i) > orb_f
-        # we'd miss it unless we check both orders without ordering filter inside sweep:
-        quadruples_seen: set[tuple[str, str, str, str]] = {
-            (r["id_a"], r["id_b"], r["id_c"], r["id_d"]) for r in quadruples
-        }
-        for i in range(n_ax):
-            ax_i, a, b, left = sorted_axes[i]
-            j = (i + 1) % n_ax
-            steps = 0
-            while steps < n_ax - 1:
-                ax_j, c, d, right = sorted_axes[j]
-                circ_diff = (ax_j - ax_i) % p_float
-                if circ_diff > orb_f:
-                    break
-                if len({a, b, c, d}) == 4:
+                if a != c and a != d and b != c and b != d:
                     pair_key = (a, b, c, d) if (a, b) < (c, d) else (c, d, a, b)
                     if pair_key not in quadruples_seen:
-                        l_ax, r_ax = (left, right) if (a, b) < (c, d) else (right, left)
-                        delta = _residual(l_ax, r_ax, p_frac)
-                        if abs(delta) <= orb:
+                        if (a, b) < (c, d):
+                            delta_f = (ax_i - ax_j + half_p_f) % p_float - half_p_f
+                        else:
+                            delta_f = (ax_j - ax_i + half_p_f) % p_float - half_p_f
+                        abs_df = abs(delta_f)
+                        keep = True
+                        if abs_df >= boundary_lo:
+                            l_ax, r_ax = (
+                                (left, right) if (a, b) < (c, d) else (right, left)
+                            )
+                            delta_val = _residual(l_ax, r_ax, p_frac)
+                            if abs(delta_val) > orb:
+                                keep = False
+                            delta_out = float(delta_val)
+                        else:
+                            delta_out = delta_f
+                        if keep:
                             quadruples_seen.add(pair_key)
                             quadruples.append(
                                 {
@@ -313,8 +317,8 @@ def midpoint_geometry(
                                     "id_c": pair_key[2],
                                     "id_d": pair_key[3],
                                     "equation": f"{pair_key[0]}/{pair_key[1]}={pair_key[2]}/{pair_key[3]}",
-                                    "orb": float(abs(delta)),
-                                    "signed_orb": float(delta),
+                                    "orb": abs(delta_out),
+                                    "signed_orb": delta_out,
                                 }
                             )
                 j = (j + 1) % n_ax
@@ -324,7 +328,7 @@ def midpoint_geometry(
             contacts.sort(key=lambda row: (row["orb"], row["equation"]))
         total_three = len(triples)
         total_four = len(quadruples)
-        cap = 15 if dial_degrees == "22.5" else 25
+        cap = 10 if dial_degrees == "22.5" else 12
         dials[str(period)] = {
             "period_degrees": period,
             "two_factor_contacts": doubles,
@@ -369,6 +373,7 @@ def _native_factors(
     factors = []
     meridian_inputs = []
     models = set()
+    trace = PhysicalEphemerisTrace()
     with runtime.preserve_ephemeris_path():
         fast_swe_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
         flags = swe.FLG_SWIEPH | (swe.FLG_SIDEREAL if sidereal else 0)
@@ -395,7 +400,9 @@ def _native_factors(
                     f"Swiss Ephemeris cannot calculate midpoint factor {name}"
                 )
             if name in PHYSICAL_BODIES:
-                models.add(runtime.ephemeris_model_from_retflag(flag))
+                model = runtime.ephemeris_model_from_retflag(flag)
+                models.add(model)
+                trace.observe(name, model)
             element_name = None
             if hypothetical:
                 element_name = swe.get_planet_name(body_id)
@@ -520,6 +527,7 @@ def _native_factors(
         "factors": factors,
         **({"angle_definition": angle_definition} if angle_definition else {}),
         "ephemeris_models": sorted(models),
+        "physical_ephemeris_source": trace.finish(),
         "julian_day_tt": jd_tt,
         "julian_day_ut1": jd_ut1.as_float(),
         **({"meridian_houses": meridian} if include_meridian_houses else {}),

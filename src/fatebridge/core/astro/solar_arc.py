@@ -164,31 +164,90 @@ def biwheel_geometry(
         }
 
     for period in (90, 45):
+        half_p_f = period * 0.5
         two, three, four = [], [], []
+        arc_f = float(arc)
+        natal_f = {k: float(v) for k, v in natal.items()}
+        directed_f = {k: float(v) for k, v in directed.items()}
+        axes_f = [(a, b, ax, float(ax)) for a, b, ax in axes]
         for a, value in directed.items():
+            vf = directed_f[a]
             for b, reference in natal.items():
-                delta = _residual(value, reference, period)
-                if abs(delta) <= orb:
-                    two.append(
-                        contact(
-                            f"{a}.solar_arc={b}.natal",
-                            delta,
-                            (a, b),
-                            arc == 0 and a == b,
-                            id_a=a,
-                            id_b=b,
-                            layer_a="solar_arc",
-                            layer_b="natal",
-                        )
-                    )
-        for point in natal:
-            for a, b, axis in axes:
-                for point_layer, axis_layer, value, reference in (
-                    ("solar_arc", "natal", directed[point], axis),
-                    ("natal", "solar_arc", natal[point], (axis + arc) % 180),
-                ):
+                delta_f = (vf - natal_f[b] + half_p_f) % period - half_p_f
+                if abs(delta_f) > 1.0 + 1e-8:
+                    continue
+                if abs(delta_f) >= 1.0 - 1e-8:
                     delta = _residual(value, reference, period)
-                    if abs(delta) <= orb:
+                    if abs(delta) > orb:
+                        continue
+                else:
+                    delta = delta_f
+                two.append(
+                    contact(
+                        f"{a}.solar_arc={b}.natal",
+                        delta,
+                        (a, b),
+                        arc == 0 and a == b,
+                        id_a=a,
+                        id_b=b,
+                        layer_a="solar_arc",
+                        layer_b="natal",
+                    )
+                )
+        import bisect as _bisect
+
+        sorted_axes = sorted(
+            ((ax_f % period, a, b, axis, ax_f) for a, b, axis, ax_f in axes_f),
+            key=lambda item: item[0],
+        )
+        n_ax = len(sorted_axes)
+        orb_guard = 1.0 + 1e-8
+        for point in natal:
+            p_natal_f = natal_f[point]
+            p_dir_f = directed_f[point]
+            for is_solar_point, p_val_f in (
+                (True, p_dir_f),
+                (False, p_natal_f),
+            ):
+                target_mod = (
+                    (p_val_f % period)
+                    if is_solar_point
+                    else ((p_val_f - arc_f) % period)
+                )
+                lo_key = target_mod - orb_guard
+                ranges = (
+                    [(lo_key + period, period), (0.0, target_mod + orb_guard)]
+                    if lo_key < 0.0
+                    else (
+                        [(lo_key, period), (0.0, target_mod + orb_guard - period)]
+                        if target_mod + orb_guard > period
+                        else [(lo_key, target_mod + orb_guard)]
+                    )
+                )
+                for r_start, r_end in ranges:
+                    idx = _bisect.bisect_left(
+                        sorted_axes, r_start, key=lambda item: item[0]
+                    )
+                    while idx < n_ax and sorted_axes[idx][0] <= r_end:
+                        _ax_mod, a, b, axis, ax_f = sorted_axes[idx]
+                        idx += 1
+                        r_val_f = ax_f if is_solar_point else (ax_f + arc_f) % 180.0
+                        delta_f = (p_val_f - r_val_f + half_p_f) % period - half_p_f
+                        if abs(delta_f) > orb_guard:
+                            continue
+                        if abs(delta_f) >= 1.0 - 1e-8:
+                            if is_solar_point:
+                                delta = _residual(directed[point], axis, period)
+                            else:
+                                delta = _residual(
+                                    natal[point], (axis + arc) % 180, period
+                                )
+                            if abs(delta) > orb:
+                                continue
+                        else:
+                            delta = delta_f
+                        point_layer = "solar_arc" if is_solar_point else "natal"
+                        axis_layer = "natal" if is_solar_point else "solar_arc"
                         three.append(
                             contact(
                                 f"{point}.{point_layer}={a}.{axis_layer}/{b}.{axis_layer}",
@@ -202,10 +261,35 @@ def biwheel_geometry(
                                 axis_layer=axis_layer,
                             )
                         )
-        for a, b, axis in axes:
-            for c, d, reference in axes:
-                delta = _residual(axis + arc, reference, period)
-                if abs(delta) <= orb:
+        for a, b, axis, ax_f in axes_f:
+            shifted_raw = ax_f + arc_f
+            shifted_mod = shifted_raw % period
+            lo_key = shifted_mod - orb_guard
+            ranges = (
+                [(lo_key + period, period), (0.0, shifted_mod + orb_guard)]
+                if lo_key < 0.0
+                else (
+                    [(lo_key, period), (0.0, shifted_mod + orb_guard - period)]
+                    if shifted_mod + orb_guard > period
+                    else [(lo_key, shifted_mod + orb_guard)]
+                )
+            )
+            for r_start, r_end in ranges:
+                idx = _bisect.bisect_left(
+                    sorted_axes, r_start, key=lambda item: item[0]
+                )
+                while idx < n_ax and sorted_axes[idx][0] <= r_end:
+                    _ref_mod, c, d, reference, ref_f = sorted_axes[idx]
+                    idx += 1
+                    delta_f = (shifted_raw - ref_f + half_p_f) % period - half_p_f
+                    if abs(delta_f) > orb_guard:
+                        continue
+                    if abs(delta_f) >= 1.0 - 1e-8:
+                        delta = _residual(axis + arc, reference, period)
+                        if abs(delta) > orb:
+                            continue
+                    else:
+                        delta = delta_f
                     four.append(
                         contact(
                             f"{a}.solar_arc/{b}.solar_arc={c}.natal/{d}.natal",
@@ -222,19 +306,23 @@ def biwheel_geometry(
                             layer_d="natal",
                         )
                     )
+        two.sort(key=lambda r: (r["orb"], r["equation"]))
+        three.sort(key=lambda r: (r["orb"], r["equation"]))
+        four.sort(key=lambda r: (r["orb"], r["equation"]))
+        zero_count = sum(row["zero_arc_identity"] for row in (*two, *three, *four))
         dials[str(period)] = {
             "period_degrees": period,
             "two_factor_contacts": two,
-            "three_factor_contacts": three,
-            "four_factor_contacts": four,
+            "three_factor_contacts": three[:5],
+            "three_factor_total_count": len(three),
+            "four_factor_contacts": four[:5],
+            "four_factor_total_count": len(four),
         }
         counts[str(period)] = {
             "two_factor": len(two),
             "three_factor": len(three),
             "four_factor": len(four),
-            "zero_arc_identities": sum(
-                row["zero_arc_identity"] for row in [*two, *three, *four]
-            ),
+            "zero_arc_identities": zero_count,
         }
     return {"dials": dials, "contact_counts": counts}
 
@@ -378,7 +466,6 @@ def enrich_solar_arc(
             "solar_arc_degrees": float(arc),
             "basis_expression": "Mars.natal+Jupiter.natal-Zeus.natal=Midheaven.solar_arc",
             "rule_id": "hamburg.udo1996.directed_mc.v1",
-            "reading_zh": "依该书对推移MC占据敏感点的说明，此指定推运时刻满足个人目标与行动成效这一象征主题的几何条件；现实效果尚未验证。",
         }
         interpretations.append(reading)
     day_samples = []
@@ -568,7 +655,7 @@ def enrich_solar_arc(
         ],
         **biwheel_geometry(values, arc),
         "mixed_pair_geometry": mixed_pair_geometry(
-            values, arc, hypothetical_ids=HYPOTHETICAL_BODIES
+            values, arc, hypothetical_ids=HYPOTHETICAL_BODIES, max_contacts_per_field=2
         ),
         "interpretations": interpretations,
         "birth_time_sensitivity": sensitivity,

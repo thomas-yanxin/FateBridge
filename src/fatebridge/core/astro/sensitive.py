@@ -109,8 +109,6 @@ def original_example_reading(
         "direct_orb_degrees": float(abs(direct)),
         "maximum_orb_degrees": float(axis_orb * 2),
         "symbolic_theme_zh": "以行动取得成效的个人目标",
-        "reading_zh": "依该书的象征解释，可围绕个人目标及行动成效讨论；这不是现实成功保证。",
-        "practical_prompt_zh": "结合现实资料核对当前目标、实际行动和成效标准。",
         "claim_type": "source_attributed_symbolic_interpretation",
         "rule_id": "hamburg.udo1996.symbolic_example.v1",
     }
