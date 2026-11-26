@@ -5,7 +5,7 @@ FateBridge divination services.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from fatebridge.core.almanac import (
     LUNAR_SUPPORTED_SOLAR_END,
@@ -411,45 +411,30 @@ def calculate_meihua_analysis(
     }
 
 
-@calculation_guard("卦义检索")
+@calculation_guard("卦象查询")
 def calculate_gua_lookup(
     *,
-    query: str,
-    lookup_mode: str = "auto",
+    queries: list[str],
+    lookup_mode: Literal["auto", "hexagram", "trigram"] = "auto",
 ) -> dict[str, Any]:
     """
-    卦义检索工具 - 支持六十四卦与八卦的离线义理查询。
+    卦象查询工具 - 支持六十四卦与八卦的批量离线义理查询。
     """
-    result = lookup_gua(query, lookup_mode=lookup_mode)
+    cleaned = [item.strip() for item in (queries or []) if item and item.strip()]
+    if not cleaned:
+        raise ValueError("queries 至少需要提供一个非空卦名或卦码。")
+
+    results = {q: lookup_gua(q, lookup_mode=lookup_mode) for q in cleaned}
+    ordered_names = [f"{results[q]['name']}（{results[q]['code']}）" for q in cleaned]
+    summary = (
+        ordered_names[0]
+        if len(cleaned) == 1
+        else f"共查询{len(cleaned)}项卦象：{'、'.join(ordered_names)}。"
+    )
     return {
-        "analysis_type": "卦义检索",
-        "query": query,
+        "analysis_type": "卦象查询",
         "lookup_mode": lookup_mode,
-        "result": result,
-        "summary": f"{result['name']}（{result['code']}）",
-    }
-
-
-@calculation_guard("梅易卦义")
-def calculate_gua_meiyi(
-    *,
-    name: list[str],
-) -> dict[str, Any]:
-    """
-    梅易卦义辅助工具 - 批量返回偏梅花易数语境的卦义说明。
-    """
-    queries = [item.strip() for item in (name or []) if item and item.strip()]
-    if not queries:
-        raise ValueError("name 至少需要提供一个卦名或卦码。")
-
-    results = {query: lookup_gua(query) for query in queries}
-    ordered_names = [results[query]["name"] for query in queries]
-
-    summary = f"共查询{len(queries)}项梅易卦义：{'、'.join(ordered_names)}。"
-
-    return {
-        "analysis_type": "梅易卦义",
-        "queries": queries,
+        "queries": cleaned,
         "results": results,
         "summary": summary,
     }
@@ -479,12 +464,10 @@ def calculate_canping_analysis(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
+    timezone: str | None = None,
     birth_utc_offset: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     gender: str | None = None,
     method: str = "gu",
     dayun_method: str = "bazi_appendix_v1",
@@ -495,12 +478,10 @@ def calculate_canping_analysis(
     return build_canping_result(
         date=date,
         time=time,
-        zone=zone,
+        timezone=timezone,
         birth_utc_offset=birth_utc_offset,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        latitude=latitude,
+        longitude=longitude,
         gender=gender,
         method=method,
         dayun_method=dayun_method,
@@ -514,12 +495,10 @@ def calculate_heluo_analysis(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
+    timezone: str | None = None,
     birth_utc_offset: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     gender: str | None = None,
     use_true_solar_time: bool = True,
     analysis_year: int | None = None,
@@ -531,12 +510,10 @@ def calculate_heluo_analysis(
     return build_heluo_result(
         date=date,
         time=time,
-        zone=zone,
+        timezone=timezone,
         birth_utc_offset=birth_utc_offset,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        latitude=latitude,
+        longitude=longitude,
         gender=gender,
         use_true_solar_time=use_true_solar_time,
         analysis_year=analysis_year,
@@ -551,16 +528,14 @@ def calculate_sixyao_analysis(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     question: str | None = None,
     gua_code: str | None = None,
     changed_code: str | None = None,
     lines: list[dict[str, Any]] | None = None,
-    method: str = "auto",
+    method: Literal["auto", "coin", "time"] = "auto",
     coins: list[int] | None = None,
     seed: int | None = None,
     focus_line: int | None = None,
@@ -573,11 +548,9 @@ def calculate_sixyao_analysis(
     return build_sixyao_result(
         date=date,
         time=time,
-        zone=zone,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        timezone=timezone,
+        latitude=latitude,
+        longitude=longitude,
         question=question,
         gua_code=gua_code,
         changed_code=changed_code,
@@ -598,17 +571,15 @@ def calculate_suzhan_analysis(
     *,
     date: str,
     time: str | None = None,
-    zone: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     szchart: int = 0,
     szshape: int = 0,
+    house_system: int | str = "D",
+    zodiac_type: str = "Tropic",
     house_start_mode: int = 1,
     doubing_su28: bool = True,
-    hsys: int = 8,
-    zodiacal: int = 0,
     leap_month_policy: str = "unresolved",
     natal_mansion: str | None = None,
     activity: str | None = None,
@@ -623,17 +594,15 @@ def calculate_suzhan_analysis(
     return build_suzhan_result(
         date=date,
         time=time,
-        zone=zone,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        timezone=timezone,
+        latitude=latitude,
+        longitude=longitude,
         szchart=szchart,
         szshape=szshape,
         house_start_mode=house_start_mode,
         doubing_su28=doubing_su28,
-        hsys=hsys,
-        zodiacal=zodiacal,
+        house_system=house_system,
+        zodiac_type=zodiac_type,
         leap_month_policy=leap_month_policy,
         natal_mansion=natal_mansion,
         activity=activity,
@@ -784,36 +753,32 @@ def calculate_otherbu_analysis(
     *,
     date: str | None = None,
     time: str | None = None,
-    zone: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     tradition: bool = False,
     sign: str | None = None,
     house: int | None = None,
     planet: str | None = None,
     question: str | None = None,
-    hsys: int = 8,
-    zodiacal: int = 0,
+    house_system: int | str = "D",
+    zodiac_type: str = "Tropic",
     fortune_method: str = "sect_reversing",
 ) -> dict[str, Any]:
     """西洋游戏 / 占星骰子分析工具。"""
     return build_otherbu_result(
         date=date,
         time=time,
-        zone=zone,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        timezone=timezone,
+        latitude=latitude,
+        longitude=longitude,
         tradition=tradition,
         sign=sign,
         house=house,
         planet=planet,
         question=question,
-        hsys=hsys,
-        zodiacal=zodiacal,
+        house_system=house_system,
+        zodiac_type=zodiac_type,
         fortune_method=fortune_method,
     )
 
@@ -823,11 +788,9 @@ def calculate_sanshiunited_analysis(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     qimen_options: dict[str, Any] | None = None,
     taiyi_options: dict[str, Any] | None = None,
     liureng_yue: str | None = None,
@@ -839,11 +802,9 @@ def calculate_sanshiunited_analysis(
     return build_sanshiunited_result(
         date=date,
         time=time,
-        zone=zone,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        timezone=timezone,
+        latitude=latitude,
+        longitude=longitude,
         qimen_options=qimen_options,
         taiyi_options=taiyi_options,
         liureng_yue=liureng_yue,

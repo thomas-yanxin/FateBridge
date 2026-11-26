@@ -79,7 +79,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="hexagram_lookup",
-        consuming_tools="gua_lookup gua_meanings",
+        consuming_tools="gua_lookup",
         implementation_path="services/divination.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="reference_text",

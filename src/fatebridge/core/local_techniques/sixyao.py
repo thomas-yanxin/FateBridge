@@ -32,6 +32,7 @@ from fatebridge.core.local_techniques.chart import (
     parse_local_datetime,
 )
 from fatebridge.core.zhouyi import moving_text_evidence
+from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
 
@@ -92,11 +93,9 @@ def build_sixyao_result(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
-    lat: str | float | None = None,
-    lon: str | float | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     question: str | None = None,
     gua_code: str | None = None,
     changed_code: str | None = None,
@@ -123,7 +122,9 @@ def build_sixyao_result(
     ):
         raise ValueError("展开日级候选需要先明确focus_line或focus_kinship")
 
-    context = _build_context(date_text=date, time_text=time, timezone_name=zone)
+    parsed_latitude = parse_geo_coordinate(latitude, axis="latitude")
+    parsed_longitude = parse_geo_coordinate(longitude, axis="longitude")
+    context = _build_context(date_text=date, time_text=time, timezone_name=timezone)
     normalized_lines = normalize_cast_lines(lines)
     explicit_lines_provided = bool(normalized_lines)
     explicit_code_provided = bool(
@@ -222,11 +223,9 @@ def build_sixyao_result(
     input_normalized = {
         "date": _normalize_date_text(date),
         "time": _normalize_time_text(time),
-        "zone": zone or DEFAULT_BIRTH_TIMEZONE,
-        "lat": lat,
-        "lon": lon,
-        "gpsLat": gps_lat,
-        "gpsLon": gps_lon,
+        "timezone": timezone or DEFAULT_BIRTH_TIMEZONE,
+        "latitude": parsed_latitude,
+        "longitude": parsed_longitude,
         "question": question,
         "gua_code": current_code,
         "changed_code": changed_hexagram_binary_code,

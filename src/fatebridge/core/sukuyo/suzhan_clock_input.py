@@ -13,15 +13,12 @@ def require_clock_input_binding(
         raise ValueError("缺少钟时输入事实")
     clock_known = inputs["time"] is not None
     has_coordinates = any(
-        inputs.get(key) is not None for key in ("lat", "lon", "gpsLat", "gpsLon")
+        inputs.get(key) is not None for key in ("latitude", "longitude")
     )
     if isinstance(request, SuZhanRequest) and (
         clock_known != (request.time is not None)
         or has_coordinates
-        != any(
-            value is not None
-            for value in (request.lat, request.lon, request.gps_lat, request.gps_lon)
-        )
+        != any(value is not None for value in (request.latitude, request.longitude))
     ):
         raise ValueError("钟时或坐标状态与请求不符")
     if "chart" not in result or "astronomy" not in result:

@@ -174,8 +174,13 @@ CHINESE_TOOL_FIELDS: dict[str, dict[str, Any]] = {
         "liuyao_evidence": LiuyaoEvidence,
         "classical_text_evidence": ClassicalTextEvidence,
     },
-    "gua_lookup": {"result": GuaLookupResult},
-    "gua_meanings": {"queries": list[str], "results": dict[str, GuaLookupResult]},
+    "gua_lookup": {
+        "queries": list[str],
+        "results": dict[str, GuaLookupResult],
+        "lookup_mode": str,
+        "summary": str,
+        "analysis_type": str,
+    },
     "canping": {
         "dayun": list[CanpingRow],
         "numerology_evidence": NumerologyEvidence,
