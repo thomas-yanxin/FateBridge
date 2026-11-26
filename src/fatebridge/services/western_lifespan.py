@@ -1,4 +1,4 @@
-"""Assemble Western predictive chart results and snapshots."""
+"""Assemble Western predictive chart results."""
 
 from __future__ import annotations
 
@@ -32,19 +32,12 @@ from fatebridge.core.predictive._common import (
     extract_named_longitudes,
     extract_reference_longitudes,
     extract_reference_points,
-    planet_label,
     point_absolute_position,
     sect_label,
 )
 from fatebridge.core.predictive.progressions import (
     build_secondary_progression_payload,
     calculate_secondary_progression_clock,
-)
-from fatebridge.services.snapshot_builders import (
-    format_snapshot_json,
-)
-from fatebridge.services.snapshot_builders import (
-    render_snapshot_text as _render_snapshot_text,
 )
 from fatebridge.utils.civil_time import UTCCalendar
 from fatebridge.utils.errors import calculation_guard
@@ -146,7 +139,6 @@ def _envelope(
     natal_reference: dict[str, Any],
     payload: dict[str, Any],
     summary: str,
-    sections: list[tuple[str, str]],
 ) -> dict[str, Any]:
     return {
         "analysis_type": analysis_type,
@@ -155,7 +147,6 @@ def _envelope(
         "natal_reference": natal_reference,
         tool_name: payload,
         "summary": summary,
-        "snapshot_text": _render_snapshot_text(sections),
     }
 
 
@@ -185,14 +176,6 @@ def calculate_harmonic_chart(
         house_system=house_system,
         zodiac_type=zodiac_type,
     )
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        ("调波位置", format_snapshot_json(payload["positions"])),
-        (
-            "同频合相",
-            format_snapshot_json(payload["resonant_conjunctions"]),
-        ),
-    ]
     return _envelope(
         analysis_type="西占调波盘",
         tool_name="harmonic_chart",
@@ -200,7 +183,6 @@ def calculate_harmonic_chart(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
 
 
@@ -257,10 +239,6 @@ def calculate_planetary_ages(
     )
     if analysis_datetime is not None:
         context["analysis_datetime"] = analysis_datetime.isoformat()
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        ("年龄段表", format_snapshot_json(payload["bands"])),
-    ]
     return _envelope(
         analysis_type="西占行星年龄",
         tool_name="planetary_ages",
@@ -268,7 +246,6 @@ def calculate_planetary_ages(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
 
 
@@ -301,24 +278,6 @@ def calculate_triplicity_rulers(
         house_system=house_system,
         zodiac_type=zodiac_type,
     )
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        (
-            "区间光体",
-            format_snapshot_json(
-                {
-                    "sect": payload["sect"],
-                    "sect_label": payload["sect_label"],
-                    "sect_light": payload["sect_light"],
-                    "sect_light_label": payload["sect_light_label"],
-                    "sect_light_sign": payload["sect_light_sign"],
-                    "element": payload["element"],
-                    "element_label": payload["element_label"],
-                },
-            ),
-        ),
-        ("人生阶段", format_snapshot_json(payload["stages"])),
-    ]
     return _envelope(
         analysis_type="西占三分主星推运",
         tool_name="triplicity_rulers",
@@ -326,7 +285,6 @@ def calculate_triplicity_rulers(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
 
 
@@ -358,27 +316,6 @@ def calculate_lunation_phase(
         house_system=house_system,
         zodiac_type=zodiac_type,
     )
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        (
-            "本命月相",
-            format_snapshot_json(
-                {
-                    "natal_phase": payload["natal_phase"],
-                    "natal_phase_label": payload["natal_phase_label"],
-                    "natal_elongation_degree": payload["natal_elongation_degree"],
-                },
-            ),
-        ),
-        (
-            "推运口径",
-            format_snapshot_json(payload["progression_options"]),
-        ),
-        (
-            "相位转换时间轴",
-            format_snapshot_json(payload["phase_ingresses"]),
-        ),
-    ]
     return _envelope(
         analysis_type="西占月相推运",
         tool_name="lunation_phase",
@@ -386,7 +323,6 @@ def calculate_lunation_phase(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
 
 
@@ -424,21 +360,6 @@ def calculate_distributions(
         house_system=house_system,
         zodiac_type=zodiac_type,
     )
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        (
-            "分配设置",
-            format_snapshot_json(
-                {
-                    "time_key": payload["time_key"],
-                    "rate_deg_per_year": payload["rate_deg_per_year"],
-                    "ascendant_absolute_degree": payload["ascendant_absolute_degree"],
-                    "max_age_years": payload["max_age_years"],
-                },
-            ),
-        ),
-        ("界限分配时间轴", format_snapshot_json(payload["periods"])),
-    ]
     return _envelope(
         analysis_type="西占界推运",
         tool_name="distributions",
@@ -446,7 +367,6 @@ def calculate_distributions(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
 
 
@@ -483,26 +403,6 @@ def calculate_balbillus(
         house_system=house_system,
         zodiac_type=zodiac_type,
     )
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        (
-            "系统设置",
-            format_snapshot_json(
-                {
-                    "start_planet": payload["start_planet"],
-                    "mode": payload["mode"],
-                    "mode_label": payload["mode_label"],
-                    "reduction_model": payload["reduction_model"],
-                    "zodiacal_order": payload["zodiacal_order"],
-                    "max_age_years": payload["max_age_years"],
-                },
-            ),
-        ),
-        (
-            "主限·子限时间轴",
-            format_snapshot_json(payload["periods"]),
-        ),
-    ]
     return _envelope(
         analysis_type="西占Balbillus 129年系统",
         tool_name="balbillus",
@@ -510,7 +410,6 @@ def calculate_balbillus(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
 
 
@@ -548,20 +447,6 @@ def calculate_keypoints(
         house_system=house_system,
         zodiac_type=zodiac_type,
     )
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        (
-            "星位挂钩",
-            format_snapshot_json(
-                {
-                    "release_mode": payload["release_mode"],
-                    "release_mode_label": payload["release_mode_label"],
-                    "positions": payload["positions"],
-                },
-            ),
-        ),
-        ("激活时间轴", format_snapshot_json(payload["activations"])),
-    ]
     return _envelope(
         analysis_type="西占数字相位推运",
         tool_name="keypoints",
@@ -569,7 +454,6 @@ def calculate_keypoints(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
 
 
@@ -602,22 +486,6 @@ def calculate_yearsystem129(
         house_system=house_system,
         zodiac_type=zodiac_type,
     )
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        (
-            "系统设置",
-            format_snapshot_json(
-                {
-                    "start_planet": payload["start_planet"],
-                    "sequence_model": payload["sequence_model"],
-                    "total_cycle_years": payload["total_cycle_years"],
-                    "zodiacal_order": payload["zodiacal_order"],
-                    "max_age_years": payload["max_age_years"],
-                },
-            ),
-        ),
-        ("小年轮值时间轴", format_snapshot_json(payload["periods"])),
-    ]
     return _envelope(
         analysis_type="西占129年系统",
         tool_name="yearsystem129",
@@ -625,7 +493,6 @@ def calculate_yearsystem129(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
 
 
@@ -681,21 +548,6 @@ def calculate_planetary_arc(
     )
     context["analysis_datetime"] = analysis_datetime.isoformat()
     context["age_years"] = round(age_years, 4)
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        (
-            "方向设置",
-            format_snapshot_json(
-                {
-                    "arc_source": payload["arc_source"],
-                    "arc_degrees": payload["arc_degrees"],
-                    "orb": payload["orb"],
-                    "positions": payload["positions"],
-                },
-            ),
-        ),
-        ("相位", format_snapshot_json(payload["hits"])),
-    ]
     return _envelope(
         analysis_type="西占行星弧方向",
         tool_name="planetary_arc",
@@ -703,32 +555,7 @@ def calculate_planetary_arc(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
-
-
-def _persian_directed_table(payload: dict[str, Any]) -> str:
-    """Render the 波斯向运 hit list as 星阙's 应期 table."""
-    hits = payload.get("hits", [])
-    if not hits:
-        return "（本盘无波斯向运应期）"
-    lines = [
-        "黄经象征向运（1°/年）：日、月、水、金、火、木、土七曜各顺行 1°/年。"
-        "表中列出向运星与固定的十颗本命星体及十二宫头形成相位的年龄和日期。",
-        "",
-        "| 年龄 | 日期 | 向运星 | 相位 | 本命对象 |",
-        "| --- | --- | --- | --- | --- |",
-    ]
-    for hit in hits:
-        significator = hit["significator"]
-        sig_name = (
-            significator if "宫头" in str(significator) else planet_label(significator)
-        )
-        lines.append(
-            f"| {hit['age']} | {hit['date'] or '-'} | {hit['promittor_label']} "
-            f"| {hit['aspect']}° | {sig_name} |"
-        )
-    return "\n".join(lines)
 
 
 @calculation_guard("波斯向运")
@@ -767,11 +594,6 @@ def calculate_persian_directed(
         zodiac_type=zodiac_type,
     )
     context["max_age_years"] = max_age_years
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        ("波斯向运（Persian Directed）", _persian_directed_table(payload)),
-        ("应期明细", format_snapshot_json(payload["hits"])),
-    ]
     return _envelope(
         analysis_type="西占波斯向运",
         tool_name="persian_directed",
@@ -779,36 +601,7 @@ def calculate_persian_directed(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
-
-
-def _age_point_table(payload: dict[str, Any]) -> str:
-    """Render the 年龄推进点 timeline as 星阙's 落座/合本命 table."""
-    points = payload.get("points", [])
-    if not points:
-        return "（本盘无年龄推进点数据）"
-    contacts = payload.get("contacts", [])
-    lines = [
-        "年龄点自上升点起，沿 Koch 宫顺行，每宫 6 年、72 年回归上升；"
-        "落于本命星处（合相）为人生关键节点。",
-    ]
-    if contacts:
-        lines.append("")
-        lines.append(
-            "关键岁数（合本命）："
-            + "；".join(f"{c['age']}岁合{c['body_label']}" for c in contacts)
-        )
-    lines.append("")
-    lines.append("| 年龄 | 落座 | 宫 | 合本命 |")
-    lines.append("| --- | --- | --- | --- |")
-    for point in points:
-        seat = f"{point['sign_label']} {point['signlon']}°"
-        aspect_to = point["aspect_to_label"] or "—"
-        lines.append(
-            f"| {point['age']}岁 | {seat} | {point['house']}宫 | {aspect_to} |"
-        )
-    return "\n".join(lines)
 
 
 @calculation_guard("年龄推进点")
@@ -851,11 +644,6 @@ def calculate_age_point(
         zodiac_type=zodiac_type,
     )
     context["max_age_years"] = max_age_years
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        ("年龄推进点（Age Point / Huber）", _age_point_table(payload)),
-        ("合本命明细", format_snapshot_json(payload["contacts"])),
-    ]
     return _envelope(
         analysis_type="西占年龄推进点",
         tool_name="age_point",
@@ -863,7 +651,6 @@ def calculate_age_point(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
 
 
@@ -922,11 +709,6 @@ def calculate_vedicprog(
     context["ayanamsha"] = "Lahiri (Swiss Ephemeris native)"
     context["analysis_datetime"] = analysis_datetime.isoformat()
     context["age_years"] = round(age_years, 4)
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        ("推运位置", format_snapshot_json(payload["positions"])),
-        ("推运相位", format_snapshot_json(payload["hits"])),
-    ]
     return _envelope(
         analysis_type="西占恒星推运",
         tool_name="vedic_progression",
@@ -934,7 +716,6 @@ def calculate_vedicprog(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )
 
 
@@ -995,13 +776,6 @@ def calculate_jaynesprog(
     )
     context["analysis_datetime"] = analysis_datetime.isoformat()
     context["age_years"] = round(age_years, 4)
-    sections = [
-        ("起盘信息", format_snapshot_json(context)),
-        (
-            "赤纬平行/反平行",
-            format_snapshot_json(payload["parallels"]),
-        ),
-    ]
     return _envelope(
         analysis_type="西占赤纬推运",
         tool_name="jaynes_declination",
@@ -1009,5 +783,4 @@ def calculate_jaynesprog(
         natal_reference=natal_reference,
         payload=payload,
         summary=summary,
-        sections=sections,
     )

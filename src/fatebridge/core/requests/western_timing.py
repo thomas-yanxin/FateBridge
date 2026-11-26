@@ -12,10 +12,10 @@ from fatebridge.core.requests.western_policy import WesternEphemerisRequest
 from fatebridge.utils.house_systems import TWELVE_HOUSE_SYSTEM_NOTE
 
 
-class WesternTimingRequest(
+class WesternTimingBaseRequest(
     AstroHouseValidatorMixin, AstroBirthRequest, WesternEphemerisRequest
 ):
-    """Request model for western predictive timing analysis."""
+    """Shared base request model for western predictive timing techniques."""
 
     analysis_year: int | None = Field(default=None, description="Analysis year")
     analysis_month: int | None = Field(
@@ -42,6 +42,35 @@ class WesternTimingRequest(
             "If omitted, keeps the birth minute for date-only compatibility."
         ),
     )
+    house_system: int | str = Field(
+        default="P",
+        description="House system, any convention: SE letter ('P'=Placidus, "
+        "'R'=Regiomontanus, 'W'=whole sign, 'D'=equal_mc), key ('placidus', "
+        "'equal_mc'), or integer code 0..8 (3=Placidus, 8=equal_mc)."
+        + TWELVE_HOUSE_SYSTEM_NOTE,
+    )
+    zodiac_type: str = Field(
+        default="Tropic", description="Zodiac type, e.g. Tropic or Sidereal"
+    )
+
+
+class WesternReturnTimingRequest(WesternTimingBaseRequest):
+    """Request model for solar and lunar return timing techniques."""
+
+    return_longitude: float | None = Field(
+        default=None, ge=-180, le=180, description="Return chart longitude"
+    )
+    return_latitude: float | None = Field(
+        default=None, ge=-90, le=90, description="Return chart latitude"
+    )
+    return_timezone: str | None = Field(
+        default=None, description="Return chart timezone (IANA name or UTC offset)"
+    )
+
+
+class WesternFirdariaRequest(WesternTimingBaseRequest):
+    """Request model for Firdaria planetary period timing."""
+
     firdaria_night_order: Literal["nodes_at_end", "nodes_after_mars"] = Field(
         default="nodes_at_end",
         description=(
@@ -58,25 +87,11 @@ class WesternTimingRequest(
             "ambiguous/nonexistent birth, analysis and generated anniversary clocks."
         ),
     )
-    return_longitude: float | None = Field(
-        default=None, ge=-180, le=180, description="Return chart longitude"
-    )
-    return_latitude: float | None = Field(
-        default=None, ge=-90, le=90, description="Return chart latitude"
-    )
-    return_timezone: str | None = Field(
-        default=None, description="Return chart timezone (IANA name or UTC offset)"
-    )
-    house_system: int | str = Field(
-        default="P",
-        description="House system, any convention: SE letter ('P'=Placidus, "
-        "'R'=Regiomontanus, 'W'=whole sign, 'D'=equal_mc), key ('placidus', "
-        "'equal_mc'), or integer code 0..8 (3=Placidus, 8=equal_mc)."
-        + TWELVE_HOUSE_SYSTEM_NOTE,
-    )
-    zodiac_type: str = Field(
-        default="Tropic", description="Zodiac type, e.g. Tropic or Sidereal"
-    )
+
+
+class WesternPrimaryDirectionsRequest(WesternTimingBaseRequest):
+    """Request model for primary directions timing."""
+
     pd_method: Literal[
         "astroapp_alchabitius", "equatorial", "fatebridge_mundane_semiarc"
     ] = Field(
@@ -100,16 +115,20 @@ class WesternTimingRequest(
         default_factory=lambda: [0, 60, 90, 120, 180],
         description="Primary direction aspects in degrees",
     )
+
+
+class WesternPrimaryDirectionsChartRequest(WesternPrimaryDirectionsRequest):
+    """Request model for primary directions chart."""
+
     show_pd_bounds: bool = Field(
         default=True,
         description="Whether to expose the bounds overlay preference for the primary direction chart",
     )
 
 
-class WesternTimingModuleRequest(WesternTimingRequest):
-    """Request model for standalone western timing module tools."""
-
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional export sections to keep in snapshot_export",
-    )
+class WesternTimingRequest(
+    WesternReturnTimingRequest,
+    WesternFirdariaRequest,
+    WesternPrimaryDirectionsChartRequest,
+):
+    """Request model for aggregate western predictive timing analysis."""

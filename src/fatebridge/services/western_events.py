@@ -28,12 +28,6 @@ from fatebridge.core.predictive._common import (
     longitude_to_point_dict,
     planet_label,
 )
-from fatebridge.services.snapshot_builders import (
-    format_snapshot_json,
-)
-from fatebridge.services.snapshot_builders import (
-    render_snapshot_text as _render_snapshot_text,
-)
 from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
 from fatebridge.utils.errors import EphemerisSourceError, handle_calculation_error
 from fatebridge.utils.house_systems import house_system_fields, normalize_house_system
@@ -50,7 +44,6 @@ def calculate_mundane(
     name: str | None = None,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
-    render_snapshot: bool = True,
 ) -> dict[str, Any]:
     """在某年某节气（春分/夏至/秋分/冬至）的精确入宫时刻排世俗盘。"""
     label = "世俗入宫盘"
@@ -113,21 +106,13 @@ def calculate_mundane(
             f"{year} 年{ingress_term}入宫盘：入宫时刻 {clock_summary}，"
             f"上升 {points['ascendant']['sign_label']}。"
         )
-        result: dict[str, JsonValue] = {
+        return {
             "analysis_type": "西占世俗入宫盘",
             "engine": calculation_basis["engine_backend"],
             "analysis_context": context,
             "mundane": payload,
             "summary": summary,
         }
-        if render_snapshot:
-            result["snapshot_text"] = _render_snapshot_text(
-                [
-                    ("起盘信息", format_snapshot_json(context)),
-                    ("入宫盘星与角", format_snapshot_json(payload)),
-                ]
-            )
-        return result
     except Exception as exc:
         return handle_calculation_error(exc, label)
 
@@ -139,7 +124,6 @@ def calculate_extrareturns(
     analysis_day: int | None = None,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
-    render_snapshot: bool = True,
     **birth_kwargs: Any,
 ) -> dict[str, Any]:
     """求土星 / 木星 / 月交点回到本命黄经的最近一次与下一次返照时刻。"""
@@ -290,20 +274,12 @@ def calculate_extrareturns(
             "returns": returns,
         }
         summary = "多重回归：" + "；".join(return_summaries)
-        result: dict[str, JsonValue] = {
+        return {
             "analysis_type": "西占多重回归",
             "engine": "fatebridge-offline",
             "analysis_context": context,
             "extrareturns": payload,
             "summary": summary,
         }
-        if render_snapshot:
-            result["snapshot_text"] = _render_snapshot_text(
-                [
-                    ("起盘信息", format_snapshot_json(context)),
-                    ("返照时刻", format_snapshot_json(returns)),
-                ]
-            )
-        return result
     except Exception as exc:
         return handle_calculation_error(exc, label)

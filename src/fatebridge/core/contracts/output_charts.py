@@ -142,10 +142,10 @@ CHART_FIELDS: dict[str, Any] = {
 
 
 CHART_TOOL_FIELDS: dict[str, dict[str, Any]] = {
-    "astro_chart": {
+    "astrology_chart": {
         "person_info": ChartPerson,
         "apparent_model_positions": OpaqueSolarPositions,
     },
-    "astro_chart13": {"person_info": ChartPerson},
-    "astro_relative_chart": {"chart": Chart},
+    "thirteen_sector_chart": {"person_info": ChartPerson},
+    "relationship_chart": {"chart": Chart},
 }

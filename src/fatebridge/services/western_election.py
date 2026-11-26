@@ -11,12 +11,6 @@ from fatebridge.core.astro.astrology_election import (
 from fatebridge.core.astro.iers_ut1 import use_ut1_source
 from fatebridge.core.western_clock_origin import event_wall_datetime
 from fatebridge.core.western_event_clock import build_event_subject
-from fatebridge.services.snapshot_builders import (
-    format_snapshot_json,
-)
-from fatebridge.services.snapshot_builders import (
-    render_snapshot_text as _render_snapshot_text,
-)
 from fatebridge.utils.errors import handle_calculation_error
 from fatebridge.utils.house_systems import house_system_fields, normalize_house_system
 
@@ -40,7 +34,6 @@ def calculate_election(
     candidate_clock_basis: str = "civil",
     candidate_hour_origin: str = "midnight",
     ut1_source: str = "swiss_delta_t",
-    render_snapshot: bool = True,
 ) -> dict[str, Any]:
     """评估某候选时刻对某类用事（结婚/开业/签约等非医疗活动）是否吉利。"""
     label = "择日"
@@ -95,7 +88,7 @@ def calculate_election(
                 "engine": "fatebridge-offline",
             }
             summary = f"择日（{payload['topic_label']}）候选盘，已核对星体及所选条件。"
-            result = {
+            return {
                 "analysis_type": "西占择日",
                 "engine": "fatebridge-offline",
                 "analysis_context": context,
@@ -104,44 +97,5 @@ def calculate_election(
                 "election": payload,
                 "summary": summary,
             }
-            if render_snapshot:
-                sections = [
-                    ("起盘信息", format_snapshot_json(context)),
-                    (
-                        "历法日期换算",
-                        format_snapshot_json(calendar_conversion),
-                    ),
-                    (
-                        "钟时与物理时刻",
-                        format_snapshot_json(clock_conversion),
-                    ),
-                    (
-                        "候选盘条件",
-                        format_snapshot_json(
-                            {
-                                "condition_policy": payload["condition_policy"],
-                                "moon": payload["moon"],
-                                "ascendant": payload["ascendant"],
-                                "significator": payload["significator"],
-                                "dignity_scope": payload["dignity_scope"],
-                                "axes": payload["axes"],
-                                "calculation_basis": payload["calculation_basis"],
-                                "solar_condition_policy": payload[
-                                    "solar_condition_policy"
-                                ],
-                                "marriage_significators": payload[
-                                    "marriage_significators"
-                                ],
-                            },
-                        ),
-                    ),
-                    ("已见因子", format_snapshot_json(payload["factors"])),
-                    (
-                        "未核算因子",
-                        format_snapshot_json(payload["unresolved_factors"]),
-                    ),
-                ]
-                result["snapshot_text"] = _render_snapshot_text(sections)
-            return result
     except Exception as exc:
         return handle_calculation_error(exc, label)
